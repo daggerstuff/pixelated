@@ -39,23 +39,23 @@ pnpm format:check # formatting
 pnpm lint:quality # code-quality audits (see below)
 ```
 
-> **Do not use** `astro check`, `pnpm typecheck`, or `tsc` — they cause OOM failures.
-> Use `pnpm lint` (type-aware oxlint) instead.
+> **Do not use** `astro check`, `pnpm typecheck`, or `tsc` — they cause OOM
+> failures. Use `pnpm lint` (type-aware oxlint) instead.
 
 ### Merging PRs: never hand-resolve pnpm-lock.yaml
 
 If merging `staging` into a PR branch (or the PR itself) conflicts on
-`pnpm-lock.yaml`, do not read or hand-merge the conflict markers — the
-lockfile is a pure function of the merged manifests. One command:
+`pnpm-lock.yaml`, do not read or hand-merge the conflict markers — the lockfile
+is a pure function of the merged manifests. One command:
 
 ```bash
 make lockfile-resolve   # seeds from MERGE_HEAD, regenerates, stages
 ```
 
 Then commit the merge. For merely-stale lockfiles use
-`pnpm install --lockfile-only`. Full triage in `docs/runbooks.md` §9.
-Keep merge conflicts rare to begin with: merge `staging` into
-long-lived PR branches early and often.
+`pnpm install --lockfile-only`. Full triage in `docs/runbooks.md` §9. Keep merge
+conflicts rare to begin with: merge `staging` into long-lived PR branches early
+and often.
 
 ### Code-quality audits
 
@@ -86,11 +86,10 @@ see the [tech-debt audit](scripts/ci/tech-debt-audit.mjs).
 
 Git hooks run automatically on commit and are managed by
 [Husky](https://typicode.github.io/husky/). Installing dependencies
-(`pnpm install`) runs the `prepare` script, which points
-`core.hooksPath` at `.husky/_` and wires the version-controlled hooks in
-`.husky/`. The tracked hooks delegate to the shared templates in
-`scripts/devops/hooks/templates/`, so the same checks run locally and in
-CI:
+(`pnpm install`) runs the `prepare` script, which points `core.hooksPath` at
+`.husky/_` and wires the version-controlled hooks in `.husky/`. The tracked
+hooks delegate to the shared templates in `scripts/devops/hooks/templates/`, so
+the same checks run locally and in CI:
 
 | Hook                           | Check                                                                                                               |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
@@ -99,8 +98,8 @@ CI:
 | `pre-rebase`                   | Blocks history rewrites of protected branches                                                                       |
 | `post-checkout` / `post-merge` | Re-syncs `pnpm-lock.yaml` / `uv.lock` when they change                                                              |
 
-Never edit `.husky/_/` (generated, git-ignored) or `.git/hooks/` directly;
-edit `.husky/<hook>` or the template in `scripts/devops/hooks/templates/`.
+Never edit `.husky/_/` (generated, git-ignored) or `.git/hooks/` directly; edit
+`.husky/<hook>` or the template in `scripts/devops/hooks/templates/`.
 
 ## Testing
 
@@ -121,12 +120,14 @@ budget (`scripts/ci/test-perf-baseline.json`). It runs in the
 step summary, and uploads the report as an artifact.
 
 Only parallelism-independent metrics are gated — total per-test time
-(`totalTestMs`, ×1.5) and the slowest single test (`maxTestMs`, ×2.0). Wall-clock
-suite time is reported but never gated, because CI runs at `maxWorkers: 1` while
-local runs use 8; per-test durations are stable across both.
+(`totalTestMs`, ×1.5) and the slowest single test (`maxTestMs`, ×2.0).
+Wall-clock suite time is reported but never gated, because CI runs at
+`maxWorkers: 1` while local runs use 8; per-test durations are stable across
+both.
 
 - `pnpm test:perf -- --update` re-pins the baseline after an intentional change.
-- `pnpm test:perf:report` re-renders the report from the last run without rerunning tests.
+- `pnpm test:perf:report` re-renders the report from the last run without
+  rerunning tests.
 
 For Python, `uv run pytest` prints the 25 slowest tests by default
 (`--durations=25` in `pyproject.toml`).
@@ -150,16 +151,16 @@ the same hermetic slice as `pnpm test:perf`, so the numbers are comparable:
 - Flaky tolerance list: a genuinely flaky external dependency can be pinned
   explicitly with `pnpm test:flaky -- --update`, but an empty list is the goal.
 - Coverage: `pnpm test:coverage:gate -- --update` re-pins after adding tests.
-  The global thresholds in `config/vitest.config.ts` target full
-  (non-hermetic) runs; the gate ratchets the hermetic slice.
-  **Keep `@vitest/coverage-v8` on the same major version as `vitest`** — a
-  mismatch silently aborts coverage collection.
+  The global thresholds in `config/vitest.config.ts` target full (non-hermetic)
+  runs; the gate ratchets the hermetic slice. **Keep `@vitest/coverage-v8` on
+  the same major version as `vitest`** — a mismatch silently aborts coverage
+  collection.
 
 ### Build performance
 
 `pnpm build:perf` times the full production build and fails when it exceeds
-1.25× the pinned baseline (`scripts/ci/build-perf-baseline.json`), so
-build-time regressions fail CI instead of silently stretching every run.
+1.25× the pinned baseline (`scripts/ci/build-perf-baseline.json`), so build-time
+regressions fail CI instead of silently stretching every run.
 `pnpm build:perf -- --update` re-pins after a deliberate build-time change.
 
 ### Profiling
@@ -172,8 +173,8 @@ Opt-in CPU profiling exists on both runtimes; both write to the gitignored
 | Web app | `pnpm dev:profile` (dev server under `--cpu-prof --heap-prof`)                                                                                           | `.profiles/node/*.cpuprofile`, `*.heapprofile`                |
 | pe API  | `PE_PROFILING_ENABLED=true uv run uvicorn src.pe.main:app` (every request), or send header `X-Profile-Request: true` for a single request on a debug pod | `.profiles/*.prof` (load with `python -m pstats` or snakeviz) |
 
-The pe middleware adds an `X-Profile` response header naming the dump file;
-it is disabled unless explicitly requested, so normal runs pay no overhead.
+The pe middleware adds an `X-Profile` response header naming the dump file; it
+is disabled unless explicitly requested, so normal runs pay no overhead.
 
 ## Security
 
@@ -182,32 +183,34 @@ it is disabled unless explicitly requested, so normal runs pay no overhead.
 - Report vulnerabilities to
   [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)
 
-All code changes run through the [Security workflow](.github/workflows/security.yml)
-(Trivy image scanning, secret/misconfig scanners), and log payloads are
-scrubbed automatically: the canonical logger redacts sensitive keys
-(passwords, tokens, secrets, session IDs, PHI fields) and masks emails and
-bearer credentials before anything reaches the console — see
+All code changes run through the
+[Security workflow](.github/workflows/security.yml) (Trivy image scanning,
+secret/misconfig scanners), and log payloads are scrubbed automatically: the
+canonical logger redacts sensitive keys (passwords, tokens, secrets, session
+IDs, PHI fields) and masks emails and bearer credentials before anything reaches
+the console — see
 [`apps/web/src/lib/logging/scrub.ts`](apps/web/src/lib/logging/scrub.ts). New
-dependencies are additionally protected by a one-day
-`minimumReleaseAge` in `pnpm-workspace.yaml` (malicious releases are usually
-yanked within hours; day-one exceptions go in `minimumReleaseAgeExclude`).
+dependencies are additionally protected by a one-day `minimumReleaseAge` in
+`pnpm-workspace.yaml` (malicious releases are usually yanked within hours;
+day-one exceptions go in `minimumReleaseAgeExclude`).
 
 ### Feature flags
 
 Flags are declared once in the registry
 ([`apps/web/src/lib/config/feature-flags.ts`](apps/web/src/lib/config/feature-flags.ts))
-with an env override (`FEATURE_*`), a safe default (`false`), and a
-description. Read them with `isFeatureEnabled('flagName')` — never read the env
-var directly at the call site. Malformed env values never enable a flag.
+with an env override (`FEATURE_*`), a safe default (`false`), and a description.
+Read them with `isFeatureEnabled('flagName')` — never read the env var directly
+at the call site. Malformed env values never enable a flag.
 
 `pnpm lint:flags` fails on dead flags: a new registry entry with no references,
-or a flag that loses its last reference. Land registry entry and consumer in
-the same change.
+or a flag that loses its last reference. Land registry entry and consumer in the
+same change.
 
 ### Dependency health
 
-Four ratcheted audits (see the [Quality workflow](.github/workflows/quality.yml));
-each fails only on NEW problems, pinned in `scripts/ci/*-baseline.json`:
+Four ratcheted audits (see the
+[Quality workflow](.github/workflows/quality.yml)); each fails only on NEW
+problems, pinned in `scripts/ci/*-baseline.json`:
 
 | Command                   | Enforces                                                       |
 | ------------------------- | -------------------------------------------------------------- |
@@ -221,14 +224,14 @@ intentional change.
 
 ### Releases and deploys
 
-- **Release notes**: pushing a `vX.Y.Z` tag verifies the tagged revision
-  builds, then creates a GitHub Release with auto-generated notes
+- **Release notes**: pushing a `vX.Y.Z` tag verifies the tagged revision builds,
+  then creates a GitHub Release with auto-generated notes
   ([release workflow](.github/workflows/release-notes.yml)).
 - **Deploys** ([deploy-aws.yml](.github/workflows/deploy-aws.yml)): a successful
   CI run on `staging` deploys to EKS automatically (manual dispatch still
-  works). Rollout status gates, a smoke test through the cluster service, and
-  — if the smoke test fails — an automatic `kubectl rollout undo` of the app
-  and agent deployments back to the previous revision. Deploys serialize via a
+  works). Rollout status gates, a smoke test through the cluster service, and —
+  if the smoke test fails — an automatic `kubectl rollout undo` of the app and
+  agent deployments back to the previous revision. Deploys serialize via a
   `deploy-production` concurrency group.
 
 ## Python Code
@@ -249,17 +252,17 @@ cd apps/web
 PYTHONPATH=.:.. uv run pytest src/pe/tests/ -q
 ```
 
-The `pe` service uses the `PE_` env prefix, so the root `.env`'s
-`DATABASE_URL` does **not** reach it. DB-backed tests need a dedicated
-throwaway postgres. The one-command path is:
+The `pe` service uses the `PE_` env prefix, so the root `.env`'s `DATABASE_URL`
+does **not** reach it. DB-backed tests need a dedicated throwaway postgres. The
+one-command path is:
 
 ```bash
 make pe-test-db   # start (or reuse) the container and apply the schema
 make pe-test-db-down   # stop it
 ```
 
-That wraps the following manual steps (any free port works) — create
-the container and point the tests at it:
+That wraps the following manual steps (any free port works) — create the
+container and point the tests at it:
 
 ```bash
 docker run -d --name pixelated-pe-test-db \
@@ -306,9 +309,8 @@ PYTHONPATH=.:.. PE_DATABASE_URL="postgresql+asyncpg://pe_test@127.0.0.1:5434/pix
   uv run --with alembic --with psycopg2-binary python -m alembic -c /tmp/pe-alembic.ini upgrade head
 ```
 
-The container binds to loopback only and uses `trust` auth — it is a
-throwaway local test database; never expose it or reuse the pattern for
-anything else.
+The container binds to loopback only and uses `trust` auth — it is a throwaway
+local test database; never expose it or reuse the pattern for anything else.
 
 ## AI Assistant Instructions
 

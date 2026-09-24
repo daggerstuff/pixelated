@@ -16,10 +16,10 @@
  */
 function getFrameElement(doc) {
   try {
-    return doc.defaultView?.frameElement ?? null;
+    return doc.defaultView?.frameElement ?? null
   } catch {
     // Ignore the error.
-    return null;
+    return null
   }
 }
 
@@ -29,20 +29,20 @@ function getFrameElement(doc) {
  * element. Without this registry, instances without another reference may be
  * garbage collected.
  */
-const registry = [];
+const registry = []
 
 /**
  * The signal updater for cross-origin intersection. When not null, it means
  * that the polyfill is configured to work in a cross-origin mode.
  * @type {function(DOMRect|ClientRect, DOMRect|ClientRect)}
  */
-let crossOriginUpdater = null;
+let crossOriginUpdater = null
 
 /**
  * The current cross-origin intersection. Only used in the cross-origin mode.
  * @type {DOMRect|ClientRect}
  */
-let crossOriginRect = null;
+let crossOriginRect = null
 
 /**
  * Creates the global IntersectionObserverEntry constructor.
@@ -51,27 +51,29 @@ let crossOriginRect = null;
  * @constructor
  */
 function IntersectionObserverEntry(entry) {
-  this.time = entry.time;
-  this.target = entry.target;
-  this.rootBounds = ensureDOMRect(entry.rootBounds);
-  this.boundingClientRect = ensureDOMRect(entry.boundingClientRect);
-  this.intersectionRect = ensureDOMRect(entry.intersectionRect ?? getEmptyRect());
-  this.isIntersecting = !!entry.intersectionRect;
+  this.time = entry.time
+  this.target = entry.target
+  this.rootBounds = ensureDOMRect(entry.rootBounds)
+  this.boundingClientRect = ensureDOMRect(entry.boundingClientRect)
+  this.intersectionRect = ensureDOMRect(
+    entry.intersectionRect ?? getEmptyRect(),
+  )
+  this.isIntersecting = !!entry.intersectionRect
 
   // Calculates the intersection ratio.
-  const targetRect = this.boundingClientRect;
-  const targetArea = targetRect.width * targetRect.height;
-  const {intersectionRect} = this;
-  const intersectionArea = intersectionRect.width * intersectionRect.height;
+  const targetRect = this.boundingClientRect
+  const targetArea = targetRect.width * targetRect.height
+  const { intersectionRect } = this
+  const intersectionArea = intersectionRect.width * intersectionRect.height
 
   // Sets intersection ratio.
   if (targetArea) {
     // Round the intersection ratio to avoid floating point math issues:
     // https://github.com/w3c/IntersectionObserver/issues/324
-    this.intersectionRatio = Number((intersectionArea / targetArea).toFixed(4));
+    this.intersectionRatio = Number((intersectionArea / targetArea).toFixed(4))
   } else {
     // If area is zero and is intersecting, sets to 1, otherwise to 0
-    this.intersectionRatio = this.isIntersecting ? 1 : 0;
+    this.intersectionRatio = this.isIntersecting ? 1 : 0
   }
 }
 
@@ -85,10 +87,10 @@ function IntersectionObserverEntry(entry) {
  * @constructor
  */
 function IntersectionObserver(callback, opt_options) {
-  const options = opt_options ?? {};
+  const options = opt_options ?? {}
 
   if (typeof callback != 'function') {
-    throw new Error('callback must be a function');
+    throw new Error('callback must be a function')
   }
 
   if (
@@ -96,50 +98,54 @@ function IntersectionObserver(callback, opt_options) {
     options.root.nodeType != 1 &&
     options.root.nodeType != 9
   ) {
-    throw new Error('root must be a Document or Element');
+    throw new Error('root must be a Document or Element')
   }
 
   // Binds and throttles `this._checkForIntersections`.
   this._checkForIntersections = throttle(
-    this._checkForIntersections.bind(this), this.THROTTLE_TIMEOUT);
+    this._checkForIntersections.bind(this),
+    this.THROTTLE_TIMEOUT,
+  )
 
   // Private properties.
-  this._callback = callback;
-  this._observationTargets = [];
-  this._queuedEntries = [];
-  this._rootMarginValues = this._parseRootMargin(options.rootMargin);
+  this._callback = callback
+  this._observationTargets = []
+  this._queuedEntries = []
+  this._rootMarginValues = this._parseRootMargin(options.rootMargin)
 
   // Public properties.
-  this.thresholds = this._initThresholds(options.threshold);
-  this.root = options.root ?? null;
-  this.rootMargin = this._rootMarginValues.map(function (margin) {
-    return margin.value + margin.unit;
-  }).join(' ');
+  this.thresholds = this._initThresholds(options.threshold)
+  this.root = options.root ?? null
+  this.rootMargin = this._rootMarginValues
+    .map(function (margin) {
+      return margin.value + margin.unit
+    })
+    .join(' ')
 
   /** @private @const {!Array<!Document>} */
-  this._monitoringDocuments = [];
+  this._monitoringDocuments = []
   /** @private @const {!Array<function()>} */
-  this._monitoringUnsubscribes = [];
+  this._monitoringUnsubscribes = []
 }
 
 /**
  * The minimum interval within which the document will be checked for
  * intersection changes.
  */
-IntersectionObserver.prototype.THROTTLE_TIMEOUT = 100;
+IntersectionObserver.prototype.THROTTLE_TIMEOUT = 100
 
 /**
  * The frequency in which the polyfill polls for intersection changes.
  * this can be updated on a per instance basis and must be set prior to
  * calling `observe` on the first target.
  */
-IntersectionObserver.prototype.POLL_INTERVAL = null;
+IntersectionObserver.prototype.POLL_INTERVAL = null
 
 /**
  * Use a mutation observer on the root element
  * to detect intersection changes.
  */
-IntersectionObserver.prototype.USE_MUTATION_OBSERVER = true;
+IntersectionObserver.prototype.USE_MUTATION_OBSERVER = true
 
 /**
  * Sets up the polyfill in the cross-origin mode. The result is the
@@ -158,25 +164,28 @@ IntersectionObserver._setupCrossOriginUpdater = function () {
      */
     crossOriginUpdater = function (boundingClientRect, intersectionRect) {
       if (!boundingClientRect || !intersectionRect) {
-        crossOriginRect = getEmptyRect();
+        crossOriginRect = getEmptyRect()
       } else {
-        crossOriginRect = convertFromParentRect(boundingClientRect, intersectionRect);
+        crossOriginRect = convertFromParentRect(
+          boundingClientRect,
+          intersectionRect,
+        )
       }
       registry.forEach(function (observer) {
-        observer._checkForIntersections();
-      });
-    };
+        observer._checkForIntersections()
+      })
+    }
   }
-  return crossOriginUpdater;
-};
+  return crossOriginUpdater
+}
 
 /**
  * Resets the cross-origin mode.
  */
 IntersectionObserver._resetCrossOriginUpdater = function () {
-  crossOriginUpdater = null;
-  crossOriginRect = null;
-};
+  crossOriginUpdater = null
+  crossOriginRect = null
+}
 
 /**
  * Starts observing a target element for intersection changes based on
@@ -184,47 +193,48 @@ IntersectionObserver._resetCrossOriginUpdater = function () {
  * @param {Element} target The DOM element to observe.
  */
 IntersectionObserver.prototype.observe = function (target) {
-  const isTargetAlreadyObserved = this._observationTargets.some(function (item) {
-    return item.element == target;
-  });
+  const isTargetAlreadyObserved = this._observationTargets.some(
+    function (item) {
+      return item.element == target
+    },
+  )
 
   if (isTargetAlreadyObserved) {
-    return;
+    return
   }
 
   if (!(target?.nodeType == 1)) {
-    throw new Error('target must be an Element');
+    throw new Error('target must be an Element')
   }
 
-  this._registerInstance();
-  this._observationTargets.push({ element: target, entry: null });
-  this._monitorIntersections(target.ownerDocument);
-  this._checkForIntersections();
-};
+  this._registerInstance()
+  this._observationTargets.push({ element: target, entry: null })
+  this._monitorIntersections(target.ownerDocument)
+  this._checkForIntersections()
+}
 
 /**
  * Stops observing a target element for intersection changes.
  * @param {Element} target The DOM element to observe.
  */
 IntersectionObserver.prototype.unobserve = function (target) {
-  this._observationTargets =
-    this._observationTargets.filter(function (item) {
-      return item.element != target;
-    });
-  this._unmonitorIntersections(target.ownerDocument);
+  this._observationTargets = this._observationTargets.filter(function (item) {
+    return item.element != target
+  })
+  this._unmonitorIntersections(target.ownerDocument)
   if (this._observationTargets.length == 0) {
-    this._unregisterInstance();
+    this._unregisterInstance()
   }
-};
+}
 
 /**
  * Stops observing all target elements for intersection changes.
  */
 IntersectionObserver.prototype.disconnect = function () {
-  this._observationTargets = [];
-  this._unmonitorAllIntersections();
-  this._unregisterInstance();
-};
+  this._observationTargets = []
+  this._unmonitorAllIntersections()
+  this._unregisterInstance()
+}
 
 /**
  * Returns any queue entries that have not yet been reported to the
@@ -233,10 +243,10 @@ IntersectionObserver.prototype.disconnect = function () {
  * @return {Array} The currently queued entries.
  */
 IntersectionObserver.prototype.takeRecords = function () {
-  const records = this._queuedEntries.slice();
-  this._queuedEntries = [];
-  return records;
-};
+  const records = this._queuedEntries.slice()
+  this._queuedEntries = []
+  return records
+}
 
 /**
  * Accepts the threshold value from the user configuration object and
@@ -248,18 +258,24 @@ IntersectionObserver.prototype.takeRecords = function () {
  * @return {Array} A sorted list of unique and valid threshold values.
  */
 IntersectionObserver.prototype._initThresholds = function (opt_threshold) {
-  let threshold = opt_threshold ?? [0];
+  let threshold = opt_threshold ?? [0]
   if (!Array.isArray(threshold)) {
-    threshold = [threshold];
+    threshold = [threshold]
   }
 
-  return threshold.sort(function(a, b) { return a - b; }).filter(function (t, i, a) {
-    if (typeof t != 'number' || isNaN(t) || t < 0 || t > 1) {
-      throw new Error('threshold must be a number between 0 and 1 inclusively');
-    }
-    return t !== a[i - 1];
-  });
-};
+  return threshold
+    .sort(function (a, b) {
+      return a - b
+    })
+    .filter(function (t, i, a) {
+      if (typeof t != 'number' || isNaN(t) || t < 0 || t > 1) {
+        throw new Error(
+          'threshold must be a number between 0 and 1 inclusively',
+        )
+      }
+      return t !== a[i - 1]
+    })
+}
 
 /**
  * Accepts the rootMargin value from the user configuration object
@@ -273,22 +289,22 @@ IntersectionObserver.prototype._initThresholds = function (opt_threshold) {
  *     value and unit.
  */
 IntersectionObserver.prototype._parseRootMargin = function (opt_rootMargin) {
-  const marginString = opt_rootMargin ?? '0px';
+  const marginString = opt_rootMargin ?? '0px'
   const margins = marginString.split(/\s+/).map(function (margin) {
-    const parts = /^(-?\d*\.?\d+)(px|%)$/.exec(margin);
+    const parts = /^(-?\d*\.?\d+)(px|%)$/.exec(margin)
     if (!parts) {
-      throw new Error('rootMargin must be specified in pixels or percent');
+      throw new Error('rootMargin must be specified in pixels or percent')
     }
-    return { value: parseFloat(parts[1]), unit: parts[2] };
-  });
+    return { value: parseFloat(parts[1]), unit: parts[2] }
+  })
 
   // Handles shorthand.
-  margins[1] = margins[1] || margins[0];
-  margins[2] = margins[2] || margins[0];
-  margins[3] = margins[3] || margins[1];
+  margins[1] = margins[1] || margins[0]
+  margins[2] = margins[2] || margins[0]
+  margins[3] = margins[3] || margins[1]
 
-  return margins;
-};
+  return margins
+}
 
 /**
  * Starts polling for intersection changes if the polling is not already
@@ -297,68 +313,68 @@ IntersectionObserver.prototype._parseRootMargin = function (opt_rootMargin) {
  * @private
  */
 IntersectionObserver.prototype._monitorIntersections = function (doc) {
-  const win = doc.defaultView;
+  const win = doc.defaultView
   if (!win) {
     // Already destroyed.
-    return;
+    return
   }
   if (this._monitoringDocuments.indexOf(doc) != -1) {
     // Already monitoring.
-    return;
+    return
   }
 
   // Private state for monitoring.
-  const callback = this._checkForIntersections;
-  let monitoringInterval = null;
-  let domObserver = null;
+  const callback = this._checkForIntersections
+  let monitoringInterval = null
+  let domObserver = null
 
   // If a poll interval is set, use polling instead of listening to
   // resize and scroll events or DOM mutations.
   if (this.POLL_INTERVAL) {
-    monitoringInterval = win.setInterval(callback, this.POLL_INTERVAL);
+    monitoringInterval = win.setInterval(callback, this.POLL_INTERVAL)
   } else {
-    addEvent(win, 'resize', callback, true);
-    addEvent(doc, 'scroll', callback, true);
+    addEvent(win, 'resize', callback, true)
+    addEvent(doc, 'scroll', callback, true)
     if (this.USE_MUTATION_OBSERVER && 'MutationObserver' in win) {
-      domObserver = new win.MutationObserver(callback);
+      domObserver = new win.MutationObserver(callback)
       domObserver.observe(doc, {
         attributes: true,
         childList: true,
         characterData: true,
-        subtree: true
-      });
+        subtree: true,
+      })
     }
   }
 
-  this._monitoringDocuments.push(doc);
+  this._monitoringDocuments.push(doc)
   this._monitoringUnsubscribes.push(function () {
     // Get the window object again. When a friendly iframe is destroyed, it
     // will be null.
-    const win = doc.defaultView;
+    const win = doc.defaultView
 
     if (win) {
       if (monitoringInterval) {
-        win.clearInterval(monitoringInterval);
+        win.clearInterval(monitoringInterval)
       }
-      removeEvent(win, 'resize', callback, true);
+      removeEvent(win, 'resize', callback, true)
     }
 
-    removeEvent(doc, 'scroll', callback, true);
+    removeEvent(doc, 'scroll', callback, true)
     if (domObserver) {
-      domObserver.disconnect();
+      domObserver.disconnect()
     }
-  });
+  })
 
   // Also monitor the parent.
   const rootDoc =
-    (this.root && (this.root.ownerDocument ?? this.root)) ?? document;
+    (this.root && (this.root.ownerDocument ?? this.root)) ?? document
   if (doc != rootDoc) {
-    const frame = getFrameElement(doc);
+    const frame = getFrameElement(doc)
     if (frame) {
-      this._monitorIntersections(frame.ownerDocument);
+      this._monitorIntersections(frame.ownerDocument)
     }
   }
-};
+}
 
 /**
  * Stops polling for intersection changes.
@@ -366,50 +382,49 @@ IntersectionObserver.prototype._monitorIntersections = function (doc) {
  * @private
  */
 IntersectionObserver.prototype._unmonitorIntersections = function (doc) {
-  const index = this._monitoringDocuments.indexOf(doc);
+  const index = this._monitoringDocuments.indexOf(doc)
   if (index == -1) {
-    return;
+    return
   }
 
   const rootDoc =
-    (this.root && (this.root.ownerDocument ?? this.root)) ?? document;
+    (this.root && (this.root.ownerDocument ?? this.root)) ?? document
 
   // Check if any dependent targets are still remaining.
-  const hasDependentTargets =
-    this._observationTargets.some(function (item) {
-      let itemDoc = item.element.ownerDocument;
-      // Target is in this context.
+  const hasDependentTargets = this._observationTargets.some(function (item) {
+    let itemDoc = item.element.ownerDocument
+    // Target is in this context.
+    if (itemDoc == doc) {
+      return true
+    }
+    // Target is nested in this context.
+    while (itemDoc && itemDoc != rootDoc) {
+      const frame = getFrameElement(itemDoc)
+      itemDoc = frame?.ownerDocument
       if (itemDoc == doc) {
-        return true;
+        return true
       }
-      // Target is nested in this context.
-      while (itemDoc && itemDoc != rootDoc) {
-        const frame = getFrameElement(itemDoc);
-        itemDoc = frame?.ownerDocument;
-        if (itemDoc == doc) {
-          return true;
-        }
-      }
-      return false;
-    });
+    }
+    return false
+  })
   if (hasDependentTargets) {
-    return;
+    return
   }
 
   // Unsubscribe.
-  const unsubscribe = this._monitoringUnsubscribes[index];
-  this._monitoringDocuments.splice(index, 1);
-  this._monitoringUnsubscribes.splice(index, 1);
-  unsubscribe();
+  const unsubscribe = this._monitoringUnsubscribes[index]
+  this._monitoringDocuments.splice(index, 1)
+  this._monitoringUnsubscribes.splice(index, 1)
+  unsubscribe()
 
   // Also unmonitor the parent.
   if (doc != rootDoc) {
-    const frame = getFrameElement(doc);
+    const frame = getFrameElement(doc)
     if (frame) {
-      this._unmonitorIntersections(frame.ownerDocument);
+      this._unmonitorIntersections(frame.ownerDocument)
     }
   }
-};
+}
 
 /**
  * Stops polling for intersection changes.
@@ -417,13 +432,13 @@ IntersectionObserver.prototype._unmonitorIntersections = function (doc) {
  * @private
  */
 IntersectionObserver.prototype._unmonitorAllIntersections = function () {
-  const unsubscribes = this._monitoringUnsubscribes.slice();
-  this._monitoringDocuments.length = 0;
-  this._monitoringUnsubscribes.length = 0;
+  const unsubscribes = this._monitoringUnsubscribes.slice()
+  this._monitoringDocuments.length = 0
+  this._monitoringUnsubscribes.length = 0
   for (const unsubscribe of unsubscribes) {
-    unsubscribe();
+    unsubscribe()
   }
-};
+}
 
 /**
  * Scans each observation target for intersection changes and adds them
@@ -434,53 +449,54 @@ IntersectionObserver.prototype._unmonitorAllIntersections = function () {
 IntersectionObserver.prototype._checkForIntersections = function () {
   if (!this.root && crossOriginUpdater && !crossOriginRect) {
     // Cross origin monitoring, but no initial data available yet.
-    return;
+    return
   }
 
-  const rootIsInDom = this._rootIsInDom();
-  const rootRect = rootIsInDom ? this._getRootRect() : getEmptyRect();
+  const rootIsInDom = this._rootIsInDom()
+  const rootRect = rootIsInDom ? this._getRootRect() : getEmptyRect()
 
   this._observationTargets.forEach(function (item) {
-    const target = item.element;
-    const targetRect = getBoundingClientRect(target);
-    const rootContainsTarget = this._rootContainsTarget(target);
-    const oldEntry = item.entry;
-    const intersectionRect = rootIsInDom && rootContainsTarget &&
-      this._computeTargetAndRootIntersection(target, targetRect, rootRect);
+    const target = item.element
+    const targetRect = getBoundingClientRect(target)
+    const rootContainsTarget = this._rootContainsTarget(target)
+    const oldEntry = item.entry
+    const intersectionRect =
+      rootIsInDom &&
+      rootContainsTarget &&
+      this._computeTargetAndRootIntersection(target, targetRect, rootRect)
 
-    let rootBounds = null;
+    let rootBounds = null
     if (!this._rootContainsTarget(target)) {
-      rootBounds = getEmptyRect();
+      rootBounds = getEmptyRect()
     } else if (!crossOriginUpdater || this.root) {
-      rootBounds = rootRect;
+      rootBounds = rootRect
     }
 
-    const newEntry = item.entry = new IntersectionObserverEntry({
+    const newEntry = (item.entry = new IntersectionObserverEntry({
       time: now(),
       target: target,
       boundingClientRect: targetRect,
       rootBounds: rootBounds,
-      intersectionRect: intersectionRect
-    });
+      intersectionRect: intersectionRect,
+    }))
 
     if (!oldEntry) {
-      this._queuedEntries.push(newEntry);
+      this._queuedEntries.push(newEntry)
     } else if (rootIsInDom && rootContainsTarget) {
       // If the new entry intersection ratio has crossed any of the
       // thresholds, add a new entry.
       if (this._hasCrossedThreshold(oldEntry, newEntry)) {
-        this._queuedEntries.push(newEntry);
+        this._queuedEntries.push(newEntry)
       }
+    } else if (oldEntry?.isIntersecting) {
+      this._queuedEntries.push(newEntry)
     }
-    else if (oldEntry?.isIntersecting) {
-      this._queuedEntries.push(newEntry);
-    }
-  }, this);
+  }, this)
 
   if (this._queuedEntries.length) {
-    this._callback(this.takeRecords(), this);
+    this._callback(this.takeRecords(), this)
   }
-};
+}
 
 /**
  * Accepts a target and root rect computes the intersection between then
@@ -493,83 +509,90 @@ IntersectionObserver.prototype._checkForIntersections = function () {
  *     intersection is found.
  * @private
  */
-IntersectionObserver.prototype._computeTargetAndRootIntersection =
-   function (target, targetRect, rootRect) {
-     // If the element isn't displayed, an intersection can't happen.
-     if (window.getComputedStyle(target).display == 'none') {
-       return;
-     }
+IntersectionObserver.prototype._computeTargetAndRootIntersection = function (
+  target,
+  targetRect,
+  rootRect,
+) {
+  // If the element isn't displayed, an intersection can't happen.
+  if (window.getComputedStyle(target).display == 'none') {
+    return
+  }
 
-     let intersectionRect = targetRect;
-     let parent = getParentNode(target);
-     let atRoot = false;
-   
-     while (!atRoot && parent) {
-       let parentRect = null;
-       const parentComputedStyle = parent.nodeType == 1 ?
-         window.getComputedStyle(parent) : {};
+  let intersectionRect = targetRect
+  let parent = getParentNode(target)
+  let atRoot = false
 
-       // If the parent isn't displayed, an intersection can't happen.
-       if (parentComputedStyle.display == 'none') {
-         return null;
-       }
+  while (!atRoot && parent) {
+    let parentRect = null
+    const parentComputedStyle =
+      parent.nodeType == 1 ? window.getComputedStyle(parent) : {}
 
-       if (parent == this.root || parent.nodeType == /* DOCUMENT */ 9) {
-         atRoot = true;
-         if (parent == this.root || parent == document) {
-           if (crossOriginUpdater && !this.root) {
-             if (!crossOriginRect ||
-               crossOriginRect.width == 0 && crossOriginRect.height == 0) {
-               // A 0-size cross-origin intersection means no-intersection.
-               parent = null;
-               parentRect = null;
-               intersectionRect = null;
-             } else {
-               parentRect = crossOriginRect;
-             }
-           } else {
-             parentRect = rootRect;
-           }
-         } else {
-           // Check if there's a frame that can be navigated to.
-           const frame = getParentNode(parent);
-           const frameRect = frame && getBoundingClientRect(frame);
-           const frameIntersect =
-             frame &&
-             this._computeTargetAndRootIntersection(frame, frameRect, rootRect);
-           if (frameRect && frameIntersect) {
-             parent = frame;
-             parentRect = convertFromParentRect(frameRect, frameIntersect);
-           } else {
-             parent = null;
-             intersectionRect = null;
-           }
-         }
-       } else {
-         // If the element has a non-visible overflow, and it's not the <body>
-         // or <html> element, update the intersection rect.
-         // Note: <body> and <html> cannot be clipped to a rect that's not also
-         // the document rect, so no need to compute a new intersection.
-         const doc = parent.ownerDocument;
-         if (parent != doc.body &&
-           parent != doc.documentElement &&
-           parentComputedStyle.overflow != 'visible') {
-           parentRect = getBoundingClientRect(parent);
-         }
-       }
+    // If the parent isn't displayed, an intersection can't happen.
+    if (parentComputedStyle.display == 'none') {
+      return null
+    }
 
-       // If either of the above conditionals set a new parentRect,
-       // calculate new intersection data.
-       if (parentRect) {
-         intersectionRect = computeRectIntersection(parentRect, intersectionRect);
-       }
-       if (!intersectionRect) {
-         break;
-       }
-       parent = parent && getParentNode(parent);
-     }
-     return intersectionRect;
-   };
+    if (parent == this.root || parent.nodeType == /* DOCUMENT */ 9) {
+      atRoot = true
+      if (parent == this.root || parent == document) {
+        if (crossOriginUpdater && !this.root) {
+          if (
+            !crossOriginRect ||
+            (crossOriginRect.width == 0 && crossOriginRect.height == 0)
+          ) {
+            // A 0-size cross-origin intersection means no-intersection.
+            parent = null
+            parentRect = null
+            intersectionRect = null
+          } else {
+            parentRect = crossOriginRect
+          }
+        } else {
+          parentRect = rootRect
+        }
+      } else {
+        // Check if there's a frame that can be navigated to.
+        const frame = getParentNode(parent)
+        const frameRect = frame && getBoundingClientRect(frame)
+        const frameIntersect =
+          frame &&
+          this._computeTargetAndRootIntersection(frame, frameRect, rootRect)
+        if (frameRect && frameIntersect) {
+          parent = frame
+          parentRect = convertFromParentRect(frameRect, frameIntersect)
+        } else {
+          parent = null
+          intersectionRect = null
+        }
+      }
+    } else {
+      // If the element has a non-visible overflow, and it's not the <body>
+      // or <html> element, update the intersection rect.
+      // Note: <body> and <html> cannot be clipped to a rect that's not also
+      // the document rect, so no need to compute a new intersection.
+      const doc = parent.ownerDocument
+      if (
+        parent != doc.body &&
+        parent != doc.documentElement &&
+        parentComputedStyle.overflow != 'visible'
+      ) {
+        parentRect = getBoundingClientRect(parent)
+      }
+    }
+
+    // If either of the above conditionals set a new parentRect,
+    // calculate new intersection data.
+    if (parentRect) {
+      intersectionRect = computeRectIntersection(parentRect, intersectionRect)
+    }
+    if (!intersectionRect) {
+      break
+    }
+    parent = parent && getParentNode(parent)
+  }
+  return intersectionRect
+}
 
 /**
  * Returns the root rect after being expanded by the rootMargin value.
@@ -577,25 +600,25 @@ IntersectionObserver.prototype._computeTargetAndRootIntersection =
  * @private
  */
 IntersectionObserver.prototype._getRootRect = function () {
-  let rootRect;
+  let rootRect
   if (this.root && !isDoc(this.root)) {
-    rootRect = getBoundingClientRect(this.root);
+    rootRect = getBoundingClientRect(this.root)
   } else {
     // Use <html>/<body> instead of window since scroll bars affect size.
-    const doc = isDoc(this.root) ? this.root : document;
-    const html = doc.documentElement;
-    const {body} = doc;
+    const doc = isDoc(this.root) ? this.root : document
+    const html = doc.documentElement
+    const { body } = doc
     rootRect = {
       top: 0,
       left: 0,
       right: html.clientWidth ?? body.clientWidth,
       width: html.clientWidth ?? body.clientWidth,
       bottom: html.clientHeight ?? body.clientHeight,
-      height: html.clientHeight ?? body.clientHeight
-    };
+      height: html.clientHeight ?? body.clientHeight,
+    }
   }
-  return this._expandRectByRootMargin(rootRect);
-};
+  return this._expandRectByRootMargin(rootRect)
+}
 
 /**
  * Accepts a rect and expands it by the rootMargin value.
@@ -605,20 +628,21 @@ IntersectionObserver.prototype._getRootRect = function () {
  */
 IntersectionObserver.prototype._expandRectByRootMargin = function (rect) {
   const margins = this._rootMarginValues.map(function (margin, i) {
-    return margin.unit == 'px' ? margin.value :
-      margin.value * (i % 2 ? rect.width : rect.height) / 100;
-  });
+    return margin.unit == 'px'
+      ? margin.value
+      : (margin.value * (i % 2 ? rect.width : rect.height)) / 100
+  })
   const newRect = {
     top: rect.top - margins[0],
     right: rect.right + margins[1],
     bottom: rect.bottom + margins[2],
-    left: rect.left - margins[3]
-  };
-  newRect.width = newRect.right - newRect.left;
-  newRect.height = newRect.bottom - newRect.top;
+    left: rect.left - margins[3],
+  }
+  newRect.width = newRect.right - newRect.left
+  newRect.height = newRect.bottom - newRect.top
 
-  return newRect;
-};
+  return newRect
+}
 
 /**
  * Accepts an old and new entry and returns true if at least one of the
@@ -630,31 +654,36 @@ IntersectionObserver.prototype._expandRectByRootMargin = function (rect) {
  * @return {boolean} Returns true if a any threshold has been crossed.
  * @private
  */
-IntersectionObserver.prototype._hasCrossedThreshold =
-  function (oldEntry, newEntry) {
+IntersectionObserver.prototype._hasCrossedThreshold = function (
+  oldEntry,
+  newEntry,
+) {
+  // To make comparing easier, an entry that has a ratio of 0
+  // but does not actually intersect is given a value of -1
+  const oldRatio = oldEntry?.isIntersecting
+    ? oldEntry.intersectionRatio || 0
+    : -1
+  const newRatio = newEntry.isIntersecting
+    ? newEntry.intersectionRatio || 0
+    : -1
 
-    // To make comparing easier, an entry that has a ratio of 0
-    // but does not actually intersect is given a value of -1
-    const oldRatio = oldEntry?.isIntersecting ?
-      oldEntry.intersectionRatio || 0 : -1;
-    const newRatio = newEntry.isIntersecting ?
-      newEntry.intersectionRatio || 0 : -1;
+  // Ignore unchanged ratios
+  if (oldRatio === newRatio) {
+    return
+  }
 
-    // Ignore unchanged ratios
-    if (oldRatio === newRatio) {
-      return;
+  for (const threshold of this.thresholds) {
+    // Return true if an entry matches a threshold or if the new ratio
+    // and the old ratio are on the opposite sides of a threshold.
+    if (
+      threshold == oldRatio ||
+      threshold == newRatio ||
+      threshold < oldRatio !== threshold < newRatio
+    ) {
+      return true
     }
-
-    for (const threshold of this.thresholds) {
-
-      // Return true if an entry matches a threshold or if the new ratio
-      // and the old ratio are on the opposite sides of a threshold.
-      if (threshold == oldRatio || threshold == newRatio ||
-        threshold < oldRatio !== threshold < newRatio) {
-        return true;
-      }
-    }
-  };
+  }
+}
 
 /**
  * Returns whether or not the root element is an element and is in the DOM.
@@ -662,8 +691,8 @@ IntersectionObserver.prototype._hasCrossedThreshold =
  * @private
  */
 IntersectionObserver.prototype._rootIsInDom = function () {
-  return !this.root || containsDeep(document, this.root);
-};
+  return !this.root || containsDeep(document, this.root)
+}
 
 /**
  * Returns whether or not the target element is a child of root.
@@ -673,12 +702,12 @@ IntersectionObserver.prototype._rootIsInDom = function () {
  */
 IntersectionObserver.prototype._rootContainsTarget = function (target) {
   const rootDoc =
-    (this.root && (this.root.ownerDocument ?? this.root)) ?? document;
+    (this.root && (this.root.ownerDocument ?? this.root)) ?? document
   return (
     containsDeep(rootDoc, target) &&
     (!this.root || rootDoc == target.ownerDocument)
-  );
-};
+  )
+}
 
 /**
  * Adds the instance to the global IntersectionObserver registry if it isn't
@@ -687,20 +716,20 @@ IntersectionObserver.prototype._rootContainsTarget = function (target) {
  */
 IntersectionObserver.prototype._registerInstance = function () {
   if (!registry.includes(this)) {
-    registry.push(this);
+    registry.push(this)
   }
-};
+}
 
 /**
  * Removes the instance from the global IntersectionObserver registry.
  * @private
  */
 IntersectionObserver.prototype._unregisterInstance = function () {
-  const index = registry.indexOf(this);
+  const index = registry.indexOf(this)
   if (index != -1) {
-    registry.splice(index, 1);
+    registry.splice(index, 1)
   }
-};
+}
 
 /**
  * Returns the result of the performance.now() method or null in browsers
@@ -708,7 +737,7 @@ IntersectionObserver.prototype._unregisterInstance = function () {
  * @return {number} The elapsed time since the page was requested.
  */
 function now() {
-  return window.performance && performance.now?.();
+  return window.performance && performance.now?.()
 }
 
 /**
@@ -720,13 +749,13 @@ function now() {
  * @return {Function} The throttled function.
  */
 function throttle(fn, timeout) {
-  let timer = null;
+  let timer = null
   return function () {
     timer ??= setTimeout(function () {
-        fn();
-        timer = null;
-      }, timeout);
-  };
+      fn()
+      timer = null
+    }, timeout)
+  }
 }
 
 /**
@@ -739,10 +768,9 @@ function throttle(fn, timeout) {
  */
 function addEvent(node, event, fn, opt_useCapture) {
   if (typeof node.addEventListener == 'function') {
-    node.addEventListener(event, fn, opt_useCapture || false);
-  }
-  else if (typeof node.attachEvent == 'function') {
-    node.attachEvent('on' + event, fn);
+    node.addEventListener(event, fn, opt_useCapture || false)
+  } else if (typeof node.attachEvent == 'function') {
+    node.attachEvent('on' + event, fn)
   }
 }
 
@@ -756,10 +784,9 @@ function addEvent(node, event, fn, opt_useCapture) {
  */
 function removeEvent(node, event, fn, opt_useCapture) {
   if (typeof node.removeEventListener == 'function') {
-    node.removeEventListener(event, fn, opt_useCapture || false);
-  }
-  else if (typeof node.detachEvent == 'function') {
-    node.detachEvent('on' + event, fn);
+    node.removeEventListener(event, fn, opt_useCapture || false)
+  } else if (typeof node.detachEvent == 'function') {
+    node.detachEvent('on' + event, fn)
   }
 }
 
@@ -771,21 +798,25 @@ function removeEvent(node, event, fn, opt_useCapture) {
  *     intersection is found.
  */
 function computeRectIntersection(rect1, rect2) {
-  const top = Math.max(rect1.top, rect2.top);
-  const bottom = Math.min(rect1.bottom, rect2.bottom);
-  const left = Math.max(rect1.left, rect2.left);
-  const right = Math.min(rect1.right, rect2.right);
-  const width = right - left;
-  const height = bottom - top;
+  const top = Math.max(rect1.top, rect2.top)
+  const bottom = Math.min(rect1.bottom, rect2.bottom)
+  const left = Math.max(rect1.left, rect2.left)
+  const right = Math.min(rect1.right, rect2.right)
+  const width = right - left
+  const height = bottom - top
 
-  return (width >= 0 && height >= 0) && {
-    top: top,
-    bottom: bottom,
-    left: left,
-    right: right,
-    width: width,
-    height: height
-  } || null;
+  return (
+    (width >= 0 &&
+      height >= 0 && {
+        top: top,
+        bottom: bottom,
+        left: left,
+        right: right,
+        width: width,
+        height: height,
+      }) ||
+    null
+  )
 }
 
 /**
@@ -794,17 +825,17 @@ function computeRectIntersection(rect1, rect2) {
  * @return {DOMRect|ClientRect} The (possibly shimmed) rect of the element.
  */
 function getBoundingClientRect(el) {
-  let rect;
+  let rect
 
   try {
-    rect = el.getBoundingClientRect();
+    rect = el.getBoundingClientRect()
   } catch (err) {
     // Ignore Windows 7 IE11 "Unspecified error"
     // https://github.com/w3c/IntersectionObserver/pull/205
   }
 
   if (!rect) {
-    return getEmptyRect();
+    return getEmptyRect()
   }
 
   // Older IE
@@ -815,10 +846,10 @@ function getBoundingClientRect(el) {
       bottom: rect.bottom,
       left: rect.left,
       width: rect.right - rect.left,
-      height: rect.bottom - rect.top
-    };
+      height: rect.bottom - rect.top,
+    }
   }
-  return rect;
+  return rect
 }
 
 /**
@@ -833,8 +864,8 @@ function getEmptyRect() {
     left: 0,
     right: 0,
     width: 0,
-    height: 0
-  };
+    height: 0,
+  }
 }
 
 /**
@@ -847,7 +878,7 @@ function getEmptyRect() {
 function ensureDOMRect(rect) {
   // A `DOMRect` object has `x` and `y` fields.
   if (!rect || 'x' in rect) {
-    return rect;
+    return rect
   }
   // A IE's `ClientRect` type does not have `x` and `y`. The same is the case
   // for internally calculated Rect objects. For the purposes of
@@ -861,8 +892,8 @@ function ensureDOMRect(rect) {
     x: rect.left,
     right: rect.right,
     width: rect.width,
-    height: rect.height
-  };
+    height: rect.height,
+  }
 }
 
 /**
@@ -873,16 +904,16 @@ function ensureDOMRect(rect) {
  * @return {ClientRect} The local root bounding rect for the parent's children.
  */
 function convertFromParentRect(parentBoundingRect, parentIntersectionRect) {
-  const top = parentIntersectionRect.top - parentBoundingRect.top;
-  const left = parentIntersectionRect.left - parentBoundingRect.left;
+  const top = parentIntersectionRect.top - parentBoundingRect.top
+  const left = parentIntersectionRect.left - parentBoundingRect.left
   return {
     top: top,
     left: left,
     height: parentIntersectionRect.height,
     width: parentIntersectionRect.width,
     bottom: top + parentIntersectionRect.height,
-    right: left + parentIntersectionRect.width
-  };
+    right: left + parentIntersectionRect.width,
+  }
 }
 
 /**
@@ -893,15 +924,15 @@ function convertFromParentRect(parentBoundingRect, parentIntersectionRect) {
  * @return {boolean} True if the parent node contains the child node.
  */
 function containsDeep(parent, child) {
-  let node = child;
+  let node = child
   while (node) {
     if (node == parent) {
-      return true;
+      return true
     }
 
-    node = getParentNode(node);
+    node = getParentNode(node)
   }
-  return false;
+  return false
 }
 
 /**
@@ -911,11 +942,11 @@ function containsDeep(parent, child) {
  * @return {Node|null} The parent node or null if no parent exists.
  */
 function getParentNode(node) {
-  let parent = node.parentNode;
+  let parent = node.parentNode
 
   if (node.nodeType == /* DOCUMENT */ 9 && node != document) {
     // If this node is a document node, look for the embedding frame.
-    return getFrameElement(node);
+    return getFrameElement(node)
   }
 
   // If the parent has element that is assigned through shadow root slot
@@ -925,10 +956,10 @@ function getParentNode(node) {
 
   if (parent?.nodeType == 11 && parent.host) {
     // If the parent is a shadow root, return the host element.
-    return parent.host;
+    return parent.host
   }
 
-  return parent;
+  return parent
 }
 
 /**
@@ -937,39 +968,42 @@ function getParentNode(node) {
  * @returns {boolean}
  */
 function isDoc(node) {
-  return node?.nodeType === 9;
+  return node?.nodeType === 9
 }
 
 // Wrap the entire polyfill in an IIFE to avoid polluting global scope
-(function () {
-  'use strict';
+;(function () {
+  'use strict'
 
   // Exit early if we're not running in a browser.
   if (typeof window !== 'object') {
-    return;
+    return
   }
 
   // Exit early if all IntersectionObserver and IntersectionObserverEntry
   // features are natively supported.
-  if ('IntersectionObserver' in window &&
+  if (
+    'IntersectionObserver' in window &&
     'IntersectionObserverEntry' in window &&
-    'intersectionRatio' in window.IntersectionObserverEntry.prototype) {
-
+    'intersectionRatio' in window.IntersectionObserverEntry.prototype
+  ) {
     // Minimal polyfill for Edge 15's lack of `isIntersecting`
     // See: https://github.com/w3c/IntersectionObserver/issues/211
     if (!('isIntersecting' in window.IntersectionObserverEntry.prototype)) {
-      Object.defineProperty(window.IntersectionObserverEntry.prototype,
-        'isIntersecting', {
-        get: function () {
-          return this.intersectionRatio > 0;
-        }
-      });
+      Object.defineProperty(
+        window.IntersectionObserverEntry.prototype,
+        'isIntersecting',
+        {
+          get: function () {
+            return this.intersectionRatio > 0
+          },
+        },
+      )
     }
-    return;
+    return
   }
 
   // Exposes the constructors globally.
-  window.IntersectionObserver = IntersectionObserver;
-  window.IntersectionObserverEntry = IntersectionObserverEntry;
-
-})();
+  window.IntersectionObserver = IntersectionObserver
+  window.IntersectionObserverEntry = IntersectionObserverEntry
+})()

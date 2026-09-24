@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import '@testing-library/jest-dom'
 import { DashboardErrorBoundary } from './DashboardErrorBoundary'
+
+import '@testing-library/jest-dom'
 
 function ThrowingDashboard(): never {
   throw new Error('header exploded')
@@ -25,11 +26,11 @@ describe('DashboardErrorBoundary', () => {
         <ThrowingDashboard />
       </DashboardErrorBoundary>,
     )
-    expect(
-      screen.getByText('Dashboard failed to render'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('Dashboard failed to render')).toBeInTheDocument()
     expect(screen.getByText('header exploded')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /reload dashboard/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /reload dashboard/i }),
+    ).toBeInTheDocument()
     spy.mockRestore()
   })
 })

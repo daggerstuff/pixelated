@@ -85,7 +85,7 @@ export const toast = {
           <div className="flex-1">{message}</div>
           <button
             onClick={() => hotToast.dismiss(t.id)}
-            className="hover:bg-gray-100 dark:hover:bg-gray-700 focus-visible:ring-ring ml-4 rounded-full p-1 focus:outline-none focus-visible:ring-2"
+            className="hover:bg-gray-100 dark:hover:bg-gray-700 ml-4 rounded-full p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Dismiss"
           >
             <IconX size={16} className="text-gray-500" aria-hidden="true" />

@@ -140,7 +140,8 @@ jobs:
       - name: Check formatting
         continue-on-error: true
         env:
-          PR_BASE_SHA: ${{ github.event_name == 'pull_request' &&
+          PR_BASE_SHA:
+            ${{ github.event_name == 'pull_request' &&
             github.event.pull_request.base.sha || '' }}
         run: |
           bash scripts/ci/get-changed-files.sh /tmp/changed_files.txt
@@ -155,7 +156,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     needs: [security-scan, code-quality]
-    if: ${{ needs.security-scan.result == 'success' && needs.code-quality.result
+    if:
+      ${{ needs.security-scan.result == 'success' && needs.code-quality.result
       == 'success' }}
     services:
       postgres:
@@ -335,7 +337,8 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{
+          key:
+            ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{
             hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-

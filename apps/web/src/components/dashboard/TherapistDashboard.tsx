@@ -61,7 +61,7 @@ export function TherapistDashboard({
       {/* Skip to main content link for keyboard users */}
       <a
         href="#main-content"
-        className="focus:ring-primary sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-background focus:p-4 focus:text-foreground focus:underline focus:ring-2"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-background focus:p-4 focus:text-foreground focus:underline focus:ring-2 focus:ring-primary"
         onClick={(e) => {
           e.preventDefault()
           const mainContent = document.getElementById('main-content')
@@ -86,7 +86,7 @@ export function TherapistDashboard({
       >
         {/* Session Controls */}
         <aside
-          className="bg-muted col-span-1 flex flex-col gap-4 rounded-md p-4"
+          className="col-span-1 flex flex-col gap-4 rounded-md bg-muted p-4"
           aria-label="Session Controls"
           role="region"
           tabIndex={0}
@@ -99,7 +99,7 @@ export function TherapistDashboard({
 
         {/* Analytics Charts */}
         <section
-          className="bg-muted col-span-1 flex flex-col gap-4 rounded-md p-4"
+          className="col-span-1 flex flex-col gap-4 rounded-md bg-muted p-4"
           aria-label="Analytics Charts"
           role="region"
           tabIndex={0}
@@ -110,7 +110,7 @@ export function TherapistDashboard({
 
         {/* Progress Widgets */}
         <section
-          className="bg-muted col-span-1 flex flex-col gap-4 rounded-md p-4"
+          className="col-span-1 flex flex-col gap-4 rounded-md bg-muted p-4"
           aria-label="Progress Tracking Widgets"
           role="region"
           tabIndex={0}
@@ -124,7 +124,7 @@ export function TherapistDashboard({
         {/* Therapy Progress Charts - Full width on larger screens */}
         {therapistData && (
           <section
-            className="bg-muted flex flex-col gap-4 rounded-md p-4 md:col-span-2 xl:col-span-3"
+            className="flex flex-col gap-4 rounded-md bg-muted p-4 md:col-span-2 xl:col-span-3"
             aria-label="Therapy Progress Charts"
             role="region"
             tabIndex={0}

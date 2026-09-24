@@ -36,7 +36,9 @@ jobs:
           sudo mv /tmp/kubectl /usr/local/bin/kubectl
 
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --region "$AWS_REGION" --name "$EKS_CLUSTER_NAME"
+        run:
+          aws eks update-kubeconfig --region "$AWS_REGION" --name
+          "$EKS_CLUSTER_NAME"
 
       - name: Collect cluster diagnostics
         run: |

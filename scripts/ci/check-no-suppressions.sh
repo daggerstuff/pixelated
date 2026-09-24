@@ -119,7 +119,16 @@ if [ "$#" -gt 0 ]; then
         ext="${arg##*.}"
         for e in "${SCAN_EXTENSIONS[@]}"; do
             if [ "$ext" = "$e" ]; then
-                CLI_FILES+=("$arg")
+                excluded=false
+                for excl in "${EXCLUDE_GLOBS[@]}"; do
+                    if [[ "$arg" == $excl ]] || [[ "/$arg" == $excl ]] || [[ "$arg" == *${excl#\*} ]]; then
+                        excluded=true
+                        break
+                    fi
+                done
+                if [ "$excluded" = "false" ]; then
+                    CLI_FILES+=("$arg")
+                fi
                 break
             fi
         done

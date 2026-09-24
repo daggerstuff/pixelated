@@ -50,7 +50,10 @@ function isSensitiveKey(key: string): boolean {
 function scrubString(value: string): string {
   return value
     .replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, '[REDACTED-EMAIL]')
-    .replace(/\b(?:bearer|basic)\s+[a-z0-9\-._~+/]+=*/gi, '[REDACTED-CREDENTIAL]')
+    .replace(
+      /\b(?:bearer|basic)\s+[a-z0-9\-._~+/]+=*/gi,
+      '[REDACTED-CREDENTIAL]',
+    )
 }
 
 const SCRUB_DEPTH_LIMIT = 4

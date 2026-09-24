@@ -5,18 +5,18 @@ import { scrub } from '../scrub'
 describe('log scrubbing', () => {
   it('redacts sensitive keys regardless of case or separator style', () => {
     const input = {
-      password: 'hunter2',
-      accessToken: 'abc',
-      refreshToken: 'abc',
-      api_key: 'k',
-      APIKEY: 'k',
-      authorization: 'Bearer x',
+      'password': 'hunter2',
+      'accessToken': 'abc',
+      'refreshToken': 'abc',
+      'api_key': 'k',
+      'APIKEY': 'k',
+      'authorization': 'Bearer x',
       'session-id': 's',
-      userJWT: 'j',
-      patient_name: 'Alice',
-      dateOfBirth: '2000-01-01',
-      safe: 'value',
-      count: 3,
+      'userJWT': 'j',
+      'patient_name': 'Alice',
+      'dateOfBirth': '2000-01-01',
+      'safe': 'value',
+      'count': 3,
     }
     const out = scrub(input) as Record<string, unknown>
     for (const key of Object.keys(input)) {
@@ -30,7 +30,9 @@ describe('log scrubbing', () => {
   it('masks emails and bearer credentials inside string values', () => {
     // Fake fixture values only: the .invalid TLD is RFC 2606 reserved, and the
     // token is a literal placeholder. This test exists to prove they get masked.
-    const out = scrub('login failed for user@example.invalid with Bearer placeholder-credential-value') as string
+    const out = scrub(
+      'login failed for user@example.invalid with Bearer placeholder-credential-value',
+    ) as string
     expect(out).not.toContain('user@example.invalid')
     expect(out).not.toContain('placeholder-credential-value')
     expect(out).toContain('[REDACTED-EMAIL]')
@@ -40,7 +42,9 @@ describe('log scrubbing', () => {
   it('scrubs nested objects and arrays without mutating the input', () => {
     const input = { outer: { inner: [{ secretToken: 'x' }] }, list: ['ok'] }
     const snapshot = JSON.stringify(input)
-    const out = scrub(input) as { outer: { inner: Array<{ secretToken: string }> } }
+    const out = scrub(input) as {
+      outer: { inner: Array<{ secretToken: string }> }
+    }
     expect(out.outer.inner[0].secretToken).toBe('[REDACTED]')
     expect(JSON.stringify(input)).toBe(snapshot)
   })

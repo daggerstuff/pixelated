@@ -1,11 +1,11 @@
 /**
  * EdgeComputingManager.codegen.ts
- * 
+ *
  * Code generation functions for edge deployment scripts.
  * Extracted from EdgeComputingManager.ts for modularity.
  */
 
-import type { EdgeLocation } from './EdgeComputingManager.types';
+import type { EdgeLocation } from './EdgeComputingManager.types'
 
 /**
  * Generate Cloudflare Worker script
@@ -111,7 +111,7 @@ export default {
     }
   }
 };
-    `.trim();
+    `.trim()
 }
 
 /**
@@ -244,7 +244,7 @@ function addEdgeHeaders(response, location, threatCheck, biasCheck, cacheStatus)
   response.headers['x-cache-status'] = [{ key: 'X-Cache-Status', value: cacheStatus }];
   return response;
 }
-    `.trim();
+    `.trim()
 }
 
 /**
@@ -381,7 +381,7 @@ public class BiasCheckResult
   public double Score { get; set; }
   public List<string> Details { get; set; }
 }
-    `.trim();
+    `.trim()
 }
 
 /**
@@ -470,5 +470,5 @@ async function processRequest(req, threatCheck, biasCheck) {
     timestamp: new Date().toISOString()
   };
 }
-    `.trim();
+    `.trim()
 }

@@ -75,8 +75,8 @@ jobs:
     # so the dependency skips this job on every push/dispatch (it ran 0
     # successful deploys before this fix).
     if: >-
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      github.ref == 'refs/heads/staging'
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      && github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

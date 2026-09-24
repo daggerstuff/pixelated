@@ -29,7 +29,10 @@ export type TreatmentModality =
   | 'Supportive'
 
 export type GoalStatus =
-  'proposed' | 'in_progress' | 'achieved' | 'discontinued'
+  | 'proposed'
+  | 'in_progress'
+  | 'achieved'
+  | 'discontinued'
 
 export type ObjectiveStatus =
   | 'not_started'

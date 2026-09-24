@@ -96,7 +96,7 @@ export function AcquisitionDetail({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Acquisition Details</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             <span className="capitalize">{acquisition.status}</span>
             {acquisition.acquiredDate &&
               ` • Acquired ${format(acquisition.acquiredDate, 'MMM d, yyyy')}`}
@@ -156,26 +156,26 @@ export function AcquisitionDetail({
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Acquisition ID
               </p>
               <p className="mt-1">{acquisition.acquisitionId}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Source ID
               </p>
               <p className="mt-1">{acquisition.sourceId}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Status
               </p>
               <p className="mt-1 capitalize">{acquisition.status}</p>
             </div>
             {acquisition.acquiredDate && (
               <div>
-                <p className="text-muted-foreground text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   Acquired Date
                 </p>
                 <p className="mt-1">
@@ -185,12 +185,12 @@ export function AcquisitionDetail({
             )}
             {acquisition.downloadProgress !== null && (
               <div>
-                <p className="text-muted-foreground text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   Download Progress
                 </p>
                 <div className="mt-2">
                   <div
-                    className="bg-muted h-2 w-full overflow-hidden rounded-full"
+                    className="h-2 w-full overflow-hidden rounded-full bg-muted"
                     role="progressbar"
                     aria-valuenow={acquisition.downloadProgress}
                     aria-valuemin={0}
@@ -198,7 +198,7 @@ export function AcquisitionDetail({
                     aria-label="Download Progress"
                   >
                     <div
-                      className="bg-primary h-full transition-all"
+                      className="h-full bg-primary transition-all"
                       style={{ width: `${acquisition.downloadProgress}%` }}
                     />
                   </div>
@@ -210,7 +210,7 @@ export function AcquisitionDetail({
             )}
             {acquisition.filePath && (
               <div>
-                <p className="text-muted-foreground text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   File Path
                 </p>
                 <p className="mt-1 font-mono text-sm">{acquisition.filePath}</p>
@@ -218,7 +218,7 @@ export function AcquisitionDetail({
             )}
             {acquisition.fileSizeMb !== null && (
               <div>
-                <p className="text-muted-foreground text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   File Size
                 </p>
                 <p className="mt-1">{acquisition.fileSizeMb.toFixed(2)} MB</p>
@@ -244,7 +244,7 @@ export function AcquisitionDetail({
                       payload: { status: 'approved' },
                     })
                   }}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
+                  className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
                 >
                   Approve
                 </button>
@@ -255,7 +255,7 @@ export function AcquisitionDetail({
                       payload: { status: 'failed' },
                     })
                   }}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md px-4 py-2 text-sm font-medium"
+                  className="hover:bg-destructive/90 rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground"
                 >
                   Reject
                 </button>
@@ -269,7 +269,7 @@ export function AcquisitionDetail({
                     payload: { status: 'in-progress' },
                   })
                 }}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
+                className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               >
                 Start Download
               </button>

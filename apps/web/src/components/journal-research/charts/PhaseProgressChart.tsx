@@ -187,7 +187,7 @@ export function PhaseProgressChart({
                   <span className="font-medium">
                     {phase.phase}
                     {phase.isCurrent && (
-                      <span className="text-primary ml-2 text-xs">
+                      <span className="ml-2 text-xs text-primary">
                         (Current)
                       </span>
                     )}
@@ -196,7 +196,7 @@ export function PhaseProgressChart({
                     {Math.round(phase.progress)}%
                   </span>
                 </div>
-                <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full transition-all ${
                       phase.isCurrent

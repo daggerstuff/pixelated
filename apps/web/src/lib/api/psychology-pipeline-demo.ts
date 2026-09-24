@@ -449,7 +449,9 @@ export const convertKnowledgeToConversation = async (
   const generatedDialogue = generateKnowledgeBasedDialogue(validatedRequest)
 
   // Calculate quality metrics
-  const qualityMetrics = calculateConversationQuality(validatedRequest as ConversationRequest)
+  const qualityMetrics = calculateConversationQuality(
+    validatedRequest as ConversationRequest,
+  )
 
   // Map knowledge sources to dialogue turns
   const knowledgeMapping = mapKnowledgeToDialogue(generatedDialogue)

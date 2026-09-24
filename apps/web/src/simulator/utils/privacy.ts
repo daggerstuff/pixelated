@@ -212,4 +212,3 @@ export function checkBrowserCompatibility(): {
 }
 
 // Example PHI audit logging - uncomment and customize as needed
-

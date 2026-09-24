@@ -91,7 +91,7 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
           </div>
 
           {session.progressMetrics && (
-            <div className="text-muted-foreground grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
               <div>
                 Identified:{' '}
                 <span className="font-medium text-foreground">
@@ -121,7 +121,7 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="text-muted-foreground text-xs">
+      <CardFooter className="text-xs text-muted-foreground">
         {session.targetSources.join(', ')}
       </CardFooter>
     </Card>

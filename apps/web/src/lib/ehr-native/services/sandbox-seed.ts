@@ -537,7 +537,6 @@ async function main() {
   const tenantId = args[tenantIdx + 1]
   const reset = resetIdx !== -1
 
-
   try {
     const result = await seedSandboxTenant({ tenantId, reset })
   } catch (err) {

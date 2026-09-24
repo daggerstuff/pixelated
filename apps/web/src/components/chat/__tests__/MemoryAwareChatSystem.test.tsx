@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import type { Message } from '@/types/chat'
 
 import { MemoryAwareChatSystem } from '../MemoryAwareChatSystem'
-import type { Message } from '@/types/chat'
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
@@ -81,12 +81,36 @@ describe('MemoryAwareChatSystem', () => {
   describe('conversation summary', () => {
     it('derives the insights summary from real conversation and memory data', async () => {
       mocks.messages = [
-        { role: 'user', content: 'I have been feeling anxious and worried about work', name: 'You' },
-        { role: 'assistant', content: 'It sounds like work has been stressful lately.', name: 'Assistant' },
-        { role: 'user', content: 'I feel fear of failing and my anxiety is high', name: 'You' },
-        { role: 'assistant', content: 'Let us slow down and look at that fear together.', name: 'Assistant' },
-        { role: 'user', content: 'I am so worried I cannot sleep', name: 'You' },
-        { role: 'assistant', content: 'Sleep difficulty is common when worry is high.', name: 'Assistant' },
+        {
+          role: 'user',
+          content: 'I have been feeling anxious and worried about work',
+          name: 'You',
+        },
+        {
+          role: 'assistant',
+          content: 'It sounds like work has been stressful lately.',
+          name: 'Assistant',
+        },
+        {
+          role: 'user',
+          content: 'I feel fear of failing and my anxiety is high',
+          name: 'You',
+        },
+        {
+          role: 'assistant',
+          content: 'Let us slow down and look at that fear together.',
+          name: 'Assistant',
+        },
+        {
+          role: 'user',
+          content: 'I am so worried I cannot sleep',
+          name: 'You',
+        },
+        {
+          role: 'assistant',
+          content: 'Sleep difficulty is common when worry is high.',
+          name: 'Assistant',
+        },
       ]
       mocks.memories = [
         { id: 'm1', content: 'user: anxious about work', metadata: {} },
@@ -116,10 +140,26 @@ describe('MemoryAwareChatSystem', () => {
 
   describe('regenerate', () => {
     it('drops the last assistant reply and resends the last user message', async () => {
-      const user1: Message = { role: 'user', content: 'Tell me about hope', name: 'You' }
-      const assistant1: Message = { role: 'assistant', content: 'Old reply', name: 'Assistant' }
-      const user2: Message = { role: 'user', content: 'And about grief?', name: 'You' }
-      const assistant2: Message = { role: 'assistant', content: 'Stale answer', name: 'Assistant' }
+      const user1: Message = {
+        role: 'user',
+        content: 'Tell me about hope',
+        name: 'You',
+      }
+      const assistant1: Message = {
+        role: 'assistant',
+        content: 'Old reply',
+        name: 'Assistant',
+      }
+      const user2: Message = {
+        role: 'user',
+        content: 'And about grief?',
+        name: 'You',
+      }
+      const assistant2: Message = {
+        role: 'assistant',
+        content: 'Stale answer',
+        name: 'Assistant',
+      }
       mocks.messages = [user1, assistant1, user2, assistant2]
       const user = userEvent.setup()
 

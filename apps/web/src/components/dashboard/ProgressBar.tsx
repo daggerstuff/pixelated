@@ -49,13 +49,13 @@ export function ProgressBar({
       {...rest}
     >
       {label && <span className="mb-1 block text-sm">{label}</span>}
-      <div className="bg-muted relative h-4 rounded-full">
+      <div className="relative h-4 rounded-full bg-muted">
         <div
-          className="bg-primary absolute left-0 top-0 h-4 rounded-full"
+          className="absolute left-0 top-0 h-4 rounded-full bg-primary"
           style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="text-muted-foreground ml-2 text-xs">
+      <span className="ml-2 text-xs text-muted-foreground">
         {ariaValueText}
       </span>
     </div>

@@ -7,9 +7,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { redis } from '../../redis'
 import { defaultRateLimitConfig } from '../config'
+import type { RateLimitRule } from '../distributed-types'
 import { DistributedRateLimiter } from '../rate-limiter'
 import { createRateLimiter } from '../rate-limiter'
-import type { RateLimitRule } from '../distributed-types'
 
 // Mock Redis with stateful implementation
 vi.mock('../../redis', () => {

@@ -8,19 +8,19 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import type { ConsentLevel } from '@/lib/research/types/research-types'
 
+import { stateConsentRulesCache } from './cache'
 import {
   StateConsentRulesEngine,
   SPECIAL_TREATMENT_CATEGORIES,
   type PatientConsentContext,
   type ConsentEngineResult,
 } from './engine'
-import type { StateConsentRuleRecord, StateRuleConfig } from './schemas'
-import { stateConsentRulesCache } from './cache'
 import {
   clearStateRules,
   registerStateRules,
   DEFAULT_STATE_RULES,
 } from './index'
+import type { StateConsentRuleRecord, StateRuleConfig } from './schemas'
 
 // ---------------------------------------------------------------------------
 // Mock data

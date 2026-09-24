@@ -2,12 +2,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 
-import '@testing-library/jest-dom'
-
 import {
   PerformanceDashboard,
   type PerformanceMetricsResponse,
 } from '../PerformanceDashboard'
+
+import '@testing-library/jest-dom'
 
 const __originalFetch: typeof fetch = global.fetch
 

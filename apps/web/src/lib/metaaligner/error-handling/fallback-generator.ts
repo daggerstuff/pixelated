@@ -28,25 +28,25 @@ export class FallbackGenerator implements IFallbackGenerator {
       return {
         enhancedResponse: `A known error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`,
         originalResponse: '',
-      alignment: {
-        evaluation: {
-          overallScore: 0,
-          objectiveResults: {},
-          weights: {},
-          normalizedScores: {},
-          aggregationMethod: 'weighted' as const,
-          evaluationContext: {} as never,
-          timestamp: new Date(),
+        alignment: {
+          evaluation: {
+            overallScore: 0,
+            objectiveResults: {},
+            weights: {},
+            normalizedScores: {},
+            aggregationMethod: 'weighted' as const,
+            evaluationContext: {} as never,
+            timestamp: new Date(),
+          },
+          metrics: {
+            overallScore: 0,
+            dimensionScores: {},
+            confidence: 0,
+            timestamp: new Date(),
+          },
+          enhanced: false,
+          enhancementAttempts: 0,
         },
-        metrics: {
-          overallScore: 0,
-          dimensionScores: {},
-          confidence: 0,
-          timestamp: new Date(),
-        },
-        enhanced: false,
-        enhancementAttempts: 0,
-      },
         errors: [
           {
             message: error instanceof Error ? error.message : 'Unknown error',
@@ -59,25 +59,25 @@ export class FallbackGenerator implements IFallbackGenerator {
         enhancedResponse:
           'An unexpected error occurred. Please try again later.',
         originalResponse: '',
-      alignment: {
-        evaluation: {
-          overallScore: 0,
-          objectiveResults: {},
-          weights: {},
-          normalizedScores: {},
-          aggregationMethod: 'weighted' as const,
-          evaluationContext: {} as never,
-          timestamp: new Date(),
+        alignment: {
+          evaluation: {
+            overallScore: 0,
+            objectiveResults: {},
+            weights: {},
+            normalizedScores: {},
+            aggregationMethod: 'weighted' as const,
+            evaluationContext: {} as never,
+            timestamp: new Date(),
+          },
+          metrics: {
+            overallScore: 0,
+            dimensionScores: {},
+            confidence: 0,
+            timestamp: new Date(),
+          },
+          enhanced: false,
+          enhancementAttempts: 0,
         },
-        metrics: {
-          overallScore: 0,
-          dimensionScores: {},
-          confidence: 0,
-          timestamp: new Date(),
-        },
-        enhanced: false,
-        enhancementAttempts: 0,
-      },
         errors: [
           {
             message: error instanceof Error ? error.message : 'Unknown error',

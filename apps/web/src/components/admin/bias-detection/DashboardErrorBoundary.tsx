@@ -49,11 +49,11 @@ export class DashboardErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         <div role="alert" className="p-6">
-          <div className="border-border bg-card text-card-foreground rounded-md border p-6">
+          <div className="rounded-md border border-border bg-card p-6 text-card-foreground">
             <h2 className="text-lg font-semibold">
               Dashboard failed to render
             </h2>
-            <p className="text-muted-foreground mt-2 text-sm">
+            <p className="mt-2 text-sm text-muted-foreground">
               {this.state.error?.message ?? 'An unexpected error occurred'}
             </p>
             <button

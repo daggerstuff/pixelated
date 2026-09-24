@@ -63,7 +63,7 @@ export function Header({
           <div className="flex items-center justify-start">
             <button
               type="button"
-              className="text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:ring-ring inline-flex items-center rounded-lg p-2 text-sm focus:outline-none focus:ring-2 lg:hidden"
+              className="inline-flex items-center rounded-lg p-2 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle mobile menu"
               aria-expanded={mobileMenuOpen || false}
@@ -106,7 +106,7 @@ export function Header({
             <div className="hidden lg:ml-6 lg:flex lg:items-center">
               <button
                 type="button"
-                className="text-muted-foreground hover:bg-accent rounded-lg p-2 hover:text-foreground"
+                className="rounded-lg p-2 text-muted-foreground hover:bg-accent hover:text-foreground"
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 aria-label="Search"
                 aria-expanded={isSearchOpen || false}
@@ -128,7 +128,7 @@ export function Header({
               </button>
               <button
                 type="button"
-                className="text-muted-foreground hover:bg-accent rounded-lg p-2 hover:text-foreground"
+                className="rounded-lg p-2 text-muted-foreground hover:bg-accent hover:text-foreground"
                 aria-label="View notifications"
               >
                 <svg
@@ -157,7 +157,7 @@ export function Header({
           aria-modal="true"
           aria-labelledby="search-modal-title"
         >
-          <div className="bg-card border-border w-full max-w-lg rounded-lg border shadow-lg">
+          <div className="w-full max-w-lg rounded-lg border border-border bg-card shadow-lg">
             <div className="p-4">
               <div className="mb-4 flex items-center justify-between">
                 <h3 id="search-modal-title" className="text-lg font-medium">
@@ -165,7 +165,7 @@ export function Header({
                 </h3>
                 <button
                   type="button"
-                  className="text-muted-foreground bg-transparent hover:bg-accent ml-auto inline-flex items-center rounded-lg p-1.5 text-sm hover:text-foreground"
+                  className="bg-transparent ml-auto inline-flex items-center rounded-lg p-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
                   onClick={() => setIsSearchOpen(false)}
                   aria-label="Close search"
                 >
@@ -192,7 +192,7 @@ export function Header({
                 onResultClick={() => setIsSearchOpen(false)}
               />
 
-              <div className="text-muted-foreground mt-4 text-xs">
+              <div className="mt-4 text-xs text-muted-foreground">
                 <p>Privacy-focused client-side search powered by FlexSearch</p>
               </div>
             </div>

@@ -63,7 +63,8 @@ export const GET: APIRoute = async () => {
 
     const metrics =
       (metricsResult.rows[0] as Record<string, unknown> | undefined) ?? {}
-    const uptime = (uptimeResult.rows[0] as { uptime_hours?: number })?.uptime_hours ?? 0
+    const uptime =
+      (uptimeResult.rows[0] as { uptime_hours?: number })?.uptime_hours ?? 0
 
     // Format response
     const response = {

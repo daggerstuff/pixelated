@@ -66,7 +66,7 @@ export function TherapistProgressTracker({
     >
       {/* Session Overview */}
       <section
-        className="bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2"
+        className="rounded-md bg-muted p-4 focus:outline-none focus:ring-2 focus:ring-primary"
         aria-labelledby="overview-heading"
         tabIndex={0}
       >
@@ -81,7 +81,7 @@ export function TherapistProgressTracker({
                 ? 'Collapse session overview'
                 : 'Expand session overview'
             }
-            className="text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2"
+            className="rounded text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             aria-expanded={expandedSections['overview']}
           >
             {expandedSections['overview'] ? '−' : '+'}
@@ -106,7 +106,7 @@ export function TherapistProgressTracker({
 
       {/* Overall Progress */}
       <section
-        className="bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2"
+        className="rounded-md bg-muted p-4 focus:outline-none focus:ring-2 focus:ring-primary"
         aria-labelledby="progress-heading"
         tabIndex={0}
       >
@@ -121,7 +121,7 @@ export function TherapistProgressTracker({
                 ? 'Collapse overall progress'
                 : 'Expand overall progress'
             }
-            className="text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2"
+            className="rounded text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             aria-expanded={expandedSections['progress']}
           >
             {expandedSections['progress'] ? '−' : '+'}
@@ -134,7 +134,7 @@ export function TherapistProgressTracker({
 
       {/* Skill Development */}
       <section
-        className="bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2"
+        className="rounded-md bg-muted p-4 focus:outline-none focus:ring-2 focus:ring-primary"
         aria-labelledby="skills-heading"
         tabIndex={0}
       >
@@ -149,7 +149,7 @@ export function TherapistProgressTracker({
                 ? 'Collapse skill development'
                 : 'Expand skill development'
             }
-            className="text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2"
+            className="rounded text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             aria-expanded={expandedSections['skills']}
           >
             {expandedSections['skills'] ? '−' : '+'}
@@ -159,7 +159,7 @@ export function TherapistProgressTracker({
         {expandedSections['skills'] && (
           <div className="space-y-3">
             {skillsLoading && (
-              <div className="text-muted-foreground text-sm">
+              <div className="text-sm text-muted-foreground">
                 Loading skills…
               </div>
             )}
@@ -173,7 +173,7 @@ export function TherapistProgressTracker({
             {!skillsLoading &&
               !skillsError &&
               (!effectiveSkills || effectiveSkills.length === 0) && (
-                <div className="text-muted-foreground text-sm">
+                <div className="text-sm text-muted-foreground">
                   No skill progress available for this session.
                 </div>
               )}
@@ -187,7 +187,7 @@ export function TherapistProgressTracker({
                     (skill: SkillProgress, index: number) => (
                       <div
                         key={`${skill.skill}-${index}`}
-                        className="focus-within:ring-primary flex items-center justify-between rounded p-2 focus-within:bg-background focus-within:ring-1 hover:bg-background"
+                        className="flex items-center justify-between rounded p-2 focus-within:bg-background focus-within:ring-1 focus-within:ring-primary hover:bg-background"
                         tabIndex={0}
                         role="listitem"
                         aria-label={`${skill.skill}: ${skill.score}% (${skill.trend})`}
@@ -196,7 +196,7 @@ export function TherapistProgressTracker({
                           {skill.skill}
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground text-sm">
+                          <span className="text-sm text-muted-foreground">
                             {skill.score}%
                           </span>
                           <span
@@ -226,7 +226,7 @@ export function TherapistProgressTracker({
 
       {/* Session Notes */}
       <section
-        className="bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2"
+        className="rounded-md bg-muted p-4 focus:outline-none focus:ring-2 focus:ring-primary"
         aria-labelledby="notes-heading"
         tabIndex={0}
       >
@@ -241,7 +241,7 @@ export function TherapistProgressTracker({
                 ? 'Collapse session notes'
                 : 'Expand session notes'
             }
-            className="text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2"
+            className="rounded text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             aria-expanded={expandedSections['notes']}
           >
             {expandedSections['notes'] ? '−' : '+'}
@@ -252,7 +252,7 @@ export function TherapistProgressTracker({
             {session.notes ? (
               <p>{session.notes}</p>
             ) : (
-              <p className="text-muted-foreground italic">
+              <p className="italic text-muted-foreground">
                 Session notes and observations will appear here...
               </p>
             )}

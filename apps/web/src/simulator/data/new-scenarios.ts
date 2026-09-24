@@ -177,4 +177,3 @@ export const newScenarios: Scenario[] = [
 ]
 
 // Example PHI audit logging - uncomment and customize as needed
-

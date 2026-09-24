@@ -77,7 +77,7 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
               type="text"
               value={formData.name}
               onChange={handleInputChange}
-              className="border-border bg-card w-full rounded-md border px-3 py-2"
+              className="w-full rounded-md border border-border bg-card px-3 py-2"
               required
             />
           </div>
@@ -92,12 +92,12 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
               type="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="border-border bg-card w-full rounded-md border px-3 py-2"
+              className="w-full rounded-md border border-border bg-card px-3 py-2"
               required
               disabled
             />
 
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               Email cannot be changed. Contact support for assistance.
             </p>
           </div>
@@ -112,7 +112,7 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
               value={formData.bio}
               onChange={handleInputChange}
               rows={3}
-              className="border-border bg-card w-full resize-none rounded-md border px-3 py-2"
+              className="w-full resize-none rounded-md border border-border bg-card px-3 py-2"
               placeholder="Tell us a bit about yourself"
             />
           </div>
@@ -128,7 +128,7 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
                 type="text"
                 value={formData.profession}
                 onChange={handleInputChange}
-                className="border-border bg-card w-full rounded-md border px-3 py-2"
+                className="w-full rounded-md border border-border bg-card px-3 py-2"
                 placeholder="e.g. Psychologist, Therapist"
               />
             </div>
@@ -146,7 +146,7 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
                 type="text"
                 value={formData.specialization}
                 onChange={handleInputChange}
-                className="border-border bg-card w-full rounded-md border px-3 py-2"
+                className="w-full rounded-md border border-border bg-card px-3 py-2"
                 placeholder="e.g. CBT, Trauma"
               />
             </div>
@@ -162,7 +162,7 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
               type="text"
               value={formData.experience}
               onChange={handleInputChange}
-              className="border-border bg-card w-full rounded-md border px-3 py-2"
+              className="w-full rounded-md border border-border bg-card px-3 py-2"
               placeholder="e.g. 5"
             />
           </div>
@@ -171,20 +171,20 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="border-border hover:bg-accent rounded-md border px-4 py-2 text-sm font-medium transition-colors"
+              className="rounded-md border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
               disabled={isLoading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center rounded-md px-4 py-2 text-sm font-medium transition-colors"
+              className="hover:bg-primary/90 flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors"
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
                   <svg
-                    className="text-primary-foreground -ml-1 mr-2 h-4 w-4 animate-spin"
+                    className="-ml-1 mr-2 h-4 w-4 animate-spin text-primary-foreground"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -227,19 +227,19 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
         <div className="flex flex-shrink-0 flex-col items-center">
           <div className="bg-primary/20 flex h-24 w-24 items-center justify-center overflow-hidden rounded-full">
             {user?.name ? (
-              <span className="text-primary text-2xl font-bold">
+              <span className="text-2xl font-bold text-primary">
                 {user.name
                   .split(' ')
                   .map((n) => n[0])
                   .join('')}
               </span>
             ) : (
-              <span className="material-symbols-outlined text-primary text-3xl">
+              <span className="material-symbols-outlined text-3xl text-primary">
                 person
               </span>
             )}
           </div>
-          <button className="text-primary mt-4 text-xs hover:underline">
+          <button className="mt-4 text-xs text-primary hover:underline">
             Upload Photo
           </button>
         </div>
@@ -247,35 +247,35 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
         <div className="flex-grow space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-1">
-              <h4 className="text-muted-foreground text-sm font-medium">
+              <h4 className="text-sm font-medium text-muted-foreground">
                 Full Name
               </h4>
               <p>{user?.name || 'Not set'}</p>
             </div>
 
             <div className="space-y-1">
-              <h4 className="text-muted-foreground text-sm font-medium">
+              <h4 className="text-sm font-medium text-muted-foreground">
                 Email Address
               </h4>
               <p>{user?.email || 'Not set'}</p>
             </div>
 
             <div className="space-y-1">
-              <h4 className="text-muted-foreground text-sm font-medium">
+              <h4 className="text-sm font-medium text-muted-foreground">
                 Profession
               </h4>
               <p>Not set</p>
             </div>
 
             <div className="space-y-1">
-              <h4 className="text-muted-foreground text-sm font-medium">
+              <h4 className="text-sm font-medium text-muted-foreground">
                 Specialization
               </h4>
               <p>Not set</p>
             </div>
 
             <div className="space-y-1 md:col-span-2">
-              <h4 className="text-muted-foreground text-sm font-medium">Bio</h4>
+              <h4 className="text-sm font-medium text-muted-foreground">Bio</h4>
               <p className="text-sm">No bio available</p>
             </div>
           </div>
@@ -283,7 +283,7 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
           <div className="pt-4">
             <button
               onClick={() => setIsEditing(true)}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium transition-colors"
+              className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors"
             >
               Edit Profile
             </button>
@@ -291,36 +291,36 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
         </div>
       </div>
 
-      <div className="border-border mt-6 border-t pt-6">
+      <div className="mt-6 border-t border-border pt-6">
         <h4 className="mb-4 text-center font-medium">Account Information</h4>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="space-y-1">
-            <h4 className="text-muted-foreground text-sm font-medium">
+            <h4 className="text-sm font-medium text-muted-foreground">
               Account Type
             </h4>
             <p>Professional (Licensed)</p>
           </div>
 
           <div className="space-y-1">
-            <h4 className="text-muted-foreground text-sm font-medium">
+            <h4 className="text-sm font-medium text-muted-foreground">
               Member Since
             </h4>
             <p>{new Date().toLocaleDateString()}</p>
           </div>
 
           <div className="space-y-1">
-            <h4 className="text-muted-foreground text-sm font-medium">
+            <h4 className="text-sm font-medium text-muted-foreground">
               Last Login
             </h4>
             <p>{new Date().toLocaleString()}</p>
           </div>
 
           <div className="space-y-1">
-            <h4 className="text-muted-foreground text-sm font-medium">
+            <h4 className="text-sm font-medium text-muted-foreground">
               Subscription
             </h4>
             <p>
-              <span className="bg-primary/20 text-primary inline-block rounded-full px-2 py-0.5 text-xs">
+              <span className="bg-primary/20 inline-block rounded-full px-2 py-0.5 text-xs text-primary">
                 Pro Plan
               </span>
             </p>

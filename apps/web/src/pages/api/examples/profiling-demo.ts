@@ -1,4 +1,3 @@
-
 // Simulates a CPU-intensive operation
 async function performHeavyComputation(): Promise<number> {
   // This is a simple yet CPU-intensive operation for demo purposes

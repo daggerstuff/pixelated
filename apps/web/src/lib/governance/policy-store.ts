@@ -65,7 +65,10 @@ export class PolicyStore {
     }
 
     const collection = this.db.collection(POLICIES_COLLECTION)
-    const doc = await collection.findOne({ _id: policyId } as Record<string, unknown>)
+    const doc = await collection.findOne({ _id: policyId } as Record<
+      string,
+      unknown
+    >)
 
     if (doc) {
       const { _id, ...rest } = doc

@@ -89,7 +89,7 @@ export const FHEDemo: FC<Props> = ({
   return (
     <div className="space-y-4">
       <div className="bg-muted/30 rounded-lg border p-4">
-        <p className="text-muted-foreground text-sm">{defaultMessage}</p>
+        <p className="text-sm text-muted-foreground">{defaultMessage}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

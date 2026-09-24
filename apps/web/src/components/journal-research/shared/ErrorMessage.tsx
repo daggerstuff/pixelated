@@ -70,7 +70,7 @@ export function ErrorMessage({
       {showDetails && normalizedError && (
         <details className="mt-2 text-xs">
           <summary className="cursor-pointer">Technical details</summary>
-          <pre className="bg-muted mt-2 overflow-auto rounded p-2">
+          <pre className="mt-2 overflow-auto rounded bg-muted p-2">
             {normalizedError.message}
             {normalizedError.code && `\nCode: ${normalizedError.code}`}
           </pre>

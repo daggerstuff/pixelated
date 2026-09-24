@@ -45,7 +45,12 @@ describe('feature-flags evaluator', () => {
 
   it('respects a default of true when the override is absent', () => {
     expect(evaluateFlag({ ...testFlag, default: true }, {})).toBe(true)
-    expect(evaluateFlag({ ...testFlag, default: true }, { FEATURE_TEST_FLAG: 'false' })).toBe(false)
+    expect(
+      evaluateFlag(
+        { ...testFlag, default: true },
+        { FEATURE_TEST_FLAG: 'false' },
+      ),
+    ).toBe(false)
   })
 
   it('getFeatureFlags returns an empty record while the registry is empty', () => {

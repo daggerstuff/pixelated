@@ -244,7 +244,11 @@ export class AdvancedCacheStrategy {
           tags: options.tags,
           ttl: options.ttl ?? CACHE_CONFIG.TTL.L2_CACHE,
         }
-        await this.invalidation.set(key, value, rule as { tags: string[]; ttl: number })
+        await this.invalidation.set(
+          key,
+          value,
+          rule as { tags: string[]; ttl: number },
+        )
       }
     } catch (error: unknown) {
       logger.error('Cache set operation failed', { key, error })

@@ -4,7 +4,12 @@
  * Extracted from BiasDashboard.tsx to reduce monolith size.
  */
 
-import type { BiasDashboardData, BiasAnalysisResult, DashboardRecommendation, BiasAlert } from '@/lib/ai/bias-detection'
+import type {
+  BiasDashboardData,
+  BiasAnalysisResult,
+  DashboardRecommendation,
+  BiasAlert,
+} from '@/lib/ai/bias-detection'
 
 export interface BiasDashboardProps {
   className?: string

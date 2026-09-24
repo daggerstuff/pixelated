@@ -5,7 +5,11 @@ type Theme = 'light' | 'dark' | 'system'
 
 const getStoredTheme = (): Theme => {
   const storedTheme = localStorage.getItem('theme') as Theme | null
-  if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
+  if (
+    storedTheme === 'light' ||
+    storedTheme === 'dark' ||
+    storedTheme === 'system'
+  ) {
     return storedTheme
   }
   localStorage.setItem('theme', 'dark')

@@ -139,7 +139,9 @@ export const POST = async ({
     const patientDataObj = (patientData as Record<string, unknown>) ?? {}
     const preferencesObj = (preferences as Record<string, unknown>) ?? {}
     const recommendationRequest = { ...patientDataObj, ...preferencesObj }
-    const recommendations = recommend(recommendationRequest as Record<string, unknown>)
+    const recommendations = recommend(
+      recommendationRequest as Record<string, unknown>,
+    )
 
     return new Response(
       JSON.stringify({

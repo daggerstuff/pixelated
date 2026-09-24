@@ -186,9 +186,9 @@ export class ErrorBoundary extends Component<Props, State> {
           />
 
           {this.state.error && (
-            <details className="text-muted-foreground mt-4 text-xs">
+            <details className="mt-4 text-xs text-muted-foreground">
               <summary className="cursor-pointer">Technical details</summary>
-              <pre className="bg-muted mt-2 overflow-auto rounded p-2">
+              <pre className="mt-2 overflow-auto rounded bg-muted p-2">
                 {this.state.error.message}
                 {this.state.errorInfo?.componentStack && (
                   <>

@@ -42,7 +42,7 @@ export function ReportViewer({
   const renderContent = () => {
     if (!report.content) {
       return (
-        <div className="text-muted-foreground py-8 text-center">
+        <div className="py-8 text-center text-muted-foreground">
           No content available. Report may still be generating.
         </div>
       )
@@ -50,7 +50,7 @@ export function ReportViewer({
 
     if (report.format === 'json') {
       return (
-        <pre className="bg-muted overflow-x-auto rounded-md p-4 text-sm">
+        <pre className="overflow-x-auto rounded-md bg-muted p-4 text-sm">
           {JSON.stringify(report.content, null, 2)}
         </pre>
       )
@@ -71,14 +71,14 @@ export function ReportViewer({
     if (report.format === 'pdf') {
       return (
         <div className="py-8 text-center">
-          <p className="text-muted-foreground mb-4">
+          <p className="mb-4 text-muted-foreground">
             PDF reports are available for download.
           </p>
           {report.filePath && (
             <a
               href={report.filePath}
               download
-              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium"
+              className="hover:bg-primary/90 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             >
               <Download className="h-4 w-4" />
               Download PDF
@@ -101,7 +101,7 @@ export function ReportViewer({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Report Viewer</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             Generated {format(report.generatedDate, 'PPpp')}
           </p>
         </div>
@@ -110,7 +110,7 @@ export function ReportViewer({
             <a
               href={report.filePath}
               download
-              className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium"
+              className="hover:bg-primary/90 flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             >
               <Download className="h-4 w-4" />
               Download
@@ -127,19 +127,19 @@ export function ReportViewer({
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Report ID
               </p>
               <p className="mt-1">{report.reportId}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Session ID
               </p>
               <p className="mt-1">{report.sessionId}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Report Type
               </p>
               <p className="mt-1 capitalize">
@@ -147,20 +147,20 @@ export function ReportViewer({
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Format
               </p>
               <p className="mt-1 uppercase">{report.format}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Generated Date
               </p>
               <p className="mt-1">{format(report.generatedDate, 'PPpp')}</p>
             </div>
             {report.filePath && (
               <div>
-                <p className="text-muted-foreground text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   File Path
                 </p>
                 <p className="mt-1 font-mono text-sm">{report.filePath}</p>

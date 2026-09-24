@@ -134,11 +134,7 @@ export const filterDataByAlertLevel = (
   if (filter === 'all' || !data) return data
   return data.filter((item) => {
     const level =
-      'level' in item
-        ? item.level
-        : 'alertLevel' in item
-          ? item.alertLevel
-          : ''
+      'level' in item ? item.level : 'alertLevel' in item ? item.alertLevel : ''
     return level === filter
   })
 }
@@ -158,7 +154,11 @@ export const getFilteredData = (
 ): FilterableData => {
   if (!data) return data
 
-  let filtered = filterDataByTimeRange(data, params.selectedTimeRange, params.customDateRange)
+  let filtered = filterDataByTimeRange(
+    data,
+    params.selectedTimeRange,
+    params.customDateRange,
+  )
 
   if (type === 'alerts') {
     filtered = filterDataByAlertLevel(filtered, params.alertLevelFilter)

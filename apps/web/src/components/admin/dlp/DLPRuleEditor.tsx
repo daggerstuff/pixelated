@@ -268,7 +268,7 @@ export default function DLPRuleEditor() {
                 value={currentRule.name}
                 onChange={handleTextChange('name')}
               />
-              <p className="text-muted-foreground text-xs">
+              <p className="text-xs text-muted-foreground">
                 Descriptive label only; not used for matching.
               </p>
             </div>
@@ -282,7 +282,7 @@ export default function DLPRuleEditor() {
               value={currentRule.matchPattern ?? ''}
               onChange={handleTextChange('matchPattern')}
             />
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               Literal text or regex to detect. Content matching this will
               trigger the rule.
             </p>
@@ -334,8 +334,8 @@ export default function DLPRuleEditor() {
           </div>
 
           {currentRule.action === DLPAction.REDACT && (
-            <div className="bg-muted rounded-md p-4">
-              <p className="text-muted-foreground mb-2 text-sm">
+            <div className="rounded-md bg-muted p-4">
+              <p className="mb-2 text-sm text-muted-foreground">
                 <strong>Preview:</strong> When this rule is triggered, matching
                 content will be redacted.
               </p>

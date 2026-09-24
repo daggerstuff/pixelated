@@ -21,7 +21,11 @@ import type { EHRPermission } from '../auth/index.js'
 // ---------------------------------------------------------------------------
 
 export type DashboardType =
-  'practice' | 'outcomes' | 'utilization' | 'billing' | 'compliance'
+  | 'practice'
+  | 'outcomes'
+  | 'utilization'
+  | 'billing'
+  | 'compliance'
 
 export const DASHBOARD_TYPES: readonly DashboardType[] = [
   'practice',

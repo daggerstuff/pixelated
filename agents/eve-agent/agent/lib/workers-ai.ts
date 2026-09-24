@@ -40,4 +40,7 @@ export const AGENT_MODEL_CONTEXT_WINDOW_TOKENS = 1_000_000
 // as passthrough options; the provider index signature forwards them).
 export const agentModel = useAiGateway
   ? AGENT_MODEL
-  : workersai(AGENT_MODEL, { reasoning_effort: 'medium', repetition_penalty: 1.1 })
+  : workersai(AGENT_MODEL, {
+      reasoning_effort: 'medium',
+      repetition_penalty: 1.1,
+    })

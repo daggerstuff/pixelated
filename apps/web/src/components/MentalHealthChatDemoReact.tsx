@@ -286,7 +286,7 @@ export default function MentalHealthChatDemoReact({
                   role="status"
                   aria-live="polite"
                 >
-                  <div className="bg-muted max-w-[80%] rounded-lg px-4 py-3">
+                  <div className="max-w-[80%] rounded-lg bg-muted px-4 py-3">
                     <div className="flex h-4 items-center space-x-1.5">
                       <div className="bg-foreground/50 animate-typing-dot h-2 w-2 rounded-full"></div>
                       <div
@@ -354,13 +354,13 @@ export default function MentalHealthChatDemoReact({
                     <h3 className="text-lg font-medium">
                       Mental Health Insights
                     </h3>
-                    <div className="bg-muted rounded-lg p-4">
+                    <div className="rounded-lg bg-muted p-4">
                       <p className="text-sm">
                         Mental health analysis will appear here
                       </p>
                     </div>
                     {analysisHistory.length === 0 && (
-                      <p className="text-muted-foreground text-sm">
+                      <p className="text-sm text-muted-foreground">
                         No analysis data available yet
                       </p>
                     )}
@@ -394,7 +394,7 @@ export default function MentalHealthChatDemoReact({
                             >
                               Enable Analysis
                             </Label>
-                            <p className="text-muted-foreground text-sm">
+                            <p className="text-sm text-muted-foreground">
                               Analyze messages for mental health indicators
                             </p>
                           </div>
@@ -414,7 +414,7 @@ export default function MentalHealthChatDemoReact({
                             >
                               Expert Guidance
                             </Label>
-                            <p className="text-muted-foreground text-sm">
+                            <p className="text-sm text-muted-foreground">
                               Use clinician-validated interpretation
                             </p>
                           </div>
@@ -434,7 +434,7 @@ export default function MentalHealthChatDemoReact({
                             >
                               Show Analysis Panel
                             </Label>
-                            <p className="text-muted-foreground text-sm">
+                            <p className="text-sm text-muted-foreground">
                               Display the analysis sidebar
                             </p>
                           </div>

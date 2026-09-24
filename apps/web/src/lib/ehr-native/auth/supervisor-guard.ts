@@ -34,7 +34,8 @@ interface SupervisorGuardDenied {
 }
 
 export type SupervisorGuardOutcome =
-  SupervisorGuardResult | SupervisorGuardDenied
+  | SupervisorGuardResult
+  | SupervisorGuardDenied
 
 /**
  * Check if a role is authorized for supervisor tooling.

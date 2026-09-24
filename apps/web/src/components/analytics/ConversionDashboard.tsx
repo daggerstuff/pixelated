@@ -379,7 +379,7 @@ export function ConversionDashboard() {
 
           {isLoading ? (
             <div className="flex h-64 items-center justify-center">
-              <div className="border-primary h-12 w-12 animate-spin rounded-full border-b-2 border-t-2"></div>
+              <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
             </div>
           ) : (
             <Tabs
@@ -438,7 +438,7 @@ export function ConversionDashboard() {
                                 {summary.trend.map((value, i) => (
                                   <div
                                     key={`trend-${summary.id}-${i}-${value}`}
-                                    className="bg-primary w-full rounded-sm"
+                                    className="w-full rounded-sm bg-primary"
                                     style={{
                                       height: `${Math.max(20, (value / Math.max(...summary.trend)) * 100)}%`,
                                       minHeight: '4px',
@@ -535,7 +535,7 @@ export function ConversionDashboard() {
                                     </span>
                                     <div className="bg-gray-200 dark:bg-gray-700 h-2.5 w-full rounded-full">
                                       <div
-                                        className="bg-primary h-2.5 rounded-full"
+                                        className="h-2.5 rounded-full bg-primary"
                                         style={{
                                           width: `${source.percentage}%`,
                                         }}
@@ -605,7 +605,7 @@ export function ConversionDashboard() {
                                     </span>
                                     <div className="bg-gray-200 dark:bg-gray-700 h-2.5 w-full rounded-full">
                                       <div
-                                        className="bg-primary h-2.5 rounded-full"
+                                        className="h-2.5 rounded-full bg-primary"
                                         style={{
                                           width: `${Math.min(page.conversionRate * 2, 100)}%`,
                                         }}

@@ -1,10 +1,10 @@
-version: "3.9"
+version: '3.9'
 
 services:
   risk-stratification:
     build: .
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       - RISK_STRAT_BAA_CONFIRMED=false
       - RISK_STRAT_NIM_URL=
@@ -14,7 +14,7 @@ services:
       - RISK_STRAT_NIM_MAX_RETRIES=3
       - RISK_STRAT_NIM_RETRY_BASE_DELAY=1.0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
       interval: 30s
       timeout: 10s
       retries: 3

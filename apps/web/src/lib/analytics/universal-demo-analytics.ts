@@ -79,7 +79,6 @@ export class UniversalDemoAnalytics {
       this.setupEventFlushing()
 
       this.isInitialized = true
-
     } catch (error: unknown) {
       // error handled by caller
     }

@@ -2,8 +2,8 @@ import type { APIContext } from 'astro'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
 import { AstroCookies } from '../../../../../../node_modules/astro/dist/core/cookies/cookies.js'
-import { POST, GET } from '../../../pages/api/session/skills'
 import { initializeDatabase } from '../../../lib/db'
+import { POST, GET } from '../../../pages/api/session/skills'
 
 type MockPoolClient = {
   query: ReturnType<typeof vi.fn<QueryFn>>

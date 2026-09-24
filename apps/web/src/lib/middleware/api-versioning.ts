@@ -29,7 +29,10 @@ export const apiVersioningMiddleware = defineMiddleware(
       if (pathVersion === null && source === 'default') {
         const deprecation = createDeprecationInfo(0, 12, 1)
         setDeprecationHeaders(response, deprecation)
-        response.headers.set('X-API-Deprecation-Notice', 'Unversioned endpoint. Migrate to /api/v1/ prefix.')
+        response.headers.set(
+          'X-API-Deprecation-Notice',
+          'Unversioned endpoint. Migrate to /api/v1/ prefix.',
+        )
       }
     }
 

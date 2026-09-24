@@ -116,7 +116,7 @@ export function SourceList({
       accessor: (row) => (
         <button
           onClick={() => onSourceClick?.(row)}
-          className="text-primary line-clamp-2 text-left font-medium hover:underline"
+          className="line-clamp-2 text-left font-medium text-primary hover:underline"
         >
           {row.title}
         </button>
@@ -171,7 +171,7 @@ export function SourceList({
           href={row.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-primary hover:text-primary/80"
+          className="hover:text-primary/80 text-primary"
           onClick={(e) => e.stopPropagation()}
           aria-label={`Open ${row.title} in new tab`}
         >
@@ -204,12 +204,12 @@ export function SourceList({
             placeholder="Search sources..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm"
+            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
           />
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="border-input rounded-md border bg-background px-3 py-2 text-sm capitalize"
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm capitalize"
           >
             <option value="all">All Types</option>
             {sourceTypes.map((type) => (
@@ -221,14 +221,14 @@ export function SourceList({
           <select
             value={accessFilter}
             onChange={(e) => setAccessFilter(e.target.value)}
-            className="border-input rounded-md border bg-background px-3 py-2 text-sm"
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
             <option value="all">All Access</option>
             <option value="open">Open Access</option>
             <option value="closed">Closed Access</option>
           </select>
         </div>
-        <div className="text-muted-foreground text-sm">
+        <div className="text-sm text-muted-foreground">
           Showing {filteredAndSortedSources.length} of {sources.total} sources
         </div>
       </div>

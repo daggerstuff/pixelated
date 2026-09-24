@@ -27,16 +27,13 @@ export const GET = async () => {
     )
   }
 
-  return new Response(
-    JSON.stringify({ csrfToken: token, expiresAt }),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store',
-      },
+  return new Response(JSON.stringify({ csrfToken: token, expiresAt }), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
     },
-  )
+  })
 }
 
 // Handle OPTIONS requests for CORS

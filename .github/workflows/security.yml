@@ -81,7 +81,8 @@ jobs:
           fi
 
       - name: Enforce high+ vulnerability threshold
-        run: node scripts/utils/check-pnpm-audit.js --fail-on high
+        run:
+          node scripts/utils/check-pnpm-audit.js --fail-on high
           audit-results.json
 
       - name: Upload audit results

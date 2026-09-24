@@ -33,17 +33,17 @@ jobs:
           days-before-stale: 60
           days-before-close: 21
           stale-issue-message: >-
-            This issue has had no activity for 60 days. If it still
-            matters, comment or update it to keep it open — otherwise it
-            will be closed as stale in 21 days. Closing is not a verdict:
-            reopen with fresh context any time.
+            This issue has had no activity for 60 days. If it still matters,
+            comment or update it to keep it open — otherwise it will be closed
+            as stale in 21 days. Closing is not a verdict: reopen with fresh
+            context any time.
           close-issue-message: >-
             Closed as stale after three weeks without activity. This is
-            housekeeping, not a decision — reopen with updated context
-            any time.
+            housekeeping, not a decision — reopen with updated context any time.
           stale-issue-label: 'status/stale'
           exempt-issue-labels: >-
-            status/needs-triage,security,help wanted,good first issue,status/accepted,status/in-progress
+            status/needs-triage,security,help wanted,good first
+            issue,status/accepted,status/in-progress
           # Never touch pull requests.
           days-before-pr-stale: -1
           days-before-pr-close: -1

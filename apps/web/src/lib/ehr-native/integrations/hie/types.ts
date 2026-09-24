@@ -10,7 +10,10 @@
 
 /** HIE network identifiers */
 export type HIENetwork =
-  'carequality' | 'directtrust' | 'ehealthexchange' | 'local'
+  | 'carequality'
+  | 'directtrust'
+  | 'ehealthexchange'
+  | 'local'
 
 /** Document type codes (LOINC) for common clinical documents */
 export type HIEDocumentType =

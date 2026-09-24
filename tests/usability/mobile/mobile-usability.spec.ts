@@ -23,13 +23,9 @@ test.describe('Mobile Usability', () => {
 
       // Include the recorded errors in the failure message so the
       // offending element is identifiable from CI logs alone.
-      expect(results.touchTargetsAdequate, results.errors.join('; ')).toBe(
-        true,
-      )
+      expect(results.touchTargetsAdequate, results.errors.join('; ')).toBe(true)
       expect(results.textReadable, results.errors.join('; ')).toBe(true)
-      expect(results.contentFitsViewport, results.errors.join('; ')).toBe(
-        true,
-      )
+      expect(results.contentFitsViewport, results.errors.join('; ')).toBe(true)
 
       if (results.errors.length > 0) {
         console.log(

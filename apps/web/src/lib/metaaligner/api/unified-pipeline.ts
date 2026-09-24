@@ -6,9 +6,8 @@
  * the evaluation/enhancement engine in `alignment-api.ts`.
  */
 
-import { QueryPreprocessor } from '../query-preparation/query-preprocessor'
 import { ContextInjector } from '../context/context-injector'
-import { ObjectiveInjector } from '../objectives/objective-injector'
+import type { AlignmentContext, ContextType } from '../core/objectives'
 import { ErrorHandler } from '../error-handling/error-handler'
 import {
   MetaAlignerError,
@@ -16,8 +15,9 @@ import {
   ValidationError,
   EnhancementError,
 } from '../error-handling/error-handler'
+import { ObjectiveInjector } from '../objectives/objective-injector'
+import { QueryPreprocessor } from '../query-preparation/query-preprocessor'
 import { MetaAlignerAPI } from './alignment-api'
-import type { AlignmentContext, ContextType } from '../core/objectives'
 import type {
   IUnifiedMetaAlignerAPI,
   UnifiedProcessingRequest,
@@ -76,9 +76,13 @@ export class UnifiedMetaAlignerPipeline implements IUnifiedMetaAlignerAPI {
       return await this.evaluateAndEnhance(withObjectives)
     } catch (error: unknown) {
       const normalized =
-        error instanceof MetaAlignerError ? error : new ProcessingError(
-          error instanceof Error ? error.message : 'Unknown processing error',
-        )
+        error instanceof MetaAlignerError
+          ? error
+          : new ProcessingError(
+              error instanceof Error
+                ? error.message
+                : 'Unknown processing error',
+            )
       return this.errorHandler.handle(normalized)
     }
   }
@@ -166,8 +170,7 @@ export class UnifiedMetaAlignerPipeline implements IUnifiedMetaAlignerAPI {
   }
 
   private toAlignmentContext(context: UnifiedContext): AlignmentContext {
-    const detected =
-      context.detectedContext ?? ContextType.GENERAL
+    const detected = context.detectedContext ?? ContextType.GENERAL
     return {
       ...context,
       detectedContext: detected as ContextType,

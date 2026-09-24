@@ -127,7 +127,7 @@ export function EvaluationForm({
               <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor={metric.key}>{metric.label}</Label>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     {metric.description}
                   </p>
                 </div>
@@ -165,7 +165,7 @@ export function EvaluationForm({
                         : undefined
                     }
                   />
-                  <span className="text-muted-foreground text-sm">/ 10</span>
+                  <span className="text-sm text-muted-foreground">/ 10</span>
                 </div>
               </div>
               <input
@@ -207,7 +207,7 @@ export function EvaluationForm({
               onChange={(e) =>
                 setFormData({ ...formData, priorityTier: e.target.value })
               }
-              className="border-input w-full rounded-md border bg-background px-3 py-2 text-sm"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             >
               <option value="">Select priority tier</option>
               {priorityTiers.map((tier) => (

@@ -5,7 +5,11 @@ import express from 'express'
 import Redis, { type RedisOptions } from 'ioredis'
 import { Pool } from 'pg'
 
-import { closeSentry, Sentry, sentryMiddleware } from '../../../config/instrument.mjs'
+import {
+  closeSentry,
+  Sentry,
+  sentryMiddleware,
+} from '../../../config/instrument.mjs'
 import authRoutes from './api/routes/auth'
 import projectsRoutes from './api/routes/projects'
 import { setPostgresPool, setRedisClient } from './lib/db/connection'
@@ -15,8 +19,8 @@ import {
   hasSentryExpressErrorHandler,
   registerSentryExpressErrorHandler,
 } from './lib/sentry/express'
-import { createSessionMiddleware } from './lib/session'
 import { SocketService } from './lib/services/socketService'
+import { createSessionMiddleware } from './lib/session'
 
 import 'dotenv/config'
 

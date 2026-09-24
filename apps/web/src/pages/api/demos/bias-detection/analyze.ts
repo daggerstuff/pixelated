@@ -78,10 +78,9 @@ export const POST: APIRoute = async ({ request }) => {
     const alertLevel = determineAlertLevel(biasFactors.overall)
 
     // Generate additional analysis components
-    const counterfactualScenarios = (generateCounterfactualScenarios as (...args: unknown[]) => unknown)(
-      sessionData,
-      biasFactors,
-    )
+    const counterfactualScenarios = (
+      generateCounterfactualScenarios as (...args: unknown[]) => unknown
+    )(sessionData, biasFactors)
     const historicalComparison = generateHistoricalComparison(
       biasFactors.overall,
     )

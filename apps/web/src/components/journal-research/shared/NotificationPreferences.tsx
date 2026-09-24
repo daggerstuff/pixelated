@@ -249,7 +249,7 @@ export function NotificationPreferences({
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="in-app">In-app notifications</Label>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     Show notifications in the notification center
                   </p>
                 </div>
@@ -265,7 +265,7 @@ export function NotificationPreferences({
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="toast">Toast notifications</Label>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     Show temporary toast messages
                   </p>
                 </div>
@@ -283,7 +283,7 @@ export function NotificationPreferences({
                   <Label htmlFor="browser-push">
                     Browser push notifications
                   </Label>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     Receive notifications even when the app is closed
                   </p>
                 </div>
@@ -319,7 +319,7 @@ export function NotificationPreferences({
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="email">Email notifications</Label>
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     Receive notifications via email
                   </p>
                 </div>

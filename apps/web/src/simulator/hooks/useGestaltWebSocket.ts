@@ -208,88 +208,93 @@ export function useGestaltWebSocket({
     }
   }, [])
 
-  const connect = useCallback(function connect() {
-    if (!isMountedRef.current) return
-    if (
-      wsRef.current?.readyState === WebSocket.OPEN ||
-      wsRef.current?.readyState === WebSocket.CONNECTING
-    ) {
-      return
-    }
-
-    setConnectionStatus('connecting')
-    setError(null)
-
-    const ws = new WebSocket(url)
-    wsRef.current = ws
-
-    ws.onopen = () => {
-      if (!isMountedRef.current) {
-        ws.close()
+  const connect = useCallback(
+    function connect() {
+      if (!isMountedRef.current) return
+      if (
+        wsRef.current?.readyState === WebSocket.OPEN ||
+        wsRef.current?.readyState === WebSocket.CONNECTING
+      ) {
         return
       }
-      reconnectCountRef.current = 0
-      setReconnectCount(0)
-      setConnectionStatus('connected')
 
-      // Send a join frame so the server can scope events to this session.
-      ws.send(
-        JSON.stringify({
-          type: 'join',
-          session_id: sessionId,
-        }),
-      )
-    }
+      setConnectionStatus('connecting')
+      setError(null)
 
-    ws.onclose = () => {
-      if (!isMountedRef.current) return
-      setConnectionStatus('disconnected')
+      const ws = new WebSocket(url)
+      wsRef.current = ws
 
-      const attempts = reconnectCountRef.current
-      if (attempts < maxReconnectAttempts) {
-        setConnectionStatus('reconnecting')
-        reconnectCountRef.current = attempts + 1
-        setReconnectCount(attempts + 1)
-        reconnectTimerRef.current = setTimeout(connect, reconnectDelayMs)
-      } else {
-        setConnectionStatus('error')
-        setError(`Failed to reconnect after ${maxReconnectAttempts} attempts.`)
-      }
-    }
-
-    ws.onerror = () => {
-      if (!isMountedRef.current) return
-      setError('WebSocket connection error — retrying.')
-    }
-
-    ws.onmessage = (event: MessageEvent) => {
-      if (!isMountedRef.current) return
-      try {
-        const frame: GestaltWebSocketFrame = JSON.parse(
-          event.data as string,
-        ) as GestaltWebSocketFrame
-
-        if (frame.type !== 'gestalt_update') return
-
-        const payload = validatePayload(frame.data)
-        if (!payload) {
-          console.warn(
-            '[useGestaltWebSocket] Received malformed gestalt_update payload',
-            frame.data,
-          )
+      ws.onopen = () => {
+        if (!isMountedRef.current) {
+          ws.close()
           return
         }
+        reconnectCountRef.current = 0
+        setReconnectCount(0)
+        setConnectionStatus('connected')
 
-        setLatestPayload(payload)
-        onUpdateRef.current?.(payload)
-      } catch (parseError) {
-        console.error(
-          '[useGestaltWebSocket] Failed to parse message:',
-          parseError,
+        // Send a join frame so the server can scope events to this session.
+        ws.send(
+          JSON.stringify({
+            type: 'join',
+            session_id: sessionId,
+          }),
         )
       }
-    }
-  }, [url, sessionId, reconnectDelayMs, maxReconnectAttempts])
+
+      ws.onclose = () => {
+        if (!isMountedRef.current) return
+        setConnectionStatus('disconnected')
+
+        const attempts = reconnectCountRef.current
+        if (attempts < maxReconnectAttempts) {
+          setConnectionStatus('reconnecting')
+          reconnectCountRef.current = attempts + 1
+          setReconnectCount(attempts + 1)
+          reconnectTimerRef.current = setTimeout(connect, reconnectDelayMs)
+        } else {
+          setConnectionStatus('error')
+          setError(
+            `Failed to reconnect after ${maxReconnectAttempts} attempts.`,
+          )
+        }
+      }
+
+      ws.onerror = () => {
+        if (!isMountedRef.current) return
+        setError('WebSocket connection error — retrying.')
+      }
+
+      ws.onmessage = (event: MessageEvent) => {
+        if (!isMountedRef.current) return
+        try {
+          const frame: GestaltWebSocketFrame = JSON.parse(
+            event.data as string,
+          ) as GestaltWebSocketFrame
+
+          if (frame.type !== 'gestalt_update') return
+
+          const payload = validatePayload(frame.data)
+          if (!payload) {
+            console.warn(
+              '[useGestaltWebSocket] Received malformed gestalt_update payload',
+              frame.data,
+            )
+            return
+          }
+
+          setLatestPayload(payload)
+          onUpdateRef.current?.(payload)
+        } catch (parseError) {
+          console.error(
+            '[useGestaltWebSocket] Failed to parse message:',
+            parseError,
+          )
+        }
+      }
+    },
+    [url, sessionId, reconnectDelayMs, maxReconnectAttempts],
+  )
 
   const disconnect = useCallback(() => {
     clearReconnectTimer()
