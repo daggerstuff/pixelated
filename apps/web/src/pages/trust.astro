@@ -70,21 +70,19 @@ const evaluationChecklist = [
   <section class="marketing-section">
     <div class="marketing-shell">
       <div class="marketing-grid marketing-grid--3">
-        {
-          trustAreas.map((area) => (
-            <article class="marketing-card">
-              <span class="marketing-card__label">{area.label}</span>
-              <h2 class="marketing-title marketing-title--medium">
-                {area.title}
-              </h2>
-              <ul class="marketing-list">
-                {area.items.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            </article>
-          ))
-        }
+        {trustAreas.map((area) => (
+          <article class="marketing-card">
+            <span class="marketing-card__label">{area.label}</span>
+            <h2 class="marketing-title marketing-title--medium">
+              {area.title}
+            </h2>
+            <ul class="marketing-list">
+              {area.items.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
       </div>
     </div>
   </section>
@@ -103,14 +101,12 @@ const evaluationChecklist = [
         </div>
 
         <div class="marketing-proof-band__items">
-          {
-            evaluationChecklist.map((item, index) => (
-              <div class="marketing-proof-item">
-                <span>Topic {String(index + 1).padStart(2, '0')}</span>
-                <strong>{item}</strong>
-              </div>
-            ))
-          }
+          {evaluationChecklist.map((item, index) => (
+            <div class="marketing-proof-item">
+              <span>Topic {String(index + 1).padStart(2, '0')}</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
         </div>
       </div>
     </div>
