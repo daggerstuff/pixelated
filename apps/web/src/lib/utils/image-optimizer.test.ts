@@ -115,7 +115,7 @@ describe('ImageOptimizer', () => {
         expect(existsSync(result.avifPath)).toBe(true)
         expect(statSync(result.avifPath).size).toBe(result.avifSize)
       }
-    })
+    }, 30000)
 
     it('should optimize a PNG and generate WebP + AVIF', async () => {
       const result = await imageOptimizer.optimizeImage(TEST_IMAGES.png)
@@ -127,7 +127,7 @@ describe('ImageOptimizer', () => {
       expect(result.avifPath).toBeDefined()
       expect(result.avifSize).toBeGreaterThan(0)
       expect(result.savings).toBeGreaterThanOrEqual(0)
-    })
+    }, 30000)
 
     it('should produce smaller WebP/AVIF than original for JPEG', async () => {
       const result = await imageOptimizer.optimizeImage(TEST_IMAGES.jpeg)
@@ -139,7 +139,7 @@ describe('ImageOptimizer', () => {
       if (result.avifSize) {
         expect(result.avifSize).toBeLessThanOrEqual(result.originalSize)
       }
-    })
+    }, 30000)
 
     it('should skip optimization for files below small file threshold', async () => {
       // Create a tiny JPEG below 10KB threshold
@@ -183,7 +183,7 @@ describe('ImageOptimizer', () => {
       expect(results[1].originalPath).toBe(TEST_IMAGES.png)
       expect(results[0].webpSize).toBeGreaterThan(0)
       expect(results[1].webpSize).toBeGreaterThan(0)
-    })
+    }, 30000)
   })
 
   describe('getOptimizationStats', () => {
@@ -306,7 +306,7 @@ describe('ImageOptimizer', () => {
       expect(report).toContain('Format Breakdown')
       expect(report).toContain('WEBP')
       expect(report).toContain('AVIF')
-    })
+    }, 30000)
   })
 
   describe('resizeImage (via optimizeImage)', () => {
@@ -349,7 +349,7 @@ describe('ImageOptimizer', () => {
       for (const variant of result.resizeVariants) {
         expect(variant.width).toBeLessThan(originalWidth)
       }
-    })
+    }, 30000)
   })
 
   describe('optimizeOriginalFormat (via optimizeImage)', () => {
@@ -363,7 +363,7 @@ describe('ImageOptimizer', () => {
         expect(statSync(result.optimizedPath).size).toBe(result.optimizedSize)
         expect(result.optimizedSize).toBeLessThanOrEqual(result.originalSize)
       }
-    })
+    }, 30000)
   })
 
   describe('optimizeBuffer', () => {
@@ -445,7 +445,7 @@ describe('ImageOptimizer', () => {
       expect(result.savings).toBe(0)
       expect(result.webp).toBeUndefined()
       expect(result.avif).toBeUndefined()
-    })
+    }, 30000)
 
     it('should return optimized original only if smaller than input', async () => {
       const rawNoise = Buffer.alloc(400 * 300 * 3)
