@@ -358,5 +358,3 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
     </div>
   );
 };
-
-export default MultiAgentThoughtUI;
