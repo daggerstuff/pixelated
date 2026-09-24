@@ -91,7 +91,7 @@ cuda-bindings==13.2.0
     # via torch
 cuda-pathfinder==1.5.4
     # via cuda-bindings
-cuda-toolkit==13.0.2
+cuda-toolkit==13.0.3.0
     # via torch
 cycler==0.12.1
     # via matplotlib
@@ -102,6 +102,8 @@ cymem==2.0.13
     #   thinc
 datasets==4.8.5
     # via evaluate
+defusedxml==0.7.1
+    # via nltk
 dill==0.4.1
     # via
     #   datasets
@@ -278,9 +280,9 @@ numpy==2.4.6
     #   transformers
 nvidia-cublas==13.1.1.3
     # via
+    #   cuda-toolkit
     #   nvidia-cudnn-cu13
     #   nvidia-cusolver
-    #   torch
 nvidia-cuda-cupti==13.0.85
     # via cuda-toolkit
 nvidia-cuda-nvrtc==13.0.88
@@ -460,9 +462,7 @@ spacy-legacy==3.0.12
 spacy-loggers==1.0.5
     # via spacy
 sqlalchemy==2.0.49
-    # via
-    #   bias-detection-service (pyproject.toml)
-    #   alembic
+    # via alembic
 srsly==2.5.3
     # via
     #   spacy
