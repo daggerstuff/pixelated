@@ -126,18 +126,18 @@ const mockManagementClient = {
     listUsersByEmail: vi.fn() as MockedFunction<
       (params: UnknownRecord) => Promise<MockManagementDataResponse[]>
     >,
-    link: vi.fn() as MockedFunction<
-      (
-        params: UnknownRecord,
-        body: UnknownRecord,
-      ) => Promise<MockManagementDataResponse>
-    >,
-    unlink: vi.fn() as MockedFunction<
-      (
-        params: UnknownRecord,
-        body: UnknownRecord,
-      ) => Promise<MockManagementDataResponse>
-    >,
+    identities: {
+      link: vi.fn() as MockedFunction<
+        (id: string, body: UnknownRecord) => Promise<MockManagementDataResponse>
+      >,
+      delete: vi.fn() as MockedFunction<
+        (
+          id: string,
+          provider: string,
+          user_id: string,
+        ) => Promise<MockManagementDataResponse>
+      >,
+    },
   },
   assignRolestoUser: vi.fn() as MockedFunction<
     (params: { id: string; roles: string[] }) => Promise<void>
@@ -185,18 +185,23 @@ type Auth0SocialAuthServiceCtor = new () => Auth0SocialAuthService
 const EXAMPLE_TEST_SECRET_PLACEHOLDER = 'example-password-placeholder'
 
 // Mock the auth0 module
-vi.mock('auth0', () => {
+vi.mock('auth0-legacy', () => {
   return {
     AuthenticationClient: vi.fn<() => typeof mockAuthenticationClient>(
       function () {
         return mockAuthenticationClient
       },
     ),
-    ManagementClient: vi.fn<() => typeof mockManagementClient>(function () {
-      return mockManagementClient
-    }),
     UserInfoClient: vi.fn<() => typeof mockUserInfoClient>(function () {
       return mockUserInfoClient
+    }),
+  }
+})
+
+vi.mock('auth0', () => {
+  return {
+    ManagementClient: vi.fn<() => typeof mockManagementClient>(function () {
+      return mockManagementClient
     }),
   }
 })
@@ -321,8 +326,8 @@ describe('Auth0 Integration Tests', () => {
     mockManagementClient.users.update.mockReset()
     mockManagementClient.users.list.mockReset()
     mockManagementClient.users.listUsersByEmail.mockReset()
-    mockManagementClient.users.link.mockReset()
-    mockManagementClient.users.unlink.mockReset()
+    mockManagementClient.users.identities.link.mockReset()
+    mockManagementClient.users.identities.delete.mockReset()
     mockManagementClient.assignRolestoUser.mockReset()
     mockManagementClient.getUserRoles.mockReset()
     mockManagementClient.getUserPermissions.mockReset()
@@ -1088,7 +1093,7 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should properly link social account to existing user', async () => {
-      mockManagementClient.users.link.mockResolvedValue({ data: {} })
+      mockManagementClient.users.identities.link.mockResolvedValue({ data: {} })
 
       await auth0SocialAuthService.linkSocialAccount(
         'auth0|user123',
@@ -1096,10 +1101,8 @@ describe('Auth0 Integration Tests', () => {
         'access-token-123',
       )
 
-      expect(mockManagementClient.users.link).toHaveBeenCalledWith(
-        {
-          id: 'auth0|user123',
-        },
+      expect(mockManagementClient.users.identities.link).toHaveBeenCalledWith(
+        'auth0|user123',
         {
           provider: 'google-oauth2',
           connection_id: 'google-oauth2',
