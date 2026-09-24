@@ -5,7 +5,7 @@ const mockAuthCodeGrant = vi.fn()
 const mockGetUserInfo = vi.fn()
 const mockSecurityLog = vi.fn()
 
-vi.mock('auth0', () => {
+vi.mock('auth0-legacy', () => {
   return {
     AuthenticationClient: vi.fn().mockImplementation(function (this: any) {
       this.oauth = {
