@@ -1,8 +1,8 @@
 /* @vitest-environment node */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { GET, POST } from '../../../pages/api/session/progress'
 import { initializeDatabase } from '../../../lib/db'
+import { GET, POST } from '../../../pages/api/session/progress'
 
 type QueryResultStub = {
   rowCount: number

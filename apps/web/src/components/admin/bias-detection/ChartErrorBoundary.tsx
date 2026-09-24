@@ -46,7 +46,7 @@ export class ChartErrorBoundary extends Component<
       return (
         <div
           role="alert"
-          className="border-border bg-card text-card-foreground rounded-md border p-4"
+          className="rounded-md border border-border bg-card p-4 text-card-foreground"
         >
           <p className="text-sm font-medium">
             {this.props.label ?? 'Chart'} is temporarily unavailable

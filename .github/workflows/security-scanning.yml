@@ -190,7 +190,8 @@ jobs:
           category: checkov-helm
 
       - name: Create diagnostic artifact when Checkov SARIF is missing
-        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if:
+          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         run: |
           if [ "${{ steps.checkov_infra_sarif.outputs.found }}" != "true" ]; then
@@ -201,7 +202,8 @@ jobs:
           fi
 
       - name: Upload Checkov diagnostic artifact
-        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if:
+          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

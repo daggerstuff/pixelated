@@ -16,7 +16,7 @@ export default function TherapyProgressCharts({
 }: TherapyProgressChartsProps) {
   if (!data) {
     return (
-      <div className="text-muted-foreground flex items-center justify-center p-8">
+      <div className="flex items-center justify-center p-8 text-muted-foreground">
         No therapy progress data available
       </div>
     )

@@ -122,7 +122,7 @@ export function EvaluationCard({
                     {metric.value.toFixed(1)}
                   </span>
                 </div>
-                <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full ${getScoreBarColor(metric.value)}`}
                     style={{ width: `${(metric.value / 10) * 100}%` }}
@@ -138,7 +138,7 @@ export function EvaluationCard({
         </div>
       </CardContent>
 
-      <CardFooter className="text-muted-foreground flex items-center justify-between text-xs">
+      <CardFooter className="flex items-center justify-between text-xs text-muted-foreground">
         <span>
           Evaluated {format(evaluation.evaluationDate, 'MMM d, yyyy')}
         </span>

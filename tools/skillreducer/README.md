@@ -1,8 +1,10 @@
 # skillreducer
 
-> **New here?** Start with the [Beginner guide](BEGINNER.md) (install, first audit/reduce, optional TSCG).
+> **New here?** Start with the [Beginner guide](BEGINNER.md) (install, first
+> audit/reduce, optional TSCG).
 
-Open-source toolkit for **token-efficient LLM agent skills**, grounded in three research papers:
+Open-source toolkit for **token-efficient LLM agent skills**, grounded in three
+research papers:
 
 | #   | Paper                         | What it does                                             | How you run it                             |
 | --- | ----------------------------- | -------------------------------------------------------- | ------------------------------------------ |
@@ -18,7 +20,9 @@ Open-source toolkit for **token-efficient LLM agent skills**, grounded in three 
 | Paper index        | [docs/PAPERS.md](docs/PAPERS.md)                                                                      |
 | Citations          | [CITATION.md](CITATION.md)                                                                            |
 
-Works with **any agent platform** that uses the standard `SKILL.md` + YAML frontmatter convention (Claude Code, Windsurf, OpenCode, SkillHub, GitHub community skills, and similar).
+Works with **any agent platform** that uses the standard `SKILL.md` + YAML
+frontmatter convention (Claude Code, Windsurf, OpenCode, SkillHub, GitHub
+community skills, and similar).
 
 ```text
 Optional quality pass     →  SkillRevise          →  skillreducer revise …
@@ -36,12 +40,13 @@ Tool / MCP schemas        →  TSCG                 →  lean mcp_manifest.tscg.
 > Yudong Gao, Zongjie Li, Yuanyuan Yuan, Zimo Ji, Pingchuan Ma, Shuai Wang  
 > [arXiv:2603.29919](https://arxiv.org/abs/2603.29919)
 
-**Problem.** Every token in a skill’s YAML `description` and body competes for context.
-The authors studied **55,315** public skills and found systemic waste: missing/short
-routing descriptions, monolithic bodies (only ~38.5% core rules), and heavy reference
-injection.
+**Problem.** Every token in a skill’s YAML `description` and body competes for
+context. The authors studied **55,315** public skills and found systemic waste:
+missing/short routing descriptions, monolithic bodies (only ~38.5% core rules),
+and heavy reference injection.
 
-**Solution.** A **structure-aware** two-stage paper pipeline (this repo adds **Stage 3** for script extraction):
+**Solution.** A **structure-aware** two-stage paper pipeline (this repo adds
+**Stage 3** for script extraction):
 
 | Stage               | Layer                   | Goal                                                                                    |
 | ------------------- | ----------------------- | --------------------------------------------------------------------------------------- |
@@ -49,32 +54,48 @@ injection.
 | **2**               | Body                    | Keep core rules in `SKILL.md`; move examples / templates / background to on-demand refs |
 | **3** _(this repo)_ | Scripts                 | Selectively extract runnable Python / bash blocks into `scripts/`                       |
 
-**Reported results (paper).** ~48% description compression, ~39% body compression, 86% functional retention; SkillsBench 87/87 with no regression.
+**Reported results (paper).** ~48% description compression, ~39% body
+compression, 86% functional retention; SkillsBench 87/87 with no regression.
 
-Deep dive: [PAPER_DETAIL.md](PAPER_DETAIL.md) · Stage docs: [stage1](skillreducer/stage1/README.md) · [stage2](skillreducer/stage2/README.md) · [stage3](skillreducer/stage3/README.md)
+Deep dive: [PAPER_DETAIL.md](PAPER_DETAIL.md) · Stage docs:
+[stage1](skillreducer/stage1/README.md) ·
+[stage2](skillreducer/stage2/README.md) ·
+[stage3](skillreducer/stage3/README.md)
 
 ### 2. TSCG — tool / MCP schema compression
 
-> **TSCG: Token-efficient Schema Compression for Generative Agents** (and companion Agentic RAG paper)  
-> Sakizli · [arXiv:2605.04107](https://arxiv.org/abs/2605.04107) · companion [2605.26165](https://arxiv.org/abs/2605.26165)
+> **TSCG: Token-efficient Schema Compression for Generative Agents** (and
+> companion Agentic RAG paper)  
+> Sakizli · [arXiv:2605.04107](https://arxiv.org/abs/2605.04107) · companion
+> [2605.26165](https://arxiv.org/abs/2605.26165)
 
-**Problem.** MCP / function-calling tool JSON schemas are often long; they burn context even when the skill body is already lean.
+**Problem.** MCP / function-calling tool JSON schemas are often long; they burn
+context even when the skill body is already lean.
 
-**Solution.** Compress tool schemas into a shorter representation (`mcp_manifest.tscg.*`) via `@tscg/core`, optionally after SkillReducer finishes the skill text.
+**Solution.** Compress tool schemas into a shorter representation
+(`mcp_manifest.tscg.*`) via `@tscg/core`, optionally after SkillReducer finishes
+the skill text.
 
-**In this repo.** Optional flag on `reduce` / `agent` — does **not** replace Stages 1–3.
+**In this repo.** Optional flag on `reduce` / `agent` — does **not** replace
+Stages 1–3.
 
-Deep dive: [docs/TSCG_PAPER_DETAIL.md](docs/TSCG_PAPER_DETAIL.md) · Setup: [skillreducer/tscg/README.md](skillreducer/tscg/README.md)
+Deep dive: [docs/TSCG_PAPER_DETAIL.md](docs/TSCG_PAPER_DETAIL.md) · Setup:
+[skillreducer/tscg/README.md](skillreducer/tscg/README.md)
 
 ### 3. SkillRevise — execution-grounded skill quality
 
-> **SkillRevise** · Liu et al. · [arXiv:2606.01139](https://arxiv.org/abs/2606.01139) · [upstream](https://github.com/xuansenpa1/skillrevise)
+> **SkillRevise** · Liu et al. ·
+> [arXiv:2606.01139](https://arxiv.org/abs/2606.01139) ·
+> [upstream](https://github.com/xuansenpa1/skillrevise)
 
-**Problem.** Compression alone does not fix incorrect or incomplete skills. Quality issues show up in **execution traces**.
+**Problem.** Compression alone does not fix incorrect or incomplete skills.
+Quality issues show up in **execution traces**.
 
-**Solution.** Revise skills from task traces (separate research / CLI). Vendored under `src/skillrevise/`.
+**Solution.** Revise skills from task traces (separate research / CLI). Vendored
+under `src/skillrevise/`.
 
-**In this repo.** Exposed as `skillreducer revise` — **not** wired into `reduce`. Use it when you care about behavior quality, not only token count.
+**In this repo.** Exposed as `skillreducer revise` — **not** wired into
+`reduce`. Use it when you care about behavior quality, not only token count.
 
 Deep dive: [src/skillrevise/README.md](src/skillrevise/README.md)
 
@@ -118,7 +139,8 @@ flowchart TD
 | **Method** | Scan fenced `python`/`py` and `bash`/`sh`/`shell`/`zsh` blocks → **LLM reviews each block** (`extract: true/false`; not bulk conversion) → write approved scripts → replace fences with `Run: \`python scripts/…\``or`bash scripts/…` → revert if markdown tokens do not decrease |
 | **Docs**   | [skillreducer/stage3/README.md](skillreducer/stage3/README.md)                                                                                                                                                                                                                    |
 
-Default `reduce` / `agent` runs **Stage 1 → 2 → 3**. Use `--stage N` for a single stage.
+Default `reduce` / `agent` runs **Stage 1 → 2 → 3**. Use `--stage N` for a
+single stage.
 
 ---
 
@@ -126,7 +148,9 @@ Default `reduce` / `agent` runs **Stage 1 → 2 → 3**. Use `--stage N` for a s
 
 ### Binary (recommended)
 
-Download the latest `skillreducer` / `skillreducer.exe` from [GitHub Releases](https://github.com/zealgoswami-lab/skillreducer/releases), or build locally:
+Download the latest `skillreducer` / `skillreducer.exe` from
+[GitHub Releases](https://github.com/zealgoswami-lab/skillreducer/releases), or
+build locally:
 
 ```bash
 pip install -e ".[build]"
@@ -238,7 +262,8 @@ cd skillreducer/tscg && npm install
 skillreducer reduce path/to/my-skill --tscg --tools tools.json
 ```
 
-Writes `mcp_manifest.json`, `mcp_manifest.tscg.txt`, and `mcp_manifest.tscg.json` into the optimized skill folder.
+Writes `mcp_manifest.json`, `mcp_manifest.tscg.txt`, and
+`mcp_manifest.tscg.json` into the optimized skill folder.
 
 ### Optional SkillRevise (paper 3) — quality from traces
 
@@ -253,7 +278,8 @@ skillrevise-benchmark --help
 skillrevise-benchmark path/to/tasks.json --manifest-kind skillsbench --limit 1
 ```
 
-Docs: [src/skillrevise/README.md](src/skillrevise/README.md) · benchmarks: [src/skillrevise/benchmarks/README.md](src/skillrevise/benchmarks/README.md)
+Docs: [src/skillrevise/README.md](src/skillrevise/README.md) · benchmarks:
+[src/skillrevise/benchmarks/README.md](src/skillrevise/benchmarks/README.md)
 
 ### CLI reference
 
@@ -278,9 +304,11 @@ Simple flow + worked example: [docs/REDUCTION_FLOW.md](docs/REDUCTION_FLOW.md)
 
 ### API key, base URL, and models (from env)
 
-Credentials and model ids are read from `.env` (auto-loaded on startup) or the environment. Env vars override `config.yaml`.
+Credentials and model ids are read from `.env` (auto-loaded on startup) or the
+environment. Env vars override `config.yaml`.
 
-`.env` is discovered automatically: package root → parent directories of cwd → cwd (later paths win among `.env` files).
+`.env` is discovered automatically: package root → parent directories of cwd →
+cwd (later paths win among `.env` files).
 
 | Setting                                       | Env name                      | YAML key                      |
 | --------------------------------------------- | ----------------------------- | ----------------------------- |
@@ -329,7 +357,8 @@ tscg:
 use_llm: true
 ```
 
-Without an API key, LLM features are disabled and heuristics are used. Use `--no-llm` to force heuristic-only mode.
+Without an API key, LLM features are disabled and heuristics are used. Use
+`--no-llm` to force heuristic-only mode.
 
 ---
 
@@ -346,7 +375,8 @@ my-skill/
     └── batch.sh
 ```
 
-After optimization, reference files include routing metadata (`when`, `topics`) so the agent can load them selectively.
+After optimization, reference files include routing metadata (`when`, `topics`)
+so the agent can load them selectively.
 
 ---
 
@@ -386,10 +416,12 @@ ruff check skillreducer tests
 | [CITATION.md](CITATION.md)                             | BibTeX / APA for all three papers                   |
 | [skill_reducer.pdf](skill_reducer.pdf)                 | SkillReducer paper (local copy)                     |
 
-If you use this tool in research, please cite the **SkillReducer paper** (Gao et al., 2026)
-for skill debloating, the **TSCG papers** (Sakizli, 2026) when discussing `--tscg`, and
-**SkillRevise** (Liu et al., 2026) for `revise` — not this repository alone.
+If you use this tool in research, please cite the **SkillReducer paper** (Gao et
+al., 2026) for skill debloating, the **TSCG papers** (Sakizli, 2026) when
+discussing `--tscg`, and **SkillRevise** (Liu et al., 2026) for `revise` — not
+this repository alone.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). The research papers are © their authors; this repo is an independent implementation.
+MIT — see [LICENSE](LICENSE). The research papers are © their authors; this repo
+is an independent implementation.

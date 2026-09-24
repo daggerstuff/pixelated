@@ -267,7 +267,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
             No crisis flags found.
           </div>
         ) : (
-          <div className="divide-gray-200 divide-y">
+          <div className="divide-y divide-border">
             {flags.map((flag) => (
               <div key={flag.id} className="p-6">
                 <div className="flex items-start justify-between">

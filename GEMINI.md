@@ -7,8 +7,8 @@
 
 ## 1. ⚡ Priority Zero: Context Grounding (Foresight First)
 
-Ambient auto-injection automatically injects `[FORESIGHT CONTINUITY CONTEXT]` into turn 1.
-When explicitly retrieving or persisting state during a session:
+Ambient auto-injection automatically injects `[FORESIGHT CONTINUITY CONTEXT]`
+into turn 1. When explicitly retrieving or persisting state during a session:
 
 - **Retrieval (Antigravity lazy MCP tool)**:
   ```python
@@ -19,7 +19,8 @@ When explicitly retrieving or persisting state during a session:
   )
   ```
 - **Continuous In-Flight Capture (Store at Any Point — Never Wait for Wrapup)**:
-  Sessions frequently end abruptly. Always store key decisions, bug fixes, operational findings, and user preferences immediately:
+  Sessions frequently end abruptly. Always store key decisions, bug fixes,
+  operational findings, and user preferences immediately:
   ```python
   # Update user preferences or pending items immediately
   call_mcp_tool(

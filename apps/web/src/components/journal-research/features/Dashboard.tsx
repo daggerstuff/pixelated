@@ -73,7 +73,7 @@ export function Dashboard({ className }: DashboardProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Journal Research Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             Monitor and manage your research sessions
           </p>
         </div>
@@ -82,7 +82,7 @@ export function Dashboard({ className }: DashboardProps) {
             <button
               key={action.label}
               onClick={action.action}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
+              className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
             >
               {action.label}
             </button>
@@ -114,11 +114,11 @@ export function Dashboard({ className }: DashboardProps) {
         </CardHeader>
         <CardContent>
           {sessionsLoading ? (
-            <div className="text-muted-foreground py-8 text-center">
+            <div className="py-8 text-center text-muted-foreground">
               Loading sessions...
             </div>
           ) : recentSessions.length === 0 ? (
-            <div className="text-muted-foreground py-8 text-center">
+            <div className="py-8 text-center text-muted-foreground">
               No sessions yet. Create your first session to get started.
             </div>
           ) : (
@@ -173,7 +173,7 @@ export function Dashboard({ className }: DashboardProps) {
         <CardContent>
           <div className="space-y-3">
             {recentSessions.length === 0 ? (
-              <div className="text-muted-foreground py-4 text-center">
+              <div className="py-4 text-center text-muted-foreground">
                 No recent activity
               </div>
             ) : (
@@ -184,7 +184,7 @@ export function Dashboard({ className }: DashboardProps) {
                 >
                   <div>
                     <p className="font-medium">{session.sessionId}</p>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Started {format(session.startDate, 'MMM d, yyyy')} •{' '}
                       {session.currentPhase}
                     </p>
@@ -193,7 +193,7 @@ export function Dashboard({ className }: DashboardProps) {
                     <p className="text-sm font-medium">
                       {session.progressMetrics?.['progress_percentage'] ?? 0}%
                     </p>
-                    <p className="text-muted-foreground text-xs">Progress</p>
+                    <p className="text-xs text-muted-foreground">Progress</p>
                   </div>
                 </div>
               ))

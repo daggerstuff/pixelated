@@ -78,7 +78,7 @@ export default function PasswordResetRequestForm() {
           }
           required
           disabled={isLoading}
-          className="border-gray-300 focus:ring-primary w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2"
+          className="border-gray-300 w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           placeholder="Enter your email"
         />
       </div>
@@ -87,7 +87,7 @@ export default function PasswordResetRequestForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="bg-primary text-white hover:bg-primary/90 focus:ring-primary w-full rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-offset-2"
+          className="text-white hover:bg-primary/90 w-full rounded-md bg-primary px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
@@ -101,7 +101,7 @@ export default function PasswordResetRequestForm() {
       </div>
 
       <div className="mt-4 text-center">
-        <a href="/login" className="text-primary text-sm hover:underline">
+        <a href="/login" className="text-sm text-primary hover:underline">
           Back to login
         </a>
       </div>

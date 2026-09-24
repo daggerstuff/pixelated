@@ -222,7 +222,7 @@ export function SessionForm({
               {availableSources.map((source) => (
                 <label
                   key={source}
-                  className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md border p-2"
+                  className="flex cursor-pointer items-center gap-2 rounded-md border p-2 hover:bg-muted"
                 >
                   <input
                     type="checkbox"
@@ -245,7 +245,7 @@ export function SessionForm({
                 value={keywordCategory}
                 onChange={(e) => setKeywordCategory(e.target.value)}
                 placeholder="Category"
-                className="border-input w-32 rounded-md border bg-background px-3 py-2 text-sm"
+                className="w-32 rounded-md border border-input bg-background px-3 py-2 text-sm"
               />
               <input
                 type="text"
@@ -258,7 +258,7 @@ export function SessionForm({
                   }
                 }}
                 placeholder="Enter keyword"
-                className="border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm"
+                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
               />
               <Button
                 type="button"
@@ -274,14 +274,14 @@ export function SessionForm({
                 ([category, keywords]) =>
                   keywords.length > 0 && (
                     <div key={category}>
-                      <p className="text-muted-foreground mb-1 text-xs font-medium">
+                      <p className="mb-1 text-xs font-medium text-muted-foreground">
                         {category}:
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {keywords.map((keyword) => (
                           <span
                             key={keyword}
-                            className="bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs"
+                            className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
                           >
                             {keyword}
                             <button
@@ -319,7 +319,7 @@ export function SessionForm({
                     onChange={(e) =>
                       handleWeeklyTargetChange(week, e.target.value)
                     }
-                    className="border-input w-full rounded-md border bg-background px-2 py-1 text-sm"
+                    className="w-full rounded-md border border-input bg-background px-2 py-1 text-sm"
                   />
                 </div>
               ))}
@@ -335,7 +335,7 @@ export function SessionForm({
                 onChange={(e) =>
                   setFormData({ ...formData, currentPhase: e.target.value })
                 }
-                className="border-input w-full rounded-md border bg-background px-3 py-2 text-sm"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
                 <option value="discovery">Discovery</option>
                 <option value="evaluation">Evaluation</option>

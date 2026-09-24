@@ -48,7 +48,7 @@ export function RiskReviewCard({
 
   return (
     <div
-      className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+      className="border-gray-200 bg-white rounded-lg border p-4 shadow-sm"
       data-testid={`risk-review-card-${review.id}`}
     >
       <div className="flex items-center justify-between">
@@ -59,14 +59,14 @@ export function RiskReviewCard({
           >
             {review.riskLevel.toUpperCase()}
           </span>
-          <span className="text-sm text-gray-500">
+          <span className="text-gray-500 text-sm">
             Score: {review.riskScore.toFixed(2)}
           </span>
         </div>
-        <span className="text-xs text-gray-400">{aiLabel}</span>
+        <span className="text-gray-400 text-xs">{aiLabel}</span>
       </div>
 
-      <div className="mt-3 space-y-1 text-sm text-gray-600">
+      <div className="text-gray-600 mt-3 space-y-1 text-sm">
         <p>
           <span className="font-medium">Patient:</span> {review.patientId}
         </p>
@@ -97,7 +97,7 @@ export function RiskReviewCard({
             type="button"
             onClick={() => onApprove(review.id)}
             disabled={disabled}
-            className="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+            className="bg-green-600 text-white hover:bg-green-700 rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-50"
             data-testid="approve-btn"
           >
             Approve
@@ -106,7 +106,7 @@ export function RiskReviewCard({
             type="button"
             onClick={() => onReject(review.id, 'Pending detailed review')}
             disabled={disabled}
-            className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+            className="bg-red-600 text-white hover:bg-red-700 rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-50"
             data-testid="reject-btn"
           >
             Reject

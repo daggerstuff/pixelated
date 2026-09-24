@@ -117,104 +117,107 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
   }, [moodVector])
 
   // Animation function
-  const animate = useCallback(function animate() {
-    const canvas = canvasRef.current
-    if (!canvas) {
-      return
-    }
+  const animate = useCallback(
+    function animate() {
+      const canvas = canvasRef.current
+      if (!canvas) {
+        return
+      }
 
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-      return
-    }
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        return
+      }
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // Set up 3D-like perspective
-    const centerX = canvas.width / 2
-    const centerY = canvas.height / 2
-    const scale = 2
+      // Set up 3D-like perspective
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
+      const scale = 2
 
-    timeRef.current += 0.02
+      timeRef.current += 0.02
 
-    // Draw brain outline
-    ctx.strokeStyle = '#E5E7EB'
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.ellipse(centerX, centerY, 80, 60, 0, 0, 2 * Math.PI)
-    ctx.stroke()
+      // Draw brain outline
+      ctx.strokeStyle = '#E5E7EB'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.ellipse(centerX, centerY, 80, 60, 0, 0, 2 * Math.PI)
+      ctx.stroke()
 
-    // Draw neural connections
-    brainRegions.forEach((region, i) => {
-      brainRegions.forEach((otherRegion, j) => {
-        if (i >= j) {
-          return
-        }
+      // Draw neural connections
+      brainRegions.forEach((region, i) => {
+        brainRegions.forEach((otherRegion, j) => {
+          if (i >= j) {
+            return
+          }
 
-        const distance = Math.sqrt(
-          Math.pow(region.x - otherRegion.x, 2) +
-            Math.pow(region.y - otherRegion.y, 2) +
-            Math.pow(region.z - otherRegion.z, 2),
-        )
-
-        if (distance < 50) {
-          const connectionStrength =
-            (region.activity + otherRegion.activity) / 2
-
-          ctx.strokeStyle = `rgba(99, 102, 241, ${connectionStrength * 0.3})`
-          ctx.lineWidth = connectionStrength * 2
-          ctx.beginPath()
-          ctx.moveTo(centerX + region.x * scale, centerY + region.y * scale)
-          ctx.lineTo(
-            centerX + otherRegion.x * scale,
-            centerY + otherRegion.y * scale,
+          const distance = Math.sqrt(
+            Math.pow(region.x - otherRegion.x, 2) +
+              Math.pow(region.y - otherRegion.y, 2) +
+              Math.pow(region.z - otherRegion.z, 2),
           )
+
+          if (distance < 50) {
+            const connectionStrength =
+              (region.activity + otherRegion.activity) / 2
+
+            ctx.strokeStyle = `rgba(99, 102, 241, ${connectionStrength * 0.3})`
+            ctx.lineWidth = connectionStrength * 2
+            ctx.beginPath()
+            ctx.moveTo(centerX + region.x * scale, centerY + region.y * scale)
+            ctx.lineTo(
+              centerX + otherRegion.x * scale,
+              centerY + otherRegion.y * scale,
+            )
+            ctx.stroke()
+          }
+        })
+      })
+
+      // Draw brain regions
+      brainRegions.forEach((region) => {
+        const x = centerX + region.x * scale
+        const y = centerY + region.y * scale
+
+        // Pulsing effect based on activity
+        const pulse =
+          1 +
+          Math.sin(timeRef.current * 3 + region.x * 0.1) * 0.2 * region.activity
+        const radius = (region.size * region.activity * pulse) / 2
+
+        // Glow effect
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 2)
+        gradient.addColorStop(0, region.color + 'AA')
+        gradient.addColorStop(0.5, region.color + '44')
+        gradient.addColorStop(1, region.color + '00')
+
+        ctx.fillStyle = gradient
+        ctx.beginPath()
+        ctx.arc(x, y, radius * 2, 0, 2 * Math.PI)
+        ctx.fill()
+
+        // Core region
+        ctx.fillStyle = region.color
+        ctx.beginPath()
+        ctx.arc(x, y, radius, 0, 2 * Math.PI)
+        ctx.fill()
+
+        // Activity indicator
+        if (region.activity > 0.7) {
+          ctx.strokeStyle = '#FFFFFF'
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.arc(x, y, radius + 3, 0, 2 * Math.PI)
           ctx.stroke()
         }
       })
-    })
 
-    // Draw brain regions
-    brainRegions.forEach((region) => {
-      const x = centerX + region.x * scale
-      const y = centerY + region.y * scale
-
-      // Pulsing effect based on activity
-      const pulse =
-        1 +
-        Math.sin(timeRef.current * 3 + region.x * 0.1) * 0.2 * region.activity
-      const radius = (region.size * region.activity * pulse) / 2
-
-      // Glow effect
-      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 2)
-      gradient.addColorStop(0, region.color + 'AA')
-      gradient.addColorStop(0.5, region.color + '44')
-      gradient.addColorStop(1, region.color + '00')
-
-      ctx.fillStyle = gradient
-      ctx.beginPath()
-      ctx.arc(x, y, radius * 2, 0, 2 * Math.PI)
-      ctx.fill()
-
-      // Core region
-      ctx.fillStyle = region.color
-      ctx.beginPath()
-      ctx.arc(x, y, radius, 0, 2 * Math.PI)
-      ctx.fill()
-
-      // Activity indicator
-      if (region.activity > 0.7) {
-        ctx.strokeStyle = '#FFFFFF'
-        ctx.lineWidth = 2
-        ctx.beginPath()
-        ctx.arc(x, y, radius + 3, 0, 2 * Math.PI)
-        ctx.stroke()
-      }
-    })
-
-    animationRef.current = requestAnimationFrame(animate)
-  }, [brainRegions])
+      animationRef.current = requestAnimationFrame(animate)
+    },
+    [brainRegions],
+  )
 
   useEffect(() => {
     const canvas = canvasRef.current

@@ -138,7 +138,7 @@ export function EvaluationList({
         <button
           type="button"
           onClick={() => onEvaluationClick?.(row)}
-          className="text-primary text-left font-mono text-sm font-medium hover:underline"
+          className="text-left font-mono text-sm font-medium text-primary hover:underline"
         >
           {row.evaluationId.slice(0, 8)}...
         </button>
@@ -220,12 +220,12 @@ export function EvaluationList({
             placeholder="Search evaluations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm"
+            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
           />
           <select
             value={tierFilter}
             onChange={(e) => setTierFilter(e.target.value)}
-            className="border-input rounded-md border bg-background px-3 py-2 text-sm capitalize"
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm capitalize"
           >
             <option value="all">All Tiers</option>
             {tiers.map((tier) => (
@@ -237,7 +237,7 @@ export function EvaluationList({
           <select
             value={scoreFilter}
             onChange={(e) => setScoreFilter(e.target.value)}
-            className="border-input rounded-md border bg-background px-3 py-2 text-sm"
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
             <option value="all">All Scores</option>
             <option value="high">High (≥8)</option>
@@ -245,7 +245,7 @@ export function EvaluationList({
             <option value="low">Low (&lt;6)</option>
           </select>
         </div>
-        <div className="text-muted-foreground text-sm">
+        <div className="text-sm text-muted-foreground">
           Showing {filteredAndSortedEvaluations.length} of {evaluations.total}{' '}
           evaluations
         </div>

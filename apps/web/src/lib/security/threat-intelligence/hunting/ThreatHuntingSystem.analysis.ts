@@ -3,10 +3,16 @@
  * Extracted analysis methods — standalone functions for analyzing hunt results.
  */
 
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type { HuntPattern } from '../global/types'
 import type { RawHuntFinding } from './ThreatHuntingSystem.types'
-import { groupBy, increaseSeverity, toDate, toStringValue, getNestedValue } from './ThreatHuntingSystem.utils'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import {
+  groupBy,
+  increaseSeverity,
+  toDate,
+  toStringValue,
+  getNestedValue,
+} from './ThreatHuntingSystem.utils'
 
 const logger = createBuildSafeLogger('threat-hunting-analysis')
 
@@ -27,7 +33,10 @@ export async function analyzeHuntResults(
       analyzedResults.push(analyzedResult)
     }
 
-    const patternAnalyzedResults = await applyPatternAnalysis(analyzedResults, pattern)
+    const patternAnalyzedResults = await applyPatternAnalysis(
+      analyzedResults,
+      pattern,
+    )
     return patternAnalyzedResults
   } catch (error: unknown) {
     logger.error('Hunt result analysis failed:', { error })
@@ -117,14 +126,17 @@ async function analyzeEndpointResults(
   results: RawHuntFinding[],
 ): Promise<RawHuntFinding[]> {
   try {
-    const processResults = results.filter((r) => r.type === 'suspicious_process')
+    const processResults = results.filter(
+      (r) => r.type === 'suspicious_process',
+    )
     const fileResults = results.filter((r) => r.type === 'file_system_anomaly')
 
     for (const processResult of processResults) {
       const relatedFiles = fileResults.filter(
         (file) =>
           Math.abs(
-            toDate(file.timestamp).getTime() - toDate(processResult.timestamp).getTime(),
+            toDate(file.timestamp).getTime() -
+              toDate(processResult.timestamp).getTime(),
           ) < 60000,
       )
 
@@ -147,8 +159,12 @@ async function analyzeUserBehaviorResults(
   results: RawHuntFinding[],
 ): Promise<RawHuntFinding[]> {
   try {
-    const loginResults = results.filter((r) => r.type === 'unusual_login_pattern')
-    const accessResults = results.filter((r) => r.type === 'unusual_access_pattern')
+    const loginResults = results.filter(
+      (r) => r.type === 'unusual_login_pattern',
+    )
+    const accessResults = results.filter(
+      (r) => r.type === 'unusual_access_pattern',
+    )
 
     for (const loginResult of loginResults) {
       const loginDataId = toStringValue(loginResult.data['_id'])
@@ -173,8 +189,12 @@ async function analyzeMalwareResults(
   results: RawHuntFinding[],
 ): Promise<RawHuntFinding[]> {
   try {
-    const signatureResults = results.filter((r) => r.type === 'known_malware_signature')
-    const behavioralResults = results.filter((r) => r.type === 'malware_behavioral_indicator')
+    const signatureResults = results.filter(
+      (r) => r.type === 'known_malware_signature',
+    )
+    const behavioralResults = results.filter(
+      (r) => r.type === 'malware_behavioral_indicator',
+    )
 
     signatureResults.forEach((result) => {
       result.confidence = 1.0
@@ -182,8 +202,12 @@ async function analyzeMalwareResults(
     })
 
     for (const behavioralResult of behavioralResults) {
-      const behavioralSourceIp = toStringValue(behavioralResult.data['sourceIp'])
-      const behavioralProcessId = toStringValue(behavioralResult.data['processId'])
+      const behavioralSourceIp = toStringValue(
+        behavioralResult.data['sourceIp'],
+      )
+      const behavioralProcessId = toStringValue(
+        behavioralResult.data['processId'],
+      )
 
       const relatedSignatures = signatureResults.filter((sig) => {
         if (toStringValue(sig.data['sourceIp']) === behavioralSourceIp) {
@@ -193,7 +217,10 @@ async function analyzeMalwareResults(
       })
 
       if (relatedSignatures.length > 0) {
-        behavioralResult.confidence = Math.min(behavioralResult.confidence * 1.3, 1.0)
+        behavioralResult.confidence = Math.min(
+          behavioralResult.confidence * 1.3,
+          1.0,
+        )
       }
     }
 
@@ -208,8 +235,12 @@ async function analyzeLateralMovementResults(
   results: RawHuntFinding[],
 ): Promise<RawHuntFinding[]> {
   try {
-    const credentialResults = results.filter((r) => r.type === 'credential_dumping')
-    const enumerationResults = results.filter((r) => r.type === 'network_enumeration')
+    const credentialResults = results.filter(
+      (r) => r.type === 'credential_dumping',
+    )
+    const enumerationResults = results.filter(
+      (r) => r.type === 'network_enumeration',
+    )
     const remoteResults = results.filter((r) => r.type === 'remote_access_tool')
 
     for (const credentialResult of credentialResults) {
@@ -226,7 +257,10 @@ async function analyzeLateralMovementResults(
       )
 
       if (relatedEnumeration.length > 0 || relatedRemote.length > 0) {
-        credentialResult.confidence = Math.min(credentialResult.confidence * 1.4, 1.0)
+        credentialResult.confidence = Math.min(
+          credentialResult.confidence * 1.4,
+          1.0,
+        )
         credentialResult.severity = 'critical'
       }
     }

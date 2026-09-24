@@ -54,7 +54,7 @@ export const Popover: FC<PopoverProps> = ({
           {trigger}
         </button>
         {isOpen && (
-          <div className="bg-popover text-popover-foreground animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 absolute z-50 min-w-32 overflow-hidden rounded-md border p-2 shadow-md">
+          <div className="animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 absolute z-50 min-w-32 overflow-hidden rounded-md border bg-popover p-2 text-popover-foreground shadow-md">
             {children}
           </div>
         )}
@@ -101,7 +101,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
 
   return (
     <div
-      className={`bg-popover text-popover-foreground animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 absolute z-50 min-w-32 overflow-hidden rounded-md border p-2 shadow-md ${className}`}
+      className={`animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 absolute z-50 min-w-32 overflow-hidden rounded-md border bg-popover p-2 text-popover-foreground shadow-md ${className}`}
     >
       {children}
     </div>

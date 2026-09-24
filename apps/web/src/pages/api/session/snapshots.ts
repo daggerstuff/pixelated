@@ -135,7 +135,9 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           sessionId,
-          snapshots: (sessionResult.rows[0] as { progress_snapshots?: unknown[] }).progress_snapshots,
+          snapshots: (
+            sessionResult.rows[0] as { progress_snapshots?: unknown[] }
+          ).progress_snapshots,
           milestones: milestoneResult.rows,
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } },

@@ -12,8 +12,8 @@ function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
   return (
     <div className="flex min-h-[200px] items-center justify-center p-8">
       <div className="flex flex-col items-center gap-2">
-        <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2" />
-        <p className="text-muted-foreground text-sm">{message}</p>
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
+        <p className="text-sm text-muted-foreground">{message}</p>
       </div>
     </div>
   )
@@ -25,7 +25,7 @@ function ErrorFallback({ error }: { error: Error }) {
     <div className="flex min-h-[200px] items-center justify-center p-8">
       <div className="text-center">
         <p className="text-red-500 text-sm">Failed to load component</p>
-        <p className="text-muted-foreground mt-1 text-xs">{error.message}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{error.message}</p>
       </div>
     </div>
   )

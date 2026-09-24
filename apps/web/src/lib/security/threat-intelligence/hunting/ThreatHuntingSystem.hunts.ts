@@ -5,6 +5,8 @@
  */
 
 import type { Db } from 'mongodb'
+
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type { HuntExecution, HuntPattern } from '../global/types'
 import type {
   RawHuntFinding,
@@ -20,7 +22,6 @@ import {
   normalizeSeverity,
   toStringValue,
 } from './ThreatHuntingSystem.utils'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('threat-hunting-hunts')
 
@@ -81,7 +82,9 @@ async function executeNetworkHunt(
   execution: HuntExecution,
 ): Promise<RawHuntFinding[]> {
   try {
-    logger.info('Executing network hunt', { executionId: execution.executionId })
+    logger.info('Executing network hunt', {
+      executionId: execution.executionId,
+    })
     const results: RawHuntFinding[] = []
     results.push(...(await huntSuspiciousConnections(db, execution)))
     results.push(...(await huntUnusualDNSQueries(db, execution)))
@@ -99,7 +102,9 @@ async function executeEndpointHunt(
   execution: HuntExecution,
 ): Promise<RawHuntFinding[]> {
   try {
-    logger.info('Executing endpoint hunt', { executionId: execution.executionId })
+    logger.info('Executing endpoint hunt', {
+      executionId: execution.executionId,
+    })
     const results: RawHuntFinding[] = []
     results.push(...(await huntSuspiciousProcesses(db, execution)))
     results.push(...(await huntFileSystemAnomalies(db, execution)))
@@ -117,7 +122,9 @@ async function executeUserBehaviorHunt(
   execution: HuntExecution,
 ): Promise<RawHuntFinding[]> {
   try {
-    logger.info('Executing user behavior hunt', { executionId: execution.executionId })
+    logger.info('Executing user behavior hunt', {
+      executionId: execution.executionId,
+    })
     const results: RawHuntFinding[] = []
     results.push(...(await huntUnusualLoginPatterns(db, execution)))
     results.push(...(await huntPrivilegeEscalation(db, execution)))
@@ -135,7 +142,9 @@ async function executeMalwareHunt(
   execution: HuntExecution,
 ): Promise<RawHuntFinding[]> {
   try {
-    logger.info('Executing malware hunt', { executionId: execution.executionId })
+    logger.info('Executing malware hunt', {
+      executionId: execution.executionId,
+    })
     const results: RawHuntFinding[] = []
     results.push(...(await huntKnownMalwareSignatures(db, execution)))
     results.push(...(await huntSuspiciousFileHashes(db, execution)))
@@ -153,7 +162,9 @@ async function executeLateralMovementHunt(
   execution: HuntExecution,
 ): Promise<RawHuntFinding[]> {
   try {
-    logger.info('Executing lateral movement hunt', { executionId: execution.executionId })
+    logger.info('Executing lateral movement hunt', {
+      executionId: execution.executionId,
+    })
     const results: RawHuntFinding[] = []
     results.push(...(await huntCredentialDumping(db, execution)))
     results.push(...(await huntNetworkEnumeration(db, execution)))
@@ -185,7 +196,9 @@ async function executeDefaultHunt(
   execution: HuntExecution,
 ): Promise<RawHuntFinding[]> {
   try {
-    logger.info('Executing default hunt', { executionId: execution.executionId })
+    logger.info('Executing default hunt', {
+      executionId: execution.executionId,
+    })
     return await executeBasicSecurityAnalysis(db, execution)
   } catch (error: unknown) {
     logger.error('Default hunt execution failed:', { error })
@@ -211,7 +224,10 @@ async function huntSuspiciousConnections(
         },
         $or: [
           { destinationPort: { $in: [22, 23, 135, 139, 445, 1433, 3389] } },
-          { connectionState: 'ESTABLISHED', bytesTransferred: { $gt: 1000000 } },
+          {
+            connectionState: 'ESTABLISHED',
+            bytesTransferred: { $gt: 1000000 },
+          },
           {
             sourceIp: { $regex: /^10\.|^172\.|^192\.168\./ },
             destinationIp: { $not: { $regex: /^10\.|^172\.|^192\.168\./ } },
@@ -292,7 +308,9 @@ async function huntPortScanning(
           $group: {
             _id: {
               sourceIp: '$sourceIp',
-              hour: { $dateToString: { format: '%Y-%m-%d %H:00', date: '$timestamp' } },
+              hour: {
+                $dateToString: { format: '%Y-%m-%d %H:00', date: '$timestamp' },
+              },
             },
             uniquePorts: { $addToSet: '$destinationPort' },
             connectionCount: { $sum: 1 },
@@ -404,9 +422,21 @@ async function huntFileSystemAnomalies(
           $lte: new Date(timeRange.endTime),
         },
         $or: [
-          { filePath: { $regex: /temp|tmp|appdata/i }, operation: 'CREATE', fileSize: { $gt: 1000000 } },
-          { filePath: { $regex: /system32|syswow64/i }, operation: 'MODIFY', user: { $ne: 'SYSTEM' } },
-          { fileExtension: { $in: ['.exe', '.dll', '.sys'] }, operation: 'CREATE', digitalSignature: { $exists: false } },
+          {
+            filePath: { $regex: /temp|tmp|appdata/i },
+            operation: 'CREATE',
+            fileSize: { $gt: 1000000 },
+          },
+          {
+            filePath: { $regex: /system32|syswow64/i },
+            operation: 'MODIFY',
+            user: { $ne: 'SYSTEM' },
+          },
+          {
+            fileExtension: { $in: ['.exe', '.dll', '.sys'] },
+            operation: 'CREATE',
+            digitalSignature: { $exists: false },
+          },
         ],
       })
       .limit(execution.maxResults ?? 1000)
@@ -442,7 +472,10 @@ async function huntRegistryModifications(
         $or: [
           { keyPath: { $regex: /run|runonce|services/i } },
           { keyPath: { $regex: /security|policy|audit/i } },
-          { operation: 'CREATE', valueData: { $regex: /http|ftp|powershell/i } },
+          {
+            operation: 'CREATE',
+            valueData: { $regex: /http|ftp|powershell/i },
+          },
         ],
       })
       .limit(execution.maxResults ?? 1000)
@@ -475,7 +508,9 @@ async function huntPersistenceMechanisms(
           $gte: new Date(timeRange.startTime),
           $lte: new Date(timeRange.endTime),
         },
-        mechanismType: { $in: ['service', 'scheduled_task', 'registry', 'startup_folder'] },
+        mechanismType: {
+          $in: ['service', 'scheduled_task', 'registry', 'startup_folder'],
+        },
       })
       .limit(execution.maxResults ?? 500)
       .toArray()
@@ -507,7 +542,10 @@ async function huntUnusualLoginPatterns(
       .aggregate<LoginAggregateResult>([
         {
           $match: {
-            timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+            timestamp: {
+              $gte: new Date(timeRange.startTime),
+              $lte: new Date(timeRange.endTime),
+            },
             eventType: 'login',
           },
         },
@@ -516,13 +554,18 @@ async function huntUnusualLoginPatterns(
             _id: '$userId',
             loginCount: { $sum: 1 },
             uniqueLocations: { $addToSet: '$sourceIp' },
-            failureCount: { $sum: { $cond: [{ $eq: ['$status', 'failure'] }, 1, 0] } },
+            failureCount: {
+              $sum: { $cond: [{ $eq: ['$status', 'failure'] }, 1, 0] },
+            },
             timestamps: { $push: '$timestamp' },
           },
         },
         {
           $match: {
-            $or: [{ failureCount: { $gte: 5 } }, { uniqueLocations: { $size: { $gte: 3 } } }],
+            $or: [
+              { failureCount: { $gte: 5 } },
+              { uniqueLocations: { $size: { $gte: 3 } } },
+            ],
           },
         },
       ])
@@ -552,7 +595,10 @@ async function huntPrivilegeEscalation(
 
     const privilegeEscalations = await authLogs
       .find({
-        timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+        timestamp: {
+          $gte: new Date(timeRange.startTime),
+          $lte: new Date(timeRange.endTime),
+        },
         eventType: 'privilege_change',
         $or: [
           { oldRole: 'user', newRole: { $in: ['admin', 'root'] } },
@@ -587,7 +633,10 @@ async function huntUnusualAccessPatterns(
       .aggregate<AccessAggregateResult>([
         {
           $match: {
-            timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+            timestamp: {
+              $gte: new Date(timeRange.startTime),
+              $lte: new Date(timeRange.endTime),
+            },
           },
         },
         {
@@ -600,7 +649,10 @@ async function huntUnusualAccessPatterns(
         },
         {
           $match: {
-            $or: [{ accessCount: { $gte: 100 } }, { uniqueResources: { $size: { $gte: 20 } } }],
+            $or: [
+              { accessCount: { $gte: 100 } },
+              { uniqueResources: { $size: { $gte: 20 } } },
+            ],
           },
         },
       ])
@@ -632,7 +684,10 @@ async function huntAccountCompromise(
       .aggregate([
         {
           $match: {
-            timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+            timestamp: {
+              $gte: new Date(timeRange.startTime),
+              $lte: new Date(timeRange.endTime),
+            },
             eventType: 'login',
             status: 'success',
           },
@@ -647,7 +702,10 @@ async function huntAccountCompromise(
         },
         {
           $match: {
-            $or: [{ loginLocations: { $size: { $gte: 5 } } }, { deviceTypes: { $size: { $gte: 3 } } }],
+            $or: [
+              { loginLocations: { $size: { $gte: 5 } } },
+              { deviceTypes: { $size: { $gte: 3 } } },
+            ],
           },
         },
       ])
@@ -681,11 +739,16 @@ async function huntKnownMalwareSignatures(
     const knownSignatures = await malwareCollection.find({}).toArray()
     const signatureHashes = knownSignatures
       .map((sig) => toStringValue(sig['hash']))
-      .filter((hash): hash is string => typeof hash === 'string' && hash.length > 0)
+      .filter(
+        (hash): hash is string => typeof hash === 'string' && hash.length > 0,
+      )
 
     const malwareFiles = await fileLogs
       .find({
-        timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+        timestamp: {
+          $gte: new Date(timeRange.startTime),
+          $lte: new Date(timeRange.endTime),
+        },
         fileHash: { $in: signatureHashes },
         operation: 'CREATE',
       })
@@ -715,7 +778,10 @@ async function huntSuspiciousFileHashes(
 
     const suspiciousHashes = await fileLogs
       .find({
-        timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+        timestamp: {
+          $gte: new Date(timeRange.startTime),
+          $lte: new Date(timeRange.endTime),
+        },
         fileHash: { $exists: true },
         $or: [
           { digitalSignature: { $exists: false } },
@@ -749,11 +815,20 @@ async function huntMalwareBehavioralIndicators(
 
     const behavioralIndicators = await processLogs
       .find({
-        timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+        timestamp: {
+          $gte: new Date(timeRange.startTime),
+          $lte: new Date(timeRange.endTime),
+        },
         $or: [
-          { processName: { $regex: /svchost|lsass|winlogon/i }, parentProcess: { $ne: 'services.exe' } },
+          {
+            processName: { $regex: /svchost|lsass|winlogon/i },
+            parentProcess: { $ne: 'services.exe' },
+          },
           { commandLine: { $regex: /-nop|-windowstyle hidden|bypass/i } },
-          { processName: { $regex: /\.exe$/i }, digitalSignature: { $exists: false } },
+          {
+            processName: { $regex: /\.exe$/i },
+            digitalSignature: { $exists: false },
+          },
         ],
       })
       .limit(execution.maxResults ?? 1000)
@@ -784,19 +859,28 @@ async function huntC2Communications(
       .aggregate<LateralAggregateResult>([
         {
           $match: {
-            timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+            timestamp: {
+              $gte: new Date(timeRange.startTime),
+              $lte: new Date(timeRange.endTime),
+            },
             destinationIp: { $not: { $regex: /^10\.|^172\.|^192\.168\./ } },
           },
         },
         {
           $group: {
-            _id: { sourceIp: '$sourceIp', destinationIp: '$destinationIp', destinationPort: '$destinationPort' },
+            _id: {
+              sourceIp: '$sourceIp',
+              destinationIp: '$destinationIp',
+              destinationPort: '$destinationPort',
+            },
             connectionCount: { $sum: 1 },
             timestamps: { $push: '$timestamp' },
             totalBytes: { $sum: '$bytesTransferred' },
           },
         },
-        { $match: { connectionCount: { $gte: 10 }, totalBytes: { $lt: 10000 } } },
+        {
+          $match: { connectionCount: { $gte: 10 }, totalBytes: { $lt: 10000 } },
+        },
       ])
       .limit(execution.maxResults ?? 100)
       .toArray()
@@ -826,7 +910,10 @@ async function huntCredentialDumping(
 
     const credentialDumping = await processLogs
       .find({
-        timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+        timestamp: {
+          $gte: new Date(timeRange.startTime),
+          $lte: new Date(timeRange.endTime),
+        },
         $or: [
           { processName: { $regex: /mimikatz|sekurlsa|lsadump/i } },
           { commandLine: { $regex: /sekurlsa::|lsadump::|hashdump/i } },
@@ -861,14 +948,19 @@ async function huntNetworkEnumeration(
       .aggregate<LateralAggregateResult>([
         {
           $match: {
-            timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+            timestamp: {
+              $gte: new Date(timeRange.startTime),
+              $lte: new Date(timeRange.endTime),
+            },
           },
         },
         {
           $group: {
             _id: {
               sourceIp: '$sourceIp',
-              hour: { $dateToString: { format: '%Y-%m-%d %H:00', date: '$timestamp' } },
+              hour: {
+                $dateToString: { format: '%Y-%m-%d %H:00', date: '$timestamp' },
+              },
             },
             uniqueDestinations: { $addToSet: '$destinationIp' },
             connectionCount: { $sum: 1 },
@@ -910,11 +1002,17 @@ async function huntServiceExploitation(
 
     const serviceExploitation = await systemLogs
       .find({
-        timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+        timestamp: {
+          $gte: new Date(timeRange.startTime),
+          $lte: new Date(timeRange.endTime),
+        },
         eventType: 'service',
         $or: [
           { message: { $regex: /exploit|buffer overflow|injection/i } },
-          { serviceName: { $in: ['smb', 'rdp', 'ssh', 'ftp'] }, status: 'crashed' },
+          {
+            serviceName: { $in: ['smb', 'rdp', 'ssh', 'ftp'] },
+            status: 'crashed',
+          },
         ],
       })
       .limit(execution.maxResults ?? 200)
@@ -943,11 +1041,19 @@ async function huntRemoteAccessTools(
 
     const remoteAccessTools = await processLogs
       .find({
-        timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+        timestamp: {
+          $gte: new Date(timeRange.startTime),
+          $lte: new Date(timeRange.endTime),
+        },
         processName: {
           $in: [
-            'teamviewer.exe', 'anydesk.exe', 'logmein.exe',
-            'gotomypc.exe', 'vncserver.exe', 'radmin.exe', 'dameware.exe',
+            'teamviewer.exe',
+            'anydesk.exe',
+            'logmein.exe',
+            'gotomypc.exe',
+            'vncserver.exe',
+            'radmin.exe',
+            'dameware.exe',
           ],
         },
       })
@@ -1007,7 +1113,10 @@ async function executeBasicSecurityAnalysis(
 
     const securityEvents = await securityLogs
       .find({
-        timestamp: { $gte: new Date(timeRange.startTime), $lte: new Date(timeRange.endTime) },
+        timestamp: {
+          $gte: new Date(timeRange.startTime),
+          $lte: new Date(timeRange.endTime),
+        },
         severity: { $in: ['high', 'critical'] },
       })
       .limit(execution.maxResults ?? 1000)

@@ -9,19 +9,18 @@
 import { EventEmitter } from 'events'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-
-import type {
-  EdgeLocation,
-  EdgeDeploymentConfig,
-  EdgeNodeStatus,
-} from './EdgeComputingManager.types'
-import { DEFAULT_EDGE_LOCATIONS } from './EdgeComputingManager.locations'
 import {
   generateWorkerScript,
   generateLambdaFunction,
   generateAzureFunction,
   generateGCPFunction,
 } from './EdgeComputingManager.codegen'
+import { DEFAULT_EDGE_LOCATIONS } from './EdgeComputingManager.locations'
+import type {
+  EdgeLocation,
+  EdgeDeploymentConfig,
+  EdgeNodeStatus,
+} from './EdgeComputingManager.types'
 
 // Re-export types for backward compatibility — index.ts and ConfigurationManager.ts import from here
 export type { EdgeLocation, EdgeDeploymentConfig, EdgeNodeStatus }
@@ -35,7 +34,8 @@ export class EdgeComputingManager extends EventEmitter {
   private isInitialized = false
 
   // Predefined edge locations covering 50+ global locations
-  private readonly DEFAULT_EDGE_LOCATIONS: EdgeLocation[] = DEFAULT_EDGE_LOCATIONS
+  private readonly DEFAULT_EDGE_LOCATIONS: EdgeLocation[] =
+    DEFAULT_EDGE_LOCATIONS
 
   constructor(config: EdgeDeploymentConfig) {
     super()

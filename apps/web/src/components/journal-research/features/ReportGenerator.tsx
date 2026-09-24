@@ -54,7 +54,7 @@ export function ReportGenerator({
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Report Generator</h1>
-        <p className="text-muted-foreground mt-1">
+        <p className="mt-1 text-muted-foreground">
           Generate comprehensive reports for your research sessions
         </p>
       </div>
@@ -80,7 +80,7 @@ export function ReportGenerator({
                       | 'summary_report',
                   )
                 }
-                className="border-input w-full rounded-md border bg-background px-3 py-2 text-sm"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
                 <option value="session_report">Session Report</option>
                 <option value="weekly_report">Weekly Report</option>
@@ -95,7 +95,7 @@ export function ReportGenerator({
                 onChange={(e) =>
                   setOutputFormat(e.target.value as 'json' | 'markdown' | 'pdf')
                 }
-                className="border-input w-full rounded-md border bg-background px-3 py-2 text-sm"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
               >
                 <option value="json">JSON</option>
                 <option value="markdown">Markdown</option>
@@ -119,7 +119,7 @@ export function ReportGenerator({
                         startDate: e.target.value,
                       })
                     }
-                    className="border-input w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
@@ -135,7 +135,7 @@ export function ReportGenerator({
                         endDate: e.target.value,
                       })
                     }
-                    className="border-input w-full rounded-md border bg-background px-3 py-2 text-sm"
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   />
                 </div>
               </div>
@@ -160,7 +160,7 @@ export function ReportGenerator({
                 })
               }}
               disabled={generateMutation.isPending}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
+              className="hover:bg-primary/90 w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
             >
               {generateMutation.isPending ? 'Generating...' : 'Generate Report'}
             </button>
@@ -175,11 +175,11 @@ export function ReportGenerator({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-muted-foreground py-8 text-center">
+            <div className="py-8 text-center text-muted-foreground">
               Loading reports...
             </div>
           ) : reports?.items.length === 0 ? (
-            <div className="text-muted-foreground py-8 text-center">
+            <div className="py-8 text-center text-muted-foreground">
               No reports generated yet. Generate your first report above.
             </div>
           ) : (
@@ -190,10 +190,10 @@ export function ReportGenerator({
                   className="flex items-center justify-between rounded-md border p-4"
                 >
                   <div className="flex items-center gap-3">
-                    <FileText className="text-muted-foreground h-5 w-5" />
+                    <FileText className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="font-medium">{report.reportId}</p>
-                      <p className="text-muted-foreground text-sm">
+                      <p className="text-sm text-muted-foreground">
                         {report.reportType.replace('_', ' ')} •{' '}
                         {report.format.toUpperCase()} •{' '}
                         {format(new Date(report.generatedDate), 'PPpp')}
@@ -205,7 +205,7 @@ export function ReportGenerator({
                       <a
                         href={report.filePath}
                         download
-                        className="border-input hover:bg-accent flex items-center gap-2 rounded-md border bg-background px-3 py-2 text-sm font-medium"
+                        className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium hover:bg-accent"
                       >
                         <Download className="h-4 w-4" />
                         Download

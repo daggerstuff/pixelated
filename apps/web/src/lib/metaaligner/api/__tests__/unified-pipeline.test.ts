@@ -10,15 +10,18 @@ vi.mock('../../../logging/build-safe-logger', () => ({
   }),
 }))
 
+import type { AIService } from '../../ai/models/ai-types'
+import type { AICompletion } from '../../ai/models/ai-types'
+import type {
+  ObjectiveDefinition,
+  AlignmentContext,
+} from '../../core/objectives'
+import { MetaAlignerAPI } from '../alignment-api'
+import type { UnifiedProcessingRequest } from '../unified-api'
 import {
   UnifiedMetaAlignerPipeline,
   type UnifiedPipelineConfig,
 } from '../unified-pipeline'
-import { MetaAlignerAPI } from '../alignment-api'
-import type { AIService } from '../../ai/models/ai-types'
-import type { AICompletion } from '../../ai/models/ai-types'
-import type { ObjectiveDefinition, AlignmentContext } from '../../core/objectives'
-import type { UnifiedProcessingRequest } from '../unified-api'
 
 function makeRequest(
   overrides: Partial<UnifiedProcessingRequest> = {},

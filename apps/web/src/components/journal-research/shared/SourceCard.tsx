@@ -51,7 +51,7 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
 
       <CardContent>
         <div className="space-y-3">
-          <div className="text-muted-foreground line-clamp-3 text-sm">
+          <div className="line-clamp-3 text-sm text-muted-foreground">
             {source.abstract}
           </div>
 
@@ -59,13 +59,13 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
             {source.keywords.slice(0, 5).map((keyword) => (
               <span
                 key={keyword}
-                className="bg-muted rounded-full px-2 py-1 text-xs"
+                className="rounded-full bg-muted px-2 py-1 text-xs"
               >
                 {keyword}
               </span>
             ))}
             {source.keywords.length > 5 && (
-              <span className="bg-muted rounded-full px-2 py-1 text-xs">
+              <span className="rounded-full bg-muted px-2 py-1 text-xs">
                 +{source.keywords.length - 5} more
               </span>
             )}
@@ -86,7 +86,7 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
             </div>
           </div>
 
-          <div className="text-muted-foreground flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
             {source.openAccess && (
               <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded px-2 py-1">
                 Open Access
@@ -101,7 +101,7 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
       </CardContent>
 
       <CardFooter className="flex items-center justify-between">
-        <div className="text-muted-foreground text-xs">
+        <div className="text-xs text-muted-foreground">
           Discovered {format(source.discoveryDate, 'MMM d, yyyy')}
         </div>
         <a
@@ -109,7 +109,7 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleLinkClick}
-          className="text-primary flex items-center gap-1 text-xs hover:underline"
+          className="flex items-center gap-1 text-xs text-primary hover:underline"
           aria-label={`Open ${source.title} in new tab`}
         >
           View Source

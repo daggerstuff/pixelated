@@ -100,7 +100,7 @@ export function DiscoveryForm({
               {availableSources.map((source) => (
                 <label
                   key={source}
-                  className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md border p-2"
+                  className="flex cursor-pointer items-center gap-2 rounded-md border p-2 hover:bg-muted"
                 >
                   <input
                     type="checkbox"
@@ -135,7 +135,7 @@ export function DiscoveryForm({
                   }
                 }}
                 placeholder="Enter keyword"
-                className="border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm"
+                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
               />
               <Button
                 type="button"
@@ -151,7 +151,7 @@ export function DiscoveryForm({
                 {keywords.map((keyword) => (
                   <span
                     key={keyword}
-                    className="bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs"
+                    className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-xs"
                   >
                     {keyword}
                     <button

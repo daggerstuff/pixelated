@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import { dataExportDAO } from '../mongodb.dao'
 import { createAuditLog, AuditEventType } from '../../audit'
 import { userManager } from '../../db'
 import { aiRepository } from '../../db/ai'
 import mongoClient from '../../db/mongoClient'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { dataExportDAO } from '../mongodb.dao'
 
 const logger = createBuildSafeLogger('data-portability-service')
 
@@ -53,7 +53,12 @@ interface PatientProfile {
 
 // Define the export status types
 type ExportStatus =
-  'pending' | 'processing' | 'completed' | 'failed' | 'expired' | 'cancelled'
+  | 'pending'
+  | 'processing'
+  | 'completed'
+  | 'failed'
+  | 'expired'
+  | 'cancelled'
 
 // Define the export formats
 export type ExportFormat = 'json' | 'csv' | 'pdf' | 'xml'
@@ -114,7 +119,11 @@ interface ExportDownloadSuccessResponse {
 interface ExportDownloadErrorResponse {
   success: false
   error:
-    'not_found' | 'unauthorized' | 'not_ready' | 'expired' | 'internal_error'
+    | 'not_found'
+    | 'unauthorized'
+    | 'not_ready'
+    | 'expired'
+    | 'internal_error'
   message?: string
   status?: ExportStatus
   progress?: number
@@ -124,7 +133,8 @@ interface ExportDownloadErrorResponse {
 
 // Combined type for download responses
 type ExportDownloadResponse =
-  ExportDownloadSuccessResponse | ExportDownloadErrorResponse
+  | ExportDownloadSuccessResponse
+  | ExportDownloadErrorResponse
 
 type ExportPriority = 'normal' | 'high'
 

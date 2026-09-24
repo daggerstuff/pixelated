@@ -231,7 +231,7 @@ export default function AgentNoteCollabDashboard() {
     <div className="space-y-6">
       <section className="rounded-lg border p-4">
         <h1 className="text-2xl font-bold">Agent Note Collaboration</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
+        <p className="mt-1 text-sm text-muted-foreground">
           Review unresolved questions, phase progression, and turn summaries
           before handoff.
         </p>
@@ -239,15 +239,15 @@ export default function AgentNoteCollabDashboard() {
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-lg border p-4">
-          <p className="text-muted-foreground text-sm">Artifact Coverage</p>
+          <p className="text-sm text-muted-foreground">Artifact Coverage</p>
           <p className="mt-1 text-2xl font-semibold">{groups.length}</p>
         </div>
         <div className="rounded-lg border p-4">
-          <p className="text-muted-foreground text-sm">Unresolved Threads</p>
+          <p className="text-sm text-muted-foreground">Unresolved Threads</p>
           <p className="mt-1 text-2xl font-semibold">{unresolvedCount}</p>
         </div>
         <div className="rounded-lg border p-4">
-          <p className="text-muted-foreground text-sm">Total Turns</p>
+          <p className="text-sm text-muted-foreground">Total Turns</p>
           <p className="mt-1 text-2xl font-semibold">{turns.length}</p>
         </div>
       </section>
@@ -255,7 +255,7 @@ export default function AgentNoteCollabDashboard() {
       <section className="rounded-lg border p-4">
         <label
           htmlFor="artifact-filter"
-          className="text-muted-foreground mb-2 block text-sm font-medium"
+          className="mb-2 block text-sm font-medium text-muted-foreground"
         >
           Filter by Artifact ID
         </label>
@@ -263,13 +263,13 @@ export default function AgentNoteCollabDashboard() {
           id="artifact-filter"
           value={artifactFilter}
           onChange={(event) => setArtifactFilter(event.target.value)}
-          className="border-border w-full rounded border bg-background px-3 py-2"
+          className="w-full rounded border border-border bg-background px-3 py-2"
           placeholder="e.g. artifact://feature-001"
         />
       </section>
 
       {loading && (
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           Loading collaboration state...
         </p>
       )}
@@ -281,7 +281,7 @@ export default function AgentNoteCollabDashboard() {
       )}
 
       {!loading && !error && groups.length === 0 && (
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           No turns are available for this filter yet.
         </p>
       )}
@@ -299,7 +299,7 @@ export default function AgentNoteCollabDashboard() {
                     <h2 className="text-lg font-semibold">
                       {group.artifactId}
                     </h2>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       {group.totalTurns} total turns · latest phase:{' '}
                       {group.latestPhase}
                     </p>
@@ -310,7 +310,7 @@ export default function AgentNoteCollabDashboard() {
                     onClick={() => {
                       void handleLoadSynthesis(group.artifactId)
                     }}
-                    className="bg-primary text-primary-foreground rounded px-3 py-1 text-sm disabled:opacity-60"
+                    className="rounded bg-primary px-3 py-1 text-sm text-primary-foreground disabled:opacity-60"
                     disabled={state?.loading}
                   >
                     {state?.loading ? 'Building…' : 'Generate Synthesis'}
@@ -318,19 +318,19 @@ export default function AgentNoteCollabDashboard() {
                 </div>
 
                 <div>
-                  <div className="text-muted-foreground mb-1 flex justify-between text-xs">
+                  <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                     <span>Phase Progress</span>
                     <span>{progress}%</span>
                   </div>
-                  <div className="bg-muted h-2 w-full overflow-hidden rounded">
+                  <div className="h-2 w-full overflow-hidden rounded bg-muted">
                     <div
-                      className="bg-primary h-full transition-[width]"
+                      className="h-full bg-primary transition-[width]"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
                 </div>
 
-                <p className="text-muted-foreground text-sm">
+                <p className="text-sm text-muted-foreground">
                   Open Questions: {group.openQuestions.length}
                 </p>
 
@@ -345,7 +345,7 @@ export default function AgentNoteCollabDashboard() {
                 )}
 
                 {group.openQuestions.length > 3 && (
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     +{group.openQuestions.length - 3} more open questions
                   </p>
                 )}
@@ -355,13 +355,13 @@ export default function AgentNoteCollabDashboard() {
                 )}
 
                 {state?.data && (
-                  <div className="bg-card rounded p-3 text-sm">
+                  <div className="rounded bg-card p-3 text-sm">
                     <p className="font-semibold">Synthesis</p>
                     <p>
                       {state.data.synthesis?.summaryText ??
                         'No summary text returned.'}
                     </p>
-                    <p className="text-muted-foreground mt-2">
+                    <p className="mt-2 text-muted-foreground">
                       Turn window: {state.data.turnCount ?? 0}
                     </p>
                   </div>

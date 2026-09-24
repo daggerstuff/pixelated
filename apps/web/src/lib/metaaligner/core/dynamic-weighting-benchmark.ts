@@ -73,7 +73,6 @@ export async function runBenchmarkSuite(): Promise<BenchmarkSuite> {
     },
   }
 
-
   // Benchmark 1: Single context calculations
   suite.results.push(await benchmarkSingleContext())
 
@@ -394,11 +393,9 @@ function calculatePerformanceDistribution(
 }
 
 function printBenchmarkSummary(suite: BenchmarkSuite): void {
-
   for (const result of suite.results) {
     const passIcon = result.passedThreshold ? '✅' : '❌'
   }
-
 
   const allPassed = suite.results.every((r) => r.passedThreshold)
 
@@ -409,7 +406,6 @@ function printBenchmarkSummary(suite: BenchmarkSuite): void {
     const barLength = Math.floor(percentage / 2)
     const bar = '█'.repeat(barLength)
   }
-
 }
 
 /**

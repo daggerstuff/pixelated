@@ -86,8 +86,8 @@ function SummaryCard({
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="space-y-2">
-                <div className="bg-muted h-4 w-20 animate-pulse rounded" />
-                <div className="bg-muted h-8 w-16 animate-pulse rounded" />
+                <div className="h-4 w-20 animate-pulse rounded bg-muted" />
+                <div className="h-8 w-16 animate-pulse rounded bg-muted" />
               </div>
             ))}
           </div>
@@ -122,7 +122,7 @@ function SummaryCard({
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
           {stats.map((stat) => (
             <div key={stat.label} className="space-y-1">
-              <p className="text-muted-foreground text-xs font-medium">
+              <p className="text-xs font-medium text-muted-foreground">
                 {stat.label}
               </p>
               <p className="text-2xl font-bold">{stat.value}</p>
@@ -150,7 +150,7 @@ function DatasetList({
     return (
       <div className="space-y-2">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="bg-muted h-12 animate-pulse rounded" />
+          <div key={i} className="h-12 animate-pulse rounded bg-muted" />
         ))}
       </div>
     )
@@ -158,7 +158,7 @@ function DatasetList({
 
   if (!datasets || datasets.items.length === 0) {
     return (
-      <p className="text-muted-foreground py-8 text-center text-sm">
+      <p className="py-8 text-center text-sm text-muted-foreground">
         No datasets found
       </p>
     )
@@ -179,7 +179,7 @@ function DatasetList({
         >
           <div className="min-w-0 flex-1 truncate">
             <p className="truncate font-medium">{dataset['name']}</p>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-xs text-muted-foreground">
               {dataset['recordCount'].toLocaleString()} records ·{' '}
               {dataset['format']}
             </p>
@@ -208,16 +208,16 @@ function AuditDetailPanel({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="bg-muted h-8 w-48 animate-pulse rounded" />
-        <div className="bg-muted h-24 animate-pulse rounded" />
-        <div className="bg-muted h-24 animate-pulse rounded" />
+        <div className="h-8 w-48 animate-pulse rounded bg-muted" />
+        <div className="h-24 animate-pulse rounded bg-muted" />
+        <div className="h-24 animate-pulse rounded bg-muted" />
       </div>
     )
   }
 
   if (!dataset) {
     return (
-      <p className="text-muted-foreground py-8 text-center text-sm">
+      <p className="py-8 text-center text-sm text-muted-foreground">
         Select a dataset to view audit details
       </p>
     )
@@ -228,7 +228,7 @@ function AuditDetailPanel({
       {/* Dataset info */}
       <div>
         <h3 className="text-lg font-semibold">{dataset['name']}</h3>
-        <div className="text-muted-foreground mt-1 grid grid-cols-2 gap-2 text-sm">
+        <div className="mt-1 grid grid-cols-2 gap-2 text-sm text-muted-foreground">
           <div>
             Format: <span className="font-medium">{dataset['format']}</span>
           </div>
@@ -272,7 +272,7 @@ function AuditDetailPanel({
                 {(audit.overallBiasScore * 100).toFixed(1)}%
               </span>
             </div>
-            <div className="bg-muted h-2 overflow-hidden rounded-full">
+            <div className="h-2 overflow-hidden rounded-full bg-muted">
               <div
                 className={cn(
                   'h-full transition-all',
@@ -314,7 +314,7 @@ function AuditDetailPanel({
           {audit.recommendations.length > 0 && (
             <div className="space-y-1">
               <h4 className="text-sm font-medium">Recommendations</h4>
-              <ul className="text-muted-foreground list-inside list-disc space-y-1 text-sm">
+              <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
                 {audit.recommendations.map((rec, i) => (
                   <li key={i}>{rec}</li>
                 ))}
@@ -351,7 +351,7 @@ function AuditDetailPanel({
             )}
         </>
       ) : (
-        <p className="text-muted-foreground py-4 text-center text-sm">
+        <p className="py-4 text-center text-sm text-muted-foreground">
           No audit results available for this dataset
         </p>
       )}
@@ -414,7 +414,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Dataset Bias Audit</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             Analyze imported datasets for bias before merging into training pool
           </p>
         </div>
@@ -422,7 +422,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
           <button
             onClick={handleAuditSelected}
             disabled={!selectedDatasetId || initiateAuditLoading}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             {initiateAuditLoading ? 'Auditing...' : 'Audit Selected'}
           </button>
@@ -434,7 +434,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
                 (d) => d.quarantineStatus === 'pending_review',
               )
             }
-            className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-md px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            className="hover:bg-secondary/90 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             Audit All Pending
           </button>
@@ -542,11 +542,11 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
               </div>
               <div className="bg-gray-700 h-2 overflow-hidden rounded-full">
                 <div
-                  className="bg-primary h-full transition-all"
+                  className="h-full bg-primary transition-all"
                   style={{ width: `${progress.progress}%` }}
                 />
               </div>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-xs text-muted-foreground">
                 {progress.currentStep}
               </p>
             </div>

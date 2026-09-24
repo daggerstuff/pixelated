@@ -31,9 +31,9 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
     () => offlineManager.getStatus().queueStats,
   )
   const [isVisible, setIsVisible] = React.useState(false)
-  const [previousAutoShow, setPreviousAutoShow] = React.useState<boolean | null>(
-    null,
-  )
+  const [previousAutoShow, setPreviousAutoShow] = React.useState<
+    boolean | null
+  >(null)
 
   const autoShow = networkState.isOffline || queueStats.total > 0
   if (previousAutoShow !== autoShow) {

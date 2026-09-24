@@ -497,7 +497,7 @@ export function TherapeuticGoalsTracker({
             <Card
               key={goal.id}
               className={`cursor-pointer p-4 transition-all duration-200 hover:shadow-md ${
-                activeGoalId === goal.id ? 'ring-primary ring-2' : ''
+                activeGoalId === goal.id ? 'ring-2 ring-primary' : ''
               }`}
               onClick={() => setActiveGoalId(goal.id)}
             >

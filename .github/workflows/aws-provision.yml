@@ -40,4 +40,6 @@ jobs:
           eksctl version
 
       - name: Create EKS cluster
-        run: eksctl create cluster -f infra/aws/eksctl/pixelated-eks.yaml --timeout 60m
+        run:
+          eksctl create cluster -f infra/aws/eksctl/pixelated-eks.yaml --timeout
+          60m

@@ -35,7 +35,8 @@ jobs:
   chaos-experiment:
     name: Run Chaos Experiment
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/staging' || github.event_name ==
+    if:
+      github.ref == 'refs/heads/staging' || github.event_name ==
       'workflow_dispatch'
     environment: aws
 
@@ -57,7 +58,9 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --region "$AWS_REGION" --name "$EKS_CLUSTER_NAME"
+        run:
+          aws eks update-kubeconfig --region "$AWS_REGION" --name
+          "$EKS_CLUSTER_NAME"
 
       - name: Verify cluster access
         run: |

@@ -101,8 +101,8 @@ function ChartLoading({ height = 300, className = '' }: ChartLoadingProps) {
       style={{ height: `${height}px` }}
     >
       <div className="flex flex-col items-center space-y-2">
-        <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2"></div>
-        <p className="text-muted-foreground text-sm">Loading chart...</p>
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+        <p className="text-sm text-muted-foreground">Loading chart...</p>
       </div>
     </div>
   )

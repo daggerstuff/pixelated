@@ -55,8 +55,7 @@ export function useConversationMessages(
   const addMessage = (role: 'therapist' | 'client', message: string) => {
     const currentTime = Date.now()
     const lastTime = lastMessageTimeRef.current
-    const responseTime =
-      lastTime === null ? 0 : (currentTime - lastTime) / 1000 // seconds
+    const responseTime = lastTime === null ? 0 : (currentTime - lastTime) / 1000 // seconds
 
     setHistory((prev) => [...prev, { role, message }])
     setProgressMetrics((prev) => {

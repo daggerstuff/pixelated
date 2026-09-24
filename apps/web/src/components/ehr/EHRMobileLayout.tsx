@@ -83,7 +83,7 @@ export const EHRMobileLayout: FC<EHRMobileLayoutProps> = ({
           <div className="flex items-center gap-2">
             {!syncStatus.isOnline ? (
               <>
-                <CloudOff className="h-4 w-4 text-amber-400" />
+                <CloudOff className="text-amber-400 h-4 w-4" />
                 <span>Offline Mode (Edits saved locally)</span>
               </>
             ) : (
@@ -95,7 +95,7 @@ export const EHRMobileLayout: FC<EHRMobileLayoutProps> = ({
               type="button"
               onClick={() => void handleManualSync()}
               disabled={isSyncing}
-              className="flex min-h-[44px] items-center gap-1.5 rounded px-2 text-xs font-semibold text-sky-400 hover:underline"
+              className="text-sky-400 flex min-h-[44px] items-center gap-1.5 rounded px-2 text-xs font-semibold hover:underline"
               aria-label="Sync pending changes now"
             >
               <RefreshCw

@@ -9,8 +9,10 @@ description: ''
 
 - Write integration tests with **pytest** and **httpx** for async APIs.
 - Mock external services at the HTTP boundary, not inside business logic.
-- Assert status code, response schema, and at least one business invariant per endpoint.
-- Use `pytest.mark.parametrize` for matrix cases (auth, validation errors, happy path).
+- Assert status code, response schema, and at least one business invariant per
+  endpoint.
+- Use `pytest.mark.parametrize` for matrix cases (auth, validation errors, happy
+  path).
 - Name tests: `test_<endpoint>_<scenario>`.
 
 ## Workflow
@@ -36,5 +38,5 @@ async def test_health_returns_200(api_client: httpx.AsyncClient):
 
 ## Background
 
-Contract tests catch regressions when handlers change. Prefer testing through the
-public HTTP interface rather than calling FastAPI route functions directly.
+Contract tests catch regressions when handlers change. Prefer testing through
+the public HTTP interface rather than calling FastAPI route functions directly.

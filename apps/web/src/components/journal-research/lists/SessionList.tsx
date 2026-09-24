@@ -112,7 +112,7 @@ export function SessionList({
       accessor: (row) => (
         <button
           onClick={() => onSessionClick?.(row)}
-          className="text-primary text-left font-medium hover:underline"
+          className="text-left font-medium text-primary hover:underline"
         >
           {row.sessionId}
         </button>
@@ -139,9 +139,9 @@ export function SessionList({
         const progress = getSessionProgress(row)
         return (
           <div className="flex items-center gap-2">
-            <div className="bg-muted h-2 w-24 overflow-hidden rounded-full">
+            <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
               <div
-                className="bg-primary h-full transition-all"
+                className="h-full bg-primary transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -189,12 +189,12 @@ export function SessionList({
             placeholder="Search sessions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm"
+            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
           />
           <select
             value={phaseFilter}
             onChange={(e) => setPhaseFilter(e.target.value)}
-            className="border-input rounded-md border bg-background px-3 py-2 text-sm capitalize"
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm capitalize"
           >
             {phases.map((phase) => (
               <option key={phase} value={phase}>
@@ -203,7 +203,7 @@ export function SessionList({
             ))}
           </select>
         </div>
-        <div className="text-muted-foreground text-sm">
+        <div className="text-sm text-muted-foreground">
           Showing {filteredAndSortedSessions.length} of {sessions.total}{' '}
           sessions
         </div>

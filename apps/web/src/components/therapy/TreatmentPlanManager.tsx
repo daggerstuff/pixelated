@@ -633,7 +633,7 @@ const TreatmentPlanManager: FC = () => {
         </Button>
       </div>
       {objectives.length === 0 && (
-        <p className="text-muted-foreground text-xs">
+        <p className="text-xs text-muted-foreground">
           No objectives added for this goal.
         </p>
       )}
@@ -713,7 +713,7 @@ const TreatmentPlanManager: FC = () => {
         </Button>
       </div>
       {goals.length === 0 && (
-        <p className="text-muted-foreground text-sm">No goals added yet.</p>
+        <p className="text-sm text-muted-foreground">No goals added yet.</p>
       )}
       {goals.map((goal, index) => (
         <div
@@ -851,7 +851,7 @@ const TreatmentPlanManager: FC = () => {
         }
       >
         <form id={`create-plan-form-${formId}`} onSubmit={handleCreatePlan}>
-          <p className="text-muted-foreground mb-4 text-sm">
+          <p className="mb-4 text-sm text-muted-foreground">
             Fill in the details below to create a new treatment plan.
           </p>
           <div className="grid gap-4 py-4">
@@ -956,7 +956,7 @@ const TreatmentPlanManager: FC = () => {
             <AlertDialogAction
               onClick={handleDeletePlan}
               disabled={isLoading}
-              className="bg-destructive hover:bg-destructive/90"
+              className="hover:bg-destructive/90 bg-destructive"
             >
               {isLoading ? 'Deleting...' : 'Yes, delete plan'}
             </AlertDialogAction>
@@ -998,7 +998,7 @@ const TreatmentPlanManager: FC = () => {
       >
         {editingPlanData && (
           <form id={`edit-plan-form-${formId}`} onSubmit={handleUpdatePlan}>
-            <p className="text-muted-foreground mb-4 text-sm">
+            <p className="mb-4 text-sm text-muted-foreground">
               Update the details for &quot;{editingPlanData.title}&quot;.
             </p>
             <div className="grid gap-4 py-4">

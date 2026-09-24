@@ -180,7 +180,6 @@ export class WebRTCService implements WebRTCServiceInterface {
       // Add the processed track to the stream
       stream.addTrack(processedAudioTrack)
 
-
       // Set up audio monitoring and visualization if needed
       this.setupAudioMonitoring(analyzer)
     } catch (error: unknown) {
@@ -264,7 +263,6 @@ export class WebRTCService implements WebRTCServiceInterface {
 
       // Start connection monitoring
       this.startConnectionMonitoring()
-
     } catch (error: unknown) {
       this.handleConnectionFailure()
     }
@@ -412,9 +410,7 @@ export class WebRTCService implements WebRTCServiceInterface {
         })
 
         // Add the simulated remote candidate
-        this.peerConnection
-          .addIceCandidate(remoteCandidate)
-          .catch(() => {})
+        this.peerConnection.addIceCandidate(remoteCandidate).catch(() => {})
       }
     }, 300)
   }
@@ -442,7 +438,6 @@ export class WebRTCService implements WebRTCServiceInterface {
     }
 
     const state = this.peerConnection.connectionState
-
 
     switch (state) {
       case 'new':
@@ -474,7 +469,6 @@ export class WebRTCService implements WebRTCServiceInterface {
 
     const state = this.peerConnection.iceConnectionState
 
-
     switch (state) {
       case 'new':
       case 'checking':
@@ -500,7 +494,6 @@ export class WebRTCService implements WebRTCServiceInterface {
   private handleConnectionFailure() {
     // Attempt to reconnect if under max attempts
     if (this.connectionAttempts < this.maxConnectionAttempts) {
-
       // Clean up existing connection
       this.cleanupPeerConnection()
 
@@ -511,7 +504,6 @@ export class WebRTCService implements WebRTCServiceInterface {
         })
       }, this.connectionRetryIntervalMs)
     } else {
-
       // Notify disconnect listeners
       this.notifyDisconnectListeners()
 

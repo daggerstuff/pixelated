@@ -5,7 +5,11 @@ import { getCurrentUser, hasRole } from './auth'
 
 // Define permission types
 export type Resource =
-  'conversations' | 'messages' | 'users' | 'settings' | 'admin'
+  | 'conversations'
+  | 'messages'
+  | 'users'
+  | 'settings'
+  | 'admin'
 export type Action = 'create' | 'read' | 'update' | 'delete' | 'list' | 'manage'
 export type Permission = `${Action}:${Resource}`
 

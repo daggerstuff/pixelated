@@ -198,14 +198,7 @@ export function useComparativeProgress(
     } finally {
       setLoading(false)
     }
-  }, [
-    authConfig,
-    userId,
-    metric,
-    cohort,
-    dateRange,
-    validateInputs,
-  ])
+  }, [authConfig, userId, metric, cohort, dateRange, validateInputs])
 
   useEffect(() => {
     const timer = window.setTimeout(() => {

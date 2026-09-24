@@ -1,6 +1,7 @@
-import { Pool, type PoolClient } from 'pg'
-import mongoose, { type Connection as MongoConnection } from 'mongoose'
 import Redis from 'ioredis'
+import mongoose, { type Connection as MongoConnection } from 'mongoose'
+import { Pool, type PoolClient } from 'pg'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('db-client')
@@ -87,9 +88,15 @@ export function getRedisClient(): Redis {
 
 export async function closeAllConnections(): Promise<void> {
   const tasks: Promise<unknown>[] = []
-  if (pgPool) { tasks.push(pgPool.end()) }
-  if (mongoConn) { tasks.push(mongoose.disconnect()) }
-  if (redisClient) { tasks.push(redisClient.quit()) }
+  if (pgPool) {
+    tasks.push(pgPool.end())
+  }
+  if (mongoConn) {
+    tasks.push(mongoose.disconnect())
+  }
+  if (redisClient) {
+    tasks.push(redisClient.quit())
+  }
   await Promise.allSettled(tasks)
   pgPool = null
   mongoConn = null

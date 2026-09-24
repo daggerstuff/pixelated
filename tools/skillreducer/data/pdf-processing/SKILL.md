@@ -13,7 +13,8 @@ description: >-
 ## Rules
 
 - Use **pdfplumber** for text and table extraction on digital PDFs.
-- Use **pytesseract** + **pdf2image** only when the PDF is scanned (no text layer).
+- Use **pytesseract** + **pdf2image** only when the PDF is scanned (no text
+  layer).
 - Always preserve page numbers when quoting extracted text.
 - For multi-page merge, use `pypdf.PdfMerger` and validate output page count.
 
@@ -62,6 +63,6 @@ with pdfplumber.open("report.pdf") as pdf:
 
 ## Background
 
-PDF (Portable Document Format) is a fixed-layout format. Digital PDFs embed a text
-layer; scanned PDFs require OCR. pdfplumber handles embedded text reliably; OCR adds
-latency and error risk on low-quality scans.
+PDF (Portable Document Format) is a fixed-layout format. Digital PDFs embed a
+text layer; scanned PDFs require OCR. pdfplumber handles embedded text reliably;
+OCR adds latency and error risk on low-quality scans.

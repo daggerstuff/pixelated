@@ -199,8 +199,8 @@ export class UsabilityUtils {
         }
         if (box.width < 24 || box.height < 24) {
           results.touchTargetsAdequate = false
-          const markup = await element.evaluate(
-            (el) => el.outerHTML.slice(0, 120),
+          const markup = await element.evaluate((el) =>
+            el.outerHTML.slice(0, 120),
           )
           results.errors.push(
             `Touch target below WCAG 2.5.8 minimum (24px): ${box.width}x${box.height}px ${markup}`,

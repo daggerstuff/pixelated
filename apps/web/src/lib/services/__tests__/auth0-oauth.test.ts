@@ -50,7 +50,8 @@ describe('Auth0 verifyOAuthCode', () => {
     process.env['AUTH0_DOMAIN'] = 'test-domain.auth0.com'
     process.env['AUTH0_CLIENT_ID'] = 'test-client-id'
     process.env['AUTH0_CLIENT_SECRET'] = 'test-client-secret'
-    process.env['AUTH0_CALLBACK_URL'] = 'http://localhost:4321/api/auth/auth0-callback'
+    process.env['AUTH0_CALLBACK_URL'] =
+      'http://localhost:4321/api/auth/auth0-callback'
   })
 
   it('exchanges authorization code and returns authenticated user with tokens', async () => {
@@ -106,7 +107,10 @@ describe('Auth0 verifyOAuthCode', () => {
       },
     })
 
-    await verifyOAuthCode('custom-code', 'https://app.pixelatedempathy.com/auth/callback')
+    await verifyOAuthCode(
+      'custom-code',
+      'https://app.pixelatedempathy.com/auth/callback',
+    )
 
     expect(mockAuthCodeGrant).toHaveBeenCalledWith({
       code: 'custom-code',
@@ -121,7 +125,9 @@ describe('Auth0 verifyOAuthCode', () => {
       data: {},
     })
 
-    await expect(verifyOAuthCode('bad-code')).rejects.toThrow('Invalid authorization code')
+    await expect(verifyOAuthCode('bad-code')).rejects.toThrow(
+      'Invalid authorization code',
+    )
   })
 
   it('throws an error when OAuth exchange fails', async () => {
@@ -129,6 +135,8 @@ describe('Auth0 verifyOAuthCode', () => {
 
     mockAuthCodeGrant.mockRejectedValueOnce(new Error('Invalid grant code'))
 
-    await expect(verifyOAuthCode('expired-code')).rejects.toThrow('Invalid authorization code')
+    await expect(verifyOAuthCode('expired-code')).rejects.toThrow(
+      'Invalid authorization code',
+    )
   })
 })

@@ -1,9 +1,9 @@
 import { Router, type Request } from 'express'
 import { Pool } from 'pg'
 
-import { uploadConfig } from '../middleware/upload.js'
 import { DocumentVersioningService } from '../lib/services/DocumentVersioningService.js'
 import { FileStorageService } from '../lib/services/FileStorageService.js'
+import { uploadConfig } from '../middleware/upload.js'
 
 interface FileMetadata {
   id: string

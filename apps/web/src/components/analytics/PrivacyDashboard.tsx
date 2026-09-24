@@ -29,7 +29,9 @@ export function PrivacyDashboard() {
     privacyBudget: 1.0,
     anonymize: true,
   })
-  const [eventCount, setEventCount] = useState(() => analytics.getEvents().length)
+  const [eventCount, setEventCount] = useState(
+    () => analytics.getEvents().length,
+  )
   const [lastSync, setLastSync] = useState<Date | null>(() => new Date())
 
   const handleSettingChange = (

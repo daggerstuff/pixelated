@@ -24,9 +24,9 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
-    "just-bash": "^3.4.2",
     "@types/express": "5.x",
     "@types/node": "24.x",
+    "just-bash": "^3.4.2",
     "vitest": "^4.1.9"
   },
   "peerDependencies": {

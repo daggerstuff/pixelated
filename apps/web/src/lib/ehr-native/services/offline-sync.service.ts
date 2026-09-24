@@ -15,7 +15,11 @@
 
 export type SyncItemType = 'note' | 'appointment' | 'message' | 'outcome'
 export type SyncStatus =
-  'pending' | 'syncing' | 'synced' | 'failed' | 'conflict'
+  | 'pending'
+  | 'syncing'
+  | 'synced'
+  | 'failed'
+  | 'conflict'
 export type ConflictStrategy = 'client-wins' | 'server-wins' | 'manual'
 
 export interface DraftNote {

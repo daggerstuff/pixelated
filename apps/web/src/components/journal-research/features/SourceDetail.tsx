@@ -47,7 +47,7 @@ export function SourceDetail({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">{source.title}</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             Published {format(source.publicationDate, 'MMM d, yyyy')} •{' '}
             {source.sourceType}
           </p>
@@ -56,7 +56,7 @@ export function SourceDetail({
           href={source.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="border-input hover:bg-accent flex items-center gap-2 rounded-md border bg-background px-4 py-2 text-sm font-medium"
+          className="flex items-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
         >
           View Source <ExternalLink className="h-4 w-4" />
         </a>
@@ -73,63 +73,63 @@ export function SourceDetail({
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Source ID
               </p>
               <p className="mt-1">{source.sourceId}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Publication Date
               </p>
               <p className="mt-1">{format(source.publicationDate, 'PPpp')}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Source Type
               </p>
               <p className="mt-1">{source.sourceType}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Open Access
               </p>
               <p className="mt-1">{source.openAccess ? 'Yes' : 'No'}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Data Availability
               </p>
               <p className="mt-1">{source.dataAvailability}</p>
             </div>
             {source.doi && (
               <div>
-                <p className="text-muted-foreground text-sm font-medium">DOI</p>
+                <p className="text-sm font-medium text-muted-foreground">DOI</p>
                 <p className="mt-1">{source.doi}</p>
               </div>
             )}
             <div className="md:col-span-2">
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Authors
               </p>
               <p className="mt-1">{source.authors.join(', ')}</p>
             </div>
             <div className="md:col-span-2">
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Abstract
               </p>
               <p className="mt-1 text-sm">{source.abstract}</p>
             </div>
             {source.keywords.length > 0 && (
               <div className="md:col-span-2">
-                <p className="text-muted-foreground text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   Keywords
                 </p>
                 <div className="mt-1 flex flex-wrap gap-2">
                   {source.keywords.map((keyword) => (
                     <span
                       key={keyword}
-                      className="bg-muted rounded-md px-2 py-1 text-xs"
+                      className="rounded-md bg-muted px-2 py-1 text-xs"
                     >
                       {keyword}
                     </span>
@@ -138,24 +138,24 @@ export function SourceDetail({
               </div>
             )}
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Discovery Date
               </p>
               <p className="mt-1">{format(source.discoveryDate, 'PPpp')}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Discovery Method
               </p>
               <p className="mt-1">{source.discoveryMethod}</p>
             </div>
             <div className="md:col-span-2">
-              <p className="text-muted-foreground text-sm font-medium">URL</p>
+              <p className="text-sm font-medium text-muted-foreground">URL</p>
               <a
                 href={source.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary mt-1 text-sm hover:underline"
+                className="mt-1 text-sm text-primary hover:underline"
               >
                 {source.url}
               </a>

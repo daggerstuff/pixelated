@@ -232,8 +232,8 @@ export const defaultThreatDetectionConfig: ThreatDetectionConfig = {
  * Extended Request type with authentication context
  */
 interface AuthenticatedRequest extends Request {
-  user?: { id: string; role?: string };
-  session?: { id: string };
+  user?: { id: string; role?: string }
+  session?: { id: string }
 }
 
 /**

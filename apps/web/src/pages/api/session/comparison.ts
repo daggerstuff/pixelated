@@ -188,7 +188,9 @@ export const GET: APIRoute = async ({ request }) => {
 
       return new Response(
         JSON.stringify({
-          therapistId: therapistId ?? (result.rows[0] as ComparisonRow | undefined)?.therapist_id,
+          therapistId:
+            therapistId ??
+            (result.rows[0] as ComparisonRow | undefined)?.therapist_id,
           sessionId: sessionId,
           comparisons,
         }),

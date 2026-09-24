@@ -1,4 +1,6 @@
 export const prerender = false
+import { z } from 'zod'
+
 import { AuditEventType, createAuditLog } from '../../../lib/audit'
 import {
   rateLimitMiddleware,
@@ -13,7 +15,6 @@ import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-inte
 import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
 import { auth0UserService } from '../../../lib/services/auth0.service'
 import { validateRequestBody } from '../../../lib/validation/validateRequestBody'
-import { z } from 'zod'
 
 const signupSchema = z.object({
   email: z.string().min(1, 'Email is required'),
@@ -67,14 +68,13 @@ export const POST = async ({
       signupSchema,
     )
     if (validationError) {
-      const firstError = Object.values(validationError.details)[0] ?? 'Email and password are required'
-      return new Response(
-        JSON.stringify({ error: firstError }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
+      const firstError =
+        Object.values(validationError.details)[0] ??
+        'Email and password are required'
+      return new Response(JSON.stringify({ error: firstError }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
     }
 
     // Sanitize input
@@ -146,7 +146,6 @@ export const POST = async ({
       },
     )
   } catch (error: any) {
-
     logSecurityEvent('error', null, {
       error: error instanceof Error ? error.message : 'Unknown error',
       clientInfo,

@@ -24,8 +24,10 @@ export function useSpeechRecognition() {
   useEffect(() => {
     // Check for browser support
     const SpeechRecognition =
-      (window as unknown as { SpeechRecognition?: new () => unknown }).SpeechRecognition ??
-      (window as unknown as { webkitSpeechRecognition?: new () => unknown }).webkitSpeechRecognition
+      (window as unknown as { SpeechRecognition?: new () => unknown })
+        .SpeechRecognition ??
+      (window as unknown as { webkitSpeechRecognition?: new () => unknown })
+        .webkitSpeechRecognition
 
     if (!SpeechRecognition) {
       logger.warn('Web Speech API is not supported in this browser')

@@ -22,7 +22,12 @@ export interface ScheduleAppointmentItem {
   start: string
   end: string
   status:
-    'booked' | 'arrived' | 'fulfilled' | 'cancelled' | 'noshow' | 'pending'
+    | 'booked'
+    | 'arrived'
+    | 'fulfilled'
+    | 'cancelled'
+    | 'noshow'
+    | 'pending'
   patientName?: string
   patientId: string
   practitionerName?: string

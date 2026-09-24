@@ -31,7 +31,6 @@ export const GET: APIRoute = async ({ url }) => {
       )
     }
 
-
     // Get historical data for the specified number of days
     const historicalQuery = `
       SELECT

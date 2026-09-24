@@ -62,8 +62,8 @@ vi.mock('uuid', () => ({
   v4: vi.fn().mockReturnValue('test-emotion-uuid'),
 }))
 
-import { aiRepository } from '../../db/ai'
 import { createAuditLog } from '../../audit'
+import { aiRepository } from '../../db/ai'
 import {
   recordEmotion,
   fetchSessionEmotionData,
@@ -71,10 +71,12 @@ import {
   type EmotionDataPoint,
 } from '../emotion-tracking.service'
 
-const mockGetEmotionsForSession = aiRepository
-  .getEmotionsForSession as unknown as ReturnType<typeof vi.fn>
+const mockGetEmotionsForSession =
+  aiRepository.getEmotionsForSession as unknown as ReturnType<typeof vi.fn>
 
-function makeDataPoint(overrides: Partial<EmotionDataPoint> = {}): EmotionDataPoint {
+function makeDataPoint(
+  overrides: Partial<EmotionDataPoint> = {},
+): EmotionDataPoint {
   return {
     timestamp: '2026-09-16T10:00:00.000Z',
     valence: 5,
@@ -108,7 +110,11 @@ describe('emotion-tracking.service', () => {
 
   describe('recordEmotion', () => {
     it('persists the data point and returns an id', async () => {
-      const result = await recordEmotion(makeDataPoint(), 'user-001', 'session-001')
+      const result = await recordEmotion(
+        makeDataPoint(),
+        'user-001',
+        'session-001',
+      )
 
       expect(result.success).toBe(true)
       expect(result.dataPointId).toBe('test-emotion-uuid')
@@ -131,7 +137,9 @@ describe('emotion-tracking.service', () => {
     })
 
     it('returns failure without throwing on insert error', async () => {
-      emotionCollectionMock.insertOne.mockRejectedValueOnce(new Error('insert failed'))
+      emotionCollectionMock.insertOne.mockRejectedValueOnce(
+        new Error('insert failed'),
+      )
 
       const result = await recordEmotion(makeDataPoint(), 'user-001')
 
@@ -163,7 +171,16 @@ describe('emotion-tracking.service', () => {
           id: 'ai-1',
           sessionId: 'session-001',
           timestamp: '2026-09-16T11:00:00.000Z',
-          emotions: { joy: 0.8, sadness: 0.1, anger: 0, fear: 0, surprise: 0, disgust: 0, trust: 0.2, anticipation: 0.1 },
+          emotions: {
+            joy: 0.8,
+            sadness: 0.1,
+            anger: 0,
+            fear: 0,
+            surprise: 0,
+            disgust: 0,
+            trust: 0.2,
+            anticipation: 0.1,
+          },
           dimensions: { valence: 0.6, arousal: 0.4, dominance: -0.2 },
           confidence: 0.9,
         },
@@ -181,7 +198,9 @@ describe('emotion-tracking.service', () => {
     })
 
     it('continues with only persisted records if AI merge fails', async () => {
-      emotionCollectionMock.toArray.mockResolvedValueOnce([makeRecord({ label: undefined })])
+      emotionCollectionMock.toArray.mockResolvedValueOnce([
+        makeRecord({ label: undefined }),
+      ])
       mockGetEmotionsForSession.mockRejectedValue(new Error('db down'))
 
       const result = await fetchSessionEmotionData('session-001')
@@ -210,7 +229,9 @@ describe('emotion-tracking.service', () => {
     })
 
     it('returns empty array on query error', async () => {
-      emotionCollectionMock.toArray.mockRejectedValueOnce(new Error('query failed'))
+      emotionCollectionMock.toArray.mockRejectedValueOnce(
+        new Error('query failed'),
+      )
 
       const result = await fetchSessionEmotionData('session-001')
 

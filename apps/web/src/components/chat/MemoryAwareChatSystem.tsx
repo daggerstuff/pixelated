@@ -72,14 +72,13 @@ export function MemoryAwareChatSystem({
     sendMessage,
     setMessages,
     memory,
-  }: UseChatWithMemoryReturn =
-    useChatWithMemory({
-      sessionId: sessionId!,
-      enableMemory,
-      enableAnalysis,
-      maxMemoryContext: 15,
-      api: '/api/mental-health/chat', // Use the actual therapeutic AI endpoint
-    })
+  }: UseChatWithMemoryReturn = useChatWithMemory({
+    sessionId: sessionId!,
+    enableMemory,
+    enableAnalysis,
+    maxMemoryContext: 15,
+    api: '/api/mental-health/chat', // Use the actual therapeutic AI endpoint
+  })
 
   const getConversationSummary = async () => {
     if (messages.length === 0) {
@@ -303,7 +302,11 @@ export function MemoryAwareChatSystem({
   }
 
   const handleClear = () => {
-    if (!window.confirm('Clear all messages and stored memories for this session?')) {
+    if (
+      !window.confirm(
+        'Clear all messages and stored memories for this session?',
+      )
+    ) {
       return
     }
     setMessages([])

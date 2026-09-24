@@ -10,14 +10,23 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "zealgoswami-lab" }]
-keywords = ["llm", "skills", "agents", "agno", "skillreducer", "prompt-compression", "skillhub", "claude-code"]
+keywords = [
+  "llm",
+  "skills",
+  "agents",
+  "agno",
+  "skillreducer",
+  "prompt-compression",
+  "skillhub",
+  "claude-code",
+]
 dependencies = [
-    "agno>=2.5",
-    "click>=8.1",
-    "pyyaml>=6.0",
-    "tiktoken>=0.7",
-    "openai>=1.40",
-    "rich>=13.7",
+  "agno>=2.5",
+  "click>=8.1",
+  "pyyaml>=6.0",
+  "tiktoken>=0.7",
+  "openai>=1.40",
+  "rich>=13.7",
 ]
 
 [project.optional-dependencies]
@@ -39,11 +48,7 @@ where = [".", "src"]
 include = ["skillreducer*", "skillrevise*"]
 
 [tool.setuptools.package-data]
-skillreducer = [
-    "tscg/bridge.mjs",
-    "tscg/package.json",
-    "tscg/README.md",
-]
+skillreducer = ["tscg/bridge.mjs", "tscg/package.json", "tscg/README.md"]
 skillrevise = ["LICENSE", "VENDOR.md", "README.md", "benchmarks/README.md"]
 
 [tool.pytest.ini_options]

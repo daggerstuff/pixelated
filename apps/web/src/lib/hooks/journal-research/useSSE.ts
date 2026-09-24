@@ -105,87 +105,90 @@ export const useJournalResearchSSE = ({
     [onMessage, onError],
   )
 
-  const connect = useCallback(function connect() {
-    if (typeof window === 'undefined') {
-      return
-    }
-    if (!sessionId || !enabled) {
-      return
-    }
-
-    if (eventSourceRef.current?.readyState === EventSource.OPEN) {
-      return
-    }
-
-    const baseUrl = journalResearchApiClient.getBaseUrl()
-    const path = endpoint ?? `/sessions/${sessionId}/progress/events`
-    const authToken = getAuthToken()
-    const sseUrl = buildSSEUrl(baseUrl, path, authToken)
-
-    setConnectionState(
-      reconnectAttemptsRef.current > 0 ? 'reconnecting' : 'connecting',
-    )
-
-    try {
-      eventSourceRef.current = new EventSource(sseUrl)
-
-      eventSourceRef.current.onopen = () => {
-        setConnectionState('connected')
-        setReconnectAttempts(0)
-        reconnectAttemptsRef.current = 0
-        onOpen?.()
+  const connect = useCallback(
+    function connect() {
+      if (typeof window === 'undefined') {
+        return
+      }
+      if (!sessionId || !enabled) {
+        return
       }
 
-      eventSourceRef.current.onmessage = handleMessage
+      if (eventSourceRef.current?.readyState === EventSource.OPEN) {
+        return
+      }
 
-      eventSourceRef.current.onerror = () => {
-        const currentState = eventSourceRef.current?.readyState
+      const baseUrl = journalResearchApiClient.getBaseUrl()
+      const path = endpoint ?? `/sessions/${sessionId}/progress/events`
+      const authToken = getAuthToken()
+      const sseUrl = buildSSEUrl(baseUrl, path, authToken)
 
-        if (currentState === EventSource.CONNECTING) {
-          setConnectionState('connecting')
-        } else if (currentState === EventSource.CLOSED) {
-          setConnectionState('disconnected')
-          onClose?.()
+      setConnectionState(
+        reconnectAttemptsRef.current > 0 ? 'reconnecting' : 'connecting',
+      )
 
-          if (
-            shouldReconnectRef.current &&
-            reconnectIntervalMs > 0 &&
-            reconnectAttemptsRef.current < maxReconnectAttempts
-          ) {
-            reconnectAttemptsRef.current += 1
-            setReconnectAttempts(reconnectAttemptsRef.current)
-            reconnectTimerRef.current = window.setTimeout(
-              connect,
-              reconnectIntervalMs,
-            )
-          } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+      try {
+        eventSourceRef.current = new EventSource(sseUrl)
+
+        eventSourceRef.current.onopen = () => {
+          setConnectionState('connected')
+          setReconnectAttempts(0)
+          reconnectAttemptsRef.current = 0
+          onOpen?.()
+        }
+
+        eventSourceRef.current.onmessage = handleMessage
+
+        eventSourceRef.current.onerror = () => {
+          const currentState = eventSourceRef.current?.readyState
+
+          if (currentState === EventSource.CONNECTING) {
+            setConnectionState('connecting')
+          } else if (currentState === EventSource.CLOSED) {
+            setConnectionState('disconnected')
+            onClose?.()
+
+            if (
+              shouldReconnectRef.current &&
+              reconnectIntervalMs > 0 &&
+              reconnectAttemptsRef.current < maxReconnectAttempts
+            ) {
+              reconnectAttemptsRef.current += 1
+              setReconnectAttempts(reconnectAttemptsRef.current)
+              reconnectTimerRef.current = window.setTimeout(
+                connect,
+                reconnectIntervalMs,
+              )
+            } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+              setConnectionState('error')
+              const error = new Error(
+                `SSE reconnection failed after ${maxReconnectAttempts} attempts`,
+              )
+              onError?.(error)
+            }
+          } else {
             setConnectionState('error')
-            const error = new Error(
-              `SSE reconnection failed after ${maxReconnectAttempts} attempts`,
-            )
+            const error = new Error('SSE connection error')
             onError?.(error)
           }
-        } else {
-          setConnectionState('error')
-          const error = new Error('SSE connection error')
-          onError?.(error)
         }
+      } catch (error: unknown) {
+        setConnectionState('error')
+        onError?.(error as Error)
       }
-    } catch (error: unknown) {
-      setConnectionState('error')
-      onError?.(error as Error)
-    }
-  }, [
-    sessionId,
-    endpoint,
-    enabled,
-    reconnectIntervalMs,
-    maxReconnectAttempts,
-    handleMessage,
-    onOpen,
-    onError,
-    onClose,
-  ])
+    },
+    [
+      sessionId,
+      endpoint,
+      enabled,
+      reconnectIntervalMs,
+      maxReconnectAttempts,
+      handleMessage,
+      onOpen,
+      onError,
+      onClose,
+    ],
+  )
 
   useEffect(() => {
     if (!enabled || !sessionId) {

@@ -3,7 +3,11 @@
  * Specialized component for identifying and classifying emotional support needs
  */
 
-import type { AIService, AIMessage, AICompletion } from '../../ai/models/ai-types'
+import type {
+  AIService,
+  AIMessage,
+  AICompletion,
+} from '../../ai/models/ai-types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('support-context-identifier')
@@ -467,8 +471,8 @@ export class SupportContextIdentifier {
           socialSupport: 'unknown',
           immediateNeeds: [],
         }
-      ;result.metadata.requiresHumanReview = true
-      ;result.metadata.crisisInterventionFlagged = true
+      result.metadata.requiresHumanReview = true
+      result.metadata.crisisInterventionFlagged = true
     }
     // Final safety: ensure at least one crisis/hotline/emergency string present for high urgency
     const urgCheck = (result.urgency || '').toLowerCase().trim()
@@ -490,8 +494,8 @@ export class SupportContextIdentifier {
           socialSupport: 'unknown',
           immediateNeeds: [],
         }
-      ;result.metadata.requiresHumanReview = true
-      ;result.metadata.crisisInterventionFlagged = true
+      result.metadata.requiresHumanReview = true
+      result.metadata.crisisInterventionFlagged = true
     }
 
     // Type-safe resource stringification

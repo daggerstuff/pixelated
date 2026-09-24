@@ -43,151 +43,156 @@ export function usePipelineWebSocket({
   // keep a ref to the socket to avoid reading socket.readyState inside hooks deps
   const socketRef = useRef<WebSocket | null>(null)
 
-  const connect = useCallback(function connect() {
-    if (socketRef.current?.readyState === WebSocket.OPEN) return
+  const connect = useCallback(
+    function connect() {
+      if (socketRef.current?.readyState === WebSocket.OPEN) return
 
-    setConnectionStatus('connecting')
-    setIsReconnecting(connectionAttempts > 0)
+      setConnectionStatus('connecting')
+      setIsReconnecting(connectionAttempts > 0)
 
-    try {
-      const ws = new WebSocket(url)
+      try {
+        const ws = new WebSocket(url)
 
-      ws.onopen = () => {
-        if (!isMountedRef.current) return
+        ws.onopen = () => {
+          if (!isMountedRef.current) return
 
-        setConnectionStatus('connected')
-        setConnectionAttempts(0)
-        setIsReconnecting(false)
-        onConnect?.()
+          setConnectionStatus('connected')
+          setConnectionAttempts(0)
+          setIsReconnecting(false)
+          onConnect?.()
 
-        // Send initial subscription message
-        const subscribeMessage: WebSocketMessage = {
-          type: 'subscribe',
-          executionId,
-          timestamp: new Date().toISOString(),
-          data: { executionId },
-        }
+          // Send initial subscription message
+          const subscribeMessage: WebSocketMessage = {
+            type: 'subscribe',
+            executionId,
+            timestamp: new Date().toISOString(),
+            data: { executionId },
+          }
 
-        ws.send(JSON.stringify(subscribeMessage))
+          ws.send(JSON.stringify(subscribeMessage))
 
-        // Process any queued messages
-        while (messageQueueRef.current.length > 0) {
-          const message = messageQueueRef.current.shift()
-          if (message) {
-            try {
-              ws.send(JSON.stringify(message))
-            } catch (_e) {
-              // If send fails, push back and break to avoid busy loop
-              if (message) messageQueueRef.current.unshift(message)
-              break
+          // Process any queued messages
+          while (messageQueueRef.current.length > 0) {
+            const message = messageQueueRef.current.shift()
+            if (message) {
+              try {
+                ws.send(JSON.stringify(message))
+              } catch (_e) {
+                // If send fails, push back and break to avoid busy loop
+                if (message) messageQueueRef.current.unshift(message)
+                break
+              }
             }
           }
         }
-      }
 
-      ws.onclose = () => {
-        if (!isMountedRef.current) return
+        ws.onclose = () => {
+          if (!isMountedRef.current) return
 
-        setConnectionStatus('disconnected')
-        setSocket(null)
-        socketRef.current = null
-        onDisconnect?.()
+          setConnectionStatus('disconnected')
+          setSocket(null)
+          socketRef.current = null
+          onDisconnect?.()
 
-        // Auto-reconnect logic
-        if (autoConnect && connectionAttempts < maxRetries) {
-          setIsReconnecting(true)
-          reconnectTimerRef.current = setTimeout(() => {
-            setConnectionAttempts((prev) => prev + 1)
-            connect()
-          }, retryDelay)
+          // Auto-reconnect logic
+          if (autoConnect && connectionAttempts < maxRetries) {
+            setIsReconnecting(true)
+            reconnectTimerRef.current = setTimeout(() => {
+              setConnectionAttempts((prev) => prev + 1)
+              connect()
+            }, retryDelay)
+          }
         }
-      }
 
-      ws.onerror = (error) => {
+        ws.onerror = (error) => {
+          if (!isMountedRef.current) return
+
+          setConnectionStatus('error')
+          const errorMessage = new Error(
+            `WebSocket connection error: ${error.type}`,
+          )
+          onError?.(errorMessage)
+        }
+
+        ws.onmessage = (event) => {
+          if (!isMountedRef.current) return
+
+          try {
+            const message: WebSocketMessage = JSON.parse(event.data)
+            setLastMessage(message)
+
+            // Handle different message types
+            switch (message.type) {
+              case 'progress_update':
+                if (message.executionId === executionId) {
+                  const { progress, stage, data } = message.data
+                  onProgressUpdate?.(progress, stage, data)
+                }
+                break
+
+              case 'status_update':
+                if (message.executionId === executionId) {
+                  const { status, message: statusMessage } = message.data
+                  onStatusChange?.(status, statusMessage)
+                }
+                break
+
+              case 'error':
+                if (message.executionId === executionId) {
+                  const error = new Error(
+                    message.data.message ?? 'Unknown WebSocket error',
+                  )
+                  onError?.(error)
+                }
+                break
+
+              case 'completion':
+                if (message.executionId === executionId) {
+                  onStatusChange?.('completed', 'Pipeline execution completed')
+                }
+                break
+              case 'progress_request': {
+                throw new Error('Not implemented yet: "progress_request" case')
+              }
+              case 'status_request': {
+                throw new Error('Not implemented yet: "status_request" case')
+              }
+              case 'subscribe': {
+                throw new Error('Not implemented yet: "subscribe" case')
+              }
+            }
+          } catch (error: unknown) {
+            console.error('Failed to parse WebSocket message:', error)
+            onError?.(new Error('Failed to parse WebSocket message'))
+          }
+        }
+
+        setSocket(ws)
+      } catch (error: unknown) {
         if (!isMountedRef.current) return
 
         setConnectionStatus('error')
-        const errorMessage = new Error(
-          `WebSocket connection error: ${error.type}`,
+        onError?.(
+          error instanceof Error
+            ? error
+            : new Error('Unknown connection error'),
         )
-        onError?.(errorMessage)
       }
-
-      ws.onmessage = (event) => {
-        if (!isMountedRef.current) return
-
-        try {
-          const message: WebSocketMessage = JSON.parse(event.data)
-          setLastMessage(message)
-
-          // Handle different message types
-          switch (message.type) {
-            case 'progress_update':
-              if (message.executionId === executionId) {
-                const { progress, stage, data } = message.data
-                onProgressUpdate?.(progress, stage, data)
-              }
-              break
-
-            case 'status_update':
-              if (message.executionId === executionId) {
-                const { status, message: statusMessage } = message.data
-                onStatusChange?.(status, statusMessage)
-              }
-              break
-
-            case 'error':
-              if (message.executionId === executionId) {
-                const error = new Error(
-                  message.data.message ?? 'Unknown WebSocket error',
-                )
-                onError?.(error)
-              }
-              break
-
-            case 'completion':
-              if (message.executionId === executionId) {
-                onStatusChange?.('completed', 'Pipeline execution completed')
-              }
-              break
-            case 'progress_request': {
-              throw new Error('Not implemented yet: "progress_request" case')
-            }
-            case 'status_request': {
-              throw new Error('Not implemented yet: "status_request" case')
-            }
-            case 'subscribe': {
-              throw new Error('Not implemented yet: "subscribe" case')
-            }
-          }
-        } catch (error: unknown) {
-          console.error('Failed to parse WebSocket message:', error)
-          onError?.(new Error('Failed to parse WebSocket message'))
-        }
-      }
-
-      setSocket(ws)
-    } catch (error: unknown) {
-      if (!isMountedRef.current) return
-
-      setConnectionStatus('error')
-      onError?.(
-        error instanceof Error ? error : new Error('Unknown connection error'),
-      )
-    }
-  }, [
-    url,
-    executionId,
-    autoConnect,
-    maxRetries,
-    retryDelay,
-    onConnect,
-    onDisconnect,
-    onError,
-    onProgressUpdate,
-    onStatusChange,
-    connectionAttempts,
-  ])
+    },
+    [
+      url,
+      executionId,
+      autoConnect,
+      maxRetries,
+      retryDelay,
+      onConnect,
+      onDisconnect,
+      onError,
+      onProgressUpdate,
+      onStatusChange,
+      connectionAttempts,
+    ],
+  )
 
   const disconnect = useCallback(() => {
     if (reconnectTimerRef.current) {

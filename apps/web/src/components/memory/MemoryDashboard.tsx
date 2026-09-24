@@ -223,9 +223,9 @@ export function MemoryDashboard({
           m.metadata?.['crisisSeverity'] &&
           m.metadata['crisisSeverity'] !== 'none',
       ) && (
-        <Card className="border-destructive bg-destructive/5">
+        <Card className="bg-destructive/5 border-destructive">
           <CardHeader className="py-3">
-            <CardTitle className="text-destructive flex items-center gap-2 text-sm font-medium">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-destructive">
               <AlertCircle className="h-4 w-4" />
               Active Crisis Signals Detected
             </CardTitle>
@@ -410,7 +410,7 @@ export function MemoryDashboard({
             <CardContent>
               {filteredMemories.length === 0 ? (
                 <div className="py-8 text-center">
-                  <Brain className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+                  <Brain className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                   <p className="text-muted-foreground">
                     {searchQuery
                       ? 'No memories found matching your search.'
@@ -442,7 +442,7 @@ export function MemoryDashboard({
                               {mem.metadata?.['category'] ?? 'general'}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
+                          <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                             {formatTimestamp(mem.metadata?.['timestamp'])}
                           </TableCell>
                           <TableCell>
@@ -521,7 +521,7 @@ export function MemoryDashboard({
                                 <Edit className="h-4 w-4" />
                               </Button>
                               <AlertDialog>
-                                <AlertDialogTrigger className="text-destructive hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-md">
+                                <AlertDialogTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-md text-destructive hover:bg-accent">
                                   <Trash2 className="h-4 w-4" />
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -542,7 +542,7 @@ export function MemoryDashboard({
                                       onClick={async () =>
                                         mem.id && handleDeleteMemory(mem.id)
                                       }
-                                      className="bg-destructive hover:bg-destructive/90"
+                                      className="hover:bg-destructive/90 bg-destructive"
                                     >
                                       Delete
                                     </AlertDialogAction>
@@ -601,7 +601,7 @@ export function MemoryDashboard({
                   <CardTitle className="text-sm font-medium">
                     Total Memories
                   </CardTitle>
-                  <Brain className="text-muted-foreground h-4 w-4" />
+                  <Brain className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -615,7 +615,7 @@ export function MemoryDashboard({
                   <CardTitle className="text-sm font-medium">
                     Categories
                   </CardTitle>
-                  <Tag className="text-muted-foreground h-4 w-4" />
+                  <Tag className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -629,7 +629,7 @@ export function MemoryDashboard({
                   <CardTitle className="text-sm font-medium">
                     Recent Activity
                   </CardTitle>
-                  <Clock className="text-muted-foreground h-4 w-4" />
+                  <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -660,9 +660,9 @@ export function MemoryDashboard({
                           <Badge variant="outline">{category}</Badge>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="bg-secondary h-2 w-24 rounded-full">
+                          <div className="h-2 w-24 rounded-full bg-secondary">
                             <div
-                              className="bg-primary h-2 rounded-full"
+                              className="h-2 rounded-full bg-primary"
                               style={{
                                 width: `${(count / (memory.stats?.totalMemories ?? 1)) * 100}%`,
                               }}

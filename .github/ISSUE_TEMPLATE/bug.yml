@@ -13,7 +13,9 @@ body:
     id: what-happened
     attributes:
       label: What happened?
-      description: A clear description of the bug, plus what you expected to happen instead.
+      description:
+        A clear description of the bug, plus what you expected to happen
+        instead.
       placeholder: 'Describe the incorrect behavior…'
     validations:
       required: true
@@ -32,7 +34,8 @@ body:
     id: logs
     attributes:
       label: Relevant logs or errors
-      description: Paste non-sensitive output only (scrub anything patient-identifiable).
+      description:
+        Paste non-sensitive output only (scrub anything patient-identifiable).
       render: shell
     validations:
       required: false

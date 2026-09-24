@@ -1,6 +1,5 @@
-import { v4 as uuidv4 } from 'uuid'
-
 import type { Collection } from 'mongodb'
+import { v4 as uuidv4 } from 'uuid'
 
 import { createAuditLog, AuditEventType } from '../audit'
 import { aiRepository } from '../db/ai'
@@ -86,9 +85,7 @@ function getEmotionCollection(): Collection<EmotionRecordDocument> {
   return mongoClient.db.collection<EmotionRecordDocument>('emotion_records')
 }
 
-function mapRecordToPoint(
-  record: EmotionRecordDocument,
-): EmotionDataPoint {
+function mapRecordToPoint(record: EmotionRecordDocument): EmotionDataPoint {
   return {
     timestamp: record.timestamp.toISOString(),
     valence: record.valence,
@@ -113,7 +110,7 @@ function mapAnalysisToPoint(
 ): EmotionDataPoint {
   // valence/dominance arrive in [-1, 1], arousal in [0, 1]
   const toVadScale = (v: number, bipolar: boolean): number =>
-    Math.round(((bipolar ? (v + 1) / 2 : v) * 10) * 100) / 100
+    Math.round((bipolar ? (v + 1) / 2 : v) * 10 * 100) / 100
   return {
     timestamp: new Date(analysis.timestamp).toISOString(),
     valence: toVadScale(analysis.dimensions.valence, true),
@@ -199,9 +196,7 @@ export async function fetchSessionEmotionData(
       }
     }
 
-    let cursor = collection
-      .find(query)
-      .sort({ timestamp: 1 })
+    let cursor = collection.find(query).sort({ timestamp: 1 })
 
     if (options?.limit) {
       cursor = cursor.limit(options.limit)

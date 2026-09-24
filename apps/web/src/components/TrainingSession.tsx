@@ -26,7 +26,7 @@ function AIErrorBoundary({ children }: { children: React.ReactNode }) {
     return (
       <div
         role="alert"
-        className="bg-destructive text-destructive-foreground rounded-md p-4"
+        className="rounded-md bg-destructive p-4 text-destructive-foreground"
       >
         <strong>AI Service Error:</strong>{' '}
         {error?.message ?? 'The AI service is temporarily unavailable.'}
@@ -147,7 +147,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
         style={{ background: tokens.colors.background }}
       >
         <header>
-          <h2 className="text-primary mb-6 text-2xl font-bold">
+          <h2 className="mb-6 text-2xl font-bold text-primary">
             Therapist Training Session
           </h2>
         </header>
@@ -219,7 +219,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
                   onChange={(e) => setClientInput(e.target.value)}
                   disabled={isLoading}
                   aria-required="true"
-                  className="focus-visible:ring-primary mb-3 w-full rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2"
+                  className="mb-3 w-full rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 />
                 <button
                   type="submit"
@@ -239,7 +239,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
 
               <div className="mt-4">
                 <strong>Client Response:</strong>
-                <div className="bg-muted mt-2 min-h-[60px] rounded-md p-3 text-sm">
+                <div className="mt-2 min-h-[60px] rounded-md bg-muted p-3 text-sm">
                   {clientResponse ?? 'Waiting for client response...'}
                 </div>
               </div>
@@ -263,7 +263,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
                 placeholder="Enter your feedback about the session..."
-                className="focus-visible:ring-primary mb-3 w-full rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2"
+                className="mb-3 w-full rounded-md border px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 rows={3}
               />
               <button
@@ -284,7 +284,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
               <h3 className="mb-3 text-lg font-semibold">
                 Conversation History
               </h3>
-              <div className="bg-muted max-h-40 overflow-y-auto rounded-md p-3">
+              <div className="max-h-40 overflow-y-auto rounded-md bg-muted p-3">
                 {memory.history.map((entry, index) => (
                   <div
                     key={index}

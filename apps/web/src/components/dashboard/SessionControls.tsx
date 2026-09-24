@@ -142,14 +142,14 @@ export function SessionControls({
                   <div className="text-sm font-medium">
                     Session {session.id}
                   </div>
-                  <div className="text-muted-foreground text-xs">
+                  <div className="text-xs text-muted-foreground">
                     {new Date(session.startTime).toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
                   </div>
                   {session.endTime && (
-                    <div className="text-muted-foreground text-xs">
+                    <div className="text-xs text-muted-foreground">
                       Ended:{' '}
                       {new Date(session.endTime).toLocaleTimeString([], {
                         hour: '2-digit',

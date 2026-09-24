@@ -43,7 +43,9 @@ jobs:
         with:
           node-version: 24.16.0
       - name: Run accuracy bucket
-        run: set -o pipefail; timeout 40m pnpm test:advisory 2>&1 | tee accuracy-test.log
+        run:
+          set -o pipefail; timeout 40m pnpm test:advisory 2>&1 | tee
+          accuracy-test.log
       - name: Upload log
         if: always() && hashFiles('accuracy-test.log') != ''
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

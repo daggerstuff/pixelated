@@ -3,11 +3,7 @@
 import type { Event } from '@sentry/astro'
 import { describe, expect, it } from 'vitest'
 
-import {
-  beforeSend,
-  isLocalDevServerEvent,
-  isLoopbackHostname,
-} from './config'
+import { beforeSend, isLocalDevServerEvent, isLoopbackHostname } from './config'
 
 const makeEvent = (partial: Event = {}): Event => ({
   level: 'error',
@@ -44,17 +40,23 @@ describe('isLocalDevServerEvent', () => {
 
   it('detects localhost and IPv6 loopback request URLs', () => {
     expect(
-      isLocalDevServerEvent(makeEvent({ request: { url: 'http://localhost:4321/foo' } })),
+      isLocalDevServerEvent(
+        makeEvent({ request: { url: 'http://localhost:4321/foo' } }),
+      ),
     ).toBe(true)
     expect(
-      isLocalDevServerEvent(makeEvent({ request: { url: 'http://[::1]:5173/' } })),
+      isLocalDevServerEvent(
+        makeEvent({ request: { url: 'http://[::1]:5173/' } }),
+      ),
     ).toBe(true)
   })
 
   it('falls back to the url tag when request data is absent', () => {
-    expect(isLocalDevServerEvent(makeEvent({ tags: { url: 'http://127.0.0.1:5173/' } }))).toBe(
-      true,
-    )
+    expect(
+      isLocalDevServerEvent(
+        makeEvent({ tags: { url: 'http://127.0.0.1:5173/' } }),
+      ),
+    ).toBe(true)
   })
 
   it('keeps external production requests', () => {
@@ -72,12 +74,18 @@ describe('isLocalDevServerEvent', () => {
   it('ignores malformed URLs instead of throwing', () => {
     expect(
       isLocalDevServerEvent(
-        makeEvent({ request: { url: 'not a url' }, tags: { url: 'https://example.com/' } }),
+        makeEvent({
+          request: { url: 'not a url' },
+          tags: { url: 'https://example.com/' },
+        }),
       ),
     ).toBe(false)
     expect(
       isLocalDevServerEvent(
-        makeEvent({ request: { url: 'not a url' }, tags: { url: 'http://localhost:5173/' } }),
+        makeEvent({
+          request: { url: 'not a url' },
+          tags: { url: 'http://localhost:5173/' },
+        }),
       ),
     ).toBe(true)
   })
@@ -100,7 +108,9 @@ describe('beforeSend (server-side, no window)', () => {
   })
 
   it('keeps events from external requests', () => {
-    const event = makeEvent({ request: { url: 'https://pixelatedempathy.tech/' } })
+    const event = makeEvent({
+      request: { url: 'https://pixelatedempathy.tech/' },
+    })
     expect(beforeSend(event)).toBe(event)
   })
 
