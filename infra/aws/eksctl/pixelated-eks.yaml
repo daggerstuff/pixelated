@@ -5,20 +5,37 @@ metadata:
   name: pixelated-eks
   region: us-west-2
   version: "1.32"
+  tags:
+    Project: pixelated-empathy
+    Environment: production
+    ManagedBy: eksctl
+    CostCenter: engineering
 
 iam:
   withOIDC: true
 
 managedNodeGroups:
   - name: pixelated-apps
-    instanceType: t3.medium
-    minSize: 2
+    instanceType: t3a.medium
+    minSize: 1
     maxSize: 3
     desiredCapacity: 2
     volumeSize: 20
     volumeType: gp3
     labels:
       workload: apps
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/pixelated-eks: "owned"
+      CostCenter: engineering
+    instancesDistribution:
+      onDemandBaseCapacity: 1
+      onDemandPercentageAboveBaseCapacity: 20
+      spotAllocationStrategy: price-capacity-optimized
+      instanceTypes:
+        - t3a.medium
+        - t3.medium
+        - t2.medium
     iam:
       withAddonPolicies:
         autoScaler: true

@@ -75,9 +75,21 @@ build_and_push() {
 
 # Deploy to AWS ECS
 deploy_aws_ecs() {
-    log "Deploying to AWS ECS..."
+    log "Deploying to AWS ECS with Cost-Optimized Fargate Spot Strategy..."
     
-    # Update ECS service
+    # Ensure CloudWatch log retention is capped (prevent indefinite storage cost)
+    aws logs put-retention-policy \
+        --log-group-name "/ecs/${PROJECT_NAME}" \
+        --retention-in-days 30 \
+        --region ${AWS_REGION} >/dev/null 2>&1 || warn "Could not set log retention policy for /ecs/${PROJECT_NAME}"
+
+    # Update ECS service with Fargate Spot capacity provider strategy for up to 70% compute savings
+    aws ecs update-service \
+        --cluster ${ECS_CLUSTER} \
+        --service ${ECS_SERVICE} \
+        --capacity-provider-strategy capacityProvider=FARGATE,weight=1,base=1 capacityProvider=FARGATE_SPOT,weight=3 \
+        --force-new-deployment \
+        --region ${AWS_REGION} || \
     aws ecs update-service \
         --cluster ${ECS_CLUSTER} \
         --service ${ECS_SERVICE} \
