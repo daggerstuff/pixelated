@@ -3,9 +3,9 @@
  * Handles OAuth2 flow with Auth0 for social providers like Google
  */
 
-import { AuthenticationClient, UserInfoClient } from 'auth0-legacy'
 import { ManagementClient } from 'auth0'
 import type { Management } from 'auth0'
+import { AuthenticationClient, UserInfoClient } from 'auth0-legacy'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'

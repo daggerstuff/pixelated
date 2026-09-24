@@ -3,8 +3,8 @@
  * Handles MFA enrollment, challenge, and management using Auth0 Guardian
  */
 
-import { AuthenticationClient } from 'auth0-legacy'
 import { ManagementClient } from 'auth0'
+import { AuthenticationClient } from 'auth0-legacy'
 
 type GuardianEnrollment = {
   id: string
