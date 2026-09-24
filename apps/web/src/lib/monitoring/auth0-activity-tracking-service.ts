@@ -248,7 +248,10 @@ export class Auth0ActivityTrackingService {
       }
 
       // Fetch logs from Auth0
-      const logs = await auth0Management.getLogs(queryParams as Record<string, unknown>)
+      const logsPage = await auth0Management.logs.list(
+        queryParams as Record<string, unknown>,
+      )
+      const logs = logsPage.data
 
       if (logs.length === 0) {
         return
