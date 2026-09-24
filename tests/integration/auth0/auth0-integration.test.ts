@@ -185,18 +185,23 @@ type Auth0SocialAuthServiceCtor = new () => Auth0SocialAuthService
 const EXAMPLE_TEST_SECRET_PLACEHOLDER = 'example-password-placeholder'
 
 // Mock the auth0 module
-vi.mock('auth0', () => {
+vi.mock('auth0-legacy', () => {
   return {
     AuthenticationClient: vi.fn<() => typeof mockAuthenticationClient>(
       function () {
         return mockAuthenticationClient
       },
     ),
-    ManagementClient: vi.fn<() => typeof mockManagementClient>(function () {
-      return mockManagementClient
-    }),
     UserInfoClient: vi.fn<() => typeof mockUserInfoClient>(function () {
       return mockUserInfoClient
+    }),
+  }
+})
+
+vi.mock('auth0', () => {
+  return {
+    ManagementClient: vi.fn<() => typeof mockManagementClient>(function () {
+      return mockManagementClient
     }),
   }
 })
