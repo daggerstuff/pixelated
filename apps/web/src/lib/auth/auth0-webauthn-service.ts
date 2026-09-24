@@ -153,7 +153,7 @@ export interface WebAuthnCredentialRequestOptions {
  * Auth0 WebAuthn/FIDO2 Service
  * Implements passwordless authentication using WebAuthn/FIDO2 standards
  */
-export class Auth0WebAuthnService {
+class Auth0WebAuthnService {
   private readonly rpName = 'Pixelated Empathy'
   private readonly rpId: string
 
@@ -598,4 +598,3 @@ export class Auth0WebAuthnService {
 
 // Export singleton instance
 export const auth0WebAuthnService = new Auth0WebAuthnService()
-export default auth0WebAuthnService

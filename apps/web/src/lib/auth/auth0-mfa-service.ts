@@ -26,7 +26,7 @@ type EnrollmentTicketResponse = {
 }
 
 // Type alias for auth0 v5+ compatibility
-export type ManagementClientOptionsWithClientCredentials = {
+type ManagementClientOptionsWithClientCredentials = {
   domain: string
   clientId: string
   clientSecret: string
@@ -180,7 +180,7 @@ function parseEnrollmentTicket(
  * Auth0 MFA Service
  * Handles Multi-Factor Authentication enrollment, challenges, and verification
  */
-export class Auth0MFAService {
+class Auth0MFAService {
   constructor() {
     if (!auth0Config.domain) {
       if (shouldWarnAuth0Configuration) {
@@ -594,4 +594,3 @@ export class Auth0MFAService {
 
 // Export singleton instance
 export const auth0MFAService = new Auth0MFAService()
-export default auth0MFAService
