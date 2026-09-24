@@ -72,7 +72,9 @@ const IGNORE_PATTERNS = [
   /\/vendor\//,
   /\/generated\//,
   /\.generated\./,
-  /\/ai\/tools\//,
+  // Anchored so the top-level submodule path matches — `relative()` never
+  // yields a leading slash.
+  /(^|\/)ai\/tools\//,
   /\/_libs\//,
   // This script's own regex/docstrings legitimately contain the marker words.
   /^scripts\/ci\/tech-debt-audit\.mjs$/,
@@ -83,9 +85,12 @@ const IGNORE_PATTERNS = [
 const TRACKED_RE =
   /\b(TODO|FIXME|HACK|XXX)\(\s*(?:[A-Z][A-Z0-9]+-\d+|#\d+|[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+#\d+)\s*\)/i
 
-// An untracked marker: TODO|FIXME|HACK|XXX not immediately followed by `(`
-// (which would make it a tracked `TODO(TICKET-123)` marker).
-const UNTRACKED_RE = /\b(TODO|FIXME|HACK|XXX)\b(?!\()/gi
+// An untracked marker: an UPPERCASE TODO|FIXME|HACK|XXX annotation. A
+// marker immediately followed by `(` is a tracked `TODO(TICKET-123)`
+// marker; otherwise it must start an annotation (whitespace, `:`, or end
+// of line). Case-sensitive so lowercase identifiers (Spanish `todo`,
+// `todo` variables, `todo-*` class names) are never mistaken for debt.
+const UNTRACKED_RE = /\b(TODO|FIXME|HACK|XXX)\b(?!\()(?=\s|:|$)/g
 
 /**
  * @typedef {{path: string, line: number, kind: string, text: string}} Marker
