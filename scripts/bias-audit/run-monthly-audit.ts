@@ -15,11 +15,45 @@ import type { TherapeuticSession } from '../../apps/web/src/lib/ai/bias-detectio
 const month = process.argv[2] ?? new Date().toISOString().slice(0, 7)
 
 /**
+ * xmur3 string hash — produces a 32-bit seed from the audit month so that
+ * monthly reports are reproducible run-to-run (same month → same data →
+ * month-over-month deltas reflect data changes, not RNG redraws).
+ */
+function xmur3(str: string): () => number {
+  let h = 1779033703 ^ str.length
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353)
+    h = (h << 13) | (h >>> 19)
+  }
+  return () => {
+    h = Math.imul(h ^ (h >>> 16), 2246822507)
+    h = Math.imul(h ^ (h >>> 13), 3266489909)
+    return (h ^= h >>> 16) >>> 0
+  }
+}
+
+function mulberry32(a: number): () => number {
+  return () => {
+    a |= 0
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+const random = mulberry32(xmur3(month)())
+
+/**
  * Generate synthetic sessions for the audit.
  *
  * In production, this would fetch real sessions from the database
  * with proper PHI redaction. The synthetic data ensures the audit
  * runner can execute end-to-end in CI without database access.
+ *
+ * Response text uses a zero-padded session index so segment text length is
+ * uncorrelated with generation order — otherwise averageResponseLength
+ * variance measures digit growth, not bias.
  */
 function generateSyntheticSessions(): TherapeuticSession[] {
   const demographics = [
@@ -65,15 +99,16 @@ function generateSyntheticSessions(): TherapeuticSession[] {
 
   for (const demo of demographics) {
     for (let i = 0; i < 30; i++) {
-      const sessionId = `session-${counter++}`
+      const n = counter++
+      const sessionId = `session-${n}`
       const responses = []
       for (let j = 0; j < 5; j++) {
         responses.push({
           responseId: `${sessionId}-resp-${j}`,
-          text: `Sample therapeutic response ${j} for session ${counter}`,
+          text: `Sample therapeutic response ${j} for session ${String(n).padStart(3, '0')}`,
           timestamp: new Date(),
           type: 'intervention' as const,
-          confidence: 0.65 + Math.random() * 0.3,
+          confidence: 0.65 + random() * 0.3,
           modelUsed: 'llama-3.1-70b',
         })
       }
@@ -85,12 +120,12 @@ function generateSyntheticSessions(): TherapeuticSession[] {
           {
             outcomeId: `${sessionId}-o1`,
             description: 'Patient engagement',
-            achieved: Math.random() > 0.2,
+            achieved: random() > 0.2,
           },
           {
             outcomeId: `${sessionId}-o2`,
             description: 'Skill demonstration',
-            achieved: Math.random() > 0.3,
+            achieved: random() > 0.3,
           },
         ],
       })

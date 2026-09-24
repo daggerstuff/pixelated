@@ -53,6 +53,7 @@ function makeSyntheticSessions(
     demo: Record<string, unknown>
     count: number
     confidence: number
+    outcomes?: { outcomeId: string; description: string; achieved: boolean }[]
   }>,
 ): TherapeuticSession[] {
   const sessions: TherapeuticSession[] = []
@@ -69,7 +70,7 @@ function makeSyntheticSessions(
           ),
         )
       }
-      sessions.push(makeSession(sid, group.demo, responses))
+      sessions.push(makeSession(sid, group.demo, responses, group.outcomes))
     }
   }
   return sessions
@@ -203,9 +204,28 @@ describe('BiasAuditRunner', () => {
     })
 
     it('should set alert level to critical when many metrics exceed', async () => {
+      // Three metrics exceed with a real gap each: averageConfidence (65pp),
+      // highConfidenceRate (0 vs 1.0 at n=75, significant), and
+      // outcomeAchievementRate (0 vs 1.0 at n=30 outcomes, significant).
       const sessions = makeSyntheticSessions([
-        { demo: { age: '18-25' }, count: 15, confidence: 0.3 },
-        { demo: { age: '26-35' }, count: 15, confidence: 0.95 },
+        {
+          demo: { age: '18-25' },
+          count: 15,
+          confidence: 0.3,
+          outcomes: [
+            { outcomeId: 'o1', description: 'A', achieved: false },
+            { outcomeId: 'o2', description: 'B', achieved: false },
+          ],
+        },
+        {
+          demo: { age: '26-35' },
+          count: 15,
+          confidence: 0.95,
+          outcomes: [
+            { outcomeId: 'o1', description: 'A', achieved: true },
+            { outcomeId: 'o2', description: 'B', achieved: true },
+          ],
+        },
       ])
 
       const report = await runner.runAudit(sessions, {
