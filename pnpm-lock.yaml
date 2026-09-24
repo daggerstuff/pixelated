@@ -396,8 +396,8 @@ importers:
         specifier: ^0.45.2
         version: 0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2)
       eve:
-        specifier: ^0.54.3
-        version: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.63.0
+        version: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -1106,13 +1106,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
         specifier: 2.3.0
-        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
+        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.5)
       eve:
-        specifier: ^0.54.3
-        version: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.63.0
+        version: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.59(zod@4.6.5))(@ai-sdk/openai@4.0.72(zod@4.6.5))(@ai-sdk/provider@4.0.17)(ai@7.0.0-beta.178(zod@4.6.5))
@@ -1137,13 +1137,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
         specifier: 2.3.0
-        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
+        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.5)
       eve:
-        specifier: ^0.54.3
-        version: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.63.0
+        version: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.59(zod@4.6.5))(@ai-sdk/openai@4.0.72(zod@4.6.5))(@ai-sdk/provider@4.0.17)(ai@7.0.0-beta.178(zod@4.6.5))
@@ -1171,13 +1171,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
         specifier: 2.3.0
-        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
+        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.5)
       eve:
-        specifier: ^0.54.3
-        version: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.63.0
+        version: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -1205,13 +1205,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
         specifier: 2.3.0
-        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
+        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.5)
       eve:
-        specifier: ^0.54.3
-        version: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.63.0
+        version: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -1257,13 +1257,13 @@ importers:
         version: 1.43.0
       '@vercel/connect':
         specifier: 2.3.0
-        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
+        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.5)
       eve:
-        specifier: ^0.54.3
-        version: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.63.0
+        version: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.59(zod@4.6.5))(@ai-sdk/openai@4.0.72(zod@4.6.5))(@ai-sdk/provider@4.0.17)(ai@7.0.0-beta.178(zod@4.6.5))
@@ -1309,13 +1309,13 @@ importers:
         version: 1.43.0
       '@vercel/connect':
         specifier: 2.3.0
-        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
+        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.5)
       eve:
-        specifier: ^0.54.3
-        version: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.63.0
+        version: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.59(zod@4.6.5))(@ai-sdk/openai@4.0.72(zod@4.6.5))(@ai-sdk/provider@4.0.17)(ai@7.0.0-beta.178(zod@4.6.5))
@@ -1361,13 +1361,13 @@ importers:
         version: 1.43.0
       '@vercel/connect':
         specifier: 2.3.0
-        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
+        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.5)
       eve:
-        specifier: ^0.54.3
-        version: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.63.0
+        version: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       mongodb:
         specifier: ^7.5.0
         version: 7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
@@ -1404,13 +1404,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
         specifier: 2.3.0
-        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
+        version: 2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.5)
       eve:
-        specifier: ^0.54.3
-        version: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.63.0
+        version: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -9802,13 +9802,13 @@ packages:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
-  eve@0.54.5:
-    resolution: {integrity: sha512-Tq+vJQa8YIjuQJ5LIAFJzdht7F25e2jviPTHVy9dRCbRjinhXz/4cY2UwmkxH4Wq2jC9u1KjUhuVkRFRORuiQw==}
+  eve@0.63.0:
+    resolution: {integrity: sha512-iDv0S4MXvZimaXNTJnyB2THumRQLWQSAgpMcZsGtMNquYQpSKB1+i8sxX4KJOHHCLd04lwD+06xnh+ja7rlZIw==}
     engines: {node: '>=24'}
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
-      ai: ^7.0.93
+      ai: ^7.0.105
       braintrust: ^3.0.0
       dd-trace: ^6.13.0
       just-bash: ^3.1.0
@@ -22284,14 +22284,14 @@ snapshots:
     dependencies:
       execa: 5.1.1
 
-  '@vercel/connect@2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))':
+  '@vercel/connect@2.3.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.0-beta.178(zod@4.6.5))(eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)))':
     dependencies:
       '@vercel/oidc': 3.7.1
     optionalDependencies:
       '@ai-sdk/mcp': 2.0.55(zod@4.6.5)
       '@modelcontextprotocol/sdk': 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       ai: 7.0.0-beta.178(zod@4.6.5)
-      eve: 0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+      eve: 0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
 
   '@vercel/functions@3.9.8(@aws-sdk/credential-provider-web-identity@3.972.77)(ws@8.21.3(utf-8-validate@6.0.6))':
     dependencies:
@@ -24605,7 +24605,7 @@ snapshots:
 
   etag@1.8.1: {}
 
-  eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)):
+  eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)):
     dependencies:
       ai: 7.0.0-beta.178(zod@4.6.5)
       nitro: 3.0.260903-beta
@@ -24614,7 +24614,7 @@ snapshots:
       '@opentelemetry/api': 1.9.1
       just-bash: 3.4.2(supports-color@10.2.2)
 
-  eve@0.54.5(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)):
+  eve@0.63.0(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)):
     dependencies:
       ai: 7.0.109(zod@4.6.5)
       nitro: 3.0.260903-beta
