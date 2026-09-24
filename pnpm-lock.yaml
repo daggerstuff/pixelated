@@ -219,8 +219,8 @@ importers:
         specifier: ^5.9.1
         version: 5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-errors@3.0.0(ajv@8.20.0))(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(class-transformer@0.5.1)(class-validator@0.15.1)(effect@3.22.2)(joi@17.13.8)(react-hook-form@7.88.0(react@19.3.0))(zod@4.6.5)
       '@iconify-json/lucide':
-        specifier: ^1.2.134
-        version: 1.2.134
+        specifier: ^1.2.135
+        version: 1.2.135
       '@microsoft/clarity':
         specifier: ^1.0.2
         version: 1.0.2
@@ -3505,8 +3505,8 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@iconify-json/lucide@1.2.134':
-    resolution: {integrity: sha512-MXzwT7H8Ii/aGN6NLtMbMLDaxLYsOxCKEdW0F5h3MemNUaUBqAxr9nz0mPlXzozd/piQyrdSiUyk0t5b5ErADg==}
+  '@iconify-json/lucide@1.2.135':
+    resolution: {integrity: sha512-M2RbCJMe/ZwRzGBxNGbqP3kEQ74iJjQyJsw5FgVQw+Kp8eJPQF1S19fiGJChG4yYLg73c8Z/fMnm07GTXUxmQA==}
 
   '@iconify-json/ri@1.2.10':
     resolution: {integrity: sha512-WWMhoncVVM+Xmu9T5fgu2lhYRrKTEWhKk3Com0KiM111EeEsRLiASjpsFKnC/SrB6covhUp95r2mH8tGxhgd5Q==}
@@ -8244,6 +8244,7 @@ packages:
   auth0@6.4.0:
     resolution: {integrity: sha512-5F63B8R1s+CasVQXDcxVhSZiDcJSFHqCcCAgHkHfIdNrD/buON0FoQrAlVtZ8q3Z51UlIx6///1ef6YUhwkZIw==}
     engines: {node: ^20.19.0 || ^22.12.0 || ^24.0.0 || ^26.0.0}
+    deprecated: 'auth0 v6 is deprecated and no longer receives updates. v7 is Management-API-only with no breaking changes for Management API usage; the authentication layer moved to @auth0/auth0-auth-js and @auth0/auth0-server-js, which receive all new features. Migration guide: https://github.com/auth0/node-auth0/blob/master/v7_MIGRATION_GUIDE.md'
 
   auto-bind@5.0.1:
     resolution: {integrity: sha512-ooviqdwwgfIfNmDwo94wlshcdzfO64XV0Cg6oDsDYBJfITDz1EngD2z7DkbvCWn+XIMsIqW27sEVF6qcpJrRcg==}
@@ -17624,7 +17625,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@iconify-json/lucide@1.2.134':
+  '@iconify-json/lucide@1.2.135':
     dependencies:
       '@iconify/types': 2.0.0
 
