@@ -3,7 +3,8 @@
  * Implements passwordless authentication using WebAuthn/FIDO2 standards
  */
 
-import { ManagementClient, AuthenticationClient } from 'auth0'
+import { ManagementClient } from 'auth0'
+import { AuthenticationClient } from 'auth0-legacy'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -152,7 +153,7 @@ export interface WebAuthnCredentialRequestOptions {
  * Auth0 WebAuthn/FIDO2 Service
  * Implements passwordless authentication using WebAuthn/FIDO2 standards
  */
-export class Auth0WebAuthnService {
+class Auth0WebAuthnService {
   private readonly rpName = 'Pixelated Empathy'
   private readonly rpId: string
 
@@ -597,4 +598,3 @@ export class Auth0WebAuthnService {
 
 // Export singleton instance
 export const auth0WebAuthnService = new Auth0WebAuthnService()
-export default auth0WebAuthnService
