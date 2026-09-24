@@ -10,34 +10,34 @@ import type {
 const getSeverityColor = (severity: string) => {
   switch (severity) {
     case 'critical':
-      return 'text-red-600 bg-red-50'
+      return 'text-foreground font-semibold bg-card border border-ring'
     case 'high':
-      return 'text-orange-600 bg-orange-50'
+      return 'text-foreground font-medium bg-secondary border border-ring'
     case 'medium':
-      return 'text-yellow-600 bg-yellow-50'
+      return 'text-foreground font-medium bg-secondary border border-ring'
     case 'low':
-      return 'text-green-600 bg-green-50'
+      return 'text-foreground bg-secondary border border-input'
     default:
-      return 'text-gray-600 bg-gray-50'
+      return 'text-muted-foreground bg-secondary border border-border'
   }
 }
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'pending':
-      return 'text-red-600 bg-red-50'
+      return 'text-foreground font-semibold bg-card border border-ring'
     case 'under_review':
-      return 'text-blue-600 bg-blue-50'
+      return 'text-foreground bg-secondary border border-input'
     case 'reviewed':
-      return 'text-green-600 bg-green-50'
+      return 'text-foreground bg-secondary border border-input'
     case 'resolved':
-      return 'text-green-700 bg-green-100'
+      return 'text-foreground bg-secondary border border-input'
     case 'escalated':
-      return 'text-purple-600 bg-purple-50'
+      return 'text-foreground font-medium bg-secondary border border-ring'
     case 'dismissed':
-      return 'text-gray-600 bg-gray-50'
+      return 'text-muted-foreground bg-secondary border border-border'
     default:
-      return 'text-gray-600 bg-gray-50'
+      return 'text-muted-foreground bg-secondary border border-border'
   }
 }
 
@@ -173,7 +173,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
         aria-live="polite"
       >
         <div
-          className="border-blue-600 h-8 w-8 animate-spin rounded-full border-b-2"
+          className="h-8 w-8 animate-spin rounded-none border-b-2 border-ring"
           aria-hidden="true"
         ></div>
         <span className="ml-2">Loading crisis flags...</span>
@@ -183,11 +183,11 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
 
   if (error) {
     return (
-      <div className="bg-red-50 border-red-200 rounded-md border p-4">
+      <div className="rounded-none border border-ring bg-card p-4">
         <div className="flex">
           <div className="flex-shrink-0">
             <svg
-              className="text-red-400 h-5 w-5"
+              className="h-5 w-5 text-foreground"
               viewBox="0 0 20 20"
               fill="currentColor"
             >
@@ -199,12 +199,12 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-red-800 text-sm font-medium">Error</h3>
-            <div className="text-red-700 mt-2 text-sm">{error}</div>
+            <h3 className="text-sm font-semibold text-foreground">Error</h3>
+            <div className="mt-2 text-sm text-foreground">{error}</div>
             <div className="mt-4">
               <button
                 onClick={loadFlags}
-                className="bg-red-100 text-red-800 hover:bg-red-200 rounded-md px-3 py-2 text-sm font-medium"
+                className="rounded-none bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-accent"
               >
                 Try Again
               </button>
@@ -219,28 +219,28 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
     <div className="space-y-6">
       {/* User Status Summary */}
       {userStatus && (
-        <div className="bg-white rounded-lg p-6 shadow">
-          <h3 className="text-gray-900 mb-4 text-lg font-medium">
+        <div className="rounded-none border border-border bg-card p-6">
+          <h3 className="mb-4 text-lg font-medium text-foreground">
             User Status Summary
           </h3>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <div className="text-center">
-              <div className="text-gray-900 text-2xl font-bold">
+              <div className="text-2xl font-bold text-foreground">
                 {userStatus.totalCrisisFlags}
               </div>
-              <div className="text-gray-500 text-sm">Total Flags</div>
+              <div className="text-sm text-muted-foreground">Total Flags</div>
             </div>
             <div className="text-center">
-              <div className="text-red-600 text-2xl font-bold">
+              <div className="text-2xl font-bold text-foreground">
                 {userStatus.activeCrisisFlags}
               </div>
-              <div className="text-gray-500 text-sm">Active Flags</div>
+              <div className="text-sm text-muted-foreground">Active Flags</div>
             </div>
             <div className="text-center">
-              <div className="text-green-600 text-2xl font-bold">
+              <div className="text-2xl font-bold text-foreground">
                 {userStatus.resolvedCrisisFlags}
               </div>
-              <div className="text-gray-500 text-sm">Resolved</div>
+              <div className="text-sm text-muted-foreground">Resolved</div>
             </div>
             <div className="text-center">
               <div
@@ -248,22 +248,22 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
               >
                 {userStatus.currentRiskLevel.toUpperCase()}
               </div>
-              <div className="text-gray-500 text-sm">Risk Level</div>
+              <div className="text-sm text-muted-foreground">Risk Level</div>
             </div>
           </div>
         </div>
       )}
 
       {/* Crisis Flags List */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="border-gray-200 border-b px-6 py-4">
-          <h3 className="text-gray-900 text-lg font-medium">
+      <div className="rounded-none border border-border bg-card">
+        <div className="border-b border-border px-6 py-4">
+          <h3 className="text-lg font-medium text-foreground">
             Crisis Session Flags {showPendingOnly && '(Pending Review)'}
           </h3>
         </div>
 
         {flags.length === 0 ? (
-          <div className="text-gray-500 p-6 text-center">
+          <div className="p-6 text-center text-muted-foreground">
             No crisis flags found.
           </div>
         ) : (
@@ -274,25 +274,25 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                   <div className="flex-1">
                     <div className="mb-2 flex items-center space-x-2">
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getSeverityColor(flag.severity)}`}
+                        className={`inline-flex items-center rounded-none border px-2.5 py-0.5 text-xs font-medium ${getSeverityColor(flag.severity)}`}
                       >
                         {flag.severity.toUpperCase()}
                       </span>
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(flag.status)}`}
+                        className={`inline-flex items-center rounded-none border px-2.5 py-0.5 text-xs font-medium ${getStatusColor(flag.status)}`}
                       >
                         {flag.status.replace('_', ' ').toUpperCase()}
                       </span>
-                      <span className="text-gray-500 text-xs">
+                      <span className="text-xs text-muted-foreground">
                         Confidence: {(flag.confidence * 100).toFixed(1)}%
                       </span>
                     </div>
 
-                    <h4 className="text-gray-900 mb-1 text-sm font-medium">
+                    <h4 className="mb-1 text-sm font-medium text-foreground">
                       {flag.reason}
                     </h4>
 
-                    <div className="text-gray-600 space-y-1 text-sm">
+                    <div className="space-y-1 text-sm text-muted-foreground">
                       <div>Session: {flag.sessionId}</div>
                       <div>
                         Flagged: {new Date(flag.flaggedAt).toLocaleString()}
@@ -301,20 +301,20 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                         <div>Risks: {flag.detectedRisks.join(', ')}</div>
                       )}
                       {flag.textSample && (
-                        <div className="bg-gray-50 mt-2 rounded p-2 text-xs">
+                        <div className="mt-2 rounded-none bg-secondary p-2 text-xs">
                           <strong>Text Sample:</strong> {flag.textSample}
                         </div>
                       )}
                     </div>
 
                     {flag.reviewerNotes && (
-                      <div className="bg-blue-50 mt-2 rounded p-2 text-sm">
+                      <div className="mt-2 rounded-none border border-input bg-secondary p-2 text-sm">
                         <strong>Reviewer Notes:</strong> {flag.reviewerNotes}
                       </div>
                     )}
 
                     {flag.resolutionNotes && (
-                      <div className="bg-green-50 mt-2 rounded p-2 text-sm">
+                      <div className="mt-2 rounded-none border border-input bg-secondary p-2 text-sm">
                         <strong>Resolution Notes:</strong>{' '}
                         {flag.resolutionNotes}
                       </div>
@@ -328,7 +328,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                         <button
                           onClick={() => setSelectedFlag(flag)}
                           disabled={updating === flag.id}
-                          className="bg-blue-600 text-white hover:bg-blue-700 rounded px-3 py-1 text-sm disabled:opacity-50"
+                          className="rounded-none bg-primary px-3 py-1 text-sm text-primary-foreground hover:bg-accent disabled:opacity-35"
                           aria-label={`Manage flag: ${flag.reason}`}
                         >
                           {updating === flag.id ? 'Updating...' : 'Manage'}
@@ -345,26 +345,26 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
       {/* Flag Management Modal */}
       {selectedFlag && allowManagement && (
         <div
-          className="bg-gray-600 fixed inset-0 z-50 h-full w-full overflow-y-auto bg-opacity-50"
+          className="bg-foreground/60 fixed inset-0 z-50 h-full w-full overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
         >
           <div
-            className="bg-white relative top-20 mx-auto w-96 rounded-md border p-5 shadow-lg"
+            className="relative top-20 mx-auto w-96 rounded-none border border-border bg-card p-5"
             role="document"
           >
             <div className="mt-3">
               <h3
                 id="modal-title"
-                className="text-gray-900 mb-4 text-lg font-medium"
+                className="mb-4 text-lg font-medium text-foreground"
               >
                 Manage Crisis Flag
               </h3>
 
               <div className="space-y-4">
                 <div>
-                  <div className="text-gray-700 mb-2 block text-sm font-medium">
+                  <div className="mb-2 block text-sm font-medium text-foreground">
                     Update Status
                   </div>
                   <div
@@ -385,7 +385,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                           updateFlagStatus(selectedFlag.id, status)
                         }
                         disabled={updating === selectedFlag.id}
-                        className="border-gray-300 hover:bg-gray-50 w-full rounded-md border px-3 py-2 text-left disabled:opacity-50"
+                        className="w-full rounded-none border border-input px-3 py-2 text-left hover:bg-secondary disabled:opacity-35"
                       >
                         {status.replace('_', ' ').toUpperCase()}
                       </button>
@@ -397,7 +397,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
               <div className="mt-6 flex justify-end space-x-3">
                 <button
                   onClick={() => setSelectedFlag(null)}
-                  className="text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md px-4 py-2 text-sm font-medium"
+                  className="rounded-none bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
                 >
                   Cancel
                 </button>
