@@ -30,6 +30,7 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "just-bash": "^3.4.2",
     "@types/node": "24.x",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitest/coverage-v8": "^5.0.1",
