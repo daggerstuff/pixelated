@@ -131,7 +131,11 @@ const mockManagementClient = {
         (id: string, body: UnknownRecord) => Promise<MockManagementDataResponse>
       >,
       delete: vi.fn() as MockedFunction<
-        (id: string, provider: string, user_id: string) => Promise<MockManagementDataResponse>
+        (
+          id: string,
+          provider: string,
+          user_id: string,
+        ) => Promise<MockManagementDataResponse>
       >,
     },
   },
