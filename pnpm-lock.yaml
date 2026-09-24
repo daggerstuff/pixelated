@@ -691,8 +691,8 @@ importers:
         specifier: ^6.16.3
         version: 6.16.3
       '@tarquinen/opencode-dcp':
-        specifier: ^3.1.15
-        version: 3.1.15(@opencode-ai/plugin@1.18.31(@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)))(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)
+        specifier: ^3.2.0
+        version: 3.2.0(@opencode-ai/plugin@1.18.31(@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)))(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)
       '@testing-library/dom':
         specifier: ^10.4.2
         version: 10.4.2
@@ -832,8 +832,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
       dependency-cruiser:
-        specifier: ^18.3.1
-        version: 18.3.1
+        specifier: ^18.4.0
+        version: 18.4.0
       dotenv:
         specifier: 18.0.1
         version: 18.0.1
@@ -6830,10 +6830,10 @@ packages:
     peerDependencies:
       react: ^19.2.4
 
-  '@tarquinen/opencode-dcp@3.1.15':
-    resolution: {integrity: sha512-cjBWL+CvcuiSCocU8dBqVAuKPwMIIfi2C3IpyX8c2uLcCD95F/8zctrVnlgbYWJbkc6ZyHVvn+8t3wVMRd/15Q==}
+  '@tarquinen/opencode-dcp@3.2.0':
+    resolution: {integrity: sha512-6tUjeYlbHgMx+0xfB2DiHkknC9G3U5Rk+F4FBsPqAI3vzjaMXGkgsBUNzjL0e5StsEGDmyDTbxtozg6p9mnhng==}
     peerDependencies:
-      '@opencode-ai/plugin': '>=1.4.3'
+      '@opencode-ai/plugin': '>=1.18.29'
 
   '@tensorflow/tfjs-backend-cpu@4.22.0':
     resolution: {integrity: sha512-1u0FmuLGuRAi8D2c3cocHTASGXOmHc/4OvoVDENJayjYkS119fcTcQf4iHrtLthWyDIPy3JiPhRrZQC9EwnhLw==}
@@ -9257,8 +9257,8 @@ packages:
     resolution: {integrity: sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==}
     engines: {node: '>= 0.8'}
 
-  dependency-cruiser@18.3.1:
-    resolution: {integrity: sha512-NUGjObRSbUJTo9FFQixtTfV/3ozbtpivPKJoWP5g7JbKdFjBrQ4TsbmpcOrUcErK+q9n2l+Y4ZS2xVjGGtzm8g==}
+  dependency-cruiser@18.4.0:
+    resolution: {integrity: sha512-LLBYQ2XYmOCMG+liUWI2ReRYnnFXIbnzvCGHTohXAViSkawXr3T35fF/FV2cxpmB661pfkJ3ZXn95jhcEQ9GqA==}
     engines: {node: ^22||^24||>=26}
     hasBin: true
 
@@ -21291,7 +21291,7 @@ snapshots:
       '@tanstack/query-core': 5.103.1
       react: 19.3.0
 
-  '@tarquinen/opencode-dcp@3.1.15(@opencode-ai/plugin@1.18.31(@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)))(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)':
+  '@tarquinen/opencode-dcp@3.2.0(@opencode-ai/plugin@1.18.31(@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)))(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)':
     dependencies:
       '@anthropic-ai/tokenizer': 0.0.4
       '@opencode-ai/plugin': 1.18.31(@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10))
@@ -24015,7 +24015,7 @@ snapshots:
 
   depd@2.0.0: {}
 
-  dependency-cruiser@18.3.1:
+  dependency-cruiser@18.4.0:
     dependencies:
       acorn: 8.18.0
       acorn-jsx: 5.3.2(acorn@8.18.0)
