@@ -664,14 +664,14 @@ importers:
         specifier: 1.0.14
         version: 1.0.14
       '@graphql-codegen/cli':
-        specifier: ^7.4.1
-        version: 7.4.1(@parcel/watcher@2.6.0)(@types/node@26.6.2)(crossws@0.4.12(srvx@1.0.5))(graphql@17.0.2)(supports-color@10.2.2)(typescript@5.8.3)(utf-8-validate@6.0.6)
+        specifier: ^7.4.2
+        version: 7.4.2(@parcel/watcher@2.6.0)(@types/node@26.6.2)(crossws@0.4.12(srvx@1.0.5))(graphql@17.0.2)(supports-color@10.2.2)(typescript@5.8.3)(utf-8-validate@6.0.6)
       '@graphql-codegen/typescript':
         specifier: ^6.1.0
         version: 6.1.0(graphql@17.0.2)
       '@graphql-codegen/typescript-operations':
-        specifier: ^6.1.6
-        version: 6.1.6(graphql@17.0.2)
+        specifier: ^6.1.7
+        version: 6.1.7(graphql@17.0.2)
       '@iconify-json/ri':
         specifier: ^1.2.10
         version: 1.2.10
@@ -922,8 +922,8 @@ importers:
         specifier: ^0.49.1
         version: 0.49.1(supports-color@10.2.2)
       mcp-remote:
-        specifier: ^0.14.2
-        version: 0.14.2(supports-color@10.2.2)
+        specifier: ^0.14.3
+        version: 0.14.3(supports-color@10.2.2)
       mdast-util-directive:
         specifier: ^3.1.0
         version: 3.1.0(supports-color@10.2.2)
@@ -3129,8 +3129,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@graphql-codegen/cli@7.4.1':
-    resolution: {integrity: sha512-jDNweI6GC+AwdKn1rXgBI6t2NEk17yEnGCUKeHWa3p8u0zoNNkhGmbL2wEb1XDVqyO3UoCAe8fekR1COhWDf0w==}
+  '@graphql-codegen/cli@7.4.2':
+    resolution: {integrity: sha512-DLzX9sBKEmzh6wWGXYNjmDRB2+h7tkl78HGKKF00wwO5bWGAbhLsedBqyjZpZxmo0+PuOBb3T3bBW9G1Hovt9g==}
     engines: {node: '>=16'}
     hasBin: true
     peerDependencies:
@@ -3180,8 +3180,8 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@graphql-codegen/typescript-operations@6.1.6':
-    resolution: {integrity: sha512-qsYRkK27YbSL2doifPvldVwdwHRQtpsxXJINs22wQWGksC1Mrgn9YNaAGUZ2so46U20TKTm4SBoiNXRJE3esqA==}
+  '@graphql-codegen/typescript-operations@6.1.7':
+    resolution: {integrity: sha512-MEjT90Ey51I+3ILMEcNckP7n4fEBUuNaejmREoSnCrQsLuMCKUoSZQcKwLbTc7syKhhr1TWO9pdbQJ4ts/V19w==}
     engines: {node: '>=16'}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
@@ -11795,8 +11795,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mcp-remote@0.14.2:
-    resolution: {integrity: sha512-AowvnFGBSa8ewOgjUZzkLMTNPNnnyVOj6HrzLbfUVn38MR0JjSAGSM4r/rzNYOyXjdJAR8CUbkwhJoCWGcYxgg==}
+  mcp-remote@0.14.3:
+    resolution: {integrity: sha512-M8eMA+LQIYbVNpntDhbCzFYNxwF9O9KozOuDxOrGTtRXbHRq/m4NuFZ6892hmJcU4Zhv4qPfpxrXyG2FPWNMKg==}
     hasBin: true
 
   md5@2.3.0:
@@ -17146,7 +17146,7 @@ snapshots:
       graphql: 17.0.2
       tslib: 2.8.1
 
-  '@graphql-codegen/cli@7.4.1(@parcel/watcher@2.6.0)(@types/node@26.6.2)(crossws@0.4.12(srvx@1.0.5))(graphql@17.0.2)(supports-color@10.2.2)(typescript@5.8.3)(utf-8-validate@6.0.6)':
+  '@graphql-codegen/cli@7.4.2(@parcel/watcher@2.6.0)(@types/node@26.6.2)(crossws@0.4.12(srvx@1.0.5))(graphql@17.0.2)(supports-color@10.2.2)(typescript@5.8.3)(utf-8-validate@6.0.6)':
     dependencies:
       '@babel/generator': 7.29.8
       '@babel/template': 7.29.7
@@ -17182,7 +17182,7 @@ snapshots:
       string-env-interpolation: 1.0.1
       ts-log: 3.0.3
       tslib: 2.8.1
-      yaml: 2.8.4
+      yaml: 2.9.1
       yargs: 18.2.0
     optionalDependencies:
       '@parcel/watcher': 2.6.0
@@ -17206,7 +17206,7 @@ snapshots:
       '@graphql-codegen/plugin-helpers': 7.3.0(graphql@17.0.2)
       '@graphql-codegen/typed-document-node': 7.1.0(graphql@17.0.2)
       '@graphql-codegen/typescript': 6.1.0(graphql@17.0.2)
-      '@graphql-codegen/typescript-operations': 6.1.6(graphql@17.0.2)
+      '@graphql-codegen/typescript-operations': 6.1.7(graphql@17.0.2)
       '@graphql-codegen/visitor-plugin-common': 7.2.5(graphql@17.0.2)
       '@graphql-tools/documents': 1.0.2(graphql@17.0.2)
       '@graphql-tools/utils': 11.2.2(graphql@17.0.2)
@@ -17256,7 +17256,7 @@ snapshots:
       graphql: 17.0.2
       tslib: 2.8.1
 
-  '@graphql-codegen/typescript-operations@6.1.6(graphql@17.0.2)':
+  '@graphql-codegen/typescript-operations@6.1.7(graphql@17.0.2)':
     dependencies:
       '@graphql-codegen/plugin-helpers': 7.3.0(graphql@17.0.2)
       '@graphql-codegen/schema-ast': 6.1.0(graphql@17.0.2)
@@ -18592,7 +18592,7 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.1)
-      yaml: 2.8.4
+      yaml: 2.9.1
 
   '@opentelemetry/configuration@0.219.0(@opentelemetry/api@1.9.1)':
     dependencies:
@@ -27005,7 +27005,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mcp-remote@0.14.2(supports-color@10.2.2):
+  mcp-remote@0.14.3(supports-color@10.2.2):
     dependencies:
       express: 5.2.1(supports-color@10.2.2)
       open: 10.2.0
