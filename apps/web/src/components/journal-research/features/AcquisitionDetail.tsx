@@ -79,16 +79,16 @@ export function AcquisitionDetail({
     statusIcons[acquisition.status as keyof typeof statusIcons] ?? Clock
 
   const statusColors = {
-    'pending': 'text-yellow-600',
-    'approved': 'text-blue-600',
-    'in-progress': 'text-blue-600',
-    'completed': 'text-green-600',
-    'failed': 'text-red-600',
+    'pending': 'text-muted-foreground',
+    'approved': 'text-foreground font-medium',
+    'in-progress': 'text-foreground font-medium',
+    'completed': 'text-foreground font-semibold',
+    'failed': 'text-foreground font-bold',
   }
 
   const statusColor =
     statusColors[acquisition.status as keyof typeof statusColors] ??
-    'text-gray-600'
+    'text-muted-foreground'
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -112,9 +112,9 @@ export function AcquisitionDetail({
           {acquisition.status === 'completed' && (
             <div className="flex items-center gap-2">
               {isIntegrated ? (
-                <div className="bg-green-50 dark:bg-green-900/20 flex items-center gap-2 rounded-md px-3 py-1.5">
-                  <CheckCircle2 className="text-green-600 dark:text-green-400 h-4 w-4" />
-                  <span className="text-green-600 dark:text-green-400 text-sm font-medium">
+                <div className="flex items-center gap-2 rounded-none border border-input bg-secondary px-3 py-1.5">
+                  <CheckCircle2 className="h-4 w-4 text-foreground" />
+                  <span className="text-sm font-medium text-foreground">
                     Integrated
                   </span>
                 </div>
@@ -190,7 +190,7 @@ export function AcquisitionDetail({
                 </p>
                 <div className="mt-2">
                   <div
-                    className="h-2 w-full overflow-hidden rounded-full bg-muted"
+                    className="h-2 w-full overflow-hidden rounded-none bg-muted"
                     role="progressbar"
                     aria-valuenow={acquisition.downloadProgress}
                     aria-valuemin={0}
@@ -244,7 +244,7 @@ export function AcquisitionDetail({
                       payload: { status: 'approved' },
                     })
                   }}
-                  className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                  className="hover:bg-primary/90 rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
                 >
                   Approve
                 </button>
@@ -255,7 +255,7 @@ export function AcquisitionDetail({
                       payload: { status: 'failed' },
                     })
                   }}
-                  className="hover:bg-destructive/90 rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground"
+                  className="hover:bg-destructive/90 rounded-none bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground"
                 >
                   Reject
                 </button>
@@ -269,7 +269,7 @@ export function AcquisitionDetail({
                     payload: { status: 'in-progress' },
                   })
                 }}
-                className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+                className="hover:bg-primary/90 rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
               >
                 Start Download
               </button>
@@ -282,7 +282,7 @@ export function AcquisitionDetail({
                     payload: { status: 'completed' },
                   })
                 }}
-                className="bg-green-600 text-white hover:bg-green-700 rounded-md px-4 py-2 text-sm font-medium"
+                className="rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-accent"
               >
                 Mark Complete
               </button>

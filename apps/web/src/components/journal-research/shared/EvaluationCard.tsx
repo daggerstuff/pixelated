@@ -22,27 +22,26 @@ export function EvaluationCard({
   className,
 }: EvaluationCardProps) {
   const getScoreColor = (score: number) => {
-    if (score >= 8) return 'text-green-600 dark:text-green-400'
-    if (score >= 6) return 'text-yellow-600 dark:text-yellow-400'
-    return 'text-red-600 dark:text-red-400'
+    if (score >= 8) return 'text-foreground font-semibold'
+    if (score >= 6) return 'text-foreground font-medium'
+    return 'text-muted-foreground'
   }
 
   const getScoreBarColor = (score: number) => {
-    if (score >= 8) return 'bg-green-500 dark:bg-green-300'
-    if (score >= 6) return 'bg-yellow-500 dark:bg-yellow-300'
-    return 'bg-red-500 dark:bg-red-300'
+    if (score >= 8) return 'bg-primary'
+    if (score >= 6) return 'bg-foreground'
+    return 'bg-muted-foreground'
   }
 
   const getPriorityColor = (tier: string) => {
     const colors: Record<string, string> = {
-      high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-      medium:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      high: 'bg-primary text-primary-foreground font-semibold',
+      medium: 'bg-secondary border border-ring text-foreground font-medium',
+      low: 'bg-secondary border border-border text-muted-foreground',
     }
     return (
       colors[tier.toLowerCase()] ??
-      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+      'bg-secondary border border-border text-muted-foreground'
     )
   }
 
@@ -67,7 +66,7 @@ export function EvaluationCard({
 
   return (
     <Card
-      className={`transition-shadow hover:shadow-lg ${onClick ? 'cursor-pointer' : ''} ${className ?? ''}`}
+      className={`transition-colors hover:border-ring ${onClick ? 'cursor-pointer' : ''} ${className ?? ''}`}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
@@ -93,7 +92,7 @@ export function EvaluationCard({
             </CardDescription>
           </div>
           <span
-            className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${getPriorityColor(evaluation.priorityTier)}`}
+            className={`rounded-none px-2 py-1 text-xs font-medium capitalize ${getPriorityColor(evaluation.priorityTier)}`}
           >
             {evaluation.priorityTier}
           </span>
@@ -122,7 +121,7 @@ export function EvaluationCard({
                     {metric.value.toFixed(1)}
                   </span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-2 w-full overflow-hidden rounded-none bg-muted">
                   <div
                     className={`h-full ${getScoreBarColor(metric.value)}`}
                     style={{ width: `${(metric.value / 10) * 100}%` }}

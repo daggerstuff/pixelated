@@ -35,10 +35,10 @@ const typeIcons = {
 }
 
 const typeColors = {
-  success: 'text-green-600 dark:text-green-400',
-  error: 'text-red-600 dark:text-red-400',
-  warning: 'text-yellow-600 dark:text-yellow-400',
-  info: 'text-blue-600 dark:text-blue-400',
+  success: 'text-foreground',
+  error: 'text-foreground font-bold',
+  warning: 'text-foreground font-semibold',
+  info: 'text-muted-foreground',
 }
 
 const mapNotificationLevelToType = (
@@ -106,13 +106,13 @@ export function NotificationCenter({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted"
+        className="relative rounded-none p-2 text-muted-foreground transition-colors hover:bg-muted"
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         aria-expanded={isOpen}
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <span className="bg-red-500 text-white absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full text-xs font-bold">
+          <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-none bg-primary text-xs font-bold text-primary-foreground">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -125,7 +125,7 @@ export function NotificationCenter({
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <Card className="absolute right-0 top-12 z-50 max-h-[600px] w-96 overflow-hidden shadow-lg">
+          <Card className="absolute right-0 top-12 z-50 max-h-[600px] w-96 overflow-hidden border border-border">
             <CardHeader className="border-b">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-semibold">
