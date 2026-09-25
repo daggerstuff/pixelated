@@ -45,7 +45,7 @@ export {
 
 export { Switch } from './switch'
 
-export { Progress, ProgressCircular } from './progress'
+export { Progress } from './progress'
 
 export { Textarea } from './textarea'
 
