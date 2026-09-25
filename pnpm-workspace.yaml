@@ -235,13 +235,22 @@ peerDependencyRules:
     '@emnapi/core': ^1.10.0
     '@emnapi/runtime': ^1.10.0
 overrides:
-  # Patch-level duplicate consolidation (issue #6050): force the newest
-  # patch of each so single-version resolution replaces duplicates.
+  # Drift consolidation (#6050): pin newest to collapse duplicate resolutions.
+  '@opentelemetry/instrumentation-mongodb': 0.72.0
+  '@oxc-project/types': 0.151.0
   aria-query: 5.3.2
   cluster-key-slot: 1.1.2
+  cookie-signature: 1.2.2
   csp_evaluator: 1.1.8
   devtools-protocol: 0.0.1687809
+  dom-accessibility-api: 0.6.3
+  fast-glob: 3.3.3
+  fflate: 0.8.3
+  html-entities: 2.6.0
   lighthouse-stack-packs: 1.12.3
+  mime-db: 1.54.0
+  mongodb: 7.6.0
+  oxc-parser: 0.151.0
   webdriver-bidi-protocol: 0.4.3
   '@cloudflare/workers-types': 4.20260611.1
   'eslint-plugin-jsx-a11y>minimatch': 3.1.5
