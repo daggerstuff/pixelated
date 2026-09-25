@@ -9,7 +9,7 @@ import type {
   SortDirection,
 } from './table-types'
 
-export interface TableProps<
+interface TableProps<
   T extends TableRowData,
 > extends React.HTMLAttributes<HTMLTableElement> {
   /** Column definitions */
@@ -78,11 +78,9 @@ function Table<T extends TableRowData>({
           'border-collapse w-full text-sm',
           {
             'w-full': fullWidth,
-            'border border-gray-200 dark:border-gray-700': bordered,
-            '[&>tbody>tr:nth-child(odd)]:bg-gray-50 dark:[&>tbody>tr:nth-child(odd)]:bg-gray-800/50':
-              striped,
-            '[&>tbody>tr:hover]:bg-gray-100 dark:[&>tbody>tr:hover]:bg-gray-800/70':
-              hoverable,
+            'border border-border': bordered,
+            '[&>tbody>tr:nth-child(odd)]:bg-secondary': striped,
+            '[&>tbody>tr:hover]:bg-accent': hoverable,
             '[&_td]:p-2 [&_th]:p-2': compact,
             '[&>thead]:sticky [&>thead]:top-0 [&>thead]:bg-inherit':
               stickyHeader,
@@ -130,7 +128,7 @@ function Table<T extends TableRowData>({
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className="text-red-500 py-8 text-center"
+                className="py-8 text-center text-muted-foreground"
               >
                 {dataSource.error}
               </TableCell>
@@ -188,46 +186,25 @@ function Table<T extends TableRowData>({
   )
 }
 
-export interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {
   className?: string
 }
 
 function TableHeader({ className, ...props }: TableHeaderProps) {
-  return (
-    <thead
-      className={cn('bg-gray-50 dark:bg-gray-800', className)}
-      {...props}
-    />
-  )
+  return <thead className={cn('bg-secondary', className)} {...props} />
 }
 
-export interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
+interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
   className?: string
 }
 
 function TableBody({ className, ...props }: TableBodyProps) {
   return (
-    <tbody
-      className={cn('divide-y divide-gray-200 dark:divide-gray-700', className)}
-      {...props}
-    />
+    <tbody className={cn('divide-y divide-border', className)} {...props} />
   )
 }
 
-export interface TableFooterProps extends React.HTMLAttributes<HTMLTableSectionElement> {
-  className?: string
-}
-
-function TableFooter({ className, ...props }: TableFooterProps) {
-  return (
-    <tfoot
-      className={cn('bg-gray-50 dark:bg-gray-800 font-medium', className)}
-      {...props}
-    />
-  )
-}
-
-export interface TableRowProps
+interface TableRowProps
   extends
     React.HTMLAttributes<HTMLTableRowElement>,
     Pick<TableRowData, 'selected' | 'disabled'> {
@@ -245,8 +222,8 @@ function TableRow({
       className={cn(
         'transition-colors',
         {
-          'hover:bg-gray-100 dark:hover:bg-gray-800/50': !disabled,
-          'bg-blue-50 dark:bg-blue-900/20': selected,
+          'hover:bg-accent': !disabled,
+          'bg-accent': selected,
           'opacity-50 cursor-not-allowed': disabled,
         },
         className,
@@ -258,7 +235,7 @@ function TableRow({
   )
 }
 
-export interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
+interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
   /** Whether the column is sortable */
   sortable?: boolean
   /** Whether the column is currently sorted ascending */
@@ -292,8 +269,8 @@ function TableHead({
   return (
     <th
       className={cn(
-        'h-12 px-4 text-left align-middle font-medium text-gray-500 dark:text-gray-400',
-        'border-b border-gray-200 dark:border-gray-700',
+        'h-12 px-4 text-left align-middle font-medium text-muted-foreground',
+        'border-b border-border',
         {
           'cursor-pointer select-none': sortable,
           'text-right': align === 'right',
@@ -334,8 +311,8 @@ function TableHead({
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className={cn('h-2 w-2', {
-                'text-gray-700 dark:text-gray-300': sortAsc,
-                'text-gray-400 dark:text-gray-600': !sortAsc,
+                'text-foreground': sortAsc,
+                'text-muted-foreground': !sortAsc,
               })}
               fill="none"
               viewBox="0 0 24 24"
@@ -352,8 +329,8 @@ function TableHead({
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className={cn('h-2 w-2', {
-                'text-gray-700 dark:text-gray-300': sortDesc,
-                'text-gray-400 dark:text-gray-600': !sortDesc,
+                'text-foreground': sortDesc,
+                'text-muted-foreground': !sortDesc,
               })}
               fill="none"
               viewBox="0 0 24 24"
@@ -376,7 +353,7 @@ function TableHead({
   )
 }
 
-export interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
+interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
   /** Cell alignment */
   align?: 'left' | 'center' | 'right'
   /** Whether to hide on mobile */
@@ -406,7 +383,7 @@ function TableCell({
   )
 }
 
-export interface TablePaginationProps extends React.HTMLAttributes<HTMLDivElement> {
+interface TablePaginationProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Current page (1-based) */
   currentPage: number
   /** Total number of pages */
@@ -456,16 +433,16 @@ function TablePagination({
   return (
     <div
       className={cn(
-        'flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 px-4 py-3 dark:border-gray-700',
+        'flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border px-4 py-3',
         className,
       )}
       {...props}
     >
       {showPageSize && (
         <div className="flex items-center gap-2">
-          <span className="text-gray-700 dark:text-gray-300 text-sm">Show</span>
+          <span className="text-sm text-foreground">Show</span>
           <select
-            className="border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 rounded-md border px-2 py-1 text-sm"
+            className="rounded-none border border-input bg-secondary px-2 py-1 text-sm"
             value={pageSize}
             onChange={(e) => onPageSizeChange?.(Number(e.target.value))}
           >
@@ -481,10 +458,10 @@ function TablePagination({
       <div className="flex items-center gap-2">
         <button
           className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-md',
-            'text-gray-500 dark:text-gray-400',
-            'hover:bg-gray-100 dark:hover:bg-gray-800',
-            'disabled:opacity-50 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent',
+            'flex h-8 w-8 items-center justify-center rounded-none',
+            'text-muted-foreground',
+            'hover:bg-accent',
+            'disabled:opacity-50 disabled:hover:bg-transparent',
           )}
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
@@ -510,11 +487,10 @@ function TablePagination({
           <button
             key={page}
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-md text-sm',
+              'flex h-8 w-8 items-center justify-center rounded-none text-sm',
               {
                 'bg-primary text-white': currentPage === page,
-                'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800':
-                  currentPage !== page,
+                'text-foreground hover:bg-accent': currentPage !== page,
               },
             )}
             onClick={() => onPageChange(page)}
@@ -527,10 +503,10 @@ function TablePagination({
 
         <button
           className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-md',
-            'text-gray-500 dark:text-gray-400',
-            'hover:bg-gray-100 dark:hover:bg-gray-800',
-            'disabled:opacity-50 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent',
+            'flex h-8 w-8 items-center justify-center rounded-none',
+            'text-muted-foreground',
+            'hover:bg-accent',
+            'disabled:opacity-50 disabled:hover:bg-transparent',
           )}
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
@@ -553,7 +529,7 @@ function TablePagination({
         </button>
       </div>
 
-      <div className="text-gray-700 dark:text-gray-300 text-sm">
+      <div className="text-sm text-foreground">
         Page <span className="font-medium">{currentPage}</span> of{' '}
         <span className="font-medium">{totalPages}</span>
       </div>
@@ -561,13 +537,4 @@ function TablePagination({
   )
 }
 
-export {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TablePagination,
-  TableRow,
-}
+export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow }
