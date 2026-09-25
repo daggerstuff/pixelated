@@ -28,8 +28,6 @@ from transformers import (
     TrainingArguments,
 )
 
-import wandb
-
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
@@ -296,6 +294,8 @@ def _save_adapter(
 )
 def train_model(config_path: str = "ai/config/training_config_v2_antirepetition.json") -> dict[str, object]:
     """Train the model with anti-repetition config."""
+    import wandb
+
     try:
         logger.info(f"Loading config from {config_path}...")
         config = _load_config(config_path)
