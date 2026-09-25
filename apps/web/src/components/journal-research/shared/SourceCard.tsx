@@ -88,7 +88,7 @@ export function SourceCard({ source, onClick, className }: SourceCardProps) {
 
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             {source.openAccess && (
-              <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded px-2 py-1">
+              <span className="rounded-none border border-input bg-secondary px-2 py-1 text-foreground">
                 Open Access
               </span>
             )}

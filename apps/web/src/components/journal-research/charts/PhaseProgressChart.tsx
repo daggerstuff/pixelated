@@ -202,8 +202,8 @@ export function PhaseProgressChart({
                       phase.isCurrent
                         ? 'bg-primary'
                         : phase.progress === 100
-                          ? 'bg-green-500'
-                          : 'bg-gray-300'
+                          ? 'bg-primary'
+                          : 'bg-secondary'
                     }`}
                     style={{ width: `${phase.progress}%` }}
                     role="progressbar"

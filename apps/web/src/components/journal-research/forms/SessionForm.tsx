@@ -195,7 +195,7 @@ export function SessionForm({
                 className={cn(
                   'w-full rounded-md border bg-background px-3 py-2 text-sm',
                   errors['sessionId'] && touched['sessionId']
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                    ? 'border-ring focus:border-ring focus:ring-ring'
                     : 'border-input',
                 )}
                 placeholder="Leave empty for auto-generated ID"
