@@ -78,7 +78,7 @@ export default function PasswordResetRequestForm() {
           }
           required
           disabled={isLoading}
-          className="border-gray-300 w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full rounded-none border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
           placeholder="Enter your email"
         />
       </div>
@@ -87,7 +87,7 @@ export default function PasswordResetRequestForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="text-white hover:bg-primary/90 w-full rounded-md bg-primary px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          className="w-full rounded-none bg-primary px-4 py-2 text-primary-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-2">
