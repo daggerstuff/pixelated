@@ -305,7 +305,7 @@
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-layers": "^4.22.0",
     "@upstash/ratelimit": "^2.1.0",
-    "@upstash/redis": "^1.38.4",
+    "@upstash/redis": "^1.39.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "ai": "^7.0.58",
