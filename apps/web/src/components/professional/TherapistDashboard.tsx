@@ -764,10 +764,10 @@ function getRiskColor(risk: RiskLevel) {
 }
 
 function getProgressColor(progress: number) {
-  if (progress >= 80) return 'bg-green-500'
+  if (progress >= 80) return 'bg-primary'
   if (progress >= 60) return 'bg-primary'
-  if (progress >= 40) return 'bg-yellow-500'
-  if (progress >= 20) return 'bg-orange-500'
-  return 'bg-red-500'
+  if (progress >= 40) return 'bg-foreground'
+  if (progress >= 20) return 'bg-muted-foreground'
+  return 'bg-border'
 }
 export default TherapistDashboard

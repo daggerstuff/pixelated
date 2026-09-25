@@ -451,21 +451,21 @@ export function MemoryDashboard({
                               {mem.metadata?.['scope'] === 'private' ? (
                                 <Badge
                                   variant="outline"
-                                  className="border-amber-200 bg-amber-50 text-amber-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <Lock className="h-2.5 w-2.5" /> Private
                                 </Badge>
                               ) : mem.metadata?.['scope'] === 'global' ? (
                                 <Badge
                                   variant="outline"
-                                  className="border-blue-200 bg-blue-50 text-blue-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <Globe className="h-2.5 w-2.5" /> Global
                                 </Badge>
                               ) : (
                                 <Badge
                                   variant="outline"
-                                  className="border-emerald-200 bg-emerald-50 text-emerald-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <ShieldCheck className="h-2.5 w-2.5" /> Shared
                                 </Badge>
@@ -489,7 +489,7 @@ export function MemoryDashboard({
                               {mem.metadata?.['isSpeculative'] && (
                                 <Badge
                                   variant="outline"
-                                  className="border-purple-200 bg-purple-50 text-purple-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <Info className="h-2.5 w-2.5" /> Speculative
                                 </Badge>
@@ -499,7 +499,7 @@ export function MemoryDashboard({
                               {mem.metadata?.['piiRemoved'] && (
                                 <Badge
                                   variant="outline"
-                                  className="border-green-200 bg-green-50 text-green-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <ShieldCheck className="h-2.5 w-2.5" /> PII
                                   Safe
@@ -521,7 +521,7 @@ export function MemoryDashboard({
                                 <Edit className="h-4 w-4" />
                               </Button>
                               <AlertDialog>
-                                <AlertDialogTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-md text-destructive hover:bg-accent">
+                                <AlertDialogTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-none text-destructive hover:bg-accent">
                                   <Trash2 className="h-4 w-4" />
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -660,9 +660,9 @@ export function MemoryDashboard({
                           <Badge variant="outline">{category}</Badge>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="h-2 w-24 rounded-full bg-secondary">
+                          <div className="h-2 w-24 rounded-none bg-secondary">
                             <div
-                              className="h-2 rounded-full bg-primary"
+                              className="h-2 rounded-none bg-primary"
                               style={{
                                 width: `${(count / (memory.stats?.totalMemories ?? 1)) * 100}%`,
                               }}
