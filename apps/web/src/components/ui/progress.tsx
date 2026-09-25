@@ -54,21 +54,20 @@ export function Progress({
 
   // Variant classes for the progress bar
   const variantClasses = {
-    default: 'bg-gray-600 dark:bg-gray-400',
-    primary: 'bg-primary dark:bg-primary-dark',
-    secondary: 'bg-gray-500 dark:bg-gray-400',
-    success: 'bg-green-500 dark:bg-green-600',
-    warning: 'bg-yellow-500 dark:bg-yellow-600',
-    error: 'bg-red-500 dark:bg-red-600',
+    default: 'bg-muted-foreground',
+    primary: 'bg-primary',
+    secondary: 'bg-accent',
+    success: 'bg-primary',
+    warning: 'bg-foreground',
+    error: 'bg-foreground',
   }
 
   // Base background classes
-  const baseBackgroundClasses =
-    'bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden'
+  const baseBackgroundClasses = 'bg-secondary rounded-none overflow-hidden'
 
   // Base progress classes
   const baseProgressClasses =
-    'h-full rounded-full transition-all duration-300 ease-in-out'
+    'h-full rounded-none transition-all duration-300 ease-in-out'
 
   return (
     <div
@@ -107,7 +106,7 @@ export function Progress({
 
         {/* Show value if requested */}
         {showValue && !indeterminate && (
-          <span className="text-gray-500 dark:text-gray-400 ml-2 text-xs">
+          <span className="ml-2 text-xs text-muted-foreground">
             {Math.round(percentage)}%
           </span>
         )}
@@ -138,12 +137,12 @@ export function ProgressCircular({
 
   // Variant classes for the progress stroke
   const variantClasses = {
-    default: 'stroke-gray-600 dark:stroke-gray-400',
-    primary: 'stroke-primary dark:stroke-primary-dark',
-    secondary: 'stroke-gray-500 dark:stroke-gray-400',
-    success: 'stroke-green-500 dark:stroke-green-600',
-    warning: 'stroke-yellow-500 dark:stroke-yellow-600',
-    error: 'stroke-red-500 dark:stroke-red-600',
+    default: 'stroke-muted-foreground',
+    primary: 'stroke-primary',
+    secondary: 'stroke-accent',
+    success: 'stroke-primary',
+    warning: 'stroke-foreground',
+    error: 'stroke-foreground',
   }
 
   return (
@@ -171,7 +170,7 @@ export function ProgressCircular({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          className="stroke-gray-200 dark:stroke-gray-700"
+          className="stroke-secondary"
           strokeWidth={strokeWidth}
           fill="none"
         />
@@ -196,7 +195,7 @@ export function ProgressCircular({
 
       {/* Show value if requested */}
       {showValue && !indeterminate && (
-        <span className="text-gray-800 dark:text-gray-200 absolute text-xs">
+        <span className="absolute text-xs text-foreground">
           {Math.round(percentage)}%
         </span>
       )}
