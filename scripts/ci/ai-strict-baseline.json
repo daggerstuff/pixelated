@@ -1,7 +1,7 @@
 {
   "$schema": "Legacy strict-typing debt in the ai submodule research tree, pinned by scripts/ci/ai-strict-ratchet.mjs.",
   "description": "files: legacy .py files under the pinned ai trees. errors: \"file :: code\" → pinned strict-error count. The ratchet fails CI on any new file with strict errors, any new error key, or any increased count. Fixes shrink these maps; --update re-pins deliberately.",
-  "generatedAt": "2026-09-18T07:10:49.279Z",
+  "generatedAt": "2026-09-25T13:57:11.718Z",
   "files": [
     "research/__init__.py",
     "research/api.py",
@@ -592,6 +592,7 @@
     "training/domain_augmentation.py",
     "training/dpo_trainer.py",
     "training/dual_judge.py",
+    "training/eval_audit_models.py",
     "training/eval_boulesis_vs_ornith.py",
     "training/evaluate_finetuned_model.py",
     "training/featherless_keys.py",
@@ -602,6 +603,7 @@
     "training/generate_arc_corpus.py",
     "training/generation_backend.py",
     "training/grpo_trainer.py",
+    "training/import_ratings.py",
     "training/ingest_router.py",
     "training/judge_edge_and_nightmare.py",
     "training/lint_arc_plans.py",
@@ -1874,10 +1876,6 @@
     "research/experiments/tests/safety/test_bias_privacy_hooks.py :: no-untyped-def": 16,
     "research/consolidation/test_inventory.py :: no-untyped-def": 5,
     "training/calibrate_judge.py :: type-arg": 4,
-    "training/tests/test_llm_quality_judge.py :: type-arg": 6,
-    "training/tests/test_llm_quality_judge.py :: untyped-decorator": 3,
-    "training/tests/test_llm_quality_judge.py :: no-untyped-def": 44,
-    "training/tests/test_llm_quality_judge.py :: no-untyped-call": 2,
     "training/scripts/async_calibrate_judge.py :: type-arg": 2,
     "training/scripts/async_calibrate_judge.py :: index": 4,
     "training/build_edge_and_nightmare_dataset.py :: no-any-return": 2,
@@ -1889,8 +1887,8 @@
     "training/probe_secondary_judge.py :: return-value": 1,
     "training/judge_edge_and_nightmare.py :: no-untyped-def": 1,
     "training/judge_edge_and_nightmare.py :: no-untyped-call": 4,
-    "training/tests/test_dual_judge.py :: no-untyped-def": 102,
-    "training/tests/test_dual_judge.py :: no-untyped-call": 16,
+    "training/tests/test_dual_judge.py :: no-untyped-def": 101,
+    "training/tests/test_dual_judge.py :: no-untyped-call": 11,
     "training/tests/test_dual_judge.py :: type-arg": 1,
     "training/nightmare_fuel_generator.py :: type-arg": 25,
     "training/nightmare_fuel_generator.py :: attr-defined": 1,
@@ -1927,6 +1925,10 @@
     "training/probe_new_judges.py :: type-arg": 1,
     "training/probe_new_judges.py :: attr-defined": 1,
     "training/probe_new_judges.py :: assignment": 1,
+    "training/tiebreak_hr.py :: no-any-return": 1,
+    "training/build_arc_plans.py :: type-arg": 17,
+    "training/build_arc_plans.py :: no-any-return": 1,
+    "training/build_arc_plans.py :: no-untyped-def": 1,
     "training/run_nightmare_fuel_distillation.py :: no-untyped-def": 1,
     "training/run_nightmare_fuel_distillation.py :: no-untyped-call": 1,
     "training/tests/test_nightmare_fuel_generator.py :: type-arg": 2,
@@ -1946,9 +1948,6 @@
     "research/reflection_bootstrap.py :: no-untyped-call": 3,
     "research/manager_factory.py :: call-arg": 2,
     "research/manager_factory.py :: name-defined": 1,
-    "research/manager_factory.py :: assignment": 1,
-    "training/build_arc_plans.py :: type-arg": 17,
-    "training/build_arc_plans.py :: no-any-return": 1,
-    "training/build_arc_plans.py :: no-untyped-def": 1
+    "research/manager_factory.py :: assignment": 1
   }
 }
