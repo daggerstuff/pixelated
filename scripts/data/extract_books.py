@@ -274,7 +274,7 @@ class BooksExtractor:
             return min(total_pages, self.config.max_pages)
         return total_pages
 
-    def _extract_book_identity(self, reader: "PdfReader", file_path: Path, total_pages: int) -> tuple[str, str]:
+    def _extract_book_identity(self, reader: PdfReader, file_path: Path, total_pages: int) -> tuple[str, str]:
         """Extract title and author metadata from the first PDF page."""
         book_title = file_path.stem
         author = "Unknown"
@@ -289,7 +289,7 @@ class BooksExtractor:
             author = metadata["author"]
         return book_title, author
 
-    def _collect_pdf_chapters(self, reader: "PdfReader", total_pages: int) -> dict[str, list[tuple[int, str]]]:
+    def _collect_pdf_chapters(self, reader: PdfReader, total_pages: int) -> dict[str, list[tuple[int, str]]]:
         """Collect text for each chapter from a PDF."""
         full_text_by_chapter: dict[str, list[tuple[int, str]]] = {}
         current_chapter_pages: list[tuple[int, str]] = []
