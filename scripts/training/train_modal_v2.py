@@ -16,7 +16,6 @@ from typing import Any
 
 import modal
 import torch
-import wandb
 from datasets import Dataset
 from peft import LoraConfig, PeftMixedModel, PeftModel, TaskType, get_peft_model
 from transformers import (
@@ -28,6 +27,8 @@ from transformers import (
     Trainer,
     TrainingArguments,
 )
+
+import wandb
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
