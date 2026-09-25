@@ -634,7 +634,7 @@ export function TrainingSessionComponent() {
   ])
 
   return (
-    <div className="bg-white/5 border-white/10 mx-auto grid max-w-4xl grid-cols-1 gap-6 rounded-2xl border p-8 shadow-2xl backdrop-blur-md md:grid-cols-3">
+    <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 rounded-none border border-border bg-card p-8 md:grid-cols-3">
       <div className="md:col-span-2">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-white text-2xl font-bold">
@@ -643,13 +643,13 @@ export function TrainingSessionComponent() {
           <div className="flex space-x-2">
             <button
               onClick={() => setRole('trainee')}
-              className={`rounded px-3 py-1 text-sm ${!isObserver ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+              className={`rounded px-3 py-1 text-sm ${!isObserver ? 'bg-primary text-primary-foreground' : 'border border-border bg-secondary text-muted-foreground'}`}
             >
               Trainee
             </button>
             <button
               onClick={() => setRole('observer')}
-              className={`rounded px-3 py-1 text-sm ${isObserver ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+              className={`rounded px-3 py-1 text-sm ${isObserver ? 'border border-ring bg-secondary font-semibold text-foreground' : 'border border-border bg-secondary text-muted-foreground'}`}
             >
               Observer
             </button>
@@ -660,13 +660,13 @@ export function TrainingSessionComponent() {
           {conversation.map((entry) => (
             <div
               key={entry.id}
-              className={`rounded-lg p-4 ${
+              className={`rounded-none p-4 ${
                 entry.role === 'client'
                   ? 'bg-neutral-500/10 border-neutral-500 border-l-4'
                   : 'bg-neutral-500/5 border-neutral-400 border-l-4'
               }`}
             >
-              <div className="text-gray-300 mb-1 text-sm font-semibold">
+              <div className="mb-1 text-sm font-semibold text-muted-foreground">
                 {entry.role === 'client' ? 'Client' : 'Therapist'}
               </div>
               <div className="text-white">{entry.message}</div>
@@ -680,17 +680,17 @@ export function TrainingSessionComponent() {
             onChange={(e) => setTherapistResponse(e.target.value)}
             rows={3}
             aria-label={textConfig.ariaLabel}
-            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 w-full rounded-lg border p-3 focus:outline-none focus:ring-2 ${isObserver ? 'focus:ring-purple-500' : 'focus:ring-blue-500'}`}
+            className={`w-full rounded-none border border-input bg-background p-3 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring`}
             placeholder={textConfig.placeholder}
           />
 
           <button
             onClick={handleResponse}
             disabled={!therapistResponse.trim()}
-            className={`text-white w-full rounded-lg px-6 py-3 font-medium transition-colors ${
+            className={`text-white w-full rounded-none px-6 py-3 font-medium transition-colors ${
               isObserver
-                ? 'bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600'
-                : 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600'
+                ? 'border border-ring bg-secondary text-foreground hover:bg-accent disabled:opacity-35'
+                : 'bg-primary text-primary-foreground hover:bg-accent disabled:opacity-35'
             }`}
           >
             {textConfig.submitButton}
@@ -698,8 +698,8 @@ export function TrainingSessionComponent() {
         </div>
 
         {evaluation && (
-          <div className="bg-yellow-500/20 border-yellow-500/30 mt-6 rounded-lg border p-4">
-            <div className="text-yellow-300 mb-2 font-semibold">
+          <div className="mt-6 rounded-none border border-ring bg-secondary p-4">
+            <div className="mb-2 font-semibold text-foreground">
               AI Feedback
             </div>
             <div className="text-white whitespace-pre-line">{evaluation}</div>
@@ -708,21 +708,23 @@ export function TrainingSessionComponent() {
       </div>
 
       {/* Sidebar for Coaching Notes */}
-      <div className="bg-black/20 rounded-xl p-4 md:col-span-1">
-        <h3 className="text-purple-300 mb-4 text-lg font-semibold">
+      <div className="rounded-none bg-secondary p-4 md:col-span-1">
+        <h3 className="mb-4 text-lg font-semibold text-foreground">
           Coaching Notes
         </h3>
         {coachingNotes.length === 0 ? (
-          <div className="text-gray-400 text-sm italic">No notes yet.</div>
+          <div className="text-sm italic text-muted-foreground">
+            No notes yet.
+          </div>
         ) : (
           <div className="max-h-[500px] space-y-3 overflow-y-auto">
             {coachingNotes.map((note) => (
               <div
                 key={note.id}
-                className="bg-purple-900/30 border-purple-500/30 rounded border p-3 text-sm"
+                className="rounded-none border border-input bg-secondary p-3 text-sm"
               >
-                <div className="text-purple-200 mb-1">{note.content}</div>
-                <div className="text-purple-400/50 text-xs">
+                <div className="mb-1 text-foreground">{note.content}</div>
+                <div className="text-xs text-muted-foreground">
                   {new Date(note.timestamp).toLocaleTimeString()}
                 </div>
               </div>

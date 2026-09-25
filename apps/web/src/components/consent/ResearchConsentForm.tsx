@@ -225,9 +225,11 @@ export function ResearchConsentForm({
 
   if (loading) {
     return (
-      <div className={`bg-white rounded-lg p-6 shadow ${className}`}>
+      <div
+        className={`rounded-none border border-border bg-card p-6 ${className}`}
+      >
         <div className="flex h-40 items-center justify-center">
-          <div className="border-green-700 h-10 w-10 animate-spin rounded-full border-b-2"></div>
+          <div className="h-10 w-10 animate-spin rounded-none border-b-2 border-ring"></div>
         </div>
       </div>
     )
@@ -235,13 +237,15 @@ export function ResearchConsentForm({
 
   if (error) {
     return (
-      <div className={`bg-white rounded-lg p-6 shadow ${className}`}>
-        <div className="bg-red-50 border-red-200 text-red-800 mb-4 rounded-lg border p-4">
+      <div
+        className={`rounded-none border border-border bg-card p-6 ${className}`}
+      >
+        <div className="mb-4 rounded-none border border-ring bg-secondary p-4 text-foreground">
           <p>{error}</p>
         </div>
         <button
           onClick={() => window.location.reload()}
-          className="bg-green-600 hover:bg-green-700 text-white rounded-lg px-4 py-2 font-medium"
+          className="rounded-none bg-primary px-4 py-2 font-medium text-primary-foreground hover:bg-accent"
         >
           Retry
         </button>
@@ -251,8 +255,10 @@ export function ResearchConsentForm({
 
   if (!consentStatus) {
     return (
-      <div className={`bg-white rounded-lg p-6 shadow ${className}`}>
-        <p className="text-gray-500">
+      <div
+        className={`rounded-none border border-border bg-card p-6 ${className}`}
+      >
+        <p className="text-muted-foreground">
           No research consent information available.
         </p>
       </div>
@@ -260,10 +266,10 @@ export function ResearchConsentForm({
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow ${className}`}>
-      <div className="border-gray-200 border-b p-6">
-        <h2 className="text-gray-800 text-xl font-semibold">{TEXT.header}</h2>
-        <p className="text-gray-500 mt-1 text-sm">
+    <div className={`rounded-none border border-border bg-card ${className}`}>
+      <div className="border-b border-border p-6">
+        <h2 className="text-xl font-semibold text-foreground">{TEXT.header}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           {consentStatus.hasActiveConsent
             ? TEXT.consentGranted(
                 new Date(
@@ -276,10 +282,10 @@ export function ResearchConsentForm({
 
       <div className="p-6">
         <div className="mb-6">
-          <h3 className="text-gray-800 mb-2 font-medium">
+          <h3 className="mb-2 font-medium text-foreground">
             {TEXT.summaryTitle}
           </h3>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             {consentStatus.currentVersion.summary}
           </p>
         </div>
@@ -288,7 +294,7 @@ export function ResearchConsentForm({
           <div className="mb-6">
             <button
               onClick={() => setExpandedView(!expandedView)}
-              className="text-green-700 hover:text-green-800 flex items-center text-sm font-medium"
+              className="flex items-center text-sm font-medium text-foreground hover:underline"
             >
               {expandedView ? TEXT.hideDetails : TEXT.viewDetails}
               <svg
@@ -306,7 +312,7 @@ export function ResearchConsentForm({
             </button>
 
             {expandedView && (
-              <div className="bg-gray-50 border-gray-200 text-gray-700 mt-4 max-h-96 overflow-auto rounded-lg border p-4 text-sm">
+              <div className="mt-4 max-h-96 overflow-auto rounded-none border border-border bg-secondary p-4 text-sm text-foreground">
                 <div
                   dangerouslySetInnerHTML={{
                     __html: sanitizedDocumentHtml,
@@ -322,7 +328,7 @@ export function ResearchConsentForm({
           !showSummaryOnly &&
           !consentStatus.hasActiveConsent && (
             <div className="mb-6">
-              <h3 className="text-gray-800 mb-2 font-medium">
+              <h3 className="mb-2 font-medium text-foreground">
                 {TEXT.optionsTitle}
               </h3>
               <div className="space-y-3">
@@ -335,16 +341,16 @@ export function ResearchConsentForm({
                       onChange={(e) =>
                         handleOptionChange(option.optionName, e.target.checked)
                       }
-                      className="text-green-600 focus:ring-green-500 border-gray-300 mt-1 h-4 w-4 rounded"
+                      className="mt-1 h-4 w-4 rounded-none border-input text-primary focus:ring-ring"
                     />
 
                     <label
                       htmlFor={option.id}
-                      className="text-gray-700 ml-2 block text-sm"
+                      className="ml-2 block text-sm text-foreground"
                     >
                       {option.description}
                       {option.isRequired && (
-                        <span className="text-red-500 ml-1">
+                        <span className="ml-1 font-semibold text-foreground">
                           {TEXT.requiredField}
                         </span>
                       )}
@@ -352,8 +358,10 @@ export function ResearchConsentForm({
                   </div>
                 ))}
               </div>
-              <p className="text-gray-500 mt-2 text-xs">
-                <span className="text-red-500">{TEXT.requiredField}</span>{' '}
+              <p className="mt-2 text-xs text-muted-foreground">
+                <span className="font-semibold text-foreground">
+                  {TEXT.requiredField}
+                </span>{' '}
                 {TEXT.requiredNote}
               </p>
             </div>
@@ -365,10 +373,10 @@ export function ResearchConsentForm({
               <button
                 onClick={handleGrantConsent}
                 disabled={loading || !allRequiredOptionsSelected()}
-                className={`rounded-lg px-4 py-2 font-medium ${
+                className={`rounded-none px-4 py-2 font-medium ${
                   allRequiredOptionsSelected()
-                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                    : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                    ? 'bg-primary text-primary-foreground hover:bg-accent'
+                    : 'cursor-not-allowed bg-secondary text-muted-foreground'
                 }`}
               >
                 {TEXT.consentButton}
@@ -377,7 +385,7 @@ export function ResearchConsentForm({
               <button
                 onClick={() => setWithdrawDialogOpen(true)}
                 disabled={loading}
-                className="bg-red-50 text-red-700 hover:bg-red-100 rounded-lg px-4 py-2 font-medium"
+                className="rounded-none border border-ring bg-secondary px-4 py-2 font-medium text-foreground hover:bg-accent"
               >
                 {TEXT.withdrawButton}
               </button>
@@ -393,22 +401,24 @@ export function ResearchConsentForm({
           aria-modal="true"
           aria-labelledby="withdraw-dialog-title"
         >
-          <div className="bg-white w-full max-w-md rounded-lg shadow-xl">
+          <div className="w-full max-w-md rounded-none border border-border bg-card">
             <div className="border-b p-4">
               <h3
                 id="withdraw-dialog-title"
-                className="text-gray-800 text-lg font-semibold"
+                className="text-lg font-semibold text-foreground"
               >
                 {TEXT.withdrawTitle}
               </h3>
             </div>
 
             <div className="p-4">
-              <p className="text-gray-600 mb-4">{TEXT.withdrawWarning}</p>
+              <p className="mb-4 text-muted-foreground">
+                {TEXT.withdrawWarning}
+              </p>
 
               <label
                 htmlFor="withdraw-reason"
-                className="text-gray-700 mb-1 block text-sm font-medium"
+                className="mb-1 block text-sm font-medium text-foreground"
               >
                 {TEXT.reasonLabel}
               </label>
@@ -416,22 +426,22 @@ export function ResearchConsentForm({
                 id="withdraw-reason"
                 value={withdrawReason}
                 onChange={(e) => setWithdrawReason(e.target.value)}
-                className="border-gray-300 focus:ring-green-500 focus:border-transparent h-24 w-full rounded-lg border p-2 text-sm focus:outline-none focus:ring-2"
+                className="focus:border-transparent h-24 w-full rounded-none border border-input bg-background p-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder={TEXT.reasonPlaceholder}
               ></textarea>
             </div>
 
-            <div className="bg-gray-50 flex justify-end space-x-3 border-t p-4">
+            <div className="flex justify-end space-x-3 border-t border-border bg-secondary p-4">
               <button
                 onClick={() => setWithdrawDialogOpen(false)}
-                className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg border px-4 py-2 font-medium"
+                className="rounded-none border border-border bg-secondary px-4 py-2 font-medium text-foreground hover:bg-accent"
               >
                 {TEXT.cancel}
               </button>
               <button
                 onClick={handleWithdrawConsent}
                 disabled={loading}
-                className="bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2 font-medium"
+                className="rounded-none bg-primary px-4 py-2 font-medium text-primary-foreground hover:bg-accent"
               >
                 {TEXT.withdrawButton}
               </button>
