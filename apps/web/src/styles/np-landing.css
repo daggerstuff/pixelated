@@ -16,7 +16,9 @@
   --np-line-strong: rgba(255, 255, 255, 0.16);
   --np-pad: clamp(1.25rem, 4vw, 3rem);
   --np-max-width: 78rem;
-  --np-font-display: 'Instrument Serif', Georgia, serif;
+  --np-font-display:
+    'Space Grotesk Variable', 'Space Grotesk', system-ui, -apple-system,
+    sans-serif;
   --np-font-body:
     'Instrument Sans Variable', system-ui, -apple-system, sans-serif;
   --np-font-mono: 'Spline Sans Mono Variable', ui-monospace, Menlo, monospace;
@@ -80,9 +82,9 @@
 .np-display-hero {
   font-family: var(--np-font-display);
   font-size: clamp(2.35rem, 4.2vw, 3.75rem);
-  font-weight: 400;
-  line-height: 1.06;
-  letter-spacing: -0.025em;
+  font-weight: 650;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
   color: var(--np-text);
   margin: 0 0 1.25rem 0;
   text-wrap: balance;
@@ -91,9 +93,9 @@
 .np-section-heading {
   font-family: var(--np-font-display);
   font-size: clamp(1.85rem, 3.2vw, 2.75rem);
-  font-weight: 400;
-  line-height: 1.12;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
   color: var(--np-text);
   margin: 0 0 1rem 0;
   text-wrap: balance;

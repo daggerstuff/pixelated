@@ -36,14 +36,17 @@
   --np-selection-text: var(--ink, oklch(0.93 0 0));
 
   /* =============================================
-     TYPOGRAPHY — Clinical editorial.
-     Instrument Serif is the display voice. Instrument Sans Variable
+     TYPOGRAPHY — Technical brutalist & clinical editorial.
+     Space Grotesk is the display/hero voice. Instrument Sans Variable
      carries reading and interface text. Spline Sans Mono remains
      restricted to app data and code surfaces.
      ============================================= */
-  --np-font-display: 'Instrument Serif', Georgia, serif;
-  --np-font-hero: 'Literata Variable', 'Instrument Serif', Georgia, serif;
-  --np-font-headline: 'Instrument Sans Variable', system-ui, sans-serif;
+  --np-font-display:
+    'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  --np-font-hero:
+    'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  --np-font-headline:
+    'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
   --np-font-condensed: var(--np-font-headline);
   --np-font-poster: var(--np-font-display);
   --np-font-body: 'Instrument Sans Variable', system-ui, sans-serif;

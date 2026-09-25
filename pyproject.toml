@@ -5,7 +5,7 @@ description = "Pixelated Empathy - AI-powered bias detection and mental health p
 authors = [
   { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
   "flask[async]",
   "flask-cors>=6.0.2", # Updated to latest secure version
@@ -175,7 +175,7 @@ build-backend = "setuptools.build_meta"
 where = ["."]
 include = ["ai*"]
 [tool.mypy]
-python_version = "3.13"
+python_version = "3.14"
 ignore_missing_imports = true
 mypy_path = "stubs:tools/skillreducer:tools/skillreducer/src"
 files = ["src", "tests", "ai"]
@@ -215,9 +215,9 @@ reportMissingTypeStubs = false
 reportMissingImports = false
 reportMissingModuleSource = false
 reportPrivateUsage = false
-pythonVersion = "3.13"
+pythonVersion = "3.14"
 [tool.ruff]
-target-version = "py313"
+target-version = "py314"
 line-length = 120
 exclude = [
   "node_modules",
@@ -352,7 +352,7 @@ known-first-party = ["ai", "src"]
 combine-as-imports = true
 force-single-line = false
 [tool.black]
-target-version = ["py313"]
+target-version = ["py314"]
 line-length = 120
 skip-string-normalization = false
 [tool.isort]
