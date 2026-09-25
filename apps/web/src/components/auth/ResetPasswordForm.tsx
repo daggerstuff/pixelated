@@ -68,7 +68,7 @@ export function ResetPasswordForm({
   return (
     <div className="reset-password-form">
       {error && (
-        <div className="error-message bg-red-50 border-red-200 text-red-700 mb-4 rounded border p-3">
+        <div className="error-message mb-4 rounded-none border border-ring bg-secondary p-3 text-foreground">
           {error}
         </div>
       )}
@@ -93,7 +93,7 @@ export function ResetPasswordForm({
             autoComplete="new-password"
           />
 
-          <small className="text-gray-500 mt-1 text-xs">
+          <small className="mt-1 text-xs text-muted-foreground">
             Password must be at least 8 characters
           </small>
         </div>
@@ -119,7 +119,7 @@ export function ResetPasswordForm({
 
         <button
           type="submit"
-          className="bg-teal-600 text-white hover:bg-teal-700 w-full rounded px-4 py-2 transition-colors"
+          className="w-full rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent"
           disabled={isLoading}
         >
           {isLoading ? 'Resetting Password...' : 'Reset Password'}

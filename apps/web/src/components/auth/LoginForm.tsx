@@ -474,7 +474,7 @@ export function LoginForm({
             setErrors({})
             setFocusedInput(null)
           }}
-          className="text-gray-400 text-responsive--small hover:text-gray-300 touch-focus underline"
+          className="text-responsive--small touch-focus text-muted-foreground underline hover:text-foreground"
           data-testid="forgot-password-button"
         >
           Forgot your password?
@@ -488,7 +488,7 @@ export function LoginForm({
             setMode('login')
             setErrors({})
           }}
-          className="text-gray-400 text-responsive--small hover:text-gray-300 touch-focus underline"
+          className="text-responsive--small touch-focus text-muted-foreground underline hover:text-foreground"
         >
           Back to Login
         </button>
@@ -498,7 +498,7 @@ export function LoginForm({
         <button
           type="button"
           onClick={() => (globalThis.location.href = '/register')}
-          className="text-gray-400 text-responsive--small hover:text-gray-300 touch-focus mt-2 underline"
+          className="text-responsive--small touch-focus mt-2 text-muted-foreground underline hover:text-foreground"
         >
           Don&apos;t have an account? Sign up
         </button>

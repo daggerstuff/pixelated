@@ -72,12 +72,12 @@ export default function RegisterForm() {
   }
 
   return (
-    <div className="auth-container bg-white w-full max-w-md rounded-lg p-6 shadow-md">
+    <div className="auth-container w-full max-w-md rounded-none border border-border bg-card p-6">
       <h2 className="mb-6 text-center text-2xl font-bold">Create Account</h2>
 
       {error && (
         <div
-          className="bg-red-100 text-red-800 mb-4 rounded-lg p-3"
+          className="mb-4 rounded-none border border-ring bg-secondary p-3 text-foreground"
           role="alert"
         >
           {error}
@@ -93,7 +93,7 @@ export default function RegisterForm() {
                   return (
                     <>
                       <label
-                        className="text-gray-700 block text-sm font-medium"
+                        className="block text-sm font-medium text-foreground"
                         htmlFor={field}
                       >
                         Full Name
@@ -104,7 +104,7 @@ export default function RegisterForm() {
                         name={field}
                         value={user[field as keyof typeof user] as string}
                         onChange={handleChange}
-                        className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 mt-1 block w-full rounded-md shadow-sm sm:ring-offset-0"
+                        className="mt-1 block w-full rounded-none border border-input bg-background focus:border-ring focus:ring-ring sm:ring-offset-0"
                         required
                       />
                     </>
@@ -113,7 +113,7 @@ export default function RegisterForm() {
                   return (
                     <>
                       <label
-                        className="text-gray-700 block text-sm font-medium"
+                        className="block text-sm font-medium text-foreground"
                         htmlFor={field}
                       >
                         Email Address
@@ -125,10 +125,10 @@ export default function RegisterForm() {
                         value={user[field as keyof typeof user] as string}
                         onChange={handleChange}
                         autoComplete="email"
-                        className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 mt-1 block w-full rounded-md shadow-sm sm:ring-offset-0"
+                        className="mt-1 block w-full rounded-none border border-input bg-background focus:border-ring focus:ring-ring sm:ring-offset-0"
                         required
                       />
-                      <p className="text-gray-400 mt-1 text-xs">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         Must be a valid email address
                       </p>
                     </>
@@ -137,7 +137,7 @@ export default function RegisterForm() {
                   return (
                     <>
                       <label
-                        className="text-gray-700 block text-sm font-medium"
+                        className="block text-sm font-medium text-foreground"
                         htmlFor={field}
                       >
                         Password
@@ -148,10 +148,10 @@ export default function RegisterForm() {
                         name={field}
                         value={user[field as keyof typeof user] as string}
                         onChange={handleChange}
-                        className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 mt-1 block w-full rounded-md shadow-sm sm:ring-offset-0"
+                        className="mt-1 block w-full rounded-none border border-input bg-background focus:border-ring focus:ring-ring sm:ring-offset-0"
                         required
                       />
-                      <p className="text-gray-400 mt-1 text-xs">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         Must be at least 6 characters
                       </p>
                     </>
@@ -166,23 +166,23 @@ export default function RegisterForm() {
                           name={field}
                           checked={user[field]}
                           onChange={handleChange}
-                          className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 h-4 w-4 rounded-md shadow-sm sm:ring-offset-0"
+                          className="h-4 w-4 rounded-none border border-input focus:border-ring focus:ring-ring sm:ring-offset-0"
                         />
                         <label
                           htmlFor={field}
-                          className="text-gray-500 text-sm"
+                          className="text-sm text-muted-foreground"
                         >
                           I agree to the
                           <a
                             href="/terms"
-                            className="text-indigo-600 hover:text-indigo-500 text-sm underline"
+                            className="text-sm text-foreground hover:underline"
                           >
                             Terms of Service
                           </a>
                         </label>
                       </div>
                       <p
-                        className="text-gray-400 text-red-500 mt-1 hidden text-xs"
+                        className="mt-1 hidden text-xs text-muted-foreground"
                         id="terms-error"
                       >
                         You must accept the Terms of Service
@@ -198,7 +198,7 @@ export default function RegisterForm() {
 
         {error && (
           <div
-            className="bg-red-100 text-red-800 mb-4 rounded-lg p-2"
+            className="mb-4 rounded-none border border-ring bg-secondary p-2 text-foreground"
             role="alert"
           >
             {error}
@@ -208,18 +208,17 @@ export default function RegisterForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 w-full rounded-md px-4 py-2 transition-colors focus:outline-none focus:ring-2 disabled:opacity-75"
+          className="w-full rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-35"
         >
           {isLoading ? 'Creating Account...' : 'Register'}
         </button>
       </form>
 
       <div className="mt-6 text-center">
-        <span className="text-gray-500 text-sm">Already have an account?</span>
-        <a
-          href="/login"
-          className="text-indigo-600 hover:text-indigo-500 text-sm underline"
-        >
+        <span className="text-sm text-muted-foreground">
+          Already have an account?
+        </span>
+        <a href="/login" className="text-sm text-foreground hover:underline">
           Sign in
         </a>
       </div>
