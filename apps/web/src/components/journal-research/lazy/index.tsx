@@ -24,7 +24,9 @@ function ErrorFallback({ error }: { error: Error }) {
   return (
     <div className="flex min-h-[200px] items-center justify-center p-8">
       <div className="text-center">
-        <p className="text-red-500 text-sm">Failed to load component</p>
+        <p className="text-sm font-semibold text-foreground">
+          Failed to load component
+        </p>
         <p className="mt-1 text-xs text-muted-foreground">{error.message}</p>
       </div>
     </div>

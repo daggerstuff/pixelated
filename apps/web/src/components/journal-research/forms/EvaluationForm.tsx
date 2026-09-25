@@ -155,7 +155,7 @@ export function EvaluationForm({
                     className={cn(
                       'w-20 rounded-md border bg-background px-2 py-1 text-right text-sm',
                       errors[metric.key] && touched[metric.key]
-                        ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                        ? 'border-ring focus:border-ring focus:ring-ring'
                         : 'border-input',
                     )}
                     aria-invalid={!!errors[metric.key] && touched[metric.key]}

@@ -114,7 +114,7 @@ export function DiscoveryForm({
             </div>
             <FieldError error={errors['sources']} />
             {sources.length === 0 && (
-              <p className="text-yellow-500 text-sm">
+              <p className="text-sm font-semibold text-foreground">
                 Please select at least one source
               </p>
             )}

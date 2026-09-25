@@ -311,7 +311,7 @@ export function NotificationPreferences({
                     </Button>
                   )}
                   {pushPermission === 'granted' && (
-                    <CheckCircle className="text-green-600 h-4 w-4" />
+                    <CheckCircle className="h-4 w-4 text-foreground" />
                   )}
                 </div>
               </div>

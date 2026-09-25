@@ -91,7 +91,10 @@ export function FieldError({ error, className }: FieldErrorProps) {
   }
 
   return (
-    <p className={cn('text-sm text-red-500 mt-1', className)} role="alert">
+    <p
+      className={cn('text-sm text-foreground font-semibold mt-1', className)}
+      role="alert"
+    >
       {error}
     </p>
   )

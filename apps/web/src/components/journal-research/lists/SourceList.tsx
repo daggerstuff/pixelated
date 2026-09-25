@@ -154,11 +154,11 @@ export function SourceList({
       header: 'Access',
       accessor: (row) =>
         row.openAccess ? (
-          <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded px-2 py-1 text-xs">
+          <span className="rounded-none border border-input bg-secondary px-2 py-1 text-xs text-foreground">
             Open
           </span>
         ) : (
-          <span className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 rounded px-2 py-1 text-xs">
+          <span className="rounded-none border border-border bg-secondary px-2 py-1 text-xs text-muted-foreground">
             Closed
           </span>
         ),
