@@ -25,18 +25,18 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
   const progressPercentage = getProgressMetric('progress_percentage')
 
   const phaseColors: Record<string, string> = {
-    discovery: 'bg-blue-500',
-    evaluation: 'bg-yellow-500',
-    acquisition: 'bg-green-500',
-    integration: 'bg-purple-500',
-    reporting: 'bg-gray-500',
+    discovery: 'bg-primary',
+    evaluation: 'bg-foreground',
+    acquisition: 'bg-foreground',
+    integration: 'bg-foreground',
+    reporting: 'bg-muted-foreground',
   }
 
-  const phaseColor = phaseColors[session.currentPhase] ?? 'bg-gray-500'
+  const phaseColor = phaseColors[session.currentPhase] ?? 'bg-muted-foreground'
 
   return (
     <Card
-      className={`cursor-pointer transition-shadow hover:shadow-lg ${className ?? ''}`}
+      className={`cursor-pointer transition-colors hover:border-ring ${className ?? ''}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -58,7 +58,7 @@ export function SessionCard({ session, onClick, className }: SessionCardProps) {
             </CardDescription>
           </div>
           <div
-            className={`h-3 w-3 rounded-full ${phaseColor}`}
+            className={`h-3 w-3 rounded-none ${phaseColor}`}
             aria-label={`Current phase: ${session.currentPhase}`}
             title={`Current phase: ${session.currentPhase}`}
           />

@@ -126,19 +126,16 @@ export function AcquisitionList({
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      'completed':
-        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      'completed': 'bg-secondary border border-input text-foreground',
       'in-progress':
-        'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      'pending':
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      'approved':
-        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-      'failed': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+        'bg-secondary border border-ring text-foreground font-medium',
+      'pending': 'bg-secondary border border-input text-muted-foreground',
+      'approved': 'bg-secondary border border-border text-muted-foreground',
+      'failed': 'bg-primary text-primary-foreground font-semibold',
     }
     return (
       colors[status.toLowerCase()] ??
-      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+      'bg-secondary border border-border text-muted-foreground'
     )
   }
 
@@ -169,7 +166,7 @@ export function AcquisitionList({
       header: 'Status',
       accessor: (row) => (
         <span
-          className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${getStatusColor(row.status)}`}
+          className={`rounded-none px-2 py-1 text-xs font-medium capitalize ${getStatusColor(row.status)}`}
         >
           {row.status.replace('-', ' ')}
         </span>
@@ -185,7 +182,7 @@ export function AcquisitionList({
           return <span>-</span>
         return (
           <div className="flex items-center gap-2">
-            <div className="h-2 w-24 overflow-hidden rounded-full bg-muted">
+            <div className="h-2 w-24 overflow-hidden rounded-none bg-muted">
               <div
                 className="h-full bg-primary transition-all"
                 style={{ width: `${progress}%` }}
@@ -237,8 +234,8 @@ export function AcquisitionList({
         if (isIntegrated) {
           return (
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="text-green-600 h-4 w-4" />
-              <span className="text-green-600 text-xs">Integrated</span>
+              <CheckCircle2 className="h-4 w-4 text-foreground" />
+              <span className="text-xs text-foreground">Integrated</span>
             </div>
           )
         }
@@ -246,8 +243,10 @@ export function AcquisitionList({
         if (isIntegrating) {
           return (
             <div className="flex items-center gap-2">
-              <Loader2 className="text-blue-600 h-4 w-4 animate-spin" />
-              <span className="text-blue-600 text-xs">Integrating...</span>
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                Integrating...
+              </span>
             </div>
           )
         }
@@ -296,12 +295,12 @@ export function AcquisitionList({
             placeholder="Search acquisitions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="flex-1 rounded-none border border-input bg-background px-3 py-2 text-sm"
           />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm capitalize"
+            className="rounded-none border border-input bg-background px-3 py-2 text-sm capitalize"
           >
             <option value="all">All Statuses</option>
             {statuses.map((status) => (

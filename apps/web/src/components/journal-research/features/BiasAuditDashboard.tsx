@@ -35,23 +35,23 @@ function StatusBadge({ status }: { status: QuarantineStatus }) {
   > = {
     pending_review: {
       label: 'Pending Review',
-      className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+      className: 'bg-secondary border border-ring text-foreground font-medium',
     },
     under_audit: {
       label: 'Under Audit',
-      className: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      className: 'bg-secondary border border-input text-foreground',
     },
     approved: {
       label: 'Approved',
-      className: 'bg-green-500/20 text-green-400 border-green-500/30',
+      className: 'bg-secondary border border-border text-muted-foreground',
     },
     quarantined: {
       label: 'Quarantined',
-      className: 'bg-red-500/20 text-red-400 border-red-500/30',
+      className: 'bg-primary text-primary-foreground font-semibold',
     },
     rejected: {
       label: 'Rejected',
-      className: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+      className: 'bg-secondary border border-border text-muted-foreground',
     },
   }
 
@@ -59,7 +59,7 @@ function StatusBadge({ status }: { status: QuarantineStatus }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
+        'inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium border',
         config.className,
       )}
     >
@@ -171,7 +171,7 @@ function DatasetList({
           key={dataset['datasetId']}
           onClick={() => onSelect(dataset['datasetId'])}
           className={cn(
-            'flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors',
+            'flex w-full items-center justify-between rounded-none px-3 py-2 text-left text-sm transition-colors',
             selectedId === dataset['datasetId']
               ? 'bg-primary/10 border-primary/30 border'
               : 'hover:bg-muted border border-transparent',
@@ -263,24 +263,24 @@ function AuditDetailPanel({
                 className={cn(
                   'text-lg font-bold',
                   audit.overallBiasScore < 0.3
-                    ? 'text-green-500'
+                    ? 'text-muted-foreground'
                     : audit.overallBiasScore < 0.6
-                      ? 'text-yellow-500'
-                      : 'text-red-500',
+                      ? 'text-foreground font-medium'
+                      : 'text-foreground font-bold',
                 )}
               >
                 {(audit.overallBiasScore * 100).toFixed(1)}%
               </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-muted">
+            <div className="h-2 overflow-hidden rounded-none bg-muted">
               <div
                 className={cn(
                   'h-full transition-all',
                   audit.overallBiasScore < 0.3
-                    ? 'bg-green-500'
+                    ? 'bg-muted-foreground'
                     : audit.overallBiasScore < 0.6
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500',
+                      ? 'bg-foreground'
+                      : 'bg-primary',
                 )}
                 style={{ width: `${audit.overallBiasScore * 100}%` }}
               />
@@ -295,10 +295,10 @@ function AuditDetailPanel({
                 <div
                   key={metric.metricName}
                   className={cn(
-                    'flex items-center justify-between rounded-md px-3 py-2 text-sm',
+                    'flex items-center justify-between rounded-none px-3 py-2 text-sm',
                     metric.passed
-                      ? 'bg-green-500/10 text-green-400'
-                      : 'bg-red-500/10 text-red-400',
+                      ? 'bg-secondary border border-input text-muted-foreground'
+                      : 'bg-primary text-primary-foreground font-semibold',
                   )}
                 >
                   <span>{metric.metricName}</span>
@@ -329,21 +329,21 @@ function AuditDetailPanel({
                 <button
                   onClick={() => onAction('approve')}
                   disabled={actionLoading}
-                  className="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
+                  className="rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-accent disabled:opacity-50"
                 >
                   {actionLoading ? 'Processing...' : 'Approve'}
                 </button>
                 <button
                   onClick={() => onAction('quarantine')}
                   disabled={actionLoading}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
+                  className="rounded-none border border-ring bg-secondary px-4 py-2 text-sm font-medium font-semibold text-foreground hover:bg-accent disabled:opacity-50"
                 >
                   Quarantine
                 </button>
                 <button
                   onClick={() => onAction('reject')}
                   disabled={actionLoading}
-                  className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
+                  className="rounded-none border border-ring bg-secondary px-4 py-2 text-sm font-bold font-medium text-foreground hover:bg-accent disabled:opacity-50"
                 >
                   Reject
                 </button>
@@ -422,7 +422,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
           <button
             onClick={handleAuditSelected}
             disabled={!selectedDatasetId || initiateAuditLoading}
-            className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="hover:bg-primary/90 rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             {initiateAuditLoading ? 'Auditing...' : 'Audit Selected'}
           </button>
@@ -434,7 +434,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
                 (d) => d.quarantineStatus === 'pending_review',
               )
             }
-            className="hover:bg-secondary/90 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="hover:bg-secondary/90 rounded-none bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground disabled:cursor-not-allowed disabled:opacity-50"
           >
             Audit All Pending
           </button>
@@ -460,7 +460,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
                       : (e.target.value as QuarantineStatus),
                   )
                 }
-                className="bg-gray-800 border-gray-700 w-full rounded-md border px-3 py-2 text-sm"
+                className="w-full rounded-none border border-input bg-secondary px-3 py-2 text-sm"
               >
                 {statusOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -482,7 +482,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
                 <button
                   onClick={() => setPage(Math.max(1, page - 1))}
                   disabled={page === 1}
-                  className="bg-gray-700 rounded px-3 py-1 text-sm disabled:opacity-50"
+                  className="rounded-none bg-primary px-3 py-1 text-sm text-primary-foreground disabled:opacity-35"
                 >
                   Previous
                 </button>
@@ -494,7 +494,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
                     setPage(Math.min(datasets.totalPages, page + 1))
                   }
                   disabled={page === datasets.totalPages}
-                  className="bg-gray-700 rounded px-3 py-1 text-sm disabled:opacity-50"
+                  className="rounded-none bg-primary px-3 py-1 text-sm text-primary-foreground disabled:opacity-35"
                 >
                   Next
                 </button>
@@ -532,7 +532,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
 
       {/* Audit Progress Overlay */}
       {auditProgress.size > 0 && (
-        <div className="bg-gray-800 border-gray-700 fixed bottom-4 right-4 w-80 space-y-3 rounded-lg border p-4 shadow-lg">
+        <div className="fixed bottom-4 right-4 w-80 space-y-3 rounded-none border border-border bg-card p-4">
           <h4 className="font-medium">Audit Progress</h4>
           {Array.from(auditProgress.entries()).map(([datasetId, progress]) => (
             <div key={datasetId} className="space-y-1">
@@ -540,7 +540,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
                 <span className="truncate">{datasetId}</span>
                 <span>{progress.progress}%</span>
               </div>
-              <div className="bg-gray-700 h-2 overflow-hidden rounded-full">
+              <div className="h-2 overflow-hidden rounded-none bg-secondary">
                 <div
                   className="h-full bg-primary transition-all"
                   style={{ width: `${progress.progress}%` }}

@@ -112,21 +112,20 @@ export function EvaluationList({
   }, [evaluations.items, searchTerm, tierFilter, scoreFilter, tableState.sort])
 
   const getScoreColor = (score: number) => {
-    if (score >= 8) return 'text-green-600 dark:text-green-400'
-    if (score >= 6) return 'text-yellow-600 dark:text-yellow-400'
-    return 'text-red-600 dark:text-red-400'
+    if (score >= 8) return 'text-foreground font-semibold'
+    if (score >= 6) return 'text-foreground font-medium'
+    return 'text-muted-foreground'
   }
 
   const getPriorityColor = (tier: string) => {
     const colors: Record<string, string> = {
-      high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-      medium:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-      low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      high: 'bg-primary text-primary-foreground font-semibold',
+      medium: 'bg-secondary border border-ring text-foreground font-medium',
+      low: 'bg-secondary border border-border text-muted-foreground',
     }
     return (
       colors[tier.toLowerCase()] ??
-      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+      'bg-secondary border border-border text-muted-foreground'
     )
   }
 
@@ -169,7 +168,7 @@ export function EvaluationList({
       header: 'Priority',
       accessor: (row) => (
         <span
-          className={`rounded-full px-2 py-1 text-xs font-medium capitalize ${getPriorityColor(row.priorityTier)}`}
+          className={`rounded-none px-2 py-1 text-xs font-medium capitalize ${getPriorityColor(row.priorityTier)}`}
         >
           {row.priorityTier}
         </span>
@@ -220,12 +219,12 @@ export function EvaluationList({
             placeholder="Search evaluations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="flex-1 rounded-none border border-input bg-background px-3 py-2 text-sm"
           />
           <select
             value={tierFilter}
             onChange={(e) => setTierFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm capitalize"
+            className="rounded-none border border-input bg-background px-3 py-2 text-sm capitalize"
           >
             <option value="all">All Tiers</option>
             {tiers.map((tier) => (
@@ -237,7 +236,7 @@ export function EvaluationList({
           <select
             value={scoreFilter}
             onChange={(e) => setScoreFilter(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm"
+            className="rounded-none border border-input bg-background px-3 py-2 text-sm"
           >
             <option value="all">All Scores</option>
             <option value="high">High (≥8)</option>
