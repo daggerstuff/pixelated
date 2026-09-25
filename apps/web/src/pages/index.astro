@@ -5,74 +5,74 @@ import { withBasePath } from '@/utils/path'
 
 const metaTitle = 'Clinical AI Simulation & Supervised Practice'
 const metaDescription =
-  'Pixelated Empathy is an evidence-based clinical AI simulation platform for therapist training and supervision. Trainees practice high-stakes therapy conversations with adaptive AI clients while supervisors coach from point-in-time transcripts.'
+  'Pixelated Empathy gives therapy trainees a safe place to practice tough client conversations with adaptive AI clients, while supervisors coach directly from exact transcript moments.'
 
 const trainingLoop = [
   {
     num: '01',
-    title: 'Standardized Simulation',
+    title: 'Realistic AI Sessions',
     description:
-      'Trainees engage realistic AI clients designed with clinical psychopathology parameters—adapting to resistance, disclosure timing, and emotional shifts.',
+      'Trainees talk with responsive AI clients that hesitate, push back, and test boundaries just like real people in session.',
   },
   {
     num: '02',
-    title: 'In-Situ Transcript Review',
+    title: 'Direct Supervisor Notes',
     description:
-      'Supervisors annotate transcripts at the exact conversational turn that mattered, coaching specific micro-interventions rather than relying on recall.',
+      'Supervisors highlight the exact turn where things stalled or clicked, leaving straightforward feedback instead of relying on memory.',
   },
   {
     num: '03',
-    title: 'Deliberate Practice & Retries',
+    title: 'Instant Retries',
     description:
-      'Trainees immediately re-enter the critical rupture point to test alternative repairs, developing clinical agility and neural resilience.',
+      'Trainees jump right back into the moment to try another approach and build real muscle memory before seeing real clients.',
   },
 ]
 
 const clinicalScenarios = [
   {
-    badge: 'Crisis Intervention',
-    title: 'Suicidality Screening & Safety Planning',
+    badge: 'Crisis & Safety',
+    title: 'Suicide Screening & Safety Planning',
     description:
-      'Practice navigating explicit and implicit ideation, conducting C-SSRS assessments, and constructing collaborative safety plans under pressure.',
+      'Catch subtle warning signs, ask direct questions without freezing up, and build realistic safety plans together.',
   },
   {
-    badge: 'Alliance Dynamics',
-    title: 'Therapeutic Rupture & Repair',
+    badge: 'Tough Moments',
+    title: 'Handling Pushback & Broken Trust',
     description:
-      'Identify subtle disengagement, address direct confrontation, and practice alliance-focused repair sequences without defensive countertransference.',
+      'Spot when a client checks out or gets frustrated, stay calm, and work through tension without getting defensive.',
   },
   {
     badge: 'Trauma & Pacing',
-    title: 'High-Stakes Disclosure Pacing',
+    title: 'Pacing Heavy Disclosures',
     description:
-      'Contain overwhelming affective floods, support grounding, and avoid premature problem-solving when clients disclose acute trauma.',
+      'Help clients ground themselves during intense moments, pace painful memories, and avoid jumping into fix-it mode too soon.',
   },
   {
     badge: 'Cultural Humility',
-    title: 'Intersectional Empathy & Micro-Ruptures',
+    title: 'Working Through Identity Differences',
     description:
-      'Navigate cross-cultural misunderstandings, acknowledge systemic context, and practice humble inquiry when identity differences emerge.',
+      'Address cultural misunderstandings openly, stay grounded, and talk through differences without making assumptions.',
   },
 ]
 
 const clinicalTriad = [
   {
     role: 'For Trainees',
-    title: 'Safe Rehearsal for Low-Frequency, High-Acuity Cases',
+    title: 'Zero-Risk Practice for Tough Situations',
     description:
-      'Build confidence in difficult conversational turns before real client contact. Experiment with theoretical orientations in a zero-risk sandbox.',
+      'Get comfortable handling tense conversational turns before facing real clients. Try different approaches without worrying about making mistakes.',
   },
   {
     role: 'For Supervisors',
-    title: 'Objective Evidence-Based Coaching',
+    title: 'Feedback Grounded in What Actually Happened',
     description:
-      'Review complete transcripts with timestamped conversational metrics. Identify micro-skills, missed cues, and communication habits instantly.',
+      'Read the full transcript instead of guessing from trainee recall. Spot communication habits and teachable moments right away.',
   },
   {
     role: 'For Program Directors',
-    title: 'Standardized Cohort Competency Benchmarks',
+    title: 'Consistent Practice Across Every Cohort',
     description:
-      'Ensure every graduating clinician has demonstrated core competencies across identical, calibrated clinical situations ready for accreditation audits.',
+      'Make sure every student handles the same core clinical scenarios, with clean audit logs ready for accreditation reviews.',
   },
 ]
 ---
@@ -88,31 +88,28 @@ const clinicalTriad = [
         <div class="np-hero-grid">
           <!-- Main Hero Column -->
           <div class="np-hero-main">
-            <span class="np-eyebrow">
-              Clinical AI Training & Supervised Practice
-            </span>
+            <span class="np-eyebrow">Clinical AI Simulation & Practice</span>
             <h1 class="np-display-hero">
               Rehearse high-stakes therapy conversations before real clients.
             </h1>
             <p class="np-lede">
-              Pixelated Empathy provides standardized, adaptive AI client
-              simulations for therapist training. Trainees practice rupture
-              repairs, risk screenings, and complex disclosures—while
-              supervisors review timestamped transcripts and coach from
-              evidence.
+              Pixelated Empathy gives trainees a realistic place to practice
+              rupture repairs, crisis screenings, and heavy disclosures with
+              responsive AI clients. Supervisors jump right into the transcript
+              to coach exact moments that matter.
             </p>
             <div class="np-actions-row">
               <a class="np-btn np-btn-primary" href={withBasePath('/contact')}>
-                Request Institutional Pilot
+                Request a Program Pilot
               </a>
               <a class="np-btn np-btn-ghost" href={withBasePath('/features')}>
-                Explore Clinical Scenarios
+                Explore Practice Scenarios
               </a>
             </div>
             <div class="np-trust-badges">
-              <span class="np-trust-badge">HIPAA-Ready Architecture</span>
-              <span class="np-trust-badge">Zero PHI Retention</span>
-              <span class="np-trust-badge">Accreditation Aligned</span>
+              <span class="np-trust-badge">Zero Real Patient Data</span>
+              <span class="np-trust-badge">Private & Encrypted</span>
+              <span class="np-trust-badge">Accreditation Ready</span>
             </div>
           </div>
 
@@ -162,9 +159,9 @@ const clinicalTriad = [
                     <span>Supervisor Annotation · Dr. E. Vance</span>
                   </div>
                   <div class="np-supervisor-text">
-                    "Named the hesitation, but redirected too fast. Slow
-                    down—acknowledge the courage it takes to voice doubt, and
-                    sit in the alliance rupture before asking for reasons."
+                    "You dodged with a stock question. Don't get defensive or
+                    overly clinical—just own that we're stuck and reset
+                    together."
                   </div>
                 </div>
 
@@ -175,10 +172,9 @@ const clinicalTriad = [
                     <span>14:32</span>
                   </div>
                   <div class="np-turn-content np-turn-content--attempt-2">
-                    "You've been showing up every week putting in real effort,
-                    and not feeling any progress must feel deeply discouraging.
-                    Let's stay right here—tell me more about what that weight
-                    feels like today."
+                    "Fair enough. If we're three weeks in and spinning our
+                    wheels, doing more of the same won't help. What needs to
+                    change?"
                   </div>
                 </div>
               </div>
@@ -199,14 +195,13 @@ const clinicalTriad = [
     <!-- Training Loop Section -->
     <section class="np-section np-section--surface" aria-label="How It Works">
       <div class="np-container">
-        <span class="np-eyebrow">The Supervisory Loop</span>
+        <span class="np-eyebrow">How It Works</span>
         <h2 class="np-section-heading">
-          A closed-loop system for clinical mastery.
+          How trainees actually build real confidence.
         </h2>
         <p class="np-lede">
-          Move beyond subjective trainee recall. Combine realistic patient
-          simulation with point-in-time supervision to accelerate clinical
-          development.
+          Skip the vague post-session check-ins. Practice real conversations,
+          see where things went off track, and try again on the spot.
         </p>
 
         <div class="np-loop-grid">
@@ -227,13 +222,13 @@ const clinicalTriad = [
     <!-- Scenario Library Section -->
     <section class="np-section" aria-label="Clinical Scenario Curriculum">
       <div class="np-container">
-        <span class="np-eyebrow">Standardized Scenarios</span>
+        <span class="np-eyebrow">Practice Scenarios</span>
         <h2 class="np-section-heading">
-          High-stakes encounters, standardized for every trainee.
+          The hardest moments in therapy, ready to practice.
         </h2>
         <p class="np-lede">
-          Our curriculum covers acute clinical scenarios rarely encountered
-          during initial practicum hours, ensuring comprehensive preparedness.
+          Give every trainee hands-on practice with high-stress situations they
+          might only see once or twice during practicum.
         </p>
 
         <div class="np-scenario-grid">
@@ -258,13 +253,13 @@ const clinicalTriad = [
       aria-label="Built for Clinical Teams"
     >
       <div class="np-container">
-        <span class="np-eyebrow">The Training Triad</span>
+        <span class="np-eyebrow">Built for the Whole Team</span>
         <h2 class="np-section-heading">
-          Engineered for trainees, supervisors, and directors.
+          Clear value for trainees, supervisors, and program leads.
         </h2>
         <p class="np-lede">
-          Every surface is tailored to the distinct workflows of counseling
-          psychology programs and behavioral health residency teams.
+          Built to fit directly into counseling graduate programs, residency
+          clinics, and weekly supervision.
         </p>
 
         <div class="np-triad-grid">
@@ -282,37 +277,33 @@ const clinicalTriad = [
     <!-- Security & Institutional Governance Section -->
     <section class="np-section" aria-label="Security and Privacy Posture">
       <div class="np-container">
-        <span class="np-eyebrow">Institutional Trust & Compliance</span>
-        <h2 class="np-section-heading">
-          Built for HIPAA and clinical accreditation requirements.
-        </h2>
+        <span class="np-eyebrow">Privacy & Security</span>
+        <h2 class="np-section-heading">Built for privacy from day one.</h2>
         <p class="np-lede">
-          Zero real-world patient data is required. All simulated conversations
-          take place in isolated, private institutional enclaves.
+          No real patient information is ever needed. All simulated sessions
+          happen in private, isolated workspaces.
         </p>
 
         <div class="np-security-grid">
           <div class="np-security-item">
-            <h3 class="np-card-title">Zero PHI Exposure</h3>
+            <h3 class="np-card-title">Zero PHI Risk</h3>
             <p class="np-prose">
-              Simulations use synthetic patient models. No actual client
-              identifiers or medical records are ever introduced into the
-              system.
+              All conversations run on synthetic AI clients. Real patient
+              records or personal health details never touch our servers.
             </p>
           </div>
           <div class="np-security-item">
-            <h3 class="np-card-title">Encrypted & Auditable</h3>
+            <h3 class="np-card-title">Private & Encrypted</h3>
             <p class="np-prose">
-              End-to-end encryption at rest and in transit. Granular role-based
-              access control separates trainee attempts, supervisor notes, and
-              admin metrics.
+              Transcripts and supervisor feedback stay strictly inside your
+              program's workspace, encrypted at rest and in transit.
             </p>
           </div>
           <div class="np-security-item">
-            <h3 class="np-card-title">Curricular Alignment</h3>
+            <h3 class="np-card-title">Accreditation Ready</h3>
             <p class="np-prose">
-              Competencies mapped to CACREP, APA, and CSWE training guidelines
-              for seamless integration into existing graduate coursework.
+              Easily track student competency milestones aligned with CACREP,
+              APA, and CSWE training guidelines.
             </p>
           </div>
         </div>
@@ -324,16 +315,16 @@ const clinicalTriad = [
               class="np-card-title"
               style="font-size: 1.5rem; margin-bottom: 0.5rem;"
             >
-              Deploy clinical AI simulation in your training program.
+              Bring realistic simulation to your training program.
             </h3>
             <p class="np-prose" style="margin-bottom: 0;">
               Partner with Pixelated Empathy to pilot standardized simulation
-              cohorts for your upcoming semester or practicum cycle.
+              cohorts for your upcoming semester.
             </p>
           </div>
           <div>
             <a class="np-btn np-btn-primary" href={withBasePath('/contact')}>
-              Request Institutional Pilot
+              Request a Program Pilot
             </a>
           </div>
         </div>
