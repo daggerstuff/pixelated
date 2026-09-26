@@ -77,7 +77,7 @@ export default function ChatCompletionExample() {
         </h2>
 
         {/* Controls */}
-        <div className='bg-gray-50 mb-4 flex flex-wrap gap-4 rounded-lg p-4'>
+        <div className='bg-secondary mb-4 flex flex-wrap gap-4 rounded-none p-4'>
           <label className='flex items-center gap-2'>
             <input
               type='checkbox'
@@ -89,7 +89,7 @@ export default function ChatCompletionExample() {
 
           <button
             onClick={resetChat}
-            className='bg-red-500 text-white hover:bg-red-600 rounded px-3 py-1'
+            className='bg-secondary border border-ring text-foreground hover:bg-accent rounded-none px-3 py-1 font-semibold'
           >
             Reset Chat
           </button>
@@ -97,7 +97,7 @@ export default function ChatCompletionExample() {
           <button
             onClick={retryLastMessage}
             disabled={!error}
-            className='bg-yellow-500 text-white hover:bg-yellow-600 rounded px-3 py-1 disabled:opacity-50'
+            className='bg-secondary border border-ring text-foreground hover:bg-accent rounded-none px-3 py-1 disabled:opacity-35'
           >
             Retry Last
           </button>
@@ -105,7 +105,7 @@ export default function ChatCompletionExample() {
           <button
             onClick={stopGeneration}
             disabled={!isLoading}
-            className='bg-gray-500 text-white hover:bg-gray-600 rounded px-3 py-1 disabled:opacity-50'
+            className='bg-secondary border border-border text-muted-foreground hover:bg-accent rounded-none px-3 py-1 disabled:opacity-35'
           >
             Stop
           </button>
@@ -116,14 +116,14 @@ export default function ChatCompletionExample() {
               void navigator.clipboard.writeText(exported)
               alert('Conversation copied to clipboard!')
             }}
-            className='bg-blue-500 text-white hover:bg-blue-600 rounded px-3 py-1'
+            className='bg-secondary border border-input text-foreground hover:bg-accent rounded-none px-3 py-1'
           >
             Export
           </button>
         </div>
 
         {/* Stats */}
-        <div className='bg-blue-50 mb-4 grid grid-cols-2 gap-4 rounded-lg p-4 md:grid-cols-4'>
+        <div className='bg-secondary mb-4 grid grid-cols-2 gap-4 rounded-none p-4 md:grid-cols-4'>
           <div>
             <div className='text-gray-600 text-sm'>Messages</div>
             <div className='font-semibold'>
@@ -160,9 +160,9 @@ export default function ChatCompletionExample() {
                 {progress.toFixed(1)}%
               </div>
             </div>
-            <div className='bg-gray-200 h-2 w-full rounded-full'>
+            <div className='bg-secondary h-2 w-full rounded-none'>
               <div
-                className='bg-blue-600 h-2 rounded-full transition-all duration-300'
+                className='bg-primary h-2 rounded-none transition-all duration-300'
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -171,27 +171,27 @@ export default function ChatCompletionExample() {
 
         {/* Error */}
         {error && (
-          <div className='bg-red-50 border-red-200 mb-4 rounded-lg border p-4'>
-            <div className='text-red-700 font-medium'>Error:</div>
+          <div className='bg-secondary border-ring mb-4 rounded-none border p-4'>
+            <div className='text-foreground font-medium'>Error:</div>
             <div className='text-red-600'>{error}</div>
           </div>
         )}
       </div>
 
       {/* Messages */}
-      <div className='mb-6 max-h-96 space-y-4 overflow-y-auto rounded-lg border p-4'>
+      <div className='mb-6 max-h-96 space-y-4 overflow-y-auto rounded-none border p-4'>
         {messages.length === 0 ? (
-          <div className='text-gray-500 py-8 text-center'>
+          <div className='text-muted-foreground py-8 text-center'>
             No messages yet. Start a conversation!
           </div>
         ) : (
           messages.map((message, index) => (
             <div
               key={`${message.role}-${index}-${message.content.slice(0, 20)}`}
-              className={`rounded-lg p-3 ${
+              className={`rounded-none p-3 ${
                 message.role === 'user'
-                  ? 'bg-blue-100 ml-8'
-                  : 'bg-gray-100 mr-8'
+                  ? 'bg-primary text-primary-foreground ml-8'
+                  : 'bg-secondary border border-border mr-8'
               }`}
             >
               <div className='flex items-start justify-between'>
@@ -213,20 +213,20 @@ export default function ChatCompletionExample() {
                         editMessage(index, newContent)
                       }
                     }}
-                    className='text-blue-600 hover:text-blue-800 text-xs'
+                    className='text-foreground hover:text-muted-foreground text-xs'
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => deleteMessage(index)}
-                    className='text-red-600 hover:text-red-800 text-xs'
+                    className='text-foreground hover:text-muted-foreground text-xs'
                   >
                     Delete
                   </button>
                   {message.role === 'user' && (
                     <button
                       onClick={ async () => resendMessage(index)}
-                      className='text-green-600 hover:text-green-800 text-xs'
+                      className='text-muted-foreground hover:text-foreground text-xs'
                     >
                       Resend
                     </button>
@@ -246,14 +246,14 @@ export default function ChatCompletionExample() {
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder='Type your message here... (Enter to send, Shift+Enter for new line)'
-            className='flex-1 resize-none rounded-lg border p-3'
+            className='flex-1 resize-none rounded-none border border-input p-3'
             rows={3}
             disabled={isLoading}
           />
           <button
             onClick={handleSendMessage}
             disabled={isLoading || !inputMessage.trim()}
-            className='bg-blue-600 text-white hover:bg-blue-700 rounded-lg px-6 py-3 disabled:cursor-not-allowed disabled:opacity-50'
+            className='bg-primary text-primary-foreground hover:bg-accent rounded-none px-6 py-3 disabled:cursor-not-allowed disabled:opacity-35'
           >
             {isLoading ? 'Sending...' : 'Send'}
           </button>
@@ -261,7 +261,7 @@ export default function ChatCompletionExample() {
 
         {/* Message Stats */}
         {messages.length > 0 && (
-          <div className='text-gray-600 bg-gray-50 rounded-lg p-3 text-sm'>
+          <div className='text-muted-foreground bg-secondary rounded-none p-3 text-sm'>
             <div className='mb-1 font-medium'>Message Statistics:</div>
             <div>Longest: {messageStats.longestMessage} chars</div>
             <div>Shortest: {messageStats.shortestMessage} chars</div>

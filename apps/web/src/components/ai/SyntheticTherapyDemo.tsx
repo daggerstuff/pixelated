@@ -438,7 +438,7 @@ export default function SyntheticTherapyDemo() {
                     <CardContent className='space-y-4'>
                       <div className='bg-secondary/50 rounded-lg p-4'>
                         <div className='flex items-start gap-4'>
-                          <div className='bg-primary text-white flex h-8 w-8 items-center justify-center rounded-full'>
+                          <div className='bg-primary text-white flex h-8 w-8 items-center justify-center rounded-none'>
                             P
                           </div>
                           <div className='flex-1'>
@@ -452,7 +452,7 @@ export default function SyntheticTherapyDemo() {
 
                       <div className='bg-muted rounded-lg p-4'>
                         <div className='flex items-start gap-4'>
-                          <div className='bg-blue-600 text-white flex h-8 w-8 items-center justify-center rounded-full'>
+                          <div className='bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-none'>
                             T
                           </div>
                           <div className='flex-1'>
@@ -492,9 +492,9 @@ export default function SyntheticTherapyDemo() {
                               <div className='text-muted-foreground text-sm'>
                                 Severity: {(symptom.severity * 100).toFixed(0)}%
                               </div>
-                              <div className='bg-secondary h-2 w-full rounded-full'>
+                              <div className='bg-secondary h-2 w-full rounded-none'>
                                 <div
-                                  className='bg-primary h-2 rounded-full'
+                                  className='bg-primary h-2 rounded-none'
                                   style={{
                                     width: `${symptom.severity * 100}%`,
                                   }}
