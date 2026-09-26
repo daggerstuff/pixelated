@@ -17,11 +17,13 @@
   --np-pad: clamp(1.25rem, 4vw, 3rem);
   --np-max-width: 78rem;
   --np-font-display:
-    'Space Grotesk Variable', 'Space Grotesk', system-ui, -apple-system,
-    sans-serif;
+    'Geist Variable', 'Geist', 'Archivo Variable', 'Archivo', system-ui,
+    -apple-system, sans-serif;
   --np-font-body:
     'Instrument Sans Variable', system-ui, -apple-system, sans-serif;
-  --np-font-mono: 'Spline Sans Mono Variable', ui-monospace, Menlo, monospace;
+  --np-font-mono:
+    'Spline Sans Mono Variable', 'IBM Plex Mono', ui-monospace, Menlo,
+    monospace;
 }
 
 .np-page {
@@ -254,6 +256,55 @@
   font-family: var(--np-font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.04em;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.np-console-tabs {
+  display: flex;
+  background-color: var(--np-bg);
+  border-bottom: 1px solid var(--np-line-strong);
+  overflow-x: auto;
+}
+
+.np-console-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.9rem;
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--np-line);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease-out;
+}
+
+.np-console-tab:hover {
+  color: var(--np-text);
+  background-color: var(--np-elevated);
+}
+
+.np-console-tab.is-active {
+  color: var(--np-text);
+  background-color: var(--np-surface);
+  border-bottom-color: var(--np-text);
+  font-weight: 600;
+}
+
+.np-tab-panel {
+  display: none;
+}
+
+.np-tab-panel.is-active {
+  display: block;
 }
 
 .np-console-status {
@@ -297,6 +348,8 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--np-muted);
+  flex-wrap: wrap;
+  gap: 0.25rem;
 }
 
 .np-turn-meta--client {
@@ -305,6 +358,29 @@
 
 .np-turn-meta--trainee {
   color: var(--np-text);
+}
+
+.np-gate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--np-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.45rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.np-gate-badge--fail {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.np-gate-badge--pass {
+  color: #000000;
+  background-color: #ffffff;
 }
 
 .np-turn-content {
@@ -321,23 +397,36 @@
 }
 
 .np-turn-content--attempt-1 {
-  border-left-color: var(--np-line-strong);
+  border-left-color: rgba(255, 255, 255, 0.3);
   color: var(--np-muted);
+  text-decoration-color: var(--np-muted);
 }
 
 .np-turn-content--attempt-2 {
   border-left-color: var(--np-text);
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.np-turn-telemetry {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  color: var(--np-muted);
+  padding: 0.25rem 0.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--np-line);
 }
 
 .np-supervisor-note {
   background-color: var(--np-elevated);
   border: 1px dashed var(--np-line-strong);
   padding: 0.75rem 1rem;
-  margin-inline: 0.5rem;
+  margin-inline: 0.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.35rem;
 }
 
 .np-supervisor-meta {
@@ -360,7 +449,133 @@
   font-size: 0.875rem;
   line-height: 1.45;
   color: var(--np-muted);
-  font-style: italic;
+}
+
+/* Quad-Audit Panel */
+.np-quad-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.np-quad-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  background-color: var(--np-bg);
+  border: 1px solid var(--np-line-strong);
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+}
+
+.np-quad-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+
+@media (min-width: 580px) {
+  .np-quad-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.np-quad-card {
+  background-color: var(--np-elevated);
+  border: 1px solid var(--np-line);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.np-quad-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+}
+
+.np-quad-judge-name {
+  color: var(--np-text);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.np-quad-score {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--np-text);
+}
+
+.np-quad-card-body {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--np-muted);
+}
+
+/* Telemetry Dashboard Panel */
+.np-telemetry-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.np-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+@media (min-width: 580px) {
+  .np-telemetry-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.np-telemetry-metric {
+  background-color: var(--np-elevated);
+  border: 1px solid var(--np-line);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.np-telemetry-label {
+  font-family: var(--np-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+}
+
+.np-telemetry-val {
+  font-family: var(--np-font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--np-text);
+  line-height: 1.1;
+}
+
+.np-telemetry-sub {
+  font-family: var(--np-font-mono);
+  font-size: 0.625rem;
+  color: var(--np-mid);
+}
+
+.np-provenance-box {
+  background-color: var(--np-bg);
+  border: 1px solid var(--np-line);
+  padding: 0.75rem;
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--np-muted);
 }
 
 .np-console-footer {
