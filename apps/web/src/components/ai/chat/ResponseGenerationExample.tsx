@@ -81,7 +81,7 @@ export function ResponseGenerationExample() {
 
   return (
     <div className='mx-auto max-w-4xl space-y-6 p-6'>
-      <h2 className='text-gray-900 text-2xl font-bold'>
+      <h2 className='text-foreground text-2xl font-bold'>
         AI Response Generation Demo
       </h2>
 
@@ -90,7 +90,7 @@ export function ResponseGenerationExample() {
         <div>
           <label
             htmlFor='prompt'
-            className='text-gray-700 block text-sm font-medium'
+            className='text-foreground block text-sm font-medium'
           >
             Enter your prompt:
           </label>
@@ -98,7 +98,7 @@ export function ResponseGenerationExample() {
             id='prompt'
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className='border-gray-300 focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none'
+            className='border-input focus:ring-ring focus:border-ring mt-1 block w-full rounded-none border px-3 py-2 focus:outline-none'
             rows={3}
             placeholder='Type your prompt here...'
           />
@@ -107,7 +107,7 @@ export function ResponseGenerationExample() {
         <div>
           <label
             htmlFor='responseType'
-            className='text-gray-700 block text-sm font-medium'
+            className='text-foreground block text-sm font-medium'
           >
             Response Type:
           </label>
@@ -117,7 +117,7 @@ export function ResponseGenerationExample() {
             onChange={(e) =>
               setResponseType(e.target.value as typeof responseType)
             }
-            className='border-gray-300 focus:ring-blue-500 focus:border-blue-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none'
+            className='border-input focus:ring-ring focus:border-ring mt-1 block w-full rounded-none border px-3 py-2 focus:outline-none'
           >
             <option value='general'>General</option>
             <option value='therapeutic'>Therapeutic</option>
@@ -132,7 +132,7 @@ export function ResponseGenerationExample() {
         <button
           onClick={handleGenerateResponse}
           disabled={isLoading || !prompt.trim()}
-          className='bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50'
+          className='bg-primary text-primary-foreground hover:bg-accent rounded-none px-4 py-2 disabled:cursor-not-allowed disabled:opacity-35'
         >
           {isLoading ? 'Generating...' : 'Generate Response'}
         </button>
@@ -140,7 +140,7 @@ export function ResponseGenerationExample() {
         <button
           onClick={handleStreamingResponse}
           disabled={isLoading || !prompt.trim()}
-          className='bg-green-600 text-white hover:bg-green-700 rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50'
+          className='bg-secondary border border-input text-foreground hover:bg-accent rounded-none px-4 py-2 disabled:cursor-not-allowed disabled:opacity-35'
         >
           {isStreaming ? 'Streaming...' : 'Stream Response'}
         </button>
@@ -148,7 +148,7 @@ export function ResponseGenerationExample() {
         <button
           onClick={regenerateLastResponse}
           disabled={isLoading}
-          className='bg-purple-600 text-white hover:bg-purple-700 rounded-md px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50'
+          className='bg-secondary border border-input text-foreground hover:bg-accent rounded-none px-4 py-2 disabled:cursor-not-allowed disabled:opacity-35'
         >
           Regenerate
         </button>
@@ -156,7 +156,7 @@ export function ResponseGenerationExample() {
         {(isLoading || isStreaming) && (
           <button
             onClick={stopGeneration}
-            className='bg-red-600 text-white hover:bg-red-700 rounded-md px-4 py-2'
+            className='bg-secondary border border-ring text-foreground font-semibold hover:bg-accent rounded-none px-4 py-2'
           >
             Stop
           </button>
@@ -164,7 +164,7 @@ export function ResponseGenerationExample() {
 
         <button
           onClick={reset}
-          className='bg-gray-600 text-white hover:bg-gray-700 rounded-md px-4 py-2'
+          className='bg-secondary border border-border text-muted-foreground hover:bg-accent rounded-none px-4 py-2'
         >
           Reset
         </button>
@@ -172,12 +172,12 @@ export function ResponseGenerationExample() {
 
       {/* Progress Bar */}
       {(isLoading || isStreaming) && (
-        <div className='bg-gray-200 h-2 w-full rounded-full'>
+        <div className='bg-secondary h-2 w-full rounded-none'>
           <div
-            className='bg-blue-600 h-2 rounded-full transition-all duration-300'
+            className='bg-primary h-2 rounded-none transition-all duration-300'
             style={{ width: `${progress}%` }}
           />
-          <div className='text-gray-600 mt-1 text-xs'>
+          <div className='text-muted-foreground mt-1 text-xs'>
             {isStreaming ? 'Streaming' : 'Loading'}: {Math.round(progress)}%
           </div>
         </div>
@@ -185,9 +185,9 @@ export function ResponseGenerationExample() {
 
       {/* Error Display */}
       {error && (
-        <div className='bg-red-50 border-red-200 rounded-md border p-4'>
+        <div className='bg-secondary border-ring rounded-none border p-4'>
           <div className='flex'>
-            <div className='text-red-800'>
+            <div className='text-foreground'>
               <strong>Error:</strong> {error}
             </div>
           </div>
@@ -196,27 +196,27 @@ export function ResponseGenerationExample() {
 
       {/* Response Display */}
       {response && (
-        <div className='bg-gray-50 border-gray-200 rounded-md border p-4'>
-          <h3 className='text-gray-900 mb-2 text-lg font-medium'>
+        <div className='bg-secondary border-border rounded-none border p-4'>
+          <h3 className='text-foreground mb-2 text-lg font-medium'>
             Generated Response:
           </h3>
-          <div className='text-gray-700 whitespace-pre-wrap'>{response}</div>
+          <div className='text-foreground whitespace-pre-wrap'>{response}</div>
         </div>
       )}
 
       {/* Therapeutic Insights */}
       {therapeuticInsights && (
-        <div className='bg-blue-50 border-blue-200 rounded-md border p-4'>
-          <h3 className='text-blue-900 mb-2 text-lg font-medium'>
+        <div className='bg-secondary border-input rounded-none border p-4'>
+          <h3 className='text-foreground mb-2 text-lg font-medium'>
             Therapeutic Insights:
           </h3>
-          <div className='text-blue-800 space-y-2 text-sm'>
+          <div className='text-foreground space-y-2 text-sm'>
             <div>
               <strong>Confidence:</strong>{' '}
               {Math.round(therapeuticInsights.confidence * 100)}%
             </div>
             {therapeuticInsights.intervention && (
-              <div className='text-red-600'>
+              <div className='text-foreground font-semibold'>
                 <strong>⚠️ Intervention Recommended</strong>
               </div>
             )}
@@ -238,11 +238,11 @@ export function ResponseGenerationExample() {
       )}
 
       {/* Usage Instructions */}
-      <div className='bg-yellow-50 border-yellow-200 rounded-md border p-4'>
-        <h3 className='text-yellow-900 mb-2 text-lg font-medium'>
+      <div className='bg-secondary border-border rounded-none border p-4'>
+        <h3 className='text-foreground mb-2 text-lg font-medium'>
           How to Use:
         </h3>
-        <ul className='text-yellow-800 list-inside list-disc space-y-1 text-sm'>
+        <ul className='text-muted-foreground list-inside list-disc space-y-1 text-sm'>
           <li>
             <strong>General:</strong> For everyday AI assistance and questions
           </li>
