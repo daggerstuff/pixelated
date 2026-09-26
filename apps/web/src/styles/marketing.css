@@ -118,12 +118,20 @@
 
 .marketing-title {
   margin: 0;
-  font-family: var(--np-font-display, 'Instrument Serif', Georgia, serif);
+  font-family: var(
+    --np-font-display,
+    'Geist Variable',
+    'Geist',
+    'Archivo Variable',
+    'Archivo',
+    system-ui,
+    sans-serif
+  );
   font-weight: var(--np-weight-display, 700);
   max-width: 18ch;
   font-size: var(--np-text-display, clamp(2.5rem, 5vw, 4.5rem));
   line-height: var(--np-leading-display, 1.05);
-  letter-spacing: var(--np-tracking-display, -0.02em);
+  letter-spacing: var(--np-tracking-display, -0.035em);
   color: var(--text-primary);
   text-wrap: balance;
   font-feature-settings: 'kern', 'liga', 'calt';
@@ -131,10 +139,19 @@
 
 .marketing-title--medium {
   max-width: 22ch;
-  font-weight: var(--np-weight-headline, 400);
+  font-family: var(
+    --np-font-headline,
+    'Geist Variable',
+    'Geist',
+    'Archivo Variable',
+    'Archivo',
+    system-ui,
+    sans-serif
+  );
+  font-weight: var(--np-weight-headline, 600);
   font-size: var(--np-text-headline, clamp(1.75rem, 3.5vw, 2.75rem));
   line-height: var(--np-leading-headline, 1.15);
-  letter-spacing: var(--np-tracking-headline, -0.02em);
+  letter-spacing: var(--np-tracking-headline, -0.025em);
 }
 
 .marketing-lede {

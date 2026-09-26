@@ -43,7 +43,15 @@
   --fm-accent-3: var(--np-mid, oklch(0.7 0 0));
   --fm-danger: var(--np-text, oklch(0.93 0 0));
   --fm-mono: 'Spline Sans Mono Variable', ui-monospace, monospace;
-  --fm-display: var(--np-font-display, 'Instrument Serif', Georgia, serif);
+  --fm-display: var(
+    --np-font-display,
+    'Geist Variable',
+    'Geist',
+    'Archivo Variable',
+    'Archivo',
+    system-ui,
+    sans-serif
+  );
   --fm-sans: var(
     --np-font-body,
     ui-sans-serif,

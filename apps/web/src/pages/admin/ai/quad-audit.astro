@@ -86,10 +86,19 @@ if (!session || !user || user.role !== 'admin') {
   }
 
   .qa-title {
-    font-family: var(--np-font-display, 'Instrument Serif', Georgia, serif);
-    font-weight: 400;
+    font-family: var(
+      --np-font-display,
+      'Geist Variable',
+      'Geist',
+      'Archivo Variable',
+      'Archivo',
+      system-ui,
+      sans-serif
+    );
+    font-weight: 600;
     font-size: clamp(1.75rem, 3.5vw, 2.75rem);
     line-height: 1.15;
+    letter-spacing: -0.025em;
     margin: 0 0 0.75rem;
   }
 

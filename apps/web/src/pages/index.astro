@@ -3,76 +3,77 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
 
-const metaTitle = 'Clinical AI Simulation & Supervised Practice'
+const metaTitle =
+  'A closed-loop system for clinical mastery | Pixelated Empathy'
 const metaDescription =
-  'Pixelated Empathy gives therapy trainees a safe place to practice tough client conversations with adaptive AI clients, while supervisors coach directly from exact transcript moments.'
+  'Deterministic adversarial clinical simulation meets real-time multi-judge auditing. Rehearse high-stakes rupture repairs, crisis screenings, and boundary confrontations with adaptive synthetic personas—supervised turn-by-turn with instant retry loops.'
 
 const trainingLoop = [
   {
     num: '01',
-    title: 'Realistic AI Sessions',
+    title: 'Deterministic Adversarial Personas',
     description:
-      'Trainees talk with responsive AI clients that hesitate, push back, and test boundaries just like real people in session.',
+      'Trainees engage with synthetic clients calibrated across 120 clinical edge-case matrices that push back, test boundaries, and refuse shallow rapport.',
   },
   {
     num: '02',
-    title: 'Direct Supervisor Notes',
+    title: 'Multi-Judge Real-Time Auditing',
     description:
-      'Supervisors highlight the exact turn where things stalled or clicked, leaving straightforward feedback instead of relying on memory.',
+      'Quadit multi-judge evaluation and clinical supervisors flag formulaic parroting, therapy-speak macros, and avoidance on the exact turn.',
   },
   {
     num: '03',
-    title: 'Instant Retries',
+    title: 'Turn-Level Supervised Retries',
     description:
-      'Trainees jump right back into the moment to try another approach and build real muscle memory before seeing real clients.',
+      'Trainees execute instant directed retries at the exact point of rupture, building authentic conversational risk tolerance before real patient contact.',
   },
 ]
 
 const clinicalScenarios = [
   {
     badge: 'Crisis & Safety',
-    title: 'Suicide Screening & Safety Planning',
+    title: 'Suicidality Screening & Safety Planning',
     description:
-      'Catch subtle warning signs, ask direct questions without freezing up, and build realistic safety plans together.',
+      'Assess lethality signals, ask direct questions without hesitation or panic, and build collaborative safety plans under acute distress.',
   },
   {
-    badge: 'Tough Moments',
-    title: 'Handling Pushback & Broken Trust',
+    badge: 'Alliance Rupture',
+    title: 'Confronting Pushback & Stalled Progress',
     description:
-      'Spot when a client checks out or gets frustrated, stay calm, and work through tension without getting defensive.',
+      'Detect implicit dropout signals, drop defensive conversational scaffolding, and address the therapeutic impasse directly without deflection.',
   },
   {
     badge: 'Trauma & Pacing',
-    title: 'Pacing Heavy Disclosures',
+    title: 'Titrating Heavy Disclosures & Flooding',
     description:
-      'Help clients ground themselves during intense moments, pace painful memories, and avoid jumping into fix-it mode too soon.',
+      'Ground clients during acute affective dysregulation, pace traumatic material safely, and avoid premature solutioning or cognitive fixes.',
   },
   {
-    badge: 'Cultural Humility',
-    title: 'Working Through Identity Differences',
+    badge: 'Boundary Integrity',
+    title: 'Managing Frame Erosion & Transference',
     description:
-      'Address cultural misunderstandings openly, stay grounded, and talk through differences without making assumptions.',
+      'Hold clinical boundaries firmly under emotional pressure, address relational testing, and maintain frame integrity without coldness.',
   },
 ]
 
 const clinicalTriad = [
   {
     role: 'For Trainees',
-    title: 'Zero-Risk Practice for Tough Situations',
+    title: 'Active Stance & Zero-Risk Clinical Mastery',
     description:
-      'Get comfortable handling tense conversational turns before facing real clients. Try different approaches without worrying about making mistakes.',
+      'Break out of canned empathy macros and passive head-nodding. Build real muscle memory through repeated exposure to uncooperative clinical moments.',
   },
   {
     role: 'For Supervisors',
-    title: 'Feedback Grounded in What Actually Happened',
+    title: 'Turn-by-Turn Telemetry & Exact Auditing',
     description:
-      'Read the full transcript instead of guessing from trainee recall. Spot communication habits and teachable moments right away.',
+      'Review deterministic transcripts and automated multi-judge evaluations instead of relying on distorted student self-reports.',
   },
   {
     role: 'For Program Directors',
-    title: 'Consistent Practice Across Every Cohort',
+    title: 'Standardized Accreditation & Cohort Benchmarking',
     description:
-      'Make sure every student handles the same core clinical scenarios, with clean audit logs ready for accreditation reviews.',
+      'Deliver calibrated clinical edge cases to every cohort member with auditable competency metrics mapped to CACREP, APA, and CSWE standards.',
   },
 ]
 ---
@@ -88,27 +89,28 @@ const clinicalTriad = [
         <div class="np-hero-grid">
           <!-- Main Hero Column -->
           <div class="np-hero-main">
-            <span class="np-eyebrow">Clinical AI Simulation & Practice</span>
+            <span class="np-eyebrow">Closed-Loop Clinical AI & Telemetry</span>
             <h1 class="np-display-hero">
-              Rehearse high-stakes therapy conversations before real clients.
+              A closed-loop system for clinical mastery.
             </h1>
             <p class="np-lede">
-              Pixelated Empathy gives trainees a realistic place to practice
-              rupture repairs, crisis screenings, and heavy disclosures with
-              responsive AI clients. Supervisors jump right into the transcript
-              to coach exact moments that matter.
+              Deterministic adversarial simulation meets real-time multi-judge
+              auditing. Trainees rehearse rupture repairs, crisis screenings,
+              and boundary confrontations against adaptive synthetic
+              clients—audited turn-by-turn to eliminate canned empathy and
+              formulaic parroting.
             </p>
             <div class="np-actions-row">
               <a class="np-btn np-btn-primary" href={withBasePath('/contact')}>
-                Request a Program Pilot
+                Request Institutional Pilot
               </a>
               <a class="np-btn np-btn-ghost" href={withBasePath('/features')}>
-                Explore Practice Scenarios
+                Inspect Adversarial Matrix
               </a>
             </div>
             <div class="np-trust-badges">
-              <span class="np-trust-badge">Zero Real Patient Data</span>
-              <span class="np-trust-badge">Private & Encrypted</span>
+              <span class="np-trust-badge">Zero Real Patient PHI</span>
+              <span class="np-trust-badge">Quadit Multi-Judge Guard</span>
               <span class="np-trust-badge">Accreditation Ready</span>
             </div>
           </div>
@@ -117,74 +119,288 @@ const clinicalTriad = [
           <div class="np-hero-proof">
             <aside
               class="np-console"
-              aria-label="Supervised Simulation Transcript"
+              aria-label="Clinical Telemetry & Simulation Console"
             >
+              <!-- Console Top Bar -->
               <div class="np-console-header">
                 <div class="np-console-status">
                   <span class="np-status-dot" aria-hidden="true"></span>
-                  <span>SIMULATION #0412</span>
+                  <span>SIMULATION #0412 · ADVERSARIAL RUPTURE</span>
                 </div>
-                <div class="np-console-scenario">CASE: ALLIANCE RUPTURE</div>
-              </div>
-
-              <div class="np-console-body">
-                <!-- Turn 1: Client -->
-                <div class="np-turn">
-                  <div class="np-turn-meta np-turn-meta--client">
-                    <span>AI Client · Sarah M. (Week 3)</span>
-                    <span>14:08</span>
-                  </div>
-                  <div class="np-turn-content np-turn-content--client">
-                    "I've been thinking about whether this is really working for
-                    me. I just don't feel like I'm getting anywhere, and maybe I
-                    shouldn't have started."
-                  </div>
-                </div>
-
-                <!-- Turn 2: Trainee Attempt 1 -->
-                <div class="np-turn">
-                  <div class="np-turn-meta np-turn-meta--trainee">
-                    <span>Trainee · Attempt 1</span>
-                    <span>14:15</span>
-                  </div>
-                  <div class="np-turn-content np-turn-content--attempt-1">
-                    "It sounds like you're not sure this is the right place.
-                    What feels off to you?"
-                  </div>
-                </div>
-
-                <!-- Supervisor Margin Note -->
-                <div class="np-supervisor-note">
-                  <div class="np-supervisor-meta">
-                    <span>Supervisor Annotation · Dr. E. Vance</span>
-                  </div>
-                  <div class="np-supervisor-text">
-                    "You dodged with a stock question. Don't get defensive or
-                    overly clinical—just own that we're stuck and reset
-                    together."
-                  </div>
-                </div>
-
-                <!-- Turn 3: Trainee Attempt 2 (Repaired) -->
-                <div class="np-turn">
-                  <div class="np-turn-meta np-turn-meta--trainee">
-                    <span>Trainee · Attempt 2 (Repaired)</span>
-                    <span>14:32</span>
-                  </div>
-                  <div class="np-turn-content np-turn-content--attempt-2">
-                    "Fair enough. If we're three weeks in and spinning our
-                    wheels, doing more of the same won't help. What needs to
-                    change?"
-                  </div>
+                <div class="np-console-scenario">
+                  DPO PAIR #889 · LATENCY: 312ms
                 </div>
               </div>
 
+              <!-- Console Mode Tabs -->
+              <div
+                class="np-console-tabs"
+                role="tablist"
+                aria-label="Console Views"
+              >
+                <button
+                  type="button"
+                  class="np-console-tab is-active"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="panel-transcript"
+                  id="tab-transcript"
+                  data-tab="transcript"
+                >
+                  [ 01 // Transcript & DPO ]
+                </button>
+                <button
+                  type="button"
+                  class="np-console-tab"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-quadit"
+                  id="tab-quadit"
+                  data-tab="quadit"
+                >
+                  [ 02 // Quadit Audit ]
+                </button>
+                <button
+                  type="button"
+                  class="np-console-tab"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-telemetry"
+                  id="tab-telemetry"
+                  data-tab="telemetry"
+                >
+                  [ 03 // Latent Metrics ]
+                </button>
+              </div>
+
+              <!-- Tab 1: Transcript & DPO Pair -->
+              <div
+                id="panel-transcript"
+                class="np-tab-panel is-active"
+                role="tabpanel"
+                aria-labelledby="tab-transcript"
+              >
+                <div class="np-console-body">
+                  <!-- Turn 1: Synthetic Client -->
+                  <div class="np-turn">
+                    <div class="np-turn-meta np-turn-meta--client">
+                      <span>Synthetic Client · Sarah M. (Week 3)</span>
+                      <span>14:08</span>
+                    </div>
+                    <div class="np-turn-content np-turn-content--client">
+                      "I've been thinking about whether this is really working
+                      for me. I just don't feel like I'm getting anywhere, and
+                      maybe I shouldn't have started."
+                    </div>
+                    <div class="np-turn-telemetry">
+                      <span>Affect: Guarded / Withdrawn</span>
+                      <span>•</span>
+                      <span>Rupture Severity: 0.82 (High)</span>
+                      <span>•</span>
+                      <span>Dropout Risk: Imminent</span>
+                    </div>
+                  </div>
+
+                  <!-- Turn 2a: Trainee Attempt 1 (Rejected) -->
+                  <div class="np-turn">
+                    <div class="np-turn-meta np-turn-meta--trainee">
+                      <span>Trainee · Attempt 1 (Rejected)</span>
+                      <span class="np-gate-badge np-gate-badge--fail">
+                        Gate Rejected: Parroting Macro
+                      </span>
+                    </div>
+                    <div class="np-turn-content np-turn-content--attempt-1">
+                      "You've been showing up every week putting in real effort,
+                      and not feeling progress must feel deeply discouraging.
+                      Tell me more about what that weight feels like today."
+                    </div>
+                  </div>
+
+                  <!-- Supervisor & Quadit Annotation -->
+                  <div class="np-supervisor-note">
+                    <div class="np-supervisor-meta">
+                      <span>Supervisor & Quadit Audit · Dr. E. Vance</span>
+                    </div>
+                    <div class="np-supervisor-text">
+                      "Textbook advanced parroting. You used synonym swapping
+                      ('not feeling progress' → 'deeply discouraging') and
+                      pivoted into a canned somatic trope ('that weight') to
+                      dodge the deadlock. Stop deflecting with therapy-speak.
+                      Own the stall directly and reset goals together."
+                    </div>
+                  </div>
+
+                  <!-- Turn 2b: Trainee Attempt 2 (Chosen) -->
+                  <div class="np-turn">
+                    <div class="np-turn-meta np-turn-meta--trainee">
+                      <span>Trainee · Attempt 2 (Chosen)</span>
+                      <span class="np-gate-badge np-gate-badge--pass">
+                        Quadit Passed: Attunement 0.94
+                      </span>
+                    </div>
+                    <div class="np-turn-content np-turn-content--attempt-2">
+                      "Fair enough. If we're three weeks in and spinning our
+                      wheels, doing more of the same won't help. Let's look at
+                      what isn't working and change direction right now."
+                    </div>
+                  </div>
+
+                  <!-- Turn 3: Client Response -->
+                  <div class="np-turn">
+                    <div class="np-turn-meta np-turn-meta--client">
+                      <span>Synthetic Client · Convergence Turn</span>
+                      <span>14:33</span>
+                    </div>
+                    <div class="np-turn-content np-turn-content--client">
+                      "Honestly? That's the first time you didn't just nod and
+                      tell me it takes time. I feel like we spend twenty minutes
+                      circling around my childhood when I can't even get out of
+                      bed on Tuesdays."
+                    </div>
+                    <div class="np-turn-telemetry">
+                      <span>Alliance Status: Repaired (+0.42 delta)</span>
+                      <span>•</span>
+                      <span>Resistance: 0.11</span>
+                      <span>•</span>
+                      <span>Focus: Pragmatic Behavioral Reset</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 2: Quadit Multi-Judge Audit Breakdown -->
+              <div
+                id="panel-quadit"
+                class="np-tab-panel"
+                role="tabpanel"
+                aria-labelledby="tab-quadit"
+              >
+                <div class="np-console-body">
+                  <div class="np-quad-container">
+                    <div class="np-quad-summary">
+                      <span>Quadit Adversarial Engine · 4/4 Gates Cleared</span>
+                      <span>Overall: 0.94 PASS</span>
+                    </div>
+                    <div class="np-quad-grid">
+                      <!-- Judge 1 -->
+                      <div class="np-quad-card">
+                        <div class="np-quad-card-head">
+                          <span class="np-quad-judge-name">
+                            01. Clinical Attunement
+                          </span>
+                          <span class="np-quad-score">0.94 / 1.00</span>
+                        </div>
+                        <div class="np-quad-card-body">
+                          Direct alliance engagement without defensive
+                          scaffolding. Acknowledged stall without pathologizing
+                          client frustration.
+                        </div>
+                      </div>
+
+                      <!-- Judge 2 -->
+                      <div class="np-quad-card">
+                        <div class="np-quad-card-head">
+                          <span class="np-quad-judge-name">
+                            02. Cliché & Parroting Gate
+                          </span>
+                          <span class="np-quad-score">0.00% Trope</span>
+                        </div>
+                        <div class="np-quad-card-body">
+                          Zero matches across 412 banned empathy macros. Zero
+                          unsolicited somatic projections ("that weight").
+                        </div>
+                      </div>
+
+                      <!-- Judge 3 -->
+                      <div class="np-quad-card">
+                        <div class="np-quad-card-head">
+                          <span class="np-quad-judge-name">
+                            03. Boundary & Scope Guard
+                          </span>
+                          <span class="np-quad-score">1.00 / 1.00</span>
+                        </div>
+                        <div class="np-quad-card-body">
+                          Strict in-scope process exploration. Refused
+                          ungrounded diagnostic labeling and premature
+                          solutioning.
+                        </div>
+                      </div>
+
+                      <!-- Judge 4 -->
+                      <div class="np-quad-card">
+                        <div class="np-quad-card-head">
+                          <span class="np-quad-judge-name">
+                            04. Vulnerability & Friction
+                          </span>
+                          <span class="np-quad-score">0.91 / 1.00</span>
+                        </div>
+                        <div class="np-quad-card-body">
+                          High dialectical friction tolerance. Trainee assumed
+                          active conversational risk rather than seeking
+                          reassurance.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 3: Latent Clinical Telemetry -->
+              <div
+                id="panel-telemetry"
+                class="np-tab-panel"
+                role="tabpanel"
+                aria-labelledby="tab-telemetry"
+              >
+                <div class="np-console-body">
+                  <div class="np-telemetry-panel">
+                    <div class="np-telemetry-grid">
+                      <div class="np-telemetry-metric">
+                        <span class="np-telemetry-label">Rupture Index</span>
+                        <span class="np-telemetry-val">0.12</span>
+                        <span class="np-telemetry-sub">-72% Resolved</span>
+                      </div>
+                      <div class="np-telemetry-metric">
+                        <span class="np-telemetry-label">Risk Stance</span>
+                        <span class="np-telemetry-val">96th %</span>
+                        <span class="np-telemetry-sub">Active Ownership</span>
+                      </div>
+                      <div class="np-telemetry-metric">
+                        <span class="np-telemetry-label">Cliché Density</span>
+                        <span class="np-telemetry-val">0.0%</span>
+                        <span class="np-telemetry-sub">Zero Parroting</span>
+                      </div>
+                      <div class="np-telemetry-metric">
+                        <span class="np-telemetry-label">
+                          Grounding Latency
+                        </span>
+                        <span class="np-telemetry-val">1.2 turns</span>
+                        <span class="np-telemetry-sub">Target: &lt; 2.0</span>
+                      </div>
+                    </div>
+
+                    <div class="np-provenance-box">
+                      <strong>PROVENANCE RECORD // GOLD DPO MATRIX</strong>
+                      <br />
+                      Dataset Target: SFT/DPO Matrix (Combo 04: Alliance Rupture
+                      × High Difficulty × Implicit Ambiguity)
+                      <br />
+                      Backend: Ollama / vLLM local engine · Dual-judge LangSmith
+                      trace ID: #889-412
+                      <br />
+                      Accreditation Hash: sha256:4f8e...ce19 (Zero PHI Verified)
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Console Footer -->
               <div class="np-console-footer">
                 <div class="np-metric-item">
                   <span>✓</span>
-                  <span>Alliance Attunement: 91% (+34%)</span>
+                  <span>Alliance Attunement: 94% (+42% delta)</span>
                 </div>
-                <div>Transcript Saved to Practicum Record</div>
+                <div>Exported to Institutional Gold DPO Corpus</div>
               </div>
             </aside>
           </div>
@@ -195,13 +411,14 @@ const clinicalTriad = [
     <!-- Training Loop Section -->
     <section class="np-section np-section--surface" aria-label="How It Works">
       <div class="np-container">
-        <span class="np-eyebrow">How It Works</span>
+        <span class="np-eyebrow">Closed-Loop Architecture</span>
         <h2 class="np-section-heading">
-          How trainees actually build real confidence.
+          How trainees build genuine clinical muscle memory.
         </h2>
         <p class="np-lede">
-          Skip the vague post-session check-ins. Practice real conversations,
-          see where things went off track, and try again on the spot.
+          Eliminate vague post-session debriefs. Standardize practice against
+          calibrated adversarial client personas, catch avoidance habits on the
+          spot, and execute immediate supervised retries.
         </p>
 
         <div class="np-loop-grid">
@@ -222,13 +439,13 @@ const clinicalTriad = [
     <!-- Scenario Library Section -->
     <section class="np-section" aria-label="Clinical Scenario Curriculum">
       <div class="np-container">
-        <span class="np-eyebrow">Practice Scenarios</span>
+        <span class="np-eyebrow">Adversarial Curriculum</span>
         <h2 class="np-section-heading">
-          The hardest moments in therapy, ready to practice.
+          High-stakes clinical encounters, calibrated for mastery.
         </h2>
         <p class="np-lede">
-          Give every trainee hands-on practice with high-stress situations they
-          might only see once or twice during practicum.
+          Expose every trainee to rare, high-consequence clinical scenarios they
+          might only encounter once or twice during practicum.
         </p>
 
         <div class="np-scenario-grid">
@@ -253,13 +470,13 @@ const clinicalTriad = [
       aria-label="Built for Clinical Teams"
     >
       <div class="np-container">
-        <span class="np-eyebrow">Built for the Whole Team</span>
+        <span class="np-eyebrow">Institutional Value</span>
         <h2 class="np-section-heading">
-          Clear value for trainees, supervisors, and program leads.
+          Built for trainees, clinical supervisors, and program directors.
         </h2>
         <p class="np-lede">
-          Built to fit directly into counseling graduate programs, residency
-          clinics, and weekly supervision.
+          Designed specifically for university counseling departments, clinical
+          psychology doctoral cohorts, and hospital residency programs.
         </p>
 
         <div class="np-triad-grid">
@@ -277,33 +494,37 @@ const clinicalTriad = [
     <!-- Security & Institutional Governance Section -->
     <section class="np-section" aria-label="Security and Privacy Posture">
       <div class="np-container">
-        <span class="np-eyebrow">Privacy & Security</span>
-        <h2 class="np-section-heading">Built for privacy from day one.</h2>
+        <span class="np-eyebrow">Institutional Privacy & Governance</span>
+        <h2 class="np-section-heading">
+          Built for privacy and compliance by doctrine.
+        </h2>
         <p class="np-lede">
-          No real patient information is ever needed. All simulated sessions
-          happen in private, isolated workspaces.
+          Zero real patient records or PHI. All simulation runs and supervisor
+          evaluations execute in isolated, cryptographically partitioned
+          institutional workspaces.
         </p>
 
         <div class="np-security-grid">
           <div class="np-security-item">
-            <h3 class="np-card-title">Zero PHI Risk</h3>
+            <h3 class="np-card-title">Zero PHI Ingestion</h3>
             <p class="np-prose">
-              All conversations run on synthetic AI clients. Real patient
-              records or personal health details never touch our servers.
+              All interactions utilize calibrated synthetic personas. Real
+              client information, medical records, and identifiers never touch
+              our runtime.
             </p>
           </div>
           <div class="np-security-item">
-            <h3 class="np-card-title">Private & Encrypted</h3>
+            <h3 class="np-card-title">Encrypted & Partitioned</h3>
             <p class="np-prose">
-              Transcripts and supervisor feedback stay strictly inside your
-              program's workspace, encrypted at rest and in transit.
+              Transcripts and supervisor evaluations remain strictly within your
+              program's dedicated workspace, encrypted at rest with AES-256-GCM.
             </p>
           </div>
           <div class="np-security-item">
-            <h3 class="np-card-title">Accreditation Ready</h3>
+            <h3 class="np-card-title">Accreditation Mapping</h3>
             <p class="np-prose">
-              Easily track student competency milestones aligned with CACREP,
-              APA, and CSWE training guidelines.
+              Automate clinical competency verification and audit trails mapped
+              directly to CACREP, APA, and CSWE accreditation standards.
             </p>
           </div>
         </div>
@@ -315,16 +536,16 @@ const clinicalTriad = [
               class="np-card-title"
               style="font-size: 1.5rem; margin-bottom: 0.5rem;"
             >
-              Bring realistic simulation to your training program.
+              Deploy closed-loop clinical simulation to your department.
             </h3>
             <p class="np-prose" style="margin-bottom: 0;">
-              Partner with Pixelated Empathy to pilot standardized simulation
-              cohorts for your upcoming semester.
+              Partner with Pixelated Empathy to pilot standardized adversarial
+              training cohorts for your upcoming practicum semester.
             </p>
           </div>
           <div>
             <a class="np-btn np-btn-primary" href={withBasePath('/contact')}>
-              Request a Program Pilot
+              Request Institutional Pilot
             </a>
           </div>
         </div>
@@ -332,3 +553,33 @@ const clinicalTriad = [
     </section>
   </div>
 </BaseLayout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('.np-console-tab')
+    const panels = document.querySelectorAll('.np-tab-panel')
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.getAttribute('data-tab')
+        if (!targetTab) return
+
+        tabs.forEach((t) => {
+          t.classList.remove('is-active')
+          t.setAttribute('aria-selected', 'false')
+        })
+        panels.forEach((p) => {
+          p.classList.remove('is-active')
+        })
+
+        tab.classList.add('is-active')
+        tab.setAttribute('aria-selected', 'true')
+
+        const targetPanel = document.getElementById(`panel-${targetTab}`)
+        if (targetPanel) {
+          targetPanel.classList.add('is-active')
+        }
+      })
+    })
+  })
+</script>
