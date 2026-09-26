@@ -388,13 +388,13 @@ export function CognitiveModelSelector({
   }
 
   if (error) {
-    return <div className="text-red-500 p-4">{error}</div>
+    return <div className="p-4 text-foreground">{error}</div>
   }
 
   return (
     <div
       className={cn(
-        'patient-model-selector bg-gray-50 border rounded-lg p-4',
+        'patient-model-selector bg-secondary border border-border rounded-none p-4',
         className,
       )}
     >
@@ -408,19 +408,19 @@ export function CognitiveModelSelector({
               <button
                 key={model.id}
                 className={cn(
-                  'w-full text-left p-3 rounded-md border transition-colors',
+                  'w-full text-left p-3 rounded-none border transition-colors',
                   selectedModelId === model.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:bg-gray-100',
+                    ? 'border-ring bg-accent'
+                    : 'border-border hover:bg-accent',
                 )}
                 onClick={() => handleModelSelect(model.id)}
               >
                 <div className="font-medium">{model.name}</div>
-                <div className="text-gray-500 text-sm">
+                <div className="text-sm text-muted-foreground">
                   {model.presentingIssues.join(', ')}
                 </div>
                 {model.diagnosisSummary && (
-                  <div className="text-gray-500 mt-1 text-xs">
+                  <div className="mt-1 text-xs text-muted-foreground">
                     {model.diagnosisSummary}
                   </div>
                 )}
@@ -433,34 +433,38 @@ export function CognitiveModelSelector({
           {currentModelDetails && (
             <div>
               <h4 className="mb-2 text-sm font-medium">Patient Details</h4>
-              <div className="bg-white border-gray-200 rounded-md border p-3">
+              <div className="rounded-none border border-border bg-card p-3">
                 <div className="mb-3 grid grid-cols-2 gap-2">
                   <div>
-                    <div className="text-gray-500 text-xs">Name</div>
+                    <div className="text-xs text-muted-foreground">Name</div>
                     <div>{currentModelDetails.name}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 text-xs">Age</div>
+                    <div className="text-xs text-muted-foreground">Age</div>
                     <div>{currentModelDetails.demographicInfo?.age}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 text-xs">Gender</div>
+                    <div className="text-xs text-muted-foreground">Gender</div>
                     <div>{currentModelDetails.demographicInfo?.gender}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 text-xs">Occupation</div>
+                    <div className="text-xs text-muted-foreground">
+                      Occupation
+                    </div>
                     <div>{currentModelDetails.demographicInfo?.occupation}</div>
                   </div>
                 </div>
 
                 <div className="mb-3">
-                  <div className="text-gray-500 text-xs">Presenting Issues</div>
+                  <div className="text-xs text-muted-foreground">
+                    Presenting Issues
+                  </div>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {currentModelDetails.presentingIssues?.map(
                       (issue: string, index: number) => (
                         <span
                           key={`issue-${issue}-${index}`}
-                          className="bg-gray-100 text-gray-800 inline-block rounded px-2 py-1 text-xs"
+                          className="inline-block rounded-none bg-secondary px-2 py-1 text-xs text-foreground"
                         >
                           {issue}
                         </span>
@@ -471,7 +475,9 @@ export function CognitiveModelSelector({
 
                 {currentModelDetails.coreBeliefs?.length > 0 && (
                   <div>
-                    <div className="text-gray-500 text-xs">Core Beliefs</div>
+                    <div className="text-xs text-muted-foreground">
+                      Core Beliefs
+                    </div>
                     <ul className="mt-1 text-sm">
                       {currentModelDetails.coreBeliefs.map(
                         (belief, index: number) => (
@@ -495,11 +501,11 @@ export function CognitiveModelSelector({
             <h4 className="mb-2 text-sm font-medium">
               Response Style Configuration
             </h4>
-            <div className="bg-white border-gray-200 rounded-md border p-3">
+            <div className="rounded-none border border-border bg-card p-3">
               <div className="mb-3">
                 <label
                   htmlFor="openness-slider"
-                  className="text-gray-500 mb-1 block text-xs"
+                  className="mb-1 block text-xs text-muted-foreground"
                 >
                   Openness (1 = Closed, 10 = Very Open)
                 </label>
@@ -516,7 +522,7 @@ export function CognitiveModelSelector({
                   aria-label="Openness level from 1 to 10"
                 />
 
-                <div className="text-gray-500 flex justify-between text-xs">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Closed</span>
                   <span>Value: {styleConfig.openness}</span>
                   <span>Open</span>
@@ -526,7 +532,7 @@ export function CognitiveModelSelector({
               <div className="mb-3">
                 <label
                   htmlFor="coherence-slider"
-                  className="text-gray-500 mb-1 block text-xs"
+                  className="mb-1 block text-xs text-muted-foreground"
                 >
                   Coherence (1 = Disorganized, 10 = Very Organized)
                 </label>
@@ -543,7 +549,7 @@ export function CognitiveModelSelector({
                   aria-label="Coherence level from 1 to 10"
                 />
 
-                <div className="text-gray-500 flex justify-between text-xs">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Disorganized</span>
                   <span>Value: {styleConfig.coherence}</span>
                   <span>Organized</span>
@@ -553,7 +559,7 @@ export function CognitiveModelSelector({
               <div className="mb-3">
                 <label
                   htmlFor="defense-slider"
-                  className="text-gray-500 mb-1 block text-xs"
+                  className="mb-1 block text-xs text-muted-foreground"
                 >
                   Defense Level (1 = Low Defenses, 10 = High Defenses)
                 </label>
@@ -570,7 +576,7 @@ export function CognitiveModelSelector({
                   aria-label="Defense level from 1 to 10"
                 />
 
-                <div className="text-gray-500 flex justify-between text-xs">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Low</span>
                   <span>Value: {styleConfig.defenseLevel}</span>
                   <span>High</span>
@@ -580,7 +586,7 @@ export function CognitiveModelSelector({
               <div className="mb-3">
                 <label
                   htmlFor="disclosure-style"
-                  className="text-gray-500 mb-1 block text-xs"
+                  className="mb-1 block text-xs text-muted-foreground"
                 >
                   Disclosure Style
                 </label>
@@ -591,10 +597,10 @@ export function CognitiveModelSelector({
                     <button
                       key={style}
                       className={cn(
-                        'text-xs py-1 px-2 rounded',
+                        'text-xs py-1 px-2 rounded-none',
                         styleConfig.disclosureStyle === style
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 hover:bg-gray-200',
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-secondary hover:bg-accent',
                       )}
                       onClick={() => handleDisclosureStyleChange(style)}
                     >
@@ -607,7 +613,7 @@ export function CognitiveModelSelector({
               <div>
                 <label
                   htmlFor="challenge-response"
-                  className="text-gray-500 mb-1 block text-xs"
+                  className="mb-1 block text-xs text-muted-foreground"
                 >
                   Response to Challenges
                 </label>
@@ -618,10 +624,10 @@ export function CognitiveModelSelector({
                     <button
                       key={response}
                       className={cn(
-                        'text-xs py-1 px-2 rounded',
+                        'text-xs py-1 px-2 rounded-none',
                         styleConfig.challengeResponses === response
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 hover:bg-gray-200',
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-secondary hover:bg-accent',
                       )}
                       onClick={() => handleChallengeResponseChange(response)}
                     >
