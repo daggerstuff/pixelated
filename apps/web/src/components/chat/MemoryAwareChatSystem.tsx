@@ -170,44 +170,40 @@ export function MemoryAwareChatSystem({
     }
 
     return (
-      <Card className="border-blue-200 dark:border-blue-800">
+      <Card className="border-input">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <Brain className="text-blue-600 h-4 w-4" />
+            <Brain className="h-4 w-4 text-foreground" />
             Memory Statistics
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-3 gap-3 text-sm">
-            <div className="bg-blue-50 dark:bg-blue-950/20 rounded p-2 text-center">
-              <div className="text-blue-700 dark:text-blue-300 font-semibold">
+            <div className="rounded-none bg-secondary p-2 text-center">
+              <div className="font-semibold text-foreground">
                 {memory.stats?.totalMemories ?? 0}
               </div>
-              <div className="text-blue-600 dark:text-blue-400 text-xs">
+              <div className="text-xs text-muted-foreground">
                 Total Memories
               </div>
             </div>
-            <div className="bg-green-50 dark:bg-green-950/20 rounded p-2 text-center">
-              <div className="text-green-700 dark:text-green-300 font-semibold">
+            <div className="rounded-none bg-secondary p-2 text-center">
+              <div className="font-semibold text-foreground">
                 {memory.memories.length}
               </div>
-              <div className="text-green-600 dark:text-green-400 text-xs">
-                This Session
-              </div>
+              <div className="text-xs text-muted-foreground">This Session</div>
             </div>
-            <div className="bg-purple-50 dark:bg-purple-950/20 rounded p-2 text-center">
-              <div className="text-purple-700 dark:text-purple-300 font-semibold">
+            <div className="rounded-none bg-secondary p-2 text-center">
+              <div className="font-semibold text-foreground">
                 {/* Context Used: Not available in MemoryStats, so remove or replace */}
                 N/A
               </div>
-              <div className="text-purple-600 dark:text-purple-400 text-xs">
-                Context Used
-              </div>
+              <div className="text-xs text-muted-foreground">Context Used</div>
             </div>
           </div>
 
           {enableMemory && (
-            <div className="text-gray-600 dark:text-gray-400 flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Brain className="h-3 w-3" />
               AI is using conversation memory for personalized responses
             </div>
@@ -223,17 +219,15 @@ export function MemoryAwareChatSystem({
     }
 
     return (
-      <Card className="border-amber-200 dark:border-amber-800">
+      <Card className="border-ring">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <Lightbulb className="text-amber-600 h-4 w-4" />
+            <Lightbulb className="h-4 w-4 text-foreground" />
             Conversation Insights
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-700 dark:text-gray-300 text-sm">
-            {conversationSummary}
-          </p>
+          <p className="text-sm text-foreground">{conversationSummary}</p>
         </CardContent>
       </Card>
     )
@@ -245,7 +239,7 @@ export function MemoryAwareChatSystem({
     }
 
     return (
-      <Card className="border-gray-200 dark:border-gray-700">
+      <Card className="border-border">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
             <Settings className="h-4 w-4" />
@@ -259,7 +253,7 @@ export function MemoryAwareChatSystem({
                 <Label htmlFor="memory-toggle" className="text-sm font-medium">
                   Enable Memory
                 </Label>
-                <p className="text-gray-600 dark:text-gray-400 text-xs">
+                <p className="text-xs text-muted-foreground">
                   Allow AI to remember and learn from conversations
                 </p>
               </div>
@@ -276,7 +270,7 @@ export function MemoryAwareChatSystem({
               <Label htmlFor="analysis-toggle" className="text-sm font-medium">
                 Enable Analysis
               </Label>
-              <p className="text-gray-600 dark:text-gray-400 text-xs">
+              <p className="text-xs text-muted-foreground">
                 Analyze messages for emotions and topics
               </p>
             </div>
@@ -378,7 +372,7 @@ export function MemoryAwareChatSystem({
               size="sm"
               onClick={handleClear}
               disabled={messages.length === 0}
-              className="text-red-600 hover:text-red-700 flex items-center gap-1"
+              className="flex items-center gap-1 text-foreground hover:text-muted-foreground"
             >
               <Trash2 className="h-3 w-3" />
               Clear
@@ -396,10 +390,10 @@ export function MemoryAwareChatSystem({
     }
 
     return (
-      <div className="text-gray-500 dark:text-gray-400 flex items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
         {messages.filter((m) => m.role === 'assistant').length > 0 && (
           <div className="flex items-center gap-1">
-            <div className="bg-green-500 h-2 w-2 animate-pulse rounded-full" />
+            <div className="h-2 w-2 animate-pulse rounded-none bg-primary" />
             <span>Messages stored in memory</span>
           </div>
         )}
@@ -419,20 +413,16 @@ export function MemoryAwareChatSystem({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-gray-900 dark:text-gray-100 text-xl font-semibold">
-              {title}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              {subtitle}
-            </p>
+            <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
           </div>
           <div className="flex items-center gap-2">
             {user && (
-              <div className="text-gray-500 dark:text-gray-400 text-xs">
+              <div className="text-xs text-muted-foreground">
                 User: {user.fullName ?? user.email}
               </div>
             )}
-            <Brain className="text-blue-600 h-5 w-5" />
+            <Brain className="h-5 w-5 text-foreground" />
           </div>
         </div>
 
@@ -442,12 +432,12 @@ export function MemoryAwareChatSystem({
 
       {/* Error Display */}
       {memory.error && (
-        <div className="bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800 rounded-lg border p-3">
-          <div className="text-red-700 dark:text-red-300 flex items-center gap-2">
+        <div className="rounded-none border border-ring bg-secondary p-3">
+          <div className="flex items-center gap-2 text-foreground">
             <Info className="h-4 w-4" />
             <span className="text-sm font-medium">Error</span>
           </div>
-          <p className="text-red-600 dark:text-red-400 mt-1 text-sm">
+          <p className="mt-1 text-sm font-semibold text-foreground">
             {memory.error}
           </p>
         </div>
@@ -476,14 +466,14 @@ export function MemoryAwareChatSystem({
           {renderSettings()}
 
           {/* Info Panel */}
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-border">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-sm font-medium">
                 <Info className="h-4 w-4" />
                 How Memory Works
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-gray-600 dark:text-gray-400 space-y-2 text-xs">
+            <CardContent className="space-y-2 text-xs text-muted-foreground">
               <div className="flex items-start gap-2">
                 <MessageSquare className="mt-1 h-3 w-3 flex-shrink-0" />
                 <span>
