@@ -125,23 +125,23 @@ export default function ChatCompletionExample() {
         {/* Stats */}
         <div className='bg-secondary mb-4 grid grid-cols-2 gap-4 rounded-none p-4 md:grid-cols-4'>
           <div>
-            <div className='text-gray-600 text-sm'>Messages</div>
+            <div className='text-muted-foreground text-sm'>Messages</div>
             <div className='font-semibold'>
               {conversationStats.messageCount}
             </div>
           </div>
           <div>
-            <div className='text-gray-600 text-sm'>Avg Response Time</div>
+            <div className='text-muted-foreground text-sm'>Avg Response Time</div>
             <div className='font-semibold'>
               {Math.round(conversationStats.avgResponseTime)}ms
             </div>
           </div>
           <div>
-            <div className='text-gray-600 text-sm'>Total Tokens</div>
+            <div className='text-muted-foreground text-sm'>Total Tokens</div>
             <div className='font-semibold'>{tokenUsage.totalTokens}</div>
           </div>
           <div>
-            <div className='text-gray-600 text-sm'>Est. Cost</div>
+            <div className='text-muted-foreground text-sm'>Est. Cost</div>
             <div className='font-semibold'>
               ${tokenUsage.estimatedCost.toFixed(4)}
             </div>
@@ -152,11 +152,11 @@ export default function ChatCompletionExample() {
         {isLoading && (
           <div className='mb-4'>
             <div className='mb-2 flex items-center gap-2'>
-              <div className='text-gray-600 text-sm'>
+              <div className='text-muted-foreground text-sm'>
                 {isStreaming ? 'Streaming...' : 'Loading...'}
                 {isTyping && ' (AI is typing)'}
               </div>
-              <div className='text-blue-600 text-sm'>
+              <div className='text-foreground font-semibold text-sm'>
                 {progress.toFixed(1)}%
               </div>
             </div>
@@ -173,7 +173,7 @@ export default function ChatCompletionExample() {
         {error && (
           <div className='bg-secondary border-ring mb-4 rounded-none border p-4'>
             <div className='text-foreground font-medium'>Error:</div>
-            <div className='text-red-600'>{error}</div>
+            <div className='text-foreground font-semibold'>{error}</div>
           </div>
         )}
       </div>
