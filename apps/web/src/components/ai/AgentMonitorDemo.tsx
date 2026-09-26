@@ -259,7 +259,7 @@ export const AgentMonitorDemo: React.FC = () => {
                 <Button 
                   onClick={addRandomActivity}
                   variant="outline"
-                  className="w-full flex items-center justify-center gap-2 border-white/10 text-white/70 hover:bg-white/10 h-11"
+                  className="w-full flex items-center justify-center gap-2 border border-border text-foreground hover:bg-accent h-11"
                 >
                   <Plus className="w-4 h-4" />
                   Inject Step
@@ -282,7 +282,7 @@ export const AgentMonitorDemo: React.FC = () => {
                     {isStreaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </Button>
                 </div>
-                <p className="text-[10px] text-white/30 italic text-center">
+                <p className="text-[10px] text-muted-foreground italic text-center">
                   This will call the actual FastAPI endpoint `/infer-stream`
                 </p>
               </div>
@@ -291,7 +291,7 @@ export const AgentMonitorDemo: React.FC = () => {
             <Button 
               onClick={clearLog}
               variant="outline"
-              className="w-full flex items-center justify-center gap-2 border-white/10 text-white/40 hover:text-white/70 h-11"
+              className="w-full flex items-center justify-center gap-2 border border-border text-muted-foreground hover:text-foreground h-11"
             >
               <Trash2 className="w-4 h-4" />
               Clear Feed
@@ -314,15 +314,15 @@ export const AgentMonitorDemo: React.FC = () => {
               {SAMPLE_AGENTS.map(agent => (
                 <div key={agent.name} className="flex items-center justify-between p-3 rounded-none bg-secondary border border-border">
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-white/90">{agent.name}</span>
-                    <span className="text-[10px] text-white/40 uppercase">{agent.role}</span>
+                    <span className="text-sm font-bold text-foreground">{agent.name}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase">{agent.role}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className={cn(
                       "h-1.5 w-1.5 rounded-none",
                       mode === 'backend' ? "bg-primary" : "bg-muted-foreground"
                     )}></span>
-                    <span className="text-[10px] font-medium text-white/60">Ready</span>
+                    <span className="text-[10px] font-medium text-muted-foreground">Ready</span>
                   </div>
                 </div>
               ))}
@@ -335,7 +335,7 @@ export const AgentMonitorDemo: React.FC = () => {
             <Zap className="w-3 h-3" />
             System Protocol
           </h3>
-          <p className="text-xs text-white/60 leading-relaxed">
+          <p className="text-xs text-muted-foreground leading-relaxed">
             {mode === 'simulation' 
               ? "Currently in Simulation Mode. This uses generated events to test the UI layout and responsiveness."
               : "Currently in Live Mode. This establishes a real Server-Sent Events (SSE) connection to the Python inference engine."
