@@ -19,10 +19,10 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
 
   const trendColor =
     defense.trend === 'increasing'
-      ? 'text-[#ff8533]'
+      ? 'text-foreground'
       : defense.trend === 'decreasing'
-        ? 'text-[#8fb8a2]'
-        : 'text-[#b0b0b0]'
+        ? 'text-foreground'
+        : 'text-muted-foreground'
 
   const trendSymbol =
     defense.trend === 'increasing'
@@ -32,16 +32,16 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
         : '→'
 
   return (
-    <div className="border-white/10 border bg-[#121212] p-4">
+    <div className="border border-border bg-card p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3">
-        <h4 className="text-sm font-medium capitalize text-[#f6f1e8]">
+        <h4 className="text-sm font-medium capitalize text-foreground">
           {defense.name.replace('-', ' ')}
         </h4>
         <div className="flex items-center gap-2">
           <span className={`font-mono text-xs ${trendColor}`}>
             {trendSymbol} {defense.trend}
           </span>
-          <span className="font-mono text-xs text-[#b0b0b0]">
+          <span className="font-mono text-xs text-muted-foreground">
             Adaptation: {defense.adaptationScore.toFixed(1)}/10
           </span>
         </div>
@@ -50,14 +50,16 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
       <div className="space-y-2">
         <div>
           <div className="mb-1 flex items-baseline justify-between">
-            <span className="font-mono text-xs text-[#b0b0b0]">Baseline</span>
-            <span className="font-mono text-xs text-[#b0b0b0]">
+            <span className="font-mono text-xs text-muted-foreground">
+              Baseline
+            </span>
+            <span className="font-mono text-xs text-muted-foreground">
               {defense.baselineIntensity.toFixed(1)}/5
             </span>
           </div>
-          <div className="bg-white/10 h-2 w-full">
+          <div className="h-2 w-full bg-secondary">
             <div
-              className="h-full bg-[#b0b0b0]"
+              className="h-full bg-muted-foreground"
               style={{ width: `${baselinePercentage}%` }}
             />
           </div>
@@ -65,14 +67,16 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
 
         <div>
           <div className="mb-1 flex items-baseline justify-between">
-            <span className="font-mono text-xs text-[#b0b0b0]">Current</span>
-            <span className="font-mono text-xs text-[#f6f1e8]">
+            <span className="font-mono text-xs text-muted-foreground">
+              Current
+            </span>
+            <span className="font-mono text-xs text-foreground">
               {defense.currentIntensity.toFixed(1)}/5
             </span>
           </div>
-          <div className="bg-white/10 h-2 w-full">
+          <div className="h-2 w-full bg-secondary">
             <div
-              className="h-full bg-[#8fb8a2] transition-all duration-300"
+              className="h-full bg-primary transition-all duration-300"
               style={{ width: `${currentPercentage}%` }}
             />
           </div>
@@ -133,8 +137,8 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
   })
 
   return (
-    <div className="border-white/10 border bg-[#121212] p-4">
-      <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
+    <div className="border border-border bg-card p-4">
+      <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-foreground">
         Defense pattern overview
       </h3>
       <svg
@@ -195,7 +199,7 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
             y={label.y}
             textAnchor={label.anchor as 'start' | 'middle' | 'end'}
             dominantBaseline="middle"
-            className="fill-[#b0b0b0] text-[8px]"
+            className="fill-muted-foreground text-[8px]"
           >
             {label.name}
           </text>
@@ -203,12 +207,12 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
       </svg>
       <div className="mt-3 flex justify-center gap-4 text-xs">
         <div className="flex items-center gap-2">
-          <div className="h-3 w-3 bg-[#b0b0b0]" />
-          <span className="text-[#b0b0b0]">Baseline</span>
+          <div className="h-3 w-3 bg-muted-foreground" />
+          <span className="text-muted-foreground">Baseline</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-3 w-3 bg-[#8fb8a2]" />
-          <span className="text-[#b0b0b0]">Current</span>
+          <div className="h-3 w-3 bg-primary" />
+          <span className="text-muted-foreground">Current</span>
         </div>
       </div>
     </div>
@@ -227,11 +231,11 @@ export function DefenseMechanismAdaptation({
       >
         <h2
           id="defense-adaptation-heading"
-          className="text-lg font-semibold text-[#f6f1e8]"
+          className="text-lg font-semibold text-foreground"
         >
           Defense mechanism adaptation
         </h2>
-        <p className="mt-2 text-sm text-[#b0b0b0]">
+        <p className="mt-2 text-sm text-muted-foreground">
           No defense mechanisms tracked yet. Defense patterns are analyzed
           during therapy sessions.
         </p>
@@ -245,16 +249,16 @@ export function DefenseMechanismAdaptation({
   return (
     <section className={className} aria-labelledby="defense-adaptation-heading">
       <div className="mb-4">
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533]">
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-foreground">
           Psychological defenses
         </p>
         <h2
           id="defense-adaptation-heading"
-          className="text-xl font-semibold text-[#f6f1e8]"
+          className="text-xl font-semibold text-foreground"
         >
           Defense mechanism adaptation
         </h2>
-        <p className="mt-1 text-sm text-[#b0b0b0]">
+        <p className="mt-1 text-sm text-muted-foreground">
           {defenses.length} mechanisms tracked · Average adaptation:{' '}
           {averageAdaptation.toFixed(1)}
           /10

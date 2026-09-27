@@ -205,7 +205,7 @@ export function TherapyChatClient() {
       {({ containerRef, messagesEndRef, showScrollButton, scrollToBottom }) => (
         <div className={isExpanded ? 'fixed inset-0 z-50' : ''}>
           {/* Header */}
-          <div className="from-purple-900 via-purple-800 to-purple-900 mb-4 flex items-center justify-between rounded-t-lg bg-gradient-to-r p-3">
+          <div className="mb-4 flex items-center justify-between rounded-t-none border-b border-border bg-secondary p-3">
             <h1 className="text-xl font-bold">
               Pixelated Empathy Therapy Chat
             </h1>
@@ -217,19 +217,19 @@ export function TherapyChatClient() {
               />
 
               {isConnected && (
-                <span className="bg-green-800 text-green-200 rounded px-2 py-1 text-xs">
+                <span className="rounded-none bg-primary px-2 py-1 text-xs text-primary-foreground">
                   Live
                 </span>
               )}
               <button
                 onClick={() => setShowAnalytics(!showAnalytics)}
-                className="bg-purple-700 hover:bg-purple-600 rounded px-2 py-1 text-sm"
+                className="rounded-none bg-primary px-2 py-1 text-sm text-primary-foreground hover:bg-accent"
               >
                 {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
               </button>
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="bg-purple-700 hover:bg-purple-600 rounded px-2 py-1 text-sm"
+                className="rounded-none bg-primary px-2 py-1 text-sm text-primary-foreground hover:bg-accent"
               >
                 {isExpanded ? 'Minimize' : 'Expand'}
               </button>
@@ -247,7 +247,7 @@ export function TherapyChatClient() {
 
           {/* FHE initialization warning */}
           {encryptionEnabled && !fheInitialized && (
-            <div className="bg-yellow-800 border-yellow-700 text-yellow-400 mb-4 rounded border bg-opacity-30 p-2 text-sm">
+            <div className="mb-4 rounded-none border border-ring bg-secondary p-2 text-sm text-foreground">
               Initializing FHE encryption system... This might take a moment.
             </div>
           )}
@@ -269,10 +269,10 @@ export function TherapyChatClient() {
             ref={containerRef}
             className={`overflow-y-auto ${
               isExpanded ? 'h-[calc(100vh-160px)]' : 'h-[55vh]'
-            } border-purple-900 bg-black mb-2 rounded-md border bg-opacity-50 p-2 shadow-sm transition-all duration-200`}
+            } mb-2 rounded-none border border-border bg-card p-2 transition-all duration-200`}
           >
             {messages.length === 0 ? (
-              <div className="text-gray-400 flex h-full flex-col items-center justify-center">
+              <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
                 <p className="mb-2 text-xl font-medium">Begin Your Session</p>
                 <p className="max-w-md text-center">
                   Start therapy training with our AI client simulation.
@@ -309,7 +309,7 @@ export function TherapyChatClient() {
           {showScrollButton && (
             <button
               onClick={scrollToBottom}
-              className="bg-purple-700 text-white hover:bg-purple-600 fixed bottom-20 right-4 rounded-full p-2 shadow-lg transition-colors"
+              className="fixed bottom-20 right-4 rounded-none bg-primary p-2 text-primary-foreground transition-colors hover:bg-accent"
               aria-label="Scroll to bottom"
             >
               ↓
