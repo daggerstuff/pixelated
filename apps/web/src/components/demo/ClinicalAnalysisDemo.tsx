@@ -237,50 +237,50 @@ export default function ClinicalAnalysisDemo() {
   const getRiskBadgeColor = (level: string) => {
     switch (level) {
       case 'low':
-        return 'bg-neutral-100 text-neutral-700 border-neutral-200'
+        return 'bg-secondary text-muted-foreground border-input'
       case 'moderate':
-        return 'bg-neutral-200 text-neutral-800 border-neutral-300'
+        return 'bg-secondary text-foreground border-ring'
       case 'high':
-        return 'bg-neutral-200 text-neutral-800 border-neutral-300'
+        return 'bg-secondary text-foreground border-ring'
       case 'critical':
-        return 'bg-neutral-300 text-neutral-900 border-neutral-400'
+        return 'bg-primary text-primary-foreground border-primary'
       default:
-        return 'bg-neutral-100 text-neutral-700 border-neutral-200'
+        return 'bg-secondary text-muted-foreground border-input'
     }
   }
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
       case 'urgent':
-        return <AlertTriangle className="text-neutral-800 h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4 text-foreground" />
       case 'high':
-        return <AlertCircle className="text-neutral-700 h-4 w-4" />
+        return <AlertCircle className="h-4 w-4 text-foreground" />
       case 'medium':
-        return <Clock className="text-neutral-600 h-4 w-4" />
+        return <Clock className="h-4 w-4 text-muted-foreground" />
       case 'low':
-        return <CheckCircle className="text-neutral-500 h-4 w-4" />
+        return <CheckCircle className="h-4 w-4 text-muted-foreground" />
       default:
-        return <Clock className="text-neutral-500 h-4 w-4" />
+        return <Clock className="h-4 w-4 text-muted-foreground" />
     }
   }
 
   const getIndicatorIcon = (present: boolean, confidence: number) => {
     if (present && confidence > 0.7)
-      return <CheckCircle className="text-neutral-700 h-4 w-4" />
+      return <CheckCircle className="h-4 w-4 text-foreground" />
     if (present && confidence > 0.5)
-      return <AlertCircle className="text-neutral-600 h-4 w-4" />
-    return <XCircle className="text-neutral-400 h-4 w-4" />
+      return <AlertCircle className="h-4 w-4 text-muted-foreground" />
+    return <XCircle className="h-4 w-4 text-muted-foreground" />
   }
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 p-6">
       {/* Header */}
       <div className="space-y-4 text-center">
-        <h1 className="text-gray-900 flex items-center justify-center gap-3 text-3xl font-bold">
-          <Brain className="text-neutral-700 h-8 w-8" />
+        <h1 className="flex items-center justify-center gap-3 text-3xl font-bold text-foreground">
+          <Brain className="h-8 w-8 text-foreground" />
           Clinical Analysis Engine
         </h1>
-        <p className="text-gray-600 mx-auto max-w-2xl">
+        <p className="mx-auto max-w-2xl text-muted-foreground">
           Advanced AI-powered clinical analysis for comprehensive mental health
           assessment. Analyze clinical notes, session transcripts, or patient
           descriptions for evidence-based insights.
@@ -304,7 +304,7 @@ export default function ClinicalAnalysisDemo() {
           />
 
           <div className="flex items-center justify-between">
-            <div className="text-gray-500 text-sm">
+            <div className="text-sm text-muted-foreground">
               {inputText.length} characters • Minimum 50 characters recommended
             </div>
             <Button
@@ -314,7 +314,7 @@ export default function ClinicalAnalysisDemo() {
             >
               {analyzing ? (
                 <>
-                  <div className="border-white border-t-transparent h-4 w-4 animate-spin rounded-full border-2" />
+                  <div className="border-t-transparent h-4 w-4 animate-spin rounded-none border-2 border-ring" />
                   Analyzing...
                 </>
               ) : (
@@ -327,7 +327,7 @@ export default function ClinicalAnalysisDemo() {
           </div>
 
           {error && (
-            <div className="bg-neutral-100 border-neutral-200 text-neutral-800 rounded-lg border p-3 text-sm">
+            <div className="rounded-none border border-ring bg-secondary p-3 text-sm text-foreground">
               {error}
             </div>
           )}
@@ -345,7 +345,7 @@ export default function ClinicalAnalysisDemo() {
                   <TrendingUp className="h-5 w-5" />
                   Analysis Overview
                 </span>
-                <div className="text-gray-600 flex items-center gap-2 text-sm">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="h-4 w-4" />
                   {results.processingTime.toFixed(1)}s processing time
                 </div>
@@ -353,40 +353,46 @@ export default function ClinicalAnalysisDemo() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <div className="text-neutral-800 text-2xl font-bold">
+                <div className="rounded-none bg-secondary p-4 text-center">
+                  <div className="text-2xl font-bold text-foreground">
                     {Math.round(results.confidence * 100)}%
                   </div>
-                  <div className="text-gray-600 text-sm">
+                  <div className="text-sm text-muted-foreground">
                     Overall Confidence
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <div className="rounded-none bg-secondary p-4 text-center">
                   <Badge
                     variant="outline"
                     className={`px-3 py-1 text-lg ${getRiskBadgeColor(results.overallRisk.level)}`}
                   >
                     {results.overallRisk.level.toUpperCase()}
                   </Badge>
-                  <div className="text-gray-600 mt-1 text-sm">Risk Level</div>
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    Risk Level
+                  </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <div className="text-neutral-700 text-2xl font-bold">
+                <div className="rounded-none bg-secondary p-4 text-center">
+                  <div className="text-2xl font-bold text-foreground">
                     {
                       results.mentalHealthIndicators.filter((i) => i.present)
                         .length
                     }
                   </div>
-                  <div className="text-gray-600 text-sm">Indicators Found</div>
+                  <div className="text-sm text-muted-foreground">
+                    Indicators Found
+                  </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <div className="text-neutral-700 text-2xl font-bold">
+                <div className="rounded-none bg-secondary p-4 text-center">
+                  <div className="text-2xl font-bold text-foreground">
                     {results.recommendations.length}
                   </div>
-                  <div className="text-gray-600 text-sm">Recommendations</div>
+                  <div className="text-sm text-muted-foreground">
+                    Recommendations
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -410,7 +416,7 @@ export default function ClinicalAnalysisDemo() {
                 <div className="p-6">
                   <TabsContent value="risk" className="mt-0 space-y-4">
                     <div className="mb-4 flex items-center gap-3">
-                      <Shield className="text-neutral-700 h-6 w-6" />
+                      <Shield className="h-6 w-6 text-foreground" />
                       <h3 className="text-xl font-semibold">Risk Assessment</h3>
                       <Badge
                         variant="outline"
@@ -422,21 +428,21 @@ export default function ClinicalAnalysisDemo() {
 
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                       <div>
-                        <h4 className="text-gray-900 mb-3 font-medium">
+                        <h4 className="mb-3 font-medium text-foreground">
                           Risk Factors Identified
                         </h4>
                         <ul className="space-y-2">
                           {results.overallRisk.factors.map((factor) => (
                             <li key={factor} className="flex items-start gap-2">
-                              <AlertTriangle className="text-neutral-600 mt-0.5 h-4 w-4 flex-shrink-0" />
-                              <span className="text-gray-700">{factor}</span>
+                              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                              <span className="text-foreground">{factor}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
 
                       <div>
-                        <h4 className="text-gray-900 mb-3 font-medium">
+                        <h4 className="mb-3 font-medium text-foreground">
                           Risk Level Score
                         </h4>
                         <div className="space-y-3">
@@ -444,14 +450,14 @@ export default function ClinicalAnalysisDemo() {
                             value={results.overallRisk.score * 100}
                             className="w-full"
                           />
-                          <div className="text-gray-600 text-sm">
+                          <div className="text-sm text-muted-foreground">
                             Score: {results.overallRisk.score.toFixed(2)} / 1.00
                           </div>
                         </div>
 
                         {results.overallRisk.immediateActions && (
                           <div className="mt-4">
-                            <h4 className="text-neutral-800 mb-2 font-medium">
+                            <h4 className="mb-2 font-medium text-foreground">
                               Immediate Actions Required
                             </h4>
                             <ul className="space-y-1">
@@ -459,7 +465,7 @@ export default function ClinicalAnalysisDemo() {
                                 (action) => (
                                   <li
                                     key={action}
-                                    className="text-neutral-700 text-sm"
+                                    className="text-sm text-foreground"
                                   >
                                     • {action}
                                   </li>
@@ -474,7 +480,7 @@ export default function ClinicalAnalysisDemo() {
 
                   <TabsContent value="indicators" className="mt-0 space-y-4">
                     <div className="mb-4 flex items-center gap-3">
-                      <Target className="text-neutral-700 h-6 w-6" />
+                      <Target className="h-6 w-6 text-foreground" />
                       <h3 className="text-xl font-semibold">
                         Mental Health Indicators
                       </h3>
@@ -486,10 +492,10 @@ export default function ClinicalAnalysisDemo() {
                           key={indicator.name}
                           className={`border-l-4 ${
                             indicator.present && indicator.confidence > 0.7
-                              ? 'border-l-neutral-500'
+                              ? 'border-l-ring'
                               : indicator.present
-                                ? 'border-l-neutral-400'
-                                : 'border-l-neutral-300'
+                                ? 'border-l-input'
+                                : 'border-l-border'
                           }`}
                         >
                           <CardContent className="p-4">
@@ -500,11 +506,11 @@ export default function ClinicalAnalysisDemo() {
                                   indicator.confidence,
                                 )}
                                 <div>
-                                  <h4 className="text-gray-900 font-medium">
+                                  <h4 className="font-medium text-foreground">
                                     {indicator.name}
                                   </h4>
                                   {indicator.notes && (
-                                    <p className="text-gray-600 text-sm">
+                                    <p className="text-sm text-muted-foreground">
                                       {indicator.notes}
                                     </p>
                                   )}
@@ -517,7 +523,7 @@ export default function ClinicalAnalysisDemo() {
                                   confidence
                                 </div>
                                 {indicator.severity && (
-                                  <div className="text-gray-600 text-sm">
+                                  <div className="text-sm text-muted-foreground">
                                     Severity: {indicator.severity}/10
                                   </div>
                                 )}
@@ -534,7 +540,7 @@ export default function ClinicalAnalysisDemo() {
                     className="mt-0 space-y-4"
                   >
                     <div className="mb-4 flex items-center gap-3">
-                      <TrendingUp className="text-neutral-700 h-6 w-6" />
+                      <TrendingUp className="h-6 w-6 text-foreground" />
                       <h3 className="text-xl font-semibold">
                         Clinical Recommendations
                       </h3>
@@ -548,7 +554,7 @@ export default function ClinicalAnalysisDemo() {
                               {getPriorityIcon(rec.priority)}
                               <div className="flex-1">
                                 <div className="mb-2 flex items-center gap-2">
-                                  <h4 className="text-gray-900 font-medium">
+                                  <h4 className="font-medium text-foreground">
                                     {rec.description}
                                   </h4>
                                   <Badge variant="outline" className="text-xs">
@@ -557,22 +563,19 @@ export default function ClinicalAnalysisDemo() {
                                   <Badge
                                     variant="outline"
                                     className={`text-xs ${
-                                      rec.priority === 'urgent'
-                                        ? 'border-neutral-400 text-neutral-800'
-                                        : rec.priority === 'high'
-                                          ? 'border-neutral-400 text-neutral-800'
-                                          : rec.priority === 'medium'
-                                            ? 'border-neutral-400 text-neutral-800'
-                                            : 'border-neutral-400 text-neutral-800'
+                                      rec.priority === 'urgent' ||
+                                      rec.priority === 'high'
+                                        ? 'border-ring font-semibold text-foreground'
+                                        : 'border-input text-muted-foreground'
                                     }`}
                                   >
                                     {rec.priority} priority
                                   </Badge>
                                 </div>
-                                <p className="text-gray-600 mb-2 text-sm">
+                                <p className="mb-2 text-sm text-muted-foreground">
                                   {rec.rationale}
                                 </p>
-                                <div className="text-gray-500 text-xs">
+                                <div className="text-xs text-muted-foreground">
                                   Timeline: {rec.timeline}
                                 </div>
                               </div>
@@ -585,7 +588,7 @@ export default function ClinicalAnalysisDemo() {
 
                   <TabsContent value="summary" className="mt-0 space-y-4">
                     <div className="mb-4 flex items-center gap-3">
-                      <FileText className="text-neutral-700 h-6 w-6" />
+                      <FileText className="h-6 w-6 text-foreground" />
                       <h3 className="text-xl font-semibold">
                         Clinical Summary
                       </h3>
@@ -594,28 +597,28 @@ export default function ClinicalAnalysisDemo() {
                     <Card>
                       <CardContent className="p-6">
                         <div className="prose max-w-none">
-                          <p className="text-gray-700 leading-relaxed">
+                          <p className="leading-relaxed text-foreground">
                             {results.clinicalSummary}
                           </p>
                         </div>
 
                         <div className="mt-6 grid grid-cols-1 gap-6 border-t pt-6 md:grid-cols-2">
                           <div>
-                            <h4 className="text-gray-900 mb-2 font-medium">
+                            <h4 className="mb-2 font-medium text-foreground">
                               Follow-up Required
                             </h4>
                             <div className="flex items-center gap-2">
                               {results.followUpRequired ? (
                                 <>
-                                  <CheckCircle className="text-neutral-600 h-4 w-4" />
-                                  <span className="text-neutral-800">
+                                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-foreground">
                                     Yes, follow-up recommended
                                   </span>
                                 </>
                               ) : (
                                 <>
-                                  <XCircle className="text-gray-400 h-4 w-4" />
-                                  <span className="text-gray-600">
+                                  <XCircle className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-muted-foreground">
                                     No immediate follow-up needed
                                   </span>
                                 </>
@@ -624,10 +627,10 @@ export default function ClinicalAnalysisDemo() {
                           </div>
 
                           <div>
-                            <h4 className="text-gray-900 mb-2 font-medium">
+                            <h4 className="mb-2 font-medium text-foreground">
                               Estimated Treatment Duration
                             </h4>
-                            <p className="text-gray-700">
+                            <p className="text-foreground">
                               {results.estimatedDuration}
                             </p>
                           </div>
