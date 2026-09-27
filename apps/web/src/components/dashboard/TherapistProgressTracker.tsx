@@ -66,7 +66,7 @@ export function TherapistProgressTracker({
     >
       {/* Session Overview */}
       <section
-        className="rounded-md bg-muted p-4 focus:outline-none focus:ring-2 focus:ring-primary"
+        className="rounded-none bg-secondary p-4 focus:outline-none focus:ring-2 focus:ring-primary"
         aria-labelledby="overview-heading"
         tabIndex={0}
       >
@@ -106,7 +106,7 @@ export function TherapistProgressTracker({
 
       {/* Overall Progress */}
       <section
-        className="rounded-md bg-muted p-4 focus:outline-none focus:ring-2 focus:ring-primary"
+        className="rounded-none bg-secondary p-4 focus:outline-none focus:ring-2 focus:ring-primary"
         aria-labelledby="progress-heading"
         tabIndex={0}
       >
@@ -134,7 +134,7 @@ export function TherapistProgressTracker({
 
       {/* Skill Development */}
       <section
-        className="rounded-md bg-muted p-4 focus:outline-none focus:ring-2 focus:ring-primary"
+        className="rounded-none bg-secondary p-4 focus:outline-none focus:ring-2 focus:ring-primary"
         aria-labelledby="skills-heading"
         tabIndex={0}
       >
@@ -165,7 +165,7 @@ export function TherapistProgressTracker({
             )}
 
             {skillsError && (
-              <div className="text-red-600 text-sm">
+              <div className="text-sm font-semibold text-foreground">
                 Failed to load skills: {skillsError.message}
               </div>
             )}
@@ -202,9 +202,10 @@ export function TherapistProgressTracker({
                           <span
                             className={cn(
                               'text-xs',
-                              skill.trend === 'up' && 'text-green-600',
-                              skill.trend === 'down' && 'text-red-600',
-                              skill.trend === 'stable' && 'text-gray-600',
+                              skill.trend === 'up' && 'text-foreground',
+                              skill.trend === 'down' && 'text-muted-foreground',
+                              skill.trend === 'stable' &&
+                                'text-muted-foreground',
                             )}
                             aria-label={`Trend: ${skill.trend === 'up' ? 'improving' : skill.trend === 'down' ? 'declining' : 'stable'}`}
                           >
@@ -226,7 +227,7 @@ export function TherapistProgressTracker({
 
       {/* Session Notes */}
       <section
-        className="rounded-md bg-muted p-4 focus:outline-none focus:ring-2 focus:ring-primary"
+        className="rounded-none bg-secondary p-4 focus:outline-none focus:ring-2 focus:ring-primary"
         aria-labelledby="notes-heading"
         tabIndex={0}
       >
@@ -262,5 +263,3 @@ export function TherapistProgressTracker({
     </div>
   )
 }
-
-export default TherapistProgressTracker

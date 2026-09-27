@@ -137,7 +137,7 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
     return (
       <div className={`emotion-dimensional-analysis ${className ?? ''}`}>
         <div className="flex h-64 items-center justify-center">
-          <div className="text-gray-500 text-lg">
+          <div className="text-lg text-muted-foreground">
             Loading emotion analysis...
           </div>
         </div>
@@ -149,7 +149,7 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
     <div
       className={`emotion-dimensional-analysis ${className ?? ''} space-y-6`}
     >
-      <div className="bg-white rounded-lg p-6 shadow">
+      <div className="rounded-none border border-border bg-card p-6">
         <h3 className="mb-4 text-xl font-semibold">Dimensional Controls</h3>
         <div className="space-y-3">
           {Object.entries(selectedDimensions).map(([dimension, isSelected]) => (
@@ -162,11 +162,14 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
                     dimension as keyof typeof selectedDimensions,
                   )
                 }
-                className="form-checkbox text-blue-600 h-4 w-4"
+                className="form-checkbox h-4 w-4 accent-primary"
                 aria-describedby={`desc-${dimension}`}
               />
               <span className="font-medium capitalize">{dimension}</span>
-              <span id={`desc-${dimension}`} className="text-gray-500 text-sm">
+              <span
+                id={`desc-${dimension}`}
+                className="text-sm text-muted-foreground"
+              >
                 {dimension === 'valence' && '(Positive/Negative)'}
                 {dimension === 'arousal' && '(Energized/Calm)'}
                 {dimension === 'dominance' && '(Control/Submissive)'}
@@ -176,10 +179,10 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-6 shadow">
+      <div className="rounded-none border border-border bg-card p-6">
         <h3 className="mb-4 text-xl font-semibold">Emotion Plot</h3>
         <div
-          className="bg-gray-50 relative rounded-lg p-4"
+          className="relative rounded-none bg-secondary p-4"
           style={{ height: '400px' }}
         >
           <svg width="100%" height="100%" viewBox="0 0 400 300">
@@ -269,30 +272,30 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-6 shadow">
+      <div className="rounded-none border border-border bg-card p-6">
         <h3 className="mb-4 text-xl font-semibold">Emotion Timeline</h3>
         <div className="space-y-3">
           {formattedEmotionData.map((point) => (
             <div
               key={point.id}
-              className="bg-gray-50 flex items-center justify-between rounded-lg p-3"
+              className="flex items-center justify-between rounded-none bg-secondary p-3"
             >
               <div className="flex items-center space-x-3">
                 <div
-                  className="h-4 w-4 rounded-full"
+                  className="h-4 w-4 rounded-none"
                   style={{ backgroundColor: getEmotionColor(point.emotion) }}
                 />
                 <span className="font-medium capitalize">{point.emotion}</span>
-                <span className="text-gray-500 text-sm">
+                <span className="text-sm text-muted-foreground">
                   {point.localeString}
                 </span>
               </div>
               <div className="text-right">
-                <div className="text-gray-600 text-sm">
+                <div className="text-sm text-muted-foreground">
                   V: {point.valence.toFixed(2)} | A: {point.arousal.toFixed(2)}{' '}
                   | D: {point.dominance.toFixed(2)}
                 </div>
-                <div className="text-gray-500 text-xs">
+                <div className="text-xs text-muted-foreground">
                   Confidence: {(point.confidence * 100).toFixed(1)}%
                 </div>
               </div>
@@ -301,26 +304,28 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-6 shadow">
+      <div className="rounded-none border border-border bg-card p-6">
         <h3 className="mb-4 text-xl font-semibold">Statistics</h3>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="bg-blue-50 rounded-lg p-4 text-center">
-            <div className="text-blue-600 text-2xl font-bold">
+          <div className="rounded-none bg-secondary p-4 text-center">
+            <div className="text-2xl font-bold text-foreground">
               {averages.valence.toFixed(2)}
             </div>
-            <div className="text-gray-600 text-sm">Average Valence</div>
+            <div className="text-sm text-muted-foreground">Average Valence</div>
           </div>
-          <div className="bg-green-50 rounded-lg p-4 text-center">
-            <div className="text-green-600 text-2xl font-bold">
+          <div className="rounded-none bg-secondary p-4 text-center">
+            <div className="text-2xl font-bold text-foreground">
               {averages.arousal.toFixed(2)}
             </div>
-            <div className="text-gray-600 text-sm">Average Arousal</div>
+            <div className="text-sm text-muted-foreground">Average Arousal</div>
           </div>
-          <div className="bg-purple-50 rounded-lg p-4 text-center">
-            <div className="text-purple-600 text-2xl font-bold">
+          <div className="rounded-none bg-secondary p-4 text-center">
+            <div className="text-2xl font-bold text-foreground">
               {averages.dominance.toFixed(2)}
             </div>
-            <div className="text-gray-600 text-sm">Average Dominance</div>
+            <div className="text-sm text-muted-foreground">
+              Average Dominance
+            </div>
           </div>
         </div>
       </div>

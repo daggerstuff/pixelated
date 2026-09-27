@@ -12,7 +12,7 @@ export function SessionMetrics({ metrics }: SessionMetricsProps) {
       {metrics.map((m, i) => (
         <div
           key={i}
-          className="flex flex-col items-center rounded-md bg-muted p-2"
+          className="flex flex-col items-center rounded-none bg-secondary p-2"
           role="listitem"
         >
           <span className="text-xs text-muted-foreground">{m.label}</span>
@@ -22,5 +22,3 @@ export function SessionMetrics({ metrics }: SessionMetricsProps) {
     </div>
   )
 }
-
-export default SessionMetrics

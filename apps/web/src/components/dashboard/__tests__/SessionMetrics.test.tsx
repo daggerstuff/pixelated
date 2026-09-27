@@ -78,8 +78,8 @@ describe('SessionMetrics', () => {
       const parent = item.closest('div')
       if (parent) {
         expect(parent).toHaveClass(
-          'bg-muted',
-          'rounded-md',
+          'bg-secondary',
+          'rounded-none',
           'p-2',
           'flex',
           'flex-col',

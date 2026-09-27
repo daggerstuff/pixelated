@@ -14,11 +14,11 @@ import type {
 // Loading skeleton component
 const LoadingSkeleton: FC = () => (
   <div className="animate-pulse" role="status">
-    <div className="bg-gray-200 mb-4 h-4 w-3/4 rounded"></div>
+    <div className="mb-4 h-4 w-3/4 rounded-none bg-secondary"></div>
     <div className="space-y-2">
-      <div className="bg-gray-200 h-3 rounded"></div>
-      <div className="bg-gray-200 h-3 w-5/6 rounded"></div>
-      <div className="bg-gray-200 h-3 w-4/6 rounded"></div>
+      <div className="h-3 rounded-none bg-secondary"></div>
+      <div className="h-3 w-5/6 rounded-none bg-secondary"></div>
+      <div className="h-3 w-4/6 rounded-none bg-secondary"></div>
     </div>
     <span className="sr-only">Loading data...</span>
   </div>
@@ -31,13 +31,16 @@ interface ErrorDisplayProps {
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
-  <div className="bg-red-50 border-red-200 rounded-lg border p-4" role="alert">
+  <div
+    className="rounded-none border border-ring bg-secondary p-4"
+    role="alert"
+  >
     <div className="flex items-center justify-between">
       <div>
-        <h4 className="text-red-800 font-medium">
+        <h4 className="font-medium text-foreground">
           Unable to load analytics data
         </h4>
-        <p className="text-red-600 mt-1 text-sm">
+        <p className="mt-1 text-sm text-foreground">
           {error instanceof Error
             ? error.message
             : typeof error === 'object' && error !== null && 'message' in error
@@ -49,7 +52,7 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
       </div>
       <button
         onClick={onRetry}
-        className="bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+        className="rounded-none bg-primary px-3 py-1 text-sm text-primary-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         Retry
       </button>
@@ -88,10 +91,10 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
             type="button"
             onClick={() => onChange(option.value)}
             aria-pressed={value === option.value}
-            className={`focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 focus-visible:ring-blue-500 rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+            className={`rounded-none px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
               value === option.value
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-muted-foreground hover:bg-accent'
             }`}
           >
             {option.label}
@@ -129,7 +132,7 @@ const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow">
+    <div className="rounded-none border border-border bg-card p-6">
       <h3 className="mb-4 text-lg font-semibold">Session Activity</h3>
       <div className="flex h-48 items-end space-x-2">
         {chartData.map((day) => (
@@ -137,17 +140,19 @@ const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
             <div
               role="img"
               aria-label={`${day.sessions} sessions on ${day.dateString}`}
-              className="bg-blue-500 hover:bg-blue-600 w-full rounded-t transition-all duration-300"
+              className="w-full rounded-none bg-primary transition-all duration-300"
               style={{
                 height: day.heightPct,
                 minHeight: '4px',
               }}
               title={`${day.sessions} sessions on ${day.dateString}`}
             />
-            <span className="text-gray-600 mt-2 text-xs">
+            <span className="mt-2 text-xs text-muted-foreground">
               {day.shortWeekday}
             </span>
-            <span className="text-gray-500 text-xs">{day.sessions}</span>
+            <span className="text-xs text-muted-foreground">
+              {day.sessions}
+            </span>
           </div>
         ))}
       </div>
@@ -169,9 +174,9 @@ const TREND_ICONS: Record<'up' | 'down' | 'stable', string> = {
 }
 
 const TREND_COLORS: Record<'up' | 'down' | 'stable', string> = {
-  up: 'text-green-600',
-  down: 'text-red-600',
-  stable: 'text-gray-600',
+  up: 'text-foreground',
+  down: 'text-muted-foreground',
+  stable: 'text-muted-foreground',
 }
 
 const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
@@ -185,7 +190,7 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
     TREND_COLORS[trend] ?? TREND_COLORS.stable
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow">
+    <div className="rounded-none border border-border bg-card p-6">
       <h3 className="mb-4 text-lg font-semibold">Skill Progress</h3>
       <div className="space-y-4">
         {data.map((skill) => (
@@ -202,10 +207,12 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
                 </span>
                 <span className="sr-only">Trend: {skill.trend}</span>
               </div>
-              <span className="text-gray-600 text-sm">{skill.score}%</span>
+              <span className="text-sm text-muted-foreground">
+                {skill.score}%
+              </span>
             </div>
             <div
-              className="bg-gray-200 h-2 w-full rounded-full"
+              className="h-2 w-full rounded-none bg-secondary"
               role="progressbar"
               aria-label={`${skill.skill} progress`}
               aria-valuenow={skill.score}
@@ -213,7 +220,7 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
               aria-valuemax={100}
             >
               <div
-                className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                className="h-2 rounded-none bg-primary transition-all duration-500"
                 style={{ width: `${skill.score}%` }}
               />
             </div>
@@ -226,11 +233,11 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
 
 // Performance optimization: Extract static map outside component to prevent recreation on every render and enable O(1) lookups
 const COLOR_CLASSES_MAP: Record<string, string> = {
-  blue: 'text-blue-600',
-  green: 'text-green-600',
-  purple: 'text-purple-600',
-  orange: 'text-orange-600',
-  red: 'text-red-600',
+  blue: 'text-foreground',
+  green: 'text-foreground',
+  purple: 'text-foreground',
+  orange: 'text-foreground',
+  red: 'text-foreground',
 }
 
 // Summary stats component
@@ -244,7 +251,10 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
     return (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white rounded-lg p-4 shadow">
+          <div
+            key={i}
+            className="rounded-none border border-border bg-card p-4"
+          >
             <LoadingSkeleton />
           </div>
         ))}
@@ -256,7 +266,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
     if (color === undefined) {
       throw new Error('Not implemented yet: undefined case')
     }
-    return COLOR_CLASSES_MAP[color] ?? 'text-gray-600'
+    return COLOR_CLASSES_MAP[color] ?? 'text-muted-foreground'
   }
 
   return (
@@ -264,23 +274,23 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
       {data.map((stat) => (
         <div
           key={stat.label}
-          className="bg-white rounded-lg p-4 text-center shadow"
+          className="rounded-none border border-border bg-card p-4 text-center"
         >
           <div className={`text-2xl font-bold ${getColorClasses(stat.color)}`}>
             {typeof stat.value === 'number'
               ? stat.value.toLocaleString()
               : stat.value}
           </div>
-          <div className="text-gray-600 text-sm">{stat.label}</div>
+          <div className="text-sm text-muted-foreground">{stat.label}</div>
           {stat.trend && (
-            <div className="text-gray-500 mt-1 text-xs">
+            <div className="mt-1 text-xs text-muted-foreground">
               <span
                 className={
                   stat.trend.direction === 'up'
-                    ? 'text-green-600'
+                    ? 'text-foreground'
                     : stat.trend.direction === 'down'
-                      ? 'text-red-600'
-                      : 'text-gray-600'
+                      ? 'text-muted-foreground'
+                      : 'text-muted-foreground'
                 }
               >
                 {stat.trend.direction === 'up'
@@ -361,7 +371,7 @@ export const AnalyticsCharts: FC = () => {
 
           {/* Data freshness indicator */}
           {data && !isLoading && (
-            <div className="text-gray-500 text-center text-xs">
+            <div className="text-center text-xs text-muted-foreground">
               Data updated {new Date().toLocaleTimeString()}
             </div>
           )}

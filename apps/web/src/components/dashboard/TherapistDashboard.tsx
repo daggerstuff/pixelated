@@ -77,7 +77,7 @@ export function TherapistDashboard({
         id="main-content"
         className={cn(
           'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6',
-          'bg-background text-foreground rounded-lg shadow-lg w-full min-h-[60vh]',
+          'bg-background text-foreground rounded-none border border-border w-full min-h-[60vh]',
           'focus:outline-none',
         )}
         aria-label="Therapist Dashboard"
@@ -86,7 +86,7 @@ export function TherapistDashboard({
       >
         {/* Session Controls */}
         <aside
-          className="col-span-1 flex flex-col gap-4 rounded-md bg-muted p-4"
+          className="col-span-1 flex flex-col gap-4 rounded-none bg-secondary p-4"
           aria-label="Session Controls"
           role="region"
           tabIndex={0}
@@ -99,7 +99,7 @@ export function TherapistDashboard({
 
         {/* Analytics Charts */}
         <section
-          className="col-span-1 flex flex-col gap-4 rounded-md bg-muted p-4"
+          className="col-span-1 flex flex-col gap-4 rounded-none bg-secondary p-4"
           aria-label="Analytics Charts"
           role="region"
           tabIndex={0}
@@ -110,7 +110,7 @@ export function TherapistDashboard({
 
         {/* Progress Widgets */}
         <section
-          className="col-span-1 flex flex-col gap-4 rounded-md bg-muted p-4"
+          className="col-span-1 flex flex-col gap-4 rounded-none bg-secondary p-4"
           aria-label="Progress Tracking Widgets"
           role="region"
           tabIndex={0}
@@ -124,7 +124,7 @@ export function TherapistDashboard({
         {/* Therapy Progress Charts - Full width on larger screens */}
         {therapistData && (
           <section
-            className="flex flex-col gap-4 rounded-md bg-muted p-4 md:col-span-2 xl:col-span-3"
+            className="flex flex-col gap-4 rounded-none bg-secondary p-4 md:col-span-2 xl:col-span-3"
             aria-label="Therapy Progress Charts"
             role="region"
             tabIndex={0}
@@ -139,5 +139,3 @@ export function TherapistDashboard({
     </div>
   )
 }
-
-export default TherapistDashboard
