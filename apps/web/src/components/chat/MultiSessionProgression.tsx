@@ -1,6 +1,6 @@
 import { useId } from 'react'
 
-export type SessionTrend = {
+type SessionTrend = {
   sessionId: string
   label: string
   date: string
@@ -34,11 +34,11 @@ function Sparkline({
 
   if (data.length === 0) {
     return (
-      <div className="border-white/10 border bg-[#121212] p-3">
-        <h4 className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
+      <div className="border border-border bg-card p-3">
+        <h4 className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
           {label}
         </h4>
-        <p className="mt-2 text-sm text-[#b0b0b0]">No data available.</p>
+        <p className="mt-2 text-sm text-muted-foreground">No data available.</p>
       </div>
     )
   }
@@ -54,12 +54,12 @@ function Sparkline({
   const latest = data[data.length - 1] ?? 0
 
   return (
-    <div className="border-white/10 border bg-[#121212] p-3">
+    <div className="border border-border bg-card p-3">
       <div className="mb-2 flex items-baseline justify-between gap-3">
-        <h4 className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
+        <h4 className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
           {label}
         </h4>
-        <span className="font-mono text-sm text-[#f6f1e8]">
+        <span className="font-mono text-sm text-foreground">
           {latest.toFixed(1)}
         </span>
       </div>
@@ -100,11 +100,11 @@ export function MultiSessionProgression({
       <section className={className} aria-labelledby="multi-session-heading">
         <h2
           id="multi-session-heading"
-          className="text-lg font-semibold text-[#f6f1e8]"
+          className="text-lg font-semibold text-foreground"
         >
           Multi-session progression
         </h2>
-        <p className="mt-2 text-sm text-[#b0b0b0]">
+        <p className="mt-2 text-sm text-muted-foreground">
           Complete multiple sessions to see progression trends.
         </p>
       </section>
@@ -124,16 +124,16 @@ export function MultiSessionProgression({
   return (
     <section className={className} aria-labelledby="multi-session-heading">
       <div className="mb-4">
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533]">
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-foreground">
           Longitudinal view
         </p>
         <h2
           id="multi-session-heading"
-          className="text-xl font-semibold text-[#f6f1e8]"
+          className="text-xl font-semibold text-foreground"
         >
           Multi-session progression
         </h2>
-        <p className="mt-1 text-sm text-[#b0b0b0]">
+        <p className="mt-1 text-sm text-muted-foreground">
           {sessions.length} sessions tracked
         </p>
       </div>
@@ -175,23 +175,23 @@ export function MultiSessionProgression({
         )}
       </div>
 
-      <div className="border-white/10 mt-5 border bg-[#121212] p-4">
-        <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
+      <div className="mt-5 border border-border bg-card p-4">
+        <h3 className="font-mono text-sm uppercase tracking-wide text-foreground">
           Session timeline
         </h3>
         <div className="mt-3 space-y-2">
           {sessions.map((session) => (
             <div
               key={session.sessionId}
-              className="flex items-center justify-between border-l-2 border-[#8fb8a2] pl-3"
+              className="flex items-center justify-between border-l-2 border-primary pl-3"
             >
               <div>
-                <p className="text-sm text-[#f6f1e8]">{session.label}</p>
-                <p className="font-mono text-xs text-[#b0b0b0]">
+                <p className="text-sm text-foreground">{session.label}</p>
+                <p className="font-mono text-xs text-muted-foreground">
                   {new Date(session.date).toLocaleDateString()}
                 </p>
               </div>
-              <div className="text-right font-mono text-xs text-[#b0b0b0]">
+              <div className="text-right font-mono text-xs text-muted-foreground">
                 <p>{session.messageCount} msgs</p>
                 <p>{session.durationMinutes} min</p>
               </div>

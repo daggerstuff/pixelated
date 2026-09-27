@@ -25,8 +25,10 @@ const serializedMessages = JSON.stringify(messages)
 ---
 
 <div class="w-full transition-colors duration-300">
-  {title && <h2 class="text-lg font-medium mb-2 text-purple-300">{title}</h2>}
-  {description && <p class="mb-4 text-sm text-purple-300/70">{description}</p>}
+  {title && <h2 class="text-lg font-medium mb-2 text-foreground">{title}</h2>}
+  {description && (
+    <p class="mb-4 text-sm text-muted-foreground">{description}</p>
+  )}
 
   {/* Use dynamic import to ensure the component is only loaded when needed */}
   <div
@@ -37,8 +39,8 @@ const serializedMessages = JSON.stringify(messages)
     data-messages={serializedMessages}
   >
     <div class="analytics-loading-placeholder">
-      <div class="p-4 bg-black bg-opacity-30 rounded-lg text-center">
-        <div class="text-purple-400 animate-pulse">
+      <div class="p-4 bg-secondary rounded-none text-center">
+        <div class="text-foreground animate-pulse">
           Loading analytics dashboard...
         </div>
       </div>
@@ -112,8 +114,8 @@ const serializedMessages = JSON.stringify(messages)
     } catch (error) {
       console.error('Error loading analytics dashboard:', error)
       container.innerHTML = `
-        <div class="p-4 bg-red-900 bg-opacity-20 rounded-lg text-center">
-          <div class="text-red-400">Failed to load analytics dashboard</div>
+        <div class="p-4 bg-secondary border border-ring rounded-none text-center">
+          <div class="text-foreground">Failed to load analytics dashboard</div>
         </div>
       `
     }

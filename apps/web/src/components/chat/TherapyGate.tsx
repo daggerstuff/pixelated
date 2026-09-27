@@ -160,11 +160,11 @@ export function TherapyGate({ className, gateApiUrl }: TherapyGateProps) {
       data-testid="therapy-gate-chat"
     >
       <div
-        className="border-slate-200 bg-white flex-1 space-y-3 overflow-y-auto rounded-lg border p-4 shadow-sm"
+        className="flex-1 space-y-3 overflow-y-auto rounded-none border border-border bg-card p-4"
         data-testid="chat-history"
       >
         {messages.length === 0 ? (
-          <p className="text-slate-500 text-sm">
+          <p className="text-sm text-muted-foreground">
             Send a message to begin the gated therapy chat session.
           </p>
         ) : (
@@ -175,10 +175,10 @@ export function TherapyGate({ className, gateApiUrl }: TherapyGateProps) {
                 message.role === 'user' ? 'message-user' : 'message-assistant'
               }
               className={cn(
-                'max-w-[85%] rounded-2xl px-4 py-3 text-sm',
+                'max-w-[85%] rounded-none px-4 py-3 text-sm',
                 message.role === 'user'
-                  ? 'bg-blue-600 text-white ml-auto'
-                  : 'bg-slate-100 text-slate-900 mr-auto',
+                  ? 'bg-primary text-primary-foreground ml-auto'
+                  : 'bg-secondary text-foreground mr-auto',
               )}
             >
               {message.content}
@@ -191,7 +191,7 @@ export function TherapyGate({ className, gateApiUrl }: TherapyGateProps) {
         <div
           role="alert"
           data-testid="safety-block"
-          className="border-red-300 bg-red-50 text-red-900 rounded-lg border px-4 py-3 shadow-sm"
+          className="rounded-none border border-ring bg-secondary px-4 py-3 text-foreground"
         >
           <p className="font-semibold">Message blocked for safety</p>
           <p data-testid="gate-result-reason" className="mt-1 text-sm">
@@ -204,26 +204,26 @@ export function TherapyGate({ className, gateApiUrl }: TherapyGateProps) {
         <div
           data-testid="gating-status"
           className={cn(
-            'flex items-center gap-2 rounded-lg border px-4 py-2 text-sm shadow-sm',
+            'flex items-center gap-2 rounded-none border px-4 py-2 text-sm',
             gatingStatus === 'evaluating'
-              ? 'border-blue-300 bg-blue-50 text-blue-900'
+              ? 'border-ring bg-secondary text-foreground'
               : gatingStatus === 'routing'
-                ? 'border-amber-300 bg-amber-50 text-amber-900'
-                : 'border-green-300 bg-green-50 text-green-900',
+                ? 'border-ring bg-secondary text-foreground'
+                : 'border-input bg-card text-foreground',
           )}
         >
           {gatingStatus === 'evaluating' ? (
             <span className="relative flex h-3 w-3">
-              <span className="bg-blue-400 absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-              <span className="bg-blue-500 relative inline-flex h-3 w-3 rounded-full" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-primary opacity-75" />
+              <span className="relative inline-flex h-3 w-3 rounded-none bg-primary" />
             </span>
           ) : gatingStatus === 'routing' ? (
             <span className="relative flex h-3 w-3">
-              <span className="bg-amber-400 absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-              <span className="bg-amber-500 relative inline-flex h-3 w-3 rounded-full" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-muted-foreground opacity-75" />
+              <span className="relative inline-flex h-3 w-3 rounded-none bg-muted-foreground" />
             </span>
           ) : (
-            <span className="bg-green-500 relative inline-flex h-3 w-3 rounded-full" />
+            <span className="relative inline-flex h-3 w-3 rounded-none bg-primary" />
           )}
           <span className="font-medium">
             {gatingStatus === 'evaluating'
@@ -256,10 +256,10 @@ export function TherapyGate({ className, gateApiUrl }: TherapyGateProps) {
           data-testid="message-input"
           disabled={gatingStatus !== 'idle'}
           className={cn(
-            'border-slate-300 min-h-[3rem] flex-1 resize-none rounded-lg border px-3 py-2 text-sm shadow-inner outline-none focus:ring-2',
+            'border-input min-h-[3rem] flex-1 resize-none rounded-none border px-3 py-2 text-sm outline-none focus:ring-2',
             gatingStatus !== 'idle'
-              ? 'opacity-50 cursor-not-allowed bg-slate-50'
-              : 'focus:border-blue-500 focus:ring-blue-200',
+              ? 'opacity-35 cursor-not-allowed bg-secondary'
+              : 'focus:border-ring focus:ring-ring/50',
           )}
         />
         <button
@@ -268,10 +268,10 @@ export function TherapyGate({ className, gateApiUrl }: TherapyGateProps) {
           data-testid="send-button"
           disabled={gatingStatus !== 'idle'}
           className={cn(
-            'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+            'rounded-none px-4 py-2 text-sm font-medium transition-colors',
             gatingStatus !== 'idle'
-              ? 'bg-slate-400 text-slate-200 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700',
+              ? 'bg-secondary text-muted-foreground cursor-not-allowed'
+              : 'bg-primary text-primary-foreground hover:bg-accent',
           )}
         >
           {gatingStatus !== 'idle' ? (
@@ -304,7 +304,10 @@ export function TherapyGate({ className, gateApiUrl }: TherapyGateProps) {
       </form>
 
       {error ? (
-        <p data-testid="gate-error" className="text-red-600 mt-1 text-xs">
+        <p
+          data-testid="gate-error"
+          className="mt-1 text-xs font-semibold text-foreground"
+        >
           {error}
         </p>
       ) : null}

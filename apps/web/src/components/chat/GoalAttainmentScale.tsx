@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export type TherapeuticGoal = {
+type TherapeuticGoal = {
   id: string
   label: string
   category:
@@ -50,51 +50,51 @@ function GoalCard({
   const totalCheckpoints = goal.checkpoints.length
 
   return (
-    <div className="border-white/10 border bg-[#121212] p-4">
+    <div className="border border-border bg-card p-4">
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+        className="w-full text-left focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
         aria-expanded={expanded}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
+              <span className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
                 {categoryLabels[goal.category]}
               </span>
             </div>
-            <p className="mt-1 text-sm text-[#f6f1e8]">{goal.label}</p>
+            <p className="mt-1 text-sm text-foreground">{goal.label}</p>
           </div>
           <div className="text-right">
-            <p className="font-mono text-sm text-[#f6f1e8]">
+            <p className="font-mono text-sm text-foreground">
               {goal.currentScore.toFixed(1)}/{goal.targetScore.toFixed(1)}
             </p>
-            <p className="font-mono text-xs text-[#b0b0b0]">
+            <p className="font-mono text-xs text-muted-foreground">
               {progressPercentage.toFixed(0)}% complete
             </p>
           </div>
         </div>
 
         <div className="mt-3">
-          <div className="bg-white/10 h-2 w-full">
+          <div className="h-2 w-full bg-secondary">
             <div
-              className="h-full bg-[#8fb8a2] transition-all duration-300"
+              className="h-full bg-primary transition-all duration-300"
               style={{ width: `${Math.min(progressPercentage, 100)}%` }}
             />
           </div>
         </div>
 
         {totalCheckpoints > 0 && (
-          <p className="mt-2 font-mono text-xs text-[#b0b0b0]">
+          <p className="mt-2 font-mono text-xs text-muted-foreground">
             {completedCheckpoints}/{totalCheckpoints} checkpoints
           </p>
         )}
       </button>
 
       {expanded && totalCheckpoints > 0 && (
-        <div className="border-white/10 mt-4 border-t pt-3">
-          <h4 className="mb-2 font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
+        <div className="mt-4 border-t border-border pt-3">
+          <h4 className="mb-2 font-mono text-xs uppercase tracking-wide text-muted-foreground">
             Checkpoints
           </h4>
           <ul className="space-y-2">
@@ -105,14 +105,14 @@ function GoalCard({
                   id={`checkpoint-${checkpoint.id}`}
                   checked={checkpoint.completed}
                   onChange={() => onCheckpointToggle?.(goal.id, checkpoint.id)}
-                  className="border-white/20 mt-0.5 h-4 w-4 border bg-[#0a0a0a] accent-[#8fb8a2] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+                  className="mt-0.5 h-4 w-4 border border-input bg-background accent-primary focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
                 />
                 <label
                   htmlFor={`checkpoint-${checkpoint.id}`}
                   className={`flex-1 text-sm ${
                     checkpoint.completed
-                      ? 'text-[#b0b0b0] line-through'
-                      : 'text-[#f6f1e8]'
+                      ? 'text-muted-foreground line-through'
+                      : 'text-foreground'
                   }`}
                 >
                   {checkpoint.label}
@@ -136,11 +136,11 @@ export function GoalAttainmentScale({
       <section className={className} aria-labelledby="goal-attainment-heading">
         <h2
           id="goal-attainment-heading"
-          className="text-lg font-semibold text-[#f6f1e8]"
+          className="text-lg font-semibold text-foreground"
         >
           Goal attainment scale
         </h2>
-        <p className="mt-2 text-sm text-[#b0b0b0]">
+        <p className="mt-2 text-sm text-muted-foreground">
           No therapeutic goals set yet. Goals are defined collaboratively during
           therapy sessions.
         </p>
@@ -158,16 +158,16 @@ export function GoalAttainmentScale({
   return (
     <section className={className} aria-labelledby="goal-attainment-heading">
       <div className="mb-4">
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533]">
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-foreground">
           Therapeutic objectives
         </p>
         <h2
           id="goal-attainment-heading"
-          className="text-xl font-semibold text-[#f6f1e8]"
+          className="text-xl font-semibold text-foreground"
         >
           Goal attainment scale
         </h2>
-        <p className="mt-1 text-sm text-[#b0b0b0]">
+        <p className="mt-1 text-sm text-muted-foreground">
           {completedGoals}/{goals.length} goals achieved · Average progress:{' '}
           {averageProgress.toFixed(0)}%
         </p>
