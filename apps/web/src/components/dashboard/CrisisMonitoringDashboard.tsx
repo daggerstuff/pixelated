@@ -66,26 +66,26 @@ export interface CrisisMonitoringDashboardProps {
 // Performance optimization: Extracted these mapping dictionaries to the module level
 // to prevent O(N) object allocations on every render cycle during .map() iterations.
 const RISK_COLORS = {
-  minimal: 'text-neutral-600 bg-neutral-100',
-  low: 'text-neutral-700 bg-neutral-100',
-  moderate: 'text-neutral-700 bg-neutral-200',
-  high: 'text-neutral-800 bg-neutral-200',
-  imminent: 'text-neutral-900 bg-neutral-300',
+  minimal: 'text-muted-foreground bg-secondary',
+  low: 'text-muted-foreground bg-secondary',
+  moderate: 'text-foreground bg-secondary',
+  high: 'text-foreground bg-accent',
+  imminent: 'text-primary-foreground bg-primary',
 } as const
 
 const SEVERITY_COLORS = {
-  low: 'border-neutral-200 bg-neutral-50',
-  medium: 'border-neutral-300 bg-neutral-100',
-  high: 'border-neutral-400 bg-neutral-100',
-  critical: 'border-neutral-500 bg-neutral-200',
+  low: 'border-border bg-secondary',
+  medium: 'border-input bg-secondary',
+  high: 'border-ring bg-secondary',
+  critical: 'border-primary bg-primary',
 } as const
 
 const RISK_DOT_COLORS = {
-  imminent: 'bg-neutral-900',
-  high: 'bg-neutral-800',
-  moderate: 'bg-neutral-700',
-  low: 'bg-neutral-600',
-  minimal: 'bg-neutral-500',
+  imminent: 'bg-primary',
+  high: 'bg-muted-foreground',
+  moderate: 'bg-secondary border border-input',
+  low: 'bg-secondary border border-border',
+  minimal: 'bg-transparent border border-border',
 } as const
 
 export const CrisisMonitoringDashboard: React.FC<
@@ -245,10 +245,10 @@ export const CrisisMonitoringDashboard: React.FC<
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-gray-900 text-3xl font-bold">
+          <h1 className="text-3xl font-bold text-foreground">
             Crisis Monitoring Dashboard
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Real-time crisis risk monitoring and escalation management
           </p>
         </div>
@@ -267,7 +267,7 @@ export const CrisisMonitoringDashboard: React.FC<
             Refresh
           </Button>
 
-          <div className="text-gray-500 text-sm">
+          <div className="text-sm text-muted-foreground">
             Last updated: {lastUpdated.toLocaleTimeString()}
           </div>
         </div>
@@ -277,7 +277,7 @@ export const CrisisMonitoringDashboard: React.FC<
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-gray-600 text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Patients
             </CardTitle>
           </CardHeader>
@@ -286,25 +286,25 @@ export const CrisisMonitoringDashboard: React.FC<
               <span className="text-2xl font-bold">
                 {metrics.totalPatients}
               </span>
-              <Users className="text-gray-400 h-5 w-5" />
+              <Users className="h-5 w-5 text-muted-foreground" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-gray-600 text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               High Risk
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-neutral-800 text-2xl font-bold">
+              <span className="text-2xl font-bold text-foreground">
                 {metrics.highRiskPatients}
               </span>
-              <AlertTriangle className="text-neutral-500 h-5 w-5" />
+              <AlertTriangle className="h-5 w-5 text-muted-foreground" />
             </div>
-            <div className="text-gray-500 mt-1 text-xs">
+            <div className="mt-1 text-xs text-muted-foreground">
               {metrics.totalPatients > 0
                 ? `${Math.round((metrics.highRiskPatients / metrics.totalPatients) * 100)}% of total`
                 : '0% of total'}
@@ -314,18 +314,18 @@ export const CrisisMonitoringDashboard: React.FC<
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-gray-600 text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Active Escalations
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-neutral-700 text-2xl font-bold">
+              <span className="text-2xl font-bold text-foreground">
                 {metrics.activeEscalations}
               </span>
-              <Bell className="text-neutral-500 h-5 w-5" />
+              <Bell className="h-5 w-5 text-muted-foreground" />
             </div>
-            <div className="text-gray-500 mt-1 text-xs">
+            <div className="mt-1 text-xs text-muted-foreground">
               Avg response: {metrics.averageResponseTime}
             </div>
           </CardContent>
@@ -333,7 +333,7 @@ export const CrisisMonitoringDashboard: React.FC<
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-gray-600 text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Today's Assessments
             </CardTitle>
           </CardHeader>
@@ -342,9 +342,9 @@ export const CrisisMonitoringDashboard: React.FC<
               <span className="text-2xl font-bold">
                 {metrics.todayAssessments}
               </span>
-              <BarChart3 className="text-gray-400 h-5 w-5" />
+              <BarChart3 className="h-5 w-5 text-muted-foreground" />
             </div>
-            <div className="text-gray-500 mt-1 text-xs">
+            <div className="mt-1 text-xs text-muted-foreground">
               {metrics.escalationRate.toFixed(1)}% escalation rate
             </div>
           </CardContent>
@@ -385,7 +385,7 @@ export const CrisisMonitoringDashboard: React.FC<
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <AlertTriangle className="text-neutral-700 mr-2 h-5 w-5" />
+                <AlertTriangle className="mr-2 h-5 w-5 text-foreground" />
                 High Risk Patients
               </CardTitle>
             </CardHeader>
@@ -394,19 +394,19 @@ export const CrisisMonitoringDashboard: React.FC<
                 {highRiskPatients.slice(0, 5).map((patient) => (
                   <div
                     key={patient.id}
-                    className="flex items-center justify-between rounded-lg border p-3"
+                    className="flex items-center justify-between rounded-none border p-3"
                   >
                     <div className="flex items-center space-x-3">
                       <div
-                        className={`h-3 w-3 rounded-full ${
+                        className={`h-3 w-3 rounded-none ${
                           patient.currentRisk === 'imminent'
-                            ? 'bg-neutral-900'
-                            : 'bg-neutral-800'
+                            ? 'bg-primary'
+                            : 'bg-muted-foreground'
                         }`}
                       />
                       <div>
                         <div className="font-medium">{patient.name}</div>
-                        <div className="text-gray-500 text-sm">
+                        <div className="text-sm text-muted-foreground">
                           Last contact: {patient.lastContactString}
                         </div>
                       </div>
@@ -434,8 +434,8 @@ export const CrisisMonitoringDashboard: React.FC<
                 ))}
 
                 {highRiskPatients.length === 0 && (
-                  <div className="text-gray-500 py-8 text-center">
-                    <CheckCircle className="text-neutral-500 mx-auto mb-2 h-12 w-12" />
+                  <div className="py-8 text-center text-muted-foreground">
+                    <CheckCircle className="mx-auto mb-2 h-12 w-12 text-muted-foreground" />
                     No high-risk patients at this time
                   </div>
                 )}
@@ -452,7 +452,7 @@ export const CrisisMonitoringDashboard: React.FC<
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-gray-500 flex h-64 items-center justify-center">
+              <div className="flex h-64 items-center justify-center text-muted-foreground">
                 {/* Placeholder for chart component */}
                 <div className="text-center">
                   <BarChart3 className="mx-auto mb-2 h-12 w-12" />
@@ -486,21 +486,21 @@ export const CrisisMonitoringDashboard: React.FC<
                       >
                         {alert.severity.toUpperCase()}
                       </Badge>
-                      <span className="text-gray-500 text-sm">
+                      <span className="text-sm text-muted-foreground">
                         {alert.timestampString}
                       </span>
                       {alert.acknowledged && (
-                        <Badge variant="outline" className="text-neutral-700">
+                        <Badge variant="outline" className="text-foreground">
                           <CheckCircle className="mr-1 h-3 w-3" />
                           Acknowledged
                         </Badge>
                       )}
                     </div>
 
-                    <p className="text-gray-900 mb-2">{alert.message}</p>
+                    <p className="mb-2 text-foreground">{alert.message}</p>
 
                     {alert.actions.length > 0 && (
-                      <div className="text-gray-600 text-sm">
+                      <div className="text-sm text-muted-foreground">
                         <strong>Recommended actions:</strong>
                         <ul className="mt-1 list-inside list-disc">
                           {alert.actions.map((action, index) => (
@@ -533,7 +533,7 @@ export const CrisisMonitoringDashboard: React.FC<
           ))}
 
           {alerts.length === 0 && (
-            <div className="text-gray-500 py-12 text-center">
+            <div className="py-12 text-center text-muted-foreground">
               <Bell className="mx-auto mb-2 h-12 w-12" />
               No alerts at this time
             </div>
@@ -549,14 +549,14 @@ export const CrisisMonitoringDashboard: React.FC<
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div
-                        className={`h-4 w-4 rounded-full ${RISK_DOT_COLORS[patient.currentRisk] || RISK_DOT_COLORS.minimal}`}
+                        className={`h-4 w-4 rounded-none ${RISK_DOT_COLORS[patient.currentRisk] || RISK_DOT_COLORS.minimal}`}
                       />
 
                       <div>
-                        <h3 className="text-gray-900 font-medium">
+                        <h3 className="font-medium text-foreground">
                           {patient.name}
                         </h3>
-                        <p className="text-gray-500 text-sm">
+                        <p className="text-sm text-muted-foreground">
                           ID: {patient.id}
                         </p>
                       </div>
@@ -567,18 +567,18 @@ export const CrisisMonitoringDashboard: React.FC<
                         <Badge className={getRiskColor(patient.currentRisk)}>
                           {patient.currentRisk.toUpperCase()}
                         </Badge>
-                        <div className="text-gray-500 mt-1 text-sm">
+                        <div className="mt-1 text-sm text-muted-foreground">
                           Confidence:{' '}
                           {Math.round(patient.prediction.confidence * 100)}%
                         </div>
                       </div>
 
-                      <div className="text-gray-500 text-right text-sm">
+                      <div className="text-right text-sm text-muted-foreground">
                         <div>Last assessment:</div>
                         <div>{patient.lastAssessmentString}</div>
                       </div>
 
-                      <div className="text-gray-500 text-right text-sm">
+                      <div className="text-right text-sm text-muted-foreground">
                         <div>Last contact:</div>
                         <div>{patient.lastContactString}</div>
                       </div>
@@ -601,11 +601,11 @@ export const CrisisMonitoringDashboard: React.FC<
 
                   {patient.prediction.primaryRiskFactors.length > 0 && (
                     <div className="mt-3 border-t pt-3">
-                      <div className="text-gray-600 text-sm">
+                      <div className="text-sm text-muted-foreground">
                         <strong>Primary risk factors:</strong>{' '}
                         {patient.prediction.primaryRiskFactors.join(', ')}
                       </div>
-                      <div className="text-gray-600 mt-1 text-sm">
+                      <div className="mt-1 text-sm text-muted-foreground">
                         <strong>Intervention window:</strong>{' '}
                         {patient.prediction.interventionWindow.optimal}
                       </div>
@@ -682,7 +682,7 @@ export const CrisisMonitoringDashboard: React.FC<
                             <div className="w-20 text-right text-sm">
                               {count} patients
                             </div>
-                            <div className="text-gray-500 w-12 text-right text-sm">
+                            <div className="w-12 text-right text-sm text-muted-foreground">
                               {percentage.toFixed(0)}%
                             </div>
                           </div>

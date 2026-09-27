@@ -49,9 +49,9 @@ export function ProgressBar({
       {...rest}
     >
       {label && <span className="mb-1 block text-sm">{label}</span>}
-      <div className="relative h-4 rounded-full bg-muted">
+      <div className="relative h-4 rounded-none bg-secondary">
         <div
-          className="absolute left-0 top-0 h-4 rounded-full bg-primary"
+          className="absolute left-0 top-0 h-4 rounded-none bg-primary"
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -61,5 +61,3 @@ export function ProgressBar({
     </div>
   )
 }
-
-export default ProgressBar

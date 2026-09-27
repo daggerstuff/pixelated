@@ -116,8 +116,8 @@ describe('SessionControls', () => {
     const activeBadge = screen.getByText('active')
     const pausedBadge = screen.getByText('paused')
 
-    expect(activeBadge).toHaveClass('bg-green-100', 'text-green-800')
-    expect(pausedBadge).toHaveClass('bg-yellow-100', 'text-yellow-800')
+    expect(activeBadge).toHaveClass('bg-primary', 'text-primary-foreground')
+    expect(pausedBadge).toHaveClass('bg-secondary', 'border', 'border-ring')
   })
 
   it('renders empty state when no sessions', () => {
