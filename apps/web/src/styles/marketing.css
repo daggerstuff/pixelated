@@ -120,10 +120,8 @@
   margin: 0;
   font-family: var(
     --np-font-display,
-    'Geist Variable',
-    'Geist',
-    'Archivo Variable',
-    'Archivo',
+    'Space Grotesk Variable',
+    'Space Grotesk',
     system-ui,
     sans-serif
   );
@@ -141,10 +139,8 @@
   max-width: 22ch;
   font-family: var(
     --np-font-headline,
-    'Geist Variable',
-    'Geist',
-    'Archivo Variable',
-    'Archivo',
+    'Space Grotesk Variable',
+    'Space Grotesk',
     system-ui,
     sans-serif
   );
