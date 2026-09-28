@@ -6,24 +6,24 @@ export interface Props {
 const { showTitle = true } = Astro.props
 ---
 
-<div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+<div class="rounded-none border border-border bg-secondary p-6">
   {showTitle && <h3 class="text-xl font-bold mb-3">Subscribe to Updates</h3>}
   <p class="mb-4">Get notified when we publish new articles and resources.</p>
   <form class="flex flex-col sm:flex-row gap-3">
     <input
       type="email"
       placeholder="Your email address"
-      class="flex-grow px-4 py-2 rounded border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+      class="flex-grow rounded-none border border-input bg-background px-4 py-2 focus:ring-2 focus:ring-ring"
       required
     />
   </form>
   <button
     type="submit"
-    class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded"
+    class="rounded-none bg-primary px-4 py-2 font-medium text-primary-foreground hover:bg-primary/90"
   >
     Subscribe
   </button>
 </div>
-<p class="text-xs text-gray-500 mt-3">
+<p class="mt-3 text-xs text-muted-foreground">
   We respect your privacy. Unsubscribe at any time.
 </p>
