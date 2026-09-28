@@ -6,7 +6,7 @@ permissions:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.16.0
-  PYTHON_VERSION: 3.13.13
+  PYTHON_VERSION: 3.14.7
 
 # Fast security lane — runs on every push and PR. Holds the checks that gate
 # merges: the security regression gate (required by branch protection) plus

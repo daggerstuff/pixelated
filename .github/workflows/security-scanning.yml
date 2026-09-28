@@ -44,7 +44,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7.0.0
         with:
-          python-version: '3.13.13'
+          python-version: '3.14.7'
 
       - name: Set up uv
         uses: ./.github/actions/setup-uv
@@ -323,7 +323,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7.0.0
         with:
-          python-version: '3.13.13'
+          python-version: '3.14.7'
 
       - name: Set up uv
         uses: ./.github/actions/setup-uv
@@ -436,7 +436,7 @@ jobs:
             dockerfile: infra/docker/Dockerfile.production
           - image: node:24-alpine
             dockerfile: infra/docker/Dockerfile.prod
-          - image: python:3.13-slim
+          - image: python:3.14-slim
             dockerfile: infra/docker/backend.Dockerfile
           - image: mcr.microsoft.com/playwright:v1.60.0-jammy
             dockerfile: infra/docker/Dockerfile.playwright

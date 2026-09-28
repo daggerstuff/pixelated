@@ -2,7 +2,7 @@
 # - Node 24 (repo runs Node v24) with the pinned pnpm 11.24 from
 #   package.json `packageManager`, installed via corepack so the pin is
 #   the only source of truth.
-# - uv for Python 3.13 (apps/web + ai/ both require >= 3.13); the actual
+# - uv for Python 3.14 (apps/web requires >= 3.14; ai/ requires >= 3.13); the actual
 #   Python interpreters are provisioned per-project by `uv sync` in the
 #   post-create command, same as local development.
 # - Standard tooling: git, bash, curl, docker CLI (the docker feature in
@@ -27,7 +27,7 @@ RUN apt-get update \
 # pnpm via corepack honors the packageManager pin (pnpm@11.24.0).
 RUN corepack enable
 
-# uv (official installer) for Python 3.13 management.
+# uv (official installer) for Python 3.14 management.
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 WORKDIR /workspaces/pixelated
