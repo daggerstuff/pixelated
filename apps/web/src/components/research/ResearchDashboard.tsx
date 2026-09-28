@@ -750,7 +750,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
         )}
 
         {showForm && (
-          <div className="bg-black/50 fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-foreground/60 fixed inset-0 z-50 flex items-center justify-center">
             <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-none bg-card p-6">
               <h2 className="mb-4 text-xl font-bold text-foreground">
                 {editingId ? 'Edit Publication' : 'Add Publication'}
@@ -906,7 +906,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
         )}
 
         {deletingPublication && (
-          <div className="bg-black/50 fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-foreground/60 fixed inset-0 z-50 flex items-center justify-center">
             <div className="w-full max-w-md rounded-none bg-card p-6">
               <h2 className="text-lg font-bold text-foreground">
                 Delete Publication
