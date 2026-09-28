@@ -40,7 +40,7 @@ install_node() {
 
 install_python() {
   su "$R_USER" -c "curl -LsSf https://astral.sh/uv/install.sh | sh" 2>/dev/null || true
-  su "$R_USER" -c 'export PATH="$HOME/.local/bin:$PATH"; uv python install 3.13' 2>/dev/null || true
+  su "$R_USER" -c 'export PATH="$HOME/.local/bin:$PATH"; uv python install 3.14' 2>/dev/null || true
 }
 
 setup_repo() {

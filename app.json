@@ -8,7 +8,7 @@
       "value": "production"
     },
     "PYTHON_VERSION": {
-      "value": "3.13"
+      "value": "3.14"
     }
   },
   "scripts": {
