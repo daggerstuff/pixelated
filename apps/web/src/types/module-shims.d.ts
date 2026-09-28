@@ -2,9 +2,6 @@ declare module 'astro-icon/components'
 
 declare module 'typeorm'
 declare module 'better-sqlite3'
-declare module '@tailus/themer-button'
-declare module '@tailus/themer-card'
-declare module '@tailus/themer-progress'
 declare module 'twilio'
 declare module 'launchdarkly-js-client-sdk'
 declare module 'ioredis' {
