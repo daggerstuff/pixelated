@@ -20,8 +20,10 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         <div class="flex items-center gap-3">
           <span
             class="inline-flex items-center rounded-none bg-secondary border border-input px-2.5 py-0.5 text-xs font-medium text-muted-foreground"
-            id="oversight-mode-badge">Supervised Mode</span
+            id="oversight-mode-badge"
           >
+            Supervised Mode
+          </span>
           <p class="text-sm text-foreground font-medium">
             All AI responses require human approval before delivery. Manual
             overrides are logged with full audit trail.
@@ -36,17 +38,15 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-6"
     >
       <div class="rounded-none border border-border bg-card p-4">
-        <h2
-          class="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-        >
+        <h2 class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Total
         </h2>
-        <p id="stat-total" class="mt-2 text-2xl font-bold text-foreground">0</p>
+        <p id="stat-total" class="mt-2 text-2xl font-bold text-foreground">
+          0
+        </p>
       </div>
       <div class="rounded-none border border-ring bg-secondary p-4">
-        <h2
-          class="text-xs font-medium uppercase tracking-wider text-foreground font-medium font-medium"
-        >
+        <h2 class="text-xs font-medium uppercase tracking-wider text-foreground font-medium font-medium">
           Pending
         </h2>
         <p
@@ -57,9 +57,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         </p>
       </div>
       <div class="rounded-none border border-input bg-secondary p-4">
-        <h2
-          class="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-        >
+        <h2 class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Approved
         </h2>
         <p
@@ -70,9 +68,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         </p>
       </div>
       <div class="rounded-none border border-ring bg-card p-4">
-        <h2
-          class="text-xs font-medium uppercase tracking-wider text-foreground font-semibold"
-        >
+        <h2 class="text-xs font-medium uppercase tracking-wider text-foreground font-semibold">
           Rejected
         </h2>
         <p
@@ -83,9 +79,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         </p>
       </div>
       <div class="rounded-none border border-input bg-secondary p-4">
-        <h2
-          class="text-xs font-medium uppercase tracking-wider text-foreground font-semibold"
-        >
+        <h2 class="text-xs font-medium uppercase tracking-wider text-foreground font-semibold">
           Overridden
         </h2>
         <p id="stat-overridden" class="mt-2 text-2xl font-bold text-foreground">
@@ -93,9 +87,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         </p>
       </div>
       <div class="rounded-none border border-border bg-secondary p-4">
-        <h2
-          class="text-xs font-medium uppercase tracking-wider text-muted-foreground"
-        >
+        <h2 class="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Expired
         </h2>
         <p id="stat-expired" class="mt-2 text-2xl font-bold text-foreground">
@@ -123,7 +115,9 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
           >
             Demo: Complete Checklist
           </button>
-          <span id="checklist-status" class="text-sm text-muted-foreground"
+          <span
+            id="checklist-status"
+            class="text-sm text-muted-foreground"
           ></span>
         </div>
       </div>
@@ -146,34 +140,22 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         <table class="min-w-full divide-y divide-border">
           <thead class="bg-secondary">
             <tr>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Request ID
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Session
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Priority
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Response Preview
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Confidence
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Queued At
               </th>
             </tr>
@@ -209,34 +191,22 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         <table class="min-w-full divide-y divide-border">
           <thead class="bg-secondary">
             <tr>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Action
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Session
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Therapist
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Timestamp
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Reason
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Checklist
               </th>
             </tr>
@@ -264,34 +234,22 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         <table class="min-w-full divide-y divide-border">
           <thead class="bg-secondary">
             <tr>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Override ID
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Session
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Action
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Therapist
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Reason
               </th>
-              <th
-                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
-              >
+              <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Timestamp
               </th>
             </tr>

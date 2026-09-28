@@ -55,11 +55,9 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
   <script src="/js/polyfill-detector.js" is:inline></script>
   <script src="/js/module-loader.js" defer is:inline></script>
-  {
-    (nprogress || mediumZoom) && (
-      <script src="/js/nprogress-and-zoom.js" type="module" />
-    )
-  }
+  {(nprogress || mediumZoom) && (
+    <script src="/js/nprogress-and-zoom.js" type="module"></script>
+  )}
   <body
     style="background: var(--np-bg); color: var(--np-text);"
     class="font-sans min-h-screen flex flex-col overflow-x-hidden"
@@ -74,29 +72,21 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
     </a>
 
     <ErrorBoundary>
-      {
-        showHeader && (
-          <Header
-            showThemeToggle={showThemeToggle}
-            showUserMenu={showUserMenu}
-            position="sticky"
-          />
-        )
-      }
+      {showHeader && (
+        <Header {showThemeToggle} {showUserMenu} position="sticky" />
+      )}
 
       <div class="flex flex-grow flex-col lg:flex-row">
-        {
-          showSidebar && (
-            <aside
-              class="sidebar fixed inset-y-0 z-20 flex-shrink-0 w-64 pt-16
+        {showSidebar && (
+          <aside
+            class="sidebar fixed inset-y-0 z-20 flex-shrink-0 w-64 pt-16
             transform transition-transform duration-300 lg:translate-x-0 lg:static lg:h-auto"
-              id="sidebar"
-              style="background: var(--np-bg); border-right: 1px solid var(--np-line);"
-            >
-              <Sidebar />
-            </aside>
-          )
-        }
+            id="sidebar"
+            style="background: var(--np-bg); border-right: 1px solid var(--np-line);"
+          >
+            <Sidebar />
+          </aside>
+        )}
 
         <main
           class:list={[
@@ -106,13 +96,11 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
           ]}
           id="main-content"
         >
-          <div
-            class="max-w-[var(--np-content)] mx-auto px-4 py-6 min-h-[calc(100vh-4rem)] flex flex-col"
-          >
+          <div class="max-w-[var(--np-content)] mx-auto px-4 py-6 min-h-[calc(100vh-4rem)] flex flex-col">
             <slot />
           </div>
 
-          {showFooter && <Footer showSocialLinks={showSocialLinks} />}
+          {showFooter && <Footer {showSocialLinks} />}
         </main>
       </div>
     </ErrorBoundary>
@@ -148,15 +136,12 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
           if (theme === 'system') applyTheme('system')
         })
     </script>
-
-    {
-      shouldRenderAnalytics && (
-        <>
-          <SpeedInsights />
-          <Analytics />
-        </>
-      )
-    }
+    {shouldRenderAnalytics && (
+      <>
+        <SpeedInsights />
+        <Analytics />
+      </>
+    )}
   </body>
 </html>
 

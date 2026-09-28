@@ -77,109 +77,101 @@ const containerClasses = `
   <div class={containerClasses}>
     <div class="flex items-center justify-between h-16">
       <!-- Logo -->
-      {
-        logo && (
-          <a
-            href={logo.href}
-            class="flex items-center space-x-2"
-            aria-label="Home"
-          >
-            {logo.src && (
-              <img src={logo.src} alt={logo.alt} class="h-8 w-auto" />
-            )}
-            <span class="text-xl font-semibold text-primary">{logo.alt}</span>
-          </a>
-        )
-      }
+      {logo && (
+        <a
+          href={logo.href}
+          class="flex items-center space-x-2"
+          aria-label="Home"
+        >
+          {logo.src && <img src={logo.src} alt={logo.alt} class="h-8 w-auto" />}
+          <span class="text-xl font-semibold text-primary">{logo.alt}</span>
+        </a>
+      )}
 
       <!-- Desktop Navigation -->
       <div class="hidden lg:flex items-center space-x-8">
-        {
-          items.map((item) => (
-            <div class="relative group">
-              {item.dropdown ? (
-                <button
-                  class="flex items-center space-x-1 text-secondary-foreground hover:text-primary transition-colors duration-200"
-                  aria-expanded="false"
-                  aria-haspopup="true"
+        {items.map((item) => (
+          <div class="relative group">
+            {item.dropdown ? (
+              <button
+                class="flex items-center space-x-1 text-secondary-foreground hover:text-primary transition-colors duration-200"
+                aria-expanded="false"
+                aria-haspopup="true"
+              >
+                <span>{item.label}</span>
+                <svg
+                  class="w-4 h-4 transition-transform group-hover:rotate-180"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <span>{item.label}</span>
-                  <svg
-                    class="w-4 h-4 transition-transform group-hover:rotate-180"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-              ) : (
-                <a
-                  href={item.href}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
-                  class="text-secondary-foreground hover:text-primary transition-colors duration-200"
-                >
-                  {item.label}
-                </a>
-              )}
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            ) : (
+              <a
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                class="text-secondary-foreground hover:text-primary transition-colors duration-200"
+              >
+                {item.label}
+              </a>
+            )}
 
-              {/* Dropdown Menu */}
-              {item.dropdown && (
-                <div class="absolute top-full left-0 mt-2 w-64 bg-secondary border border-border-primary rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
-                  <div class="py-2">
-                    {item.dropdown.map((dropdownItem) => (
-                      <a
-                        href={dropdownItem.href}
-                        class="flex items-center space-x-3 px-4 py-3 text-secondary-foreground hover:bg-primary/10 hover:text-primary transition-colors duration-200"
-                      >
-                        {dropdownItem.icon && (
-                          <span class="text-lg">{dropdownItem.icon}</span>
+            {/* Dropdown Menu */}
+            {item.dropdown && (
+              <div class="absolute top-full left-0 mt-2 w-64 bg-secondary border border-border-primary rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-2 group-hover:translate-y-0">
+                <div class="py-2">
+                  {item.dropdown.map((dropdownItem) => (
+                    <a
+                      href={dropdownItem.href}
+                      class="flex items-center space-x-3 px-4 py-3 text-secondary-foreground hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+                    >
+                      {dropdownItem.icon && (
+                        <span class="text-lg">{dropdownItem.icon}</span>
+                      )}
+                      <div class="flex-1">
+                        <div class="font-medium">{dropdownItem.label}</div>
+                        {dropdownItem.description && (
+                          <div class="text-sm text-muted-foreground">
+                            {dropdownItem.description}
+                          </div>
                         )}
-                        <div class="flex-1">
-                          <div class="font-medium">{dropdownItem.label}</div>
-                          {dropdownItem.description && (
-                            <div class="text-sm text-muted-foreground">
-                              {dropdownItem.description}
-                            </div>
-                          )}
-                        </div>
-                      </a>
-                    ))}
-                  </div>
+                      </div>
+                    </a>
+                  ))}
                 </div>
-              )}
-            </div>
-          ))
-        }
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       <!-- CTA Button -->
-      {
-        cta && (
-          <div class="hidden lg:block">
-            <a
-              href={cta.href}
-              class:list={[
-                'inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors duration-200',
-                cta.variant === 'primary' &&
-                  'bg-primary text-primary-foreground hover:bg-primary/90',
-                cta.variant === 'secondary' &&
-                  'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-                cta.variant === 'outline' &&
-                  'border border-primary text-primary hover:bg-primary hover:text-primary-foreground',
-              ]}
-            >
-              {cta.label}
-            </a>
-          </div>
-        )
-      }
+      {cta && (
+        <div class="hidden lg:block">
+          <a
+            href={cta.href}
+            class:list={[
+              'inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors duration-200',
+              cta.variant === 'primary' &&
+                'bg-primary text-primary-foreground hover:bg-primary/90',
+              cta.variant === 'secondary' &&
+                'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+              cta.variant === 'outline' &&
+                'border border-primary text-primary hover:bg-primary hover:text-primary-foreground',
+            ]}
+          >
+            {cta.label}
+          </a>
+        </div>
+      )}
 
       <!-- Mobile Menu Button -->
       <button
@@ -198,7 +190,8 @@ const containerClasses = `
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h16"></path>
+            d="M4 6h16M4 12h16M4 18h16"
+          ></path>
         </svg>
       </button>
     </div>
@@ -209,59 +202,55 @@ const containerClasses = `
       class="lg:hidden hidden border-t border-border-secondary mt-4 pt-4 pb-6"
     >
       <div class="space-y-4">
-        {
-          items.map((item) => (
-            <div>
-              {item.dropdown ? (
-                <div class="space-y-2">
-                  <div class="font-medium text-secondary-foreground">
-                    {item.label}
-                  </div>
-                  <div class="space-y-1 pl-4">
-                    {item.dropdown.map((dropdownItem) => (
-                      <a
-                        href={dropdownItem.href}
-                        class="block py-2 text-sm text-secondary-foreground hover:text-primary transition-colors duration-200"
-                      >
-                        {dropdownItem.label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <a
-                  href={item.href}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
-                  class="block py-2 text-secondary-foreground hover:text-primary transition-colors duration-200"
-                >
+        {items.map((item) => (
+          <div>
+            {item.dropdown ? (
+              <div class="space-y-2">
+                <div class="font-medium text-secondary-foreground">
                   {item.label}
-                </a>
-              )}
-            </div>
-          ))
-        }
-
-        {
-          cta && (
-            <div class="pt-4 border-t border-border-secondary">
+                </div>
+                <div class="space-y-1 pl-4">
+                  {item.dropdown.map((dropdownItem) => (
+                    <a
+                      href={dropdownItem.href}
+                      class="block py-2 text-sm text-secondary-foreground hover:text-primary transition-colors duration-200"
+                    >
+                      {dropdownItem.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : (
               <a
-                href={cta.href}
-                class:list={[
-                  'block w-full text-center px-4 py-2 rounded-md font-medium transition-colors duration-200',
-                  cta.variant === 'primary' &&
-                    'bg-primary text-primary-foreground hover:bg-primary/90',
-                  cta.variant === 'secondary' &&
-                    'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-                  cta.variant === 'outline' &&
-                    'border border-primary text-primary hover:bg-primary hover:text-primary-foreground',
-                ]}
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                class="block py-2 text-secondary-foreground hover:text-primary transition-colors duration-200"
               >
-                {cta.label}
+                {item.label}
               </a>
-            </div>
-          )
-        }
+            )}
+          </div>
+        ))}
+
+        {cta && (
+          <div class="pt-4 border-t border-border-secondary">
+            <a
+              href={cta.href}
+              class:list={[
+                'block w-full text-center px-4 py-2 rounded-md font-medium transition-colors duration-200',
+                cta.variant === 'primary' &&
+                  'bg-primary text-primary-foreground hover:bg-primary/90',
+                cta.variant === 'secondary' &&
+                  'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+                cta.variant === 'outline' &&
+                  'border border-primary text-primary hover:bg-primary hover:text-primary-foreground',
+              ]}
+            >
+              {cta.label}
+            </a>
+          </div>
+        )}
       </div>
     </div>
   </div>

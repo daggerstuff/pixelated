@@ -80,29 +80,27 @@ const bgType = 'dot'
 
     <div class="prose dark:prose-invert">
       <!-- Docs by Category -->
-      {
-        categories.map((category) => (
-          <div class="mb-8">
-            <h2 class="text-2xl mb-4">{category}</h2>
-            <ul class="space-y-3 list-none pl-0">
-              {docsByCategory[category].map((doc: DocPage) => (
-                <li class="flex justify-between items-baseline mb-2 leading-relaxed">
-                  <a
-                    href={`/docs/${doc.slug}`}
-                    class="flex-1 text-primary hover:underline text-lg"
-                    transition:name={`doc-title-${doc.slug}`}
-                  >
-                    {doc.data.title}
-                  </a>
-                  <span class="text-sm text-gray-500 dark:text-gray-400 op-80 ml-4">
-                    {formatDocDate(doc.data.pubDate, doc.data.readingTime)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
+      {categories.map((category) => (
+        <div class="mb-8">
+          <h2 class="text-2xl mb-4">{category}</h2>
+          <ul class="space-y-3 list-none pl-0">
+            {docsByCategory[category].map((doc: DocPage) => (
+              <li class="flex justify-between items-baseline mb-2 leading-relaxed">
+                <a
+                  href={`/docs/${doc.slug}`}
+                  class="flex-1 text-primary hover:underline text-lg"
+                  transition:name={`doc-title-${doc.slug}`}
+                >
+                  {doc.data.title}
+                </a>
+                <span class="text-sm text-gray-500 dark:text-gray-400 op-80 ml-4">
+                  {formatDocDate(doc.data.pubDate, doc.data.readingTime)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
 
       <!-- Navigation Section -->
       <div class="mt-16">

@@ -25,17 +25,15 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
             </svg>
             API Health Status
           </h2>
         </div>
         <div class="card-body p-4">
           <div id="api-status" class="flex items-center mb-2">
-            <div
-              class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"
-            >
-            </div>
+            <div class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"></div>
             <span class="status-text">Checking API status...</span>
           </div>
           <div id="api-response-time" class="text-sm text-muted-foreground">
@@ -68,32 +66,33 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M4 7h16"></path>
+                d="M4 7h16"
+              ></path>
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M4 11h16"></path>
+                d="M4 11h16"
+              ></path>
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M8 14h8"></path>
+                d="M8 14h8"
+              ></path>
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M8 17h8"></path>
+                d="M8 17h8"
+              ></path>
             </svg>
             Database Status
           </h2>
         </div>
         <div class="card-body p-4">
           <div id="db-status" class="flex items-center mb-2">
-            <div
-              class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"
-            >
-            </div>
+            <div class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"></div>
             <span class="status-text">Checking database status...</span>
           </div>
           <div id="db-details" class="text-sm text-muted-foreground">
@@ -127,10 +126,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
         </div>
         <div class="card-body p-4">
           <div id="redis-status" class="flex items-center mb-2">
-            <div
-              class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"
-            >
-            </div>
+            <div class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"></div>
             <span class="status-text">Checking Redis status...</span>
           </div>
           <div id="redis-details" class="text-sm text-muted-foreground">
@@ -164,15 +160,16 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           <div class="mb-2">
             <div class="flex justify-between mb-1">
               <span class="text-sm font-medium">Memory Usage</span>
-              <span id="memory-usage-percent" class="text-sm">--%</span>
+              <span id="memory-usage-percent" class="text-sm">
+                --%
+              </span>
             </div>
             <div class="w-full bg-secondary rounded-none h-2.5">
               <div
                 id="memory-usage-bar"
                 class="bg-primary h-2.5 rounded-none"
                 style="width: 0%"
-              >
-              </div>
+              ></div>
             </div>
           </div>
           <div id="memory-details" class="text-sm text-muted-foreground mb-4">
@@ -214,16 +211,20 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           <div>
             <h3 class="font-medium mb-2">Operating System</h3>
             <div id="os-info" class="text-sm text-muted-foreground mb-4">
-              Platform: --<br />
-              Release: --<br />
+              Platform: --
+              <br />
+              Release: --
+              <br />
               Uptime: --
             </div>
           </div>
           <div>
             <h3 class="font-medium mb-2">Runtime</h3>
             <div id="runtime-info" class="text-sm text-muted-foreground">
-              Node.js: --<br />
-              Process Memory: --<br />
+              Node.js: --
+              <br />
+              Process Memory: --
+              <br />
               Process Uptime: --
             </div>
           </div>
@@ -247,7 +248,8 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M4 6h16M4 12h16M4 18h16"></path>
+                d="M4 6h16M4 12h16M4 18h16"
+              ></path>
             </svg>
             Raw Health Check Response
           </h2>
@@ -276,7 +278,8 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
       <div class="card-body p-4">
         <pre
           id="raw-response"
-          class="bg-secondary p-4 rounded-none overflow-auto text-sm h-80 max-h-80">Loading health check data...</pre>
+          class="bg-secondary p-4 rounded-none overflow-auto text-sm h-80 max-h-80"
+        >Loading health check data...</pre>
       </div>
     </div>
   </div>

@@ -187,19 +187,17 @@ function getStatusDisplayText(
           Test Success Rate
         </h3>
         <p class="text-2xl font-bold text-muted-foreground">
-          {
-            Math.round(
-              (recoveryMetrics.successfulTests /
-                (recoveryMetrics.successfulTests +
-                  recoveryMetrics.failedTests)) *
-                100,
-            )
-          }%
+          {Math.round(
+            (recoveryMetrics.successfulTests /
+              (recoveryMetrics.successfulTests + recoveryMetrics.failedTests)) *
+              100,
+          )}
+          %
         </p>
         <p class="text-xs text-muted-foreground mt-1">
-          {recoveryMetrics.successfulTests} of {
-            recoveryMetrics.successfulTests + recoveryMetrics.failedTests
-          } tests passed
+          {recoveryMetrics.successfulTests} of{' '}
+          {recoveryMetrics.successfulTests + recoveryMetrics.failedTests} tests
+          passed
         </p>
       </div>
       <div class="bg-card rounded-none p-4">
@@ -225,103 +223,109 @@ function getStatusDisplayText(
               <th
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >Plan ID</th
               >
+                Plan ID
+              </th>
               <th
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >Recovery Plan</th
               >
+                Recovery Plan
+              </th>
               <th
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >Systems</th
               >
+                Systems
+              </th>
               <th
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >RTO</th
               >
+                RTO
+              </th>
               <th
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >RPO</th
               >
+                RPO
+              </th>
               <th
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >Last Tested</th
               >
+                Last Tested
+              </th>
               <th
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >Status</th
               >
+                Status
+              </th>
               <th
                 scope="col"
                 class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >Actions</th
               >
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody class="bg-card divide-y divide-border">
-            {
-              recoveryPlans.map((plan) => (
-                <tr>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                    {plan.id}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                    {plan.name}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                    <div class="flex flex-wrap gap-1">
-                      {plan.systems.map((system) => (
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
-                          {system}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                    {plan.rto} min
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                    {plan.rpo} min
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                    {formatDate(plan.lastTested)}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <span
-                      class={`inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium ${getStatusBadgeClass(plan.status as any)}`}
-                    >
-                      {getStatusDisplayText(plan.status as any)}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <a
-                      href={`/admin/security/disaster-recovery/plans/${plan.id}`}
-                      class="text-foreground hover:underline mr-3"
-                    >
-                      View
-                    </a>
-                    <button
-                      data-plan-id={plan.id}
-                      class="test-plan text-muted-foreground hover:text-muted-foreground mr-3"
-                    >
-                      Test
-                    </button>
-                    <button
-                      data-plan-id={plan.id}
-                      class="edit-plan text-foreground font-medium hover:text-foreground font-semibold"
-                    >
-                      Edit
-                    </button>
-                  </td>
-                </tr>
-              ))
-            }
+            {recoveryPlans.map((plan) => (
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                  {plan.id}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  {plan.name}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  <div class="flex flex-wrap gap-1">
+                    {plan.systems.map((system) => (
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
+                        {system}
+                      </span>
+                    ))}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  {plan.rto} min
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  {plan.rpo} min
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  {formatDate(plan.lastTested)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    class={`inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium ${getStatusBadgeClass(plan.status as any)}`}
+                  >
+                    {getStatusDisplayText(plan.status as any)}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <a
+                    href={`/admin/security/disaster-recovery/plans/${plan.id}`}
+                    class="text-foreground hover:underline mr-3"
+                  >
+                    View
+                  </a>
+                  <button
+                    data-plan-id={plan.id}
+                    class="test-plan text-muted-foreground hover:text-muted-foreground mr-3"
+                  >
+                    Test
+                  </button>
+                  <button
+                    data-plan-id={plan.id}
+                    class="edit-plan text-foreground font-medium hover:text-foreground font-semibold"
+                  >
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -329,8 +333,9 @@ function getStatusDisplayText(
         <a
           href="/admin/security/disaster-recovery/plans"
           class="text-foreground hover:underline text-sm font-medium"
-          >View All Recovery Plans</a
         >
+          View All Recovery Plans
+        </a>
       </div>
     </div>
 
@@ -338,43 +343,41 @@ function getStatusDisplayText(
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div class="bg-card rounded-none p-6">
         <h2 class="text-lg font-semibold mb-4">Upcoming Recovery Tests</h2>
-        {
-          scheduledTests.length === 0 ? (
-            <p class="text-muted-foreground text-center py-4">
-              No scheduled tests found.
-            </p>
-          ) : (
-            <ul class="divide-y divide-border">
-              {scheduledTests.map((test) => (
-                <li class="py-4">
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <h3 class="text-sm font-medium text-foreground">
-                        {test.plan}
-                      </h3>
-                      <p class="text-xs text-muted-foreground">
-                        Type: {test.type} | Duration: {test.duration}
-                      </p>
-                    </div>
-                    <div class="text-right">
-                      <p class="text-sm font-medium text-foreground">
-                        {formatDate(test.scheduledDate)}
-                      </p>
-                      <div class="mt-1">
-                        <button
-                          data-test-id={test.id}
-                          class="text-xs text-foreground hover:underline"
-                        >
-                          View Details
-                        </button>
-                      </div>
+        {scheduledTests.length === 0 ? (
+          <p class="text-muted-foreground text-center py-4">
+            No scheduled tests found.
+          </p>
+        ) : (
+          <ul class="divide-y divide-border">
+            {scheduledTests.map((test) => (
+              <li class="py-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-medium text-foreground">
+                      {test.plan}
+                    </h3>
+                    <p class="text-xs text-muted-foreground">
+                      Type: {test.type} | Duration: {test.duration}
+                    </p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm font-medium text-foreground">
+                      {formatDate(test.scheduledDate)}
+                    </p>
+                    <div class="mt-1">
+                      <button
+                        data-test-id={test.id}
+                        class="text-xs text-foreground hover:underline"
+                      >
+                        View Details
+                      </button>
                     </div>
                   </div>
-                </li>
-              ))}
-            </ul>
-          )
-        }
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
         <div class="mt-4">
           <button
             id="schedule-test-btn"
@@ -398,12 +401,12 @@ function getStatusDisplayText(
                   Patient Data Access
                 </div>
                 <div class="w-full h-2 bg-secondary rounded-none">
-                  <div class="h-2 bg-primary rounded-none" style="width: 95%">
-                  </div>
+                  <div
+                    class="h-2 bg-primary rounded-none"
+                    style="width: 95%"
+                  ></div>
                 </div>
-                <div
-                  class="w-12 text-right text-xs font-medium text-foreground"
-                >
+                <div class="w-12 text-right text-xs font-medium text-foreground">
                   95%
                 </div>
               </div>
@@ -412,36 +415,36 @@ function getStatusDisplayText(
                   Authentication
                 </div>
                 <div class="w-full h-2 bg-secondary rounded-none">
-                  <div class="h-2 bg-primary rounded-none" style="width: 100%">
-                  </div>
+                  <div
+                    class="h-2 bg-primary rounded-none"
+                    style="width: 100%"
+                  ></div>
                 </div>
-                <div
-                  class="w-12 text-right text-xs font-medium text-foreground"
-                >
+                <div class="w-12 text-right text-xs font-medium text-foreground">
                   100%
                 </div>
               </div>
               <div class="flex items-center">
                 <div class="w-32 text-xs text-muted-foreground">Analytics</div>
                 <div class="w-full h-2 bg-secondary rounded-none">
-                  <div class="h-2 bg-primary rounded-none" style="width: 80%">
-                  </div>
+                  <div
+                    class="h-2 bg-primary rounded-none"
+                    style="width: 80%"
+                  ></div>
                 </div>
-                <div
-                  class="w-12 text-right text-xs font-medium text-foreground"
-                >
+                <div class="w-12 text-right text-xs font-medium text-foreground">
                   80%
                 </div>
               </div>
               <div class="flex items-center">
                 <div class="w-32 text-xs text-muted-foreground">Reporting</div>
                 <div class="w-full h-2 bg-secondary rounded-none">
-                  <div class="h-2 bg-primary rounded-none" style="width: 75%">
-                  </div>
+                  <div
+                    class="h-2 bg-primary rounded-none"
+                    style="width: 75%"
+                  ></div>
                 </div>
-                <div
-                  class="w-12 text-right text-xs font-medium text-foreground"
-                >
+                <div class="w-12 text-right text-xs font-medium text-foreground">
                   75%
                 </div>
               </div>
@@ -457,29 +460,37 @@ function getStatusDisplayText(
                 <span>Business Impact Analysis</span>
                 <a
                   href="/admin/security/disaster-recovery/bcp/impact-analysis"
-                  class="text-foreground hover:underline">View</a
+                  class="text-foreground hover:underline"
                 >
+                  View
+                </a>
               </li>
               <li class="flex justify-between items-center text-sm">
                 <span>Recovery Strategies</span>
                 <a
                   href="/admin/security/disaster-recovery/bcp/strategies"
-                  class="text-foreground hover:underline">View</a
+                  class="text-foreground hover:underline"
                 >
+                  View
+                </a>
               </li>
               <li class="flex justify-between items-center text-sm">
                 <span>Communication Plan</span>
                 <a
                   href="/admin/security/disaster-recovery/bcp/communication"
-                  class="text-foreground hover:underline">View</a
+                  class="text-foreground hover:underline"
                 >
+                  View
+                </a>
               </li>
               <li class="flex justify-between items-center text-sm">
                 <span>Training Materials</span>
                 <a
                   href="/admin/security/disaster-recovery/bcp/training"
-                  class="text-foreground hover:underline">View</a
+                  class="text-foreground hover:underline"
                 >
+                  View
+                </a>
               </li>
             </ul>
           </div>
@@ -500,12 +511,8 @@ function getStatusDisplayText(
     <div class="bg-card rounded-none p-6">
       <h2 class="text-lg font-semibold mb-4">Recent Test Results</h2>
       <div class="overflow-hidden">
-        <div
-          class="flex items-center p-4 rounded-none bg-secondary border border-border mb-4"
-        >
-          <div
-            class="flex-shrink-0 h-10 w-10 rounded-none bg-secondary border border-input flex items-center justify-center mr-4"
-          >
+        <div class="flex items-center p-4 rounded-none bg-secondary border border-border mb-4">
+          <div class="flex-shrink-0 h-10 w-10 rounded-none bg-secondary border border-input flex items-center justify-center mr-4">
             <span class="text-muted-foreground text-lg">✓</span>
           </div>
           <div>
@@ -513,15 +520,12 @@ function getStatusDisplayText(
               Database Recovery Test
             </h3>
             <p class="text-xs text-muted-foreground">
-              Successfully completed on {
-                formatDate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
-              }
+              Successfully completed on{' '}
+              {formatDate(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))}
             </p>
           </div>
           <div class="ml-auto text-right">
-            <span
-              class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground"
-            >
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
               Success
             </span>
             <p class="text-xs text-muted-foreground mt-1">
@@ -530,12 +534,8 @@ function getStatusDisplayText(
           </div>
         </div>
 
-        <div
-          class="flex items-center p-4 rounded-none bg-card border border-border mb-4"
-        >
-          <div
-            class="flex-shrink-0 h-10 w-10 rounded-none bg-primary flex items-center justify-center mr-4"
-          >
+        <div class="flex items-center p-4 rounded-none bg-card border border-border mb-4">
+          <div class="flex-shrink-0 h-10 w-10 rounded-none bg-primary flex items-center justify-center mr-4">
             <span class="text-foreground font-semibold text-lg">×</span>
           </div>
           <div>
@@ -543,15 +543,12 @@ function getStatusDisplayText(
               Ransomware Recovery Test
             </h3>
             <p class="text-xs text-muted-foreground">
-              Failed on {
-                formatDate(new Date(Date.now() - 21 * 24 * 60 * 60 * 1000))
-              }
+              Failed on{' '}
+              {formatDate(new Date(Date.now() - 21 * 24 * 60 * 60 * 1000))}
             </p>
           </div>
           <div class="ml-auto text-right">
-            <span
-              class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground font-semibold"
-            >
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground font-semibold">
               Failed
             </span>
             <p class="text-xs text-muted-foreground mt-1">
@@ -560,12 +557,8 @@ function getStatusDisplayText(
           </div>
         </div>
 
-        <div
-          class="flex items-center p-4 rounded-none bg-secondary border border-border"
-        >
-          <div
-            class="flex-shrink-0 h-10 w-10 rounded-none bg-secondary border border-input flex items-center justify-center mr-4"
-          >
+        <div class="flex items-center p-4 rounded-none bg-secondary border border-border">
+          <div class="flex-shrink-0 h-10 w-10 rounded-none bg-secondary border border-input flex items-center justify-center mr-4">
             <span class="text-muted-foreground text-lg">✓</span>
           </div>
           <div>
@@ -573,15 +566,12 @@ function getStatusDisplayText(
               API Service Recovery Test
             </h3>
             <p class="text-xs text-muted-foreground">
-              Successfully completed on {
-                formatDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-              }
+              Successfully completed on{' '}
+              {formatDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))}
             </p>
           </div>
           <div class="ml-auto text-right">
-            <span
-              class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground"
-            >
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
               Success
             </span>
             <p class="text-xs text-muted-foreground mt-1">
@@ -595,8 +585,9 @@ function getStatusDisplayText(
         <a
           href="/admin/security/disaster-recovery/tests"
           class="text-foreground hover:underline text-sm font-medium"
-          >View All Test Results</a
         >
+          View All Test Results
+        </a>
       </div>
     </div>
   </div>

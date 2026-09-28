@@ -25,11 +25,9 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     <div class="text-center mb-8">
       <h1 class="text-4xl font-bold tracking-tight mb-3">
         Welcome to Your Therapy Space
-        {
-          user?.name && (
-            <span class="text-primary">, {user.name.split(' ')[0]}</span>
-          )
-        }
+        {user?.name && (
+          <span class="text-primary">, {user.name.split(' ')[0]}</span>
+        )}
       </h1>
       <p class="text-xl text-muted-foreground mb-6">
         Track your progress, explore emotions, and engage with your healing
@@ -37,9 +35,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       </p>
 
       <!-- Progress Summary -->
-      <div
-        class="inline-flex items-center gap-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 px-8 py-4 rounded-full border border-blue-200 dark:border-blue-800"
-      >
+      <div class="inline-flex items-center gap-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 px-8 py-4 rounded-full border border-blue-200 dark:border-blue-800">
         <div class="text-center">
           <div class="text-2xl font-bold text-blue-600">85%</div>
           <div class="text-sm text-muted-foreground">Overall Progress</div>
@@ -60,9 +56,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     <!-- Journey Overview Carousel -->
     <Card>
       <div class="p-6">
-        <h2
-          class="text-2xl font-semibold mb-6 text-center flex items-center justify-center gap-2"
-        >
+        <h2 class="text-2xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
           <span class="material-symbols-outlined text-primary">timeline</span>
           Your Therapy Journey
         </h2>
@@ -129,9 +123,9 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       <Card>
         <div class="p-6">
           <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-purple-600"
-              >psychology</span
-            >
+            <span class="material-symbols-outlined text-purple-600">
+              psychology
+            </span>
             Emotion Exploration Space
           </h3>
           <p class="text-muted-foreground text-sm mb-4">
@@ -154,9 +148,9 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       <Card>
         <div class="p-6">
           <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-blue-600"
-              >3d_rotation</span
-            >
+            <span class="material-symbols-outlined text-blue-600">
+              3d_rotation
+            </span>
             Your Emotion Journey
           </h3>
           <p class="text-muted-foreground text-sm mb-4">
@@ -178,9 +172,9 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       <Card>
         <div class="p-6">
           <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-green-600"
-              >trending_up</span
-            >
+            <span class="material-symbols-outlined text-green-600">
+              trending_up
+            </span>
             Your Progress Over Time
           </h3>
           <p class="text-muted-foreground text-sm mb-4">
@@ -232,16 +226,12 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 
     <!-- Action Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <Card
-        class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20"
-      >
+      <Card class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
         <div class="p-6 text-center">
-          <div
-            class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <span class="material-symbols-outlined text-white text-2xl"
-              >chat</span
-            >
+          <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-white text-2xl">
+              chat
+            </span>
           </div>
           <h3 class="text-lg font-semibold mb-2">Continue Therapy</h3>
           <p class="text-sm text-muted-foreground mb-4">
@@ -257,16 +247,12 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
         </div>
       </Card>
 
-      <Card
-        class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20"
-      >
+      <Card class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
         <div class="p-6 text-center">
-          <div
-            class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <span class="material-symbols-outlined text-white text-2xl"
-              >assignment</span
-            >
+          <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-white text-2xl">
+              assignment
+            </span>
           </div>
           <h3 class="text-lg font-semibold mb-2">Review Goals</h3>
           <p class="text-sm text-muted-foreground mb-4">
@@ -282,16 +268,12 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
         </div>
       </Card>
 
-      <Card
-        class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20"
-      >
+      <Card class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
         <div class="p-6 text-center">
-          <div
-            class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <span class="material-symbols-outlined text-white text-2xl"
-              >insights</span
-            >
+          <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-white text-2xl">
+              insights
+            </span>
           </div>
           <h3 class="text-lg font-semibold mb-2">Explore Tools</h3>
           <p class="text-sm text-muted-foreground mb-4">
@@ -309,25 +291,21 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     </div>
 
     <!-- Today's Insights -->
-    <Card
-      class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20"
-    >
+    <Card class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20">
       <div class="p-6">
         <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-indigo-600"
-            >lightbulb</span
-          >
+          <span class="material-symbols-outlined text-indigo-600">
+            lightbulb
+          </span>
           Today's Insights
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
             <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center"
-              >
-                <span class="material-symbols-outlined text-green-600 text-sm"
-                  >trending_up</span
-                >
+              <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-green-600 text-sm">
+                  trending_up
+                </span>
               </div>
               <h4 class="font-medium">Progress Milestone</h4>
             </div>
@@ -339,12 +317,10 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 
           <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
             <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center"
-              >
-                <span class="material-symbols-outlined text-blue-600 text-sm"
-                  >schedule</span
-                >
+              <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-blue-600 text-sm">
+                  schedule
+                </span>
               </div>
               <h4 class="font-medium">Session Reminder</h4>
             </div>
@@ -355,12 +331,10 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 
           <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
             <div class="flex items-center gap-3 mb-2">
-              <div
-                class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center"
-              >
-                <span class="material-symbols-outlined text-purple-600 text-sm"
-                  >psychology</span
-                >
+              <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                <span class="material-symbols-outlined text-purple-600 text-sm">
+                  psychology
+                </span>
               </div>
               <h4 class="font-medium">Mood Pattern</h4>
             </div>
@@ -378,14 +352,13 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       <div class="flex items-center gap-4 text-sm text-muted-foreground">
         <span>Patient Dashboard</span>
         <span>•</span>
-        <span
-          >Live Data: <span class="font-medium text-green-600">Connected</span
-          ></span
-        >
+        <span>
+          Live Data: <span class="font-medium text-green-600">Connected</span>
+        </span>
         <span>•</span>
-        <span
-          >Privacy: <span class="font-medium text-blue-600">Maximum</span></span
-        >
+        <span>
+          Privacy: <span class="font-medium text-blue-600">Maximum</span>
+        </span>
       </div>
 
       <div class="flex items-center gap-2">

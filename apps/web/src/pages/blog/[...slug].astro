@@ -79,9 +79,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 >
   <div class="relative min-h-screen text-white">
     <!-- Floating Particles -->
-    <div
-      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
-    >
+    <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
       <div class="particle particle-1"></div>
       <div class="particle particle-2"></div>
       <div class="particle particle-3"></div>
@@ -108,15 +106,13 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
           <div class="text-center mb-8">
             <!-- Category and Meta Info -->
             <div class="flex items-center justify-center gap-4 mb-6">
-              {
-                entry.data.category && (
-                  <Badge
-                    class={`bg-${categoryColor}-500/20 text-${categoryColor}-300`}
-                  >
-                    {entry.data.category}
-                  </Badge>
-                )
-              }
+              {entry.data.category && (
+                <Badge
+                  class={`bg-${categoryColor}-500/20 text-${categoryColor}-300`}
+                >
+                  {entry.data.category}
+                </Badge>
+              )}
               <Badge class="bg-gray-500/20 text-gray-300">
                 {readingTime} min read
               </Badge>
@@ -133,43 +129,37 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
             </h1>
 
             <!-- Description -->
-            {
-              entry.data.description && (
-                <p class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed">
-                  {entry.data.description}
-                </p>
-              )
-            }
+            {entry.data.description && (
+              <p class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+                {entry.data.description}
+              </p>
+            )}
 
             <!-- Featured Image -->
-            {
-              entry.data.image && (
-                <div class="w-full max-w-3xl mx-auto mb-8">
-                  <div
-                    class={`bg-gradient-to-br from-${categoryColor}-400/20 to-${categoryColor}-500/20 rounded-2xl p-2 overflow-hidden`}
-                  >
-                    <img
-                      src={entry.data.image.url}
-                      alt={entry.data.image.alt}
-                      class="w-full h-64 lg:h-96 object-cover rounded-xl"
-                    />
-                  </div>
+            {entry.data.image && (
+              <div class="w-full max-w-3xl mx-auto mb-8">
+                <div
+                  class={`bg-gradient-to-br from-${categoryColor}-400/20 to-${categoryColor}-500/20 rounded-2xl p-2 overflow-hidden`}
+                >
+                  <img
+                    src={entry.data.image.url}
+                    alt={entry.data.image.alt}
+                    class="w-full h-64 lg:h-96 object-cover rounded-xl"
+                  />
                 </div>
-              )
-            }
+              </div>
+            )}
 
             <!-- Tags -->
-            {
-              entry.data.tags && entry.data.tags.length > 0 && (
-                <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
-                  {entry.data.tags.map((tag: string) => (
-                    <Badge class="bg-slate-700/50 text-slate-300 text-xs">
-                      #{tag}
-                    </Badge>
-                  ))}
-                </div>
-              )
-            }
+            {entry.data.tags && entry.data.tags.length > 0 && (
+              <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
+                {entry.data.tags.map((tag: string) => (
+                  <Badge class="bg-slate-700/50 text-slate-300 text-xs">
+                    #{tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -188,9 +178,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
         <!-- Article Actions -->
         <div class="max-w-4xl mx-auto mb-16">
-          <Card
-            class="border border-green-600/30 bg-green-900/20 rounded-2xl overflow-hidden"
-          >
+          <Card class="border border-green-600/30 bg-green-900/20 rounded-2xl overflow-hidden">
             <CardContent class="p-6 lg:p-8 text-center">
               <div class="text-4xl mb-4 text-green-400">
                 <Lightbulb className="w-10 h-10" />
@@ -202,9 +190,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
                 Share your thoughts with other therapy educators or explore more
                 insights from the training revolution.
               </p>
-              <div
-                class="flex flex-col sm:flex-row gap-4 justify-center items-center"
-              >
+              <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Button
                   className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-400 hover:to-emerald-400 text-white px-6 py-3 rounded-full"
                   data-demo-link="/demo-hub"
@@ -224,102 +210,92 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
         </div>
 
         <!-- Related Posts -->
-        {
-          relatedPosts.length > 0 && (
-            <div class="max-w-6xl mx-auto mb-16">
-              <div class="text-center mb-12">
-                <h2 class="text-2xl lg:text-3xl font-bold text-white mb-4">
-                  You Might Also
-                  <span class={`text-${categoryColor}-400 golden-shimmer`}>
-                    Enjoy
-                  </span>
-                </h2>
-                <p class="text-base text-green-100/90 max-w-2xl mx-auto">
-                  More insights from the therapy training revolution
-                </p>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {relatedPosts.map((post: CollectionEntry<'blog'>) => (
-                  <Card class="border border-slate-600/30 hover:border-slate-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
-                    <CardHeader class="pb-4">
-                      {post.data.image && (
-                        <div class="w-full h-40 bg-gradient-to-br from-orange-400/20 to-red-500/20 rounded-lg mb-4 overflow-hidden">
-                          <img
-                            src={post.data.image.url}
-                            alt={post.data.image.alt}
-                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                          />
-                        </div>
-                      )}
-
-                      {post.data.category && (
-                        <Badge class="bg-slate-500/20 text-slate-300 text-xs mb-3">
-                          {post.data.category}
-                        </Badge>
-                      )}
-
-                      <CardTitle class="text-base font-bold text-slate-100 tracking-wide mb-3 group-hover:text-slate-50 transition-colors">
-                        <a
-                          href={`/blog/${post.data.slug || post.slug}`}
-                          class="hover:underline"
-                        >
-                          {post.data.title}
-                        </a>
-                      </CardTitle>
-
-                      <CardDescription class="text-sm text-slate-200/80 leading-relaxed mb-4">
-                        {post.data.description}
-                      </CardDescription>
-
-                      <div class="flex items-center justify-between text-xs text-slate-300/70">
-                        <span>
-                          {new Date(post.data.pubDate).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
+        {relatedPosts.length > 0 && (
+          <div class="max-w-6xl mx-auto mb-16">
+            <div class="text-center mb-12">
+              <h2 class="text-2xl lg:text-3xl font-bold text-white mb-4">
+                You Might Also
+                <span class={`text-${categoryColor}-400 golden-shimmer`}>
+                  Enjoy
+                </span>
+              </h2>
+              <p class="text-base text-green-100/90 max-w-2xl mx-auto">
+                More insights from the therapy training revolution
+              </p>
             </div>
-          )
-        }
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {relatedPosts.map((post: CollectionEntry<'blog'>) => (
+                <Card class="border border-slate-600/30 hover:border-slate-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card bg-slate-900/50">
+                  <CardHeader class="pb-4">
+                    {post.data.image && (
+                      <div class="w-full h-40 bg-gradient-to-br from-orange-400/20 to-red-500/20 rounded-lg mb-4 overflow-hidden">
+                        <img
+                          src={post.data.image.url}
+                          alt={post.data.image.alt}
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        />
+                      </div>
+                    )}
+
+                    {post.data.category && (
+                      <Badge class="bg-slate-500/20 text-slate-300 text-xs mb-3">
+                        {post.data.category}
+                      </Badge>
+                    )}
+
+                    <CardTitle class="text-base font-bold text-slate-100 tracking-wide mb-3 group-hover:text-slate-50 transition-colors">
+                      <a
+                        href={`/blog/${post.data.slug || post.slug}`}
+                        class="hover:underline"
+                      >
+                        {post.data.title}
+                      </a>
+                    </CardTitle>
+
+                    <CardDescription class="text-sm text-slate-200/80 leading-relaxed mb-4">
+                      {post.data.description}
+                    </CardDescription>
+
+                    <div class="flex items-center justify-between text-xs text-slate-300/70">
+                      <span>
+                        {new Date(post.data.pubDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         <!-- Newsletter Signup -->
         <div class="max-w-4xl mx-auto">
-          <Card
-            class="border border-blue-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
-          >
+          <Card class="border border-blue-500/40 bg-slate-900/50 rounded-3xl overflow-hidden">
             <CardContent class="p-8 lg:p-12 text-center">
               <div class="text-6xl text-blue-400 mb-6">📬</div>
 
               <h2 class="text-2xl lg:text-3xl font-bold text-blue-100 mb-6">
                 Stay Ahead of the
                 <br />
-                <span class="text-blue-400 golden-shimmer"
-                  >Training Revolution</span
-                >
+                <span class="text-blue-400 golden-shimmer">
+                  Training Revolution
+                </span>
               </h2>
 
-              <p
-                class="text-base text-blue-200/90 mb-8 leading-relaxed max-w-2xl mx-auto"
-              >
+              <p class="text-base text-blue-200/90 mb-8 leading-relaxed max-w-2xl mx-auto">
                 Get weekly insights like this delivered to your inbox.
                 University success stories, breakthrough research, and practical
                 tips for therapy educators.
               </p>
 
-              <div
-                class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6 max-w-md mx-auto"
-              >
+              <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6 max-w-md mx-auto">
                 <input
                   type="email"
                   placeholder="your.email@university.edu"
                   class="flex-1 px-4 py-3 rounded-full bg-slate-800/50 border border-blue-500/30 text-blue-100 placeholder-blue-300/50 focus:outline-none focus:border-blue-400"
                 />
-                <Button
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white px-6 py-3 rounded-full transform hover:scale-105 transition-all duration-300"
-                >
+                <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white px-6 py-3 rounded-full transform hover:scale-105 transition-all duration-300">
                   Subscribe
                 </Button>
               </div>

@@ -177,9 +177,7 @@ const withdrawalsByType: Record<string, number> = {}
   <!-- Dashboard Stats Cards -->
   <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
     <Card>
-      <CardHeader
-        class="flex flex-row items-center justify-between space-y-0 pb-2"
-      >
+      <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="text-sm font-medium">Active Consents</CardTitle>
         <SafeIcon name="tabler:check-circle" class="h-4 w-4 text-foreground" />
       </CardHeader>
@@ -192,9 +190,7 @@ const withdrawalsByType: Record<string, number> = {}
     </Card>
 
     <Card>
-      <CardHeader
-        class="flex flex-row items-center justify-between space-y-0 pb-2"
-      >
+      <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="text-sm font-medium">Withdrawn Consents</CardTitle>
         <SafeIcon name="tabler:circle-x" class="h-4 w-4 text-foreground" />
       </CardHeader>
@@ -205,9 +201,7 @@ const withdrawalsByType: Record<string, number> = {}
     </Card>
 
     <Card>
-      <CardHeader
-        class="flex flex-row items-center justify-between space-y-0 pb-2"
-      >
+      <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="text-sm font-medium">Consent Types</CardTitle>
         <SafeIcon name="tabler:category" class="h-4 w-4 text-foreground" />
       </CardHeader>
@@ -218,9 +212,7 @@ const withdrawalsByType: Record<string, number> = {}
     </Card>
 
     <Card>
-      <CardHeader
-        class="flex flex-row items-center justify-between space-y-0 pb-2"
-      >
+      <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle class="text-sm font-medium">Consent Versions</CardTitle>
         <SafeIcon name="tabler:versions" class="h-4 w-4 text-foreground" />
       </CardHeader>
@@ -239,37 +231,31 @@ const withdrawalsByType: Record<string, number> = {}
       </CardHeader>
       <CardContent>
         <div class="space-y-4">
-          {
-            consentTypes &&
-              consentTypes.map((type) => (
-                <div class="flex items-center justify-between border-b pb-2">
-                  <div>
-                    <p class="font-medium">{type['name']}</p>
-                    <p class="text-xs text-muted-foreground">
-                      Scope: {type['scope']}
-                    </p>
-                  </div>
-                  <div class="flex items-center space-x-2">
-                    <Badge
-                      variant={type['is_active'] ? 'default' : 'secondary'}
-                    >
-                      {type['is_active'] ? 'Active' : 'Inactive'}
-                    </Badge>
-                    <span class="text-sm font-medium">
-                      {consentsByType[type['name']] || 0} active
-                    </span>
-                  </div>
+          {consentTypes &&
+            consentTypes.map((type) => (
+              <div class="flex items-center justify-between border-b pb-2">
+                <div>
+                  <p class="font-medium">{type['name']}</p>
+                  <p class="text-xs text-muted-foreground">
+                    Scope: {type['scope']}
+                  </p>
                 </div>
-              ))
-          }
+                <div class="flex items-center space-x-2">
+                  <Badge variant={type['is_active'] ? 'default' : 'secondary'}>
+                    {type['is_active'] ? 'Active' : 'Inactive'}
+                  </Badge>
+                  <span class="text-sm font-medium">
+                    {consentsByType[type['name']] || 0} active
+                  </span>
+                </div>
+              </div>
+            ))}
 
-          {
-            (!consentTypes || consentTypes.length === 0) && (
-              <p class="text-center text-muted-foreground py-4">
-                No consent types defined
-              </p>
-            )
-          }
+          {(!consentTypes || consentTypes.length === 0) && (
+            <p class="text-center text-muted-foreground py-4">
+              No consent types defined
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -280,38 +266,33 @@ const withdrawalsByType: Record<string, number> = {}
       </CardHeader>
       <CardContent>
         <div class="space-y-4">
-          {
-            typedConsentVersions &&
-              typedConsentVersions
-                .filter(
-                  (v): v is ConsentVersionWithTypeName =>
-                    v.is_current && !!v.consent_types?.name,
-                )
-                .map((version) => (
-                  <div class="flex items-center justify-between border-b pb-2">
-                    <div>
-                      <p class="font-medium">
-                        {version.consent_types?.name || 'Unknown'}
-                      </p>
-                      <p class="text-xs text-muted-foreground">
-                        Version {version.version} • Effective:{' '}
-                        {formatDate(version.effective_date, { month: 'short' })}
-                      </p>
-                    </div>
-                    <Badge variant="outline">Current</Badge>
+          {typedConsentVersions &&
+            typedConsentVersions
+              .filter(
+                (v): v is ConsentVersionWithTypeName =>
+                  v.is_current && !!v.consent_types?.name,
+              )
+              .map((version) => (
+                <div class="flex items-center justify-between border-b pb-2">
+                  <div>
+                    <p class="font-medium">
+                      {version.consent_types?.name || 'Unknown'}
+                    </p>
+                    <p class="text-xs text-muted-foreground">
+                      Version {version.version} • Effective:{' '}
+                      {formatDate(version.effective_date, { month: 'short' })}
+                    </p>
                   </div>
-                ))
-          }
+                  <Badge variant="outline">Current</Badge>
+                </div>
+              ))}
 
-          {
-            (!typedConsentVersions ||
-              typedConsentVersions.filter((v) => v.is_current).length ===
-                0) && (
-              <p class="text-center text-muted-foreground py-4">
-                No current versions found
-              </p>
-            )
-          }
+          {(!typedConsentVersions ||
+            typedConsentVersions.filter((v) => v.is_current).length === 0) && (
+            <p class="text-center text-muted-foreground py-4">
+              No current versions found
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -322,106 +303,100 @@ const withdrawalsByType: Record<string, number> = {}
         <CardTitle>Consent Analytics</CardTitle>
       </CardHeader>
       <CardContent>
-        {
-          Object.keys(consentsByType).length > 0 ? (
-            <div class="space-y-8">
-              <div>
-                <h3 class="text-sm font-medium mb-2">
-                  Active Consents by Type
-                </h3>
-                <div class="space-y-2">
-                  {Object.entries(consentsByType).map(([typeName, count]) => (
-                    <div>
-                      <div class="flex items-center justify-between">
-                        <span class="text-sm">{typeName}</span>
-                        <span class="text-sm font-medium">{count}</span>
-                      </div>
-                      <div class="h-2 w-full mt-1 bg-secondary rounded-none overflow-hidden">
-                        <div
-                          class="bg-primary h-full rounded-none"
-                          style={`width: ${Math.min(100, Math.round((count / totalActiveConsents) * 100))}%`}
-                        />
-                      </div>
+        {Object.keys(consentsByType).length > 0 ? (
+          <div class="space-y-8">
+            <div>
+              <h3 class="text-sm font-medium mb-2">Active Consents by Type</h3>
+              <div class="space-y-2">
+                {Object.entries(consentsByType).map(([typeName, count]) => (
+                  <div>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm">{typeName}</span>
+                      <span class="text-sm font-medium">{count}</span>
                     </div>
-                  ))}
+                    <div class="h-2 w-full mt-1 bg-secondary rounded-none overflow-hidden">
+                      <div
+                        class="bg-primary h-full rounded-none"
+                        style={`width: ${Math.min(100, Math.round((count / totalActiveConsents) * 100))}%`}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {Object.keys(withdrawalsByType).length > 0 && (
+              <div>
+                <h3 class="text-sm font-medium mb-2">Withdrawals by Type</h3>
+                <div class="space-y-2">
+                  {Object.entries(withdrawalsByType).map(
+                    ([typeName, count]) => (
+                      <div>
+                        <div class="flex items-center justify-between">
+                          <span class="text-sm">{typeName}</span>
+                          <span class="text-sm font-medium">{count}</span>
+                        </div>
+                        <div class="h-2 w-full mt-1 bg-secondary rounded-none overflow-hidden">
+                          <div
+                            class="bg-primary h-full rounded-none"
+                            style={`width: ${Math.min(100, Math.round((count / totalWithdrawnConsents) * 100))}%`}
+                          />
+                        </div>
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
-
-              {Object.keys(withdrawalsByType).length > 0 && (
-                <div>
-                  <h3 class="text-sm font-medium mb-2">Withdrawals by Type</h3>
-                  <div class="space-y-2">
-                    {Object.entries(withdrawalsByType).map(
-                      ([typeName, count]) => (
-                        <div>
-                          <div class="flex items-center justify-between">
-                            <span class="text-sm">{typeName}</span>
-                            <span class="text-sm font-medium">{count}</span>
-                          </div>
-                          <div class="h-2 w-full mt-1 bg-secondary rounded-none overflow-hidden">
-                            <div
-                              class="bg-primary h-full rounded-none"
-                              style={`width: ${Math.min(100, Math.round((count / totalWithdrawnConsents) * 100))}%`}
-                            />
-                          </div>
-                        </div>
-                      ),
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div class="text-center py-8">
-              <SafeIcon
-                name="tabler:chart-bar"
-                class="h-12 w-12 text-muted-foreground mx-auto mb-3"
-              />
-              <p class="text-muted-foreground">
-                No consent data available for analysis
-              </p>
-            </div>
-          )
-        }
+            )}
+          </div>
+        ) : (
+          <div class="text-center py-8">
+            <SafeIcon
+              name="tabler:chart-bar"
+              class="h-12 w-12 text-muted-foreground mx-auto mb-3"
+            />
+            <p class="text-muted-foreground">
+              No consent data available for analysis
+            </p>
+          </div>
+        )}
       </CardContent>
     </Card>
 
     <!-- Recent Withdrawals -->
-    {
-      typedWithdrawnConsents && typedWithdrawnConsents.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Consent Withdrawals</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div class="space-y-4">
-              {typedWithdrawnConsents.slice(0, 5).map((consent) => (
-                <div class="border-b pb-4">
-                  <div class="flex items-center justify-between mb-2">
-                    <div>
-                      <Badge variant="outline">
-                        {consent.consent_versions?.consent_types?.name ||
-                          'Unknown'}
-                      </Badge>
-                      <span class="text-xs text-muted-foreground ml-2">
-                        Withdrawn on{' '}
-                        {formatDate(consent.withdrawal_date, {
-                          month: 'short',
-                        })}
-                      </span>
-                    </div>
+    {typedWithdrawnConsents && typedWithdrawnConsents.length > 0 && (
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Consent Withdrawals</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="space-y-4">
+            {typedWithdrawnConsents.slice(0, 5).map((consent) => (
+              <div class="border-b pb-4">
+                <div class="flex items-center justify-between mb-2">
+                  <div>
+                    <Badge variant="outline">
+                      {consent.consent_versions?.consent_types?.name ||
+                        'Unknown'}
+                    </Badge>
+                    <span class="text-xs text-muted-foreground ml-2">
+                      Withdrawn on{' '}
+                      {formatDate(consent.withdrawal_date, {
+                        month: 'short',
+                      })}
+                    </span>
                   </div>
-                  {consent.withdrawal_reason && (
-                    <p class="text-sm border-l-2 border-ring pl-3 text-muted-foreground italic">
-                      "{consent.withdrawal_reason}"
-                    </p>
-                  )}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )
-    }
+                {consent.withdrawal_reason && (
+                  <p class="text-sm border-l-2 border-ring pl-3 text-muted-foreground italic">
+                    "{consent.withdrawal_reason}"
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )}
   </div>
 </div>

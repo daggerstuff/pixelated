@@ -57,7 +57,8 @@ const { cspNonce } = Astro.locals
     color: var(--text-secondary, #6b6b66);
     text-decoration: none;
     border-left: 2px solid transparent;
-    transition: background var(--np-duration-fast, 0.15s) var(--np-ease, ease-out);
+    transition: background var(--np-duration-fast, 0.15s)
+      var(--np-ease, ease-out);
   }
 
   .nav-link-refined:hover {
@@ -168,7 +169,8 @@ const { cspNonce } = Astro.locals
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"></path>
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
               </svg>
             </button>
 
@@ -194,9 +196,7 @@ const { cspNonce } = Astro.locals
               </button>
 
               <div class="relative">
-                <button
-                  class="flex items-center text-gray-700 dark:text-gray-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:focus-visible:ring-gray-500"
-                >
+                <button class="flex items-center text-gray-700 dark:text-gray-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:focus-visible:ring-gray-500">
                   <img
                     class="h-8 w-8 rounded-full object-cover"
                     src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
@@ -212,7 +212,8 @@ const { cspNonce } = Astro.locals
                     <path
                       fill-rule="evenodd"
                       d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clip-rule="evenodd"></path>
+                      clip-rule="evenodd"
+                    ></path>
                   </svg>
                 </button>
               </div>
@@ -245,7 +246,10 @@ const { cspNonce } = Astro.locals
 
         // Close on Escape
         button.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+          if (
+            e.key === 'Escape' &&
+            button.getAttribute('aria-expanded') === 'true'
+          ) {
             button.setAttribute('aria-expanded', 'false')
             sidebar.classList.add('hidden')
             button.focus()

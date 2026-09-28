@@ -39,13 +39,11 @@ try {
 
   <div class:list={['content-wrapper', { 'content-with-toc': pageToc }]}>
     {contentResult && <contentResult />}
-    {
-      !contentResult && (
-        <div class="error-message">
-          <p>Sorry, the content could not be loaded.</p>
-        </div>
-      )
-    }
+    {!contentResult && (
+      <div class="error-message">
+        <p>Sorry, the content could not be loaded.</p>
+      </div>
+    )}
   </div>
 </div>
 

@@ -10,7 +10,9 @@ const session = (Astro.locals as any)?.session
 const user = (Astro.locals as any)?.user
 
 if (!session || !user || user.role !== 'admin') {
-  return Astro.redirect(`/login?redirect=${encodeURIComponent('/admin/bias-detection')}`)
+  return Astro.redirect(
+    `/login?redirect=${encodeURIComponent('/admin/bias-detection')}`,
+  )
 }
 
 // Page metadata
@@ -27,7 +29,11 @@ const pageDescription =
   <ClientRouter />
 
   <div class="container mx-auto px-4 py-6">
-    <div id="bias-dashboard" data-testid="bias-dashboard" class="bias-dashboard-container">
+    <div
+      id="bias-dashboard"
+      data-testid="bias-dashboard"
+      class="bias-dashboard-container"
+    >
       <BiasDashboard
         client:load
         refreshInterval={30000}

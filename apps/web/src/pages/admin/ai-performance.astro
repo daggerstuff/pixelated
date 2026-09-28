@@ -33,12 +33,8 @@ const pageDescription =
 <DashboardLayout title={`${pageTitle} | Admin`}>
   <div class="container px-4 py-8 mx-auto">
     <header class="mb-8">
-      <h1 class="text-2xl font-bold text-foreground">
-        {pageTitle}
-      </h1>
-      <p class="mt-2 text-muted-foreground">
-        {pageDescription}
-      </p>
+      <h1 class="text-2xl font-bold text-foreground">{pageTitle}</h1>
+      <p class="mt-2 text-muted-foreground">{pageDescription}</p>
     </header>
 
     <div class="mb-8">
@@ -60,8 +56,7 @@ const pageDescription =
       </p>
       <div class="bg-secondary rounded-none p-4 mb-4">
         <h3 class="text-lg font-medium text-foreground mb-2">Usage Example</h3>
-        <pre
-          class="bg-popover text-foreground rounded-none p-4 overflow-x-auto text-sm">
+        <pre class="bg-popover text-foreground rounded-none p-4 overflow-x-auto text-sm">
 {`// Import the performance monitoring decorator
 import { monitorPerformance } from '@/lib/ai/performance';
 

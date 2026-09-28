@@ -117,9 +117,7 @@ const getStatusBadge = (status: string) => {
 
 <div class="bg-card rounded-none -md overflow-hidden">
   <div class="p-6">
-    <h2 class="text-2xl font-bold text-foreground mb-4">
-      {title}
-    </h2>
+    <h2 class="text-2xl font-bold text-foreground mb-4">{title}</h2>
 
     <div class="mb-8">
       <p class="text-muted-foreground mb-4">
@@ -129,27 +127,21 @@ const getStatusBadge = (status: string) => {
       </p>
 
       <div class="flex flex-wrap gap-4 mb-6">
-        <div
-          class="bg-secondary border border-input p-3 rounded-none flex items-center"
-        >
+        <div class="bg-secondary border border-input p-3 rounded-none flex items-center">
           <Icon name="file-text" class="w-5 h-5 text-foreground mr-2" />
-          <span class="text-foreground font-medium font-medium text-sm"
-            >Customizable reports</span
-          >
+          <span class="text-foreground font-medium font-medium text-sm">
+            Customizable reports
+          </span>
         </div>
 
-        <div
-          class="bg-secondary border border-input p-3 rounded-none flex items-center"
-        >
+        <div class="bg-secondary border border-input p-3 rounded-none flex items-center">
           <Icon name="calendar" class="w-5 h-5 text-foreground mr-2" />
-          <span class="text-foreground font-medium text-sm"
-            >Automated scheduling</span
-          >
+          <span class="text-foreground font-medium text-sm">
+            Automated scheduling
+          </span>
         </div>
 
-        <div
-          class="bg-secondary border border-input p-3 rounded-none flex items-center"
-        >
+        <div class="bg-secondary border border-input p-3 rounded-none flex items-center">
           <Icon name="mail" class="w-5 h-5 text-foreground mr-2" />
           <span class="text-foreground text-sm">Email distribution</span>
         </div>
@@ -170,57 +162,55 @@ const getStatusBadge = (status: string) => {
       </div>
 
       <div class="grid grid-cols-1 gap-4 mb-6">
-        {
-          reportTypes.map((report) => (
-            <div class="bg-card border border-border rounded-none p-4">
-              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                <div class="flex-1">
-                  <h4 class="text-base font-medium text-foreground">
-                    {report.name}
-                  </h4>
-                  <p class="text-sm text-muted-foreground">
-                    {report.description}
-                  </p>
-                  <div class="flex flex-wrap gap-1 mt-2">
-                    {report.format.map((format) => (
-                      <span
-                        class={`px-2 py-0.5 rounded-none text-xs font-medium ${getFormatBadge(format)}`}
-                      >
-                        {format}
-                      </span>
-                    ))}
+        {reportTypes.map((report) => (
+          <div class="bg-card border border-border rounded-none p-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div class="flex-1">
+                <h4 class="text-base font-medium text-foreground">
+                  {report.name}
+                </h4>
+                <p class="text-sm text-muted-foreground">
+                  {report.description}
+                </p>
+                <div class="flex flex-wrap gap-1 mt-2">
+                  {report.format.map((format) => (
+                    <span
+                      class={`px-2 py-0.5 rounded-none text-xs font-medium ${getFormatBadge(format)}`}
+                    >
+                      {format}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div class="flex flex-col">
+                <div class="text-sm text-muted-foreground mb-2">
+                  <div class="flex items-center gap-1">
+                    <Icon name="calendar" class="w-4 h-4" />
+                    <span>
+                      {report.frequency} | Last: {report.lastGenerated}
+                    </span>
                   </div>
                 </div>
 
-                <div class="flex flex-col">
-                  <div class="text-sm text-muted-foreground mb-2">
-                    <div class="flex items-center gap-1">
-                      <Icon name="calendar" class="w-4 h-4" />
-                      <span>
-                        {report.frequency} | Last: {report.lastGenerated}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div class="flex gap-2">
-                    <button
-                      type="button"
-                      class="px-3 py-1 text-xs font-medium bg-primary text-white rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      Generate Now
-                    </button>
-                    <button
-                      type="button"
-                      class="px-3 py-1 text-xs font-medium bg-secondary text-foreground rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
-                    >
-                      Schedule
-                    </button>
-                  </div>
+                <div class="flex gap-2">
+                  <button
+                    type="button"
+                    class="px-3 py-1 text-xs font-medium bg-primary text-white rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    Generate Now
+                  </button>
+                  <button
+                    type="button"
+                    class="px-3 py-1 text-xs font-medium bg-secondary text-foreground rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    Schedule
+                  </button>
                 </div>
               </div>
             </div>
-          ))
-        }
+          </div>
+        ))}
       </div>
     </div>
 
@@ -234,81 +224,93 @@ const getStatusBadge = (status: string) => {
         <table class="w-full text-sm text-left text-muted-foreground">
           <thead class="text-xs text-foreground uppercase bg-secondary">
             <tr>
-              <th scope="col" class="py-3 px-4">Report Name</th>
-              <th scope="col" class="py-3 px-4">Type</th>
-              <th scope="col" class="py-3 px-4">Format</th>
-              <th scope="col" class="py-3 px-4">Frequency</th>
-              <th scope="col" class="py-3 px-4">Recipients</th>
-              <th scope="col" class="py-3 px-4">Status</th>
-              <th scope="col" class="py-3 px-4">Actions</th>
+              <th scope="col" class="py-3 px-4">
+                Report Name
+              </th>
+              <th scope="col" class="py-3 px-4">
+                Type
+              </th>
+              <th scope="col" class="py-3 px-4">
+                Format
+              </th>
+              <th scope="col" class="py-3 px-4">
+                Frequency
+              </th>
+              <th scope="col" class="py-3 px-4">
+                Recipients
+              </th>
+              <th scope="col" class="py-3 px-4">
+                Status
+              </th>
+              <th scope="col" class="py-3 px-4">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
-            {
-              schedules.map((schedule) => (
-                <tr class="bg-card border-b hover:bg-secondary">
-                  <td class="py-3 px-4 font-medium text-foreground">
-                    {schedule.name}
-                  </td>
-                  <td class="py-3 px-4">
-                    {schedule.reportType
-                      .replace(/-/g, ' ')
-                      .replace(/\b\w/g, (l) => l.toUpperCase())}
-                  </td>
-                  <td class="py-3 px-4">
-                    <span
-                      class={`px-2 py-0.5 rounded-none text-xs font-medium ${getFormatBadge(schedule.format)}`}
+            {schedules.map((schedule) => (
+              <tr class="bg-card border-b hover:bg-secondary">
+                <td class="py-3 px-4 font-medium text-foreground">
+                  {schedule.name}
+                </td>
+                <td class="py-3 px-4">
+                  {schedule.reportType
+                    .replace(/-/g, ' ')
+                    .replace(/\b\w/g, (l) => l.toUpperCase())}
+                </td>
+                <td class="py-3 px-4">
+                  <span
+                    class={`px-2 py-0.5 rounded-none text-xs font-medium ${getFormatBadge(schedule.format)}`}
+                  >
+                    {schedule.format}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  {schedule.frequency} ({schedule.day})
+                </td>
+                <td class="py-3 px-4">
+                  <div class="flex flex-wrap gap-1">
+                    {schedule.recipients.map((recipient, index) =>
+                      index < 2 ? (
+                        <span class="px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
+                          {recipient}
+                        </span>
+                      ) : index === 2 ? (
+                        <span class="px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-muted-foreground">
+                          +{schedule.recipients.length - 2} more
+                        </span>
+                      ) : null,
+                    )}
+                  </div>
+                </td>
+                <td class="py-3 px-4">
+                  <span
+                    class={`px-2 py-0.5 rounded-none text-xs font-medium ${getStatusBadge(schedule.status)}`}
+                  >
+                    {schedule.status.charAt(0).toUpperCase() +
+                      schedule.status.slice(1)}
+                  </span>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="flex space-x-2">
+                    <button
+                      type="button"
+                      class="text-foreground hover:underline"
+                      aria-label="Edit schedule"
                     >
-                      {schedule.format}
-                    </span>
-                  </td>
-                  <td class="py-3 px-4">
-                    {schedule.frequency} ({schedule.day})
-                  </td>
-                  <td class="py-3 px-4">
-                    <div class="flex flex-wrap gap-1">
-                      {schedule.recipients.map((recipient, index) =>
-                        index < 2 ? (
-                          <span class="px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
-                            {recipient}
-                          </span>
-                        ) : index === 2 ? (
-                          <span class="px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-muted-foreground">
-                            +{schedule.recipients.length - 2} more
-                          </span>
-                        ) : null,
-                      )}
-                    </div>
-                  </td>
-                  <td class="py-3 px-4">
-                    <span
-                      class={`px-2 py-0.5 rounded-none text-xs font-medium ${getStatusBadge(schedule.status)}`}
+                      <Icon name="pencil" class="w-5 h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      class="text-foreground font-medium hover:underline"
+                      aria-label="Delete schedule"
                     >
-                      {schedule.status.charAt(0).toUpperCase() +
-                        schedule.status.slice(1)}
-                    </span>
-                  </td>
-                  <td class="py-3 px-4">
-                    <div class="flex space-x-2">
-                      <button
-                        type="button"
-                        class="text-foreground hover:underline"
-                        aria-label="Edit schedule"
-                      >
-                        <Icon name="pencil" class="w-5 h-5" />
-                      </button>
-                      <button
-                        type="button"
-                        class="text-foreground font-medium hover:underline"
-                        aria-label="Delete schedule"
-                      >
-                        <Icon name="trash" class="w-5 h-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            }
+                      <Icon name="trash" class="w-5 h-5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -344,8 +346,9 @@ const getStatusBadge = (status: string) => {
             >
               <option value="">Select a report type</option>
               <option value="compliance-summary">Compliance Summary</option>
-              <option value="retention-details">Retention Policy Details</option
-              >
+              <option value="retention-details">
+                Retention Policy Details
+              </option>
               <option value="archiving-report">Archiving Activity</option>
               <option value="destruction-audit">Data Destruction Audit</option>
               <option value="hipaa-compliance">HIPAA Compliance</option>

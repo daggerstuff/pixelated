@@ -32,34 +32,30 @@ const {
           >
             {primaryCTA.text}
           </a>
-          {
-            secondaryCTA && (
-              <a
-                class="marketing-button marketing-button--secondary"
-                href={secondaryCTA.href}
-              >
-                {secondaryCTA.text}
-              </a>
-            )
-          }
+          {secondaryCTA && (
+            <a
+              class="marketing-button marketing-button--secondary"
+              href={secondaryCTA.href}
+            >
+              {secondaryCTA.text}
+            </a>
+          )}
         </div>
         {note && <p class="marketing-note">{note}</p>}
       </div>
 
-      {
-        checklist.length > 0 && (
-          <aside class="marketing-cta-band__aside">
-            <span class="marketing-list-label">
-              What to bring into the conversation
-            </span>
-            <ul>
-              {checklist.map((item) => (
-                <li>{item}</li>
-              ))}
-            </ul>
-          </aside>
-        )
-      }
+      {checklist.length > 0 && (
+        <aside class="marketing-cta-band__aside">
+          <span class="marketing-list-label">
+            What to bring into the conversation
+          </span>
+          <ul>
+            {checklist.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </aside>
+      )}
     </div>
   </div>
 </section>

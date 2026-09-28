@@ -11,27 +11,45 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
   <p>
     Real-world integration patterns using the auto-generated TypeScript and
     Python SDKs. These SDKs are generated from our
-    <a href="/docs/api/_openapi.yaml">OpenAPI 3.1 specification</a> and support all
-    API endpoints.
+    <a href="/docs/api/_openapi.yaml">OpenAPI 3.1 specification</a> and support
+    all API endpoints.
   </p>
 
   <h2>Table of Contents</h2>
   <ol>
-    <li><a href="#install">SDK Installation</a></li>
-    <li><a href="#setup">Initialization</a></li>
-    <li><a href="#search">Content Search</a></li>
-    <li><a href="#bias">Bias Analysis</a></li>
-    <li><a href="#memory">Memory Operations</a></li>
-    <li><a href="#error-handling">Error Handling</a></li>
-    <li><a href="#retry">Retry & Backoff</a></li>
+    <li>
+      <a href="#install">SDK Installation</a>
+    </li>
+    <li>
+      <a href="#setup">Initialization</a>
+    </li>
+    <li>
+      <a href="#search">Content Search</a>
+    </li>
+    <li>
+      <a href="#bias">Bias Analysis</a>
+    </li>
+    <li>
+      <a href="#memory">Memory Operations</a>
+    </li>
+    <li>
+      <a href="#error-handling">Error Handling</a>
+    </li>
+    <li>
+      <a href="#retry">Retry & Backoff</a>
+    </li>
   </ol>
 
   <h2 id="install">SDK Installation</h2>
 
   <div class="tab-group">
     <div class="tab-header">
-      <button class="tab-btn active" data-tab="ts">TypeScript</button>
-      <button class="tab-btn" data-tab="py">Python</button>
+      <button class="tab-btn active" data-tab="ts">
+        TypeScript
+      </button>
+      <button class="tab-btn" data-tab="py">
+        Python
+      </button>
     </div>
 
     <div class="tab-content active" data-tab="ts">
@@ -51,8 +69,12 @@ uv add pixelated-empathy-sdk</code></pre>
 
   <div class="tab-group">
     <div class="tab-header">
-      <button class="tab-btn active" data-tab="ts">TypeScript</button>
-      <button class="tab-btn" data-tab="py">Python</button>
+      <button class="tab-btn active" data-tab="ts">
+        TypeScript
+      </button>
+      <button class="tab-btn" data-tab="py">
+        Python
+      </button>
     </div>
 
     <div class="tab-content active" data-tab="ts">
@@ -83,8 +105,12 @@ client = DefaultApi(config)</code></pre>
 
   <div class="tab-group">
     <div class="tab-header">
-      <button class="tab-btn active" data-tab="ts">TypeScript</button>
-      <button class="tab-btn" data-tab="py">Python</button>
+      <button class="tab-btn active" data-tab="ts">
+        TypeScript
+      </button>
+      <button class="tab-btn" data-tab="py">
+        Python
+      </button>
     </div>
 
     <div class="tab-content active" data-tab="ts">
@@ -114,8 +140,12 @@ for result in results.data:
 
   <div class="tab-group">
     <div class="tab-header">
-      <button class="tab-btn active" data-tab="ts">TypeScript</button>
-      <button class="tab-btn" data-tab="py">Python</button>
+      <button class="tab-btn active" data-tab="ts">
+        TypeScript
+      </button>
+      <button class="tab-btn" data-tab="py">
+        Python
+      </button>
     </div>
 
     <div class="tab-content active" data-tab="ts">
@@ -153,8 +183,12 @@ print(analysis.confidence_score)</code></pre>
 
   <div class="tab-group">
     <div class="tab-header">
-      <button class="tab-btn active" data-tab="ts">TypeScript</button>
-      <button class="tab-btn" data-tab="py">Python</button>
+      <button class="tab-btn active" data-tab="ts">
+        TypeScript
+      </button>
+      <button class="tab-btn" data-tab="py">
+        Python
+      </button>
     </div>
 
     <div class="tab-content active" data-tab="ts">
@@ -194,8 +228,12 @@ results = client.search_memories(
 
   <div class="tab-group">
     <div class="tab-header">
-      <button class="tab-btn active" data-tab="ts">TypeScript</button>
-      <button class="tab-btn" data-tab="py">Python</button>
+      <button class="tab-btn active" data-tab="ts">
+        TypeScript
+      </button>
+      <button class="tab-btn" data-tab="py">
+        Python
+      </button>
     </div>
 
     <div class="tab-content active" data-tab="ts">
@@ -235,8 +273,12 @@ except ApiException as e:
 
   <div class="tab-group">
     <div class="tab-header">
-      <button class="tab-btn active" data-tab="ts">TypeScript</button>
-      <button class="tab-btn" data-tab="py">Python</button>
+      <button class="tab-btn active" data-tab="ts">
+        TypeScript
+      </button>
+      <button class="tab-btn" data-tab="py">
+        Python
+      </button>
     </div>
 
     <div class="tab-content active" data-tab="ts">
@@ -271,9 +313,15 @@ const client = new DefaultApi(config);</code></pre>
 
   <h2>Related</h2>
   <ul>
-    <li><a href="/docs/developer/getting-started">Getting Started Guide</a></li>
-    <li><a href="/docs/developer/sdk-guide">SDK Installation Guide</a></li>
-    <li><a href="/docs/api/swagger">Interactive API Reference</a></li>
+    <li>
+      <a href="/docs/developer/getting-started">Getting Started Guide</a>
+    </li>
+    <li>
+      <a href="/docs/developer/sdk-guide">SDK Installation Guide</a>
+    </li>
+    <li>
+      <a href="/docs/api/swagger">Interactive API Reference</a>
+    </li>
   </ul>
 </DocumentationLayout>
 

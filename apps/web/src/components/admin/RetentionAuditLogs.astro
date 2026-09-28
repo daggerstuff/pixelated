@@ -129,9 +129,7 @@ const getStatusBadge = (status: string) => {
 
 <div class="bg-card rounded-none overflow-hidden">
   <div class="p-6">
-    <h2 class="text-2xl font-bold text-foreground mb-4">
-      {title}
-    </h2>
+    <h2 class="text-2xl font-bold text-foreground mb-4">{title}</h2>
 
     <div class="mb-8">
       <p class="text-muted-foreground mb-4">
@@ -243,79 +241,91 @@ const getStatusBadge = (status: string) => {
       <table class="w-full text-sm text-left text-muted-foreground">
         <thead class="text-xs text-foreground uppercase bg-secondary">
           <tr>
-            <th scope="col" class="py-3 px-4">Date & Time</th>
-            <th scope="col" class="py-3 px-4">Action</th>
-            <th scope="col" class="py-3 px-4">Category</th>
-            <th scope="col" class="py-3 px-4">Description</th>
-            <th scope="col" class="py-3 px-4">Records</th>
-            <th scope="col" class="py-3 px-4">User</th>
-            <th scope="col" class="py-3 px-4">Status</th>
-            <th scope="col" class="py-3 px-4">Details</th>
+            <th scope="col" class="py-3 px-4">
+              Date & Time
+            </th>
+            <th scope="col" class="py-3 px-4">
+              Action
+            </th>
+            <th scope="col" class="py-3 px-4">
+              Category
+            </th>
+            <th scope="col" class="py-3 px-4">
+              Description
+            </th>
+            <th scope="col" class="py-3 px-4">
+              Records
+            </th>
+            <th scope="col" class="py-3 px-4">
+              User
+            </th>
+            <th scope="col" class="py-3 px-4">
+              Status
+            </th>
+            <th scope="col" class="py-3 px-4">
+              Details
+            </th>
           </tr>
         </thead>
         <tbody>
-          {
-            auditLogs.map((log) => (
-              <tr class="bg-card border-b hover:bg-secondary">
-                <td class="py-3 px-4 whitespace-nowrap">
-                  {formatDate(log.timestamp, {
-                    month: 'short',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true,
-                  })}
-                </td>
-                <td class="py-3 px-4">
-                  <div class="flex items-center">
-                    <SafeIcon
-                      name={getActionIcon(log.action)}
-                      class="w-4 h-4 mr-2 text-muted-foreground"
-                    />
-                    <span>{log.action.replace(/_/g, ' ')}</span>
-                  </div>
-                </td>
-                <td class="py-3 px-4">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">
-                    {log.category}
-                  </span>
-                </td>
-                <td class="py-3 px-4">{log.description}</td>
-                <td class="py-3 px-4 text-center">
-                  {log.affectedRecords.toLocaleString()}
-                </td>
-                <td class="py-3 px-4">
-                  <span
-                    class={
-                      log.user === 'system'
-                        ? 'text-muted-foreground italic'
-                        : ''
-                    }
-                  >
-                    {log.user}
-                  </span>
-                </td>
-                <td class="py-3 px-4">
-                  <span
-                    class={`px-2.5 py-0.5 rounded-none text-xs font-medium ${getStatusBadge(log.status)}`}
-                  >
-                    {log.status.charAt(0).toUpperCase() + log.status.slice(1)}
-                  </span>
-                </td>
-                <td class="py-3 px-4">
-                  <button
-                    type="button"
-                    class="text-foreground hover:underline"
-                    data-log-id={log.id}
-                    aria-label="View details"
-                  >
-                    <SafeIcon name="eye" class="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            ))
-          }
+          {auditLogs.map((log) => (
+            <tr class="bg-card border-b hover:bg-secondary">
+              <td class="py-3 px-4 whitespace-nowrap">
+                {formatDate(log.timestamp, {
+                  month: 'short',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: true,
+                })}
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex items-center">
+                  <SafeIcon
+                    name={getActionIcon(log.action)}
+                    class="w-4 h-4 mr-2 text-muted-foreground"
+                  />
+                  <span>{log.action.replace(/_/g, ' ')}</span>
+                </div>
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">
+                  {log.category}
+                </span>
+              </td>
+              <td class="py-3 px-4">{log.description}</td>
+              <td class="py-3 px-4 text-center">
+                {log.affectedRecords.toLocaleString()}
+              </td>
+              <td class="py-3 px-4">
+                <span
+                  class={
+                    log.user === 'system' ? 'text-muted-foreground italic' : ''
+                  }
+                >
+                  {log.user}
+                </span>
+              </td>
+              <td class="py-3 px-4">
+                <span
+                  class={`px-2.5 py-0.5 rounded-none text-xs font-medium ${getStatusBadge(log.status)}`}
+                >
+                  {log.status.charAt(0).toUpperCase() + log.status.slice(1)}
+                </span>
+              </td>
+              <td class="py-3 px-4">
+                <button
+                  type="button"
+                  class="text-foreground hover:underline"
+                  data-log-id={log.id}
+                  aria-label="View details"
+                >
+                  <SafeIcon name="eye" class="w-5 h-5" />
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
@@ -323,9 +333,8 @@ const getStatusBadge = (status: string) => {
     <!-- Pagination -->
     <div class="flex items-center justify-between mt-4">
       <div class="text-sm text-foreground">
-        Showing <span class="font-medium">1-7</span> of <span
-          class="font-medium">7</span
-        > logs
+        Showing <span class="font-medium">1-7</span> of{' '}
+        <span class="font-medium">7</span> logs
       </div>
 
       <div class="flex items-center space-x-2">
@@ -336,10 +345,9 @@ const getStatusBadge = (status: string) => {
         >
           Previous
         </button>
-        <span
-          class="px-3 py-1 border border-ring text-foreground bg-secondary rounded-none"
-          >1</span
-        >
+        <span class="px-3 py-1 border border-ring text-foreground bg-secondary rounded-none">
+          1
+        </span>
         <button
           type="button"
           class="px-3 py-1 border border-input bg-card text-muted-foreground rounded-none hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:bg-accent disabled:opacity-50"

@@ -46,21 +46,24 @@ const verificationHistory: Verification[] = []
           <label
             for="documentDescription"
             class="block text-sm font-medium text-foreground mb-1"
-            >Description</label
           >
+            Description
+          </label>
           <textarea
             id="documentDescription"
             name="documentDescription"
             rows="2"
             class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
-            placeholder="Brief description of the document..."></textarea>
+            placeholder="Brief description of the document..."
+          ></textarea>
         </div>
         <div>
           <label
             for="documentExpiryDate"
             class="block text-sm font-medium text-foreground mb-1"
-            >Document Expiry Date</label
           >
+            Document Expiry Date
+          </label>
           <input
             type="date"
             id="documentExpiryDate"
@@ -72,8 +75,9 @@ const verificationHistory: Verification[] = []
           <label
             for="documentFile"
             class="block text-sm font-medium text-foreground mb-1"
-            >Upload Document<span class="text-foreground">*</span></label
           >
+            Upload Document<span class="text-foreground">*</span>
+          </label>
           <input
             type="file"
             id="documentFile"
@@ -91,8 +95,9 @@ const verificationHistory: Verification[] = []
         <button
           type="submit"
           class="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-none text-primary-foreground bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
-          >Upload Document</button
         >
+          Upload Document
+        </button>
       </div>
     </form>
 
@@ -101,171 +106,165 @@ const verificationHistory: Verification[] = []
       <!-- Documents Section -->
       <div class="bg-card rounded-none p-6">
         <h2 class="text-lg font-semibold mb-4">Compliance Documents</h2>
-        {
-          documents.length === 0 ? (
-            <p class="text-muted-foreground">
-              No documents have been uploaded for this vendor.
-            </p>
-          ) : (
-            <div class="overflow-y-auto max-h-96">
-              <table class="min-w-full divide-y divide-border">
-                <thead class="bg-secondary">
+        {documents.length === 0 ? (
+          <p class="text-muted-foreground">
+            No documents have been uploaded for this vendor.
+          </p>
+        ) : (
+          <div class="overflow-y-auto max-h-96">
+            <table class="min-w-full divide-y divide-border">
+              <thead class="bg-secondary">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Document
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Type
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Uploaded
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-card divide-y divide-border">
+                {documents.map((doc) => (
                   <tr>
-                    <th
-                      scope="col"
-                      class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                    >
-                      Document
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                    >
-                      Type
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                    >
-                      Uploaded
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                    >
-                      Status
-                    </th>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-foreground hover:underline">
+                      <a
+                        href={doc.documentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {doc.name}
+                      </a>
+                      {doc.description && (
+                        <p class="text-xs text-muted-foreground truncate">
+                          {doc.description}
+                        </p>
+                      )}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground capitalize">
+                      {doc.type.replace(/_/g, ' ')}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
+                      {new Date(doc.uploadDate).toLocaleDateString()}
+                      {doc.expiryDate && (
+                        <div class="text-xs text-muted-foreground">
+                          Expires:{' '}
+                          {new Date(doc.expiryDate).toLocaleDateString()}
+                        </div>
+                      )}
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">
+                      {doc.isValid ? (
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                          Valid
+                        </span>
+                      ) : (
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
+                          Invalid
+                        </span>
+                      )}
+                    </td>
                   </tr>
-                </thead>
-                <tbody class="bg-card divide-y divide-border">
-                  {documents.map((doc) => (
-                    <tr>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-foreground hover:underline">
-                        <a
-                          href={doc.documentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          {doc.name}
-                        </a>
-                        {doc.description && (
-                          <p class="text-xs text-muted-foreground truncate">
-                            {doc.description}
-                          </p>
-                        )}
-                      </td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground capitalize">
-                        {doc.type.replace(/_/g, ' ')}
-                      </td>
-                      <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
-                        {new Date(doc.uploadDate).toLocaleDateString()}
-                        {doc.expiryDate && (
-                          <div class="text-xs text-muted-foreground">
-                            Expires:{' '}
-                            {new Date(doc.expiryDate).toLocaleDateString()}
-                          </div>
-                        )}
-                      </td>
-                      <td class="px-4 py-3 whitespace-nowrap">
-                        {doc.isValid ? (
-                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
-                            Valid
-                          </span>
-                        ) : (
-                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
-                            Invalid
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )
-        }
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <!-- Verification History Section -->
       <div class="bg-card rounded-none p-6">
         <h2 class="text-lg font-semibold mb-4">Verification History</h2>
-        {
-          verificationHistory.length === 0 ? (
-            <p class="text-muted-foreground">
-              No verification history found for this vendor.
-            </p>
-          ) : (
-            <div class="overflow-y-auto max-h-96">
-              <div class="space-y-4">
-                {verificationHistory.map((verification) => (
-                  <div class="border border-border rounded-none p-4">
-                    <div class="flex justify-between items-start">
-                      <div>
-                        <p class="text-sm font-medium">
-                          {verification.complianceLevel
-                            .replace(/_/g, ' ')
-                            .replace(/\b\w/g, (char) => char.toUpperCase())}
-                        </p>
-                        <p class="text-xs text-muted-foreground">
-                          Verified on{' '}
-                          {new Date(
-                            verification.verificationDate,
-                          ).toLocaleDateString()}{' '}
-                          via{' '}
-                          {verification.verificationMethod.replace(/_/g, ' ')}
-                        </p>
-                      </div>
-                      {verification.expiryDate && (
-                        <div class="text-right">
-                          <p class="text-xs text-muted-foreground">
-                            {new Date(verification.expiryDate) > new Date()
-                              ? `Expires on ${new Date(verification.expiryDate).toLocaleDateString()}`
-                              : `Expired on ${new Date(verification.expiryDate).toLocaleDateString()}`}
-                          </p>
-                        </div>
-                      )}
+        {verificationHistory.length === 0 ? (
+          <p class="text-muted-foreground">
+            No verification history found for this vendor.
+          </p>
+        ) : (
+          <div class="overflow-y-auto max-h-96">
+            <div class="space-y-4">
+              {verificationHistory.map((verification) => (
+                <div class="border border-border rounded-none p-4">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <p class="text-sm font-medium">
+                        {verification.complianceLevel
+                          .replace(/_/g, ' ')
+                          .replace(/\b\w/g, (char) => char.toUpperCase())}
+                      </p>
+                      <p class="text-xs text-muted-foreground">
+                        Verified on{' '}
+                        {new Date(
+                          verification.verificationDate,
+                        ).toLocaleDateString()}{' '}
+                        via {verification.verificationMethod.replace(/_/g, ' ')}
+                      </p>
                     </div>
-                    {verification.notes && (
-                      <div class="mt-2 text-sm text-muted-foreground border-t border-border pt-2">
-                        {verification.notes}
+                    {verification.expiryDate && (
+                      <div class="text-right">
+                        <p class="text-xs text-muted-foreground">
+                          {new Date(verification.expiryDate) > new Date()
+                            ? `Expires on ${new Date(verification.expiryDate).toLocaleDateString()}`
+                            : `Expired on ${new Date(verification.expiryDate).toLocaleDateString()}`}
+                        </p>
                       </div>
                     )}
-                    {verification.attachments &&
-                      verification.attachments.length > 0 && (
-                        <div class="mt-2">
-                          <p class="text-xs font-medium text-muted-foreground">
-                            Attached Documents:
-                          </p>
-                          <ul class="mt-1 text-xs text-foreground">
-                            {verification.attachments.map((docId) => {
-                              const doc = documents.find((d) => d.id === docId)
-                              return doc ? (
-                                <li class="inline-block mr-2">
-                                  <a
-                                    href={doc.documentUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="hover:text-foreground"
-                                  >
-                                    {doc.name}
-                                  </a>
-                                </li>
-                              ) : null
-                            })}
-                          </ul>
-                        </div>
-                      )}
                   </div>
-                ))}
-              </div>
+                  {verification.notes && (
+                    <div class="mt-2 text-sm text-muted-foreground border-t border-border pt-2">
+                      {verification.notes}
+                    </div>
+                  )}
+                  {verification.attachments &&
+                    verification.attachments.length > 0 && (
+                      <div class="mt-2">
+                        <p class="text-xs font-medium text-muted-foreground">
+                          Attached Documents:
+                        </p>
+                        <ul class="mt-1 text-xs text-foreground">
+                          {verification.attachments.map((docId) => {
+                            const doc = documents.find((d) => d.id === docId)
+                            return doc ? (
+                              <li class="inline-block mr-2">
+                                <a
+                                  href={doc.documentUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  class="hover:text-foreground"
+                                >
+                                  {doc.name}
+                                </a>
+                              </li>
+                            ) : null
+                          })}
+                        </ul>
+                      </div>
+                    )}
+                </div>
+              ))}
             </div>
-          )
-        }
+          </div>
+        )}
       </div>
     </div>
   </div>
 </AdminLayout>
-
 <script>
   // Document form submission (demo only)
   document.addEventListener('DOMContentLoaded', (_event: Event) => {
@@ -284,13 +283,13 @@ const verificationHistory: Verification[] = []
   name="documentExpiryDate"
   class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
 />
-
 <div>
   <label
     for="documentFile"
     class="block text-sm font-medium text-foreground mb-1"
-    >Upload Document*</label
   >
+    Upload Document*
+  </label>
   <input
     type="file"
     id="documentFile"
@@ -302,7 +301,6 @@ const verificationHistory: Verification[] = []
     Accepted formats: PDF, DOC, DOCX, XLS, XLSX (max 10MB)
   </p>
 </div>
-
 <div class="flex justify-end pt-4">
   <button
     type="submit"
@@ -311,177 +309,171 @@ const verificationHistory: Verification[] = []
     Upload Document
   </button>
 </div>
-
 <!-- Documents and Verification History -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
   <!-- Documents Section -->
   <div class="bg-card rounded-none p-6">
     <h2 class="text-lg font-semibold mb-4">Compliance Documents</h2>
 
-    {
-      documents.length === 0 ? (
-        <p class="text-muted-foreground">
-          No documents have been uploaded for this vendor.
-        </p>
-      ) : (
-        <div class="overflow-y-auto max-h-96">
-          <table class="min-w-full divide-y divide-border">
-            <thead class="bg-secondary">
+    {documents.length === 0 ? (
+      <p class="text-muted-foreground">
+        No documents have been uploaded for this vendor.
+      </p>
+    ) : (
+      <div class="overflow-y-auto max-h-96">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-secondary">
+            <tr>
+              <th
+                scope="col"
+                class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Document
+              </th>
+              <th
+                scope="col"
+                class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Type
+              </th>
+              <th
+                scope="col"
+                class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Uploaded
+              </th>
+              <th
+                scope="col"
+                class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+              >
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-card divide-y divide-border">
+            {documents.map((doc) => (
               <tr>
-                <th
-                  scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >
-                  Document
-                </th>
-                <th
-                  scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >
-                  Type
-                </th>
-                <th
-                  scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >
-                  Uploaded
-                </th>
-                <th
-                  scope="col"
-                  class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                >
-                  Status
-                </th>
+                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-foreground hover:underline">
+                  <a
+                    href={doc.documentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {doc.name}
+                  </a>
+                  {doc.description && (
+                    <p class="text-xs text-muted-foreground truncate">
+                      {doc.description}
+                    </p>
+                  )}
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground capitalize">
+                  {doc.type.replace(/_/g, ' ')}
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
+                  {new Date(doc.uploadDate).toLocaleDateString()}
+                  {doc.expiryDate && (
+                    <div class="text-xs text-muted-foreground">
+                      Expires: {new Date(doc.expiryDate).toLocaleDateString()}
+                    </div>
+                  )}
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  {doc.isValid ? (
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                      Valid
+                    </span>
+                  ) : (
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
+                      Invalid
+                    </span>
+                  )}
+                </td>
               </tr>
-            </thead>
-            <tbody class="bg-card divide-y divide-border">
-              {documents.map((doc) => (
-                <tr>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-foreground hover:underline">
-                    <a
-                      href={doc.documentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {doc.name}
-                    </a>
-                    {doc.description && (
-                      <p class="text-xs text-muted-foreground truncate">
-                        {doc.description}
-                      </p>
-                    )}
-                  </td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground capitalize">
-                    {doc.type.replace(/_/g, ' ')}
-                  </td>
-                  <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
-                    {new Date(doc.uploadDate).toLocaleDateString()}
-                    {doc.expiryDate && (
-                      <div class="text-xs text-muted-foreground">
-                        Expires: {new Date(doc.expiryDate).toLocaleDateString()}
-                      </div>
-                    )}
-                  </td>
-                  <td class="px-4 py-3 whitespace-nowrap">
-                    {doc.isValid ? (
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
-                        Valid
-                      </span>
-                    ) : (
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
-                        Invalid
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )
-    }
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
   </div>
 
   <!-- Verification History Section -->
   <div class="bg-card rounded-none p-6">
     <h2 class="text-lg font-semibold mb-4">Verification History</h2>
 
-    {
-      verificationHistory.length === 0 ? (
-        <p class="text-muted-foreground">
-          No verification history found for this vendor.
-        </p>
-      ) : (
-        <div class="overflow-y-auto max-h-96">
-          <div class="space-y-4">
-            {verificationHistory.map((verification) => (
-              <div class="border border-border rounded-none p-4">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <p class="text-sm font-medium">
-                      {verification.complianceLevel
-                        .replace(/_/g, ' ')
-                        .replace(/\b\w/g, (char) => char.toUpperCase())}
-                    </p>
-                    <p class="text-xs text-muted-foreground">
-                      Verified on{' '}
-                      {new Date(
-                        verification.verificationDate,
-                      ).toLocaleDateString()}
-                      via {verification.verificationMethod.replace(/_/g, ' ')}
-                    </p>
-                  </div>
-                  {verification.expiryDate && (
-                    <div class="text-right">
-                      <p class="text-xs text-muted-foreground">
-                        {new Date(verification.expiryDate) > new Date()
-                          ? `Expires on ${new Date(verification.expiryDate).toLocaleDateString()}`
-                          : `Expired on ${new Date(verification.expiryDate).toLocaleDateString()}`}
-                      </p>
-                    </div>
-                  )}
+    {verificationHistory.length === 0 ? (
+      <p class="text-muted-foreground">
+        No verification history found for this vendor.
+      </p>
+    ) : (
+      <div class="overflow-y-auto max-h-96">
+        <div class="space-y-4">
+          {verificationHistory.map((verification) => (
+            <div class="border border-border rounded-none p-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <p class="text-sm font-medium">
+                    {verification.complianceLevel
+                      .replace(/_/g, ' ')
+                      .replace(/\b\w/g, (char) => char.toUpperCase())}
+                  </p>
+                  <p class="text-xs text-muted-foreground">
+                    Verified on{' '}
+                    {new Date(
+                      verification.verificationDate,
+                    ).toLocaleDateString()}
+                    via {verification.verificationMethod.replace(/_/g, ' ')}
+                  </p>
                 </div>
-
-                {verification.notes && (
-                  <div class="mt-2 text-sm text-muted-foreground border-t border-border pt-2">
-                    {verification.notes}
+                {verification.expiryDate && (
+                  <div class="text-right">
+                    <p class="text-xs text-muted-foreground">
+                      {new Date(verification.expiryDate) > new Date()
+                        ? `Expires on ${new Date(verification.expiryDate).toLocaleDateString()}`
+                        : `Expired on ${new Date(verification.expiryDate).toLocaleDateString()}`}
+                    </p>
                   </div>
                 )}
-
-                {verification.attachments &&
-                  verification.attachments.length > 0 && (
-                    <div class="mt-2">
-                      <p class="text-xs font-medium text-muted-foreground">
-                        Attached Documents:
-                      </p>
-                      <ul class="mt-1 text-xs text-foreground">
-                        {verification.attachments.map((docId) => {
-                          const doc = documents.find((d) => d.id === docId)
-                          return doc ? (
-                            <li class="inline-block mr-2">
-                              <a
-                                href={doc.documentUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="hover:text-foreground"
-                              >
-                                {doc.name}
-                              </a>
-                            </li>
-                          ) : null
-                        })}
-                      </ul>
-                    </div>
-                  )}
               </div>
-            ))}
-          </div>
+
+              {verification.notes && (
+                <div class="mt-2 text-sm text-muted-foreground border-t border-border pt-2">
+                  {verification.notes}
+                </div>
+              )}
+
+              {verification.attachments &&
+                verification.attachments.length > 0 && (
+                  <div class="mt-2">
+                    <p class="text-xs font-medium text-muted-foreground">
+                      Attached Documents:
+                    </p>
+                    <ul class="mt-1 text-xs text-foreground">
+                      {verification.attachments.map((docId) => {
+                        const doc = documents.find((d) => d.id === docId)
+                        return doc ? (
+                          <li class="inline-block mr-2">
+                            <a
+                              href={doc.documentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="hover:text-foreground"
+                            >
+                              {doc.name}
+                            </a>
+                          </li>
+                        ) : null
+                      })}
+                    </ul>
+                  </div>
+                )}
+            </div>
+          ))}
         </div>
-      )
-    }
+      </div>
+    )}
   </div>
 </div>
-
 <script>
   // Document selection modal - this would be implemented with a proper modal in production
   document.addEventListener('DOMContentLoaded', () => {

@@ -11,35 +11,30 @@ type Props =
 const { heading, anchors } = Astro.props
 ---
 
-{
-  heading ? (
-    <li>
-      {heading.slug && (
-        <Link
-          href={`#${heading.slug}`}
-          aria-label={`Scroll to ${heading.text}`}
-        >
-          {heading.text}
-        </Link>
-      )}
-      {!!heading.children.length && (
-        <ul>
-          {heading.children.map((subheading) => (
-            <Astro.self heading={subheading} />
-          ))}
-        </ul>
-      )}
-    </li>
-  ) : (
-    <>
-      {!!anchors.length &&
-        anchors.map((item) => (
-          <li>
-            <Link href={`#${slug(item)}`} aria-label={`Scroll to ${item}`}>
-              {item}
-            </Link>
-          </li>
+{heading ? (
+  <li>
+    {heading.slug && (
+      <Link href={`#${heading.slug}`} aria-label={`Scroll to ${heading.text}`}>
+        {heading.text}
+      </Link>
+    )}
+    {!!heading.children.length && (
+      <ul>
+        {heading.children.map((subheading) => (
+          <Astro.self heading={subheading} />
         ))}
-    </>
-  )
-}
+      </ul>
+    )}
+  </li>
+) : (
+  <>
+    {!!anchors.length &&
+      anchors.map((item) => (
+        <li>
+          <Link href={`#${slug(item)}`} aria-label={`Scroll to ${item}`}>
+            {item}
+          </Link>
+        </li>
+      ))}
+  </>
+)}

@@ -17,13 +17,13 @@ const { title, text, primaryHref, primaryText, secondaryHref, secondaryText } =
     {text && <p>{text}</p>}
   </div>
   <div class="fm-cta-block__side">
-    <a href={primaryHref} class="fm-btn-glow">{primaryText}</a>
-    {
-      secondaryHref && secondaryText && (
-        <a href={secondaryHref} class="fm-btn-glow--ghost">
-          {secondaryText}
-        </a>
-      )
-    }
+    <a href={primaryHref} class="fm-btn-glow">
+      {primaryText}
+    </a>
+    {secondaryHref && secondaryText && (
+      <a href={secondaryHref} class="fm-btn-glow--ghost">
+        {secondaryText}
+      </a>
+    )}
   </div>
 </div>

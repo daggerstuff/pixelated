@@ -26,8 +26,8 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         </p>
         <ul class="list-disc pl-6 text-sm text-foreground space-y-1 mb-4">
           <li>
-            <strong>Confidence score</strong> (0-1): Normalized confidence from the
-            LLM provider, capped and clamped to valid range.
+            <strong>Confidence score</strong> (0-1): Normalized confidence from
+            the LLM provider, capped and clamped to valid range.
           </li>
           <li>
             <strong>Sources array</strong>: Documents where each result
@@ -79,13 +79,14 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
                 id="confidence-bar"
                 class="h-full rounded-none bg-primary transition-all duration-300"
                 style="width: 0%"
-              >
-              </div>
+              ></div>
             </div>
             <span
               id="confidence-value"
-              class="text-lg font-bold text-foreground">N/A</span
+              class="text-lg font-bold text-foreground"
             >
+              N/A
+            </span>
           </div>
           <p class="mt-1 text-xs text-muted-foreground">
             Green ≥ 0.8 (high) · Yellow ≥ 0.5 (medium) · Red &lt; 0.5 (low)
@@ -122,9 +123,9 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
           How Source Attribution Works
         </h2>
         <p class="text-sm text-muted-foreground mb-4">
-          Every AI response payload now includes a <code>sources</code> array that
-          traces the origin of each component in the analysis. This provides auditability
-          and transparency for clinical AI decisions.
+          Every AI response payload now includes a <code>sources</code> array
+          that traces the origin of each component in the analysis. This
+          provides auditability and transparency for clinical AI decisions.
         </p>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

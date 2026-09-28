@@ -175,13 +175,9 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
   </div>
 
   <!-- Search and Filter Controls -->
-  <div
-    class="flex flex-col md:flex-row md:justify-between md:items-center gap-4"
-  >
+  <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
     <div class="flex flex-1 relative items-center max-w-md">
-      <div
-        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-      >
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <SafeIcon name="search" class="h-5 w-5 text-muted-foreground" />
       </div>
       <input
@@ -279,103 +275,95 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
         </tr>
       </thead>
       <tbody class="bg-card divide-y divide-border">
-        {
-          deletionRequests.map((request) => (
-            <tr class="hover:bg-secondary">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                {request.id}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                <div class="flex flex-col">
-                  <span class="font-medium text-foreground">
-                    {request.patientName}
-                  </span>
-                  <span class="text-xs text-muted-foreground">
-                    {request.patientId}
-                  </span>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                {formatDate(request.dateRequested)}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                <span
-                  class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${getScopeBadgeClass(request.dataScope)}`}
-                >
-                  {request.dataScope === 'all'
-                    ? 'Full Record'
-                    : 'Specific Data'}
+        {deletionRequests.map((request) => (
+          <tr class="hover:bg-secondary">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+              {request.id}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+              <div class="flex flex-col">
+                <span class="font-medium text-foreground">
+                  {request.patientName}
                 </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                <span
-                  class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${getStatusBadgeClass(request.status)}`}
-                >
-                  {request.status.charAt(0).toUpperCase() +
-                    request.status.slice(1)}
+                <span class="text-xs text-muted-foreground">
+                  {request.patientId}
                 </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                {request.dateProcessed
-                  ? formatDate(request.dateProcessed)
-                  : '-'}
-                {request.processedBy && (
-                  <span class="block text-xs text-muted-foreground">
-                    by {request.processedBy}
-                  </span>
-                )}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div class="flex justify-end space-x-2">
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+              {formatDate(request.dateRequested)}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+              <span
+                class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${getScopeBadgeClass(request.dataScope)}`}
+              >
+                {request.dataScope === 'all' ? 'Full Record' : 'Specific Data'}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+              <span
+                class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${getStatusBadgeClass(request.status)}`}
+              >
+                {request.status.charAt(0).toUpperCase() +
+                  request.status.slice(1)}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+              {request.dateProcessed ? formatDate(request.dateProcessed) : '-'}
+              {request.processedBy && (
+                <span class="block text-xs text-muted-foreground">
+                  by {request.processedBy}
+                </span>
+              )}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <div class="flex justify-end space-x-2">
+                <button
+                  type="button"
+                  class="text-muted-foreground hover:text-foreground"
+                  aria-label="View details"
+                >
+                  <SafeIcon name="eye" class="w-5 h-5" />
+                </button>
+
+                {request.status === 'pending' && (
                   <button
                     type="button"
-                    class="text-muted-foreground hover:text-foreground"
-                    aria-label="View details"
+                    class="text-foreground hover:text-foreground font-medium"
+                    aria-label="Approve request"
+                    data-request-id={request.id}
+                    data-action="approve"
                   >
-                    <SafeIcon name="eye" class="w-5 h-5" />
+                    <SafeIcon name="check" class="w-5 h-5" />
                   </button>
+                )}
 
-                  {request.status === 'pending' && (
-                    <button
-                      type="button"
-                      class="text-foreground hover:text-foreground font-medium"
-                      aria-label="Approve request"
-                      data-request-id={request.id}
-                      data-action="approve"
-                    >
-                      <SafeIcon name="check" class="w-5 h-5" />
-                    </button>
-                  )}
+                {request.status === 'pending' && (
+                  <button
+                    type="button"
+                    class="text-foreground font-medium hover:underline font-medium"
+                    aria-label="Deny request"
+                    data-request-id={request.id}
+                    data-action="deny"
+                  >
+                    <SafeIcon name="x" class="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+            </td>
+          </tr>
+        ))}
 
-                  {request.status === 'pending' && (
-                    <button
-                      type="button"
-                      class="text-foreground font-medium hover:underline font-medium"
-                      aria-label="Deny request"
-                      data-request-id={request.id}
-                      data-action="deny"
-                    >
-                      <SafeIcon name="x" class="w-5 h-5" />
-                    </button>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))
-        }
-
-        {
-          deletionRequests.length === 0 && (
-            <tr>
-              <td
-                colspan="7"
-                class="px-6 py-10 text-center text-sm text-muted-foreground"
-              >
-                No deletion requests found
-              </td>
-            </tr>
-          )
-        }
+        {deletionRequests.length === 0 && (
+          <tr>
+            <td
+              colspan="7"
+              class="px-6 py-10 text-center text-sm text-muted-foreground"
+            >
+              No deletion requests found
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   </div>
@@ -407,20 +395,15 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
   role="dialog"
   aria-modal="true"
 >
-  <div
-    class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"
-  >
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
     <!-- Background overlay -->
     <div
       class="fixed inset-0 bg-secondary0 bg-opacity-75 transition-opacity"
       aria-hidden="true"
-    >
-    </div>
+    ></div>
 
     <!-- Modal panel -->
-    <div
-      class="inline-block align-bottom bg-card rounded-none text-left overflow-hidden -xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full"
-    >
+    <div class="inline-block align-bottom bg-card rounded-none text-left overflow-hidden -xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
       <div class="absolute top-0 right-0 pt-4 pr-4">
         <button
           type="button"

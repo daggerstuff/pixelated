@@ -53,16 +53,12 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
     <script src="/js/polyfill-detector.js" is:inline></script>
     <script src="/js/module-loader.js" defer is:inline></script>
     <script src="/js/background-loader.js" defer is:inline></script>
-    {
-      (nprogress || mediumZoom) && (
-        <script src="/js/nprogress-and-zoom.js" type="module" />
-      )
-    }
+    {(nprogress || mediumZoom) && (
+      <script src="/js/nprogress-and-zoom.js" type="module"></script>
+    )}
   </head>
 
-  <body
-    class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"
-  >
+  <body class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30">
     <Navbar />
 
     <div class="container-refined py-12 flex flex-col md:flex-row gap-8">
@@ -80,28 +76,38 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
             <a
               href="/docs"
               class="nav-link-refined block"
-              transition:animate="slide">Home</a
+              transition:animate="slide"
             >
+              Home
+            </a>
             <a
               href="/docs/api"
               class="nav-link-refined block"
-              transition:animate="slide">API Reference</a
+              transition:animate="slide"
             >
+              API Reference
+            </a>
             <a
               href="/docs/components"
               class="nav-link-refined block"
-              transition:animate="slide">Components</a
+              transition:animate="slide"
             >
+              Components
+            </a>
             <a
               href="/docs/security"
               class="nav-link-refined block"
-              transition:animate="slide">Security</a
+              transition:animate="slide"
             >
+              Security
+            </a>
             <a
               href="/docs/guides"
               class="nav-link-refined block"
-              transition:animate="slide">Guides</a
+              transition:animate="slide"
             >
+              Guides
+            </a>
           </nav>
 
           <!-- On this page navigation (generated from headings) -->
@@ -123,9 +129,7 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
       <!-- Main content -->
       <main class="flex-1" transition:animate="slide">
-        <article
-          class="prose prose-lg dark:prose-invert max-w-none docs-content"
-        >
+        <article class="prose prose-lg dark:prose-invert max-w-none docs-content">
           <!-- Documentation title and metadata -->
           <header class="mb-12">
             <div class="section-number mb-6">Documentation</div>
@@ -164,7 +168,8 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
                 <path
                   fill-rule="evenodd"
                   d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                  clip-rule="evenodd"></path>
+                  clip-rule="evenodd"
+                ></path>
               </svg>
               Previous Page
             </a>
@@ -182,7 +187,8 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
                 <path
                   fill-rule="evenodd"
                   d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                  clip-rule="evenodd"></path>
+                  clip-rule="evenodd"
+                ></path>
               </svg>
             </a>
           </div>
@@ -255,15 +261,12 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
         }
       })
     </script>
-
     <!-- Vercel Speed Insights and Analytics -->
-    {
-      shouldRenderAnalytics && (
-        <>
-          <SpeedInsights />
-          <Analytics />
-        </>
-      )
-    }
+    {shouldRenderAnalytics && (
+      <>
+        <SpeedInsights />
+        <Analytics />
+      </>
+    )}
   </body>
 </html>

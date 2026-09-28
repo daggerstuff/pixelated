@@ -8,23 +8,33 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
     <div class="stat-grid">
       <div class="stat-card">
         <span class="stat-label">Total Keys</span>
-        <span class="stat-value" id="total-keys">—</span>
+        <span class="stat-value" id="total-keys">
+          —
+        </span>
       </div>
       <div class="stat-card">
         <span class="stat-label">Active Keys</span>
-        <span class="stat-value" id="active-keys">—</span>
+        <span class="stat-value" id="active-keys">
+          —
+        </span>
       </div>
       <div class="stat-card">
         <span class="stat-label">Expired Keys</span>
-        <span class="stat-value" id="expired-keys">—</span>
+        <span class="stat-value" id="expired-keys">
+          —
+        </span>
       </div>
       <div class="stat-card">
         <span class="stat-label">Recent Failures (24h)</span>
-        <span class="stat-value" id="recent-failures">—</span>
+        <span class="stat-value" id="recent-failures">
+          —
+        </span>
       </div>
       <div class="stat-card">
         <span class="stat-label">Avg Rate Limit</span>
-        <span class="stat-value" id="avg-rate-limit">—</span>
+        <span class="stat-value" id="avg-rate-limit">
+          —
+        </span>
       </div>
     </div>
   </section>
@@ -42,8 +52,12 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         Active Only
       </label>
       <input type="text" id="filter-user-id" placeholder="Filter by user ID" />
-      <button id="btn-apply-filters" class="btn-primary">Apply</button>
-      <button id="btn-clear-filters" class="btn-secondary">Clear</button>
+      <button id="btn-apply-filters" class="btn-primary">
+        Apply
+      </button>
+      <button id="btn-clear-filters" class="btn-secondary">
+        Clear
+      </button>
     </div>
   </section>
 
@@ -85,8 +99,12 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
   <section class="actions">
     <h2>Admin Actions</h2>
     <div class="action-row">
-      <button id="btn-refresh" class="btn-primary">Refresh</button>
-      <button id="btn-stats" class="btn-secondary">Stats Only</button>
+      <button id="btn-refresh" class="btn-primary">
+        Refresh
+      </button>
+      <button id="btn-stats" class="btn-secondary">
+        Stats Only
+      </button>
     </div>
   </section>
 </DashboardLayout>

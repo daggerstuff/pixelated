@@ -36,26 +36,27 @@ const navLinks = [
 
     <nav class="np-nav">
       <ul class="np-nav-list">
-        {
-          navLinks.map((link) => (
-            <li>
-              <a
-                href={link.href}
-                class="np-nav-link"
-                class:list={[{ 'np-nav-link--hl': link.highlight }]}
-              >
-                {link.highlight && <span class="np-badge">NEW</span>}
-                {link.name}
-              </a>
-            </li>
-          ))
-        }
+        {navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="np-nav-link"
+              class:list={[{ 'np-nav-link--hl': link.highlight }]}
+            >
+              {link.highlight && <span class="np-badge">NEW</span>}
+              {link.name}
+            </a>
+          </li>
+        ))}
       </ul>
 
       <div class="np-header-actions">
         <ThemeToggle />
 
-        <a href="/contact" class="np-header-cta"> Get Started </a>
+        <a href="/contact" class="np-header-cta">
+          {' '}
+          Get Started{' '}
+        </a>
       </div>
     </nav>
 
@@ -80,7 +81,8 @@ const navLinks = [
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h16"></path>
+            d="M4 6h16M4 12h16M4 18h16"
+          ></path>
         </svg>
         <svg
           id="np-close-icon"
@@ -95,7 +97,8 @@ const navLinks = [
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"></path>
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
         </svg>
       </button>
     </div>
@@ -104,41 +107,35 @@ const navLinks = [
   <!-- Mobile menu -->
   <div id="np-mobile-menu" class="np-mobile-menu" aria-hidden="true">
     <div class="np-mobile-menu-inner">
-      <div
-        style="display:flex;align-items:center;gap:12px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--np-line);"
-      >
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--np-line);">
         <img src="/apple-touch-icon.png" alt="PE" width="28" height="28" />
-        <span
-          style="font-family:var(--np-font-display);font-size:1.25rem;font-weight:700;letter-spacing:-0.02em;color:var(--np-text)"
-          >Pixelated Empathy</span
-        >
+        <span style="font-family:var(--np-font-display);font-size:1.25rem;font-weight:700;letter-spacing:-0.02em;color:var(--np-text)">
+          Pixelated Empathy
+        </span>
       </div>
 
       <nav>
-        {
-          navLinks.map((link) => (
-            <a
-              href={link.href}
-              class="np-mobile-link"
-              onclick="document.getElementById('np-mobile-menu').classList.remove('np-mobile-menu--open'); document.getElementById('np-mobile-btn').setAttribute('aria-expanded','false');"
-            >
-              {link.highlight && <span class="np-badge">NEW</span>}
-              {link.name}
-            </a>
-          ))
-        }
+        {navLinks.map((link) => (
+          <a
+            href={link.href}
+            class="np-mobile-link"
+            onclick="document.getElementById('np-mobile-menu').classList.remove('np-mobile-menu--open'); document.getElementById('np-mobile-btn').setAttribute('aria-expanded','false');"
+          >
+            {link.highlight && <span class="np-badge">NEW</span>}
+            {link.name}
+          </a>
+        ))}
       </nav>
 
-      <div
-        style="margin-top:24px;padding-top:16px;border-top:1px solid var(--np-line);"
-      >
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--np-line);">
         <a
           href="/contact"
           class="np-header-cta"
           style="display:block;text-align:center"
           onclick="document.getElementById('np-mobile-menu').classList.remove('np-mobile-menu--open'); document.getElementById('np-mobile-btn').setAttribute('aria-expanded','false');"
-          >Get Started</a
         >
+          Get Started
+        </a>
       </div>
     </div>
   </div>

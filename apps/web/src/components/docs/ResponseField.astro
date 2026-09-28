@@ -21,13 +21,11 @@ const {
     {type && <span class="response-field-type">{type}</span>}
     {required && <span class="response-field-required">required</span>}
   </div>
-  {
-    Astro.slots.has('default') && (
-      <div class="response-field-description">
-        <slot />
-      </div>
-    )
-  }
+  {Astro.slots.has('default') && (
+    <div class="response-field-description">
+      <slot />
+    </div>
+  )}
 </div>
 
 <style>

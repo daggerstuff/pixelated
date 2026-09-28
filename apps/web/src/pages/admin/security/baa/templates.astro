@@ -44,109 +44,107 @@ const allTemplates = templateService.getAllTemplates()
     <div class="bg-card rounded-none p-6 mb-8">
       <h2 class="text-xl font-semibold mb-4">Templates</h2>
 
-      {
-        allTemplates.length === 0 ? (
-          <p class="text-muted-foreground">
-            No templates found. Create your first template to get started.
-          </p>
-        ) : (
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-border">
-              <thead class="bg-secondary">
+      {allTemplates.length === 0 ? (
+        <p class="text-muted-foreground">
+          No templates found. Create your first template to get started.
+        </p>
+      ) : (
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-border">
+            <thead class="bg-secondary">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Name
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Version
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Last Updated
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Associate Types
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Default
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-card divide-y divide-border">
+              {allTemplates.map((template) => (
                 <tr>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Name
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Version
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Last Updated
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Associate Types
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Default
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Actions
-                  </th>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                    {template.name}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {template.version}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {template.lastUpdated.toLocaleDateString()}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {template.associateTypes.map((type) => (
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground mr-1">
+                        {type.replace('_', ' ')}
+                      </span>
+                    ))}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                    {template.isDefault ? (
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                        Default
+                      </span>
+                    ) : (
+                      <span>-</span>
+                    )}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <a
+                      href={`/admin/security/baa/templates/${template.id}`}
+                      class="text-foreground hover:underline mr-3"
+                    >
+                      View
+                    </a>
+                    <a
+                      href={`/admin/security/baa/templates/${template.id}/edit`}
+                      class="text-foreground hover:underline mr-3"
+                    >
+                      Edit
+                    </a>
+                    <button
+                      data-template-id={template.id}
+                      class="delete-template text-foreground font-semibold hover:text-foreground font-semibold"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody class="bg-card divide-y divide-border">
-                {allTemplates.map((template) => (
-                  <tr>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                      {template.name}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {template.version}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {template.lastUpdated.toLocaleDateString()}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {template.associateTypes.map((type) => (
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground mr-1">
-                          {type.replace('_', ' ')}
-                        </span>
-                      ))}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {template.isDefault ? (
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
-                          Default
-                        </span>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <a
-                        href={`/admin/security/baa/templates/${template.id}`}
-                        class="text-foreground hover:underline mr-3"
-                      >
-                        View
-                      </a>
-                      <a
-                        href={`/admin/security/baa/templates/${template.id}/edit`}
-                        class="text-foreground hover:underline mr-3"
-                      >
-                        Edit
-                      </a>
-                      <button
-                        data-template-id={template.id}
-                        class="delete-template text-foreground font-semibold hover:text-foreground font-semibold"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
-      }
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

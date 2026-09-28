@@ -28,36 +28,34 @@ const { images, imageProps, autoplayDelay = 3000 } = Astro.props
   aria-label="Image carousel"
   aria-live="polite"
 >
-  {
-    images.map((item) => (
-      <div class="op-transition-600" role="group" aria-roledescription="slide">
-        {typeof item.src === 'string' ? (
-          imageProps ? (
-            <Image
-              class="aspect-[16/9] object-cover"
-              src={item.src}
-              alt={item.alt}
-              {...imageProps}
-            />
-          ) : (
-            <Image
-              class="aspect-[16/9] object-cover"
-              src={item.src}
-              alt={item.alt}
-              inferSize={true}
-            />
-          )
-        ) : (
+  {images.map((item) => (
+    <div class="op-transition-600" role="group" aria-roledescription="slide">
+      {typeof item.src === 'string' ? (
+        imageProps ? (
           <Image
             class="aspect-[16/9] object-cover"
             src={item.src}
             alt={item.alt}
             {...imageProps}
           />
-        )}
-      </div>
-    ))
-  }
+        ) : (
+          <Image
+            class="aspect-[16/9] object-cover"
+            src={item.src}
+            alt={item.alt}
+            inferSize={true}
+          />
+        )
+      ) : (
+        <Image
+          class="aspect-[16/9] object-cover"
+          src={item.src}
+          alt={item.alt}
+          {...imageProps}
+        />
+      )}
+    </div>
+  ))}
 </image-carousel>
 
 <script>

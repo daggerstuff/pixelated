@@ -58,18 +58,10 @@ const socialLinks = [
 ]
 ---
 
-<footer
-  class="bg-gradient-to-t from-neutral-950 to-neutral-900 border-t border-neutral-800/50 relative overflow-hidden"
->
+<footer class="bg-gradient-to-t from-neutral-950 to-neutral-900 border-t border-neutral-800/50 relative overflow-hidden">
   <!-- Background Pattern -->
-  <div
-    class="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(59,130,246,0.05)_0%,transparent_50%)]"
-  >
-  </div>
-  <div
-    class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(147,51,234,0.05)_0%,transparent_50%)]"
-  >
-  </div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(59,130,246,0.05)_0%,transparent_50%)]"></div>
+  <div class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(147,51,234,0.05)_0%,transparent_50%)]"></div>
 
   <!-- Main Footer Content -->
   <div class="container mx-auto px-6 lg:px-8 py-16">
@@ -83,9 +75,7 @@ const socialLinks = [
             class="h-10 w-auto transition-transform duration-300 group-hover:scale-110"
           />
           <div>
-            <h3
-              class="text-xl font-bold text-neutral-100 group-hover:text-primary-400 transition-colors"
-            >
+            <h3 class="text-xl font-bold text-neutral-100 group-hover:text-primary-400 transition-colors">
               {companyName}
             </h3>
             <p class="text-sm text-neutral-400">
@@ -109,9 +99,7 @@ const socialLinks = [
               placeholder="Enter your email"
               class="flex-1 px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-neutral-100 placeholder-neutral-400 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500/20 transition-colors"
             />
-            <button
-              class="px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105"
-            >
+            <button class="px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105">
               Subscribe
             </button>
           </div>
@@ -119,49 +107,45 @@ const socialLinks = [
 
         <!-- Social Links -->
         <div class="flex space-x-4">
-          {
-            socialLinks.map((link) => (
-              <a
-                href={link.href}
-                class="group p-2 bg-neutral-800 hover:bg-primary-600 text-neutral-400 hover:text-white rounded-lg transition-all duration-300 hover:scale-110"
-                aria-label={link.name}
-              >
-                <span class="text-xl">{link.icon}</span>
-              </a>
-            ))
-          }
+          {socialLinks.map((link) => (
+            <a
+              href={link.href}
+              class="group p-2 bg-neutral-800 hover:bg-primary-600 text-neutral-400 hover:text-white rounded-lg transition-all duration-300 hover:scale-110"
+              aria-label={link.name}
+            >
+              <span class="text-xl">{link.icon}</span>
+            </a>
+          ))}
         </div>
       </div>
 
       <!-- Navigation Sections -->
       <div class="lg:col-span-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {
-            footerSections.map((section) => (
-              <div class="space-y-4">
-                <h4 class="text-neutral-100 font-semibold text-lg">
-                  {section.title}
-                </h4>
-                <ul class="space-y-3">
-                  {section.links.map((link) => (
-                    <li>
-                      <a
-                        href={link.href}
-                        class="text-neutral-400 hover:text-primary-400 transition-colors group flex items-center"
-                      >
-                        <span class="group-hover:translate-x-1 transition-transform duration-300">
-                          {link.name}
-                        </span>
-                        <span class="opacity-0 group-hover:opacity-100 ml-2 transition-opacity">
-                          →
-                        </span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          }
+          {footerSections.map((section) => (
+            <div class="space-y-4">
+              <h4 class="text-neutral-100 font-semibold text-lg">
+                {section.title}
+              </h4>
+              <ul class="space-y-3">
+                {section.links.map((link) => (
+                  <li>
+                    <a
+                      href={link.href}
+                      class="text-neutral-400 hover:text-primary-400 transition-colors group flex items-center"
+                    >
+                      <span class="group-hover:translate-x-1 transition-transform duration-300">
+                        {link.name}
+                      </span>
+                      <span class="opacity-0 group-hover:opacity-100 ml-2 transition-opacity">
+                        →
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -170,24 +154,22 @@ const socialLinks = [
     <div class="border-t border-neutral-800/50 my-12"></div>
 
     <!-- Bottom Section -->
-    <div
-      class="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0"
-    >
+    <div class="flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
       <!-- Copyright -->
-      <div
-        class="text-neutral-400 text-sm space-y-2 lg:space-y-0 lg:space-x-8 lg:flex"
-      >
-        <p>© {year} {companyName}. All rights reserved.</p>
+      <div class="text-neutral-400 text-sm space-y-2 lg:space-y-0 lg:space-x-8 lg:flex">
+        <p>
+          © {year} {companyName}. All rights reserved.
+        </p>
         <div class="flex space-x-6">
-          <a href="#privacy" class="hover:text-primary-400 transition-colors"
-            >Privacy Policy</a
-          >
-          <a href="#terms" class="hover:text-primary-400 transition-colors"
-            >Terms of Service</a
-          >
-          <a href="#cookies" class="hover:text-primary-400 transition-colors"
-            >Cookie Policy</a
-          >
+          <a href="#privacy" class="hover:text-primary-400 transition-colors">
+            Privacy Policy
+          </a>
+          <a href="#terms" class="hover:text-primary-400 transition-colors">
+            Terms of Service
+          </a>
+          <a href="#cookies" class="hover:text-primary-400 transition-colors">
+            Cookie Policy
+          </a>
         </div>
       </div>
 
@@ -216,7 +198,8 @@ const socialLinks = [
         stroke-linecap="round"
         stroke-linejoin="round"
         stroke-width="2"
-        d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        d="M5 10l7-7m0 0l7 7m-7-7v18"
+      ></path>
     </svg>
   </button>
 </footer>

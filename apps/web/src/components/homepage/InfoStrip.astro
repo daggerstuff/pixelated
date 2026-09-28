@@ -26,14 +26,12 @@ const {
   </div>
 
   <div class="info-strip__list pe-home-stack">
-    {
-      items.map((item) => (
-        <div class="info-strip__row">
-          <span class="info-strip__label">{item.label}</span>
-          <p class="info-strip__value">{item.value}</p>
-        </div>
-      ))
-    }
+    {items.map((item) => (
+      <div class="info-strip__row">
+        <span class="info-strip__label">{item.label}</span>
+        <p class="info-strip__value">{item.value}</p>
+      </div>
+    ))}
   </div>
 </div>
 

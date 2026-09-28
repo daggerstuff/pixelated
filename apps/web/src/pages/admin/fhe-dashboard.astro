@@ -24,31 +24,27 @@ const fheStats = {
       Fully Homomorphic Encryption Dashboard
     </h1>
 
-    {
-      fheStats ? (
-        <div class="bg-white shadow rounded-lg p-6">
-          <h2 class="text-xl font-semibold mb-4">Latest Verification</h2>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <p class="text-muted-foreground">Timestamp</p>
-              <p class="font-medium">
-                {new Date(fheStats.timestamp).toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <p class="text-muted-foreground">Verification Hash</p>
-              <p class="font-medium font-mono">{fheStats.verificationHash}</p>
-            </div>
+    {fheStats ? (
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">Latest Verification</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-muted-foreground">Timestamp</p>
+            <p class="font-medium">
+              {new Date(fheStats.timestamp).toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p class="text-muted-foreground">Verification Hash</p>
+            <p class="font-medium font-mono">{fheStats.verificationHash}</p>
           </div>
         </div>
-      ) : (
-        <div class="bg-white shadow rounded-lg p-6 text-center">
-          <p class="text-muted-foreground">
-            No FHE verification data available
-          </p>
-        </div>
-      )
-    }
+      </div>
+    ) : (
+      <div class="bg-white shadow rounded-lg p-6 text-center">
+        <p class="text-muted-foreground">No FHE verification data available</p>
+      </div>
+    )}
   </div>
 </BaseLayout>
 
