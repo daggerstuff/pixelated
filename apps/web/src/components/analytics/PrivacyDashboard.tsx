@@ -78,7 +78,7 @@ export function PrivacyDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium">Enable Analytics</h3>
-              <p className="text-gray-500 text-sm">
+              <p className="text-sm text-muted-foreground">
                 Allow collection of anonymous usage data
               </p>
             </div>
@@ -93,7 +93,7 @@ export function PrivacyDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium">Differential Privacy</h3>
-              <p className="text-gray-500 text-sm">
+              <p className="text-sm text-muted-foreground">
                 Add noise to data to enhance privacy
               </p>
             </div>
@@ -108,7 +108,7 @@ export function PrivacyDashboard() {
           <div className="space-y-2">
             <div>
               <h3 className="font-medium">Privacy Budget</h3>
-              <p className="text-gray-500 text-sm">
+              <p className="text-sm text-muted-foreground">
                 Control the balance between privacy and accuracy
               </p>
             </div>
@@ -125,7 +125,7 @@ export function PrivacyDashboard() {
               }
             />
 
-            <div className="text-gray-500 flex justify-between text-sm">
+            <div className="flex justify-between text-sm text-muted-foreground">
               <span>More Private</span>
               <span>More Accurate</span>
             </div>
@@ -134,7 +134,7 @@ export function PrivacyDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium">Anonymize Data</h3>
-              <p className="text-gray-500 text-sm">
+              <p className="text-sm text-muted-foreground">
                 Remove personally identifiable information
               </p>
             </div>
@@ -158,11 +158,15 @@ export function PrivacyDashboard() {
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-sm">Events Collected</span>
+              <span className="text-sm text-muted-foreground">
+                Events Collected
+              </span>
               <span className="font-medium">{eventCount}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-sm">Last Updated</span>
+              <span className="text-sm text-muted-foreground">
+                Last Updated
+              </span>
               <span className="font-medium">
                 {lastSync?.toLocaleTimeString() ?? 'Never'}
               </span>

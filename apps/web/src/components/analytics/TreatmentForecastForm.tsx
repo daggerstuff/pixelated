@@ -213,7 +213,9 @@ const TreatmentForecastForm: FC = () => {
       <div>
         <label htmlFor="desiredOutcomes" className="block font-medium">
           Desired Outcomes{' '}
-          <span className="text-gray-500 text-xs">(comma-separated)</span>
+          <span className="text-xs text-muted-foreground">
+            (comma-separated)
+          </span>
         </label>
         <input
           id="desiredOutcomes"
@@ -247,11 +249,16 @@ const TreatmentForecastForm: FC = () => {
           />
           <ul className="mt-4 space-y-2">
             {results.map((r) => (
-              <li key={r.technique} className="bg-gray-50 rounded border p-3">
+              <li
+                key={r.technique}
+                className="rounded-none border border-border bg-secondary p-3"
+              >
                 <strong>{r.technique}</strong>: {Math.round(r.score * 100)}%
                 efficacy
                 <br />
-                <span className="text-gray-600 text-xs">{r.rationale}</span>
+                <span className="text-xs text-muted-foreground">
+                  {r.rationale}
+                </span>
               </li>
             ))}
           </ul>

@@ -301,7 +301,7 @@ export function AdvancedFilteringComponent({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label>Intensity Range</Label>
-                <span className="text-gray-500 text-xs">
+                <span className="text-xs text-muted-foreground">
                   {options.emotions?.minIntensity?.toFixed(1) ?? '0.0'} -{' '}
                   {options.emotions?.maxIntensity?.toFixed(1) ?? '1.0'}
                 </span>
@@ -345,7 +345,7 @@ export function AdvancedFilteringComponent({
                     <Label className="text-sm">
                       Valence (Negative to Positive)
                     </Label>
-                    <span className="text-gray-500 text-xs">
+                    <span className="text-xs text-muted-foreground">
                       {formatRange(
                         options.emotions?.dimensionalRanges?.valence,
                       )}
@@ -414,7 +414,7 @@ export function AdvancedFilteringComponent({
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <Label className="text-sm">Arousal (Calm to Excited)</Label>
-                    <span className="text-gray-500 text-xs">
+                    <span className="text-xs text-muted-foreground">
                       {formatRange(
                         options.emotions?.dimensionalRanges?.arousal,
                       )}
@@ -485,7 +485,7 @@ export function AdvancedFilteringComponent({
                     <Label className="text-sm">
                       Dominance (Submissive to Dominant)
                     </Label>
-                    <span className="text-gray-500 text-xs">
+                    <span className="text-xs text-muted-foreground">
                       {formatRange(
                         options.emotions?.dimensionalRanges?.dominance,
                       )}
@@ -585,7 +585,7 @@ export function AdvancedFilteringComponent({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label>Minimum Pattern Strength</Label>
-                <span className="text-gray-500 text-xs">
+                <span className="text-xs text-muted-foreground">
                   {options.patterns?.minStrength?.toFixed(1) ?? '0.0'}
                 </span>
               </div>
@@ -605,7 +605,7 @@ export function AdvancedFilteringComponent({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label>Minimum Confidence</Label>
-                <span className="text-gray-500 text-xs">
+                <span className="text-xs text-muted-foreground">
                   {options.patterns?.minConfidence?.toFixed(1) ?? '0.0'}
                 </span>
               </div>
@@ -677,7 +677,7 @@ export function AdvancedFilteringComponent({
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label>Smoothing</Label>
-                <span className="text-gray-500 text-xs">
+                <span className="text-xs text-muted-foreground">
                   {options.visualization?.smoothing ?? 0}
                 </span>
               </div>
@@ -798,7 +798,7 @@ export function AdvancedFilteringComponent({
                       'py-2 px-3 text-sm capitalize',
                       activeTab === tab
                         ? 'border-b-2 border-primary font-medium'
-                        : 'text-gray-500 hover:text-gray-700',
+                        : 'text-muted-foreground hover:text-foreground',
                     )}
                     onClick={() => setActiveTab(tab)}
                   >
@@ -832,7 +832,7 @@ export function AdvancedFilteringComponent({
   return (
     <div
       className={cn(
-        'advanced-filtering p-4 border rounded-md bg-gray-50 dark:bg-gray-900',
+        'advanced-filtering rounded-none border border-border bg-secondary p-4',
         className,
       )}
     >
@@ -857,7 +857,7 @@ export function AdvancedFilteringComponent({
                 'py-2 px-4 text-sm capitalize',
                 activeTab === tab
                   ? 'border-b-2 border-primary font-medium'
-                  : 'text-gray-500 hover:text-gray-700',
+                  : 'text-muted-foreground hover:text-foreground',
               )}
               onClick={() => setActiveTab(tab)}
             >
