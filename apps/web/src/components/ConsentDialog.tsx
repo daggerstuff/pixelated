@@ -174,10 +174,10 @@ export function ConsentDialog({
             <button
               onClick={handleConsentClick}
               disabled={!checked}
-              className={`text-white focus:ring-blue-700 rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              className={`rounded-none px-4 py-2 text-sm font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
                 checked
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-blue-300 cursor-not-allowed'
+                  ? 'hover:bg-primary/90 bg-primary'
+                  : 'bg-primary/35 cursor-not-allowed'
               }`}
             >
               I Consent
