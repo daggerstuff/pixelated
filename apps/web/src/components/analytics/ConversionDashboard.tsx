@@ -334,9 +334,9 @@ export function ConversionDashboard() {
           <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <IconFilter className="text-gray-500 h-4 w-4" />
+                <IconFilter className="h-4 w-4 text-muted-foreground" />
 
-                <span className="text-gray-500 text-sm">Filter:</span>
+                <span className="text-sm text-muted-foreground">Filter:</span>
               </div>
               <Select value={filter} onValueChange={setFilter}>
                 <SelectTrigger className="w-[180px]">
@@ -407,7 +407,7 @@ export function ConversionDashboard() {
                         <CardContent>
                           <div className="space-y-2">
                             <div className="flex justify-between">
-                              <span className="text-gray-500 text-sm">
+                              <span className="text-sm text-muted-foreground">
                                 Count:
                               </span>
                               <span className="font-semibold">
@@ -415,7 +415,7 @@ export function ConversionDashboard() {
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-500 text-sm">
+                              <span className="text-sm text-muted-foreground">
                                 Value:
                               </span>
                               <span className="font-semibold">
@@ -423,7 +423,7 @@ export function ConversionDashboard() {
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-500 text-sm">
+                              <span className="text-sm text-muted-foreground">
                                 Conversion Rate:
                               </span>
                               <span className="font-semibold">
@@ -431,14 +431,14 @@ export function ConversionDashboard() {
                               </span>
                             </div>
                             <div className="mt-2">
-                              <div className="text-gray-500 mb-1 text-sm">
+                              <div className="mb-1 text-sm text-muted-foreground">
                                 Last 7 days:
                               </div>
                               <div className="flex h-8 items-end space-x-1">
                                 {summary.trend.map((value, i) => (
                                   <div
                                     key={`trend-${summary.id}-${i}-${value}`}
-                                    className="w-full rounded-sm bg-primary"
+                                    className="w-full rounded-none bg-primary"
                                     style={{
                                       height: `${Math.max(20, (value / Math.max(...summary.trend)) * 100)}%`,
                                       minHeight: '4px',
@@ -454,7 +454,7 @@ export function ConversionDashboard() {
                   ) : (
                     <Card className="col-span-3">
                       <CardContent className="py-6">
-                        <p className="text-gray-500 text-center">
+                        <p className="text-center text-muted-foreground">
                           No conversion data available for the selected filters.
                         </p>
                       </CardContent>
@@ -467,7 +467,7 @@ export function ConversionDashboard() {
                     <CardTitle>Conversions Over Time</CardTitle>
                   </CardHeader>
                   <CardContent className="flex h-[300px] items-center justify-center">
-                    <div className="text-gray-500 text-center">
+                    <div className="text-center text-muted-foreground">
                       [Chart Component Would Render Here with{' '}
                       {timeChartData.labels.join(', ')}]
                     </div>
@@ -479,7 +479,7 @@ export function ConversionDashboard() {
                     <CardTitle>Conversion Types Distribution</CardTitle>
                   </CardHeader>
                   <CardContent className="flex h-[300px] items-center justify-center">
-                    <div className="text-gray-500 text-center">
+                    <div className="text-center text-muted-foreground">
                       [Pie Chart Would Render Here with{' '}
                       {typeChartData.labels.join(', ')}]
                     </div>
@@ -498,8 +498,8 @@ export function ConversionDashboard() {
                   <CardContent>
                     {sourceData.length > 0 ? (
                       <div className="relative overflow-x-auto">
-                        <table className="text-gray-500 dark:text-gray-400 w-full text-left text-sm">
-                          <thead className="text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 text-xs uppercase">
+                        <table className="w-full text-left text-sm text-muted-foreground">
+                          <thead className="bg-secondary text-xs uppercase text-foreground">
                             <tr>
                               <th scope="col" className="px-6 py-3">
                                 Source
@@ -519,9 +519,9 @@ export function ConversionDashboard() {
                             {sourceData.map((source) => (
                               <tr
                                 key={source.source}
-                                className="bg-white dark:bg-gray-800 dark:border-gray-700 border-b"
+                                className="border-b border-border bg-card"
                               >
-                                <td className="text-gray-900 dark:text-white whitespace-nowrap px-6 py-4 font-medium">
+                                <td className="whitespace-nowrap px-6 py-4 font-medium text-foreground">
                                   {source.source}
                                 </td>
                                 <td className="px-6 py-4">{source.count}</td>
@@ -533,9 +533,9 @@ export function ConversionDashboard() {
                                     <span className="mr-2">
                                       {source.percentage.toFixed(1)}%
                                     </span>
-                                    <div className="bg-gray-200 dark:bg-gray-700 h-2.5 w-full rounded-full">
+                                    <div className="h-2.5 w-full rounded-none bg-secondary">
                                       <div
-                                        className="h-2.5 rounded-full bg-primary"
+                                        className="h-2.5 rounded-none bg-primary"
                                         style={{
                                           width: `${source.percentage}%`,
                                         }}
@@ -549,7 +549,7 @@ export function ConversionDashboard() {
                         </table>
                       </div>
                     ) : (
-                      <p className="text-gray-500 py-4 text-center">
+                      <p className="py-4 text-center text-muted-foreground">
                         No source data available for the selected filters.
                       </p>
                     )}
@@ -568,8 +568,8 @@ export function ConversionDashboard() {
                   <CardContent>
                     {pageData.length > 0 ? (
                       <div className="relative overflow-x-auto">
-                        <table className="text-gray-500 dark:text-gray-400 w-full text-left text-sm">
-                          <thead className="text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 text-xs uppercase">
+                        <table className="w-full text-left text-sm text-muted-foreground">
+                          <thead className="bg-secondary text-xs uppercase text-foreground">
                             <tr>
                               <th scope="col" className="px-6 py-3">
                                 Page
@@ -589,9 +589,9 @@ export function ConversionDashboard() {
                             {pageData.map((page) => (
                               <tr
                                 key={page.path}
-                                className="bg-white dark:bg-gray-800 dark:border-gray-700 border-b"
+                                className="border-b border-border bg-card"
                               >
-                                <td className="text-gray-900 dark:text-white whitespace-nowrap px-6 py-4 font-medium">
+                                <td className="whitespace-nowrap px-6 py-4 font-medium text-foreground">
                                   {page.path}
                                 </td>
                                 <td className="px-6 py-4">{page.count}</td>
@@ -603,9 +603,9 @@ export function ConversionDashboard() {
                                     <span className="mr-2">
                                       {page.conversionRate.toFixed(1)}%
                                     </span>
-                                    <div className="bg-gray-200 dark:bg-gray-700 h-2.5 w-full rounded-full">
+                                    <div className="h-2.5 w-full rounded-none bg-secondary">
                                       <div
-                                        className="h-2.5 rounded-full bg-primary"
+                                        className="h-2.5 rounded-none bg-primary"
                                         style={{
                                           width: `${Math.min(page.conversionRate * 2, 100)}%`,
                                         }}
@@ -619,7 +619,7 @@ export function ConversionDashboard() {
                         </table>
                       </div>
                     ) : (
-                      <p className="text-gray-500 py-4 text-center">
+                      <p className="py-4 text-center text-muted-foreground">
                         No page data available for the selected filters.
                       </p>
                     )}
@@ -638,8 +638,8 @@ export function ConversionDashboard() {
                   <CardContent>
                     {conversionEvents.length > 0 ? (
                       <div className="relative overflow-x-auto">
-                        <table className="text-gray-500 dark:text-gray-400 w-full text-left text-sm">
-                          <thead className="text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400 text-xs uppercase">
+                        <table className="w-full text-left text-sm text-muted-foreground">
+                          <thead className="bg-secondary text-xs uppercase text-foreground">
                             <tr>
                               <th scope="col" className="px-6 py-3">
                                 Timestamp
@@ -662,12 +662,12 @@ export function ConversionDashboard() {
                             {conversionEvents.map((event) => (
                               <tr
                                 key={`event-${event.conversionId}-${event.timestamp}`}
-                                className="bg-white dark:bg-gray-800 dark:border-gray-700 border-b"
+                                className="border-b border-border bg-card"
                               >
                                 <td className="px-6 py-4">
                                   {new Date(event.timestamp).toLocaleString()}
                                 </td>
-                                <td className="text-gray-900 dark:text-white px-6 py-4 font-medium">
+                                <td className="px-6 py-4 font-medium text-foreground">
                                   {event.conversionId}
                                 </td>
                                 <td className="px-6 py-4">
@@ -687,7 +687,7 @@ export function ConversionDashboard() {
                         </table>
                       </div>
                     ) : (
-                      <p className="text-gray-500 py-4 text-center">
+                      <p className="py-4 text-center text-muted-foreground">
                         No events available for the selected filters.
                       </p>
                     )}

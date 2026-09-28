@@ -71,7 +71,7 @@ export function ComparativeProgressControls({
           id="metric-select"
           value={metric}
           onChange={(e) => setMetric(e.target.value)}
-          className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:ring-indigo-500 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 sm:w-auto"
+          className="w-full rounded-none border border-input bg-background px-3 py-2 shadow-none focus:outline-none focus:ring-2 focus:ring-ring sm:w-auto"
           disabled={isLoading}
         >
           {availableMetrics.map((option) => (
@@ -93,7 +93,7 @@ export function ComparativeProgressControls({
           id="cohort-select"
           value={cohort}
           onChange={(e) => setCohort(e.target.value)}
-          className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:ring-indigo-500 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 sm:w-auto"
+          className="w-full rounded-none border border-input bg-background px-3 py-2 shadow-none focus:outline-none focus:ring-2 focus:ring-ring sm:w-auto"
           disabled={isLoading}
         >
           {availableCohorts.map((option) => (
@@ -115,7 +115,7 @@ export function ComparativeProgressControls({
               id="start-date"
               value={dateRange.startDate}
               onChange={handleStartDateChange}
-              className={`bg-white dark:bg-gray-800 w-full border px-3 py-2 sm:w-auto ${dateError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} focus:ring-indigo-500 rounded-md shadow-sm focus:outline-none focus:ring-2`}
+              className={`w-full rounded-none border bg-background px-3 py-2 sm:w-auto ${dateError ? 'border-ring' : 'border-input'} focus:outline-none focus:ring-2 focus:ring-ring`}
               disabled={isLoading}
             />
             <span>to</span>
@@ -124,12 +124,14 @@ export function ComparativeProgressControls({
               id="end-date"
               value={dateRange.endDate}
               onChange={handleEndDateChange}
-              className={`bg-white dark:bg-gray-800 w-full border px-3 py-2 sm:w-auto ${dateError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} focus:ring-indigo-500 rounded-md shadow-sm focus:outline-none focus:ring-2`}
+              className={`w-full rounded-none border bg-background px-3 py-2 sm:w-auto ${dateError ? 'border-ring' : 'border-input'} focus:outline-none focus:ring-2 focus:ring-ring`}
               disabled={isLoading}
             />
           </div>
           {dateError && (
-            <div className="text-red-500 mt-1 text-xs">{dateError}</div>
+            <div className="mt-1 text-xs font-medium text-foreground">
+              {dateError}
+            </div>
           )}
         </div>
       </div>

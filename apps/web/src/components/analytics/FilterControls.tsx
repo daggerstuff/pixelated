@@ -70,7 +70,7 @@ export function FilterControls({
 
   return (
     <div
-      className="filter-controls bg-gray-50 dark:bg-gray-900 mb-4 space-y-4 rounded-md border p-4"
+      className="filter-controls mb-4 space-y-4 rounded-none border border-border bg-secondary p-4"
       role="region"
       aria-label="Filter options"
     >
@@ -132,7 +132,11 @@ export function FilterControls({
       )}
 
       {dateError && (
-        <div id="date-error" className="text-red-500 mb-2 text-xs" role="alert">
+        <div
+          id="date-error"
+          className="mb-2 text-xs font-medium text-foreground"
+          role="alert"
+        >
           {dateError}
         </div>
       )}
