@@ -1,7 +1,7 @@
 import React from 'react'
 
 // Common source types based on SourceType enum in backend
-export type SourceType =
+type SourceType =
   | 'all'
   | 'publisher' // Generic publisher category
   | 'api' // Generic API category
