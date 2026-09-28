@@ -26,7 +26,7 @@ export interface EncryptedData {
   timestamp: number
 }
 
-export interface KeyMetadata {
+interface KeyMetadata {
   id: string
   algorithm: string
   created: Date
@@ -528,4 +528,3 @@ export const encryptionManager = new EncryptionManager({
 
 // Export class for custom instances
 export { EncryptionManager }
-export default encryptionManager
