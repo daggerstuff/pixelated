@@ -214,33 +214,33 @@ export function ModalityNoteEditor({
               style={{ color: 'var(--np-muted)' }}
             >
               {isOnline ? (
-                <span className="text-emerald-400 flex items-center gap-1">
+                <span className="flex items-center gap-1 text-foreground">
                   <Cloud className="h-3.5 w-3.5" /> Online
                 </span>
               ) : (
-                <span className="text-amber-400 flex items-center gap-1">
+                <span className="flex items-center gap-1 text-muted-foreground">
                   <CloudOff className="h-3.5 w-3.5" /> Offline Mode (Drafting
                   Enabled)
                 </span>
               )}
               <span>•</span>
               {syncStatus === 'synced' && (
-                <span className="text-emerald-400 flex items-center gap-1">
+                <span className="flex items-center gap-1 text-foreground">
                   <CheckCircle2 className="h-3.5 w-3.5" /> Saved
                 </span>
               )}
               {syncStatus === 'syncing' && (
-                <span className="text-sky-400 flex items-center gap-1">
+                <span className="flex items-center gap-1 text-muted-foreground">
                   <RefreshCw className="h-3.5 w-3.5 animate-spin" /> Saving...
                 </span>
               )}
               {syncStatus === 'pending' && (
-                <span className="text-amber-400 flex items-center gap-1">
+                <span className="flex items-center gap-1 text-muted-foreground">
                   <Save className="h-3.5 w-3.5" /> Unsaved Changes
                 </span>
               )}
               {syncStatus === 'conflict' && (
-                <span className="text-rose-400 flex items-center gap-1">
+                <span className="flex items-center gap-1 font-medium text-foreground">
                   <AlertCircle className="h-3.5 w-3.5" /> Sync Conflict
                 </span>
               )}
@@ -277,13 +277,13 @@ export function ModalityNoteEditor({
           role="alert"
           className="flex items-center justify-between rounded-lg p-3 text-sm"
           style={{
-            background: 'rgba(239, 68, 68, 0.1)',
+            background: 'var(--np-surface)',
             border: '1px solid var(--np-line)',
             color: 'var(--np-text)',
           }}
         >
           <div className="flex items-center gap-2">
-            <AlertCircle className="text-rose-400 h-4 w-4" />
+            <AlertCircle className="h-4 w-4 text-foreground" />
             <span>{conflictMessage}</span>
           </div>
           <button
@@ -295,7 +295,7 @@ export function ModalityNoteEditor({
                 force: true,
               })
             }}
-            className="text-rose-400 min-h-[44px] rounded px-3 py-1 text-xs font-semibold underline"
+            className="min-h-[44px] rounded px-3 py-1 text-xs font-semibold text-foreground underline"
           >
             Overwrite Server
           </button>
@@ -389,7 +389,7 @@ export function ModalityNoteEditor({
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold">{sec.label}</span>
                   {sec.required && (
-                    <span className="text-amber-400 text-xs font-normal">
+                    <span className="text-xs font-normal text-muted-foreground">
                       *Required
                     </span>
                   )}

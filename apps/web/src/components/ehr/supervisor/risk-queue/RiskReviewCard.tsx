@@ -22,11 +22,14 @@ export interface RiskReviewCardProps {
   disabled?: boolean
 }
 
+// Value-contrast ladder: low quiet, medium ring+weight, high ring+bold,
+// crisis inverted primary (highest emphasis). No hue — state encodes via
+// chip fill, border tone, and weight per the zero-chroma doctrine.
 const RISK_LEVEL_STYLES: Record<string, string> = {
-  low: 'bg-green-100 text-green-800 border-green-300',
-  medium: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-  high: 'bg-orange-100 text-orange-800 border-orange-300',
-  crisis: 'bg-red-100 text-red-800 border-red-300',
+  low: 'border-border bg-secondary text-muted-foreground',
+  medium: 'border-ring bg-secondary font-medium text-foreground',
+  high: 'border-ring bg-secondary font-bold text-foreground',
+  crisis: 'border-transparent bg-primary text-primary-foreground',
 }
 
 const AI_SOURCE_LABELS: Record<string, string> = {
@@ -48,25 +51,25 @@ export function RiskReviewCard({
 
   return (
     <div
-      className="border-gray-200 bg-white rounded-lg border p-4 shadow-sm"
+      className="rounded-none border border-border bg-card p-4"
       data-testid={`risk-review-card-${review.id}`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span
-            className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${riskStyle}`}
+            className={`inline-flex items-center rounded-none border px-2.5 py-0.5 text-xs font-medium ${riskStyle}`}
             data-testid="risk-level-badge"
           >
             {review.riskLevel.toUpperCase()}
           </span>
-          <span className="text-gray-500 text-sm">
+          <span className="text-sm text-muted-foreground">
             Score: {review.riskScore.toFixed(2)}
           </span>
         </div>
-        <span className="text-gray-400 text-xs">{aiLabel}</span>
+        <span className="text-xs text-muted-foreground">{aiLabel}</span>
       </div>
 
-      <div className="text-gray-600 mt-3 space-y-1 text-sm">
+      <div className="mt-3 space-y-1 text-sm text-foreground">
         <p>
           <span className="font-medium">Patient:</span> {review.patientId}
         </p>
@@ -84,7 +87,7 @@ export function RiskReviewCard({
           </p>
         )}
         {review.rejectionReason && (
-          <p className="text-red-600">
+          <p className="font-medium text-foreground">
             <span className="font-medium">Rejection reason:</span>{' '}
             {review.rejectionReason}
           </p>
@@ -97,7 +100,7 @@ export function RiskReviewCard({
             type="button"
             onClick={() => onApprove(review.id)}
             disabled={disabled}
-            className="bg-green-600 text-white hover:bg-green-700 rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+            className="hover:bg-primary/90 rounded-none bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
             data-testid="approve-btn"
           >
             Approve
@@ -106,7 +109,7 @@ export function RiskReviewCard({
             type="button"
             onClick={() => onReject(review.id, 'Pending detailed review')}
             disabled={disabled}
-            className="bg-red-600 text-white hover:bg-red-700 rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+            className="rounded-none border border-ring bg-secondary px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent disabled:opacity-50"
             data-testid="reject-btn"
           >
             Reject

@@ -218,21 +218,21 @@ export function TelehealthSession({
 
   return (
     <div
-      className="border-gray-200 bg-white flex flex-col gap-4 rounded-lg border p-4 shadow-sm"
+      className="flex flex-col gap-4 rounded-none border border-border bg-card p-4"
       data-testid="telehealth-session"
       data-appointment-id={appointmentId}
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-gray-900 text-lg font-semibold">
+        <h2 className="text-lg font-semibold text-foreground">
           Telehealth Session — {patientName}
         </h2>
         <span
-          className={`rounded-full px-3 py-1 text-xs font-medium ${
+          className={`rounded-none px-3 py-1 text-xs font-medium ${
             state.phase === 'active'
-              ? 'bg-green-100 text-green-700'
+              ? 'bg-primary text-primary-foreground'
               : state.phase === 'failed'
-                ? 'bg-red-100 text-red-700'
-                : 'bg-gray-100 text-gray-600'
+                ? 'border border-ring bg-secondary font-bold text-foreground'
+                : 'bg-secondary text-muted-foreground'
           }`}
         >
           {state.phase}
@@ -247,14 +247,14 @@ export function TelehealthSession({
       )}
 
       {state.phase === 'connecting' && (
-        <div className="text-gray-500 flex min-h-[300px] items-center justify-center">
+        <div className="flex min-h-[300px] items-center justify-center text-muted-foreground">
           Connecting via {providerType}…
         </div>
       )}
 
       {state.phase === 'active' && (
         <>
-          <div className="bg-gray-900 relative aspect-video overflow-hidden rounded-md">
+          <div className="relative aspect-video overflow-hidden rounded-none bg-background">
             <video
               ref={localVideoRef}
               autoPlay
@@ -264,8 +264,8 @@ export function TelehealthSession({
               aria-label="Your video preview"
             />
             {state.isRecording && (
-              <div className="bg-red-600 text-white absolute right-3 top-3 flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium">
-                <span className="bg-white h-2 w-2 animate-pulse rounded-full" />
+              <div className="absolute right-3 top-3 flex items-center gap-2 rounded-none bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-primary-foreground" />
                 REC
               </div>
             )}
@@ -278,7 +278,7 @@ export function TelehealthSession({
                   type="button"
                   onClick={handleStartRecording}
                   disabled={state.isRecording}
-                  className="bg-red-600 text-white hover:bg-red-700 disabled:bg-gray-300 rounded-md px-4 py-2 text-sm font-medium disabled:cursor-not-allowed"
+                  className="hover:bg-primary/90 rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-35"
                 >
                   Start Recording
                 </button>
@@ -286,7 +286,7 @@ export function TelehealthSession({
                   type="button"
                   onClick={handleStopRecording}
                   disabled={!state.isRecording}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md border px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-none border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Stop Recording
                 </button>
@@ -295,7 +295,7 @@ export function TelehealthSession({
             <button
               type="button"
               onClick={handleEndSession}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md border px-4 py-2 text-sm font-medium"
+              className="rounded-none border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
             >
               End Session
             </button>
@@ -305,14 +305,14 @@ export function TelehealthSession({
 
       {state.phase === 'failed' && state.errorMessage && (
         <div
-          className="border-red-200 bg-red-50 text-red-800 rounded-md border p-4 text-sm"
+          className="rounded-none border border-ring bg-secondary p-4 text-sm text-foreground"
           role="alert"
         >
           {state.errorMessage}
           <button
             type="button"
             onClick={handleEndSession}
-            className="border-red-300 text-red-700 hover:bg-red-100 mt-3 rounded-md border px-4 py-2 text-sm font-medium"
+            className="mt-3 rounded-none border border-input px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
           >
             Close
           </button>
@@ -321,11 +321,11 @@ export function TelehealthSession({
 
       {state.phase === 'ended' && (
         <div className="flex min-h-[200px] flex-col items-center justify-center gap-3 text-center">
-          <p className="text-gray-600">Session ended.</p>
+          <p className="text-muted-foreground">Session ended.</p>
           <button
             type="button"
             onClick={handleEndSession}
-            className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md border px-4 py-2 text-sm font-medium"
+            className="rounded-none border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
           >
             Close
           </button>
