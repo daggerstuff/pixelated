@@ -41,37 +41,41 @@ export default function PipelineOverview() {
               <button
                 key={step.title}
                 type="button"
-                className={`cursor-pointer rounded-lg p-4 text-left transition-all ${
+                className={`cursor-pointer rounded-none p-4 text-left transition-all ${
                   activeStep === index
-                    ? 'bg-blue-600/20 border-blue-400 border-2'
-                    : 'bg-slate-700/50 border-slate-600/50 hover:bg-slate-600/50 border'
+                    ? 'border-2 border-ring bg-secondary'
+                    : 'border border-border bg-card hover:bg-secondary'
                 }`}
                 onClick={() => setActiveStep(index)}
                 aria-pressed={activeStep === index}
               >
                 <div className="mb-2 text-2xl">{step.icon}</div>
-                <h3 className="text-white mb-1 text-sm font-semibold">
+                <h3 className="mb-1 text-sm font-semibold text-foreground">
                   {step.title}
                 </h3>
-                <p className="text-slate-300 text-xs">{step.description}</p>
+                <p className="text-xs text-muted-foreground">
+                  {step.description}
+                </p>
               </button>
             ))}
           </div>
 
           {/* Active Step Details */}
-          <div className="bg-slate-800/50 border-slate-600/50 rounded-lg border p-6">
+          <div className="rounded-none border border-border bg-card p-6">
             <div className="mb-4 flex items-center gap-3">
               <span className="text-3xl">{steps[activeStep]?.icon}</span>
               <div>
-                <h3 className="text-white text-xl font-semibold">
+                <h3 className="text-xl font-semibold text-foreground">
                   {steps[activeStep]?.title}
                 </h3>
-                <p className="text-slate-300">
+                <p className="text-muted-foreground">
                   {steps[activeStep]?.description}
                 </p>
               </div>
             </div>
-            <p className="text-slate-400">{steps[activeStep]?.details}</p>
+            <p className="text-muted-foreground">
+              {steps[activeStep]?.details}
+            </p>
           </div>
         </div>
       </div>
