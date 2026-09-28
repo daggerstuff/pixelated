@@ -281,14 +281,14 @@ export default function KnowledgeParsingDemo() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-100 rounded-lg p-2">
-                <Brain className="text-blue-600 h-6 w-6" />
+              <div className="rounded-none bg-secondary p-2">
+                <Brain className="h-6 w-6 text-foreground" />
               </div>
               <div>
                 <CardTitle className="text-2xl">
                   Enterprise Knowledge Parsing
                 </CardTitle>
-                <p className="text-gray-600 mt-1">
+                <p className="mt-1 text-muted-foreground">
                   Advanced clinical text analysis with real-time monitoring
                 </p>
               </div>
@@ -298,7 +298,7 @@ export default function KnowledgeParsingDemo() {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsRealTimeMode(!isRealTimeMode)}
-                className={isRealTimeMode ? 'bg-green-50 border-green-200' : ''}
+                className={isRealTimeMode ? 'border-ring bg-secondary' : ''}
               >
                 <Activity className="mr-2 h-4 w-4" />
                 {isRealTimeMode ? 'Real-time ON' : 'Real-time OFF'}
@@ -321,13 +321,13 @@ export default function KnowledgeParsingDemo() {
                 onChange={(e) => setInputText(e.target.value)}
                 className="min-h-[120px] text-sm"
               />
-              <div className="text-gray-500 mt-2 flex items-center justify-between text-xs">
+              <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
                 <span>
                   {inputText.length} characters,{' '}
                   {inputText.split(/\s+/).filter((w) => w).length} words
                 </span>
                 {isRealTimeMode && inputText.length > 10 && (
-                  <span className="text-green-600">
+                  <span className="font-medium text-foreground">
                     Real-time analysis active
                   </span>
                 )}
@@ -374,8 +374,8 @@ export default function KnowledgeParsingDemo() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border-red-200 mt-4 rounded-lg border p-3">
-              <div className="text-red-700 flex items-center gap-2">
+            <div className="mt-4 rounded-none border border-ring bg-secondary p-3">
+              <div className="flex items-center gap-2 font-medium text-foreground">
                 <AlertTriangle className="h-4 w-4" />
                 <span className="text-sm">{error}</span>
               </div>
@@ -423,7 +423,7 @@ export default function KnowledgeParsingDemo() {
                   {results.entities.map((entity) => (
                     <div
                       key={entity.text + entity.type}
-                      className="flex items-center justify-between rounded-lg border p-3"
+                      className="flex items-center justify-between rounded-none border p-3"
                     >
                       <div className="flex items-center gap-3">
                         <Badge variant="outline">{entity.type}</Badge>
@@ -458,7 +458,7 @@ export default function KnowledgeParsingDemo() {
                   {results.concepts.map((concept) => (
                     <div
                       key={concept.concept}
-                      className="flex items-center justify-between rounded-lg border p-3"
+                      className="flex items-center justify-between rounded-none border p-3"
                     >
                       <span className="font-medium">{concept.concept}</span>
                       <div className="text-right">
@@ -490,17 +490,17 @@ export default function KnowledgeParsingDemo() {
                   {results.riskFactors.map((risk) => (
                     <div
                       key={risk.factor}
-                      className="flex items-center justify-between rounded-lg border p-3"
+                      className="flex items-center justify-between rounded-none border p-3"
                     >
                       <span className="font-medium">{risk.factor}</span>
                       <Badge
                         variant="outline"
                         className={
                           risk.severity === 'High'
-                            ? 'border-red-200 text-red-700 bg-red-50'
+                            ? 'rounded-none border-primary bg-primary font-medium text-primary-foreground'
                             : risk.severity === 'Moderate'
-                              ? 'border-yellow-200 text-yellow-700 bg-yellow-50'
-                              : 'border-green-200 text-green-700 bg-green-50'
+                              ? 'rounded-none border-ring bg-secondary font-medium text-foreground'
+                              : 'rounded-none border-border text-muted-foreground'
                         }
                       >
                         {risk.severity}
@@ -526,22 +526,22 @@ export default function KnowledgeParsingDemo() {
                     {results.insights.map((insight) => (
                       <div
                         key={insight.category + insight.insight}
-                        className="bg-blue-50 rounded-lg border p-4"
+                        className="rounded-none border bg-secondary p-4"
                       >
                         <div className="mb-2 flex items-start justify-between">
                           <Badge variant="outline">{insight.category}</Badge>
-                          <span className="text-gray-600 text-sm">
+                          <span className="text-sm text-muted-foreground">
                             {(insight.confidence * 100).toFixed(1)}% confidence
                           </span>
                         </div>
-                        <p className="text-gray-700 text-sm">
+                        <p className="text-sm text-foreground">
                           {insight.insight}
                         </p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-gray-500 py-8 text-center">
+                  <div className="py-8 text-center text-muted-foreground">
                     <Brain className="mx-auto mb-3 h-12 w-12 opacity-50" />
                     <p>
                       Clinical insights will appear here based on advanced
@@ -566,7 +566,7 @@ export default function KnowledgeParsingDemo() {
                   {results.metadata && (
                     <div className="space-y-4">
                       <div className="flex justify-between">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-sm text-muted-foreground">
                           Processing Time
                         </span>
                         <span className="font-medium">
@@ -574,7 +574,7 @@ export default function KnowledgeParsingDemo() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-sm text-muted-foreground">
                           Word Count
                         </span>
                         <span className="font-medium">
@@ -582,13 +582,15 @@ export default function KnowledgeParsingDemo() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 text-sm">Sentences</span>
+                        <span className="text-sm text-muted-foreground">
+                          Sentences
+                        </span>
                         <span className="font-medium">
                           {results.metadata.sentenceCount}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-sm text-muted-foreground">
                           Complexity Score
                         </span>
                         <span className="font-medium">
@@ -596,7 +598,7 @@ export default function KnowledgeParsingDemo() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-sm text-muted-foreground">
                           Readability Score
                         </span>
                         <span className="font-medium">
@@ -619,7 +621,7 @@ export default function KnowledgeParsingDemo() {
                   <div className="space-y-4">
                     <div>
                       <div className="mb-2 flex justify-between">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-sm text-muted-foreground">
                           Analysis Confidence
                         </span>
                         <span className="font-medium">
@@ -630,7 +632,7 @@ export default function KnowledgeParsingDemo() {
                     </div>
                     <div>
                       <div className="mb-2 flex justify-between">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-sm text-muted-foreground">
                           Entity Detection
                         </span>
                         <span className="font-medium">
@@ -644,7 +646,7 @@ export default function KnowledgeParsingDemo() {
                     </div>
                     <div>
                       <div className="mb-2 flex justify-between">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-sm text-muted-foreground">
                           Risk Assessment
                         </span>
                         <span className="font-medium">
@@ -683,14 +685,14 @@ export default function KnowledgeParsingDemo() {
               {analysisHistory.map((item) => (
                 <button
                   key={item.id}
-                  className="hover:bg-gray-50 flex w-full cursor-pointer items-center justify-between rounded-lg border p-3 text-left"
+                  className="flex w-full cursor-pointer items-center justify-between rounded-none border p-3 text-left hover:bg-secondary"
                   onClick={() => loadFromHistory(item)}
                 >
                   <div>
                     <p className="max-w-md truncate text-sm font-medium">
                       {item.text}
                     </p>
-                    <p className="text-gray-500 text-xs">
+                    <p className="text-xs text-muted-foreground">
                       {new Date(item.timestamp).toLocaleString()} •{' '}
                       {item.processingTime}ms
                     </p>
