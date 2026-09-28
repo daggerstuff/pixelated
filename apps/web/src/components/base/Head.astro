@@ -113,15 +113,13 @@ const webPageData = {
 <meta property="og:image" content={ogImageURL} />
 <meta property="og:site_name" content={siteName} />
 <meta property="og:locale" content={SITE.ogLocale} />
-{
-  pubDate && (
-    <>
-      <meta property="article:author" content={SITE.author} />
-      <meta property="article:published_time" content={pubDate} />
-      <meta property="article:modified_time" content={lastModDate} />
-    </>
-  )
-}
+{pubDate && (
+  <>
+    <meta property="article:author" content={SITE.author} />
+    <meta property="article:published_time" content={pubDate} />
+    <meta property="article:modified_time" content={lastModDate} />
+  </>
+)}
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
@@ -165,34 +163,30 @@ const webPageData = {
 />
 
 <!-- Google JSON-LD Structured Data -->
-{
-  pubDate ? (
-    <script
-      is:inline
-      type="application/ld+json"
-      set:html={JSON.stringify(blogPostingData)
-        .replace(/<\//g, '\\u003c/')
-        .replace(/</g, '\\u003c')
-        .replace(/>/g, '\\u003e')}
-    />
-  ) : (
-    <script
-      is:inline
-      type="application/ld+json"
-      set:html={JSON.stringify(webPageData)
-        .replace(/<\//g, '\\u003c/')
-        .replace(/</g, '\\u003c')
-        .replace(/>/g, '\\u003e')}
-    />
-  )
-}
+{pubDate ? (
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(blogPostingData)
+      .replace(/<\//g, '\\u003c/')
+      .replace(/</g, '\\u003c')
+      .replace(/>/g, '\\u003e')}
+  ></script>
+) : (
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(webPageData)
+      .replace(/<\//g, '\\u003c/')
+      .replace(/</g, '\\u003c')
+      .replace(/>/g, '\\u003e')}
+  ></script>
+)}
 
 <ClientRouter />
-{
-  shouldRenderAnalytics && (
-    <>
-      {isVercelDeploy && <SpeedInsights />}
-      <UmamiAnalytics nonce={cspNonce} trackPageTransitions />
-    </>
-  )
-}
+{shouldRenderAnalytics && (
+  <>
+    {isVercelDeploy && <SpeedInsights />}
+    <UmamiAnalytics nonce={cspNonce} trackPageTransitions />
+  </>
+)}

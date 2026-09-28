@@ -28,13 +28,11 @@ export const prerender = false
       </p>
     </header>
 
-    {
-      isFromDashboard && (
-        <p class="auth-card__notice" role="status">
-          You need to be logged in to access the dashboard.
-        </p>
-      )
-    }
+    {isFromDashboard && (
+      <p class="auth-card__notice" role="status">
+        You need to be logged in to access the dashboard.
+      </p>
+    )}
 
     <LoginForm client:load redirectTo={redirectUrl} showSignup={false} />
 

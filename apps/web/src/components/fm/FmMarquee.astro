@@ -16,24 +16,20 @@ const items = Array.from({ length: repeat })
 <section class={`fm-marquee ${className}`} aria-label={`${word} archive`}>
   <div class="fm-marquee__track">
     <div class="fm-marquee__group" aria-hidden="true">
-      {
-        items.map(() => (
-          <h2 class="fm-marquee__word">
-            {word}
-            <span class="fm-dot">.</span>
-          </h2>
-        ))
-      }
+      {items.map(() => (
+        <h2 class="fm-marquee__word">
+          {word}
+          <span class="fm-dot">.</span>
+        </h2>
+      ))}
     </div>
     <div class="fm-marquee__group" aria-hidden="true">
-      {
-        items.map(() => (
-          <h2 class="fm-marquee__word">
-            {word}
-            <span class="fm-dot">.</span>
-          </h2>
-        ))
-      }
+      {items.map(() => (
+        <h2 class="fm-marquee__word">
+          {word}
+          <span class="fm-dot">.</span>
+        </h2>
+      ))}
     </div>
   </div>
 </section>

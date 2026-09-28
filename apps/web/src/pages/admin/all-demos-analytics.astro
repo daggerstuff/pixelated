@@ -46,9 +46,7 @@ const demoPages = [
 >
   <div class="relative min-h-screen text-foreground">
     {/* Floating Particles */}
-    <div
-      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
-    >
+    <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
       <div class="particle particle-1"></div>
       <div class="particle particle-2"></div>
       <div class="particle particle-3"></div>
@@ -62,27 +60,19 @@ const demoPages = [
         <div class="text-center mb-12">
           <h1 class="text-4xl lg:text-5xl font-bold mb-6">
             Demo Analytics Command Center
-            <span class="text-foreground block mt-2"
-              >All Pages • Real-Time Results</span
-            >
+            <span class="text-foreground block mt-2">
+              All Pages • Real-Time Results
+            </span>
           </h1>
           <div class="flex justify-center gap-4 mb-6">
-            <Badge
-              class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary/20 border border-ring text-foreground rounded-none"
-            >
+            <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary/20 border border-ring text-foreground rounded-none">
               <span class="relative flex h-3 w-3">
-                <span
-                  class="animate-pulse absolute inline-flex h-full w-full rounded-none bg-primary opacity-75"
-                ></span>
-                <span
-                  class="relative inline-flex rounded-none h-3 w-3 bg-primary"
-                ></span>
+                <span class="animate-pulse absolute inline-flex h-full w-full rounded-none bg-primary opacity-75"></span>
+                <span class="relative inline-flex rounded-none h-3 w-3 bg-primary"></span>
               </span>
               Live Data Stream
             </Badge>
-            <Badge
-              class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary/20 border border-ring text-foreground rounded-none"
-            >
+            <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary/20 border border-ring text-foreground rounded-none">
               <span class="text-foreground">🧪</span>
               A/B Testing Active
             </Badge>
@@ -93,9 +83,9 @@ const demoPages = [
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <Card class="border border-input bg-secondary">
             <CardHeader class="pb-2">
-              <CardTitle class="text-foreground text-lg"
-                >Total Sessions</CardTitle
-              >
+              <CardTitle class="text-foreground text-lg">
+                Total Sessions
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div
@@ -110,9 +100,9 @@ const demoPages = [
 
           <Card class="border border-input bg-secondary">
             <CardHeader class="pb-2">
-              <CardTitle class="text-foreground text-lg"
-                >Overall Conversion</CardTitle
-              >
+              <CardTitle class="text-foreground text-lg">
+                Overall Conversion
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div
@@ -127,9 +117,9 @@ const demoPages = [
 
           <Card class="border border-input bg-secondary">
             <CardHeader class="pb-2">
-              <CardTitle class="text-foreground text-lg"
-                >Best Performing Demo</CardTitle
-              >
+              <CardTitle class="text-foreground text-lg">
+                Best Performing Demo
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div id="best-demo" class="text-2xl font-bold text-foreground">
@@ -143,9 +133,9 @@ const demoPages = [
 
           <Card class="border border-input bg-secondary">
             <CardHeader class="pb-2">
-              <CardTitle class="text-foreground text-lg"
-                >A/B Test Winners</CardTitle
-              >
+              <CardTitle class="text-foreground text-lg">
+                A/B Test Winners
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div id="ab-winners" class="text-2xl font-bold text-foreground">
@@ -160,167 +150,165 @@ const demoPages = [
 
         {/* Individual Demo Performance */}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {
-            demoPages.map((demo) => (
-              <Card class="border border-input bg-card">
-                <CardHeader>
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <CardTitle class={`text-${demo.color}-100 text-xl`}>
-                        {demo.title}
-                      </CardTitle>
-                      <CardDescription class={`text-${demo.color}-200/80`}>
-                        {demo.description}
-                      </CardDescription>
-                    </div>
-                    <Badge
-                      class={`bg-${demo.color}-500/20 text-${demo.color}-300`}
+          {demoPages.map((demo) => (
+            <Card class="border border-input bg-card">
+              <CardHeader>
+                <div class="flex justify-between items-start">
+                  <div>
+                    <CardTitle class={`text-${demo.color}-100 text-xl`}>
+                      {demo.title}
+                    </CardTitle>
+                    <CardDescription class={`text-${demo.color}-200/80`}>
+                      {demo.description}
+                    </CardDescription>
+                  </div>
+                  <Badge
+                    class={`bg-${demo.color}-500/20 text-${demo.color}-300`}
+                  >
+                    <span id={`${demo.name}-status`}>Active</span>
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {/* Performance Metrics */}
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                  <div class="text-center">
+                    <div
+                      id={`${demo.name}-sessions`}
+                      class={`text-2xl font-bold text-${demo.color}-400`}
                     >
-                      <span id={`${demo.name}-status`}>Active</span>
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {/* Performance Metrics */}
-                  <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div class="text-center">
-                      <div
-                        id={`${demo.name}-sessions`}
-                        class={`text-2xl font-bold text-${demo.color}-400`}
-                      >
-                        0
-                      </div>
-                      <div class={`text-sm text-${demo.color}-200/70`}>
-                        Sessions
-                      </div>
+                      0
                     </div>
-                    <div class="text-center">
-                      <div
-                        id={`${demo.name}-conversion`}
-                        class={`text-2xl font-bold text-${demo.color}-400`}
-                      >
-                        0%
-                      </div>
-                      <div class={`text-sm text-${demo.color}-200/70`}>
-                        Conversion
-                      </div>
-                    </div>
-                    <div class="text-center">
-                      <div
-                        id={`${demo.name}-time`}
-                        class={`text-2xl font-bold text-${demo.color}-400`}
-                      >
-                        0s
-                      </div>
-                      <div class={`text-sm text-${demo.color}-200/70`}>
-                        Avg Time
-                      </div>
+                    <div class={`text-sm text-${demo.color}-200/70`}>
+                      Sessions
                     </div>
                   </div>
+                  <div class="text-center">
+                    <div
+                      id={`${demo.name}-conversion`}
+                      class={`text-2xl font-bold text-${demo.color}-400`}
+                    >
+                      0%
+                    </div>
+                    <div class={`text-sm text-${demo.color}-200/70`}>
+                      Conversion
+                    </div>
+                  </div>
+                  <div class="text-center">
+                    <div
+                      id={`${demo.name}-time`}
+                      class={`text-2xl font-bold text-${demo.color}-400`}
+                    >
+                      0s
+                    </div>
+                    <div class={`text-sm text-${demo.color}-200/70`}>
+                      Avg Time
+                    </div>
+                  </div>
+                </div>
 
-                  {/* A/B Test Results */}
-                  <div class="bg-secondary rounded-none p-4">
-                    <h4 class={`text-${demo.color}-300 font-medium mb-3`}>
-                      A/B Test Performance
-                    </h4>
-                    <div class="space-y-2">
-                      <div class="flex justify-between items-center">
-                        <span class="text-muted-foreground text-sm">
-                          Variant A
-                        </span>
-                        <div class="flex items-center gap-2">
-                          <span
-                            id={`${demo.name}-variant-a-rate`}
-                            class={`text-${demo.color}-400 font-bold text-sm`}
-                          >
-                            0%
-                          </span>
-                          <div class="w-16 bg-secondary rounded-none h-1">
-                            <div
-                              id={`${demo.name}-variant-a-bar`}
-                              class={`bg-${demo.color}-500 h-1 rounded-none`}
-                              style="width: 0%"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-muted-foreground text-sm">
-                          Variant B
-                        </span>
-                        <div class="flex items-center gap-2">
-                          <span
-                            id={`${demo.name}-variant-b-rate`}
-                            class={`text-${demo.color}-400 font-bold text-sm`}
-                          >
-                            0%
-                          </span>
-                          <div class="w-16 bg-secondary rounded-none h-1">
-                            <div
-                              id={`${demo.name}-variant-b-bar`}
-                              class={`bg-${demo.color}-500 h-1 rounded-none`}
-                              style="width: 0%"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-muted-foreground text-sm">
-                          Variant C
-                        </span>
-                        <div class="flex items-center gap-2">
-                          <span
-                            id={`${demo.name}-variant-c-rate`}
-                            class={`text-${demo.color}-400 font-bold text-sm`}
-                          >
-                            0%
-                          </span>
-                          <div class="w-16 bg-secondary rounded-none h-1">
-                            <div
-                              id={`${demo.name}-variant-c-bar`}
-                              class={`bg-${demo.color}-500 h-1 rounded-none`}
-                              style="width: 0%"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="mt-3 pt-3 border-t border-border">
-                      <div class="flex justify-between items-center">
-                        <span class="text-muted-foreground text-xs">
-                          Statistical Significance
-                        </span>
+                {/* A/B Test Results */}
+                <div class="bg-secondary rounded-none p-4">
+                  <h4 class={`text-${demo.color}-300 font-medium mb-3`}>
+                    A/B Test Performance
+                  </h4>
+                  <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                      <span class="text-muted-foreground text-sm">
+                        Variant A
+                      </span>
+                      <div class="flex items-center gap-2">
                         <span
-                          id={`${demo.name}-significance`}
-                          class="text-xs font-medium"
+                          id={`${demo.name}-variant-a-rate`}
+                          class={`text-${demo.color}-400 font-bold text-sm`}
                         >
-                          Collecting data...
+                          0%
                         </span>
+                        <div class="w-16 bg-secondary rounded-none h-1">
+                          <div
+                            id={`${demo.name}-variant-a-bar`}
+                            class={`bg-${demo.color}-500 h-1 rounded-none`}
+                            style="width: 0%"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-muted-foreground text-sm">
+                        Variant B
+                      </span>
+                      <div class="flex items-center gap-2">
+                        <span
+                          id={`${demo.name}-variant-b-rate`}
+                          class={`text-${demo.color}-400 font-bold text-sm`}
+                        >
+                          0%
+                        </span>
+                        <div class="w-16 bg-secondary rounded-none h-1">
+                          <div
+                            id={`${demo.name}-variant-b-bar`}
+                            class={`bg-${demo.color}-500 h-1 rounded-none`}
+                            style="width: 0%"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                      <span class="text-muted-foreground text-sm">
+                        Variant C
+                      </span>
+                      <div class="flex items-center gap-2">
+                        <span
+                          id={`${demo.name}-variant-c-rate`}
+                          class={`text-${demo.color}-400 font-bold text-sm`}
+                        >
+                          0%
+                        </span>
+                        <div class="w-16 bg-secondary rounded-none h-1">
+                          <div
+                            id={`${demo.name}-variant-c-bar`}
+                            class={`bg-${demo.color}-500 h-1 rounded-none`}
+                            style="width: 0%"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* Quick Actions */}
-                  <div class="flex gap-2 mt-4">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className={`border-${demo.color}-500/50 text-${demo.color}-300 hover:bg-${demo.color}-500/10`}
-                    >
-                      View Details
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className={`border-${demo.color}-500/50 text-${demo.color}-300 hover:bg-${demo.color}-500/10`}
-                    >
-                      Export Data
-                    </Button>
+                  <div class="mt-3 pt-3 border-t border-border">
+                    <div class="flex justify-between items-center">
+                      <span class="text-muted-foreground text-xs">
+                        Statistical Significance
+                      </span>
+                      <span
+                        id={`${demo.name}-significance`}
+                        class="text-xs font-medium"
+                      >
+                        Collecting data...
+                      </span>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))
-          }
+                </div>
+
+                {/* Quick Actions */}
+                <div class="flex gap-2 mt-4">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className={`border-${demo.color}-500/50 text-${demo.color}-300 hover:bg-${demo.color}-500/10`}
+                  >
+                    View Details
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className={`border-${demo.color}-500/50 text-${demo.color}-300 hover:bg-${demo.color}-500/10`}
+                  >
+                    Export Data
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Comparative Analysis */}
@@ -328,9 +316,9 @@ const demoPages = [
           {/* Conversion Funnel Comparison */}
           <Card class="border border-input bg-card">
             <CardHeader>
-              <CardTitle class="text-foreground"
-                >Conversion Funnel Comparison</CardTitle
-              >
+              <CardTitle class="text-foreground">
+                Conversion Funnel Comparison
+              </CardTitle>
               <CardDescription class="text-muted-foreground">
                 Drop-off rates across all demo pages
               </CardDescription>
@@ -350,8 +338,7 @@ const demoPages = [
                       <div
                         class="bg-indigo-500 h-2 rounded-none"
                         style="width: 100%"
-                      >
-                      </div>
+                      ></div>
                     </div>
                     <span class="text-foreground text-sm">100%</span>
                   </div>
@@ -371,13 +358,14 @@ const demoPages = [
                         id="funnel-interactions-bar"
                         class="bg-primary h-2 rounded-none"
                         style="width: 0%"
-                      >
-                      </div>
+                      ></div>
                     </div>
                     <span
                       id="funnel-interactions-pct"
-                      class="text-foreground text-sm">0%</span
+                      class="text-foreground text-sm"
                     >
+                      0%
+                    </span>
                   </div>
                 </div>
 
@@ -395,12 +383,11 @@ const demoPages = [
                         id="funnel-cta-bar"
                         class="bg-primary h-2 rounded-none"
                         style="width: 0%"
-                      >
-                      </div>
+                      ></div>
                     </div>
-                    <span id="funnel-cta-pct" class="text-foreground text-sm"
-                      >0%</span
-                    >
+                    <span id="funnel-cta-pct" class="text-foreground text-sm">
+                      0%
+                    </span>
                   </div>
                 </div>
               </div>
@@ -438,34 +425,34 @@ const demoPages = [
                   </div>
                   <div class="space-y-2">
                     <div class="flex justify-between text-sm">
-                      <span class="text-muted-foreground"
-                        >ClinicalVault Trainer</span
-                      >
-                      <span id="clinical-winner" class="text-foreground"
-                        >TBD</span
-                      >
+                      <span class="text-muted-foreground">
+                        ClinicalVault Trainer
+                      </span>
+                      <span id="clinical-winner" class="text-foreground">
+                        TBD
+                      </span>
                     </div>
                     <div class="flex justify-between text-sm">
-                      <span class="text-muted-foreground"
-                        >Synthetic Generator</span
-                      >
-                      <span id="synthetic-winner" class="text-foreground"
-                        >TBD</span
-                      >
+                      <span class="text-muted-foreground">
+                        Synthetic Generator
+                      </span>
+                      <span id="synthetic-winner" class="text-foreground">
+                        TBD
+                      </span>
                     </div>
                     <div class="flex justify-between text-sm">
-                      <span class="text-muted-foreground"
-                        >Pipeline Processor</span
-                      >
-                      <span id="pipeline-winner" class="text-foreground"
-                        >TBD</span
-                      >
+                      <span class="text-muted-foreground">
+                        Pipeline Processor
+                      </span>
+                      <span id="pipeline-winner" class="text-foreground">
+                        TBD
+                      </span>
                     </div>
                     <div class="flex justify-between text-sm">
                       <span class="text-muted-foreground">Security Engine</span>
-                      <span id="security-winner" class="text-foreground"
-                        >TBD</span
-                      >
+                      <span id="security-winner" class="text-foreground">
+                        TBD
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -836,7 +823,6 @@ const demoPages = [
       dashboard.init() // Assuming there's an init method, or you can use any other method
     })
   </script>
-
   <style>
     /* Organic Particles */
     .particles-container {

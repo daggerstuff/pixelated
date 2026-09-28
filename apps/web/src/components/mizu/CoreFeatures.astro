@@ -38,27 +38,27 @@ const {
       <div class="core-feature-proof">
         <span class="pe-page-panel-label">{proofLabel}</span>
         <ul class="core-feature-proof__list">
-          {proofItems.map((item) => <li>{item}</li>)}
+          {proofItems.map((item) => (
+            <li>{item}</li>
+          ))}
         </ul>
       </div>
 
       <div class="core-feature-grid">
-        {
-          cards.map((feature, index) => (
-            <article
-              class:list={[
-                'core-feature-card',
-                index === 0 && 'core-feature-card--lead',
-              ]}
-            >
-              <span class="core-feature-card__caption">
-                Capability {String(index + 1).padStart(2, '0')}
-              </span>
-              <h3 class="pe-heading-s">{feature.title}</h3>
-              <p>{feature.description}</p>
-            </article>
-          ))
-        }
+        {cards.map((feature, index) => (
+          <article
+            class:list={[
+              'core-feature-card',
+              index === 0 && 'core-feature-card--lead',
+            ]}
+          >
+            <span class="core-feature-card__caption">
+              Capability {String(index + 1).padStart(2, '0')}
+            </span>
+            <h3 class="pe-heading-s">{feature.title}</h3>
+            <p>{feature.description}</p>
+          </article>
+        ))}
       </div>
     </div>
   </div>

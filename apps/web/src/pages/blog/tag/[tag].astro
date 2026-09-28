@@ -70,7 +70,9 @@ const description = `Articles tagged with #${tag} - Explore insights and guides 
       </p>
     </div>
     <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {posts.map((post) => <PostCard post={post} />)}
+      {posts.map((post) => (
+        <PostCard {post} />
+      ))}
     </ul>
     <div class="mt-12 text-center">
       <a

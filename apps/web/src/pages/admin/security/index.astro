@@ -117,27 +117,25 @@ const recentUpdates = [
             Recent Updates
           </h2>
           <div class="space-y-4">
-            {
-              recentUpdates.map((update) => (
-                <div class="border-l-4 border-neutral-500 pl-4 py-2">
-                  <h3 class="font-medium text-foreground">{update.name}</h3>
-                  <p class="text-sm text-muted-foreground">
-                    {update.description}
-                  </p>
-                  <div class="flex justify-between items-center mt-2">
-                    <span class="text-xs text-muted-foreground">
-                      {formatDate(update.date)}
-                    </span>
-                    <a
-                      href={update.link}
-                      class="text-xs text-foreground hover:text-foreground"
-                    >
-                      View Details
-                    </a>
-                  </div>
+            {recentUpdates.map((update) => (
+              <div class="border-l-4 border-neutral-500 pl-4 py-2">
+                <h3 class="font-medium text-foreground">{update.name}</h3>
+                <p class="text-sm text-muted-foreground">
+                  {update.description}
+                </p>
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-xs text-muted-foreground">
+                    {formatDate(update.date)}
+                  </span>
+                  <a
+                    href={update.link}
+                    class="text-xs text-foreground hover:text-foreground"
+                  >
+                    View Details
+                  </a>
                 </div>
-              ))
-            }
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -154,9 +152,7 @@ const recentUpdates = [
               <p class="text-3xl font-bold text-muted-foreground">
                 {securityMetrics.hipaaComplianceScore}%
               </p>
-              <div
-                class="w-12 h-12 bg-secondary border border-input rounded-none flex items-center justify-center"
-              >
+              <div class="w-12 h-12 bg-secondary border border-input rounded-none flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-6 w-6 text-muted-foreground"
@@ -186,9 +182,7 @@ const recentUpdates = [
               <p class="text-3xl font-bold text-foreground">
                 {securityMetrics.securityRiskScore}%
               </p>
-              <div
-                class="w-12 h-12 bg-secondary border border-input rounded-none flex items-center justify-center"
-              >
+              <div class="w-12 h-12 bg-secondary border border-input rounded-none flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-6 w-6 text-foreground"
@@ -218,9 +212,7 @@ const recentUpdates = [
               <p class="text-3xl font-bold text-foreground">
                 {securityMetrics.threatDetectionLevel}%
               </p>
-              <div
-                class="w-12 h-12 bg-secondary border border-input rounded-none flex items-center justify-center"
-              >
+              <div class="w-12 h-12 bg-secondary border border-input rounded-none flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-6 w-6 text-foreground"
@@ -250,9 +242,7 @@ const recentUpdates = [
               <p class="text-3xl font-bold text-foreground">
                 {securityMetrics.dataProtectionLevel}%
               </p>
-              <div
-                class="w-12 h-12 bg-secondary border border-input rounded-none flex items-center justify-center"
-              >
+              <div class="w-12 h-12 bg-secondary border border-input rounded-none flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-6 w-6 text-foreground"
@@ -289,59 +279,57 @@ const recentUpdates = [
             </a>
           </div>
 
-          {
-            securityAlerts.length === 0 ? (
-              <div class="text-center py-6">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-12 w-12 mx-auto text-muted-foreground"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                  />
-                </svg>
-                <p class="mt-4 text-muted-foreground">
-                  No security alerts at this time.
-                </p>
-              </div>
-            ) : (
-              <div class="space-y-4">
-                {securityAlerts.map((alert) => (
-                  <div class="border-l-4 border-neutral-200 pl-4 py-3">
-                    <div class="flex justify-between items-center">
-                      <h3 class="font-medium text-foreground">{alert.title}</h3>
-                      <span
-                        class={`px-2 py-1 text-xs font-medium rounded-none ${getAlertLevelClass(alert.level)}`}
-                      >
-                        {alert.level.charAt(0).toUpperCase() +
-                          alert.level.slice(1)}
-                      </span>
-                    </div>
-                    <p class="text-sm text-muted-foreground mt-1">
-                      {alert.description}
-                    </p>
-                    <div class="flex justify-between items-center mt-2">
-                      <span class="text-xs text-muted-foreground">
-                        {formatDate(alert.timestamp)}
-                      </span>
-                      <a
-                        href={`/admin/security/alerts/${alert.id}`}
-                        class="text-xs text-foreground hover:text-foreground"
-                      >
-                        View Details
-                      </a>
-                    </div>
+          {securityAlerts.length === 0 ? (
+            <div class="text-center py-6">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-12 w-12 mx-auto text-muted-foreground"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              <p class="mt-4 text-muted-foreground">
+                No security alerts at this time.
+              </p>
+            </div>
+          ) : (
+            <div class="space-y-4">
+              {securityAlerts.map((alert) => (
+                <div class="border-l-4 border-neutral-200 pl-4 py-3">
+                  <div class="flex justify-between items-center">
+                    <h3 class="font-medium text-foreground">{alert.title}</h3>
+                    <span
+                      class={`px-2 py-1 text-xs font-medium rounded-none ${getAlertLevelClass(alert.level)}`}
+                    >
+                      {alert.level.charAt(0).toUpperCase() +
+                        alert.level.slice(1)}
+                    </span>
                   </div>
-                ))}
-              </div>
-            )
-          }
+                  <p class="text-sm text-muted-foreground mt-1">
+                    {alert.description}
+                  </p>
+                  <div class="flex justify-between items-center mt-2">
+                    <span class="text-xs text-muted-foreground">
+                      {formatDate(alert.timestamp)}
+                    </span>
+                    <a
+                      href={`/admin/security/alerts/${alert.id}`}
+                      class="text-xs text-foreground hover:text-foreground"
+                    >
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <!-- HIPAA Compliance Summary -->
@@ -357,8 +345,10 @@ const recentUpdates = [
               </h3>
               <div class="flex items-center mb-4">
                 <div class="w-full bg-secondary rounded-none h-2.5 mr-2">
-                  <div class="bg-primary h-2.5 rounded-none" style="width: 98%">
-                  </div>
+                  <div
+                    class="bg-primary h-2.5 rounded-none"
+                    style="width: 98%"
+                  ></div>
                 </div>
                 <span class="text-sm font-medium text-foreground">98%</span>
               </div>
@@ -391,8 +381,7 @@ const recentUpdates = [
                   <div
                     class="bg-primary h-2.5 rounded-none"
                     style="width: 100%"
-                  >
-                  </div>
+                  ></div>
                 </div>
                 <span class="text-sm font-medium text-foreground">100%</span>
               </div>
@@ -422,8 +411,10 @@ const recentUpdates = [
               </h3>
               <div class="flex items-center mb-4">
                 <div class="w-full bg-secondary rounded-none h-2.5 mr-2">
-                  <div class="bg-primary h-2.5 rounded-none" style="width: 95%">
-                  </div>
+                  <div
+                    class="bg-primary h-2.5 rounded-none"
+                    style="width: 95%"
+                  ></div>
                 </div>
                 <span class="text-sm font-medium text-foreground">95%</span>
               </div>

@@ -116,168 +116,146 @@ const descriptionClasses = `
 
 <section class={heroClasses}>
   <!-- Background Elements -->
-  {
-    background === 'gradient' && (
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1)_0%,transparent_50%)]" />
-    )
-  }
+  {background === 'gradient' && (
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1)_0%,transparent_50%)]" />
+  )}
 
-  {
-    background === 'particles' && particles && (
-      <div class="absolute inset-0 overflow-hidden">
-        <div class="particles-container">
-          {Array.from({ length: 50 }).map(() => (
-            <div class="particle" />
-          ))}
-        </div>
+  {background === 'particles' && particles && (
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="particles-container">
+        {Array.from({ length: 50 }).map(() => (
+          <div class="particle" />
+        ))}
       </div>
-    )
-  }
+    </div>
+  )}
 
-  {
-    background === 'waves' && (
-      <div class="absolute inset-0">
-        <svg
-          class="absolute bottom-0 left-0 right-0"
-          viewBox="0 0 1440 320"
-          preserveAspectRatio="none"
-        >
-          <path
-            fill="rgba(59, 130, 246, 0.1)"
-            d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-          />
-        </svg>
-      </div>
-    )
-  }
+  {background === 'waves' && (
+    <div class="absolute inset-0">
+      <svg
+        class="absolute bottom-0 left-0 right-0"
+        viewBox="0 0 1440 320"
+        preserveAspectRatio="none"
+      >
+        <path
+          fill="rgba(59, 130, 246, 0.1)"
+          d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+        />
+      </svg>
+    </div>
+  )}
 
   <!-- Animated Elements -->
-  {
-    animatedElements && (
-      <div class="absolute inset-0 pointer-events-none">
-        <div class="floating-element element-1" />
-        <div class="floating-element element-2" />
-        <div class="floating-element element-3" />
-        <div class="floating-element element-4" />
-      </div>
-    )
-  }
+  {animatedElements && (
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="floating-element element-1" />
+      <div class="floating-element element-2" />
+      <div class="floating-element element-3" />
+      <div class="floating-element element-4" />
+    </div>
+  )}
 
   <div class={contentClasses}>
     <!-- Main Content -->
     <div class="relative z-10">
       {subtitle && <p class={subtitleClasses}>{subtitle}</p>}
 
-      <h1 class={titleClasses}>
-        {title}
-      </h1>
+      <h1 class={titleClasses}>{title}</h1>
 
-      <p class={descriptionClasses}>
-        {description}
-      </p>
+      <p class={descriptionClasses}>{description}</p>
 
       <!-- CTA Buttons -->
-      {
-        (primaryCTA || secondaryCTA) && (
-          <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
-            {primaryCTA && (
-              <a
-                href={primaryCTA.href}
-                class:list={[
-                  'inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300',
-                  ctaVariantClasses[primaryCTA.variant || 'primary'],
-                  animatedElements
-                    ? 'animate-fade-in-up animation-delay-600'
-                    : '',
-                  'hover:scale-105 hover:shadow-xl',
-                ]}
-              >
-                {primaryCTA.label}
-              </a>
-            )}
+      {(primaryCTA || secondaryCTA) && (
+        <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+          {primaryCTA && (
+            <a
+              href={primaryCTA.href}
+              class:list={[
+                'inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300',
+                ctaVariantClasses[primaryCTA.variant || 'primary'],
+                animatedElements
+                  ? 'animate-fade-in-up animation-delay-600'
+                  : '',
+                'hover:scale-105 hover:shadow-xl',
+              ]}
+            >
+              {primaryCTA.label}
+            </a>
+          )}
 
-            {secondaryCTA && (
-              <a
-                href={secondaryCTA.href}
-                class:list={[
-                  'inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300',
-                  ctaVariantClasses[secondaryCTA.variant || 'outline'],
-                  animatedElements
-                    ? 'animate-fade-in-up animation-delay-700'
-                    : '',
-                  'hover:scale-105',
-                ]}
-              >
-                {secondaryCTA.label}
-              </a>
-            )}
-          </div>
-        )
-      }
+          {secondaryCTA && (
+            <a
+              href={secondaryCTA.href}
+              class:list={[
+                'inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300',
+                ctaVariantClasses[secondaryCTA.variant || 'outline'],
+                animatedElements
+                  ? 'animate-fade-in-up animation-delay-700'
+                  : '',
+                'hover:scale-105',
+              ]}
+            >
+              {secondaryCTA.label}
+            </a>
+          )}
+        </div>
+      )}
 
       <!-- Stats -->
-      {
-        showStats && stats.length > 0 && (
-          <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {stats.map((stat) => (
-              <div class="text-center">
-                <div class="text-3xl sm:text-4xl font-bold text-primary">
-                  {stat.value}
-                  {stat.suffix && <span class="text-xl">{stat.suffix}</span>}
-                </div>
-                <div class="text-sm text-muted-foreground mt-1">
-                  {stat.label}
-                </div>
+      {showStats && stats.length > 0 && (
+        <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8">
+          {stats.map((stat) => (
+            <div class="text-center">
+              <div class="text-3xl sm:text-4xl font-bold text-primary">
+                {stat.value}
+                {stat.suffix && <span class="text-xl">{stat.suffix}</span>}
               </div>
-            ))}
-          </div>
-        )
-      }
+              <div class="text-sm text-muted-foreground mt-1">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
 
     <!-- Features (for split layout) -->
-    {
-      layout === 'split' && features.length > 0 && (
-        <div class="mt-16 lg:mt-0">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {features.map((feature, index) => (
-              <div
-                class:list={[
-                  'bg-secondary/50 backdrop-blur-sm rounded-xl p-6 border border-border-primary/50',
-                  animatedElements ? 'animate-fade-in-right' : '',
-                  `animation-delay-${index * 200}`,
-                ]}
-              >
-                <div class="text-3xl mb-4">{feature.icon}</div>
-                <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p class="text-muted-foreground">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )
-    }
-
-    <!-- Features (for centered layout) -->
-    {
-      layout === 'centered' && features.length > 0 && (
-        <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+    {layout === 'split' && features.length > 0 && (
+      <div class="mt-16 lg:mt-0">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {features.map((feature, index) => (
             <div
               class:list={[
-                'text-center',
-                animatedElements ? 'animate-fade-in-up' : '',
-                `animation-delay-${600 + index * 150}`,
+                'bg-secondary/50 backdrop-blur-sm rounded-xl p-6 border border-border-primary/50',
+                animatedElements ? 'animate-fade-in-right' : '',
+                `animation-delay-${index * 200}`,
               ]}
             >
-              <div class="text-4xl mb-4">{feature.icon}</div>
+              <div class="text-3xl mb-4">{feature.icon}</div>
               <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
               <p class="text-muted-foreground">{feature.description}</p>
             </div>
           ))}
         </div>
-      )
-    }
+      </div>
+    )}
+
+    <!-- Features (for centered layout) -->
+    {layout === 'centered' && features.length > 0 && (
+      <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+        {features.map((feature, index) => (
+          <div
+            class:list={[
+              'text-center',
+              animatedElements ? 'animate-fade-in-up' : '',
+              `animation-delay-${600 + index * 150}`,
+            ]}
+          >
+            <div class="text-4xl mb-4">{feature.icon}</div>
+            <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
+            <p class="text-muted-foreground">{feature.description}</p>
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 </section>
 

@@ -125,152 +125,148 @@ const frequencyOptions = [
         <h2 class="text-lg font-semibold">Compliance Requirements</h2>
       </div>
 
-      {
-        requirements.length === 0 ? (
-          <div class="p-6 text-center text-muted-foreground">
-            No compliance requirements defined yet. Click "Add New Requirement"
-            to create your first requirement.
-          </div>
-        ) : (
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-border">
-              <thead class="bg-secondary">
+      {requirements.length === 0 ? (
+        <div class="p-6 text-center text-muted-foreground">
+          No compliance requirements defined yet. Click "Add New Requirement" to
+          create your first requirement.
+        </div>
+      ) : (
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-border">
+            <thead class="bg-secondary">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Requirement
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Description
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Applies To
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Required Level
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Verification
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Status
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                >
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-card divide-y divide-border">
+              {requirements.map((req) => (
                 <tr>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Requirement
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Description
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Applies To
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Required Level
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Verification
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Status
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                  >
-                    Actions
-                  </th>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-foreground">
+                      {req.name}
+                    </div>
+                    <div class="text-xs text-muted-foreground">
+                      Frequency: {req.frequency.replace(/_/g, ' ')}
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-muted-foreground">
+                    <div class="max-w-md truncate">{req.description}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-xs text-muted-foreground mb-1">Types:</div>
+                    <div class="flex flex-wrap gap-1">
+                      {req.applicableTypes.map((type) => (
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                          {type.replace(/_/g, ' ')}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {(() => {
+                      switch (req.minimumComplianceLevel) {
+                        case ComplianceLevel.HIPAA_CERTIFIED:
+                          return (
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                              HIPAA Certified
+                            </span>
+                          )
+                        case ComplianceLevel.THIRD_PARTY_VERIFIED:
+                          return (
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">
+                              Third Party Verified
+                            </span>
+                          )
+                        case ComplianceLevel.SELF_ATTESTED:
+                          return (
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-ring text-foreground">
+                              Self Attested
+                            </span>
+                          )
+                        default:
+                          return (
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
+                              {req.minimumComplianceLevel.replace(/_/g, ' ')}
+                            </span>
+                          )
+                      }
+                    })()}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground capitalize">
+                    {req.verificationMethod.replace(/_/g, ' ')}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {req.isRequired ? (
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
+                        Required
+                      </span>
+                    ) : (
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
+                        Optional
+                      </span>
+                    )}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button
+                      data-req-id={req.id}
+                      class="edit-requirement text-foreground hover:underline mr-3"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      data-req-id={req.id}
+                      class="delete-requirement text-foreground font-semibold hover:text-foreground font-semibold"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody class="bg-card divide-y divide-border">
-                {requirements.map((req) => (
-                  <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-medium text-foreground">
-                        {req.name}
-                      </div>
-                      <div class="text-xs text-muted-foreground">
-                        Frequency: {req.frequency.replace(/_/g, ' ')}
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 text-sm text-muted-foreground">
-                      <div class="max-w-md truncate">{req.description}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-xs text-muted-foreground mb-1">
-                        Types:
-                      </div>
-                      <div class="flex flex-wrap gap-1">
-                        {req.applicableTypes.map((type) => (
-                          <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
-                            {type.replace(/_/g, ' ')}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      {(() => {
-                        switch (req.minimumComplianceLevel) {
-                          case ComplianceLevel.HIPAA_CERTIFIED:
-                            return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
-                                HIPAA Certified
-                              </span>
-                            )
-                          case ComplianceLevel.THIRD_PARTY_VERIFIED:
-                            return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">
-                                Third Party Verified
-                              </span>
-                            )
-                          case ComplianceLevel.SELF_ATTESTED:
-                            return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-ring text-foreground">
-                                Self Attested
-                              </span>
-                            )
-                          default:
-                            return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
-                                {req.minimumComplianceLevel.replace(/_/g, ' ')}
-                              </span>
-                            )
-                        }
-                      })()}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground capitalize">
-                      {req.verificationMethod.replace(/_/g, ' ')}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      {req.isRequired ? (
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
-                          Required
-                        </span>
-                      ) : (
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
-                          Optional
-                        </span>
-                      )}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        data-req-id={req.id}
-                        class="edit-requirement text-foreground hover:underline mr-3"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        data-req-id={req.id}
-                        class="delete-requirement text-foreground font-semibold hover:text-foreground font-semibold"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
-      }
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
 
     <!-- Best Practices Card -->
@@ -308,24 +304,24 @@ const frequencyOptions = [
           <h3 class="font-medium text-foreground mb-2">Verification Methods</h3>
           <ul class="list-disc list-inside text-muted-foreground space-y-1">
             <li>
-              <span class="font-medium">Self-Assessment:</span> The vendor completes
-              a questionnaire about their practices
+              <span class="font-medium">Self-Assessment:</span> The vendor
+              completes a questionnaire about their practices
             </li>
             <li>
-              <span class="font-medium">Documentation Review:</span> Evaluating policies,
-              procedures, and other written evidence
+              <span class="font-medium">Documentation Review:</span> Evaluating
+              policies, procedures, and other written evidence
             </li>
             <li>
-              <span class="font-medium">Third-Party Audit:</span> Independent verification
-              by qualified security assessors
+              <span class="font-medium">Third-Party Audit:</span> Independent
+              verification by qualified security assessors
             </li>
             <li>
-              <span class="font-medium">Certification Validation:</span> Verifying
-              industry-recognized certifications
+              <span class="font-medium">Certification Validation:</span>{' '}
+              Verifying industry-recognized certifications
             </li>
             <li>
-              <span class="font-medium">Onsite Assessment:</span> Direct observation
-              of security controls at vendor locations
+              <span class="font-medium">Onsite Assessment:</span> Direct
+              observation of security controls at vendor locations
             </li>
           </ul>
         </div>
@@ -339,9 +335,7 @@ const frequencyOptions = [
   id="add-requirement-modal"
   class="hidden fixed inset-0 bg-secondary0 bg-opacity-75 flex items-center justify-center p-4 z-50"
 >
-  <div
-    class="bg-card rounded-none max-w-3xl w-full max-h-screen overflow-y-auto p-6"
-  >
+  <div class="bg-card rounded-none max-w-3xl w-full max-h-screen overflow-y-auto p-6">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-semibold">Add New Compliance Requirement</h2>
       <button
@@ -358,16 +352,20 @@ const frequencyOptions = [
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"></path>
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
         </svg>
       </button>
     </div>
 
     <form id="requirement-form" class="space-y-4">
       <div>
-        <label for="name" class="block text-sm font-medium text-foreground mb-1"
-          >Requirement Name*</label
+        <label
+          for="name"
+          class="block text-sm font-medium text-foreground mb-1"
         >
+          Requirement Name*
+        </label>
         <input
           type="text"
           id="name"
@@ -382,8 +380,9 @@ const frequencyOptions = [
         <label
           for="description"
           class="block text-sm font-medium text-foreground mb-1"
-          >Description*</label
         >
+          Description*
+        </label>
         <textarea
           id="description"
           name="description"
@@ -395,44 +394,40 @@ const frequencyOptions = [
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-foreground mb-1"
-          >Applicable Business Associate Types*</label
-        >
+        <label class="block text-sm font-medium text-foreground mb-1">
+          Applicable Business Associate Types*
+        </label>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {
-            associateTypeOptions.map((option) => (
-              <label class="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="applicableTypes"
-                  value={option.value}
-                  class="rounded-none border-input text-foreground focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
-                />
-                <span class="ml-2 text-sm text-foreground">{option.label}</span>
-              </label>
-            ))
-          }
+          {associateTypeOptions.map((option) => (
+            <label class="inline-flex items-center">
+              <input
+                type="checkbox"
+                name="applicableTypes"
+                value={option.value}
+                class="rounded-none border-input text-foreground focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
+              />
+              <span class="ml-2 text-sm text-foreground">{option.label}</span>
+            </label>
+          ))}
         </div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-foreground mb-1"
-          >Applicable Service Categories*</label
-        >
+        <label class="block text-sm font-medium text-foreground mb-1">
+          Applicable Service Categories*
+        </label>
         <div class="grid grid-cols-2 gap-2">
-          {
-            serviceCategoryOptions.map((option) => (
-              <label class="inline-flex items-center">
-                <input
-                  type="checkbox"
-                  name="applicableCategories"
-                  value={option.value}
-                  class="rounded-none border-input text-foreground focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
-                />
-                <span class="ml-2 text-sm text-foreground">{option.label}</span>
-              </label>
-            ))
-          }
+          {serviceCategoryOptions.map((option) => (
+            <label class="inline-flex items-center">
+              <input
+                type="checkbox"
+                name="applicableCategories"
+                value={option.value}
+                class="rounded-none border-input text-foreground focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
+              />
+              <span class="ml-2 text-sm text-foreground">{option.label}</span>
+            </label>
+          ))}
         </div>
       </div>
 
@@ -440,8 +435,9 @@ const frequencyOptions = [
         <label
           for="requiredDocuments"
           class="block text-sm font-medium text-foreground mb-1"
-          >Required Documents*</label
         >
+          Required Documents*
+        </label>
         <input
           type="text"
           id="requiredDocuments"
@@ -457,19 +453,18 @@ const frequencyOptions = [
           <label
             for="minimumComplianceLevel"
             class="block text-sm font-medium text-foreground mb-1"
-            >Minimum Compliance Level*</label
           >
+            Minimum Compliance Level*
+          </label>
           <select
             id="minimumComplianceLevel"
             name="minimumComplianceLevel"
             required
             class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
           >
-            {
-              complianceLevelOptions.map((option) => (
-                <option value={option.value}>{option.label}</option>
-              ))
-            }
+            {complianceLevelOptions.map((option) => (
+              <option value={option.value}>{option.label}</option>
+            ))}
           </select>
         </div>
 
@@ -477,19 +472,18 @@ const frequencyOptions = [
           <label
             for="verificationMethod"
             class="block text-sm font-medium text-foreground mb-1"
-            >Verification Method*</label
           >
+            Verification Method*
+          </label>
           <select
             id="verificationMethod"
             name="verificationMethod"
             required
             class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
           >
-            {
-              verificationMethodOptions.map((option) => (
-                <option value={option.value}>{option.label}</option>
-              ))
-            }
+            {verificationMethodOptions.map((option) => (
+              <option value={option.value}>{option.label}</option>
+            ))}
           </select>
         </div>
 
@@ -497,26 +491,25 @@ const frequencyOptions = [
           <label
             for="frequency"
             class="block text-sm font-medium text-foreground mb-1"
-            >Verification Frequency*</label
           >
+            Verification Frequency*
+          </label>
           <select
             id="frequency"
             name="frequency"
             required
             class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
           >
-            {
-              frequencyOptions.map((option) => (
-                <option value={option.value}>{option.label}</option>
-              ))
-            }
+            {frequencyOptions.map((option) => (
+              <option value={option.value}>{option.label}</option>
+            ))}
           </select>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-foreground mb-3"
-            >Requirement Status*</label
-          >
+          <label class="block text-sm font-medium text-foreground mb-3">
+            Requirement Status*
+          </label>
           <div class="flex space-x-4">
             <label class="inline-flex items-center">
               <input

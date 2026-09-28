@@ -52,13 +52,13 @@ export function ConsentDialog({
   }
 
   return (
-    <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 p-4">
+    <div className="bg-foreground/60 fixed inset-0 z-50 flex items-center justify-center p-4">
       <FocusTrap active={isOpen}>
         <div
           ref={dialogRef}
           tabIndex={-1}
           onKeyDown={handleDialogKeyDown}
-          className="bg-white flex w-full max-w-2xl flex-col rounded-lg shadow-xl"
+          className="flex w-full max-w-2xl flex-col rounded-none border border-border bg-card"
           role="dialog"
           aria-modal="true"
           aria-labelledby="consent-dialog-title"
@@ -68,7 +68,7 @@ export function ConsentDialog({
           <div className="border-b p-4">
             <h2
               id="consent-dialog-title"
-              className="text-gray-800 text-xl font-semibold"
+              className="text-xl font-semibold text-foreground"
             >
               Privacy & Data Collection Consent
             </h2>
@@ -81,7 +81,7 @@ export function ConsentDialog({
           >
             <div className="mb-6">
               <svg
-                className="text-blue-500 mx-auto mb-3 h-16 w-16"
+                className="mx-auto mb-3 h-16 w-16 text-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -95,16 +95,16 @@ export function ConsentDialog({
                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                 />
               </svg>
-              <p className="text-gray-700 text-center font-medium">
+              <p className="text-center font-medium text-foreground">
                 Your privacy is our priority
               </p>
             </div>
 
             <div className="mb-6">
-              <h3 className="text-gray-800 mb-2 font-medium">
+              <h3 className="mb-2 font-medium text-foreground">
                 About This Simulator
               </h3>
-              <p className="text-gray-600 mb-4 text-sm">
+              <p className="mb-4 text-sm text-muted-foreground">
                 This therapeutic practice simulator is designed to help you
                 improve your skills in a completely private environment. We take
                 privacy and security seriously, especially when it comes to
@@ -112,10 +112,10 @@ export function ConsentDialog({
               </p>
 
               <div className="mb-4">
-                <h4 className="text-blue-800 mb-2 font-medium">
+                <h4 className="mb-2 font-medium text-foreground">
                   What we DO NOT collect or store:
                 </h4>
-                <ul className="text-gray-600 list-disc space-y-1 pl-5 text-sm">
+                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                   <li>
                     No audio or video recordings are ever created or stored
                   </li>
@@ -126,10 +126,10 @@ export function ConsentDialog({
               </div>
 
               <div className="mb-4">
-                <h4 className="text-blue-800 mb-2 font-medium">
+                <h4 className="mb-2 font-medium text-foreground">
                   What you can optionally allow:
                 </h4>
-                <ul className="text-gray-600 list-disc space-y-1 pl-5 text-sm">
+                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                   {privacyPoints.map((point) => (
                     <li key={point}>{point}</li>
                   ))}
@@ -137,7 +137,7 @@ export function ConsentDialog({
               </div>
             </div>
 
-            <div className="bg-gray-50 border-gray-200 rounded-md border p-4">
+            <div className="rounded-none border border-border bg-secondary p-4">
               <div className="mb-4 flex items-start">
                 <div className="flex h-5 items-center">
                   <input
@@ -145,17 +145,17 @@ export function ConsentDialog({
                     type="checkbox"
                     checked={checked}
                     onChange={() => setChecked(!checked)}
-                    className="border-gray-300 bg-gray-50 focus:ring-3 focus:ring-blue-300 h-4 w-4 rounded border"
+                    className="focus:ring-3 h-4 w-4 rounded-none border border-input bg-background focus:ring-ring"
                   />
                 </div>
                 <label
                   htmlFor="consent-checkbox"
-                  className="text-gray-700 ml-2 text-sm"
+                  className="ml-2 text-sm text-foreground"
                 >
                   {consentText}
                 </label>
               </div>
-              <p className="text-gray-500 text-xs">
+              <p className="text-xs text-muted-foreground">
                 You can change your preference at any time from the metrics
                 panel. You can always use the simulator without enabling metrics
                 collection.
@@ -167,7 +167,7 @@ export function ConsentDialog({
           <div className="flex justify-end gap-3 border-t p-4">
             <button
               onClick={handleDeclineClick}
-              className="text-gray-700 bg-white hover:bg-gray-50 border-gray-300 focus:ring-blue-700 rounded-md border px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+              className="rounded-none border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               Decline
             </button>

@@ -109,20 +109,18 @@ const {
         <div class="space-y-2">
           <Label>Emotion Types</Label>
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1">
-            {
-              availableEmotionTypes.map((type: string) => (
-                <div class="flex items-center space-x-2">
-                  <Checkbox
-                    id={`emotion-${type}`}
-                    value={type}
-                    className="emotion-type-checkbox"
-                  />
-                  <Label htmlFor={`emotion-${type}`} className="cursor-pointer">
-                    {type}
-                  </Label>
-                </div>
-              ))
-            }
+            {availableEmotionTypes.map((type: string) => (
+              <div class="flex items-center space-x-2">
+                <Checkbox
+                  id={`emotion-${type}`}
+                  value={type}
+                  className="emotion-type-checkbox"
+                />
+                <Label htmlFor={`emotion-${type}`} className="cursor-pointer">
+                  {type}
+                </Label>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -212,20 +210,18 @@ const {
         <div class="space-y-2">
           <Label>Pattern Types</Label>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
-            {
-              availablePatternTypes.map((type: string) => (
-                <div class="flex items-center space-x-2">
-                  <Checkbox
-                    id={`pattern-${type}`}
-                    value={type}
-                    className="pattern-type-checkbox"
-                  />
-                  <Label htmlFor={`pattern-${type}`} className="cursor-pointer">
-                    {type}
-                  </Label>
-                </div>
-              ))
-            }
+            {availablePatternTypes.map((type: string) => (
+              <div class="flex items-center space-x-2">
+                <Checkbox
+                  id={`pattern-${type}`}
+                  value={type}
+                  className="pattern-type-checkbox"
+                />
+                <Label htmlFor={`pattern-${type}`} className="cursor-pointer">
+                  {type}
+                </Label>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -260,23 +256,21 @@ const {
         <div class="space-y-2">
           <Label>Pattern Categories</Label>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
-            {
-              availablePatternCategories.map((category: string) => (
-                <div class="flex items-center space-x-2">
-                  <Checkbox
-                    id={`category-${category}`}
-                    value={category}
-                    className="pattern-category-checkbox"
-                  />
-                  <Label
-                    htmlFor={`category-${category}`}
-                    className="cursor-pointer"
-                  >
-                    {category}
-                  </Label>
-                </div>
-              ))
-            }
+            {availablePatternCategories.map((category: string) => (
+              <div class="flex items-center space-x-2">
+                <Checkbox
+                  id={`category-${category}`}
+                  value={category}
+                  className="pattern-category-checkbox"
+                />
+                <Label
+                  htmlFor={`category-${category}`}
+                  className="cursor-pointer"
+                >
+                  {category}
+                </Label>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -322,9 +316,9 @@ const {
           </div>
 
           <div class="flex items-center justify-between">
-            <Label htmlFor="show-confidence-intervals"
-              >Show Confidence Intervals</Label
-            >
+            <Label htmlFor="show-confidence-intervals">
+              Show Confidence Intervals
+            </Label>
             <Switch id="show-confidence-intervals" />
           </div>
 

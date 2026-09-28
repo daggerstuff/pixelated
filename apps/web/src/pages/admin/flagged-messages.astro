@@ -42,65 +42,57 @@ function getFlagReason(metadata: unknown): string {
     </div>
 
     <div class="admin-actions">
-      <a href="/admin" class="btn btn-secondary">Back to Admin Dashboard</a>
+      <a href="/admin" class="btn btn-secondary">
+        Back to Admin Dashboard
+      </a>
     </div>
 
     <div class="flagged-messages">
-      {
-        flaggedMessages.length === 0 ? (
-          <div class="empty-state">
-            <p>No flagged messages to review at this time.</p>
-          </div>
-        ) : (
-          <table class="messages-table">
-            <thead>
+      {flaggedMessages.length === 0 ? (
+        <div class="empty-state">
+          <p>No flagged messages to review at this time.</p>
+        </div>
+      ) : (
+        <table class="messages-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Conversation</th>
+              <th>Content</th>
+              <th>Reason</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {flaggedMessages.map((message) => (
               <tr>
-                <th>Date</th>
-                <th>Conversation</th>
-                <th>Content</th>
-                <th>Reason</th>
-                <th>Actions</th>
+                <td>{new Date(message.created_at || '').toLocaleString()}</td>
+                <td>
+                  <a href={`/admin/conversations/${message.conversation_id}`}>
+                    {message.conversation_id}
+                  </a>
+                </td>
+                <td class="message-content">{message.content}</td>
+                <td>{getFlagReason(message.metadata)}</td>
+                <td class="actions">
+                  <form action="/api/admin/messages/approve" method="post">
+                    <input type="hidden" name="messageId" value={message._id} />
+                    <button type="submit" class="btn btn-small btn-success">
+                      Approve
+                    </button>
+                  </form>
+                  <form action="/api/admin/messages/delete" method="post">
+                    <input type="hidden" name="messageId" value={message._id} />
+                    <button type="submit" class="btn btn-small btn-danger">
+                      Delete
+                    </button>
+                  </form>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {flaggedMessages.map((message) => (
-                <tr>
-                  <td>{new Date(message.created_at || '').toLocaleString()}</td>
-                  <td>
-                    <a href={`/admin/conversations/${message.conversation_id}`}>
-                      {message.conversation_id}
-                    </a>
-                  </td>
-                  <td class="message-content">{message.content}</td>
-                  <td>{getFlagReason(message.metadata)}</td>
-                  <td class="actions">
-                    <form action="/api/admin/messages/approve" method="post">
-                      <input
-                        type="hidden"
-                        name="messageId"
-                        value={message._id}
-                      />
-                      <button type="submit" class="btn btn-small btn-success">
-                        Approve
-                      </button>
-                    </form>
-                    <form action="/api/admin/messages/delete" method="post">
-                      <input
-                        type="hidden"
-                        name="messageId"
-                        value={message._id}
-                      />
-                      <button type="submit" class="btn btn-small btn-danger">
-                        Delete
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )
-      }
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   </main>
 </BaseLayout>

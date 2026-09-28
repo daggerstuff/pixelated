@@ -77,27 +77,24 @@ const tabletImage = tabletSrc ? getImageAttributes(tabletSrc) : null
         z-index: ${zIndex};
       `}
     >
-      {
-        typeof src !== 'string' && src && (
-          <Image
-            src={src}
-            alt={alt}
-            width={mainImage.width || 1000}
-            height={mainImage.height || 1000}
-            quality={quality}
-            format={format}
-            class="hidden"
-          />
-        )
-      }
+      {typeof src !== 'string' && src && (
+        <Image
+          {src}
+          {alt}
+          width={mainImage.width || 1000}
+          height={mainImage.height || 1000}
+          {quality}
+          {format}
+          class="hidden"
+        />
+      )}
     </div>
 
     <!-- Tablet Image (if provided) -->
-    {
-      tabletImage && (
-        <div
-          class="background-image tablet-image"
-          style={`
+    {tabletImage && (
+      <div
+        class="background-image tablet-image"
+        style={`
           background-image: url(${typeof tabletSrc === 'string' ? tabletSrc : ''});
           background-position: ${position};
           background-size: ${size};
@@ -105,28 +102,26 @@ const tabletImage = tabletSrc ? getImageAttributes(tabletSrc) : null
           ${blurEffect ? 'filter: blur(5px);' : ''}
           z-index: ${zIndex};
         `}
-        >
-          {typeof tabletSrc !== 'string' && tabletSrc && (
-            <Image
-              src={tabletSrc}
-              alt={`${alt} (tablet)`}
-              width={tabletImage?.width || 1000}
-              height={tabletImage?.height || 1000}
-              quality={quality}
-              format={format}
-              class="hidden"
-            />
-          )}
-        </div>
-      )
-    }
+      >
+        {typeof tabletSrc !== 'string' && tabletSrc && (
+          <Image
+            src={tabletSrc}
+            alt={`${alt} (tablet)`}
+            width={tabletImage?.width || 1000}
+            height={tabletImage?.height || 1000}
+            {quality}
+            {format}
+            class="hidden"
+          />
+        )}
+      </div>
+    )}
 
     <!-- Mobile Image (if provided) -->
-    {
-      mobileImage && (
-        <div
-          class="background-image mobile-image"
-          style={`
+    {mobileImage && (
+      <div
+        class="background-image mobile-image"
+        style={`
           background-image: url(${typeof mobileSrc === 'string' ? mobileSrc : ''});
           background-position: ${position};
           background-size: ${size};
@@ -134,31 +129,28 @@ const tabletImage = tabletSrc ? getImageAttributes(tabletSrc) : null
           ${blurEffect ? 'filter: blur(5px);' : ''}
           z-index: ${zIndex};
         `}
-        >
-          {typeof mobileSrc !== 'string' && mobileSrc && (
-            <Image
-              src={mobileSrc}
-              alt={`${alt} (mobile)`}
-              width={mobileImage?.width || 1000}
-              height={mobileImage?.height || 1000}
-              quality={quality}
-              format={format}
-              class="hidden"
-            />
-          )}
-        </div>
-      )
-    }
+      >
+        {typeof mobileSrc !== 'string' && mobileSrc && (
+          <Image
+            src={mobileSrc}
+            alt={`${alt} (mobile)`}
+            width={mobileImage?.width || 1000}
+            height={mobileImage?.height || 1000}
+            {quality}
+            {format}
+            class="hidden"
+          />
+        )}
+      </div>
+    )}
 
     <!-- Optional overlay -->
-    {
-      overlayColor && (
-        <div
-          class="background-overlay"
-          style={`background-color: ${overlayColor}; z-index: ${zIndex + 1};`}
-        />
-      )
-    }
+    {overlayColor && (
+      <div
+        class="background-overlay"
+        style={`background-color: ${overlayColor}; z-index: ${zIndex + 1};`}
+      />
+    )}
   </div>
 
   <!-- Content slot -->

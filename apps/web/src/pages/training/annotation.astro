@@ -212,23 +212,19 @@ const handlePromote = `
   title="Pixelated Empathy - Expert Annotation Queue"
   description="Review pending clinical validity samples for expert annotation"
 >
-  <main
-    class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50"
-  >
+  <main class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
     {/* Hero Section */}
     <section class="relative px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="text-center">
         <div class="flex items-center justify-center mb-6">
-          <div
-            class="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl flex items-center justify-center mr-4"
-          >
+          <div class="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl flex items-center justify-center mr-4">
             <span class="text-2xl">📋</span>
           </div>
           <h1 class="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl">
-            Expert <span
-              class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600"
-              >Annotation Queue</span
-            >
+            Expert{' '}
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600">
+              Annotation Queue
+            </span>
           </h1>
         </div>
 
@@ -257,39 +253,35 @@ const handlePromote = `
           Pending Items for Review
         </h2>
 
-        {
-          error ? (
-            <div class="bg-neutral-50 border border-neutral-300 p-4 mb-6 rounded-lg">
-              <div class="flex">
-                <div class="flex-shrink-0">
-                  <svg
-                    class="h-5 w-5 text-neutral-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm text-neutral-700">{error}</p>
-                </div>
+        {error ? (
+          <div class="bg-neutral-50 border border-neutral-300 p-4 mb-6 rounded-lg">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-5 w-5 text-neutral-500"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm text-neutral-700">{error}</p>
               </div>
             </div>
-          ) : null
-        }
+          </div>
+        ) : null}
       </div>
 
       {/* Empty State */}
       <div
         class={`empty-state ${pendingItems.length > 0 ? 'hidden' : 'block'} mb-8 text-center py-12`}
       >
-        <div
-          class="mx-auto w-24 h-24 bg-neutral-200 rounded-full flex items-center justify-center mb-6"
-        >
+        <div class="mx-auto w-24 h-24 bg-neutral-200 rounded-full flex items-center justify-center mb-6">
           <span class="text-3xl">📭</span>
         </div>
         <h3 class="text-2xl font-bold text-gray-700 mb-3">No pending items</h3>
@@ -301,18 +293,230 @@ const handlePromote = `
 
       {/* Items Container */}
       <div class="items-container grid gap-6">
-        {
-          pendingItems.map((item) => (
-            <div id={`item-${item.id}`} class="transition-all duration-300">
-              <Card class="p-6 border border-neutral-300">
+        {pendingItems.map((item) => (
+          <div id={`item-${item.id}`} class="transition-all duration-300">
+            <Card class="p-6 border border-neutral-300">
+              <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                {/* Sample Text */}
+                <div class="flex-1">
+                  <div class="mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                      Sample Text
+                    </h3>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 max-h-48 overflow-y-auto">
+                      <p class="text-gray-700 whitespace-pre-wrap">
+                        {item.sample_text}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Scores Summary */}
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-neutral-100 p-3 rounded-lg border border-neutral-200">
+                      <div class="text-xs font-medium text-neutral-700 uppercase tracking-wide mb-1">
+                        Original Score
+                      </div>
+                      <div class="text-xl font-bold text-neutral-900">
+                        {(item.original_score * 100).toFixed(1)}%
+                      </div>
+                    </div>
+
+                    {item.routing_reason ? (
+                      <div class="bg-neutral-100 p-3 rounded-lg border border-neutral-200">
+                        <div class="text-xs font-medium text-neutral-700 uppercase tracking-wide mb-1">
+                          Routing Reason
+                        </div>
+                        <div class="text-sm text-neutral-800">
+                          {item.routing_reason}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    <div class="bg-purple-50 p-3 rounded-lg border border-purple-100">
+                      <div class="text-xs font-medium text-purple-800 uppercase tracking-wide mb-1">
+                        Dimensions
+                      </div>
+                      <div class="text-sm text-purple-900">
+                        {Object.keys(item.per_dimension_scores || {}).length}{' '}
+                        scored
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Per-dimension Scores */}
+                  {item.per_dimension_scores &&
+                  Object.keys(item.per_dimension_scores).length > 0 ? (
+                    <div class="mb-4">
+                      <h4 class="text-sm font-semibold text-gray-900 mb-2">
+                        Per-dimension Scores
+                      </h4>
+                      <div class="flex flex-wrap gap-2">
+                        {Object.entries(item.per_dimension_scores).map(
+                          ([dimension, score]) => (
+                            <div class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
+                              {dimension}: {(score * 100).toFixed(0)}%
+                            </div>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+
+                {/* Review Form */}
+                <div class="lg:w-96">
+                  <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                    Your Review
+                  </h3>
+
+                  <form
+                    class="space-y-4"
+                    data-reviewer-id={reviewerId}
+                    onsubmit={`handleSubmit(event, ${item.id}); return false;`}
+                  >
+                    {/* Reviewer Score */}
+                    <div>
+                      <label
+                        for={`reviewer_score_${item.id}`}
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Reviewer Score (0-1)
+                      </label>
+                      <div class="relative">
+                        <input
+                          type="number"
+                          id={`reviewer_score_${item.id}`}
+                          name="reviewer_score"
+                          min="0"
+                          max="1"
+                          step="0.01"
+                          required
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
+                          placeholder="e.g., 0.75"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                          <span class="text-gray-500">/1</span>
+                        </div>
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Enter a score between 0 (not clinically valid) and 1
+                        (highly clinically valid)
+                      </p>
+                    </div>
+
+                    {/* Notes */}
+                    <div>
+                      <label
+                        for={`notes_${item.id}`}
+                        class="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Notes (Optional)
+                      </label>
+                      <textarea
+                        id={`notes_${item.id}`}
+                        name="notes"
+                        rows="3"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
+                        placeholder="Add any notes about your assessment..."
+                      ></textarea>
+                      <p class="mt-1 text-xs text-gray-500">
+                        Maximum 5000 characters
+                      </p>
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      class="w-full bg-neutral-800 hover:bg-neutral-900 text-white font-medium py-2.5 px-4 rounded-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2"
+                    >
+                      Submit Review
+                    </button>
+                  </form>
+
+                  {/* Success and Error Messages */}
+                  <div class="mt-4 space-y-2">
+                    <div class="success-message hidden bg-neutral-50 border border-neutral-300 p-4 rounded-lg">
+                      <div class="flex">
+                        <div class="flex-shrink-0">
+                          <svg
+                            class="h-5 w-5 text-neutral-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <div class="ml-3">
+                          <p class="text-sm text-neutral-700" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="error-message hidden bg-neutral-50 border border-neutral-300 p-4 rounded-lg">
+                      <div class="flex">
+                        <div class="flex-shrink-0">
+                          <svg
+                            class="h-5 w-5 text-neutral-500"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                        </div>
+                        <div class="ml-3">
+                          <p class="text-sm text-neutral-700" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        ))}
+      </div>
+
+      {/* Reviewed Items (eligible for promotion) */}
+      <div class="mt-12">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-neutral-800 rounded-xl flex items-center justify-center">
+            <span class="text-xl text-white">⬆</span>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900">Reviewed Items</h2>
+          <span class="px-3 py-1 text-xs font-medium rounded-full bg-neutral-100 text-neutral-700">
+            {reviewedItems.length} ready for promotion
+          </span>
+        </div>
+
+        {reviewedItems.length > 0 ? (
+          <div class="space-y-6" data-reviewed-list>
+            {reviewedItems.map((item) => (
+              <div
+                id={`reviewed-${item.id}`}
+                class="transition-all duration-300 p-6 border border-neutral-300 bg-neutral-50 rounded-lg"
+                data-queue-card
+              >
                 <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                   {/* Sample Text */}
                   <div class="flex-1">
                     <div class="mb-4">
-                      <h3 class="text-lg font-semibold text-gray-900 mb-2">
-                        Sample Text
-                      </h3>
-                      <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 max-h-48 overflow-y-auto">
+                      <div class="flex items-center gap-2 mb-2">
+                        <h3 class="text-lg font-semibold text-gray-900">
+                          Sample #{item.id}
+                        </h3>
+                        <span class="px-2 py-0.5 text-xs font-medium rounded bg-neutral-200 text-neutral-700">
+                          Reviewed
+                        </span>
+                      </div>
+                      <div class="bg-white p-4 rounded-lg border border-gray-200 max-h-48 overflow-y-auto">
                         <p class="text-gray-700 whitespace-pre-wrap">
                           {item.sample_text}
                         </p>
@@ -341,11 +545,11 @@ const handlePromote = `
                         </div>
                       ) : null}
 
-                      <div class="bg-purple-50 p-3 rounded-lg border border-purple-100">
-                        <div class="text-xs font-medium text-purple-800 uppercase tracking-wide mb-1">
+                      <div class="bg-neutral-100 p-3 rounded-lg border border-neutral-200">
+                        <div class="text-xs font-medium text-neutral-700 uppercase tracking-wide mb-1">
                           Dimensions
                         </div>
-                        <div class="text-sm text-purple-900">
+                        <div class="text-sm text-neutral-800">
                           {Object.keys(item.per_dimension_scores || {}).length}{' '}
                           scored
                         </div>
@@ -372,268 +576,45 @@ const handlePromote = `
                     ) : null}
                   </div>
 
-                  {/* Review Form */}
-                  <div class="lg:w-96">
+                  {/* Promote Action */}
+                  <div class="lg:w-64">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                      Your Review
+                      Promotion
                     </h3>
-
-                    <form
-                      class="space-y-4"
-                      data-reviewer-id={reviewerId}
-                      onsubmit={`handleSubmit(event, ${item.id}); return false;`}
+                    <p class="text-sm text-gray-600 mb-4">
+                      This item has been reviewed and is ready to be promoted to
+                      the next stage.
+                    </p>
+                    <button
+                      type="button"
+                      data-promote-btn
+                      onclick={`handlePromote(${item.id}, 'validated')`}
+                      class="w-full bg-neutral-800 hover:bg-neutral-900 text-white font-medium py-2.5 px-4 rounded-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2"
                     >
-                      {/* Reviewer Score */}
-                      <div>
-                        <label
-                          for={`reviewer_score_${item.id}`}
-                          class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                          Reviewer Score (0-1)
-                        </label>
-                        <div class="relative">
-                          <input
-                            type="number"
-                            id={`reviewer_score_${item.id}`}
-                            name="reviewer_score"
-                            min="0"
-                            max="1"
-                            step="0.01"
-                            required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
-                            placeholder="e.g., 0.75"
-                          />
-                          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <span class="text-gray-500">/1</span>
-                          </div>
-                        </div>
-                        <p class="mt-1 text-xs text-gray-500">
-                          Enter a score between 0 (not clinically valid) and 1
-                          (highly clinically valid)
-                        </p>
-                      </div>
-
-                      {/* Notes */}
-                      <div>
-                        <label
-                          for={`notes_${item.id}`}
-                          class="block text-sm font-medium text-gray-700 mb-1"
-                        >
-                          Notes (Optional)
-                        </label>
-                        <textarea
-                          id={`notes_${item.id}`}
-                          name="notes"
-                          rows="3"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500"
-                          placeholder="Add any notes about your assessment..."
-                        />
-                        <p class="mt-1 text-xs text-gray-500">
-                          Maximum 5000 characters
-                        </p>
-                      </div>
-
-                      {/* Submit Button */}
-                      <button
-                        type="submit"
-                        class="w-full bg-neutral-800 hover:bg-neutral-900 text-white font-medium py-2.5 px-4 rounded-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2"
-                      >
-                        Submit Review
-                      </button>
-                    </form>
-
-                    {/* Success and Error Messages */}
-                    <div class="mt-4 space-y-2">
-                      <div class="success-message hidden bg-neutral-50 border border-neutral-300 p-4 rounded-lg">
-                        <div class="flex">
-                          <div class="flex-shrink-0">
-                            <svg
-                              class="h-5 w-5 text-neutral-500"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd"
-                              />
-                            </svg>
-                          </div>
-                          <div class="ml-3">
-                            <p class="text-sm text-neutral-700" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="error-message hidden bg-neutral-50 border border-neutral-300 p-4 rounded-lg">
-                        <div class="flex">
-                          <div class="flex-shrink-0">
-                            <svg
-                              class="h-5 w-5 text-neutral-500"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                clip-rule="evenodd"
-                              />
-                            </svg>
-                          </div>
-                          <div class="ml-3">
-                            <p class="text-sm text-neutral-700" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                      Promote to Validated
+                    </button>
                   </div>
                 </div>
-              </Card>
-            </div>
-          ))
-        }
-      </div>
-
-      {/* Reviewed Items (eligible for promotion) */}
-      <div class="mt-12">
-        <div class="flex items-center gap-3 mb-6">
-          <div
-            class="w-10 h-10 bg-neutral-800 rounded-xl flex items-center justify-center"
-          >
-            <span class="text-xl text-white">⬆</span>
-          </div>
-          <h2 class="text-2xl font-bold text-gray-900">Reviewed Items</h2>
-          <span
-            class="px-3 py-1 text-xs font-medium rounded-full bg-neutral-100 text-neutral-700"
-          >
-            {reviewedItems.length} ready for promotion
-          </span>
-        </div>
-
-        {
-          reviewedItems.length > 0 ? (
-            <div class="space-y-6" data-reviewed-list>
-              {reviewedItems.map((item) => (
-                <div
-                  id={`reviewed-${item.id}`}
-                  class="transition-all duration-300 p-6 border border-neutral-300 bg-neutral-50 rounded-lg"
-                  data-queue-card
-                >
-                  <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-                    {/* Sample Text */}
-                    <div class="flex-1">
-                      <div class="mb-4">
-                        <div class="flex items-center gap-2 mb-2">
-                          <h3 class="text-lg font-semibold text-gray-900">
-                            Sample #{item.id}
-                          </h3>
-                          <span class="px-2 py-0.5 text-xs font-medium rounded bg-neutral-200 text-neutral-700">
-                            Reviewed
-                          </span>
-                        </div>
-                        <div class="bg-white p-4 rounded-lg border border-gray-200 max-h-48 overflow-y-auto">
-                          <p class="text-gray-700 whitespace-pre-wrap">
-                            {item.sample_text}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Scores Summary */}
-                      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
-                        <div class="bg-neutral-100 p-3 rounded-lg border border-neutral-200">
-                          <div class="text-xs font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                            Original Score
-                          </div>
-                          <div class="text-xl font-bold text-neutral-900">
-                            {(item.original_score * 100).toFixed(1)}%
-                          </div>
-                        </div>
-
-                        {item.routing_reason ? (
-                          <div class="bg-neutral-100 p-3 rounded-lg border border-neutral-200">
-                            <div class="text-xs font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                              Routing Reason
-                            </div>
-                            <div class="text-sm text-neutral-800">
-                              {item.routing_reason}
-                            </div>
-                          </div>
-                        ) : null}
-
-                        <div class="bg-neutral-100 p-3 rounded-lg border border-neutral-200">
-                          <div class="text-xs font-medium text-neutral-700 uppercase tracking-wide mb-1">
-                            Dimensions
-                          </div>
-                          <div class="text-sm text-neutral-800">
-                            {
-                              Object.keys(item.per_dimension_scores || {})
-                                .length
-                            }{' '}
-                            scored
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Per-dimension Scores */}
-                      {item.per_dimension_scores &&
-                      Object.keys(item.per_dimension_scores).length > 0 ? (
-                        <div class="mb-4">
-                          <h4 class="text-sm font-semibold text-gray-900 mb-2">
-                            Per-dimension Scores
-                          </h4>
-                          <div class="flex flex-wrap gap-2">
-                            {Object.entries(item.per_dimension_scores).map(
-                              ([dimension, score]) => (
-                                <div class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">
-                                  {dimension}: {(score * 100).toFixed(0)}%
-                                </div>
-                              ),
-                            )}
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-
-                    {/* Promote Action */}
-                    <div class="lg:w-64">
-                      <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                        Promotion
-                      </h3>
-                      <p class="text-sm text-gray-600 mb-4">
-                        This item has been reviewed and is ready to be promoted
-                        to the next stage.
-                      </p>
-                      <button
-                        type="button"
-                        data-promote-btn
-                        onclick={`handlePromote(${item.id}, 'validated')`}
-                        class="w-full bg-neutral-800 hover:bg-neutral-900 text-white font-medium py-2.5 px-4 rounded-md transition duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2"
-                      >
-                        Promote to Validated
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div
-              class="text-center py-12 bg-gray-100 rounded-lg"
-              data-empty-reviewed
-            >
-              <div class="mx-auto w-24 h-24 bg-neutral-200 rounded-full flex items-center justify-center mb-6">
-                <span class="text-3xl">✓</span>
               </div>
-              <h3 class="text-2xl font-bold text-gray-700 mb-3">
-                No items ready for promotion
-              </h3>
-              <p class="text-gray-600 max-w-md mx-auto">
-                Reviewed items will appear here ready for promotion to the next
-                workflow stage.
-              </p>
+            ))}
+          </div>
+        ) : (
+          <div
+            class="text-center py-12 bg-gray-100 rounded-lg"
+            data-empty-reviewed
+          >
+            <div class="mx-auto w-24 h-24 bg-neutral-200 rounded-full flex items-center justify-center mb-6">
+              <span class="text-3xl">✓</span>
             </div>
-          )
-        }
+            <h3 class="text-2xl font-bold text-gray-700 mb-3">
+              No items ready for promotion
+            </h3>
+            <p class="text-gray-600 max-w-md mx-auto">
+              Reviewed items will appear here ready for promotion to the next
+              workflow stage.
+            </p>
+          </div>
+        )}
       </div>
     </section>
 
@@ -680,8 +661,7 @@ const handlePromote = `
   </main>
 </Layout>
 
-<script is:inline set:html={handleSubmit + handlePromote} />
-
+<script is:inline set:html={handleSubmit + handlePromote}></script>
 <style>
   /* Custom styles */
   .items-container {

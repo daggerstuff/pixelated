@@ -65,14 +65,12 @@ const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
           <time datetime={formattedDate.toISOString()}>
             {formatDate(formattedDate)}
           </time>
-          {
-            readingTime && readingTime > 0 && (
-              <>
-                <span class="mx-2">·</span>
-                <span>{readingTime} min read</span>
-              </>
-            )
-          }
+          {readingTime && readingTime > 0 && (
+            <>
+              <span class="mx-2">·</span>
+              <span>{readingTime} min read</span>
+            </>
+          )}
         </div>
 
         <h1
@@ -85,36 +83,32 @@ const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
         {description && <p class="lede-text">{description}</p>}
       </div>
 
-      {
-        tags && tags.length > 0 && (
-          <div class="flex flex-wrap gap-2 mb-6">
-            {tags.map((tag: unknown) => (
-              <a
-                href={`/blog/tags/${tag}`}
-                class="eyebrow-text px-3 py-1 rounded-full transition-colors"
-                style="background: var(--bg-elevated); border: 1px solid var(--border-primary); color: var(--text-secondary);"
-                onmouseover="this.style.background='var(--bg-card)'; this.style.borderColor='var(--accent-primary)'; this.style.color='var(--accent-primary)'"
-                onmouseout="this.style.background='var(--bg-elevated)'; this.style.borderColor='var(--border-primary)'; this.style.color='var(--text-secondary)'"
-                transition:animate="slide"
-                data-astro-prefetch
-              >
-                {tag}
-              </a>
-            ))}
-          </div>
-        )
-      }
+      {tags && tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 mb-6">
+          {tags.map((tag: unknown) => (
+            <a
+              href={`/blog/tags/${tag}`}
+              class="eyebrow-text px-3 py-1 rounded-full transition-colors"
+              style="background: var(--bg-elevated); border: 1px solid var(--border-primary); color: var(--text-secondary);"
+              onmouseover="this.style.background='var(--bg-card)'; this.style.borderColor='var(--accent-primary)'; this.style.color='var(--accent-primary)'"
+              onmouseout="this.style.background='var(--bg-elevated)'; this.style.borderColor='var(--border-primary)'; this.style.color='var(--text-secondary)'"
+              transition:animate="slide"
+              data-astro-prefetch
+            >
+              {tag}
+            </a>
+          ))}
+        </div>
+      )}
 
-      {
-        image?.url && (
-          <img
-            src={image.url}
-            alt={image.alt || postTitle}
-            class="w-full rounded-lg shadow-md mb-8"
-            transition:name={`image-${entry.data.slug}`}
-          />
-        )
-      }
+      {image?.url && (
+        <img
+          src={image.url}
+          alt={image.alt || postTitle}
+          class="w-full rounded-lg shadow-md mb-8"
+          transition:name={`image-${entry.data.slug}`}
+        />
+      )}
     </header>
 
     <div class="prose dark:prose-invert prose-lg max-w-none">
@@ -142,7 +136,8 @@ const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
             <path
               fill-rule="evenodd"
               d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
-              clip-rule="evenodd"></path>
+              clip-rule="evenodd"
+            ></path>
           </svg>
           back
         </a>

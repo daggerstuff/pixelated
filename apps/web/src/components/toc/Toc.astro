@@ -59,19 +59,15 @@ const specHeadings = generateToc(headings, minHeadingLevel, maxHeadingLevel)
     >
       <div class="toc-desktop-anchor i-ri-menu-2-fill"></div>
       <ul>
-        {
-          !!specHeadings.length &&
-            specHeadings.map((heading) => <TocItem {heading} />)
-        }
+        {!!specHeadings.length &&
+          specHeadings.map((heading) => <TocItem {heading} />)}
         {!!anchors.length && <TocItem {anchors} />}
       </ul>
     </nav>
     <!-- less than 1128px -->
     <TocButton>
-      {
-        !!specHeadings.length &&
-          specHeadings.map((heading) => <TocItem {heading} />)
-      }
+      {!!specHeadings.length &&
+        specHeadings.map((heading) => <TocItem {heading} />)}
       {!!anchors.length && <TocItem {anchors} />}
     </TocButton>
   </table-of-contents>

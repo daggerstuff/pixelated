@@ -183,44 +183,40 @@ if (collectionType === 'prs') {
   role="feed"
   aria-label={`GitHub ${collectionType}`}
 >
-  {
-    collectionType === 'releases' && extendedReleases.length > 0 ? (
-      extendedReleases.map((item, idx) => (
-        <GithubItem
-          collectionType={collectionType}
-          idx={idx}
-          item={item}
-          isDiffMonth={isDiffMonth(
-            item.publishedAt,
-            extendedReleases[idx - 1]?.publishedAt,
-          )}
-        />
-      ))
-    ) : collectionType === 'releases' ? (
-      <p class="text-center op-50" role="status">
-        No releases found
-      </p>
-    ) : null
-  }
-  {
-    collectionType === 'prs' && extendedPrs.length > 0 ? (
-      extendedPrs.map((item, idx) => (
-        <GithubItem
-          collectionType={collectionType}
-          idx={idx}
-          item={item}
-          isDiffMonth={isDiffMonth(
-            item.createdAt,
-            extendedPrs[idx - 1]?.createdAt,
-          )}
-        />
-      ))
-    ) : collectionType === 'prs' ? (
-      <p class="text-center op-50" role="status">
-        No pull requests found
-      </p>
-    ) : null
-  }
+  {collectionType === 'releases' && extendedReleases.length > 0 ? (
+    extendedReleases.map((item, idx) => (
+      <GithubItem
+        {collectionType}
+        {idx}
+        {item}
+        isDiffMonth={isDiffMonth(
+          item.publishedAt,
+          extendedReleases[idx - 1]?.publishedAt,
+        )}
+      />
+    ))
+  ) : collectionType === 'releases' ? (
+    <p class="text-center op-50" role="status">
+      No releases found
+    </p>
+  ) : null}
+  {collectionType === 'prs' && extendedPrs.length > 0 ? (
+    extendedPrs.map((item, idx) => (
+      <GithubItem
+        {collectionType}
+        {idx}
+        {item}
+        isDiffMonth={isDiffMonth(
+          item.createdAt,
+          extendedPrs[idx - 1]?.createdAt,
+        )}
+      />
+    ))
+  ) : collectionType === 'prs' ? (
+    <p class="text-center op-50" role="status">
+      No pull requests found
+    </p>
+  ) : null}
 </div>
 
 <div
@@ -259,9 +255,11 @@ if (collectionType === 'prs') {
     Inspired by
     <Link
       class="op-100!"
-      href={collectionType === 'releases'
-        ? 'https://releases.antfu.me/'
-        : 'https://prs.atinux.com/'}
+      href={
+        collectionType === 'releases'
+          ? 'https://releases.antfu.me/'
+          : 'https://prs.atinux.com/'
+      }
     >
       {collectionType === 'releases' ? 'releases.antfu.me' : 'prs.atinux.com'}
     </Link>

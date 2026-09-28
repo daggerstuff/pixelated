@@ -190,36 +190,34 @@ const deletionReasons = [
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {
-            dataCategories.map((category) => (
-              <div class="flex items-start">
-                <div class="flex items-center h-5">
-                  <input
-                    type="checkbox"
-                    id={`category-${category.id}`}
-                    name="data-categories"
-                    value={category.id}
-                    aria-describedby={`category-desc-${category.id}`}
-                    class="h-4 w-4 text-foreground border-input rounded-none focus:ring-ring"
-                  />
-                </div>
-                <div class="ml-3 text-sm">
-                  <label
-                    for={`category-${category.id}`}
-                    class="font-medium text-foreground"
-                  >
-                    {category.label}
-                  </label>
-                  <p
-                    id={`category-desc-${category.id}`}
-                    class="text-muted-foreground"
-                  >
-                    {category.description}
-                  </p>
-                </div>
+          {dataCategories.map((category) => (
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input
+                  type="checkbox"
+                  id={`category-${category.id}`}
+                  name="data-categories"
+                  value={category.id}
+                  aria-describedby={`category-desc-${category.id}`}
+                  class="h-4 w-4 text-foreground border-input rounded-none focus:ring-ring"
+                />
               </div>
-            ))
-          }
+              <div class="ml-3 text-sm">
+                <label
+                  for={`category-${category.id}`}
+                  class="font-medium text-foreground"
+                >
+                  {category.label}
+                </label>
+                <p
+                  id={`category-desc-${category.id}`}
+                  class="text-muted-foreground"
+                >
+                  {category.description}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -242,13 +240,11 @@ const deletionReasons = [
           required
         >
           <option value="">Select a reason...</option>
-          {
-            deletionReasons.map((reason) => (
-              <option value={reason.id}>
-                {reason.label} - {reason.description}
-              </option>
-            ))
-          }
+          {deletionReasons.map((reason) => (
+            <option value={reason.id}>
+              {reason.label} - {reason.description}
+            </option>
+          ))}
         </select>
       </div>
 

@@ -60,7 +60,9 @@ const initialTodosJson = JSON.stringify(initialTodos || [])
       x-model="newTodo"
       @keyup.enter="addTodo()"
     />
-    <button class="todo-button add-button" @click="addTodo()">Add</button>
+    <button class="todo-button add-button" @click="addTodo()">
+      Add
+    </button>
   </div>
 
   <ul class="todo-list">
@@ -75,10 +77,14 @@ const initialTodosJson = JSON.stringify(initialTodos || [])
           <button
             class="todo-button complete-button"
             @click="toggleComplete(todo.id)"
-            x-text="todo.completed ? '↩️' : '✓'"></button>
-          <button class="todo-button delete-button" @click="deleteTodo(todo.id)"
-            >×</button
+            x-text="todo.completed ? '↩️' : '✓'"
+          ></button>
+          <button
+            class="todo-button delete-button"
+            @click="deleteTodo(todo.id)"
           >
+            ×
+          </button>
         </div>
       </li>
     </template>

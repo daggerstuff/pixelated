@@ -135,9 +135,9 @@ const formatActionLabel = (action: string): string => {
         </p>
         <div class="flex items-center mt-4 text-muted-foreground">
           <Icon name="trending-up" class="w-4 h-4 mr-1" />
-          <span class="text-sm font-medium"
-            >{complianceMetrics.totalRequests.change} from previous month</span
-          >
+          <span class="text-sm font-medium">
+            {complianceMetrics.totalRequests.change} from previous month
+          </span>
         </div>
       </div>
     </div>
@@ -149,26 +149,24 @@ const formatActionLabel = (action: string): string => {
       </h4>
 
       <div class="space-y-3">
-        {
-          complianceMetrics.requestTypes.map((type) => (
-            <div>
-              <div class="flex justify-between items-center">
-                <span class="text-sm font-medium text-foreground">
-                  {type.type}
-                </span>
-                <span class="text-sm text-foreground">
-                  {type.count} ({type.percentage}%)
-                </span>
-              </div>
-              <div class="mt-1 w-full bg-secondary rounded-none h-2.5">
-                <div
-                  class="bg-primary h-2.5 rounded-none"
-                  style={`width: ${type.percentage}%`}
-                />
-              </div>
+        {complianceMetrics.requestTypes.map((type) => (
+          <div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium text-foreground">
+                {type.type}
+              </span>
+              <span class="text-sm text-foreground">
+                {type.count} ({type.percentage}%)
+              </span>
             </div>
-          ))
-        }
+            <div class="mt-1 w-full bg-secondary rounded-none h-2.5">
+              <div
+                class="bg-primary h-2.5 rounded-none"
+                style={`width: ${type.percentage}%`}
+              />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   </div>
@@ -217,31 +215,29 @@ const formatActionLabel = (action: string): string => {
             </tr>
           </thead>
           <tbody class="bg-card divide-y divide-border">
-            {
-              auditLogEntries.map((entry) => (
-                <tr class="hover:bg-secondary">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                    {formatDate(entry.date)}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                    {entry.requestId}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                    <span
-                      class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${getActionBadgeClass(entry.action)}`}
-                    >
-                      {formatActionLabel(entry.action)}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                    {entry.user}
-                  </td>
-                  <td class="px-6 py-4 text-sm text-muted-foreground">
-                    {entry.details}
-                  </td>
-                </tr>
-              ))
-            }
+            {auditLogEntries.map((entry) => (
+              <tr class="hover:bg-secondary">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  {formatDate(entry.date)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                  {entry.requestId}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  <span
+                    class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${getActionBadgeClass(entry.action)}`}
+                  >
+                    {formatActionLabel(entry.action)}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  {entry.user}
+                </td>
+                <td class="px-6 py-4 text-sm text-muted-foreground">
+                  {entry.details}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -350,9 +346,7 @@ const formatActionLabel = (action: string): string => {
                   Generated on Jun 15, 2025
                 </p>
               </div>
-              <button
-                class="text-foreground hover:text-foreground font-medium font-medium"
-              >
+              <button class="text-foreground hover:text-foreground font-medium font-medium">
                 <Icon name="download" class="h-5 w-5" />
               </button>
             </div>
@@ -367,9 +361,7 @@ const formatActionLabel = (action: string): string => {
                   Generated on Jun 10, 2025
                 </p>
               </div>
-              <button
-                class="text-foreground hover:text-foreground font-medium font-medium"
-              >
+              <button class="text-foreground hover:text-foreground font-medium font-medium">
                 <Icon name="download" class="h-5 w-5" />
               </button>
             </div>
@@ -384,9 +376,7 @@ const formatActionLabel = (action: string): string => {
                   Generated on Jun 5, 2025
                 </p>
               </div>
-              <button
-                class="text-foreground hover:text-foreground font-medium font-medium"
-              >
+              <button class="text-foreground hover:text-foreground font-medium font-medium">
                 <Icon name="download" class="h-5 w-5" />
               </button>
             </div>

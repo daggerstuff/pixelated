@@ -55,8 +55,9 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
             <label
               for="templateName"
               class="block text-sm font-medium text-foreground mb-1"
-              >Template Name*</label
             >
+              Template Name*
+            </label>
             <input
               type="text"
               id="templateName"
@@ -71,8 +72,9 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
             <label
               for="templateVersion"
               class="block text-sm font-medium text-foreground mb-1"
-              >Version*</label
             >
+              Version*
+            </label>
             <input
               type="text"
               id="templateVersion"
@@ -87,8 +89,9 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
             <label
               for="templateDescription"
               class="block text-sm font-medium text-foreground mb-1"
-              >Description*</label
             >
+              Description*
+            </label>
             <textarea
               id="templateDescription"
               name="templateDescription"
@@ -103,8 +106,9 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
             <label
               for="associateTypes"
               class="block text-sm font-medium text-foreground mb-1"
-              >Associate Types*</label
             >
+              Associate Types*
+            </label>
             <select
               id="associateTypes"
               name="associateTypes"
@@ -113,11 +117,9 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               size="5"
             >
-              {
-                associateTypeOptions.map((option) => (
-                  <option value={option.value}>{option.label}</option>
-                ))
-              }
+              {associateTypeOptions.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))}
             </select>
             <p class="text-xs text-muted-foreground mt-1">
               Hold Ctrl/Cmd to select multiple types
@@ -128,8 +130,9 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
             <label
               for="serviceCategories"
               class="block text-sm font-medium text-foreground mb-1"
-              >Service Categories*</label
             >
+              Service Categories*
+            </label>
             <select
               id="serviceCategories"
               name="serviceCategories"
@@ -138,11 +141,9 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               size="5"
             >
-              {
-                serviceCategoryOptions.map((option) => (
-                  <option value={option.value}>{option.label}</option>
-                ))
-              }
+              {serviceCategoryOptions.map((option) => (
+                <option value={option.value}>{option.label}</option>
+              ))}
             </select>
             <p class="text-xs text-muted-foreground mt-1">
               Hold Ctrl/Cmd to select multiple categories
@@ -152,8 +153,10 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div>
             <label
               for="tags"
-              class="block text-sm font-medium text-foreground mb-1">Tags</label
+              class="block text-sm font-medium text-foreground mb-1"
             >
+              Tags
+            </label>
             <input
               type="text"
               id="tags"

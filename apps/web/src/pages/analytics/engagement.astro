@@ -131,109 +131,107 @@ const activityTableColumns: Column[] = [
           columns={2}
           widgetGap="medium"
         >
-          {
-            error ? (
-              <div class="col-span-2 text-center text-red-600 font-semibold py-8">
-                Failed to load engagement metrics: {error}
-              </div>
-            ) : !metrics ? (
-              <div class="col-span-2 text-center text-gray-500 py-8">
-                Loading engagement metrics...
-              </div>
-            ) : (
-              <>
-                {/* Key Metrics Row */}
-                <MetricWidget
-                  client:load
-                  title="Total Sessions"
-                  metricName="total_sessions"
-                  value={metrics.totalSessions}
-                  previousValue={undefined}
-                />
-                <MetricWidget
-                  client:load
-                  title="Engagement Rate"
-                  metricName="engagement_rate"
-                  value={metrics.engagementRate}
-                  previousValue={undefined}
-                  format="percentage"
-                />
-                <MetricWidget
-                  client:visible
-                  title="Avg. Session Duration"
-                  metricName="avg_session_duration"
-                  value={metrics.avgSessionDuration}
-                  previousValue={undefined}
-                  suffix=" min"
-                />
-                <MetricWidget
-                  client:visible
-                  title="Active Users"
-                  metricName="active_users"
-                  value={metrics.activeUsers}
-                  previousValue={undefined}
-                />
+          {error ? (
+            <div class="col-span-2 text-center text-red-600 font-semibold py-8">
+              Failed to load engagement metrics: {error}
+            </div>
+          ) : !metrics ? (
+            <div class="col-span-2 text-center text-gray-500 py-8">
+              Loading engagement metrics...
+            </div>
+          ) : (
+            <>
+              {/* Key Metrics Row */}
+              <MetricWidget
+                client:load
+                title="Total Sessions"
+                metricName="total_sessions"
+                value={metrics.totalSessions}
+                previousValue={undefined}
+              />
+              <MetricWidget
+                client:load
+                title="Engagement Rate"
+                metricName="engagement_rate"
+                value={metrics.engagementRate}
+                previousValue={undefined}
+                format="percentage"
+              />
+              <MetricWidget
+                client:visible
+                title="Avg. Session Duration"
+                metricName="avg_session_duration"
+                value={metrics.avgSessionDuration}
+                previousValue={undefined}
+                suffix=" min"
+              />
+              <MetricWidget
+                client:visible
+                title="Active Users"
+                metricName="active_users"
+                value={metrics.activeUsers}
+                previousValue={undefined}
+              />
 
-                {/* Charts Row */}
-                <ChartWidget
+              {/* Charts Row */}
+              <ChartWidget
+                client:visible
+                title="Session Trends"
+                description="Daily session count and unique users"
+                chartType="line"
+                labels={metrics.sessionTrends.labels}
+                series={metrics.sessionTrends.series}
+                isTimeSeries={true}
+                allowRangeSelection={true}
+                height={300}
+              />
+              <ChartWidget
+                client:visible
+                title="Engagement Rate Trend"
+                description="Daily engagement rate percentage"
+                chartType="line"
+                labels={metrics.engagementRateTrend.labels}
+                series={metrics.engagementRateTrend.series}
+                isTimeSeries={true}
+                allowRangeSelection={true}
+                height={300}
+              />
+              <ChartWidget
+                client:visible
+                title="Session Duration Trend"
+                description="Average daily session duration in minutes"
+                chartType="line"
+                labels={metrics.sessionDurationTrend.labels}
+                series={metrics.sessionDurationTrend.series}
+                isTimeSeries={true}
+                allowRangeSelection={true}
+                height={300}
+              />
+              <ChartWidget
+                client:visible
+                title="Interaction Breakdown"
+                description="Percentage distribution of user interactions"
+                chartType="pie"
+                labels={metrics.interactionBreakdown.map(
+                  (i: { label: string }) => i.label,
+                )}
+                series={metrics.interactionBreakdown}
+                height={300}
+              />
+              <div class="col-span-1 lg:col-span-2">
+                <TableWidget
                   client:visible
-                  title="Session Trends"
-                  description="Daily session count and unique users"
-                  chartType="line"
-                  labels={metrics.sessionTrends.labels}
-                  series={metrics.sessionTrends.series}
-                  isTimeSeries={true}
-                  allowRangeSelection={true}
-                  height={300}
+                  title="Recent Activity"
+                  description="Latest user engagement events"
+                  columns={activityTableColumns}
+                  data={metrics.recentActivity}
+                  enableSearch={true}
+                  enableExport={true}
+                  pagination={{ pageSize: 5 }}
                 />
-                <ChartWidget
-                  client:visible
-                  title="Engagement Rate Trend"
-                  description="Daily engagement rate percentage"
-                  chartType="line"
-                  labels={metrics.engagementRateTrend.labels}
-                  series={metrics.engagementRateTrend.series}
-                  isTimeSeries={true}
-                  allowRangeSelection={true}
-                  height={300}
-                />
-                <ChartWidget
-                  client:visible
-                  title="Session Duration Trend"
-                  description="Average daily session duration in minutes"
-                  chartType="line"
-                  labels={metrics.sessionDurationTrend.labels}
-                  series={metrics.sessionDurationTrend.series}
-                  isTimeSeries={true}
-                  allowRangeSelection={true}
-                  height={300}
-                />
-                <ChartWidget
-                  client:visible
-                  title="Interaction Breakdown"
-                  description="Percentage distribution of user interactions"
-                  chartType="pie"
-                  labels={metrics.interactionBreakdown.map(
-                    (i: { label: string }) => i.label,
-                  )}
-                  series={metrics.interactionBreakdown}
-                  height={300}
-                />
-                <div class="col-span-1 lg:col-span-2">
-                  <TableWidget
-                    client:visible
-                    title="Recent Activity"
-                    description="Latest user engagement events"
-                    columns={activityTableColumns}
-                    data={metrics.recentActivity}
-                    enableSearch={true}
-                    enableExport={true}
-                    pagination={{ pageSize: 5 }}
-                  />
-                </div>
-              </>
-            )
-          }
+              </div>
+            </>
+          )}
         </AnalyticsDashboard>
       </div>
     </div>

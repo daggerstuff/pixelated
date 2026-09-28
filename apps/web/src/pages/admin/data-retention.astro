@@ -73,13 +73,9 @@ const compliancePercentage = Math.round(
 <AdminLayout {title} {description} activeItem="data-retention">
   <div class="space-y-6">
     <!-- Header Section -->
-    <div
-      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-    >
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-foreground">
-          {title}
-        </h1>
+        <h1 class="text-2xl font-bold text-foreground">{title}</h1>
         <p class="mt-1 text-muted-foreground">
           Manage retention policies and automated archiving for patient data
         </p>
@@ -117,12 +113,11 @@ const compliancePercentage = Math.round(
             <div
               class="h-4 bg-primary rounded-none"
               style={`width: ${compliancePercentage}%`}
-            >
-            </div>
+            ></div>
           </div>
-          <span class="ml-3 text-sm font-medium text-foreground"
-            >{compliancePercentage}%</span
-          >
+          <span class="ml-3 text-sm font-medium text-foreground">
+            {compliancePercentage}%
+          </span>
         </div>
 
         <div class="grid grid-cols-3 gap-2 text-center">
@@ -148,39 +143,33 @@ const compliancePercentage = Math.round(
       </div>
 
       <!-- Quick Stats Cards -->
-      <div
-        class="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-      >
-        {
-          quickStats.map((stat) => (
-            <div class="bg-card rounded-none p-5">
-              <div class="flex justify-between items-start">
-                <div>
-                  <p class="text-sm font-medium text-muted-foreground">
-                    {stat.label}
-                  </p>
-                  <p class="text-2xl font-bold text-foreground mt-1">
-                    {stat.value}
-                  </p>
-                </div>
-                <div class="p-3 rounded-none bg-secondary border border-input">
-                  <Icon name={stat.icon} class="w-6 h-6 text-foreground" />
-                </div>
+      <div class="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {quickStats.map((stat) => (
+          <div class="bg-card rounded-none p-5">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-sm font-medium text-muted-foreground">
+                  {stat.label}
+                </p>
+                <p class="text-2xl font-bold text-foreground mt-1">
+                  {stat.value}
+                </p>
               </div>
-              <div
-                class={`flex items-center mt-4 ${getTrendClass(stat.trend)}`}
-              >
-                <Icon
-                  name={stat.trend === 'up' ? 'trending-up' : 'trending-down'}
-                  class="w-4 h-4 mr-1"
-                />
-                <span class="text-sm font-medium">
-                  {stat.change} from last month
-                </span>
+              <div class="p-3 rounded-none bg-secondary border border-input">
+                <Icon name={stat.icon} class="w-6 h-6 text-foreground" />
               </div>
             </div>
-          ))
-        }
+            <div class={`flex items-center mt-4 ${getTrendClass(stat.trend)}`}>
+              <Icon
+                name={stat.trend === 'up' ? 'trending-up' : 'trending-down'}
+                class="w-4 h-4 mr-1"
+              />
+              <span class="text-sm font-medium">
+                {stat.change} from last month
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
 

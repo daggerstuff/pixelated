@@ -44,61 +44,57 @@ if (type === 'social') {
 }
 ---
 
-{
-  type === 'internal' &&
-    (!mobileItemType ? (
+{type === 'internal' &&
+  (!mobileItemType ? (
+    <Link href={item.link} class={classList}>
+      {item.name}
+    </Link>
+  ) : mobileItemType === 'icon' ? (
+    <div class="py-3">
       <Link href={item.link} class={classList}>
-        {item.name}
+        {item.icon ? <i class={item.icon} /> : null}
+        <span>{item.name}</span>
       </Link>
-    ) : mobileItemType === 'icon' ? (
-      <div class="py-3">
-        <Link href={item.link} class={classList}>
-          {item.icon ? <i class={item.icon} /> : null}
-          <span>{item.name}</span>
-        </Link>
-        {item.desc && <div class="pl-7 op-50 text-xs">{item.desc}</div>}
-      </div>
-    ) : (
-      <Link href={item.link} class={classList}>
-        {item.name}
-      </Link>
-    ))
-}
+      {item.desc && <div class="pl-7 op-50 text-xs">{item.desc}</div>}
+    </div>
+  ) : (
+    <Link href={item.link} class={classList}>
+      {item.name}
+    </Link>
+  ))}
 
-{
-  type === 'social' &&
-    (!mobileItemType ? (
-      <a
-        href={item.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        class={externalClass}
-      >
-        {item.icon ? <i class={item.icon} /> : item.name}
-        <span class="sr-only">{item.name}</span>
-      </a>
-    ) : mobileItemType === 'icon' ? (
-      <div class="py-3">
-        <a
-          href={item.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          class={classList}
-        >
-          {item.icon ? <i class={item.icon} /> : null}
-          <span>{item.name}</span>
-        </a>
-        {item.desc && <div class="pl-7 op-50 text-xs">{item.desc}</div>}
-      </div>
-    ) : (
+{type === 'social' &&
+  (!mobileItemType ? (
+    <a
+      href={item.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      class={externalClass}
+    >
+      {item.icon ? <i class={item.icon} /> : item.name}
+      <span class="sr-only">{item.name}</span>
+    </a>
+  ) : mobileItemType === 'icon' ? (
+    <div class="py-3">
       <a
         href={item.link}
         target="_blank"
         rel="noopener noreferrer"
         class={classList}
       >
-        {item.icon && <i class={item.icon} />}
+        {item.icon ? <i class={item.icon} /> : null}
         <span>{item.name}</span>
       </a>
-    ))
-}
+      {item.desc && <div class="pl-7 op-50 text-xs">{item.desc}</div>}
+    </div>
+  ) : (
+    <a
+      href={item.link}
+      target="_blank"
+      rel="noopener noreferrer"
+      class={classList}
+    >
+      {item.icon && <i class={item.icon} />}
+      <span>{item.name}</span>
+    </a>
+  ))}

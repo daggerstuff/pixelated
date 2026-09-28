@@ -117,9 +117,7 @@ const universityResults = [
   <section class="brutalist-section">
     <div class="brutalist-container">
       <div class="text-center mb-12">
-        <div
-          class="status-indicator status-indicator--warning inline-flex mb-6"
-        >
+        <div class="status-indicator status-indicator--warning inline-flex mb-6">
           <div class="pulse-dot pulse-dot--blue"></div>
           <span class="font-bold">CRISIS TRAINING ACTIVE</span>
         </div>
@@ -141,15 +139,13 @@ const universityResults = [
   <section class="brutalist-section bg-gray-900/50">
     <div class="brutalist-container">
       <div class="dashboard-grid">
-        {
-          technicalSpecs.map((spec) => (
-            <div class="metric-card hover-lift">
-              <div class="metric-value text-red-400">{spec.value}</div>
-              <div class="metric-label">{spec.metric}</div>
-              <div class="text-xs text-gray-400 mt-2">{spec.comparison}</div>
-            </div>
-          ))
-        }
+        {technicalSpecs.map((spec) => (
+          <div class="metric-card hover-lift">
+            <div class="metric-value text-red-400">{spec.value}</div>
+            <div class="metric-label">{spec.metric}</div>
+            <div class="text-xs text-gray-400 mt-2">{spec.comparison}</div>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -180,9 +176,7 @@ const universityResults = [
           <div class="chat-container">
             <div class="chat-header">
               <div class="flex items-center gap-3">
-                <div
-                  class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center"
-                >
+                <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
                   <span class="text-red-400">👤</span>
                 </div>
                 <div>
@@ -250,22 +244,20 @@ const universityResults = [
       </div>
 
       <div class="brutalist-grid brutalist-grid--2">
-        {
-          impossibleScenarios.map((scenario) => (
-            <BrutalistCard hover={true}>
-              <div class="space-y-4">
-                <div class="text-5xl text-center">{scenario.icon}</div>
-                <div class="brutalist-badge brutalist-badge--danger text-center">
-                  PREVIOUSLY IMPOSSIBLE TO PRACTICE SAFELY
-                </div>
-                <h3 class="brutalist-subheading text-lg">{scenario.title}</h3>
-                <p class="text-gray-400 leading-relaxed">
-                  {scenario.description}
-                </p>
+        {impossibleScenarios.map((scenario) => (
+          <BrutalistCard hover={true}>
+            <div class="space-y-4">
+              <div class="text-5xl text-center">{scenario.icon}</div>
+              <div class="brutalist-badge brutalist-badge--danger text-center">
+                PREVIOUSLY IMPOSSIBLE TO PRACTICE SAFELY
               </div>
-            </BrutalistCard>
-          ))
-        }
+              <h3 class="brutalist-subheading text-lg">{scenario.title}</h3>
+              <p class="text-gray-400 leading-relaxed">
+                {scenario.description}
+              </p>
+            </div>
+          </BrutalistCard>
+        ))}
       </div>
     </div>
   </section>
@@ -286,24 +278,20 @@ const universityResults = [
       </div>
 
       <div class="brutalist-grid brutalist-grid--3">
-        {
-          universityResults.map((result) => (
-            <BrutalistCard hover={true}>
-              <div class="text-center space-y-4">
-                <div class="text-5xl">🏛️</div>
-                <h3 class="brutalist-subheading text-lg">
-                  {result.university}
-                </h3>
-                <div class="text-2xl font-bold text-green-400">
-                  {result.result}
-                </div>
-                <p class="text-gray-400 text-sm leading-relaxed">
-                  {result.detail}
-                </p>
+        {universityResults.map((result) => (
+          <BrutalistCard hover={true}>
+            <div class="text-center space-y-4">
+              <div class="text-5xl">🏛️</div>
+              <h3 class="brutalist-subheading text-lg">{result.university}</h3>
+              <div class="text-2xl font-bold text-green-400">
+                {result.result}
               </div>
-            </BrutalistCard>
-          ))
-        }
+              <p class="text-gray-400 text-sm leading-relaxed">
+                {result.detail}
+              </p>
+            </div>
+          </BrutalistCard>
+        ))}
       </div>
     </div>
   </section>
@@ -346,11 +334,11 @@ const universityResults = [
   <section class="brutalist-section">
     <div class="brutalist-container">
       <div class="mental-health-safe max-w-4xl mx-auto text-center">
-        <div class="text-6xl mb-6"><TargetIcon className="w-24 h-24" /></div>
+        <div class="text-6xl mb-6">
+          <TargetIcon className="w-24 h-24" />
+        </div>
 
-        <div
-          class="status-indicator status-indicator--warning inline-flex mb-6"
-        >
+        <div class="status-indicator status-indicator--warning inline-flex mb-6">
           <div class="pulse-dot pulse-dot--blue"></div>
           <span class="font-bold">LIMITED BETA ACCESS AVAILABLE</span>
         </div>

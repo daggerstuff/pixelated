@@ -26,23 +26,35 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       </thead>
       <tbody>
         <tr class="tier-free">
-          <td>Free</td><td>60</td><td>1,000</td><td>10,000</td><td>10</td>
+          <td>Free</td>
+          <td>60</td>
+          <td>1,000</td>
+          <td>10,000</td>
+          <td>10</td>
           <td>Basic access for evaluation and testing</td>
         </tr>
         <tr class="tier-developer">
-          <td>Developer</td><td>200</td><td>5,000</td><td>50,000</td><td>25</td>
+          <td>Developer</td>
+          <td>200</td>
+          <td>5,000</td>
+          <td>50,000</td>
+          <td>25</td>
           <td>Standard developer access</td>
         </tr>
         <tr class="tier-professional">
-          <td>Professional</td><td>1,000</td><td>25,000</td><td>250,000</td><td
-            >50</td
-          >
+          <td>Professional</td>
+          <td>1,000</td>
+          <td>25,000</td>
+          <td>250,000</td>
+          <td>50</td>
           <td>Production workloads</td>
         </tr>
         <tr class="tier-enterprise">
-          <td>Enterprise</td><td>5,000</td><td>100,000</td><td>1,000,000</td><td
-            >100</td
-          >
+          <td>Enterprise</td>
+          <td>5,000</td>
+          <td>100,000</td>
+          <td>1,000,000</td>
+          <td>100</td>
           <td>High-volume enterprise access</td>
         </tr>
       </tbody>
@@ -53,28 +65,28 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
     <h3>Overview Stats</h3>
     <div class="stats-grid" id="stats-grid">
       <div class="stat-card">
-        <span class="stat-label">Total Active Keys</span><span
-          class="stat-value"
-          id="stat-total">—</span
-        >
+        <span class="stat-label">Total Active Keys</span>
+        <span class="stat-value" id="stat-total">
+          —
+        </span>
       </div>
       <div class="stat-card alert">
-        <span class="stat-label">Near Rate Limit</span><span
-          class="stat-value"
-          id="stat-rate">—</span
-        >
+        <span class="stat-label">Near Rate Limit</span>
+        <span class="stat-value" id="stat-rate">
+          —
+        </span>
       </div>
       <div class="stat-card alert">
-        <span class="stat-label">Near Daily Quota</span><span
-          class="stat-value"
-          id="stat-daily">—</span
-        >
+        <span class="stat-label">Near Daily Quota</span>
+        <span class="stat-value" id="stat-daily">
+          —
+        </span>
       </div>
       <div class="stat-card alert">
-        <span class="stat-label">Near Monthly Quota</span><span
-          class="stat-value"
-          id="stat-monthly">—</span
-        >
+        <span class="stat-label">Near Monthly Quota</span>
+        <span class="stat-value" id="stat-monthly">
+          —
+        </span>
       </div>
     </div>
   </section>
@@ -106,7 +118,11 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         </tr>
       </thead>
       <tbody id="usage-tbody">
-        <tr><td colspan="7" class="muted">Loading…</td></tr>
+        <tr>
+          <td colspan="7" class="muted">
+            Loading…
+          </td>
+        </tr>
       </tbody>
     </table>
   </section>
@@ -115,33 +131,48 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
     <h3>API Endpoints</h3>
     <table class="endpoint-table">
       <thead>
-        <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+        <tr>
+          <th>Method</th>
+          <th>Endpoint</th>
+          <th>Description</th>
+        </tr>
       </thead>
       <tbody>
-        <tr
-          ><td>GET</td><td><code>/api/v1/admin/rate-limits</code></td><td
-            >List usage for all active keys</td
-          ></tr
-        >
-        <tr
-          ><td>GET</td><td><code>/api/v1/admin/rate-limits?stats=true</code></td
-          ><td>Aggregate stats (near-limit counts, tier distribution)</td></tr
-        >
-        <tr
-          ><td>GET</td><td><code>/api/v1/admin/rate-limits/alerts</code></td><td
-            >Active quota alerts</td
-          ></tr
-        >
-        <tr
-          ><td>GET</td><td><code>/api/developer/rate-limits/usage</code></td><td
-            >Usage for current user's keys</td
-          ></tr
-        >
-        <tr
-          ><td>GET</td><td
-            ><code>/api/developer/rate-limits/usage?keyId=X</code></td
-          ><td>Usage for specific key</td></tr
-        >
+        <tr>
+          <td>GET</td>
+          <td>
+            <code>/api/v1/admin/rate-limits</code>
+          </td>
+          <td>List usage for all active keys</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>
+            <code>/api/v1/admin/rate-limits?stats=true</code>
+          </td>
+          <td>Aggregate stats (near-limit counts, tier distribution)</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>
+            <code>/api/v1/admin/rate-limits/alerts</code>
+          </td>
+          <td>Active quota alerts</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>
+            <code>/api/developer/rate-limits/usage</code>
+          </td>
+          <td>Usage for current user's keys</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>
+            <code>/api/developer/rate-limits/usage?keyId=X</code>
+          </td>
+          <td>Usage for specific key</td>
+        </tr>
       </tbody>
     </table>
   </section>

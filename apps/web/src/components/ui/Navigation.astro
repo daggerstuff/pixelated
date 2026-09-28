@@ -51,32 +51,30 @@ const currentPath = Astro.url.pathname
     </a>
 
     <div class="hidden md:flex items-center gap-6">
-      {
-        menuItems.map((item) => {
-          // Check if this is the current page
-          const isActive =
-            (item.link === '/' && currentPath === '/') ||
-            (item.link !== '/' && currentPath.startsWith(item.link))
-          return (
-            <a
-              href={item.link}
-              class:list={[
-                'relative transition-colors',
-                isActive
-                  ? 'text-primary font-medium'
-                  : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary',
-              ]}
-              transition:animate="slide"
-              aria-current={isActive ? 'page' : undefined}
-            >
-              {item.text}
-              {isActive && (
-                <span class="absolute bottom-0 left-0 w-full h-0.5 bg-primary -mb-1.5" />
-              )}
-            </a>
-          )
-        })
-      }
+      {menuItems.map((item) => {
+        // Check if this is the current page
+        const isActive =
+          (item.link === '/' && currentPath === '/') ||
+          (item.link !== '/' && currentPath.startsWith(item.link))
+        return (
+          <a
+            href={item.link}
+            class:list={[
+              'relative transition-colors',
+              isActive
+                ? 'text-primary font-medium'
+                : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary',
+            ]}
+            transition:animate="slide"
+            aria-current={isActive ? 'page' : undefined}
+          >
+            {item.text}
+            {isActive && (
+              <span class="absolute bottom-0 left-0 w-full h-0.5 bg-primary -mb-1.5" />
+            )}
+          </a>
+        )
+      })}
     </div>
 
     <div class="flex items-center gap-4" transition:animate="slide">
@@ -109,29 +107,27 @@ const currentPath = Astro.url.pathname
   <!-- Mobile menu -->
   <div id="mobile-menu" class="md:hidden hidden">
     <div class="container mx-auto px-4 py-4 flex flex-col gap-4">
-      {
-        menuItems.map((item) => {
-          // Check if this is the current page
-          const isActive =
-            (item.link === '/' && currentPath === '/') ||
-            (item.link !== '/' && currentPath.startsWith(item.link))
-          return (
-            <a
-              href={item.link}
-              class:list={[
-                'relative block py-2 transition-colors',
-                isActive
-                  ? 'text-primary font-medium pl-3 border-l-2 border-primary'
-                  : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary',
-              ]}
-              transition:animate="slide"
-              aria-current={isActive ? 'page' : undefined}
-            >
-              {item.text}
-            </a>
-          )
-        })
-      }
+      {menuItems.map((item) => {
+        // Check if this is the current page
+        const isActive =
+          (item.link === '/' && currentPath === '/') ||
+          (item.link !== '/' && currentPath.startsWith(item.link))
+        return (
+          <a
+            href={item.link}
+            class:list={[
+              'relative block py-2 transition-colors',
+              isActive
+                ? 'text-primary font-medium pl-3 border-l-2 border-primary'
+                : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary',
+            ]}
+            transition:animate="slide"
+            aria-current={isActive ? 'page' : undefined}
+          >
+            {item.text}
+          </a>
+        )
+      })}
     </div>
   </div>
 </nav>

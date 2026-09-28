@@ -21,19 +21,14 @@ export const prerender = false // Enable SSR for real-time data
       <div class="text-center mb-12">
         <h1 class="text-4xl lg:text-5xl font-bold mb-6">
           Demo Analytics Dashboard
-          <span class="text-foreground block mt-2"
-            >Real-Time A/B Testing Results</span
-          >
+          <span class="text-foreground block mt-2">
+            Real-Time A/B Testing Results
+          </span>
         </h1>
-        <Badge
-          class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary/20 border border-ring text-foreground rounded-none"
-        >
+        <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary/20 border border-ring text-foreground rounded-none">
           <span class="relative flex h-3 w-3">
-            <span
-              class="animate-pulse absolute inline-flex h-full w-full rounded-none bg-primary opacity-75"
-            ></span>
-            <span class="relative inline-flex rounded-none h-3 w-3 bg-primary"
-            ></span>
+            <span class="animate-pulse absolute inline-flex h-full w-full rounded-none bg-primary opacity-75"></span>
+            <span class="relative inline-flex rounded-none h-3 w-3 bg-primary"></span>
           </span>
           Live Data Stream Active
         </Badge>
@@ -43,8 +38,9 @@ export const prerender = false // Enable SSR for real-time data
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <Card class="border border-input bg-secondary">
           <CardHeader class="pb-2">
-            <CardTitle class="text-foreground text-lg">Total Sessions</CardTitle
-            >
+            <CardTitle class="text-foreground text-lg">
+              Total Sessions
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div id="total-sessions" class="text-3xl font-bold text-foreground">
@@ -56,9 +52,9 @@ export const prerender = false // Enable SSR for real-time data
 
         <Card class="border border-input bg-secondary">
           <CardHeader class="pb-2">
-            <CardTitle class="text-foreground text-lg"
-              >Conversion Rate</CardTitle
-            >
+            <CardTitle class="text-foreground text-lg">
+              Conversion Rate
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div
@@ -75,9 +71,9 @@ export const prerender = false // Enable SSR for real-time data
 
         <Card class="border border-input bg-secondary">
           <CardHeader class="pb-2">
-            <CardTitle class="text-foreground text-lg"
-              >Avg. Time to CTA</CardTitle
-            >
+            <CardTitle class="text-foreground text-lg">
+              Avg. Time to CTA
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div id="avg-time-cta" class="text-3xl font-bold text-foreground">
@@ -89,9 +85,9 @@ export const prerender = false // Enable SSR for real-time data
 
         <Card class="border border-input bg-secondary">
           <CardHeader class="pb-2">
-            <CardTitle class="text-foreground text-lg"
-              >Avg. Scroll Depth</CardTitle
-            >
+            <CardTitle class="text-foreground text-lg">
+              Avg. Scroll Depth
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div
@@ -119,9 +115,9 @@ export const prerender = false // Enable SSR for real-time data
             <div class="space-y-4">
               <div id="variant-a-stats" class="bg-secondary rounded-none p-4">
                 <div class="flex justify-between items-center mb-2">
-                  <span class="text-foreground font-medium"
-                    >Variant A: "HIPAA Made Impossible"</span
-                  >
+                  <span class="text-foreground font-medium">
+                    Variant A: "HIPAA Made Impossible"
+                  </span>
                   <Badge class="bg-primary/20 text-foreground">Original</Badge>
                 </div>
                 <div class="grid grid-cols-3 gap-4 text-sm">
@@ -154,9 +150,9 @@ export const prerender = false // Enable SSR for real-time data
 
               <div id="variant-b-stats" class="bg-secondary rounded-none p-4">
                 <div class="flex justify-between items-center mb-2">
-                  <span class="text-foreground font-medium"
-                    >Variant B: "Train Without Risk"</span
-                  >
+                  <span class="text-foreground font-medium">
+                    Variant B: "Train Without Risk"
+                  </span>
                   <Badge class="bg-primary/20 text-foreground">Test</Badge>
                 </div>
                 <div class="grid grid-cols-3 gap-4 text-sm">
@@ -189,9 +185,9 @@ export const prerender = false // Enable SSR for real-time data
 
               <div id="variant-c-stats" class="bg-secondary rounded-none p-4">
                 <div class="flex justify-between items-center mb-2">
-                  <span class="text-foreground font-medium"
-                    >Variant C: "Practice Crisis Safely"</span
-                  >
+                  <span class="text-foreground font-medium">
+                    Variant C: "Practice Crisis Safely"
+                  </span>
                   <Badge class="bg-primary/20 text-foreground">Test</Badge>
                 </div>
                 <div class="grid grid-cols-3 gap-4 text-sm">
@@ -228,9 +224,9 @@ export const prerender = false // Enable SSR for real-time data
         <!-- Statistical Significance -->
         <Card class="border border-input bg-card">
           <CardHeader>
-            <CardTitle class="text-foreground"
-              >Statistical Significance</CardTitle
-            >
+            <CardTitle class="text-foreground">
+              Statistical Significance
+            </CardTitle>
             <CardDescription class="text-muted-foreground">
               Test confidence and recommendations
             </CardDescription>
@@ -302,9 +298,7 @@ export const prerender = false // Enable SSR for real-time data
         </CardHeader>
         <CardContent>
           <div class="space-y-4">
-            <div
-              class="flex items-center justify-between bg-secondary rounded-none p-4"
-            >
+            <div class="flex items-center justify-between bg-secondary rounded-none p-4">
               <span class="text-foreground">Page Views</span>
               <div class="flex items-center gap-4">
                 <div id="funnel-page-views" class="text-foreground font-bold">
@@ -315,16 +309,13 @@ export const prerender = false // Enable SSR for real-time data
                     id="funnel-page-views-bar"
                     class="bg-indigo-500 h-2 rounded-none"
                     style="width: 100%"
-                  >
-                  </div>
+                  ></div>
                 </div>
                 <span class="text-foreground text-sm">100%</span>
               </div>
             </div>
 
-            <div
-              class="flex items-center justify-between bg-secondary rounded-none p-4"
-            >
+            <div class="flex items-center justify-between bg-secondary rounded-none p-4">
               <span class="text-foreground">Demo Interactions</span>
               <div class="flex items-center gap-4">
                 <div
@@ -338,19 +329,18 @@ export const prerender = false // Enable SSR for real-time data
                     id="funnel-demo-interactions-bar"
                     class="bg-primary h-2 rounded-none"
                     style="width: 0%"
-                  >
-                  </div>
+                  ></div>
                 </div>
                 <span
                   id="funnel-demo-interactions-pct"
-                  class="text-foreground text-sm">0%</span
+                  class="text-foreground text-sm"
                 >
+                  0%
+                </span>
               </div>
             </div>
 
-            <div
-              class="flex items-center justify-between bg-secondary rounded-none p-4"
-            >
+            <div class="flex items-center justify-between bg-secondary rounded-none p-4">
               <span class="text-foreground">CTA Clicks</span>
               <div class="flex items-center gap-4">
                 <div id="funnel-cta-clicks" class="text-foreground font-bold">
@@ -361,12 +351,14 @@ export const prerender = false // Enable SSR for real-time data
                     id="funnel-cta-clicks-bar"
                     class="bg-primary h-2 rounded-none"
                     style="width: 0%"
-                  >
-                  </div>
+                  ></div>
                 </div>
-                <span id="funnel-cta-clicks-pct" class="text-foreground text-sm"
-                  >0%</span
+                <span
+                  id="funnel-cta-clicks-pct"
+                  class="text-foreground text-sm"
                 >
+                  0%
+                </span>
               </div>
             </div>
           </div>

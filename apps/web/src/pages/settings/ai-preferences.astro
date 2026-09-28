@@ -69,28 +69,35 @@ const defaultPreferences = {
             <option
               value="gemini-2-flash"
               selected={defaultPreferences.defaultModel === 'gemini-2-flash'}
-              >Gemini 2 Flash (Balanced)</option
             >
+              Gemini 2 Flash (Balanced)
+            </option>
             <option
               value="gemini-2-flash-lite"
-              selected={defaultPreferences.defaultModel ===
-                'gemini-2-flash-lite'}>Gemini 2 Flash Lite (Faster)</option
+              selected={
+                defaultPreferences.defaultModel === 'gemini-2-flash-lite'
+              }
             >
+              Gemini 2 Flash Lite (Faster)
+            </option>
             <option
               value="claude-3-opus"
               selected={defaultPreferences.defaultModel === 'claude-3-opus'}
-              >Claude 3 Opus (Detailed)</option
             >
+              Claude 3 Opus (Detailed)
+            </option>
             <option
               value="claude-3-sonnet"
               selected={defaultPreferences.defaultModel === 'claude-3-sonnet'}
-              >Claude 3 Sonnet (Balanced)</option
             >
+              Claude 3 Sonnet (Balanced)
+            </option>
             <option
               value="claude-3-haiku"
               selected={defaultPreferences.defaultModel === 'claude-3-haiku'}
-              >Claude 3 Haiku (Fast)</option
             >
+              Claude 3 Haiku (Fast)
+            </option>
           </select>
           <div class="form-hint">
             This model will be used by default for all AI interactions.
@@ -290,9 +297,9 @@ const defaultPreferences = {
         </div>
 
         <div class="form-group" id="crisisDetectionSensitivityGroup">
-          <label for="crisisDetectionSensitivity"
-            >Crisis Detection Sensitivity</label
-          >
+          <label for="crisisDetectionSensitivity">
+            Crisis Detection Sensitivity
+          </label>
           <select
             id="crisisDetectionSensitivity"
             name="crisisDetectionSensitivity"
@@ -301,18 +308,25 @@ const defaultPreferences = {
             <option
               value="low"
               selected={defaultPreferences.crisisDetectionSensitivity === 'low'}
-              >Low</option
             >
+              Low
+            </option>
             <option
               value="medium"
-              selected={defaultPreferences.crisisDetectionSensitivity ===
-                'medium'}>Medium</option
+              selected={
+                defaultPreferences.crisisDetectionSensitivity === 'medium'
+              }
             >
+              Medium
+            </option>
             <option
               value="high"
-              selected={defaultPreferences.crisisDetectionSensitivity ===
-                'high'}>High</option
+              selected={
+                defaultPreferences.crisisDetectionSensitivity === 'high'
+              }
             >
+              High
+            </option>
           </select>
           <div class="form-hint">
             Higher sensitivity may result in more false positives.
@@ -365,13 +379,17 @@ const defaultPreferences = {
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save Preferences</button>
-        <button type="button" id="reset-defaults" class="btn btn-secondary"
-          >Reset to Defaults</button
-        >
+        <button type="submit" class="btn btn-primary">
+          Save Preferences
+        </button>
+        <button type="button" id="reset-defaults" class="btn btn-secondary">
+          Reset to Defaults
+        </button>
       </div>
     </form>
-    <div id="ai-preferences-loading" class="hidden">Loading preferences...</div>
+    <div id="ai-preferences-loading" class="hidden">
+      Loading preferences...
+    </div>
   </main>
 </BaseLayout>
 

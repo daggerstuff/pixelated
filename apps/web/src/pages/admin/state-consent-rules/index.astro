@@ -14,9 +14,7 @@ await requirePageAuth(Astro, 'admin')
 >
   <div class="space-y-6">
     <!-- Header -->
-    <div
-      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-    >
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold text-foreground">State Consent Rules</h1>
         <p class="mt-1 text-muted-foreground">
@@ -112,34 +110,22 @@ await requirePageAuth(Astro, 'admin')
         <table class="min-w-full divide-y divide-border">
           <thead class="bg-secondary">
             <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 State
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Version
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Status
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Created By
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Created At
               </th>
-              <th
-                class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -172,9 +158,9 @@ await requirePageAuth(Astro, 'admin')
           >
             Previous
           </button>
-          <span id="page-indicator" class="text-sm text-muted-foreground"
-            >1</span
-          >
+          <span id="page-indicator" class="text-sm text-muted-foreground">
+            1
+          </span>
           <button
             id="btn-next"
             type="button"
@@ -193,9 +179,7 @@ await requirePageAuth(Astro, 'admin')
     id="create-modal"
     class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50"
   >
-    <div
-      class="bg-card rounded-none shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
-    >
+    <div class="bg-card rounded-none shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
       <div class="px-6 py-4 border-b border-border">
         <h2 class="text-lg font-semibold text-foreground">
           Create New State Consent Rule
@@ -224,9 +208,8 @@ await requirePageAuth(Astro, 'admin')
             for="create-consent-level"
             class="block text-sm font-medium text-foreground mb-1"
           >
-            Minimum Consent Level <span class="text-foreground font-semibold"
-              >*</span
-            >
+            Minimum Consent Level{' '}
+            <span class="text-foreground font-semibold">*</span>
           </label>
           <select
             id="create-consent-level"
@@ -277,9 +260,8 @@ await requirePageAuth(Astro, 'admin')
               for="create-age-majority"
               class="block text-sm font-medium text-foreground mb-1"
             >
-              Age of Majority <span class="text-foreground font-semibold"
-                >*</span
-              >
+              Age of Majority{' '}
+              <span class="text-foreground font-semibold">*</span>
             </label>
             <input
               type="number"
@@ -306,14 +288,14 @@ await requirePageAuth(Astro, 'admin')
             name="notes"
             rows="3"
             class="w-full rounded-none border border-input text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            placeholder="Optional notes for this rule..."></textarea>
+            placeholder="Optional notes for this rule..."
+          ></textarea>
         </div>
 
         <div
           id="create-error"
           class="hidden text-sm text-foreground font-semibold"
-        >
-        </div>
+        ></div>
 
         <div class="flex justify-end gap-3 pt-2">
           <button

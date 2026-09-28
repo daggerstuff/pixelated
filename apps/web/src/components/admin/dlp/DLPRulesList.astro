@@ -40,114 +40,82 @@ const getActionBadge = (action: DLPAction) => {
 <div class="rules-list">
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-xl font-semibold">DLP Rules</h2>
-    <Button data-new-rule class="bg-primary text-white hover:bg-primary/90"
-      >Add New Rule</Button
-    >
+    <Button data-new-rule class="bg-primary text-white hover:bg-primary/90">
+      Add New Rule
+    </Button>
   </div>
 
-  {
-    rules.length === 0 ? (
-      <Card>
-        <CardContent class="py-8">
-          <p class="text-center text-muted-foreground">
-            No DLP rules found. Add a rule to get started.
-          </p>
-        </CardContent>
-      </Card>
-    ) : (
-      <div class="space-y-4">
-        {rules.map((ruleItem: DLPRule) => {
-          const actionBadge = getActionBadge(ruleItem.action as DLPAction)
-          return (
-            <div class="rule-card">
-              <Card>
-                <CardHeader class="pb-2">
-                  <div class="flex justify-between items-start">
-                    <div>
-                      <CardTitle class="text-lg">{ruleItem.name}</CardTitle>
-                      <CardDescription>{ruleItem.description}</CardDescription>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                      <span class="text-sm text-muted-foreground">
-                        {ruleItem.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                      <Switch
-                        checked={ruleItem.isActive}
-                        data-rule-id={ruleItem.id}
-                        data-rule-name={ruleItem.name}
-                        className="toggle-rule"
-                        onCheckedChange={(isChecked: boolean) => {
-                          const ruleId = ruleItem.id
-                          const ruleName = ruleItem.name
-
-                          // Update rule in the service
-                          const allRules = dlpService.getRules()
-                          const existingRule = allRules.find(
-                            (r) => r.id === ruleId,
-                          )
-
-                          if (existingRule) {
-                            const updatedRule: DLPRule = {
-                              ...existingRule,
-                              isActive: isChecked,
-                            }
-                            dlpService.removeRule(ruleId)
-                            dlpService.addRule(updatedRule)
-
-                            // Dispatch event for the parent component to handle
-                            document.dispatchEvent(
-                              new CustomEvent('dlp:rule-updated', {
-                                detail: {
-                                  id: ruleId,
-                                  name: ruleName,
-                                  isActive: isChecked,
-                                },
-                              }),
-                            )
-                          }
-                        }}
-                      />
-                    </div>
+  {rules.length === 0 ? (
+    <Card>
+      <CardContent class="py-8">
+        <p class="text-center text-muted-foreground">
+          No DLP rules found. Add a rule to get started.
+        </p>
+      </CardContent>
+    </Card>
+  ) : (
+    <div class="space-y-4">
+      {rules.map((ruleItem: DLPRule) => {
+        const actionBadge = getActionBadge(ruleItem.action as DLPAction)
+        return (
+          <div class="rule-card">
+            <Card>
+              <CardHeader class="pb-2">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <CardTitle class="text-lg">{ruleItem.name}</CardTitle>
+                    <CardDescription>{ruleItem.description}</CardDescription>
                   </div>
-                </CardHeader>
-                <CardContent class="pt-0">
-                  <div class="flex justify-between items-center">
-                    <div>
-                      <Badge variant={actionBadge.variant as any}>
-                        {actionBadge.text}
-                      </Badge>
-                    </div>
-                    <div class="flex space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        data-edit-rule={ruleItem.id}
-                        data-rule={JSON.stringify(ruleItem)}
-                        id={`edit-rule-${ruleItem.id}`}
-                        class="edit-rule-btn"
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        class="delete-rule-btn"
-                        data-rule-id={ruleItem.id}
-                        data-rule-name={ruleItem.name}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span class="sr-only">Delete rule</span>
-                      </Button>
-                    </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="text-sm text-muted-foreground">
+                      {ruleItem.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                    <Switch
+                      checked={ruleItem.isActive}
+                      data-rule-id={ruleItem.id}
+                      data-rule-name={ruleItem.name}
+                      className="toggle-rule"
+                    />
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-          )
-        })}
-      </div>
-    )
-  }
+                </div>
+              </CardHeader>
+              <CardContent class="pt-0">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <Badge variant={actionBadge.variant as any}>
+                      {actionBadge.text}
+                    </Badge>
+                  </div>
+                  <div class="flex space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      data-edit-rule={ruleItem.id}
+                      data-rule={JSON.stringify(ruleItem)}
+                      id={`edit-rule-${ruleItem.id}`}
+                      class="edit-rule-btn"
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      class="delete-rule-btn"
+                      data-rule-id={ruleItem.id}
+                      data-rule-name={ruleItem.name}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span class="sr-only">Delete rule</span>
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+      })}
+    </div>
+  )}
 </div>
 
 <!-- Import the TypeScript file for client-side logic -->

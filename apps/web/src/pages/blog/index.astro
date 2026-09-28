@@ -83,55 +83,53 @@ const topTags = allTags
       </div>
 
       <div class="space-y-8">
-        {
-          posts.map((post: BlogPost) => (
-            <article class="group">
-              <div class="flex flex-col sm:flex-row gap-4">
-                <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
-                  {formatDate(new Date(post.data.pubDate))}
-                  <span class="hidden sm:block mt-1">
-                    {getReadingTime(post.body)}
-                  </span>
-                </div>
-
-                <div class="flex-1">
-                  <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
-                    <a href={`/blog/${post.slug}`} class="block">
-                      {post.data.title}
-                    </a>
-                  </h3>
-
-                  <p class="text-slate-300 mb-3 leading-relaxed">
-                    {post.data.description}
-                  </p>
-
-                  {post.data.tags && post.data.tags.length > 0 && (
-                    <div class="flex flex-wrap gap-2">
-                      {post.data.tags.map((tag: string) => (
-                        <a
-                          href={`/blog/tags/${tag}`}
-                          class="text-xs text-green-400 hover:text-green-300 transition-colors"
-                        >
-                          #{tag}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-
-                  <a
-                    href={`/blog/${post.slug}`}
-                    class="inline-flex items-center mt-3 text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
-                  >
-                    Read article
-                    <span class="ml-1 group-hover:translate-x-1 transition-transform">
-                      →
-                    </span>
-                  </a>
-                </div>
+        {posts.map((post: BlogPost) => (
+          <article class="group">
+            <div class="flex flex-col sm:flex-row gap-4">
+              <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
+                {formatDate(new Date(post.data.pubDate))}
+                <span class="hidden sm:block mt-1">
+                  {getReadingTime(post.body)}
+                </span>
               </div>
-            </article>
-          ))
-        }
+
+              <div class="flex-1">
+                <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
+                  <a href={`/blog/${post.slug}`} class="block">
+                    {post.data.title}
+                  </a>
+                </h3>
+
+                <p class="text-slate-300 mb-3 leading-relaxed">
+                  {post.data.description}
+                </p>
+
+                {post.data.tags && post.data.tags.length > 0 && (
+                  <div class="flex flex-wrap gap-2">
+                    {post.data.tags.map((tag: string) => (
+                      <a
+                        href={`/blog/tags/${tag}`}
+                        class="text-xs text-green-400 hover:text-green-300 transition-colors"
+                      >
+                        #{tag}
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                <a
+                  href={`/blog/${post.slug}`}
+                  class="inline-flex items-center mt-3 text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
+                >
+                  Read article
+                  <span class="ml-1 group-hover:translate-x-1 transition-transform">
+                    →
+                  </span>
+                </a>
+              </div>
+            </div>
+          </article>
+        ))}
       </div>
     </section>
 
@@ -148,31 +146,27 @@ const topTags = allTags
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {
-          topTags.filter(Boolean).map((tag) => {
-            const tagPosts = allPosts.filter((post: BlogPost) =>
-              post.data.tags?.includes(tag),
-            )
-            return (
-              <a
-                href={`/blog/tags/${tag}`}
-                class="group block p-6 rounded-lg border border-slate-700 bg-slate-800/40 hover:border-green-400/50 hover:bg-slate-800/60 transition-all"
-              >
-                <div class="flex items-center justify-between mb-2">
-                  <h3 class="font-bold text-lg group-hover:text-green-400 transition-colors">
-                    #{tag}
-                  </h3>
-                  <span class="text-sm text-slate-400">
-                    {tagPosts.length} post{tagPosts.length !== 1 ? 's' : ''}
-                  </span>
-                </div>
-                <p class="text-sm text-slate-400">
-                  Explore articles about {tag}
-                </p>
-              </a>
-            )
-          })
-        }
+        {topTags.filter(Boolean).map((tag) => {
+          const tagPosts = allPosts.filter((post: BlogPost) =>
+            post.data.tags?.includes(tag),
+          )
+          return (
+            <a
+              href={`/blog/tags/${tag}`}
+              class="group block p-6 rounded-lg border border-slate-700 bg-slate-800/40 hover:border-green-400/50 hover:bg-slate-800/60 transition-all"
+            >
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-bold text-lg group-hover:text-green-400 transition-colors">
+                  #{tag}
+                </h3>
+                <span class="text-sm text-slate-400">
+                  {tagPosts.length} post{tagPosts.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <p class="text-sm text-slate-400">Explore articles about {tag}</p>
+            </a>
+          )
+        })}
       </div>
     </section>
   </div>

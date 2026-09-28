@@ -177,28 +177,23 @@ const mockUpcomingActions = [
     <div class="bg-card rounded-none p-6 mb-6">
       <h2 class="text-lg font-semibold mb-4">BAA Management Workflow</h2>
       <div class="relative">
-        <div
-          class="hidden sm:block absolute left-0 right-0 top-1/2 h-0.5 bg-secondary -translate-y-1/2"
-        >
-        </div>
+        <div class="hidden sm:block absolute left-0 right-0 top-1/2 h-0.5 bg-secondary -translate-y-1/2"></div>
         <div class="flex flex-col sm:flex-row justify-between items-start">
-          {
-            workflowStages.map((stage, index) => (
-              <div class="relative flex flex-col items-center my-4">
-                <div
-                  class={`w-10 h-10 rounded-none border-2 flex items-center justify-center z-10 ${index < 3 ? 'bg-secondary border-ring text-foreground' : 'bg-card border-input text-muted-foreground'}`}
-                >
-                  {index + 1}
-                </div>
-                <div class="mt-2 text-center">
-                  <h3 class="font-medium text-sm">{stage.name}</h3>
-                  <p class="text-xs text-muted-foreground max-w-[120px]">
-                    {stage.description}
-                  </p>
-                </div>
+          {workflowStages.map((stage, index) => (
+            <div class="relative flex flex-col items-center my-4">
+              <div
+                class={`w-10 h-10 rounded-none border-2 flex items-center justify-center z-10 ${index < 3 ? 'bg-secondary border-ring text-foreground' : 'bg-card border-input text-muted-foreground'}`}
+              >
+                {index + 1}
               </div>
-            ))
-          }
+              <div class="mt-2 text-center">
+                <h3 class="font-medium text-sm">{stage.name}</h3>
+                <p class="text-xs text-muted-foreground max-w-[120px]">
+                  {stage.description}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -217,8 +212,9 @@ const mockUpcomingActions = [
             <label
               for="searchQuery"
               class="block text-sm font-medium text-foreground mb-1"
-              >Search</label
             >
+              Search
+            </label>
             <input
               type="text"
               id="searchQuery"
@@ -232,239 +228,231 @@ const mockUpcomingActions = [
             <label
               for="status"
               class="block text-sm font-medium text-foreground mb-1"
-              >BAA Status</label
             >
+              BAA Status
+            </label>
             <select
               id="status"
               name="status"
               class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
             >
-              {
-                statusOptions.map((option) => (
-                  <option
-                    value={option.value}
-                    selected={status === option.value}
-                  >
-                    {option.label}
-                  </option>
-                ))
-              }
+              {statusOptions.map((option) => (
+                <option value={option.value} selected={status === option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
         </form>
 
-        {
-          filteredAgreements.length === 0 ? (
-            <div class="p-6 text-center text-muted-foreground">
-              No vendors match your search criteria. Try adjusting your filters
-              or add a new vendor.
-            </div>
-          ) : (
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-border">
-                <thead class="bg-secondary">
+        {filteredAgreements.length === 0 ? (
+          <div class="p-6 text-center text-muted-foreground">
+            No vendors match your search criteria. Try adjusting your filters or
+            add a new vendor.
+          </div>
+        ) : (
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-border">
+              <thead class="bg-secondary">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Vendor
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Type
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Compliance
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-card divide-y divide-border">
+                {filteredAgreements.map((vendor) => (
                   <tr>
-                    <th
-                      scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                    >
-                      Vendor
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                    >
-                      Type
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                    >
-                      Status
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                    >
-                      Compliance
-                    </th>
-                    <th
-                      scope="col"
-                      class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-card divide-y divide-border">
-                  {filteredAgreements.map((vendor) => (
-                    <tr>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-foreground">
-                          {vendor.name}
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-foreground">
+                        {vendor.name}
+                      </div>
+                      {vendor.website && (
+                        <div class="text-xs text-muted-foreground">
+                          <a
+                            href={vendor.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-foreground hover:underline"
+                          >
+                            {vendor.website.replace(/^https?:\/\//, '')}
+                          </a>
                         </div>
-                        {vendor.website && (
-                          <div class="text-xs text-muted-foreground">
-                            <a
-                              href={vendor.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="text-foreground hover:underline"
-                            >
-                              {vendor.website.replace(/^https?:\/\//, '')}
-                            </a>
-                          </div>
-                        )}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
+                      )}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                        {vendor.type.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {vendor.activeAgreementId ? (
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
-                          {vendor.type.replace(/_/g, ' ')}
+                          Active BAA
                         </span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        {vendor.activeAgreementId ? (
-                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
-                            Active BAA
-                          </span>
-                        ) : vendor.agreementHistory.length > 0 ? (
-                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-ring text-foreground">
-                            Pending
-                          </span>
-                        ) : (
-                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
-                            No BAA
-                          </span>
-                        )}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        {(() => {
-                          switch (vendor.complianceLevel) {
-                            case ComplianceLevel.HIPAA_CERTIFIED:
-                              return (
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
-                                  HIPAA Certified
-                                </span>
-                              )
-                            case ComplianceLevel.THIRD_PARTY_VERIFIED:
-                              return (
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">
-                                  Third Party Verified
-                                </span>
-                              )
-                            case ComplianceLevel.SELF_ATTESTED:
-                              return (
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-ring text-foreground">
-                                  Self Attested
-                                </span>
-                              )
-                            case ComplianceLevel.NON_COMPLIANT:
-                              return (
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
-                                  Non Compliant
-                                </span>
-                              )
-                            default:
-                              return (
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
-                                  Not Verified
-                                </span>
-                              )
-                          }
-                        })()}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        {vendor.activeAgreementId ? (
-                          <>
-                            <a
-                              href={`/admin/security/baa/agreements/${vendor.activeAgreementId}`}
-                              class="text-foreground hover:underline mr-3"
-                            >
-                              View BAA
-                            </a>
-                            <button
-                              data-vendor-id={vendor.id}
-                              class="renew-baa text-muted-foreground hover:text-foreground"
-                            >
-                              Renew
-                            </button>
-                          </>
-                        ) : vendor.agreementHistory.length > 0 ? (
-                          <>
-                            <a
-                              href={`/admin/security/baa/agreements/${vendor.agreementHistory[vendor.agreementHistory.length - 1]}`}
-                              class="text-foreground hover:underline mr-3"
-                            >
-                              View Draft
-                            </a>
-                            <button
-                              data-vendor-id={vendor.id}
-                              class="send-baa text-foreground hover:underline"
-                            >
-                              Send
-                            </button>
-                          </>
-                        ) : (
+                      ) : vendor.agreementHistory.length > 0 ? (
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-ring text-foreground">
+                          Pending
+                        </span>
+                      ) : (
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
+                          No BAA
+                        </span>
+                      )}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      {(() => {
+                        switch (vendor.complianceLevel) {
+                          case ComplianceLevel.HIPAA_CERTIFIED:
+                            return (
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                                HIPAA Certified
+                              </span>
+                            )
+                          case ComplianceLevel.THIRD_PARTY_VERIFIED:
+                            return (
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">
+                                Third Party Verified
+                              </span>
+                            )
+                          case ComplianceLevel.SELF_ATTESTED:
+                            return (
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-ring text-foreground">
+                                Self Attested
+                              </span>
+                            )
+                          case ComplianceLevel.NON_COMPLIANT:
+                            return (
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
+                                Non Compliant
+                              </span>
+                            )
+                          default:
+                            return (
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
+                                Not Verified
+                              </span>
+                            )
+                        }
+                      })()}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      {vendor.activeAgreementId ? (
+                        <>
+                          <a
+                            href={`/admin/security/baa/agreements/${vendor.activeAgreementId}`}
+                            class="text-foreground hover:underline mr-3"
+                          >
+                            View BAA
+                          </a>
                           <button
                             data-vendor-id={vendor.id}
-                            class="create-baa text-foreground hover:underline"
+                            class="renew-baa text-muted-foreground hover:text-foreground"
                           >
-                            Create BAA
+                            Renew
                           </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )
-        }
+                        </>
+                      ) : vendor.agreementHistory.length > 0 ? (
+                        <>
+                          <a
+                            href={`/admin/security/baa/agreements/${vendor.agreementHistory[vendor.agreementHistory.length - 1]}`}
+                            class="text-foreground hover:underline mr-3"
+                          >
+                            View Draft
+                          </a>
+                          <button
+                            data-vendor-id={vendor.id}
+                            class="send-baa text-foreground hover:underline"
+                          >
+                            Send
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          data-vendor-id={vendor.id}
+                          class="create-baa text-foreground hover:underline"
+                        >
+                          Create BAA
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       <!-- Upcoming Actions Widget -->
       <div class="bg-card rounded-none p-6">
         <h2 class="text-lg font-semibold mb-4">Upcoming BAA Actions</h2>
         <div class="space-y-4">
-          {
-            mockUpcomingActions.map((action) => (
-              <div
-                class={`border-l-4 ${
-                  action.priority === 'high'
-                    ? 'border-neutral-500'
-                    : action.priority === 'medium'
-                      ? 'border-neutral-400'
-                      : 'border-neutral-300'
-                } pl-4 py-2`}
-              >
-                <div class="flex justify-between">
-                  <h3 class="font-medium text-foreground">{action.name}</h3>
-                  <span
-                    class={`text-xs font-medium ${
-                      action.priority === 'high'
-                        ? 'text-neutral-800'
-                        : action.priority === 'medium'
-                          ? 'text-neutral-700'
-                          : 'text-neutral-600'
-                    }`}
-                  >
-                    {action.priority.toUpperCase()}
-                  </span>
-                </div>
-                <p class="text-sm text-muted-foreground">{action.type}</p>
-                <div class="mt-1 flex justify-between items-center">
-                  <span class="text-xs text-muted-foreground">
-                    Due: {action.dueDate.toLocaleDateString()}
-                  </span>
-                  <button
-                    class="text-xs text-foreground hover:underline"
-                    data-action-id={action.id}
-                  >
-                    View Details
-                  </button>
-                </div>
+          {mockUpcomingActions.map((action) => (
+            <div
+              class={`border-l-4 ${
+                action.priority === 'high'
+                  ? 'border-neutral-500'
+                  : action.priority === 'medium'
+                    ? 'border-neutral-400'
+                    : 'border-neutral-300'
+              } pl-4 py-2`}
+            >
+              <div class="flex justify-between">
+                <h3 class="font-medium text-foreground">{action.name}</h3>
+                <span
+                  class={`text-xs font-medium ${
+                    action.priority === 'high'
+                      ? 'text-neutral-800'
+                      : action.priority === 'medium'
+                        ? 'text-neutral-700'
+                        : 'text-neutral-600'
+                  }`}
+                >
+                  {action.priority.toUpperCase()}
+                </span>
               </div>
-            ))
-          }
+              <p class="text-sm text-muted-foreground">{action.type}</p>
+              <div class="mt-1 flex justify-between items-center">
+                <span class="text-xs text-muted-foreground">
+                  Due: {action.dueDate.toLocaleDateString()}
+                </span>
+                <button
+                  class="text-xs text-foreground hover:underline"
+                  data-action-id={action.id}
+                >
+                  View Details
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
         <div class="mt-6">
           <button

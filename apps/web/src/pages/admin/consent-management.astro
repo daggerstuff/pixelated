@@ -60,10 +60,9 @@ for (const id of clientIds) {
       <div class="border rounded-none p-4">
         <div class="flex items-center justify-between">
           <span class="text-sm font-medium">Total Clients</span>
-          <span
-            class="text-xs px-2 py-1 bg-secondary border border-input text-foreground font-medium rounded-none"
-            >CRUD</span
-          >
+          <span class="text-xs px-2 py-1 bg-secondary border border-input text-foreground font-medium rounded-none">
+            CRUD
+          </span>
         </div>
         <p class="text-2xl font-bold mt-2" id="stat-total">
           {statistics.totalClients}
@@ -72,10 +71,9 @@ for (const id of clientIds) {
       <div class="border rounded-none p-4">
         <div class="flex items-center justify-between">
           <span class="text-sm font-medium">Active Consents</span>
-          <span
-            class="text-xs px-2 py-1 bg-secondary border border-input text-muted-foreground rounded-none"
-            >Active</span
-          >
+          <span class="text-xs px-2 py-1 bg-secondary border border-input text-muted-foreground rounded-none">
+            Active
+          </span>
         </div>
         <p
           class="text-2xl font-bold mt-2 text-muted-foreground"
@@ -87,10 +85,9 @@ for (const id of clientIds) {
       <div class="border rounded-none p-4">
         <div class="flex items-center justify-between">
           <span class="text-sm font-medium">Withdrawals</span>
-          <span
-            class="text-xs px-2 py-1 bg-secondary border border-ring text-foreground font-medium rounded-none"
-            >Pending</span
-          >
+          <span class="text-xs px-2 py-1 bg-secondary border border-ring text-foreground font-medium rounded-none">
+            Pending
+          </span>
         </div>
         <p
           class="text-2xl font-bold mt-2 text-foreground font-medium"
@@ -102,10 +99,9 @@ for (const id of clientIds) {
       <div class="border rounded-none p-4">
         <div class="flex items-center justify-between">
           <span class="text-sm font-medium">Expired Consents</span>
-          <span
-            class="text-xs px-2 py-1 bg-primary text-primary-foreground text-foreground font-semibold rounded-none"
-            >Alert</span
-          >
+          <span class="text-xs px-2 py-1 bg-primary text-primary-foreground text-foreground font-semibold rounded-none">
+            Alert
+          </span>
         </div>
         <p
           class="text-2xl font-bold mt-2 text-foreground font-semibold"
@@ -120,30 +116,26 @@ for (const id of clientIds) {
     <div class="border rounded-none p-4">
       <h2 class="text-lg font-semibold mb-3">Consent Level Distribution</h2>
       <div class="space-y-2">
-        {
-          Object.entries(statistics.consentLevels).map(([level, count]) => (
-            <div class="flex items-center justify-between">
-              <span class="text-sm capitalize">{level}</span>
-              <div class="flex items-center gap-2">
-                <div class="h-2 w-32 bg-secondary rounded-none overflow-hidden">
-                  <div
-                    class="h-full rounded-none"
-                    style={`width: ${statistics.activeConsents > 0 ? Math.round((count / statistics.activeConsents) * 100) : 0}%`}
-                    class:list={[
-                      level === 'full' ? 'bg-primary' : '',
-                      level === 'limited' ? 'bg-primary' : '',
-                      level === 'minimal' ? 'bg-primary' : '',
-                      level === 'none'
-                        ? 'bg-secondary border border-input'
-                        : '',
-                    ]}
-                  />
-                </div>
-                <span class="text-sm font-medium w-8">{count}</span>
+        {Object.entries(statistics.consentLevels).map(([level, count]) => (
+          <div class="flex items-center justify-between">
+            <span class="text-sm capitalize">{level}</span>
+            <div class="flex items-center gap-2">
+              <div class="h-2 w-32 bg-secondary rounded-none overflow-hidden">
+                <div
+                  class="h-full rounded-none"
+                  style={`width: ${statistics.activeConsents > 0 ? Math.round((count / statistics.activeConsents) * 100) : 0}%`}
+                  class:list={[
+                    level === 'full' ? 'bg-primary' : '',
+                    level === 'limited' ? 'bg-primary' : '',
+                    level === 'minimal' ? 'bg-primary' : '',
+                    level === 'none' ? 'bg-secondary border border-input' : '',
+                  ]}
+                />
               </div>
+              <span class="text-sm font-medium w-8">{count}</span>
             </div>
-          ))
-        }
+          </div>
+        ))}
       </div>
     </div>
 
@@ -157,17 +149,13 @@ for (const id of clientIds) {
       </div>
 
       <div class="grid gap-3 md:grid-cols-3 mb-4">
-        <div
-          class="text-center p-3 bg-secondary border border-ring rounded-none"
-        >
+        <div class="text-center p-3 bg-secondary border border-ring rounded-none">
           <p class="text-2xl font-bold text-foreground font-medium">
             {expiryResult.summary.expiringSoon}
           </p>
           <p class="text-xs text-muted-foreground">Expiring Soon (≤30d)</p>
         </div>
-        <div
-          class="text-center p-3 bg-secondary border border-ring rounded-none"
-        >
+        <div class="text-center p-3 bg-secondary border border-ring rounded-none">
           <p class="text-2xl font-bold text-foreground font-medium">
             {expiryResult.summary.expiringCritical}
           </p>
@@ -183,69 +171,63 @@ for (const id of clientIds) {
         </div>
       </div>
 
-      {
-        expiryResult.reminders.length > 0 && (
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b">
-                  <th class="text-left py-2 px-3">Client ID</th>
-                  <th class="text-left py-2 px-3">Level</th>
-                  <th class="text-left py-2 px-3">Expires</th>
-                  <th class="text-left py-2 px-3">Days</th>
-                  <th class="text-left py-2 px-3">Status</th>
-                  <th class="text-left py-2 px-3">Message</th>
+      {expiryResult.reminders.length > 0 && (
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left py-2 px-3">Client ID</th>
+                <th class="text-left py-2 px-3">Level</th>
+                <th class="text-left py-2 px-3">Expires</th>
+                <th class="text-left py-2 px-3">Days</th>
+                <th class="text-left py-2 px-3">Status</th>
+                <th class="text-left py-2 px-3">Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              {expiryResult.reminders.map((reminder) => (
+                <tr class="border-b hover:bg-secondary">
+                  <td class="py-2 px-3 font-mono text-xs">
+                    {reminder.clientId}
+                  </td>
+                  <td class="py-2 px-3 capitalize">{reminder.consentLevel}</td>
+                  <td class="py-2 px-3">
+                    {new Date(reminder.expirationDate).toLocaleDateString()}
+                  </td>
+                  <td class="py-2 px-3">{reminder.daysUntilExpiry}</td>
+                  <td class="py-2 px-3">
+                    <span
+                      class:list={[
+                        'px-2 py-1 rounded-none text-xs font-medium',
+                        reminder.reminderType === 'expired'
+                          ? 'bg-primary text-primary-foreground text-foreground font-semibold'
+                          : '',
+                        reminder.reminderType === 'expiring-critical'
+                          ? 'bg-secondary border border-ring text-foreground font-medium'
+                          : '',
+                        reminder.reminderType === 'expiring-soon'
+                          ? 'bg-secondary border border-ring text-foreground font-medium'
+                          : '',
+                      ]}
+                    >
+                      {reminder.reminderType}
+                    </span>
+                  </td>
+                  <td class="py-2 px-3 text-xs text-muted-foreground">
+                    {reminder.message}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {expiryResult.reminders.map((reminder) => (
-                  <tr class="border-b hover:bg-secondary">
-                    <td class="py-2 px-3 font-mono text-xs">
-                      {reminder.clientId}
-                    </td>
-                    <td class="py-2 px-3 capitalize">
-                      {reminder.consentLevel}
-                    </td>
-                    <td class="py-2 px-3">
-                      {new Date(reminder.expirationDate).toLocaleDateString()}
-                    </td>
-                    <td class="py-2 px-3">{reminder.daysUntilExpiry}</td>
-                    <td class="py-2 px-3">
-                      <span
-                        class:list={[
-                          'px-2 py-1 rounded-none text-xs font-medium',
-                          reminder.reminderType === 'expired'
-                            ? 'bg-primary text-primary-foreground text-foreground font-semibold'
-                            : '',
-                          reminder.reminderType === 'expiring-critical'
-                            ? 'bg-secondary border border-ring text-foreground font-medium'
-                            : '',
-                          reminder.reminderType === 'expiring-soon'
-                            ? 'bg-secondary border border-ring text-foreground font-medium'
-                            : '',
-                        ]}
-                      >
-                        {reminder.reminderType}
-                      </span>
-                    </td>
-                    <td class="py-2 px-3 text-xs text-muted-foreground">
-                      {reminder.message}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
-      }
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {
-        expiryResult.reminders.length === 0 && (
-          <p class="text-center text-muted-foreground py-4">
-            No expiring or expired consents. All consent records are current.
-          </p>
-        )
-      }
+      {expiryResult.reminders.length === 0 && (
+        <p class="text-center text-muted-foreground py-4">
+          No expiring or expired consents. All consent records are current.
+        </p>
+      )}
     </div>
 
     <!-- Initialize New Consent -->
@@ -286,73 +268,69 @@ for (const id of clientIds) {
       <h2 class="text-lg font-semibold mb-3">
         Consent Records ({records.length})
       </h2>
-      {
-        records.length > 0 ? (
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b">
-                  <th class="text-left py-2 px-3">Client ID</th>
-                  <th class="text-left py-2 px-3">Level</th>
-                  <th class="text-left py-2 px-3">Last Updated</th>
-                  <th class="text-left py-2 px-3">Expires</th>
-                  <th class="text-left py-2 px-3">Withdrawal</th>
-                  <th class="text-left py-2 px-3">Actions</th>
+      {records.length > 0 ? (
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left py-2 px-3">Client ID</th>
+                <th class="text-left py-2 px-3">Level</th>
+                <th class="text-left py-2 px-3">Last Updated</th>
+                <th class="text-left py-2 px-3">Expires</th>
+                <th class="text-left py-2 px-3">Withdrawal</th>
+                <th class="text-left py-2 px-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {records.map((record) => (
+                <tr class="border-b hover:bg-secondary">
+                  <td class="py-2 px-3 font-mono text-xs">{record.clientId}</td>
+                  <td class="py-2 px-3 capitalize">{record.currentLevel}</td>
+                  <td class="py-2 px-3 text-xs">
+                    {new Date(record.lastUpdated).toLocaleDateString()}
+                  </td>
+                  <td class="py-2 px-3 text-xs">
+                    {new Date(record.expirationDate).toLocaleDateString()}
+                  </td>
+                  <td class="py-2 px-3">
+                    {record.withdrawalRequested ? (
+                      <span class="px-2 py-1 bg-primary text-primary-foreground text-foreground font-semibold rounded-none text-xs">
+                        Requested
+                      </span>
+                    ) : (
+                      <span class="px-2 py-1 bg-secondary border border-input text-muted-foreground rounded-none text-xs">
+                        Active
+                      </span>
+                    )}
+                  </td>
+                  <td class="py-2 px-3">
+                    <div class="flex gap-1">
+                      <button
+                        class="px-2 py-1 text-xs border rounded-none hover:bg-accent"
+                        data-action="update"
+                        data-client-id={record.clientId}
+                      >
+                        Update
+                      </button>
+                      <button
+                        class="px-2 py-1 text-xs border rounded-none text-foreground font-semibold hover:bg-card"
+                        data-action="withdraw"
+                        data-client-id={record.clientId}
+                      >
+                        Withdraw
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {records.map((record) => (
-                  <tr class="border-b hover:bg-secondary">
-                    <td class="py-2 px-3 font-mono text-xs">
-                      {record.clientId}
-                    </td>
-                    <td class="py-2 px-3 capitalize">{record.currentLevel}</td>
-                    <td class="py-2 px-3 text-xs">
-                      {new Date(record.lastUpdated).toLocaleDateString()}
-                    </td>
-                    <td class="py-2 px-3 text-xs">
-                      {new Date(record.expirationDate).toLocaleDateString()}
-                    </td>
-                    <td class="py-2 px-3">
-                      {record.withdrawalRequested ? (
-                        <span class="px-2 py-1 bg-primary text-primary-foreground text-foreground font-semibold rounded-none text-xs">
-                          Requested
-                        </span>
-                      ) : (
-                        <span class="px-2 py-1 bg-secondary border border-input text-muted-foreground rounded-none text-xs">
-                          Active
-                        </span>
-                      )}
-                    </td>
-                    <td class="py-2 px-3">
-                      <div class="flex gap-1">
-                        <button
-                          class="px-2 py-1 text-xs border rounded-none hover:bg-accent"
-                          data-action="update"
-                          data-client-id={record.clientId}
-                        >
-                          Update
-                        </button>
-                        <button
-                          class="px-2 py-1 text-xs border rounded-none text-foreground font-semibold hover:bg-card"
-                          data-action="withdraw"
-                          data-client-id={record.clientId}
-                        >
-                          Withdraw
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p class="text-center text-muted-foreground py-4">
-            No consent records. Initialize a new consent above.
-          </p>
-        )
-      }
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p class="text-center text-muted-foreground py-4">
+          No consent records. Initialize a new consent above.
+        </p>
+      )}
     </div>
 
     <!-- Audit Trail -->
@@ -360,58 +338,56 @@ for (const id of clientIds) {
       <h2 class="text-lg font-semibold mb-3">
         HIPAA Audit Trail ({auditTrail.length} entries)
       </h2>
-      {
-        auditTrail.length > 0 ? (
-          <div class="overflow-x-auto max-h-96 overflow-y-auto">
-            <table class="w-full text-sm">
-              <thead class="sticky top-0 bg-card">
-                <tr class="border-b">
-                  <th class="text-left py-2 px-3">Timestamp</th>
-                  <th class="text-left py-2 px-3">Client ID</th>
-                  <th class="text-left py-2 px-3">Operation</th>
-                  <th class="text-left py-2 px-3">Old Level</th>
-                  <th class="text-left py-2 px-3">New Level</th>
-                  <th class="text-left py-2 px-3">Reason</th>
-                </tr>
-              </thead>
-              <tbody>
-                {auditTrail
-                  .slice()
-                  .reverse()
-                  .slice(0, 100)
-                  .map((entry) => (
-                    <tr class="border-b hover:bg-secondary">
-                      <td class="py-1 px-3 text-xs text-muted-foreground">
-                        {new Date(entry.timestamp).toLocaleString()}
-                      </td>
-                      <td class="py-1 px-3 font-mono text-xs">
-                        {entry.clientId}
-                      </td>
-                      <td class="py-1 px-3">
-                        <span class="px-2 py-1 bg-secondary rounded-none text-xs">
-                          {entry.operation}
-                        </span>
-                      </td>
-                      <td class="py-1 px-3 capitalize text-xs">
-                        {entry.oldLevel ?? '-'}
-                      </td>
-                      <td class="py-1 px-3 capitalize text-xs">
-                        {entry.newLevel ?? '-'}
-                      </td>
-                      <td class="py-1 px-3 text-xs text-muted-foreground">
-                        {entry.reason ?? '-'}
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p class="text-center text-muted-foreground py-4">
-            No audit trail entries. Consent operations will appear here.
-          </p>
-        )
-      }
+      {auditTrail.length > 0 ? (
+        <div class="overflow-x-auto max-h-96 overflow-y-auto">
+          <table class="w-full text-sm">
+            <thead class="sticky top-0 bg-card">
+              <tr class="border-b">
+                <th class="text-left py-2 px-3">Timestamp</th>
+                <th class="text-left py-2 px-3">Client ID</th>
+                <th class="text-left py-2 px-3">Operation</th>
+                <th class="text-left py-2 px-3">Old Level</th>
+                <th class="text-left py-2 px-3">New Level</th>
+                <th class="text-left py-2 px-3">Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {auditTrail
+                .slice()
+                .reverse()
+                .slice(0, 100)
+                .map((entry) => (
+                  <tr class="border-b hover:bg-secondary">
+                    <td class="py-1 px-3 text-xs text-muted-foreground">
+                      {new Date(entry.timestamp).toLocaleString()}
+                    </td>
+                    <td class="py-1 px-3 font-mono text-xs">
+                      {entry.clientId}
+                    </td>
+                    <td class="py-1 px-3">
+                      <span class="px-2 py-1 bg-secondary rounded-none text-xs">
+                        {entry.operation}
+                      </span>
+                    </td>
+                    <td class="py-1 px-3 capitalize text-xs">
+                      {entry.oldLevel ?? '-'}
+                    </td>
+                    <td class="py-1 px-3 capitalize text-xs">
+                      {entry.newLevel ?? '-'}
+                    </td>
+                    <td class="py-1 px-3 text-xs text-muted-foreground">
+                      {entry.reason ?? '-'}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p class="text-center text-muted-foreground py-4">
+          No audit trail entries. Consent operations will appear here.
+        </p>
+      )}
     </div>
 
     <!-- API Documentation -->
@@ -419,48 +395,49 @@ for (const id of clientIds) {
       <h2 class="text-lg font-semibold mb-3">API Endpoints</h2>
       <div class="space-y-2 text-sm font-mono">
         <div>
-          <span class="text-muted-foreground font-bold">GET</span> /api/v1/admin/consent
-          — List all records + stats
+          <span class="text-muted-foreground font-bold">GET</span>{' '}
+          /api/v1/admin/consent — List all records + stats
         </div>
         <div>
-          <span class="text-muted-foreground font-bold">GET</span> /api/v1/admin/consent?clientId=X
-          — Get one record
+          <span class="text-muted-foreground font-bold">GET</span>{' '}
+          /api/v1/admin/consent?clientId=X — Get one record
         </div>
         <div>
-          <span class="text-foreground font-bold">POST</span> /api/v1/admin/consent
-          — Initialize consent
+          <span class="text-foreground font-bold">POST</span>{' '}
+          /api/v1/admin/consent — Initialize consent
         </div>
         <div>
-          <span class="text-muted-foreground font-bold">GET</span> /api/v1/admin/consent/:clientId
-          — Get specific record
+          <span class="text-muted-foreground font-bold">GET</span>{' '}
+          /api/v1/admin/consent/:clientId — Get specific record
         </div>
         <div>
-          <span class="text-foreground font-medium font-bold">PATCH</span> /api/v1/admin/consent/:clientId
-          — Update consent level
+          <span class="text-foreground font-medium font-bold">PATCH</span>{' '}
+          /api/v1/admin/consent/:clientId — Update consent level
         </div>
         <div>
-          <span class="text-foreground font-semibold font-bold">DELETE</span> /api/v1/admin/consent/:clientId
-          — Request withdrawal
+          <span class="text-foreground font-semibold font-bold">DELETE</span>{' '}
+          /api/v1/admin/consent/:clientId — Request withdrawal
         </div>
         <div>
-          <span class="text-foreground font-bold">POST</span> /api/v1/admin/consent/:clientId/complete-withdrawal
-          — Complete withdrawal
+          <span class="text-foreground font-bold">POST</span>{' '}
+          /api/v1/admin/consent/:clientId/complete-withdrawal — Complete
+          withdrawal
         </div>
         <div>
-          <span class="text-muted-foreground font-bold">GET</span> /api/v1/admin/consent/audit
-          — Full audit trail
+          <span class="text-muted-foreground font-bold">GET</span>{' '}
+          /api/v1/admin/consent/audit — Full audit trail
         </div>
         <div>
-          <span class="text-muted-foreground font-bold">GET</span> /api/v1/admin/consent/audit?clientId=X
-          — Client audit trail
+          <span class="text-muted-foreground font-bold">GET</span>{' '}
+          /api/v1/admin/consent/audit?clientId=X — Client audit trail
         </div>
         <div>
-          <span class="text-muted-foreground font-bold">GET</span> /api/v1/admin/consent/export
-          — Export all consent data
+          <span class="text-muted-foreground font-bold">GET</span>{' '}
+          /api/v1/admin/consent/export — Export all consent data
         </div>
         <div>
-          <span class="text-muted-foreground font-bold">GET</span> /api/v1/admin/consent/expiry-check
-          — Run expiry check
+          <span class="text-muted-foreground font-bold">GET</span>{' '}
+          /api/v1/admin/consent/expiry-check — Run expiry check
         </div>
       </div>
     </div>

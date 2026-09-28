@@ -42,11 +42,9 @@ const secondaryAction = headerContent.actions.secondary
       <span class="brand-lockup">
         <span class="brand-mark">
           <span class="brand-mark__primary">{titlePrimary}</span>
-          {
-            titleSecondary ? (
-              <span class="brand-mark__secondary">{titleSecondary}</span>
-            ) : null
-          }
+          {titleSecondary ? (
+            <span class="brand-mark__secondary">{titleSecondary}</span>
+          ) : null}
         </span>
         <span class="brand-meta">{headerContent.brandMeta}</span>
       </span>
@@ -55,22 +53,20 @@ const secondaryAction = headerContent.actions.secondary
     <div class="header-frame">
       <nav class="header-nav" aria-label="Main navigation">
         <ul class="header-nav-list">
-          {
-            navItems.map((item, index) => (
-              <li>
-                <a
-                  href={item.href}
-                  class="header-nav-link"
-                  aria-current={isActivePath(item.href) ? 'page' : undefined}
-                >
-                  <span class="header-nav-link__index">
-                    {String(index + 1).padStart(2, '0')}
-                  </span>
-                  <span>{item.label}</span>
-                </a>
-              </li>
-            ))
-          }
+          {navItems.map((item, index) => (
+            <li>
+              <a
+                href={item.href}
+                class="header-nav-link"
+                aria-current={isActivePath(item.href) ? 'page' : undefined}
+              >
+                <span class="header-nav-link__index">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span>{item.label}</span>
+              </a>
+            </li>
+          ))}
         </ul>
       </nav>
 
@@ -78,13 +74,15 @@ const secondaryAction = headerContent.actions.secondary
         <a
           href={secondaryAction.href}
           class="header-action-link header-action-link--secondary"
-          >{secondaryAction.text}</a
         >
+          {secondaryAction.text}
+        </a>
         <a
           href={primaryAction.href}
           class="header-action-link header-action-link--primary"
-          >{primaryAction.text}</a
         >
+          {primaryAction.text}
+        </a>
       </div>
     </div>
 
@@ -98,30 +96,30 @@ const secondaryAction = headerContent.actions.secondary
 
       <nav class="header-mobile-nav" aria-label="Mobile navigation">
         <ul class="header-mobile-list">
-          {
-            navItems.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  class="header-nav-link"
-                  aria-current={isActivePath(item.href) ? 'page' : undefined}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))
-          }
+          {navItems.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class="header-nav-link"
+                aria-current={isActivePath(item.href) ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
           <li class="header-mobile-actions">
             <a
               href={secondaryAction.href}
               class="header-action-link header-action-link--secondary"
-              >{secondaryAction.text}</a
             >
+              {secondaryAction.text}
+            </a>
             <a
               href={primaryAction.href}
               class="header-action-link header-action-link--primary"
-              >{primaryAction.text}</a
             >
+              {primaryAction.text}
+            </a>
           </li>
         </ul>
       </nav>
