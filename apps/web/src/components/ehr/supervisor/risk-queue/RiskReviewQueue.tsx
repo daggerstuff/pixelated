@@ -67,14 +67,14 @@ export function RiskReviewQueue({
   return (
     <div className="space-y-4" data-testid="risk-review-queue">
       <div className="flex items-center justify-between">
-        <h2 className="text-gray-900 text-lg font-semibold">
+        <h2 className="text-lg font-semibold text-foreground">
           Risk Review Queue
         </h2>
         <button
           type="button"
           onClick={loadReviews}
           disabled={loading}
-          className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-50"
+          className="hover:bg-primary/90 rounded-none bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
           data-testid="refresh-btn"
         >
           {loading ? 'Loading...' : 'Refresh'}
@@ -83,7 +83,7 @@ export function RiskReviewQueue({
 
       {error && (
         <div
-          className="border-red-200 bg-red-50 text-red-700 rounded-md border p-3 text-sm"
+          className="rounded-none border border-ring bg-secondary p-3 text-sm text-foreground"
           data-testid="error-message"
         >
           {error}
@@ -92,7 +92,7 @@ export function RiskReviewQueue({
 
       {!loading && !error && reviews.length === 0 && (
         <div
-          className="border-gray-200 bg-gray-50 text-gray-500 rounded-md border p-6 text-center text-sm"
+          className="rounded-none border border-border bg-secondary p-6 text-center text-sm text-muted-foreground"
           data-testid="empty-state"
         >
           No pending risk reviews.
@@ -111,7 +111,7 @@ export function RiskReviewQueue({
       </div>
 
       {/* Stub notice: full implementation in F3.2 */}
-      <p className="text-gray-400 text-xs">
+      <p className="text-xs text-muted-foreground">
         Supervisor review queue — stub for F3.2. Full filtering, pagination, and
         clinician notification will be implemented in F3.2.
       </p>

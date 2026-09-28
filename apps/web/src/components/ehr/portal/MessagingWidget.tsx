@@ -474,12 +474,12 @@ export function MessagingWidget() {
           >
             <span>Communicate with your care team</span>
             {!isOnline && (
-              <span className="text-amber-400 flex items-center gap-1 text-xs font-medium">
+              <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
                 <CloudOff className="h-3.5 w-3.5" /> Offline Mode
               </span>
             )}
             {queuedMessages.length > 0 && (
-              <span className="text-amber-400 text-xs font-medium">
+              <span className="text-xs font-medium text-muted-foreground">
                 ({queuedMessages.length} queued)
               </span>
             )}
