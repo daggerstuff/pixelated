@@ -22,8 +22,7 @@
   --np-font-body:
     'Instrument Sans Variable', system-ui, -apple-system, sans-serif;
   --np-font-mono:
-    'Spline Sans Mono Variable', 'IBM Plex Mono', ui-monospace, Menlo,
-    monospace;
+    'Spline Sans Mono Variable', 'IBM Plex Mono', ui-monospace, Menlo, monospace;
 }
 
 .np-page {
@@ -184,94 +183,120 @@
   outline-offset: 3px;
 }
 
-/* Hero Section & 2-Column Grid */
+/* =============================================
+   HERO SECTION & CLINICAL APPARATUS
+   ============================================= */
 .np-hero-section {
   padding-block: clamp(3.5rem, 6vw, 5.5rem);
   border-bottom: 1px solid var(--np-line);
 }
 
-.np-hero-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(2.5rem, 4vw, 4rem);
-  align-items: center;
-}
-
-@media (min-width: 980px) {
-  .np-hero-grid {
-    grid-template-columns: 1.08fr 0.92fr;
-  }
-}
-
-.np-hero-main {
+.np-hero-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 3rem;
 }
 
-.np-trust-badges {
+/* Hero Header Deck */
+.np-hero-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  align-items: center;
-  font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  color: var(--np-muted);
-  text-transform: uppercase;
-  padding-top: 1rem;
-  border-top: 1px solid var(--np-line);
+  flex-direction: column;
+  max-width: 62rem;
 }
 
-.np-trust-badge {
+.np-hero-top-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.np-status-pill {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+  padding: 0.2rem 0.5rem;
+  background-color: var(--np-surface);
+  border: 1px solid var(--np-line-strong);
+  font-family: var(--np-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--np-text);
 }
 
-.np-trust-badge::before {
+.np-status-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--np-text);
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.np-hero-ticker {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--np-line);
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+}
+
+@media (min-width: 768px) {
+  .np-hero-ticker {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.np-ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.np-ticker-item::before {
   content: '■';
-  font-size: 0.5rem;
+  font-size: 0.45rem;
   color: var(--np-line-strong);
 }
 
-/* Simulation Transcript Console (Proof Object) */
-.np-console {
+/* Expansive Clinical Workstation & Telemetry Apparatus */
+.np-apparatus {
   background-color: var(--np-surface);
   border: 1px solid var(--np-line-strong);
   border-top: 2px solid var(--np-text);
   display: flex;
   flex-direction: column;
   width: 100%;
-  box-shadow: none;
 }
 
-.np-console-header {
+.np-apparatus-top {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  background-color: var(--np-elevated);
-  border-bottom: 1px solid var(--np-line);
-  font-family: var(--np-font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.np-console-tabs {
-  display: flex;
+  align-items: stretch;
   background-color: var(--np-bg);
   border-bottom: 1px solid var(--np-line-strong);
-  overflow-x: auto;
+  flex-wrap: wrap;
 }
 
-.np-console-tab {
+.np-apparatus-tabs {
+  display: flex;
+  overflow-x: auto;
+  border-right: 1px solid var(--np-line-strong);
+}
+
+.np-apparatus-tab {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.6rem 0.9rem;
+  gap: 0.5rem;
+  padding: 0.75rem 1.1rem;
   font-family: var(--np-font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
@@ -287,52 +312,86 @@
   transition: all 0.15s ease-out;
 }
 
-.np-console-tab:hover {
+.np-apparatus-tab:hover {
   color: var(--np-text);
   background-color: var(--np-elevated);
 }
 
-.np-console-tab.is-active {
+.np-apparatus-tab.is-active {
   color: var(--np-text);
   background-color: var(--np-surface);
   border-bottom-color: var(--np-text);
   font-weight: 600;
 }
 
-.np-tab-panel {
-  display: none;
-}
-
-.np-tab-panel.is-active {
-  display: block;
-}
-
-.np-console-status {
+.np-apparatus-telemetry-badge {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--np-text);
-}
-
-.np-status-dot {
-  width: 6px;
-  height: 6px;
-  background-color: var(--np-text);
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.np-console-scenario {
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
   color: var(--np-muted);
+  flex-wrap: wrap;
 }
 
-.np-console-body {
+/* 2-Column Workstation Body Grid */
+.np-apparatus-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .np-apparatus-grid {
+    grid-template-columns: 1.14fr 0.86fr;
+  }
+}
+
+.np-apparatus-pane {
+  display: flex;
+  flex-direction: column;
+}
+
+.np-apparatus-pane--left {
+  border-bottom: 1px solid var(--np-line-strong);
+}
+
+@media (min-width: 1024px) {
+  .np-apparatus-pane--left {
+    border-bottom: none;
+    border-right: 1px solid var(--np-line-strong);
+  }
+}
+
+.np-pane-head {
+  padding: 0.65rem 1rem;
+  background-color: var(--np-elevated);
+  border-bottom: 1px solid var(--np-line);
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.np-pane-tag {
+  color: var(--np-muted);
+  font-weight: 400;
+}
+
+.np-pane-body {
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  height: 100%;
 }
 
+/* Turns & Dialogue */
 .np-turn {
   display: flex;
   flex-direction: column;
@@ -399,7 +458,6 @@
 .np-turn-content--attempt-1 {
   border-left-color: rgba(255, 255, 255, 0.3);
   color: var(--np-muted);
-  text-decoration-color: var(--np-muted);
 }
 
 .np-turn-content--attempt-2 {
@@ -415,7 +473,7 @@
   font-size: 0.6875rem;
   color: var(--np-muted);
   padding: 0.25rem 0.5rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.25);
   border: 1px solid var(--np-line);
 }
 
@@ -451,18 +509,12 @@
   color: var(--np-muted);
 }
 
-/* Quad-Audit Panel */
-.np-quad-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
+/* Right Pane: Quadit Audit & Telemetry */
 .np-quad-summary {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.6rem 0.8rem;
+  padding: 0.65rem 0.85rem;
   background-color: var(--np-bg);
   border: 1px solid var(--np-line-strong);
   font-family: var(--np-font-mono);
@@ -518,13 +570,7 @@
   color: var(--np-muted);
 }
 
-/* Telemetry Dashboard Panel */
-.np-telemetry-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
+/* Telemetry Grid */
 .np-telemetry-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -578,7 +624,8 @@
   color: var(--np-muted);
 }
 
-.np-console-footer {
+/* Apparatus Footer */
+.np-apparatus-footer {
   padding: 0.75rem 1rem;
   background-color: var(--np-elevated);
   border-top: 1px solid var(--np-line);

@@ -37,22 +37,26 @@
 
   /* =============================================
      TYPOGRAPHY — Technical brutalist & clinical editorial.
-     Geist & Archivo carry the high-precision brutalist display/hero voice.
+     Space Grotesk carries the technical brutalist display/hero voice.
      Instrument Sans Variable carries reading and interface text.
      Spline Sans Mono and IBM Plex Mono remain restricted to app data,
      telemetry, and code surfaces.
      ============================================= */
   --np-font-display:
-    'Geist Variable', 'Geist', 'Archivo Variable', 'Archivo', system-ui, -apple-system, sans-serif;
+    'Space Grotesk Variable', 'Space Grotesk', system-ui, -apple-system,
+    sans-serif;
   --np-font-hero:
-    'Geist Variable', 'Geist', 'Archivo Variable', 'Archivo', system-ui, -apple-system, sans-serif;
+    'Space Grotesk Variable', 'Space Grotesk', system-ui, -apple-system,
+    sans-serif;
   --np-font-headline:
-    'Geist Variable', 'Geist', 'Archivo Variable', 'Archivo', system-ui, -apple-system, sans-serif;
+    'Space Grotesk Variable', 'Space Grotesk', system-ui, -apple-system,
+    sans-serif;
   --np-font-condensed: var(--np-font-headline);
   --np-font-poster: var(--np-font-display);
   --np-font-body: 'Instrument Sans Variable', system-ui, sans-serif;
   --np-font-label: 'Instrument Sans Variable', system-ui, sans-serif;
-  --np-font-mono: 'Spline Sans Mono Variable', 'IBM Plex Mono', ui-monospace, monospace;
+  --np-font-mono:
+    'Spline Sans Mono Variable', 'IBM Plex Mono', ui-monospace, monospace;
 
   /* Weights — weight carries hierarchy (The Content-is-Type Rule) */
   --np-weight-display: 400;

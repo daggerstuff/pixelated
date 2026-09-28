@@ -1,10 +1,8 @@
 // Centralized font imports — all layouts import from here to ensure
 // consistent font loading and avoid duplicate <style> injection.
-// Geist and Archivo carry brutalist technical display on homepage and marketing surfaces;
+// Space Grotesk carries the technical brutalist display on homepage and marketing surfaces;
 // Instrument Sans Variable carries reading and interface text. Spline Sans
-// Mono and IBM Plex Mono remain app-data utility.
-import '@fontsource-variable/geist'
-import '@fontsource-variable/archivo'
+// Mono and IBM Plex Mono remain app-data and telemetry utility.
 import '@fontsource-variable/space-grotesk'
 import '@fontsource/instrument-serif'
 import '@fontsource-variable/instrument-sans'
