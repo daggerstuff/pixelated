@@ -122,8 +122,10 @@ export default function SearchInterface() {
               <button
                 type="button"
                 onClick={() => setShowFilters(!showFilters)}
-                className={`hover:bg-slate-700 rounded-md p-2 transition-colors ${
-                  showFilters ? 'text-pink-400 bg-slate-700' : 'text-slate-400'
+                className={`rounded-none p-2 transition-colors hover:bg-secondary ${
+                  showFilters
+                    ? 'bg-secondary text-foreground'
+                    : 'text-muted-foreground'
                 }`}
                 title="Advanced Filters"
                 aria-label="Toggle advanced filters"
@@ -147,10 +149,10 @@ export default function SearchInterface() {
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-pink-600 hover:bg-pink-700 disabled:bg-pink-800 text-white flex items-center gap-2 rounded-lg px-4 py-2 transition-colors"
+                className="flex items-center gap-2 rounded-none bg-primary px-4 py-2 text-foreground transition-colors hover:bg-accent disabled:opacity-35"
               >
                 {loading ? (
-                  <span className="border-white border-t-transparent h-4 w-4 animate-spin rounded-full border-2"></span>
+                  <span className="border-white border-t-transparent h-4 w-4 animate-spin rounded-none border-2"></span>
                 ) : (
                   <span>Search</span>
                 )}
@@ -184,7 +186,7 @@ export default function SearchInterface() {
         {/* Results Area */}
         <div className="relative z-0 mt-8 w-full">
           {error && (
-            <div className="bg-red-900/20 border-red-800 text-red-200 mb-6 rounded-lg border p-4 text-center">
+            <div className="mb-6 rounded-none border border-ring bg-secondary p-4 text-center text-foreground">
               {error}
             </div>
           )}
@@ -192,7 +194,7 @@ export default function SearchInterface() {
           {!hasSearched && !loading && (
             <div className="py-12 text-center">
               <div className="mb-4 text-6xl opacity-20">🔬</div>
-              <p className="text-slate-400 text-lg">
+              <p className="text-lg text-muted-foreground">
                 Enter a query to explore the academic literature.
               </p>
             </div>
@@ -200,12 +202,12 @@ export default function SearchInterface() {
 
           {hasSearched && !loading && results.length > 0 && (
             <div className="mb-4 flex items-center justify-between px-2">
-              <div className="text-slate-400 text-sm">
+              <div className="text-sm text-muted-foreground">
                 Found {results.length} results
               </div>
               <button
                 onClick={() => setShowExport(true)}
-                className="text-pink-400 hover:text-pink-300 flex items-center gap-2 text-sm transition-colors"
+                className="flex items-center gap-2 text-sm text-foreground transition-colors hover:text-muted-foreground"
               >
                 <svg
                   className="h-4 w-4"
@@ -230,7 +232,7 @@ export default function SearchInterface() {
           )}
 
           {hasSearched && !loading && results.length === 0 && !error && (
-            <div className="text-slate-400 py-12 text-center">
+            <div className="py-12 text-center text-muted-foreground">
               <p>
                 No results found for "{query}". Try broadening your search
                 terms.

@@ -12,14 +12,12 @@ const ResultCardHeader = ({
 }: {
   therapeutic_relevance_score?: number
 }) => (
-  <div className="from-slate-700 to-slate-800 relative flex h-32 items-center justify-center overflow-hidden bg-gradient-to-br">
-    <div className="from-slate-900 to-transparent absolute inset-0 bg-gradient-to-t opacity-60"></div>
-
+  <div className="relative flex h-32 items-center justify-center overflow-hidden bg-secondary">
     {/* Relevance Score Badge */}
     {therapeutic_relevance_score !== undefined &&
       therapeutic_relevance_score !== null && (
-        <div className="bg-black/40 border-white/10 absolute right-2 top-2 flex items-center gap-1 rounded-md border px-2 py-1 backdrop-blur-sm">
-          <span className="text-white font-mono text-xs">
+        <div className="absolute right-2 top-2 flex items-center gap-1 rounded-none border border-border bg-secondary px-2 py-1">
+          <span className="font-mono text-xs text-foreground">
             {therapeutic_relevance_score.toFixed(2)}
           </span>
         </div>
@@ -35,11 +33,11 @@ const ResultCardMetadata = ({
   publication_year?: number
 }) => (
   <div className="mb-3 flex gap-2 text-xs">
-    <span className="bg-slate-700 text-slate-300 border-slate-600 rounded border px-2 py-1 capitalize">
+    <span className="rounded border border-input bg-secondary px-2 py-1 capitalize text-foreground">
       {(source ?? 'unknown').replace('_', ' ')}
     </span>
     {(publication_year ?? 0) > 0 && (
-      <span className="bg-slate-700 text-slate-300 border-slate-600 rounded border px-2 py-1">
+      <span className="rounded border border-input bg-secondary px-2 py-1 text-foreground">
         {publication_year}
       </span>
     )}
@@ -47,13 +45,13 @@ const ResultCardMetadata = ({
 )
 
 const ResultCardActions = ({ url }: { url?: string }) => (
-  <div className="border-slate-700/50 mt-auto flex gap-2 border-t pt-4">
+  <div className="border-border/50 mt-auto flex gap-2 border-t pt-4">
     {url ? (
       <a
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-pink-400 hover:text-pink-300 flex items-center gap-1 text-xs font-medium uppercase tracking-wide transition-colors"
+        className="flex items-center gap-1 text-xs font-medium uppercase tracking-wide text-foreground transition-colors hover:text-muted-foreground"
       >
         View Details
         <svg
@@ -72,7 +70,7 @@ const ResultCardActions = ({ url }: { url?: string }) => (
       </a>
     ) : (
       <button
-        className="text-slate-500 cursor-not-allowed text-xs font-medium uppercase tracking-wide"
+        className="cursor-not-allowed text-xs font-medium uppercase tracking-wide text-muted-foreground"
         disabled
       >
         Details Unavailable
@@ -81,7 +79,7 @@ const ResultCardActions = ({ url }: { url?: string }) => (
 
     <div className="flex-grow"></div>
     <button
-      className="text-slate-500 hover:text-white transition-colors"
+      className="text-muted-foreground transition-colors hover:text-foreground"
       title="Save to favorites"
       aria-label="Save to favorites"
     >
@@ -117,7 +115,7 @@ export default React.memo(function ResultCard({ result }: ResultCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
-      className="result-card bg-slate-800 border-slate-700 hover:border-pink-500/30 group flex h-full flex-col overflow-hidden rounded-xl border transition-colors hover:shadow-xl"
+      className="result-card hover:border-ring/30 group flex h-full flex-col overflow-hidden rounded-none border border-border bg-secondary transition-colors"
     >
       <ResultCardHeader
         therapeutic_relevance_score={therapeutic_relevance_score}
@@ -129,11 +127,11 @@ export default React.memo(function ResultCard({ result }: ResultCardProps) {
           publication_year={publication_year}
         />
 
-        <h3 className="text-slate-100 group-hover:text-pink-400 mb-2 line-clamp-2 text-lg font-bold leading-tight transition-colors">
+        <h3 className="mb-2 line-clamp-2 text-lg font-bold leading-tight text-foreground transition-colors group-hover:text-foreground">
           {title}
         </h3>
 
-        <p className="text-slate-400 mb-4 line-clamp-2 text-sm">
+        <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
           {authors.join(', ')}
         </p>
 

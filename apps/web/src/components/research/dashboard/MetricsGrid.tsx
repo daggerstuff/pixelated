@@ -20,82 +20,88 @@ const MetricsGrid: FC<MetricsGridProps> = memo(({ metrics }) => {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
       <FadeIn>
-        <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+        <div className="rounded-none border border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Total Studies
               </p>
-              <p className="text-gray-900 dark:text-white text-3xl font-bold">
+              <p className="text-3xl font-bold text-foreground">
                 {metrics.totalStudies}
               </p>
             </div>
-            <div className="bg-blue-100 dark:bg-blue-900/30 flex h-8 w-8 items-center justify-center rounded-lg">
-              <span className="text-blue-600 dark:text-blue-400">🔬</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-none bg-secondary">
+              <span className="text-foreground">🔬</span>
             </div>
           </div>
-          <p className="text-gray-500 mt-2 text-sm">
+          <p className="mt-2 text-sm text-muted-foreground">
             {metrics.activeStudies} currently active
           </p>
         </div>
       </FadeIn>
 
       <FadeIn>
-        <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+        <div className="rounded-none border border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Participants
               </p>
-              <p className="text-gray-900 dark:text-white text-3xl font-bold">
+              <p className="text-3xl font-bold text-foreground">
                 {metrics.totalParticipants.toLocaleString()}
               </p>
             </div>
-            <div className="bg-green-100 dark:bg-green-900/30 flex h-8 w-8 items-center justify-center rounded-lg">
-              <span className="text-green-600 dark:text-green-400">👥</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-none bg-secondary">
+              <span className="text-foreground">👥</span>
             </div>
           </div>
-          <p className="text-gray-500 mt-2 text-sm">Across all studies</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Across all studies
+          </p>
         </div>
       </FadeIn>
 
       <FadeIn>
-        <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+        <div className="rounded-none border border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Publications
               </p>
-              <p className="text-gray-900 dark:text-white text-3xl font-bold">
+              <p className="text-3xl font-bold text-foreground">
                 {metrics.publications}
               </p>
             </div>
-            <div className="bg-purple-100 dark:bg-purple-900/30 flex h-8 w-8 items-center justify-center rounded-lg">
-              <span className="text-purple-600 dark:text-purple-400">📚</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-none bg-secondary">
+              <span className="text-foreground">📚</span>
             </div>
           </div>
-          <p className="text-gray-500 mt-2 text-sm">Peer-reviewed articles</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Peer-reviewed articles
+          </p>
         </div>
       </FadeIn>
 
       <FadeIn>
-        <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+        <div className="rounded-none border border-border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Avg Effect Size
               </p>
-              <p className="text-gray-900 dark:text-white text-3xl font-bold">
+              <p className="text-3xl font-bold text-foreground">
                 {metrics.avgEffectSize}
               </p>
             </div>
-            <div className="bg-yellow-100 dark:bg-yellow-900/30 flex h-8 w-8 items-center justify-center rounded-lg">
-              <span className="text-yellow-600 dark:text-yellow-400">
+            <div className="flex h-8 w-8 items-center justify-center rounded-none bg-secondary">
+              <span className="text-foreground">
                 <ArrowTrendingUpIcon className="h-5 w-5" />
               </span>
             </div>
           </div>
-          <p className="text-gray-500 mt-2 text-sm">Treatment effectiveness</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Treatment effectiveness
+          </p>
         </div>
       </FadeIn>
     </div>
