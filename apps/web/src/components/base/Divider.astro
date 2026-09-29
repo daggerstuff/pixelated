@@ -6,7 +6,4 @@ interface Props {
 const { class: className } = Astro.props
 ---
 
-<hr
-  class={`w-0.25 h-[85%] b-t-0 bg-[#ddd] dark:bg-[#333] ${className}`}
-  aria-hidden={true}
-/>
+<hr class={`w-0.25 h-[85%] b-t-0 bg-border ${className}`} aria-hidden={true} />

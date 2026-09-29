@@ -662,14 +662,14 @@ export function TrainingSessionComponent() {
               key={entry.id}
               className={`rounded-none p-4 ${
                 entry.role === 'client'
-                  ? 'bg-neutral-500/10 border-neutral-500 border-l-4'
-                  : 'bg-neutral-500/5 border-neutral-400 border-l-4'
+                  ? 'border-l-4 border-border bg-secondary'
+                  : 'bg-secondary/50 border-border/50 border-l-4'
               }`}
             >
               <div className="mb-1 text-sm font-semibold text-muted-foreground">
                 {entry.role === 'client' ? 'Client' : 'Therapist'}
               </div>
-              <div className="text-white">{entry.message}</div>
+              <div className="text-foreground">{entry.message}</div>
             </div>
           ))}
         </div>

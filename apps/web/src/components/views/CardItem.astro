@@ -86,12 +86,11 @@ const sanitizedDetails = details
 <section class={className}>
   <div
     class="overflow-hidden flex flex-col
-      b b-[#8884] rounded-lg bg-white dark:bg-black
-      shadow-transition-500 hover:(shadow-custom_0_3_20_-5)"
+      b b-border rounded-none bg-card"
   >
     {((images && images.length > 0) || video) && (
       <MediaContainer
-        class="b-b b-b-[#8884] op-100!"
+        class="b-b b-b-border op-100!"
         {...(MediaContainer === Link ? { href: link } : {})}
       >
         {images &&
@@ -132,12 +131,12 @@ const sanitizedDetails = details
     )}
     {external && (
       <Link
-        class="overflow-hidden flex flex-col b b-[#8884] rounded-lg mt-3 mx-3 op-100! shadow-transition-500 hover:(shadow-custom_0_5_15_-3)"
+        class="overflow-hidden flex flex-col b b-border rounded-none mt-3 mx-3 op-100!"
         href={external.uri}
       >
         {!COMPACT && external.thumb && (
           <Image
-            class="b-b b-b-[#8884] aspect-[1.91/1] object-cover"
+            class="b-b b-b-border aspect-[1.91/1] object-cover"
             src={external.thumb}
             alt={external.title}
             width={1200}
@@ -145,7 +144,7 @@ const sanitizedDetails = details
           />
         )}
         <div class="flex flex-col px-3 pt-2 pb-1">
-          <div class="flex flex-col gap-1 pb-1.5 b-b b-b-[#8884]">
+          <div class="flex flex-col gap-1 pb-1.5 b-b b-b-border">
             <p class="text-sm font-600">{external.title}</p>
             <p class="text-xs">{external.description}</p>
           </div>
@@ -157,7 +156,7 @@ const sanitizedDetails = details
       </Link>
     )}
     {quote && (
-      <div class="overflow-hidden flex flex-col gap-2 b b-[#8884] rounded-lg p-2 mt-3 mx-3 text-sm shadow-transition-500 hover:(shadow-custom_0_5_15_-3)">
+      <div class="overflow-hidden flex flex-col gap-2 b b-border rounded-none p-2 mt-3 mx-3 text-sm">
         <div class="flex items-center gap-1">
           <Image
             class="size-1em rounded-full object-cover"
@@ -184,12 +183,12 @@ const sanitizedDetails = details
       {text && <p class="prose card-item-prose">{text}</p>}
       {sanitizedDetails && (
         <div class="card-item-details" style="max-height: 0; overflow-y: clip;">
-          <ol class="relative border-s border-gray-200 dark:border-gray-700">
+          <ol class="relative border-s border-border">
             {sanitizedDetails
               .slice(0, MAX_DETAILS + 1)
               .map((detail: string, idx: number) => (
                 <li class="ms-4 mb-6 last:mb-0">
-                  <div class="absolute start--1.6 w-3 h-3 border rounded-full border-white dark:border-gray-900 mt-1.5 bg-gray-200 dark:bg-gray-700" />
+                  <div class="absolute start--1.6 w-3 h-3 border rounded-full border-background mt-1.5 bg-secondary" />
                   {idx < MAX_DETAILS && (
                     <div class="prose card-item-prose" set:html={detail} />
                   )}
@@ -217,7 +216,7 @@ const sanitizedDetails = details
               type="button"
               aria-expanded="false"
               aria-label="Toggle details"
-              class="details-switch op-50 op-transition hover:op-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#888]"
+              class="details-switch op-50 op-transition hover:op-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               <div u-i-lucide-chevron-down class="icon-down" />
               <div u-i-lucide-chevron-up class="icon-up hidden" />
