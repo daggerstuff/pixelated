@@ -400,10 +400,10 @@ describe('WebSocketProgressBar', () => {
         expect(progressBar).toHaveClass(expectedColor)
       }
 
-      testProgress(25, 'bg-orange-500')
-      testProgress(50, 'bg-yellow-500')
-      testProgress(70, 'bg-blue-500')
-      testProgress(85, 'bg-green-500')
+      testProgress(25, 'bg-muted-foreground')
+      testProgress(50, 'bg-primary/70')
+      testProgress(70, 'bg-primary')
+      testProgress(85, 'bg-foreground')
     })
   })
 
