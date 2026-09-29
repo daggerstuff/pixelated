@@ -46,15 +46,15 @@ const { class: className } = Astro.props
 
 <style>
   .snippet-intro {
-    @apply mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg dark:from-blue-900/20 dark:to-indigo-900/20 dark:border-blue-800;
+    @apply mb-8 p-6 bg-secondary border border-border rounded-none;
   }
 
   .intro-content h2 {
-    @apply text-2xl font-bold text-blue-900 dark:text-blue-100 mb-4;
+    @apply text-2xl font-bold text-foreground mb-4;
   }
 
   .intro-content > p {
-    @apply text-blue-800 dark:text-blue-200 mb-6 text-lg;
+    @apply text-muted-foreground mb-6 text-lg;
   }
 
   .features-grid {
@@ -62,14 +62,14 @@ const { class: className } = Astro.props
   }
 
   .feature {
-    @apply bg-white dark:bg-gray-800 p-4 rounded-lg border border-blue-100 dark:border-blue-700;
+    @apply bg-card p-4 rounded-none border border-border;
   }
 
   .feature h3 {
-    @apply text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2;
+    @apply text-lg font-semibold text-foreground mb-2;
   }
 
   .feature p {
-    @apply text-blue-700 dark:text-blue-300 text-sm;
+    @apply text-muted-foreground text-sm;
   }
 </style>

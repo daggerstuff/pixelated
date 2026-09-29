@@ -15,9 +15,9 @@ interface UnusualPatternsProps {
 }
 
 const severityColors = {
-  low: 'bg-yellow-100 text-yellow-800',
-  medium: 'bg-orange-100 text-orange-800',
-  high: 'bg-red-100 text-red-800',
+  low: 'bg-secondary text-foreground',
+  medium: 'bg-secondary text-foreground border border-ring font-medium',
+  high: 'bg-foreground text-background',
 }
 
 export function UnusualPatterns({ patterns }: UnusualPatternsProps) {
@@ -59,10 +59,10 @@ export function UnusualPatterns({ patterns }: UnusualPatternsProps) {
                     {pattern.severity}
                   </Badge>
                 </div>
-                <p className="text-gray-600 mb-3 text-sm">
+                <p className="mb-3 text-sm text-muted-foreground">
                   {pattern.description}
                 </p>
-                <div className="text-gray-500 text-xs">
+                <div className="text-xs text-muted-foreground">
                   {pattern.relatedLogs.length} related log entries
                 </div>
               </div>

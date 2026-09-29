@@ -36,11 +36,11 @@ const { title, defaultOpen = false, class: className } = Astro.props
 
 <style>
   .expandable {
-    @apply border border-gray-200 rounded-lg mb-4 dark:border-gray-700;
+    @apply border border-border mb-4;
   }
 
   .expandable-trigger {
-    @apply flex items-center justify-between w-full p-4 text-left bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors duration-200 dark:bg-gray-800 dark:hover:bg-gray-700;
+    @apply flex items-center justify-between w-full p-4 text-left bg-secondary hover:bg-accent cursor-pointer transition-colors duration-200;
     list-style: none;
   }
 
@@ -53,11 +53,11 @@ const { title, defaultOpen = false, class: className } = Astro.props
   }
 
   .expandable-title {
-    @apply font-medium text-gray-900 dark:text-gray-100;
+    @apply font-medium text-foreground;
   }
 
   .expandable-icon {
-    @apply text-gray-500 transition-transform duration-200 dark:text-gray-400;
+    @apply text-muted-foreground transition-transform duration-200;
   }
 
   .expandable[open] .expandable-icon {
@@ -65,7 +65,7 @@ const { title, defaultOpen = false, class: className } = Astro.props
   }
 
   .expandable-content {
-    @apply p-4 border-t border-gray-200 dark:border-gray-700;
+    @apply p-4 border-t border-border;
   }
 
   .expandable-content :global(> *:first-child) {
@@ -78,7 +78,7 @@ const { title, defaultOpen = false, class: className } = Astro.props
 
   /* Nested expandables */
   .expandable-content .expandable {
-    @apply ml-4 border-l-2 border-gray-200 dark:border-gray-600;
+    @apply ml-4 border-l-2 border-border;
   }
 </style>
 

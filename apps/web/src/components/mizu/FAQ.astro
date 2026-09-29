@@ -23,25 +23,27 @@ const faqs = [
 ]
 ---
 
-<section id="faq" class="py-24 bg-slate-950 border-t border-white/5">
+<section id="faq" class="py-24 bg-background border-t border-border">
   <div class="container mx-auto px-4 max-w-4xl">
     <div class="text-center mb-16">
-      <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 text-foreground">
         Frequently Asked Questions
       </h2>
-      <p class="text-slate-400 text-base">
+      <p class="text-muted-foreground text-base">
         Everything you need to know about the platform.
       </p>
     </div>
 
     <div class="space-y-4">
       {faqs.map((faq) => (
-        <details class="group bg-slate-900/50 border border-white/5 rounded-2xl open:bg-slate-800/50 transition-all duration-300">
+        <details class="group bg-card border border-border rounded-none open:bg-secondary transition-all duration-300">
           <summary class="flex justify-between items-center p-6 cursor-pointer list-none">
-            <span class="text-base font-medium text-white">{faq.question}</span>
+            <span class="text-base font-medium text-foreground">
+              {faq.question}
+            </span>
             <span class="transition-transform group-open:rotate-180">
               <svg
-                class="w-6 h-6 text-slate-400"
+                class="w-6 h-6 text-muted-foreground"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -55,7 +57,7 @@ const faqs = [
               </svg>
             </span>
           </summary>
-          <div class="px-6 pb-6 text-slate-400 leading-relaxed">
+          <div class="px-6 pb-6 text-muted-foreground leading-relaxed">
             {faq.answer}
           </div>
         </details>

@@ -375,7 +375,7 @@ export default function SyntheticTherapyDemo() {
 
                       <div className="rounded-lg bg-muted p-4">
                         <div className="flex items-start gap-4">
-                          <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                          <div className="h-8 w-8 rounded-none bg-secondary flex items-center justify-center text-foreground">
                             T
                           </div>
                           <div className="flex-1">

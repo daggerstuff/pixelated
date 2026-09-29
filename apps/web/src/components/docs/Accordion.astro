@@ -9,16 +9,16 @@ const accordionId = `accordion-${Math.random().toString(36).substring(2, 9)}`
 ---
 
 <details
-  class="accordion-item border border-gray-200 dark:border-gray-700 rounded-lg mb-2"
+  class="accordion-item border border-border rounded-none mb-2"
   open={defaultOpen}
 >
   <summary
-    class="accordion-header cursor-pointer px-4 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg transition-colors duration-200 flex items-center justify-between"
+    class="accordion-header cursor-pointer px-4 py-3 bg-secondary hover:bg-accent rounded-none transition-colors duration-200 flex items-center justify-between"
     id={accordionId}
   >
-    <span class="font-medium text-gray-900 dark:text-gray-100">{title}</span>
+    <span class="font-medium text-foreground">{title}</span>
     <svg
-      class="accordion-icon w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform duration-200"
+      class="accordion-icon w-5 h-5 text-muted-foreground transition-transform duration-200"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -32,7 +32,7 @@ const accordionId = `accordion-${Math.random().toString(36).substring(2, 9)}`
       ></path>
     </svg>
   </summary>
-  <div class="accordion-content px-4 py-3 bg-white dark:bg-gray-900 rounded-b-lg">
+  <div class="accordion-content px-4 py-3 bg-card rounded-none">
     <slot />
   </div>
 </details>
@@ -43,7 +43,7 @@ const accordionId = `accordion-${Math.random().toString(36).substring(2, 9)}`
   }
 
   .accordion-header:focus {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid var(--np-mid);
     outline-offset: 2px;
   }
 

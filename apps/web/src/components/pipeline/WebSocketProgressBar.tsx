@@ -96,10 +96,11 @@ export function WebSocketProgressBar(props: {
   }, [webSocket, executionId, onProgressUpdate])
 
   const progressColor = useMemo(() => {
-    if (progress < 40) return 'bg-orange-500'
-    if (progress < 60) return 'bg-yellow-500'
-    if (progress < 80) return 'bg-blue-500'
-    return 'bg-green-500'
+    // Value-contrast ramp: darker/fuller fills read as further along.
+    if (progress < 40) return 'bg-muted-foreground'
+    if (progress < 60) return 'bg-primary/70'
+    if (progress < 80) return 'bg-primary'
+    return 'bg-foreground'
   }, [progress])
 
   return (
@@ -201,5 +202,3 @@ export function WebSocketMessageLogger(props: {
     </div>
   )
 }
-
-export default WebSocketProgressBar

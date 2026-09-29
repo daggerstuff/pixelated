@@ -30,7 +30,7 @@ const {
 
 <style>
   .response-field {
-    @apply border border-gray-200 rounded-lg p-4 mb-4 dark:border-gray-700;
+    @apply border border-border p-4 mb-4;
   }
 
   .response-field-header {
@@ -38,19 +38,19 @@ const {
   }
 
   .response-field-name {
-    @apply font-mono text-sm bg-gray-100 px-2 py-1 rounded dark:bg-gray-800;
+    @apply font-mono text-sm bg-secondary px-2 py-1 rounded-none;
   }
 
   .response-field-type {
-    @apply text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded dark:bg-blue-900 dark:text-blue-200;
+    @apply text-xs bg-secondary text-muted-foreground px-2 py-1 rounded-none;
   }
 
   .response-field-required {
-    @apply text-xs bg-red-100 text-red-800 px-2 py-1 rounded dark:bg-red-900 dark:text-red-200;
+    @apply text-xs bg-primary text-primary-foreground px-2 py-1 rounded-none;
   }
 
   .response-field-description {
-    @apply text-sm text-gray-600 dark:text-gray-400;
+    @apply text-sm text-muted-foreground;
   }
 
   .response-field-description :global(p:first-child) {

@@ -1,5 +1,4 @@
 import { defineAgent } from 'eve'
-import { z } from 'zod'
 
 import {
   AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
@@ -15,16 +14,4 @@ export default defineAgent({
   model: agentModel,
   modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   reasoning: 'medium',
-  outputSchema: z.object({
-    intervention_kind: z.enum([
-      'suggestion',
-      'escalation_request',
-      'pause_session',
-      'note',
-    ]),
-    urgency: z.number().min(0).max(1),
-    body: z.string().max(800),
-    restart_session: z.boolean().optional(),
-    halt_session: z.boolean().optional(),
-  }),
 })

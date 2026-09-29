@@ -7,28 +7,28 @@ import type { FilterableData } from './BiasDashboard.types'
 
 // ─── Color helpers (pure) ─────────────────────────────────────────────────
 
-/** Alert severity background color (neutral grayscale ramp). */
+/** Alert severity chip classes (value-contrast ladder, token bridge). */
 export const getAlertColor = (level: string): string => {
   switch (level) {
     case 'critical':
-      return 'bg-neutral-900'
+      return 'bg-foreground text-background'
     case 'high':
-      return 'bg-neutral-800'
+      return 'bg-primary text-primary-foreground'
     case 'medium':
-      return 'bg-neutral-700'
+      return 'bg-primary/70 text-primary-foreground'
     case 'low':
-      return 'bg-neutral-600'
+      return 'bg-secondary text-foreground'
     default:
-      return 'bg-neutral-500'
+      return 'bg-secondary text-foreground'
   }
 }
 
-/** Bias score text color based on severity (neutral grayscale ramp). */
+/** Bias score text color based on severity (value-contrast ladder). */
 export const getBiasScoreColor = (score: number): string => {
-  if (score >= 0.8) return 'text-neutral-900'
-  if (score >= 0.6) return 'text-neutral-800'
-  if (score >= 0.3) return 'text-neutral-700'
-  return 'text-neutral-600'
+  if (score >= 0.8) return 'text-foreground'
+  if (score >= 0.6) return 'text-foreground/80'
+  if (score >= 0.3) return 'text-muted-foreground'
+  return 'text-muted-foreground/70'
 }
 
 /** Chart series color — zero-chroma grayscale HSL ramp (DESIGN.md). */
@@ -45,7 +45,7 @@ export interface DateRange {
 }
 
 /** Filter data by time range. Pure — accepts customDateRange as param. */
-export const filterDataByTimeRange = (
+const filterDataByTimeRange = (
   data: FilterableData,
   timeRange: string,
   customDateRange?: DateRange,
@@ -97,7 +97,7 @@ export const filterDataByTimeRange = (
 }
 
 /** Filter data by bias score threshold. Pure. */
-export const filterDataByBiasScore = (
+const filterDataByBiasScore = (
   data: FilterableData,
   filter: string,
 ): FilterableData => {
@@ -127,7 +127,7 @@ export const filterDataByBiasScore = (
 }
 
 /** Filter data by alert level. Pure. */
-export const filterDataByAlertLevel = (
+const filterDataByAlertLevel = (
   data: FilterableData,
   filter: string,
 ): FilterableData => {
