@@ -3,3 +3,10 @@
 # Hardened: read-only, type: Directory, seccomp: RuntimeDefault,
 # runAsNonRoot, readOnlyRootFilesystem, all capabilities dropped.
 KSV-0121
+
+# CVE-2026-81726: nltk 3.10.3 (HIGH) in
+# apps/web/src/lib/ai/bias-detection/python-service/uv.lock.
+# No fixed version released upstream as of 2026-09-29. Temporary,
+# accepted-risk ignore — remove once a patched nltk release lands
+# (revisit by 2026-10-13 or on any Dependabot nltk update).
+CVE-2026-81726
