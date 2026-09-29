@@ -29,11 +29,11 @@ const { class: className } = Astro.props
 
 <style>
   .warning-box {
-    @apply flex items-start gap-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-900 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-100;
+    @apply flex items-start gap-3 p-4 bg-secondary border border-ring rounded-none text-foreground font-medium;
   }
 
   .warning-icon {
-    @apply flex-shrink-0 text-yellow-600 dark:text-yellow-400;
+    @apply flex-shrink-0 text-foreground;
   }
 
   .warning-content {
