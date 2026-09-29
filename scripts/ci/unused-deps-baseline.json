@@ -212,7 +212,6 @@
     "package.json :: devDependencies :: url-polyfill",
     "package.json :: devDependencies :: vfile",
     "package.json :: devDependencies :: viewerjs",
-    "package.json :: devDependencies :: vscode-jsonrpc",
     "package.json :: devDependencies :: wait-on",
     "tests/load.test.cjs :: unlisted :: autocannon"
   ]

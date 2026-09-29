@@ -1,5 +1,4 @@
 import { defineAgent } from 'eve'
-import { z } from 'zod'
 
 import {
   AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
@@ -15,17 +14,4 @@ export default defineAgent({
   model: agentModel,
   modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   reasoning: 'medium',
-  outputSchema: z.object({
-    headline: z.string().max(280),
-    strengths: z.array(z.string().max(160)).min(1).max(3),
-    gaps: z.array(z.string().max(160)).max(3),
-    rubric_items: z.array(
-      z.object({
-        item_id: z.string(),
-        passed: z.boolean(),
-        comment: z.string().max(160),
-      }),
-    ),
-    next_session_hint: z.string().max(160).optional(),
-  }),
 })
