@@ -291,8 +291,8 @@ function TrainingSession({ className }: TrainingSessionProps) {
                     className={cn(
                       'mb-2 p-2 rounded',
                       entry.role === 'therapist'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-green-100 text-green-800',
+                        ? 'bg-secondary text-foreground'
+                        : 'border border-border bg-card text-foreground',
                     )}
                   >
                     <strong>

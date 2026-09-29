@@ -114,7 +114,7 @@ function isActive(href: string) {
       <ThemeSwitcher />
       <button
         id="mobile-menu-button"
-        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-400 dark:focus:ring-gray-500"
+        class="inline-flex items-center justify-center rounded-none p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-ring"
         aria-controls="mobile-menu"
         aria-expanded="false"
         aria-label="Open main menu"
@@ -175,7 +175,7 @@ function isActive(href: string) {
                     'block py-2 transition-colors',
                     active
                       ? 'text-accent-primary font-medium border-l-2 border-accent-primary pl-3'
-                      : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
+                      : 'text-muted-foreground hover:text-foreground pl-0',
                   ]}
                   aria-current={active ? 'page' : undefined}
                   role="menuitem"
@@ -185,17 +185,14 @@ function isActive(href: string) {
               </li>
             )
           })}
-          <li
-            role="none"
-            class="pt-2 border-t border-gray-200 dark:border-gray-800"
-          >
+          <li role="none" class="pt-2 border-t border-border">
             <a
               href="/login"
               class:list={[
                 'block py-2 transition-colors',
                 isActive('/login')
                   ? 'text-accent-primary font-medium border-l-2 border-accent-primary pl-3'
-                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
+                  : 'text-muted-foreground hover:text-foreground pl-0',
               ]}
               aria-current={isActive('/login') ? 'page' : undefined}
               role="menuitem"
@@ -210,7 +207,7 @@ function isActive(href: string) {
                 'block py-2 transition-colors',
                 isActive('/register')
                   ? 'text-accent-primary font-medium border-l-2 border-accent-primary pl-3'
-                  : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
+                  : 'text-muted-foreground hover:text-foreground pl-0',
               ]}
               aria-current={isActive('/register') ? 'page' : undefined}
               role="menuitem"

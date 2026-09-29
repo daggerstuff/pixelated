@@ -18,10 +18,10 @@ const SearchDemo = {
     return {
       html: `
         <div class="w-full transition-colors duration-300 ${className}">
-          <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+          <h2 class="text-2xl font-bold mb-4 text-foreground">
             ${title}
           </h2>
-          <p class="mb-6 text-gray-600 dark:text-gray-400">
+          <p class="mb-6 text-muted-foreground">
             ${description}
           </p>
           <search-demo-react data-testid="search-demo-react"></search-demo-react>
