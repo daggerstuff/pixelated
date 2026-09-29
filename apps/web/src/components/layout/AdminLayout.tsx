@@ -22,7 +22,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
     <div className="admin-layout">
       {/* Mobile sidebar toggle: absolutely placed top-left */}
       <button
-        className="mobile-sidebar-toggle bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 text-gray-700 dark:text-gray-300 fixed left-4 top-4 z-[51] flex h-10 w-10 items-center justify-center rounded-full border shadow-lg transition-all md:hidden"
+        className="mobile-sidebar-toggle fixed left-4 top-4 z-[51] flex h-10 w-10 items-center justify-center rounded-none border border-border bg-card text-foreground transition-colors md:hidden"
         aria-label="Toggle sidebar"
         aria-controls="admin-sidebar"
         aria-expanded={sidebarOpen}
@@ -45,12 +45,12 @@ const AdminLayout: FC<AdminLayoutProps> = ({
       </button>
 
       {/* Header would normally be added by the Astro AdminLayout */}
-      <header className="bg-white dark:bg-gray-800 sticky top-0 z-30 px-6 py-4 shadow-md">
+      <header className="sticky top-0 z-30 border-b border-border bg-card px-6 py-4">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold">{title}</h1>
           <div className="flex items-center gap-4">
             <div className="relative">
-              <button className="text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              <button className="flex items-center gap-2 text-foreground">
                 <img
                   className="h-8 w-8 rounded-full object-cover"
                   src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
@@ -66,14 +66,14 @@ const AdminLayout: FC<AdminLayoutProps> = ({
       {/* Sidebar */}
       <aside
         id="admin-sidebar"
-        className={`sidebar dashboard-sidebar bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 fixed left-0 top-0 z-40 h-screen w-64 border-r transition-transform ${sidebarOpen ? 'expanded translate-x-0' : '-translate-x-full'} md:expanded md:translate-x-0`}
+        className={`sidebar dashboard-sidebar fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card transition-transform ${sidebarOpen ? 'expanded translate-x-0' : '-translate-x-full'} md:expanded md:translate-x-0`}
         aria-label="Admin sidebar"
         aria-hidden={sidebarOpen ? 'false' : 'true'}
       >
         <div className="h-full overflow-y-auto px-3 py-4">
           {/* Logo */}
           <div className="mb-5 flex items-center p-2">
-            <h2 className="text-gray-800 dark:text-white text-xl font-semibold">
+            <h2 className="text-xl font-semibold text-foreground">
               Admin Portal
             </h2>
           </div>
@@ -83,7 +83,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
             <li>
               <a
                 href="/admin"
-                className="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center rounded-lg p-2"
+                className="flex items-center rounded-none p-2 text-foreground transition-colors hover:bg-secondary"
               >
                 <span className="ms-3">Dashboard</span>
               </a>
@@ -91,7 +91,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
             <li>
               <a
                 href="/admin/users"
-                className="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center rounded-lg p-2"
+                className="flex items-center rounded-none p-2 text-foreground transition-colors hover:bg-secondary"
               >
                 <span className="ms-3">Users</span>
               </a>
@@ -99,7 +99,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
             <li>
               <a
                 href="/admin/ai-performance"
-                className="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center rounded-lg p-2"
+                className="flex items-center rounded-none p-2 text-foreground transition-colors hover:bg-secondary"
               >
                 <span className="ms-3">AI Performance</span>
               </a>
@@ -107,7 +107,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
             <li>
               <a
                 href="/admin/security-dashboard"
-                className="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center rounded-lg p-2"
+                className="flex items-center rounded-none p-2 text-foreground transition-colors hover:bg-secondary"
               >
                 <span className="ms-3">Security</span>
               </a>
@@ -115,7 +115,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
             <li>
               <a
                 href="/admin/dlp"
-                className="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center rounded-lg p-2"
+                className="flex items-center rounded-none p-2 text-foreground transition-colors hover:bg-secondary"
               >
                 <span className="ms-3">DLP Rules</span>
               </a>
@@ -123,7 +123,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
             <li>
               <a
                 href="/admin/backup-security"
-                className="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center rounded-lg p-2"
+                className="flex items-center rounded-none p-2 text-foreground transition-colors hover:bg-secondary"
               >
                 <span className="ms-3">Backup Security</span>
               </a>
@@ -131,7 +131,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
             <li>
               <a
                 href="/admin/audit-logs"
-                className="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center rounded-lg p-2"
+                className="flex items-center rounded-none p-2 text-foreground transition-colors hover:bg-secondary"
               >
                 <span className="ms-3">Audit Logs</span>
               </a>
@@ -139,7 +139,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
             <li>
               <a
                 href="/admin/settings"
-                className="text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center rounded-lg p-2"
+                className="flex items-center rounded-none p-2 text-foreground transition-colors hover:bg-secondary"
               >
                 <span className="ms-3">Settings</span>
               </a>
@@ -150,7 +150,7 @@ const AdminLayout: FC<AdminLayoutProps> = ({
 
       {/* Main content */}
       <div className="w-full p-4 pt-20 md:ml-64">
-        <div className="border-gray-200 dark:border-gray-700 rounded-lg border-2 border-dashed p-4">
+        <div className="rounded-none border-2 border-dashed border-border p-4">
           {children}
         </div>
         {/* Overlay for sidebar on mobile */}
