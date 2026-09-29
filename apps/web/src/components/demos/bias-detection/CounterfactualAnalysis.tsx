@@ -454,5 +454,3 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
     </div>
   )
 }
-
-export default CounterfactualAnalysis
