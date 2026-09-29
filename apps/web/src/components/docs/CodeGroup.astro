@@ -13,7 +13,7 @@ const { class: className } = Astro.props
 
 <style>
   .code-group {
-    @apply border border-gray-200 rounded-lg overflow-hidden dark:border-gray-700;
+    @apply border border-border overflow-hidden;
   }
 
   .code-group :global(pre) {
@@ -21,14 +21,14 @@ const { class: className } = Astro.props
   }
 
   .code-group :global(pre:first-child) {
-    @apply rounded-t-lg;
+    @apply rounded-none;
   }
 
   .code-group :global(pre:last-child) {
-    @apply rounded-b-lg;
+    @apply rounded-none;
   }
 
   .code-group :global(pre:only-child) {
-    @apply rounded-lg;
+    @apply rounded-none;
   }
 </style>
