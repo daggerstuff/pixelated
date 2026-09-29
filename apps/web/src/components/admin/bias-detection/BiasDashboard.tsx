@@ -282,7 +282,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           onToggleExportDialog={() => setShowExportDialog((prev) => !prev)}
         />
         <div className="flex h-64 items-center justify-center">
-          <RefreshCw className="text-neutral-500 h-8 w-8 animate-spin" />
+          <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
           <span className="ml-2 text-lg">
             Loading bias detection dashboard...
           </span>

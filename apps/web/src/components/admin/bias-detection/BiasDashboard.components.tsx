@@ -1626,9 +1626,7 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-3">
-                        <Badge
-                          className={`${getAlertColor(alert.level)} text-white`}
-                        >
+                        <Badge className={getAlertColor(alert.level)}>
                           {alert.level?.toUpperCase() || 'UNKNOWN'}
                         </Badge>
                         <div>

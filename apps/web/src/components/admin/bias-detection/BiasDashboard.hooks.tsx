@@ -628,28 +628,28 @@ export function useConnectionStatus(
       case 'connected':
         return {
           text: 'Live updates connected',
-          color: 'text-neutral-600',
+          color: 'text-muted-foreground',
           icon: <Activity className="mr-1 h-3 w-3" />,
           pulse: false,
         }
       case 'connecting':
         return {
           text: 'Connecting to live updates...',
-          color: 'text-neutral-700',
+          color: 'text-muted-foreground',
           icon: <RefreshCw className="mr-1 h-3 w-3 animate-spin" />,
           pulse: true,
         }
       case 'reconnecting':
         return {
           text: `Reconnecting... (attempt ${wsReconnectAttempts})`,
-          color: 'text-neutral-800',
+          color: 'text-foreground',
           icon: <RefreshCw className="mr-1 h-3 w-3 animate-spin" />,
           pulse: true,
         }
       case 'error':
         return {
           text: 'Live updates failed',
-          color: 'text-neutral-900',
+          color: 'text-foreground',
           icon: <AlertTriangle className="mr-1 h-3 w-3" />,
           pulse: false,
         }

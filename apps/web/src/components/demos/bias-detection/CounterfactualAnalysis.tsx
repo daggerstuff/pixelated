@@ -7,6 +7,17 @@ import type {
   SessionData,
 } from '../../../lib/types/bias-detection'
 
+/**
+ * Severity-tier fill for impact marks (sanctioned §2.1 data mark;
+ * defined once instead of inline).
+ */
+const impactTierFill = (change: number): string =>
+  Math.abs(change) > 0.3
+    ? 'bg-primary'
+    : Math.abs(change) > 0.1
+      ? 'bg-yellow-500'
+      : 'bg-red-500'
+
 interface CounterfactualAnalysisProps {
   scenarios: CounterfactualScenario[]
   originalSession: SessionData | null
@@ -305,13 +316,7 @@ export const CounterfactualAnalysis: FC<CounterfactualAnalysisProps> = ({
                       {/* Impact Visualization */}
                       <div className="mb-2 h-2 w-full rounded-none bg-secondary">
                         <div
-                          className={`h-2 rounded-none ${
-                            Math.abs(scenario.biasScoreChange) > 0.3
-                              ? 'bg-primary'
-                              : Math.abs(scenario.biasScoreChange) > 0.1
-                                ? 'bg-yellow-500'
-                                : 'bg-red-500'
-                          }`}
+                          className={`h-2 rounded-none ${impactTierFill(scenario.biasScoreChange)}`}
                           style={{
                             width: `${Math.min(Math.abs(scenario.biasScoreChange) * 100, 100)}%`,
                           }}

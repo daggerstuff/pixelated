@@ -7,6 +7,29 @@ import type {
   SessionData,
 } from '../../../lib/types/bias-detection'
 
+/**
+ * Severity-tier fill for bias-score progress marks (sanctioned §2.1
+ * data mark per the BiasAnalysisResults precedent; defined once).
+ */
+const biasScoreTierFill = (score: number): string =>
+  score >= 0.8
+    ? 'bg-red-500'
+    : score >= 0.6
+      ? 'bg-orange-500'
+      : score >= 0.4
+        ? 'bg-yellow-500'
+        : 'bg-green-500'
+
+/** Severity-tier fill for alert-level glyph marks (§2.1, same palette). */
+const alertLevelTierFill = (level: string): string =>
+  level === 'critical'
+    ? 'bg-red-500'
+    : level === 'high'
+      ? 'bg-orange-500'
+      : level === 'medium'
+        ? 'bg-yellow-500'
+        : 'bg-green-500'
+
 interface BiasAnalysisDisplayProps {
   results: BiasAnalysisResults
   sessionData: SessionData | null
@@ -76,15 +99,7 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
           <div className="mt-4">
             <div className="h-3 rounded-none bg-secondary">
               <div
-                className={`h-3 rounded-none transition-all duration-500 ${
-                  results.overallBiasScore >= 0.8
-                    ? 'bg-red-500'
-                    : results.overallBiasScore >= 0.6
-                      ? 'bg-orange-500'
-                      : results.overallBiasScore >= 0.4
-                        ? 'bg-yellow-500'
-                        : 'bg-green-500'
-                }`}
+                className={`h-3 rounded-none transition-all duration-500 ${biasScoreTierFill(results.overallBiasScore)}`}
                 style={{ width: `${results.overallBiasScore * 100}%` }}
               />
             </div>
@@ -100,15 +115,7 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
             className={`inline-flex items-center rounded-none border px-4 py-2 text-lg font-semibold ${getAlertLevelStyle(results.alertLevel)}`}
           >
             <div
-              className={`mr-2 h-3 w-3 rounded-none ${
-                results.alertLevel === 'critical'
-                  ? 'bg-red-500'
-                  : results.alertLevel === 'high'
-                    ? 'bg-orange-500'
-                    : results.alertLevel === 'medium'
-                      ? 'bg-yellow-500'
-                      : 'bg-green-500'
-              }`}
+              className={`mr-2 h-3 w-3 rounded-none ${alertLevelTierFill(results.alertLevel)}`}
             />
             {results.alertLevel.toUpperCase()}
           </div>
