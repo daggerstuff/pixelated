@@ -8,17 +8,15 @@ export interface Props {
 const { class: className, variant = 'success' } = Astro.props
 
 const variantClasses = {
-  success:
-    'text-green-800 bg-green-50 border-green-200 dark:text-green-100 dark:bg-green-900/20 dark:border-green-800',
-  info: 'text-blue-800 bg-blue-50 border-blue-200 dark:text-blue-100 dark:bg-blue-900/20 dark:border-blue-800',
-  default:
-    'text-gray-800 bg-gray-50 border-gray-200 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700',
+  success: 'text-foreground bg-secondary border-border',
+  info: 'text-foreground bg-secondary border-border',
+  default: 'text-foreground bg-secondary border-border',
 }
 
 const iconColors = {
-  success: 'text-green-600 dark:text-green-400',
-  info: 'text-blue-600 dark:text-blue-400',
-  default: 'text-gray-600 dark:text-gray-400',
+  success: 'text-foreground',
+  info: 'text-foreground',
+  default: 'text-muted-foreground',
 }
 ---
 

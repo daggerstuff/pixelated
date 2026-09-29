@@ -94,6 +94,19 @@ interface AnalyticsDashboardProps {
   scenario: string
 }
 
+// Bounded section 2.1 chart-mark palette for the emotional-patterns
+// scatter: six categorical emotion series whose identity must read at
+// a glance. Defined once; both the scatter points and the legend
+// swatches reference it. Chart chrome stays on the neutral ramp.
+const EMOTION_COLORS = {
+  anger: 'bg-red-500',
+  sadness: 'bg-blue-500',
+  fear: 'bg-purple-500',
+  joy: 'bg-green-500',
+  surprise: 'bg-yellow-500',
+  disgust: 'bg-orange-500',
+} as const
+
 export default function AnalyticsDashboard({
   messages,
   securityLevel,
@@ -251,7 +264,7 @@ export default function AnalyticsDashboard({
     return (
       <div className="p-4">
         <h3 className="mb-2 text-lg font-medium">Sentiment Analysis</h3>
-        <div className="bg-black rounded-none bg-opacity-30 p-4">
+        <div className="rounded-none bg-secondary p-4">
           <div className="mb-4 flex justify-between">
             <div>
               <span className="text-sm text-muted-foreground">
@@ -284,10 +297,10 @@ export default function AnalyticsDashboard({
               const height = `${Math.max(10, Math.round(sentimentValue * 100))}%`
               const color =
                 sentimentValue > 0.7
-                  ? 'bg-green-500'
+                  ? 'bg-foreground'
                   : sentimentValue > 0.4
-                    ? 'bg-blue-500'
-                    : 'bg-purple-500'
+                    ? 'bg-primary'
+                    : 'bg-muted-foreground'
 
               return (
                 <div
@@ -348,7 +361,7 @@ export default function AnalyticsDashboard({
     return (
       <div className="p-4">
         <h3 className="mb-2 text-lg font-medium">Topic Distribution</h3>
-        <div className="bg-black rounded-none bg-opacity-30 p-4">
+        <div className="rounded-none bg-secondary p-4">
           <div className="mb-4">
             <span className="text-sm text-muted-foreground">
               Messages Analyzed:
@@ -368,7 +381,7 @@ export default function AnalyticsDashboard({
                 </div>
                 <div className="h-2.5 w-full rounded-none bg-card">
                   <div
-                    className="bg-indigo-600 h-2.5 rounded-none"
+                    className="h-2.5 rounded-none bg-primary"
                     style={{ width: `${Math.round(value * 100)}%` }}
                   ></div>
                 </div>
@@ -414,7 +427,7 @@ export default function AnalyticsDashboard({
     return (
       <div className="p-4">
         <h3 className="mb-2 text-lg font-medium">Risk Assessment</h3>
-        <div className="bg-black rounded-none bg-opacity-30 p-4">
+        <div className="rounded-none bg-secondary p-4">
           <div className="mb-4">
             <span className="text-sm text-muted-foreground">
               Messages Analyzed:
@@ -502,7 +515,7 @@ export default function AnalyticsDashboard({
     return (
       <div className="p-4">
         <h3 className="mb-2 text-lg font-medium">Intervention Effectiveness</h3>
-        <div className="bg-black rounded-none bg-opacity-30 p-4">
+        <div className="rounded-none bg-secondary p-4">
           <div className="mb-4">
             <span className="text-sm text-muted-foreground">
               Exchanges Analyzed:
@@ -526,10 +539,10 @@ export default function AnalyticsDashboard({
                   <div
                     className={`h-2.5 rounded-none ${
                       intervention.effectiveness > 0.7
-                        ? 'bg-green-600'
+                        ? 'bg-foreground'
                         : intervention.effectiveness > 0.4
                           ? 'bg-primary'
-                          : 'bg-purple-600'
+                          : 'bg-muted-foreground'
                     }`}
                     style={{
                       width: `${Math.round(intervention.effectiveness * 100)}%`,
@@ -578,7 +591,7 @@ export default function AnalyticsDashboard({
     return (
       <div className="p-4">
         <h3 className="mb-2 text-lg font-medium">Emotional Patterns</h3>
-        <div className="bg-black rounded-none bg-opacity-30 p-4">
+        <div className="rounded-none bg-secondary p-4">
           <div className="mb-4">
             <span className="text-sm text-muted-foreground">
               Messages Analyzed:
@@ -587,7 +600,7 @@ export default function AnalyticsDashboard({
           </div>
 
           {/* Mock emotion pattern visualization */}
-          <div className="relative h-40 rounded-none bg-card bg-opacity-50 p-2">
+          <div className="relative h-40 rounded-none border border-border bg-card p-2">
             {mockEmotionData.map((item) => (
               <div key={item.emotion} className="absolute">
                 {item.values.map((value, index) => {
@@ -596,15 +609,7 @@ export default function AnalyticsDashboard({
                   // Position points along the y-axis (inverted)
                   const y = `${(1 - value) * 100}%`
 
-                  // Determine color based on emotion
-                  const colors = {
-                    anger: 'bg-red-500',
-                    sadness: 'bg-blue-500',
-                    fear: 'bg-purple-500',
-                    joy: 'bg-green-500',
-                    surprise: 'bg-yellow-500',
-                    disgust: 'bg-orange-500',
-                  }
+                  const colors = EMOTION_COLORS
 
                   const color = colors[item.emotion as keyof typeof colors]
 
@@ -624,16 +629,8 @@ export default function AnalyticsDashboard({
           {/* Legend */}
           <div className="mt-3 flex flex-wrap gap-3">
             {emotions.map((emotion) => {
-              const colors = {
-                anger: 'bg-red-500',
-                sadness: 'bg-blue-500',
-                fear: 'bg-purple-500',
-                joy: 'bg-green-500',
-                surprise: 'bg-yellow-500',
-                disgust: 'bg-orange-500',
-              }
-
-              const color = colors[emotion as keyof typeof colors]
+              const color =
+                EMOTION_COLORS[emotion as keyof typeof EMOTION_COLORS]
 
               return (
                 <div key={emotion} className="flex items-center">
@@ -733,18 +730,18 @@ export default function AnalyticsDashboard({
   return (
     <div className="overflow-hidden rounded-none border border-border bg-background text-foreground">
       {/* Header */}
-      <div className="from-black via-purple-900 to-black flex items-center justify-between bg-gradient-to-r p-3">
+      <div className="flex items-center justify-between border-b border-border bg-secondary p-3">
         <h2 className="text-lg font-medium">Therapy Analytics</h2>
         <div className="flex items-center space-x-2">
           {securityLevel === 'maximum' && (
-            <span className="text-green-400 bg-black flex items-center rounded-none bg-opacity-50 px-2 py-1 text-xs">
+            <span className="flex items-center rounded-none border border-border bg-secondary px-2 py-1 text-xs font-medium text-foreground">
               <IconLock className="mr-1 h-3 w-3" />
               FHE Secured
             </span>
           )}
           <button
             onClick={loadAnalytics}
-            className="hover:bg-black rounded-none p-1 hover:bg-opacity-30"
+            className="rounded-none p-1 transition-colors hover:bg-accent"
             title="Refresh Analytics"
           >
             <IconRefresh className="h-4 w-4" />
@@ -754,7 +751,7 @@ export default function AnalyticsDashboard({
 
       {/* Privacy warning */}
       {showPrivacyWarning && (
-        <div className="bg-yellow-900 text-yellow-300 flex items-start bg-opacity-30 px-3 py-2 text-sm">
+        <div className="flex items-start rounded-none border-l-4 border-ring bg-secondary px-3 py-2 text-sm font-medium text-foreground">
           <IconAlertTriangle className="mr-2 mt-0.5 h-4 w-4 flex-shrink-0" />
 
           <div>
@@ -766,13 +763,13 @@ export default function AnalyticsDashboard({
       )}
 
       {/* Analytics tabs */}
-      <div className="bg-black border-gray-800 border-b bg-opacity-40">
+      <div className="border-b border-border bg-secondary">
         <div className="flex overflow-x-auto">
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.SENTIMENT_TREND
-                ? 'text-purple-400 border-purple-400 border-b-2'
-                : 'text-muted-foreground hover:text-muted-foreground'
+                ? 'border-b-2 border-foreground text-foreground'
+                : 'text-muted-foreground transition-colors hover:text-foreground'
             }`}
             onClick={() => setActiveTab(AnalyticsType.SENTIMENT_TREND)}
           >
@@ -785,8 +782,8 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.TOPIC_CLUSTERING
-                ? 'text-purple-400 border-purple-400 border-b-2'
-                : 'text-muted-foreground hover:text-muted-foreground'
+                ? 'border-b-2 border-foreground text-foreground'
+                : 'text-muted-foreground transition-colors hover:text-foreground'
             }`}
             onClick={() => setActiveTab(AnalyticsType.TOPIC_CLUSTERING)}
           >
@@ -799,8 +796,8 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.EMOTIONAL_PATTERNS
-                ? 'text-purple-400 border-purple-400 border-b-2'
-                : 'text-muted-foreground hover:text-muted-foreground'
+                ? 'border-b-2 border-foreground text-foreground'
+                : 'text-muted-foreground transition-colors hover:text-foreground'
             }`}
             onClick={() => setActiveTab(AnalyticsType.EMOTIONAL_PATTERNS)}
           >
@@ -813,8 +810,8 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.INTERVENTION_EFFECTIVENESS
-                ? 'text-purple-400 border-purple-400 border-b-2'
-                : 'text-muted-foreground hover:text-muted-foreground'
+                ? 'border-b-2 border-foreground text-foreground'
+                : 'text-muted-foreground transition-colors hover:text-foreground'
             }`}
             onClick={() =>
               setActiveTab(AnalyticsType.INTERVENTION_EFFECTIVENESS)
@@ -829,8 +826,8 @@ export default function AnalyticsDashboard({
           <button
             className={`px-4 py-2 text-sm font-medium ${
               activeTab === AnalyticsType.RISK_ASSESSMENT
-                ? 'text-purple-400 border-purple-400 border-b-2'
-                : 'text-muted-foreground hover:text-muted-foreground'
+                ? 'border-b-2 border-foreground text-foreground'
+                : 'text-muted-foreground transition-colors hover:text-foreground'
             }`}
             onClick={() => setActiveTab(AnalyticsType.RISK_ASSESSMENT)}
           >
@@ -846,7 +843,7 @@ export default function AnalyticsDashboard({
       <div className="min-h-[300px]">{renderAnalyticsContent()}</div>
 
       {/* Footer */}
-      <div className="bg-black flex justify-between bg-opacity-40 p-2 text-xs text-muted-foreground">
+      <div className="flex justify-between border-t border-border bg-secondary p-2 text-xs text-muted-foreground">
         <div>
           {scenario ? `Analysis for ${scenario} scenario` : 'All client data'}
         </div>

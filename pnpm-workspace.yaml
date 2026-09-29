@@ -288,6 +288,15 @@ overrides:
   '@unocss/core': ^66.7.0
   '@unocss/reset': ^66.7.0
   '@unocss/vite': ^66.7.0
+  # astro 7.3.5 ships @astrojs/compiler-rs 0.5.1; the astro lint tooling
+  # (astro-eslint-parser 3.1.0, prettier-plugin-astro 1.1.0) still requests
+  # ^0.4.0. Override to a single 0.5.x copy — parse API ({ast, diagnostics}) is
+  # compatible; verified via live prettier format. Drop when the tooling
+  # publishes ^0.5 ranges.
+  '@astrojs/compiler-rs': ^0.5.1
+  # astro 7.3.5 depends on obug ^3.0.0 while @babel/traverse 8.0.6 requests
+  # ^2.1.1. Both expose createDebug with the same signature; pin the newer.
+  obug: ^3.0.0
   '@vercel/routing-utils': npm:@vercel/routing-utils@6.2.0
   '@vercel/routing-utils>path-to-regexp': ^6.3.0
   '@vercel/routing-utils>path-to-regexp@<6.3.0': 6.3.0

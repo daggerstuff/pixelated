@@ -5,6 +5,19 @@ import type { FC } from 'react'
 
 import type { HistoricalComparison } from '../../../lib/types/bias-detection'
 
+/**
+ * Severity-tier fill for score-progress marks (sanctioned §2.1 data
+ * mark; defined once instead of inline).
+ */
+const scoreTierFill = (score: number): string =>
+  score >= 0.8
+    ? 'bg-red-500'
+    : score >= 0.6
+      ? 'bg-orange-500'
+      : score >= 0.4
+        ? 'bg-yellow-500'
+        : 'bg-green-500'
+
 interface HistoricalProgressTrackerProps {
   comparison: HistoricalComparison
   currentScore: number
@@ -196,15 +209,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
             </div>
             <div className="h-3 w-full rounded-none bg-secondary">
               <div
-                className={`h-3 rounded-none ${
-                  currentScore >= 0.8
-                    ? 'bg-red-500'
-                    : currentScore >= 0.6
-                      ? 'bg-orange-500'
-                      : currentScore >= 0.4
-                        ? 'bg-yellow-500'
-                        : 'bg-green-500'
-                }`}
+                className={`h-3 rounded-none ${scoreTierFill(currentScore)}`}
                 style={{ width: `${currentScore * 100}%` }}
               />
             </div>
@@ -394,5 +399,3 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
     </div>
   )
 }
-
-export default HistoricalProgressTracker

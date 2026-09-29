@@ -115,14 +115,9 @@ const links = [
   .marketing-nav__shell {
     margin: 0 auto;
     width: min(var(--marketing-shell), calc(100vw - 1.5rem));
-    border: 1px solid rgba(253, 252, 252, 0.08);
-    border-radius: 8px;
-    background: linear-gradient(
-      180deg,
-      rgba(48, 44, 44, 0.76),
-      rgba(32, 29, 29, 0.92)
-    );
-    backdrop-filter: blur(20px);
+    border: 1px solid var(--np-line);
+    border-radius: 0;
+    background: var(--np-surface);
   }
 
   .marketing-nav__row {
@@ -145,11 +140,11 @@ const links = [
   .marketing-nav__logo {
     width: 2.1rem;
     height: 2.1rem;
-    border-radius: 8px;
+    border-radius: 0;
     overflow: hidden;
     flex-shrink: 0;
-    border: 1px solid rgba(253, 252, 252, 0.08);
-    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--np-line);
+    background: var(--np-surface);
   }
 
   .marketing-nav__title {
@@ -163,11 +158,11 @@ const links = [
     font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: var(--text-primary);
+    color: var(--np-text);
   }
 
   .marketing-nav__tag {
-    color: rgba(253, 252, 252, 0.56);
+    color: var(--np-muted);
     font-family: var(--font-mono);
     font-size: 0.75rem;
     letter-spacing: 0.16em;
@@ -185,7 +180,7 @@ const links = [
   .marketing-nav__link {
     position: relative;
     padding-bottom: 0.3rem;
-    color: rgba(253, 252, 252, 0.76);
+    color: var(--np-muted);
     text-decoration: none;
     font-family: var(--font-mono);
     font-size: 0.75rem;
@@ -218,7 +213,7 @@ const links = [
 
   .marketing-nav__link:hover,
   .marketing-nav__link--active {
-    color: var(--text-primary);
+    color: var(--np-text);
   }
 
   .marketing-nav__link:hover::after,
@@ -240,7 +235,7 @@ const links = [
     justify-content: center;
     min-height: 2.5rem;
     padding: 0 1rem;
-    border-radius: 8px;
+    border-radius: 0;
     text-decoration: none;
     font-family: var(--font-mono);
     font-size: 0.68rem;
@@ -248,40 +243,38 @@ const links = [
     letter-spacing: 0.14em;
     text-transform: uppercase;
     transition:
-      transform var(--duration-fast) var(--ease-out),
       background var(--duration-fast) var(--ease-out),
       border-color var(--duration-fast) var(--ease-out),
       color var(--duration-fast) var(--ease-out);
   }
 
   .marketing-nav__pilot {
-    border: 1px solid rgba(var(--accent-primary-rgb), 0.46);
-    background: #0d9488;
-    color: #201d1d;
+    border: 1px solid var(--np-text);
+    background: var(--np-text);
+    color: var(--np-bg);
   }
 
   .marketing-nav__pilot:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.03);
+    background: color-mix(in srgb, var(--np-text) 90%, var(--np-bg));
+    border-color: var(--np-mid);
   }
 
   .marketing-nav__demo {
-    border: 1px solid rgba(253, 252, 252, 0.14);
-    background: rgba(255, 255, 255, 0.03);
-    color: rgba(253, 252, 252, 0.84);
+    border: 1px solid var(--np-line-strong);
+    background: var(--np-surface);
+    color: var(--np-text);
   }
 
   .marketing-nav__demo:hover {
-    transform: translateY(-1px);
-    border-color: rgba(var(--accent-primary-rgb), 0.36);
-    color: var(--accent-primary);
+    border-color: var(--np-mid);
+    color: var(--np-text);
   }
 
   .marketing-nav__toggle {
     display: none;
     align-items: center;
     justify-content: center;
-    color: var(--text-primary);
+    color: var(--np-text);
     background: transparent;
     border: 0;
     padding: 0.45rem;
@@ -289,7 +282,7 @@ const links = [
   }
 
   .marketing-mobile-menu {
-    border-top: 1px dotted rgba(253, 252, 252, 0.12);
+    border-top: 1px dotted var(--np-line-strong);
   }
 
   .marketing-mobile-menu__content {
@@ -299,7 +292,7 @@ const links = [
   }
 
   .marketing-mobile-menu__link {
-    color: var(--text-primary);
+    color: var(--np-text);
     text-decoration: none;
     font-family: var(--font-mono);
     font-size: 0.78rem;
@@ -310,14 +303,14 @@ const links = [
   }
 
   .marketing-mobile-menu__link--muted {
-    color: var(--text-secondary);
+    color: var(--np-muted);
   }
 
   .marketing-mobile-menu__actions {
     display: grid;
     gap: 0.8rem;
     padding-top: 0.8rem;
-    border-top: 1px dotted rgba(253, 252, 252, 0.12);
+    border-top: 1px dotted var(--np-line-strong);
   }
 
   @media (max-width: 1080px) {

@@ -25,37 +25,22 @@ const { title, active = false, className } = Astro.props
     font-size: 0.875rem;
     font-weight: 500;
     border-bottom: 2px solid transparent;
-    color: #6b7280;
+    color: var(--np-muted);
     transition: all 0.2s ease;
   }
 
   .tab:hover {
-    color: #374151;
-    background-color: #f9fafb;
+    color: var(--np-text);
+    background-color: var(--np-surface);
   }
 
   .tab-active {
-    color: #3b82f6;
-    border-bottom-color: #3b82f6;
+    color: var(--np-text);
+    border-bottom-color: var(--np-text);
   }
 
   .tab:focus {
     outline: none;
-    box-shadow: 0 0 0 2px #3b82f6;
-  }
-
-  /* Dark mode support */
-  :global(.dark) .tab {
-    color: #9ca3af;
-  }
-
-  :global(.dark) .tab:hover {
-    color: #d1d5db;
-    background-color: #1f2937;
-  }
-
-  :global(.dark) .tab-active {
-    color: #60a5fa;
-    border-bottom-color: #60a5fa;
+    box-shadow: 0 0 0 2px var(--np-mid);
   }
 </style>

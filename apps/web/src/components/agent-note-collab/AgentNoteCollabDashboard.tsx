@@ -275,7 +275,7 @@ export default function AgentNoteCollabDashboard() {
       )}
 
       {error && (
-        <p className="border-red-500/50 bg-red-950/20 text-red-300 rounded border p-3 text-sm">
+        <p className="rounded-none border border-ring bg-secondary p-3 text-sm text-foreground">
           {error}
         </p>
       )}
@@ -351,7 +351,7 @@ export default function AgentNoteCollabDashboard() {
                 )}
 
                 {state?.error && (
-                  <p className="text-red-300 text-sm">{state.error}</p>
+                  <p className="text-sm text-foreground">{state.error}</p>
                 )}
 
                 {state?.data && (
