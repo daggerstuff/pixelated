@@ -53,7 +53,7 @@ function AlertButton() {
 }
 
 // Main demo wrapper
-export function LiveRegionDemoReact() {
+function LiveRegionDemoReact() {
   return (
     <LiveRegionProvider>
       <div className="rounded-none border border-border bg-secondary p-4">
