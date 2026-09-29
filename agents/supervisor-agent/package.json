@@ -34,7 +34,7 @@
   },
   "overrides": {
     "ai": "7.0.109",
-    "fast-uri": "3.1.4"
+    "fast-uri": "3.1.8"
   },
   "engines": {
     "node": "24.x"
