@@ -4,8 +4,8 @@ import type { ModelMessage } from 'ai'
 import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
-import { verifyAuthToken } from '../../utils/auth'
 import { validateRequestBody } from '../../lib/validation/validateRequestBody'
+import { verifyAuthToken } from '../../utils/auth'
 
 export const prerender = false
 
@@ -45,7 +45,8 @@ export const POST: APIRoute = async ({ request }) => {
     chatSchema,
   )
   if (validationError) {
-    const firstError = Object.values(validationError.details)[0] ?? 'Invalid request format'
+    const firstError =
+      Object.values(validationError.details)[0] ?? 'Invalid request format'
     return new Response(
       JSON.stringify({
         success: false,

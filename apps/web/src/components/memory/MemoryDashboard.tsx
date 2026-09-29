@@ -223,9 +223,9 @@ export function MemoryDashboard({
           m.metadata?.['crisisSeverity'] &&
           m.metadata['crisisSeverity'] !== 'none',
       ) && (
-        <Card className="border-destructive bg-destructive/5">
+        <Card className="bg-destructive/5 border-destructive">
           <CardHeader className="py-3">
-            <CardTitle className="text-destructive flex items-center gap-2 text-sm font-medium">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-destructive">
               <AlertCircle className="h-4 w-4" />
               Active Crisis Signals Detected
             </CardTitle>
@@ -410,7 +410,7 @@ export function MemoryDashboard({
             <CardContent>
               {filteredMemories.length === 0 ? (
                 <div className="py-8 text-center">
-                  <Brain className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+                  <Brain className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                   <p className="text-muted-foreground">
                     {searchQuery
                       ? 'No memories found matching your search.'
@@ -442,7 +442,7 @@ export function MemoryDashboard({
                               {mem.metadata?.['category'] ?? 'general'}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
+                          <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
                             {formatTimestamp(mem.metadata?.['timestamp'])}
                           </TableCell>
                           <TableCell>
@@ -451,21 +451,21 @@ export function MemoryDashboard({
                               {mem.metadata?.['scope'] === 'private' ? (
                                 <Badge
                                   variant="outline"
-                                  className="border-amber-200 bg-amber-50 text-amber-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <Lock className="h-2.5 w-2.5" /> Private
                                 </Badge>
                               ) : mem.metadata?.['scope'] === 'global' ? (
                                 <Badge
                                   variant="outline"
-                                  className="border-blue-200 bg-blue-50 text-blue-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <Globe className="h-2.5 w-2.5" /> Global
                                 </Badge>
                               ) : (
                                 <Badge
                                   variant="outline"
-                                  className="border-emerald-200 bg-emerald-50 text-emerald-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <ShieldCheck className="h-2.5 w-2.5" /> Shared
                                 </Badge>
@@ -489,7 +489,7 @@ export function MemoryDashboard({
                               {mem.metadata?.['isSpeculative'] && (
                                 <Badge
                                   variant="outline"
-                                  className="border-purple-200 bg-purple-50 text-purple-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <Info className="h-2.5 w-2.5" /> Speculative
                                 </Badge>
@@ -499,7 +499,7 @@ export function MemoryDashboard({
                               {mem.metadata?.['piiRemoved'] && (
                                 <Badge
                                   variant="outline"
-                                  className="border-green-200 bg-green-50 text-green-700 gap-1 px-1.5 py-0 text-[10px]"
+                                  className="gap-1 border-border bg-secondary px-1.5 py-0 text-[10px] text-foreground"
                                 >
                                   <ShieldCheck className="h-2.5 w-2.5" /> PII
                                   Safe
@@ -521,7 +521,7 @@ export function MemoryDashboard({
                                 <Edit className="h-4 w-4" />
                               </Button>
                               <AlertDialog>
-                                <AlertDialogTrigger className="text-destructive hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-md">
+                                <AlertDialogTrigger className="inline-flex h-9 w-9 items-center justify-center rounded-none text-destructive hover:bg-accent">
                                   <Trash2 className="h-4 w-4" />
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
@@ -542,7 +542,7 @@ export function MemoryDashboard({
                                       onClick={async () =>
                                         mem.id && handleDeleteMemory(mem.id)
                                       }
-                                      className="bg-destructive hover:bg-destructive/90"
+                                      className="hover:bg-destructive/90 bg-destructive"
                                     >
                                       Delete
                                     </AlertDialogAction>
@@ -601,7 +601,7 @@ export function MemoryDashboard({
                   <CardTitle className="text-sm font-medium">
                     Total Memories
                   </CardTitle>
-                  <Brain className="text-muted-foreground h-4 w-4" />
+                  <Brain className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -615,7 +615,7 @@ export function MemoryDashboard({
                   <CardTitle className="text-sm font-medium">
                     Categories
                   </CardTitle>
-                  <Tag className="text-muted-foreground h-4 w-4" />
+                  <Tag className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -629,7 +629,7 @@ export function MemoryDashboard({
                   <CardTitle className="text-sm font-medium">
                     Recent Activity
                   </CardTitle>
-                  <Clock className="text-muted-foreground h-4 w-4" />
+                  <Clock className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
@@ -660,9 +660,9 @@ export function MemoryDashboard({
                           <Badge variant="outline">{category}</Badge>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="bg-secondary h-2 w-24 rounded-full">
+                          <div className="h-2 w-24 rounded-none bg-secondary">
                             <div
-                              className="bg-primary h-2 rounded-full"
+                              className="h-2 rounded-none bg-primary"
                               style={{
                                 width: `${(count / (memory.stats?.totalMemories ?? 1)) * 100}%`,
                               }}

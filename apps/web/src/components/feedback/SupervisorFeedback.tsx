@@ -288,9 +288,9 @@ export function SupervisorFeedback({
   }
 
   return (
-    <Card className="supervisor-feedback border-green-700/20 overflow-hidden shadow-md">
-      <CardHeader className="bg-green-900/10">
-        <CardTitle className="text-green-800 flex items-center justify-between">
+    <Card className="supervisor-feedback overflow-hidden">
+      <CardHeader className="bg-secondary">
+        <CardTitle className="flex items-center justify-between text-foreground">
           <span>Clinical Supervisor Feedback</span>
           {feedbackSummary && (
             <Badge
@@ -308,7 +308,7 @@ export function SupervisorFeedback({
         </CardTitle>
       </CardHeader>
 
-      <div className="bg-green-800/10 flex space-x-1 px-4 py-1">
+      <div className="flex space-x-1 bg-secondary px-4 py-1">
         <Button
           variant={activeTab === 'techniques' ? 'default' : 'ghost'}
           size="sm"
@@ -336,8 +336,8 @@ export function SupervisorFeedback({
         {isGenerating ? (
           <div className="flex h-full items-center justify-center">
             <div className="animate-pulse text-center">
-              <p className="text-green-800">Analyzing therapy session...</p>
-              <p className="text-green-600 text-sm">
+              <p className="text-foreground">Analyzing therapy session...</p>
+              <p className="text-sm text-muted-foreground">
                 Using therapeutic technique recognition
               </p>
             </div>
@@ -350,7 +350,7 @@ export function SupervisorFeedback({
                   Detected Therapeutic Techniques
                 </h3>
                 {detectedTechniques.length === 0 ? (
-                  <p className="text-gray-500 italic">
+                  <p className="italic text-muted-foreground">
                     No therapeutic techniques detected in the session.
                   </p>
                 ) : (
@@ -378,7 +378,7 @@ export function SupervisorFeedback({
                     </div>
 
                     {selectedTechnique && (
-                      <div className="bg-green-50 rounded-md p-3">
+                      <div className="rounded-none border border-border bg-secondary p-3">
                         <h4 className="font-medium">
                           {selectedTechnique} Examples:
                         </h4>
@@ -388,7 +388,7 @@ export function SupervisorFeedback({
                             ?.examples.map((example) => (
                               <li
                                 key={`${selectedTechnique}-${example.slice(0, 20)}`}
-                                className="text-gray-700 border-green-300 border-l-2 pl-2 text-sm"
+                                className="border-l-2 border-ring pl-2 text-sm text-foreground"
                               >
                                 &ldquo;{example}&rdquo;
                               </li>
@@ -407,7 +407,7 @@ export function SupervisorFeedback({
                   Therapeutic Opportunities
                 </h3>
                 {missedOpportunities.length === 0 ? (
-                  <p className="text-gray-500 italic">
+                  <p className="italic text-muted-foreground">
                     No significant missed opportunities detected.
                   </p>
                 ) : (
@@ -415,7 +415,7 @@ export function SupervisorFeedback({
                     {missedOpportunities.map((opportunity) => (
                       <div
                         key={`${opportunity.suggestedTechnique}-${opportunity.context.slice(0, 20)}`}
-                        className="bg-blue-50 rounded-md p-3"
+                        className="rounded-none border border-border bg-secondary p-3"
                       >
                         <div className="flex justify-between font-medium">
                           <span>
@@ -426,17 +426,17 @@ export function SupervisorFeedback({
                           </Badge>
                         </div>
                         <div className="mt-2 text-sm">
-                          <p className="text-gray-700 mb-2 italic">
+                          <p className="mb-2 italic text-foreground">
                             Client: &ldquo;{opportunity.context}&rdquo;
                           </p>
-                          <p className="text-gray-600 mb-2">
+                          <p className="mb-2 text-muted-foreground">
                             {opportunity.rationale}
                           </p>
-                          <div className="bg-white border-blue-100 rounded border p-2">
-                            <p className="text-blue-800 text-sm font-medium">
+                          <div className="rounded-none border border-border bg-card p-2">
+                            <p className="text-sm font-medium text-foreground">
                               Example response:
                             </p>
-                            <p className="text-gray-700">
+                            <p className="text-foreground">
                               &ldquo;{opportunity.exampleResponse}&rdquo;
                             </p>
                           </div>
@@ -456,14 +456,14 @@ export function SupervisorFeedback({
 
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-green-700 font-medium">Strengths</h4>
+                    <h4 className="font-medium text-foreground">Strengths</h4>
                     <ul className="mt-1 space-y-1">
                       {feedbackSummary.positivePoints.map((point) => (
                         <li
                           key={point}
                           className="flex items-start gap-2 text-sm"
                         >
-                          <span className="text-green-500">✓</span>
+                          <span className="text-foreground">✓</span>
                           <span>{point}</span>
                         </li>
                       ))}
@@ -471,7 +471,7 @@ export function SupervisorFeedback({
                   </div>
 
                   <div>
-                    <h4 className="text-amber-700 font-medium">
+                    <h4 className="font-medium text-foreground">
                       Development Areas
                     </h4>
                     <ul className="mt-1 space-y-1">
@@ -480,16 +480,16 @@ export function SupervisorFeedback({
                           key={point}
                           className="flex items-start gap-2 text-sm"
                         >
-                          <span className="text-amber-500">→</span>
+                          <span className="text-muted-foreground">→</span>
                           <span>{point}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="bg-gray-50 rounded-md p-3">
+                  <div className="rounded-none border border-border bg-secondary p-3">
                     <h4 className="font-medium">Supervisor Recommendations</h4>
-                    <p className="text-gray-700 mt-1 text-sm">
+                    <p className="mt-1 text-sm text-foreground">
                       {feedbackSummary.overallRating > 7
                         ? 'Excellent therapeutic presence. Continue to build on your strengths while incorporating a wider range of techniques.'
                         : feedbackSummary.overallRating > 4
@@ -504,7 +504,7 @@ export function SupervisorFeedback({
         )}
       </CardContent>
 
-      <CardFooter className="bg-green-50 border-green-100 flex items-center justify-between border-t">
+      <CardFooter className="flex items-center justify-between border-t border-border bg-secondary">
         <Button
           variant="outline"
           size="sm"
@@ -513,7 +513,7 @@ export function SupervisorFeedback({
         >
           Regenerate Feedback
         </Button>
-        <p className="text-gray-500 text-xs">
+        <p className="text-xs text-muted-foreground">
           Feedback generated based on {therapistResponses.length} therapist
           responses
         </p>

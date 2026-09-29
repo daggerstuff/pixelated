@@ -1,12 +1,13 @@
 import json
 import random
+from pathlib import Path
 
 INPUT_FILE = str(Path.home() / "dataset" / "ULTIMATE_FINAL_DATASET.jsonl")
 OUTPUT_FILE = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
 MAX_CONVERSATIONS = 10000
 
 
-def get_system_prompt(role_to_play):
+def get_system_prompt(role_to_play: str) -> str:
     if role_to_play == "client":
         return "You are the client in a therapy session. Respond to the therapist in character."
     return "You are a highly empathetic and clinically precise AI therapist. Formulate a clinical response."

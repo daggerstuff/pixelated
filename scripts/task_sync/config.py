@@ -20,9 +20,10 @@ def _load_internal_config(config_path: Path | None = None) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        payload: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return {}
+    return payload
 
 
 def _write_internal_config(payload: Mapping[str, Any], config_path: Path | None = None) -> None:

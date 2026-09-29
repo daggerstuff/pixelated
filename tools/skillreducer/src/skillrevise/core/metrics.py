@@ -31,7 +31,7 @@ def utility_weights_for_preset(name: str) -> UtilityWeights:
     return UtilityWeights(alpha=preset.alpha, beta=preset.beta, gamma=preset.gamma, lam=preset.lam)
 
 
-def _relative_reduction(baseline: int | float, current: int | float) -> float:
+def _relative_reduction(baseline: float, current: float) -> float:
     if baseline <= 0:
         return 0.0
     return (baseline - current) / baseline

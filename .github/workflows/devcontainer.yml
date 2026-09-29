@@ -1,0 +1,56 @@
+name: Devcontainer
+
+# Readiness: devcontainer + devcontainer_runnable. The local policy bans
+# building Docker images on dev machines (pull only), so the container
+# image is built here in CI and smoke-checked: the pinned toolchain
+# (node 24, pnpm 11.24 via corepack, uv) must come up and answer with
+# the expected versions.
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - '.devcontainer/**'
+      - '.github/workflows/devcontainer.yml'
+  pull_request:
+    branches: [staging]
+    paths:
+      - '.devcontainer/**'
+      - '.github/workflows/devcontainer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devcontainer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-smoke:
+    name: devcontainer image build + toolchain smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - name: Build the devcontainer image
+        run:
+          docker build -t pixelated-devcontainer -f
+          .devcontainer/Dockerfile.devcontainer .devcontainer
+
+      - name: Toolchain smoke check
+        run: |
+          docker run --rm pixelated-devcontainer sh -c '
+            set -e
+            test "$(node --version | cut -dv -f2 | cut -d. -f1)" = "24" || { echo "wrong node major"; exit 1; }
+            pnpm --version
+            uv --version
+            git --version
+          '

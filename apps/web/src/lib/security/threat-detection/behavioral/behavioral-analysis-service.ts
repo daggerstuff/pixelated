@@ -2,7 +2,7 @@ import { EventEmitter } from 'events'
 
 import * as tf from '@tensorflow/tfjs'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { IMongoClient, IRedisClient } from '../threat-hunting/types'
 import { BehavioralAnalysisRepository } from './behavioral-analysis-repository'
 import { BehavioralConfig } from './types'

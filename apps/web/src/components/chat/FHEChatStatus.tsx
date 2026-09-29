@@ -19,24 +19,24 @@ export default function FHEChatStatus({
   return (
     <div className={`fhe-status flex items-center gap-1 ${className}`}>
       {isEncrypted ? (
-        <span className="text-green-600 dark:text-green-400 flex items-center">
+        <span className="flex items-center text-foreground">
           <LockIcon className="mr-1 h-3 w-3" />
           Encrypted
         </span>
       ) : (
-        <span className="text-amber-600 dark:text-amber-400 flex items-center">
+        <span className="flex items-center text-muted-foreground">
           <UnlockIcon className="mr-1 h-3 w-3" />
           Unencrypted
         </span>
       )}
 
       {isVerified ? (
-        <span className="text-green-600 dark:text-green-400 ml-2 flex items-center">
+        <span className="ml-2 flex items-center text-foreground">
           <CheckIcon className="mr-1 h-3 w-3" />
           Verified
         </span>
       ) : (
-        <span className="text-red-600 dark:text-red-400 ml-2 flex items-center">
+        <span className="ml-2 flex items-center font-semibold text-foreground">
           <AlertIcon className="mr-1 h-3 w-3" />
           Unverified
         </span>

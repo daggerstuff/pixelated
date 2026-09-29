@@ -10,7 +10,7 @@ from skillreducer.config import Config
 
 
 @pytest.fixture
-def mock_agno_agent():
+def mock_agno_agent() -> MagicMock:
     run_output = MagicMock()
     run_output.content = "ok"
     agent = MagicMock()
@@ -41,11 +41,11 @@ def test_skill_optimization_result_paths(tmp_path: Path) -> None:
 @patch("skillreducer.agent.create_completion_agent")
 @patch("skillreducer.agent.reduce_skill")
 def test_skill_reducer_agent_optimize_dry_run(
-    mock_reduce,
-    mock_completion,
-    mock_orchestrator,
-    mock_stage1_cls,
-    mock_agno_agent,
+    mock_reduce: MagicMock,
+    mock_completion: MagicMock,
+    mock_orchestrator: MagicMock,
+    mock_stage1_cls: MagicMock,
+    mock_agno_agent: MagicMock,
     tmp_path: Path,
 ) -> None:
     skill_dir = tmp_path / "my-skill"

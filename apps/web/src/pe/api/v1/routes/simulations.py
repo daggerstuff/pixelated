@@ -9,12 +9,15 @@ Implements:
 
 from __future__ import annotations
 
+import asyncio
 import json
 import uuid
 from datetime import datetime, timezone
 from typing import Annotated, Any
+from uuid import UUID
 
 import structlog
+from celery import chain
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
@@ -100,31 +103,85 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-# ── Celery Integration (async stub) ───────────────────────────────
+# ── Celery Integration ────────────────────────────────────────────
 
 
 async def trigger_celery_chain(
-    _session_id: str,
-    _user_input: str,
+    session_id: str,
+    user_input: str,
     _tenant_id: str,
     _user_id: str,
 ) -> str | None:
-    """Trigger the Celery orchestration chain.
+    """Trigger the Celery orchestration chain for a learner message.
 
-    In production this would call:
-        chain(
-            run_safety_input_guard.s(user_input),
-            update_persona_state.s(),
-            generate_llm_response.s(),
-            run_safety_output_guard.s(),
-            broadcast_response.s(session_id)
-        ).apply_async()
+    ``_tenant_id``/``_user_id`` are accepted (underscore-dummy) for call-site
+    stability — reserved for per-tenant routing and per-user attribution
+    once the broker enforces them.
 
-    Returns a task_id for polling, or None if Celery is unavailable.
+    Dispatches:
+        run_safety_input_guard(user_input)
+          → update_persona_state(sanitized, session_id)
+            → generate_llm_response(context)
+              → run_safety_output_guard(context)
+                → broadcast_response(context, session_id)
+
+    The chain result id is reported through the session WebSocket as a
+    ``state_update`` so clients can correlate the eventual response.
+
+    Returns the chain result task_id for polling, or None when the Celery
+    broker is unreachable (the caller falls back to the inline echo reply).
     """
-    # Stub: For now, simulate a synchronous response for testing
-    # In production, this calls celery_app.send_task(...)
-    return None
+    loop = asyncio.get_running_loop()
+
+    def _dispatch() -> str | None:
+        # Lazy import keeps celery (and its broker client) out of module
+        # import time — see the apps/web/src/pe/api per-file-ignores note.
+        from src.pe.tasks.simulation import (
+            broadcast_response,
+            generate_llm_response,
+            run_safety_input_guard,
+            run_safety_output_guard,
+            update_persona_state,
+        )
+
+        try:
+            workflow = chain(
+                run_safety_input_guard.s(user_input),
+                update_persona_state.s(session_id),
+                generate_llm_response.s(),
+                run_safety_output_guard.s(),
+                broadcast_response.s(session_id),
+            )
+            result = workflow.apply_async()
+            return str(result.id)
+        except Exception:
+            logger.warning(
+                "celery_dispatch_failed",
+                session_id=session_id,
+                exc_info=True,
+            )
+            return None
+
+    try:
+        # apply_async performs broker I/O — run it off the event loop
+        task_id = await loop.run_in_executor(None, _dispatch)
+        if task_id is not None:
+            await manager.broadcast(
+                session_id,
+                {
+                    "type": "state_update",
+                    "payload": {
+                        "state": {
+                            "current": "processing",
+                            "variables": {"task_id": task_id},
+                        }
+                    },
+                },
+            )
+        return task_id
+    except Exception:
+        logger.warning("celery_chain_trigger_failed", session_id=session_id, exc_info=True)
+        return None
 
 
 # ── Simulation CRUD Endpoints ─────────────────────────────────────
@@ -134,8 +191,8 @@ async def trigger_celery_chain(
 async def create_simulation(
     request: CreateSimulationRequest,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_educator_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_educator_required)],
+) -> SimulationResponse:
     """Create a new simulation session.
 
     Initializes the session with pending status, creates persona instances
@@ -230,9 +287,9 @@ async def create_simulation(
 @router.get("", response_model=list[SimulationResponse])
 async def list_simulations(
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_learner_required)],
+    current_user: Annotated[dict[str, Any], Depends(_learner_required)],
     status_filter: str | None = None,
-):
+) -> list[SimulationResponse]:
     """List simulation sessions for the current tenant.
 
     Learners see only their own sessions. Educators+ see all.
@@ -284,10 +341,10 @@ async def list_simulations(
 
 @router.get("/{sim_id}", response_model=SimulationResponse)
 async def get_simulation(
-    sim_id: str,
+    sim_id: UUID,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_learner_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_learner_required)],
+) -> SimulationResponse:
     """Get details of a specific simulation session."""
     result = await session.execute(
         text("""
@@ -318,10 +375,10 @@ async def get_simulation(
 
 @router.post("/{sim_id}/start", response_model=SimulationResponse)
 async def start_simulation(
-    sim_id: str,
+    sim_id: UUID,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_educator_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_educator_required)],
+) -> SimulationResponse:
     """Start a pending simulation session."""
     result = await session.execute(
         text("""
@@ -353,10 +410,10 @@ async def start_simulation(
 
 @router.post("/{sim_id}/pause", response_model=SimulationResponse)
 async def pause_simulation(
-    sim_id: str,
+    sim_id: UUID,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_educator_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_educator_required)],
+) -> SimulationResponse:
     """Pause an active simulation."""
     result = await session.execute(
         text("""
@@ -388,10 +445,10 @@ async def pause_simulation(
 
 @router.post("/{sim_id}/resume", response_model=SimulationResponse)
 async def resume_simulation(
-    sim_id: str,
+    sim_id: UUID,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_educator_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_educator_required)],
+) -> SimulationResponse:
     """Resume a paused simulation, accounting for elapsed pause time."""
     # Calculate and accumulate pause duration
     result = await session.execute(
@@ -427,10 +484,10 @@ async def resume_simulation(
 
 @router.post("/{sim_id}/abort", response_model=SimulationResponse)
 async def abort_simulation(
-    sim_id: str,
+    sim_id: UUID,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_admin_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_admin_required)],
+) -> SimulationResponse:
     """Abort a simulation (admin only — terminates any status except completed)."""
     result = await session.execute(
         text("""
@@ -468,7 +525,7 @@ async def simulation_websocket(  # noqa: PLR0912, PLR0915
     ws: WebSocket,
     session_id: str,
     token: str | None = None,
-):
+) -> None:
     """WebSocket endpoint for live simulation interaction.
 
     Connection: wss://host/api/v1/simulations/ws/{session_id}?token={jwt}
@@ -547,9 +604,7 @@ async def simulation_websocket(  # noqa: PLR0912, PLR0915
                 # Trigger Celery chain (async)
                 assert tenant_id is not None
                 assert user_id is not None
-                task_id = await trigger_celery_chain(  # type: ignore
-                    session_id, user_text, tenant_id, user_id
-                )
+                task_id = await trigger_celery_chain(session_id, user_text, tenant_id, user_id)
 
                 # If no Celery, echo back a stub response
                 if task_id is None:

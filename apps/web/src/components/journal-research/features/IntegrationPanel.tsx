@@ -45,13 +45,13 @@ export function IntegrationPanel({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Integration Planning</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             Plan and visualize dataset integration strategies
           </p>
         </div>
         <button
           onClick={() => setIsInitiating(true)}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
+          className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
           disabled={initiateMutation.isPending}
         >
           {initiateMutation.isPending
@@ -68,14 +68,14 @@ export function IntegrationPanel({
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 Select sources to create integration plans for. Leave empty to
                 plan for all acquired sources.
               </p>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Target Format</label>
                 <select
-                  className="border-input w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   defaultValue="chatml"
                 >
                   <option value="chatml">ChatML</option>
@@ -95,13 +95,13 @@ export function IntegrationPanel({
                       },
                     )
                   }}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
+                  className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
                 >
                   Plan for All Acquired
                 </button>
                 <button
                   onClick={() => setIsInitiating(false)}
-                  className="border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium"
+                  className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
                 >
                   Cancel
                 </button>
@@ -118,11 +118,11 @@ export function IntegrationPanel({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-muted-foreground py-8 text-center">
+            <div className="py-8 text-center text-muted-foreground">
               Loading integration plans...
             </div>
           ) : plans?.items.length === 0 ? (
-            <div className="text-muted-foreground py-8 text-center">
+            <div className="py-8 text-center text-muted-foreground">
               No integration plans yet. Start integration planning to create
               plans.
             </div>
@@ -133,7 +133,7 @@ export function IntegrationPanel({
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg">{plan.planId}</CardTitle>
-                      <span className="bg-muted rounded-md px-2 py-1 text-xs font-medium capitalize">
+                      <span className="rounded-md bg-muted px-2 py-1 text-xs font-medium capitalize">
                         {plan.complexity}
                       </span>
                     </div>
@@ -141,19 +141,19 @@ export function IntegrationPanel({
                   <CardContent>
                     <div className="grid gap-4 md:grid-cols-2">
                       <div>
-                        <p className="text-muted-foreground text-sm font-medium">
+                        <p className="text-sm font-medium text-muted-foreground">
                           Source ID
                         </p>
                         <p className="mt-1">{plan.sourceId}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-sm font-medium">
+                        <p className="text-sm font-medium text-muted-foreground">
                           Target Format
                         </p>
                         <p className="mt-1">{plan.targetFormat}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-sm font-medium">
+                        <p className="text-sm font-medium text-muted-foreground">
                           Estimated Effort
                         </p>
                         <p className="mt-1">
@@ -161,7 +161,7 @@ export function IntegrationPanel({
                         </p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground text-sm font-medium">
+                        <p className="text-sm font-medium text-muted-foreground">
                           Created Date
                         </p>
                         <p className="mt-1">
@@ -170,7 +170,7 @@ export function IntegrationPanel({
                       </div>
                       {plan.requiredTransformations.length > 0 && (
                         <div className="md:col-span-2">
-                          <p className="text-muted-foreground text-sm font-medium">
+                          <p className="text-sm font-medium text-muted-foreground">
                             Required Transformations
                           </p>
                           <ul className="mt-1 list-inside list-disc space-y-1">
@@ -186,7 +186,7 @@ export function IntegrationPanel({
                       )}
                       {Object.keys(plan.schemaMapping).length > 0 && (
                         <div className="md:col-span-2">
-                          <p className="text-muted-foreground text-sm font-medium">
+                          <p className="text-sm font-medium text-muted-foreground">
                             Schema Mapping
                           </p>
                           <div className="mt-1 space-y-1">

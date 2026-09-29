@@ -1,1 +1,1 @@
-export { default } from '../../../lib/channels/eve.js';
+export { default } from '../../../lib/channels/eve.js'

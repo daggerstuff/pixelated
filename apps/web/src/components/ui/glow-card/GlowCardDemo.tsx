@@ -12,7 +12,7 @@ export default function GlowCardDemo() {
           metric="Progress"
           metricValue="85%"
           status="active"
-          icon={<Brain className="text-blue-400 h-6 w-6" />}
+          icon={<Brain className="h-6 w-6 text-foreground" />}
           glowColor="blue"
         />
 
@@ -22,7 +22,7 @@ export default function GlowCardDemo() {
           metric="Streak"
           metricValue="12 days"
           status="completed"
-          icon={<Heart className="text-purple-400 h-6 w-6" />}
+          icon={<Heart className="h-6 w-6 text-foreground" />}
           glowColor="purple"
         />
 
@@ -32,7 +32,7 @@ export default function GlowCardDemo() {
           metric="Today"
           metricValue="8,432"
           status="active"
-          icon={<Activity className="text-green-400 h-6 w-6" />}
+          icon={<Activity className="h-6 w-6 text-foreground" />}
           glowColor="green"
         />
 
@@ -42,7 +42,7 @@ export default function GlowCardDemo() {
           metric="Improvement"
           metricValue="+24%"
           status="pending"
-          icon={<TrendingUp className="text-orange-400 h-6 w-6" />}
+          icon={<TrendingUp className="h-6 w-6 text-muted-foreground" />}
           glowColor="orange"
         />
       </div>

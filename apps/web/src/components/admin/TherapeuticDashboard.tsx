@@ -49,16 +49,16 @@ export const TherapeuticDashboard: React.FC = () => {
   }
 
   return (
-    <div className="bg-gray-50 border-gray-100 mx-auto max-w-4xl rounded-xl border p-6 shadow-sm">
+    <div className="mx-auto max-w-4xl rounded-none border border-border bg-secondary p-6">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-gray-800 text-2xl font-bold">
+        <h2 className="text-2xl font-bold text-foreground">
           Therapeutic AI Dashboard
         </h2>
         <div
-          className={`rounded-full px-3 py-1 text-sm font-medium ${
+          className={`rounded-none px-3 py-1 text-sm font-medium ${
             health?.status === 'healthy'
-              ? 'bg-green-100 text-green-700'
-              : 'bg-red-100 text-red-700'
+              ? 'border border-input bg-secondary text-foreground'
+              : 'border border-ring bg-card font-semibold text-foreground'
           }`}
         >
           API: {health?.status ?? 'Unknown'}{' '}
@@ -68,16 +68,16 @@ export const TherapeuticDashboard: React.FC = () => {
 
       <div className="space-y-6">
         {/* Input Section */}
-        <div className="bg-white border-gray-200 rounded-lg border p-4">
+        <div className="rounded-none border border-border bg-card p-4">
           <label
             htmlFor="therapeutic-dashboard-input"
-            className="text-gray-700 mb-2 block text-sm font-medium"
+            className="mb-2 block text-sm font-medium text-foreground"
           >
             Test Input (Patient Transcript)
           </label>
           <textarea
             id="therapeutic-dashboard-input"
-            className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 h-32 w-full rounded-md border p-3 focus:ring-2"
+            className="h-32 w-full rounded-none border border-input p-3 focus:border-ring focus:ring-2 focus:ring-ring"
             placeholder="Enter text here... (e.g., 'I am feeling hopeless and want to end it all')"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
@@ -86,7 +86,7 @@ export const TherapeuticDashboard: React.FC = () => {
             <button
               onClick={runAnalysis}
               disabled={loading || !inputText}
-              className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Analyzing...' : 'Run Analysis'}
             </button>
@@ -96,17 +96,17 @@ export const TherapeuticDashboard: React.FC = () => {
         {/* Results Grid */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Crisis Detection Results */}
-          <div className="bg-white border-gray-200 rounded-lg border p-4">
-            <h3 className="text-gray-800 mb-3 flex items-center gap-2 text-lg font-semibold">
+          <div className="rounded-none border border-border bg-card p-4">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-foreground">
               🚑 Crisis Detection
             </h3>
             {analysis.crisis ? (
               <div className="space-y-3">
                 <div
-                  className={`rounded-md p-3 ${
+                  className={`rounded-none p-3 ${
                     analysis.crisis.has_crisis_signal
-                      ? 'bg-red-50 border-red-200 border'
-                      : 'bg-green-50 border-green-200 border'
+                      ? 'border border-ring bg-card'
+                      : 'border border-input bg-secondary'
                   }`}
                 >
                   <div className="flex justify-between">
@@ -114,10 +114,10 @@ export const TherapeuticDashboard: React.FC = () => {
                     <span
                       className={`font-bold uppercase ${
                         analysis.crisis.risk_level === 'imminent'
-                          ? 'text-red-700'
+                          ? 'font-semibold text-foreground'
                           : analysis.crisis.risk_level === 'high'
-                            ? 'text-orange-600'
-                            : 'text-gray-600'
+                            ? 'font-medium text-foreground'
+                            : 'text-muted-foreground'
                       }`}
                     >
                       {analysis.crisis.risk_level}
@@ -127,16 +127,16 @@ export const TherapeuticDashboard: React.FC = () => {
 
                 {analysis.crisis.signals.length > 0 && (
                   <div>
-                    <h4 className="text-gray-500 mb-2 text-xs font-semibold uppercase">
+                    <h4 className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
                       Detected Signals
                     </h4>
                     <ul className="space-y-2">
                       {analysis.crisis.signals.map((signal, idx) => (
                         <li
                           key={`signal-${signal.category}-${signal.context}-${signal.id ?? idx}`}
-                          className="bg-gray-50 rounded p-2 text-sm"
+                          className="rounded-none bg-secondary p-2 text-sm"
                         >
-                          <span className="text-indigo-700 font-medium">
+                          <span className="font-medium text-foreground">
                             {signal.category}:
                           </span>{' '}
                           {signal.context}
@@ -148,10 +148,10 @@ export const TherapeuticDashboard: React.FC = () => {
 
                 {analysis.crisis.action_required && (
                   <div className="mt-2">
-                    <h4 className="text-gray-500 mb-1 text-xs font-semibold uppercase">
+                    <h4 className="mb-1 text-xs font-semibold uppercase text-muted-foreground">
                       Protocol
                     </h4>
-                    <ul className="text-gray-700 list-inside list-disc text-sm">
+                    <ul className="list-inside list-disc text-sm text-foreground">
                       {analysis.crisis.escalation_protocol.map((step) => (
                         <li
                           key={`protocol-step-${step.replace(/\s+/g, '-').toLowerCase()}`}
@@ -164,29 +164,29 @@ export const TherapeuticDashboard: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div className="text-gray-400 py-4 text-center text-sm italic">
+              <div className="py-4 text-center text-sm italic text-muted-foreground">
                 No analysis run yet
               </div>
             )}
           </div>
 
           {/* PII Scrubbing Results */}
-          <div className="bg-white border-gray-200 rounded-lg border p-4">
-            <h3 className="text-gray-800 mb-3 flex items-center gap-2 text-lg font-semibold">
+          <div className="rounded-none border border-border bg-card p-4">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-foreground">
               🔒 PII Scrubber
             </h3>
             {analysis.pii ? (
               <div className="space-y-3">
-                <div className="bg-gray-50 border-gray-200 rounded-md border p-3 font-mono text-sm">
+                <div className="rounded-none border border-border bg-secondary p-3 font-mono text-sm">
                   {analysis.pii.scrubbed_text}
                 </div>
-                <div className="text-gray-500 flex gap-4 text-xs">
+                <div className="flex gap-4 text-xs text-muted-foreground">
                   <span>Original Length: {analysis.pii.original_length}</span>
                   <span>Scrubbed Length: {analysis.pii.scrubbed_length}</span>
                 </div>
               </div>
             ) : (
-              <div className="text-gray-400 py-4 text-center text-sm italic">
+              <div className="py-4 text-center text-sm italic text-muted-foreground">
                 No analysis run yet
               </div>
             )}

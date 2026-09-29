@@ -1,5 +1,6 @@
 import { Calendar, Clock, Plus, X } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
+
 import { offlineSyncService } from '@/lib/ehr-native/services/offline-sync.service'
 
 interface Appointment {

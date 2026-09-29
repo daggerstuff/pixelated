@@ -12,7 +12,11 @@ import type { ClinicalRole, EHRPermission } from '@/lib/ehr-native/auth'
 // ---------------------------------------------------------------------------
 
 export type DashboardType =
-  'practice' | 'outcomes' | 'utilization' | 'billing' | 'compliance'
+  | 'practice'
+  | 'outcomes'
+  | 'utilization'
+  | 'billing'
+  | 'compliance'
 
 export const DASHBOARD_TYPES: readonly DashboardType[] = [
   'practice',
@@ -51,7 +55,13 @@ export type WidgetSize = 'small' | 'medium' | 'large' | 'wide' | 'tall'
 export type WidgetCategory = 'metric' | 'chart' | 'table' | 'list'
 
 export type ChartType =
-  'line' | 'area' | 'bar' | 'pie' | 'radar' | 'donut' | 'metric-card'
+  | 'line'
+  | 'area'
+  | 'bar'
+  | 'pie'
+  | 'radar'
+  | 'donut'
+  | 'metric-card'
 
 export interface WidgetDefinition {
   /** Unique widget identifier (e.g. 'practice.appointments-today') */

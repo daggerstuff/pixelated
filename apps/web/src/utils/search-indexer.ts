@@ -143,7 +143,6 @@ export async function buildSearchIndex(
           continue
         }
 
-
         // Convert entries to search documents
         const docs = entries.map((entry) => {
           const { id, slug, data, body } = entry

@@ -85,5 +85,5 @@
   "reportMissingImports": false,
   "reportMissingModuleSource": false,
   "reportPrivateUsage": false,
-  "pythonVersion": "3.13"
+  "pythonVersion": "3.14"
 }

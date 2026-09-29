@@ -132,12 +132,17 @@ describe('TokenBucketRateLimiter', () => {
   it('refills tokens over time', async () => {
     const limiter = new TokenBucketRateLimiter('test', {
       capacity: 1,
-      refillRatePerMs: 100, // 1 token per 10ms
+      refillRatePerMs: 0.1, // 1 token per 10ms
       maxWaitMs: 1000,
     })
     expect(limiter.tryAcquire()).toBe(true)
+    // The bucket refills at 0.1 token/ms, so no full token can accrue in
+    // the microseconds between the two calls — deterministic even if the
+    // 1ms-resolution wall clock ticks between them.
     expect(limiter.tryAcquire()).toBe(false)
-    await new Promise((r) => setTimeout(r, 15))
+    // 25ms guarantees at least one full token (needs 10ms) even on a
+    // heavily loaded runner; do not lower toward the refill interval.
+    await new Promise((r) => setTimeout(r, 25))
     expect(limiter.tryAcquire()).toBe(true)
   })
 

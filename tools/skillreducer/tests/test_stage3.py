@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -9,7 +10,6 @@ from skillreducer.config import Config
 from skillreducer.pipeline import reduce_skill
 from skillreducer.stage3.extract import extract_scripts_from_markdown
 from skillreducer.stage3.scan import scan_python_blocks, scan_script_blocks
-
 
 SAMPLE_MD = """\
 **Quick API**
@@ -229,7 +229,7 @@ def test_multi_file_processing() -> None:
     llm = MagicMock()
     llm.enabled = True
 
-    def _side_effect(prompt: str) -> dict:
+    def _side_effect(prompt: str) -> dict[str, Any]:
         if "SKILL.md" in prompt:
             return {"items": [{"index": 0, "extract": False, "reason": "inline"}]}
         return {

@@ -11,21 +11,19 @@ const {
 ---
 
 <div
-  class="rum-dashboard bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden"
+  class="rum-dashboard rounded-none border border-border bg-card overflow-hidden"
   data-testid="astro-component"
 >
-  <div
-    class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center"
-  >
+  <div class="flex items-center justify-between border-b border-border p-4">
     <div>
-      <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
+      <h2 class="text-xl font-semibold text-foreground">
         {title}
       </h2>
-      <p class="text-sm text-gray-600 dark:text-gray-400">{description}</p>
+      <p class="text-sm text-muted-foreground">{description}</p>
     </div>
     <button
       id="refresh-btn"
-      class="px-3 py-1 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-200 rounded text-sm"
+      class="rounded-none bg-primary px-3 py-1 text-sm font-medium text-primary-foreground hover:bg-primary/90"
     >
       Refresh Now
     </button>
@@ -33,8 +31,8 @@ const {
 
   <div class="metrics-container p-4">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="metric-card rounded-none border border-border bg-secondary p-3">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Loading Performance
         </h3>
         <div id="loading-metrics">
@@ -45,8 +43,8 @@ const {
         </div>
       </div>
 
-      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="metric-card rounded-none border border-border bg-secondary p-3">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Interactivity
         </h3>
         <div id="interactivity-metrics">
@@ -56,8 +54,8 @@ const {
         </div>
       </div>
 
-      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="metric-card rounded-none border border-border bg-secondary p-3">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Visual Stability
         </h3>
         <div id="stability-metrics">
@@ -65,8 +63,8 @@ const {
         </div>
       </div>
 
-      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="metric-card rounded-none border border-border bg-secondary p-3">
+        <h3 class="text-sm font-medium text-muted-foreground">
           User Demographics
         </h3>
         <div id="demographics-metrics">
@@ -76,8 +74,8 @@ const {
         </div>
       </div>
 
-      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="metric-card rounded-none border border-border bg-secondary p-3">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Resource Metrics
         </h3>
         <div id="resource-metrics">
@@ -87,8 +85,8 @@ const {
         </div>
       </div>
 
-      <div class="metric-card bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="metric-card rounded-none border border-border bg-secondary p-3">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Error Rates
         </h3>
         <div id="error-metrics">
@@ -114,22 +112,9 @@ const {
       border-color 300ms ease-in-out;
   }
 
-  .metric-card {
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-  }
-
-  .metric-card:hover {
-    transform: translateY(-2px);
-  }
-
-  :global(.dark) .metric-card {
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
   .loading-placeholder {
     animation: pulse 1.5s infinite;
-    color: #cbd5e0;
+    color: var(--np-muted);
   }
 
   @keyframes pulse {
@@ -140,21 +125,5 @@ const {
     50% {
       opacity: 0.5;
     }
-  }
-
-  .text-green-500 {
-    color: #48bb78;
-  }
-
-  .text-yellow-500 {
-    color: #ecc94b;
-  }
-
-  .text-red-500 {
-    color: #f56565;
-  }
-
-  .text-gray-500 {
-    color: #a0aec0;
   }
 </style>

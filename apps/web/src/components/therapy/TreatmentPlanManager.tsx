@@ -609,7 +609,7 @@ const TreatmentPlanManager: FC = () => {
   }
 
   if (error) {
-    return <p className="text-red-500">Error: {error}</p>
+    return <p className="font-semibold text-foreground">Error: {error}</p>
   }
 
   const renderObjectivesSection = (
@@ -617,11 +617,9 @@ const TreatmentPlanManager: FC = () => {
     objectives: EditableObjective[],
     isEdit = false,
   ) => (
-    <div className="border-slate-300 dark:border-slate-700 ml-4 mt-3 border-l pl-4">
+    <div className="ml-4 mt-3 border-l border-border pl-4">
       <div className="mb-2 flex items-center justify-between">
-        <h4 className="text-md text-slate-700 dark:text-slate-300 font-medium">
-          Objectives
-        </h4>
+        <h4 className="text-md font-medium text-foreground">Objectives</h4>
         <Button
           type="button"
           variant="outline"
@@ -633,14 +631,14 @@ const TreatmentPlanManager: FC = () => {
         </Button>
       </div>
       {objectives.length === 0 && (
-        <p className="text-muted-foreground text-xs">
+        <p className="text-xs text-muted-foreground">
           No objectives added for this goal.
         </p>
       )}
       {objectives.map((obj, objIndex) => (
         <div
           key={obj.tempId}
-          className="bg-slate-100 dark:bg-slate-700/50 mb-2 rounded-md border p-2"
+          className="mb-2 rounded-none border border-input bg-secondary p-2"
         >
           <div className="grid grid-cols-1 items-center gap-2 md:grid-cols-6">
             <Textarea
@@ -686,7 +684,7 @@ const TreatmentPlanManager: FC = () => {
               variant="ghost"
               size="icon"
               onClick={() => removeObjective(goalIndex, objIndex, isEdit)}
-              className="text-red-500 hover:text-red-700 h-9 w-9 place-self-center md:col-span-1 md:place-self-auto"
+              className="h-9 w-9 place-self-center text-foreground hover:text-muted-foreground md:col-span-1 md:place-self-auto"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -713,12 +711,12 @@ const TreatmentPlanManager: FC = () => {
         </Button>
       </div>
       {goals.length === 0 && (
-        <p className="text-muted-foreground text-sm">No goals added yet.</p>
+        <p className="text-sm text-muted-foreground">No goals added yet.</p>
       )}
       {goals.map((goal, index) => (
         <div
           key={goal.tempId}
-          className="dark:bg-slate-800 mb-3 rounded-md border bg-background p-3 shadow-sm"
+          className="mb-3 rounded-none border border-border bg-card p-3"
         >
           <div className="grid grid-cols-1 items-center gap-2 md:grid-cols-6">
             <Textarea
@@ -753,7 +751,7 @@ const TreatmentPlanManager: FC = () => {
               variant="ghost"
               size="icon"
               onClick={() => removeGoal(index, isEdit)}
-              className="text-red-500 hover:text-red-700 place-self-center md:col-span-1 md:place-self-auto"
+              className="place-self-center text-foreground hover:text-muted-foreground md:col-span-1 md:place-self-auto"
             >
               <Trash2 className="h-5 w-5" />
             </Button>
@@ -776,7 +774,7 @@ const TreatmentPlanManager: FC = () => {
       )}
 
       {plans.length > 0 && (
-        <div className="rounded-md border">
+        <div className="rounded-none border">
           <table className="w-full">
             <TableHeader>
               <TableRow>
@@ -851,7 +849,7 @@ const TreatmentPlanManager: FC = () => {
         }
       >
         <form id={`create-plan-form-${formId}`} onSubmit={handleCreatePlan}>
-          <p className="text-muted-foreground mb-4 text-sm">
+          <p className="mb-4 text-sm text-muted-foreground">
             Fill in the details below to create a new treatment plan.
           </p>
           <div className="grid gap-4 py-4">
@@ -956,7 +954,7 @@ const TreatmentPlanManager: FC = () => {
             <AlertDialogAction
               onClick={handleDeletePlan}
               disabled={isLoading}
-              className="bg-destructive hover:bg-destructive/90"
+              className="hover:bg-destructive/90 bg-destructive"
             >
               {isLoading ? 'Deleting...' : 'Yes, delete plan'}
             </AlertDialogAction>
@@ -998,7 +996,7 @@ const TreatmentPlanManager: FC = () => {
       >
         {editingPlanData && (
           <form id={`edit-plan-form-${formId}`} onSubmit={handleUpdatePlan}>
-            <p className="text-muted-foreground mb-4 text-sm">
+            <p className="mb-4 text-sm text-muted-foreground">
               Update the details for &quot;{editingPlanData.title}&quot;.
             </p>
             <div className="grid gap-4 py-4">

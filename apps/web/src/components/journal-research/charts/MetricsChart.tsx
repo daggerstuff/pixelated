@@ -105,7 +105,7 @@ export function MetricsChart({
               // This would need to be handled by parent component
               // For now, just a visual indicator
             }}
-            className="border-input rounded-md border bg-background px-2 py-1 text-sm"
+            className="rounded-md border border-input bg-background px-2 py-1 text-sm"
             disabled
           >
             <option value="week">Last Week</option>

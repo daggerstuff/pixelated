@@ -42,8 +42,8 @@ class TaxonomyValidation:
         """
         self.sample_size = sample_size
         self.classifier = TaxonomyClassifier()
-        self.ground_truth = {}  # record_id -> category
-        self.predictions = {}  # record_id -> (category, confidence)
+        self.ground_truth: dict[str, str] = {}  # record_id -> category
+        self.predictions: dict[str, tuple[str, float]] = {}  # record_id -> (category, confidence)
 
     def sample_records_from_local(self, data_dir: Path, output_file: Path) -> list[dict[str, Any]]:
         """
@@ -114,7 +114,7 @@ class TaxonomyValidation:
 
         return samples
 
-    def classify_samples(self, samples_file: Path) -> dict[str, tuple[str, float]]:
+    def classify_samples(self, samples_file: Path) -> dict[str, tuple[str, float, str]]:
         """
         Run classifier on sampled records.
 
@@ -122,11 +122,11 @@ class TaxonomyValidation:
             samples_file: File containing sampled records
 
         Returns:
-            Dict mapping record index to (category, confidence)
+            Dict mapping record index to (category, confidence, reasoning)
         """
         logger.info(f"Classifying samples from {samples_file}")
 
-        predictions = {}
+        predictions: dict[str, tuple[str, float, str]] = {}
 
         with open(samples_file) as f:
             for i, line in enumerate(f):
@@ -151,8 +151,8 @@ class TaxonomyValidation:
         return predictions
 
     def generate_annotation_template(
-        self, samples_file: Path, predictions: dict[str, tuple[str, float]], output_file: Path
-    ):
+        self, samples_file: Path, predictions: dict[str, tuple[str, float, str]], output_file: Path
+    ) -> None:
         """
         Generate a human-friendly annotation template.
 
@@ -183,7 +183,7 @@ class TaxonomyValidation:
 
                 try:
                     record = json.loads(line)
-                    pred_data = predictions.get(str(i), ("unknown", 0.0))
+                    pred_data = predictions.get(str(i), ("unknown", 0.0, ""))
                     pred_cat = pred_data[0]
                     confidence = pred_data[1]
                     reasoning = ""
@@ -214,7 +214,7 @@ class TaxonomyValidation:
 
         logger.info(f"💾 Saved annotation template to {output_file}")
 
-    def calculate_accuracy(self, annotated_file: Path) -> dict[str, Any]:
+    def calculate_accuracy(self, annotated_file: Path) -> dict[str, object]:
         """
         Calculate accuracy from annotated file.
 
@@ -254,7 +254,7 @@ class TaxonomyValidation:
         accuracy = correct / total if total > 0 else 0.0
 
         # Per-category metrics
-        category_stats = defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0})
+        category_stats: defaultdict[str, dict[str, int]] = defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0})
 
         for record_id, gt_cat in ground_truth.items():
             pred_cat = predicted[record_id]
@@ -266,13 +266,7 @@ class TaxonomyValidation:
                 category_stats[pred_cat]["fp"] += 1
 
         # Calculate precision, recall, F1
-        metrics = {
-            "overall_accuracy": accuracy,
-            "total_samples": total,
-            "correct": correct,
-            "incorrect": total - correct,
-            "categories": {},
-        }
+        category_metrics: dict[str, dict[str, float | int]] = {}
 
         for cat in category_stats:
             tp = category_stats[cat]["tp"]
@@ -283,17 +277,25 @@ class TaxonomyValidation:
             recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
             f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
 
-            metrics["categories"][cat] = {
+            category_metrics[cat] = {
                 "precision": precision,
                 "recall": recall,
                 "f1_score": f1,
                 "support": tp + fn,
             }
 
+        metrics: dict[str, object] = {
+            "overall_accuracy": accuracy,
+            "total_samples": total,
+            "correct": correct,
+            "incorrect": total - correct,
+            "categories": category_metrics,
+        }
+
         return metrics
 
 
-def main():
+def main() -> None:
     """Run validation workflow."""
 
     parser = argparse.ArgumentParser(description="Validate taxonomy classifier")

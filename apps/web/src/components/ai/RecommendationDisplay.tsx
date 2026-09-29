@@ -42,29 +42,29 @@ interface ExtendedTreatmentRecommendation extends TreatmentRecommendation {
 
 const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations }) => {
   if (!recommendations || recommendations.length === 0) {
-    return <div className="text-gray-500 py-8 text-center">No recommendations available</div>;
+    return <div className="text-muted-foreground py-8 text-center">No recommendations available</div>;
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-primary text-primary-foreground border-transparent font-semibold";
       case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-secondary border-ring text-foreground font-medium";
       case "low":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-secondary border-input text-foreground";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-secondary border-border text-muted-foreground";
     }
   };
 
   const getEfficacyColor = (efficacy: number) => {
     if (efficacy >= 0.8) {
-      return "text-green-600";
+      return "text-foreground font-semibold";
     } else if (efficacy >= 0.6) {
-      return "text-yellow-600";
+      return "text-foreground font-medium";
     } else {
-      return "text-red-600";
+      return "text-foreground font-bold";
     }
   };
 
@@ -97,7 +97,7 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
 
   return (
     <div className="space-y-6">
-      <h2 className="text-gray-900 mb-4 text-2xl font-bold">
+      <h2 className="text-foreground mb-4 text-2xl font-bold">
         Treatment Recommendations ({recommendations.length})
       </h2>
 
@@ -110,19 +110,19 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
             key={
               rec.id || `rec-${index}`
             }
-            className="bg-white border-gray-200 rounded-lg border p-6 shadow-md"
+            className="bg-card border-border rounded-none border p-6"
           >
             {/* Header */}
             <div className="mb-4 flex items-start justify-between">
               <div className="flex-1">
-                <h3 className="text-gray-900 mb-2 text-xl font-semibold">
+                <h3 className="text-foreground mb-2 text-xl font-semibold">
                   {rec.title || "Treatment Recommendation"}
                 </h3>
-                {rec.description && <p className="text-gray-600 mb-3">{rec.description}</p>}
+                {rec.description && <p className="text-muted-foreground mb-3">{rec.description}</p>}
               </div>
               <div className="flex flex-col items-end gap-2">
                 <span
-                  className={`rounded-full border px-3 py-1 text-sm font-medium ${getPriorityColor(rec.priority)}`}
+                  className={`rounded-none border px-3 py-1 text-sm font-medium ${getPriorityColor(rec.priority)}`}
                 >
                   {rec.priority.charAt(0).toUpperCase() + rec.priority.slice(1)} Priority
                 </span>
@@ -137,12 +137,12 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
             {/* Indications */}
             {rec.indications && rec.indications.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-gray-700 mb-2 text-sm font-medium">Target Indications:</h4>
+                <h4 className="text-foreground mb-2 text-sm font-medium">Target Indications:</h4>
                 <div className="flex flex-wrap gap-2">
                   {rec.indications.map((indication: string) => (
                     <span
                       key={`indication-${indication}`}
-                      className="bg-blue-100 text-blue-800 rounded px-2 py-1 text-sm"
+                      className="bg-secondary border border-input text-foreground rounded-none px-2 py-1 text-sm"
                     >
                       {indication}
                     </span>
@@ -154,10 +154,10 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
             {/* Treatment Details */}
             {rec.treatment && (
               <div className="mb-4">
-                <h4 className="text-gray-700 mb-2 text-sm font-medium">Treatment Details:</h4>
-                <div className="bg-gray-50 rounded p-3">
+                <h4 className="text-foreground mb-2 text-sm font-medium">Treatment Details:</h4>
+                <div className="bg-secondary rounded-none p-3">
                   {typeof rec.treatment === "string" ? (
-                    <p className="text-gray-800">{rec.treatment}</p>
+                    <p className="text-foreground">{rec.treatment}</p>
                   ) : isTreatmentDetails(rec.treatment) ? (
                     <div className="space-y-2">
                       {rec.treatment["approach"] && (
@@ -186,7 +186,7 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
                       )}
                     </div>
                   ) : (
-                    <p className="text-gray-800">Treatment details available</p>
+                    <p className="text-foreground">Treatment details available</p>
                   )}
                 </div>
               </div>
@@ -195,16 +195,16 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
             {/* Rationale */}
             {rec.rationale && (
               <div className="mb-4">
-                <h4 className="text-gray-700 mb-2 text-sm font-medium">Rationale:</h4>
-                <p className="text-gray-600 text-sm">{rec.rationale}</p>
+                <h4 className="text-foreground mb-2 text-sm font-medium">Rationale:</h4>
+                <p className="text-muted-foreground text-sm">{rec.rationale}</p>
               </div>
             )}
 
             {/* Evidence */}
             {rec.evidence && rec.evidence.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-gray-700 mb-2 text-sm font-medium">Supporting Evidence:</h4>
-                <ul className="text-gray-600 list-inside list-disc space-y-1 text-sm">
+                <h4 className="text-foreground mb-2 text-sm font-medium">Supporting Evidence:</h4>
+                <ul className="text-muted-foreground list-inside list-disc space-y-1 text-sm">
                   {rec.evidence.map((evidence: string) => (
                     <li key={`evidence-${evidence.slice(0, 20)}`}>{evidence}</li>
                   ))}
@@ -215,12 +215,12 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
             {/* Personalization */}
             {rec.personalization && (
               <div className="mb-4">
-                <h4 className="text-gray-700 mb-2 text-sm font-medium">Personalization Notes:</h4>
-                <div className="bg-blue-50 rounded p-3">
+                <h4 className="text-foreground mb-2 text-sm font-medium">Personalization Notes:</h4>
+                <div className="bg-secondary border border-input rounded-none p-3">
                   {typeof rec.personalization === "string" ? (
-                    <p className="text-blue-800 text-sm">{rec.personalization}</p>
+                    <p className="text-foreground text-sm">{rec.personalization}</p>
                   ) : isPersonalizationDetails(rec.personalization) ? (
-                    <div className="text-blue-800 space-y-1 text-sm">
+                    <div className="text-foreground space-y-1 text-sm">
                       {rec.personalization["factors"] &&
                         rec.personalization["factors"].length > 0 && (
                           <div>
@@ -236,7 +236,7 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
                       )}
                     </div>
                   ) : (
-                    <p className="text-blue-800 text-sm">Personalization details available</p>
+                    <p className="text-foreground text-sm">Personalization details available</p>
                   )}
                 </div>
               </div>
@@ -245,13 +245,13 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
             {/* Alternatives */}
             {rec.alternatives && rec.alternatives.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-gray-700 mb-2 text-sm font-medium">Alternative Approaches:</h4>
+                <h4 className="text-foreground mb-2 text-sm font-medium">Alternative Approaches:</h4>
                 <div className="space-y-2">
                   {rec.alternatives.map((alt) => (
-                    <div key={`alt-${alt.name}`} className="bg-gray-50 rounded p-2 text-sm">
-                      <div className="text-gray-800 font-medium">{alt.name}</div>
+                    <div key={`alt-${alt.name}`} className="bg-secondary rounded-none p-2 text-sm">
+                      <div className="text-foreground font-medium">{alt.name}</div>
                       {alt.description && (
-                        <div className="text-gray-600 mt-1">{alt.description}</div>
+                        <div className="text-muted-foreground mt-1">{alt.description}</div>
                       )}
                       {typeof alt.efficacy === "number" && (
                         <div className={`mt-1 ${getEfficacyColor(alt.efficacy)}`}>
@@ -267,24 +267,24 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
             {/* Media Recommendations */}
             {rec.mediaRecommendations && rec.mediaRecommendations.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-gray-700 mb-2 text-sm font-medium">Recommended Resources:</h4>
+                <h4 className="text-foreground mb-2 text-sm font-medium">Recommended Resources:</h4>
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                   {rec.mediaRecommendations.map((media) => (
                     <div
                       key={`media-${media.title}-${media.type}`}
-                      className="bg-gray-50 rounded p-3 text-sm"
+                      className="bg-secondary rounded-none p-3 text-sm"
                     >
-                      <div className="text-gray-800 font-medium">{media.title}</div>
-                      <div className="text-gray-600 mt-1 capitalize">{media.type}</div>
+                      <div className="text-foreground font-medium">{media.title}</div>
+                      <div className="text-muted-foreground mt-1 capitalize">{media.type}</div>
                       {media.description && (
-                        <div className="text-gray-600 mt-1 text-xs">{media.description}</div>
+                        <div className="text-muted-foreground mt-1 text-xs">{media.description}</div>
                       )}
                       {media.url && (
                         <a
                           href={media.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 mt-1 inline-block text-xs"
+                          className="text-foreground hover:underline mt-1 inline-block text-xs"
                         >
                           View Resource →
                         </a>
@@ -297,7 +297,7 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
 
             {/* Timestamp */}
             {rec.timestamp && (
-              <div className="text-gray-500 mt-4 border-t pt-3 text-xs">
+              <div className="text-muted-foreground mt-4 border-t pt-3 text-xs">
                 Generated: {new Date(rec.timestamp).toLocaleString()}
               </div>
             )}

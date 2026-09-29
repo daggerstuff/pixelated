@@ -165,14 +165,12 @@ export function MetricWidget({
 
         {percentChange !== null && (
           <div className="flex items-center text-sm">
-            <span className="text-gray-500 mr-1">vs previous:</span>
+            <span className="mr-1 text-muted-foreground">vs previous:</span>
             <span
               className={`flex items-center font-medium ${
-                percentChange > 0
-                  ? 'text-green-500'
-                  : percentChange < 0
-                    ? 'text-red-500'
-                    : 'text-gray-500'
+                percentChange === 0
+                  ? 'text-muted-foreground'
+                  : 'text-foreground'
               }`}
             >
               {percentChange > 0 ? (

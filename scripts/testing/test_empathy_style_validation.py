@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import sys
+from typing import Any, TypedDict
 
 # Adjust sys.path to allow imports from the parent 'ai' directory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../ai")))
@@ -18,10 +19,56 @@ from integration.crisis_intervention_system import (
 )
 
 
+class InstitutionalViolation(TypedDict):
+    pattern: str
+    matches: list[str]
+    severity: str
+
+
+class InstitutionalCheck(TypedDict):
+    has_violations: bool
+    violation_count: int
+    violations: list[InstitutionalViolation]
+    matches: list[str]
+
+
+class CollaborativeCheck(TypedDict):
+    has_collaborative_language: bool
+    match_count: int
+    matches: list[str]
+
+
+class ResponseStyleValidation(TypedDict):
+    empathy_score: float
+    connection_score: float
+    institutional_violations: InstitutionalCheck
+    collaborative_elements: CollaborativeCheck
+    passes_validation: bool
+
+
+class CrisisTestCase(TypedDict):
+    message: str
+    expected_risk: Any  # RiskLevel enum from the crisis intervention system
+
+
+class CrisisTestResult(TypedDict):
+    input: str
+    risk_level: str
+    response: str
+    validation: ResponseStyleValidation
+    passed: bool
+
+
+class CrisisTestSummary(TypedDict):
+    test_results: list[CrisisTestResult]
+    overall_pass_rate: float
+    all_passed: bool
+
+
 class EmpathyStyleValidator:
     """Validates that responses follow the collaborative support approach"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         # Institutional referral patterns to avoid
         self.institutional_patterns = [
             r"\b988\b",
@@ -56,10 +103,10 @@ class EmpathyStyleValidator:
         self.engine = CrisisDetectionEngine()
         self.responder = TherapeuticCrisisResponder()
 
-    def detect_institutional_language(self, text: str) -> dict:
+    def detect_institutional_language(self, text: str) -> InstitutionalCheck:
         """Detect institutional referral language that violates empathy guidelines"""
-        violations = []
-        matches = []
+        violations: list[InstitutionalViolation] = []
+        matches: list[str] = []
 
         for pattern in self.institutional_patterns:
             found_matches = re.findall(pattern, text, re.IGNORECASE)
@@ -80,9 +127,9 @@ class EmpathyStyleValidator:
             "matches": matches,
         }
 
-    def detect_collaborative_language(self, text: str) -> dict:
+    def detect_collaborative_language(self, text: str) -> CollaborativeCheck:
         """Detect collaborative support language that aligns with empathy guidelines"""
-        positive_matches = []
+        positive_matches: list[str] = []
 
         for pattern in self.collaborative_patterns:
             found_matches = re.findall(pattern, text, re.IGNORECASE)
@@ -95,7 +142,7 @@ class EmpathyStyleValidator:
             "matches": positive_matches,
         }
 
-    def validate_response_style(self, response_text: str) -> dict:
+    def validate_response_style(self, response_text: str) -> ResponseStyleValidation:
         """Comprehensive validation of response style"""
         institutional_check = self.detect_institutional_language(response_text)
         collaborative_check = self.detect_collaborative_language(response_text)
@@ -125,9 +172,9 @@ class EmpathyStyleValidator:
             "passes_validation": empathy_score >= 0.7 and connection_score >= 0.3,
         }
 
-    def test_crisis_responses(self) -> dict:
+    def test_crisis_responses(self) -> CrisisTestSummary:
         """Test various crisis scenarios with the updated system"""
-        test_cases = [
+        test_cases: list[CrisisTestCase] = [
             {
                 "message": "I'm feeling really overwhelmed and hopeless lately",
                 "expected_risk": RiskLevel.MEDIUM,
@@ -142,7 +189,7 @@ class EmpathyStyleValidator:
             },
         ]
 
-        results = []
+        results: list[CrisisTestResult] = []
 
         for test_case in test_cases:
             # Assess risk
@@ -171,7 +218,7 @@ class EmpathyStyleValidator:
         }
 
 
-def main():
+def main() -> None:
     """Run the empathy style validation tests"""
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")

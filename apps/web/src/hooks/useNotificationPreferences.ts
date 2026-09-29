@@ -67,7 +67,7 @@ export function useNotificationPreferences() {
       setError(err instanceof Error ? err : new Error('Unknown error'))
       // Fall back to default preferences on error
       setPreferences(defaultPreferences)
-  } finally {
+    } finally {
       setIsLoading(false)
     }
   }

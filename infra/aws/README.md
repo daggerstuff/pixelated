@@ -1,8 +1,8 @@
 # Pixelated Empathy AWS EKS migration
 
-Replacement for the failed Civo K3s deployment. Target is a managed EKS
-cluster with the existing Traefik ingress policy preserved and the same
-Docker Hub image pipeline.
+Replacement for the failed Civo K3s deployment. Target is a managed EKS cluster
+with the existing Traefik ingress policy preserved and the same Docker Hub image
+pipeline.
 
 ## Target shape
 
@@ -21,7 +21,8 @@ The `aws` environment secrets were configured with `gh-axi secret set`:
 
 The remaining values are already available as repository secrets:
 
-- `AWS_DEPLOY_ROLE_ARN` — OIDC role with EKS, EC2, VPC, IAM, and CloudFormation permissions
+- `AWS_DEPLOY_ROLE_ARN` — OIDC role with EKS, EC2, VPC, IAM, and CloudFormation
+  permissions
 - `DOCKERHUB_USERNAME`
 - `DOCKERHUB_TOKEN`
 - `JWT_SECRET`
@@ -64,9 +65,9 @@ deleted. The deploy workflow is idempotent.
 
 - The Civo deploy workflow and `infra/k8s/civo/` overlay were removed. EKS is
   the sole deploy target.
-- Re-point any external Postgres, Redis, or MongoDB clients to allowlist the
-  EKS node egress IPs. The deploy workflow already carries `DATABASE_URL`,
-  `REDIS_URL`, and `MONGODB_URI` through, so no database move is required on
-  day one.
+- Re-point any external Postgres, Redis, or MongoDB clients to allowlist the EKS
+  node egress IPs. The deploy workflow already carries `DATABASE_URL`,
+  `REDIS_URL`, and `MONGODB_URI` through, so no database move is required on day
+  one.
 - Upgrade origin TLS later by adding a Cloudflare Origin CA certificate or a
   Let's Encrypt resolver, then switch Cloudflare to **Full (strict)**.

@@ -24,8 +24,10 @@ from skillreducer.tokenizer import count_tokens
 
 try:
     from agno.agent import Agent
+
+    _AGENT_AVAILABLE = True
 except ImportError:  # pragma: no cover
-    Agent = None  # type: ignore[misc, assignment]
+    _AGENT_AVAILABLE = False
 
 
 @dataclass
@@ -43,12 +45,10 @@ def create_stage1_routing_agent(config: Config) -> Agent:
 
     Stage 1 Phase 1: routing model that selects the target skill from pool C.
     """
-    if Agent is None:
+    if not _AGENT_AVAILABLE:
         raise ImportError("agno is not installed. Install with: pip install agno")
     if not resolve_api_key(config):
-        raise ValueError(
-            "API key required. Set api_key in .env or environment, or in config.yaml."
-        )
+        raise ValueError("API key required. Set api_key in .env or environment, or in config.yaml.")
 
     return Agent(
         name="skillreducer-stage1-routing",
@@ -115,7 +115,8 @@ class Stage1RoutingAgent:
             candidate = str(result["description"]).strip()
             if simulated_oracle(candidate, ctx, self._llm):
                 return candidate
-        return generate_description(skill, self._llm, oracle_ctx=ctx, config=self.config)
+        generated: str = generate_description(skill, self._llm, oracle_ctx=ctx, config=self.config)
+        return generated
 
     def routing_oracle(
         self,
@@ -126,7 +127,8 @@ class Stage1RoutingAgent:
     ) -> bool:
         """Evaluate O(d,Q,C) on a candidate description (Phase 1 or Phase 2 Q_val)."""
         queries = oracle_ctx.q_val if phase2 and oracle_ctx.q_val else None
-        return simulated_oracle(description, oracle_ctx, self._llm, queries=queries)
+        passed: bool = simulated_oracle(description, oracle_ctx, self._llm, queries=queries)
+        return passed
 
     def compress(
         self,
@@ -138,7 +140,7 @@ class Stage1RoutingAgent:
         """Compress description via DDMIN + O(d,Q,C) + Phase 2 validation."""
         ctx = oracle_ctx or self.build_oracle(skill, skill_library)
         ctx.original_description = description.strip()
-        return compress_description(
+        compressed_result: tuple[str, list[str]] = compress_description(
             description,
             self._llm,
             skill=skill,
@@ -147,6 +149,7 @@ class Stage1RoutingAgent:
             max_restore_steps=self.config.max_restore_steps,
             config=self.config,
         )
+        return compressed_result
 
     def run(
         self,

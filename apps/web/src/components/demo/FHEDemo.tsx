@@ -7,7 +7,7 @@ interface Props {
   defaultMessage?: string
 }
 
-export const FHEDemo: FC<Props> = ({
+const FHEDemo: FC<Props> = ({
   defaultMessage = 'Your data is protected with FHE technology',
 }) => {
   const [plainText, setPlainText] = useState(
@@ -88,8 +88,8 @@ export const FHEDemo: FC<Props> = ({
 
   return (
     <div className="space-y-4">
-      <div className="bg-muted/30 rounded-lg border p-4">
-        <p className="text-muted-foreground text-sm">{defaultMessage}</p>
+      <div className="bg-muted/30 rounded-none border p-4">
+        <p className="text-sm text-muted-foreground">{defaultMessage}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -125,7 +125,7 @@ export const FHEDemo: FC<Props> = ({
           </label>
 
           <button
-            className="bg-blue-600 text-white mt-4 w-full rounded py-2 disabled:opacity-60"
+            className="mt-4 w-full rounded-none bg-primary py-2 text-primary-foreground disabled:opacity-60"
             onClick={handleProcess}
             disabled={isLoading}
           >
@@ -143,7 +143,7 @@ export const FHEDemo: FC<Props> = ({
       </div>
 
       {error && (
-        <div className="border-red-400 bg-red-50 text-red-700 rounded border p-3">
+        <div className="rounded-none border border-ring bg-secondary p-3 text-foreground">
           {error}
         </div>
       )}

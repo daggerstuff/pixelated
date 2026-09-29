@@ -22,7 +22,12 @@ export interface ScheduleAppointmentItem {
   start: string
   end: string
   status:
-    'booked' | 'arrived' | 'fulfilled' | 'cancelled' | 'noshow' | 'pending'
+    | 'booked'
+    | 'arrived'
+    | 'fulfilled'
+    | 'cancelled'
+    | 'noshow'
+    | 'pending'
   patientName?: string
   patientId: string
   practitionerName?: string
@@ -222,9 +227,11 @@ export function MobileScheduleView({
             style={{ color: 'var(--np-muted)' }}
           >
             {isOnline ? (
-              <span className="text-emerald-400">● Online Sync Active</span>
+              <span className="font-medium text-foreground">
+                ● Online Sync Active
+              </span>
             ) : (
-              <span className="text-amber-400 flex items-center gap-1">
+              <span className="flex items-center gap-1 text-foreground">
                 <CloudOff className="h-3.5 w-3.5" /> Offline Mode (Cached
                 Schedule)
               </span>
@@ -384,7 +391,7 @@ export function MobileScheduleView({
                         e.stopPropagation()
                         void handleCancel(appt.id)
                       }}
-                      className="text-rose-400 hover:bg-rose-950/30 min-h-[44px] min-w-[44px] rounded-lg px-3 py-1.5 text-xs transition-colors"
+                      className="min-h-[44px] min-w-[44px] rounded-none px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
                       aria-label={`Cancel appointment at ${timeStr}`}
                     >
                       Cancel

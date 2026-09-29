@@ -3,9 +3,9 @@
 
   <br />
 
-  # Pixelated Empathy
+# Pixelated Empathy
 
-  **Pioneering the digital frontier of mental health.**
+**Pioneering the digital frontier of mental health.**
 
   <br />
 
@@ -20,17 +20,19 @@
 
 ## The Vision
 
-Pixelated Empathy is fundamentally reshaping the mental health landscape. Historically, the clinical world
-has pushed back against integrating deeply with the digital realm—often out of valid concerns for safety,
-empathy, and privacy.
+Pixelated Empathy is fundamentally reshaping the mental health landscape.
+Historically, the clinical world has pushed back against integrating deeply with
+the digital realm—often out of valid concerns for safety, empathy, and privacy.
 
-We are here to bridge that gap in a highly positive and beneficial way. By merging clinical rigor with
-advanced, carefully aligned AI, we create environments where high-stakes, human-centered teams can
-practice, analyze, and evolve their emotional intelligence before stepping into real-world scenarios.
+We are here to bridge that gap in a highly positive and beneficial way. By
+merging clinical rigor with advanced, carefully aligned AI, we create
+environments where high-stakes, human-centered teams can practice, analyze, and
+evolve their emotional intelligence before stepping into real-world scenarios.
 
-Our goal moving forward is to scale deep, genuine empathy through digital platforms without losing the
-profoundly human essence of care. We believe that by thoughtfully bringing therapeutic principles into
-the digital realm, we can unlock new paradigms for training, healing, and connection.
+Our goal moving forward is to scale deep, genuine empathy through digital
+platforms without losing the profoundly human essence of care. We believe that
+by thoughtfully bringing therapeutic principles into the digital realm, we can
+unlock new paradigms for training, healing, and connection.
 
 ---
 
@@ -38,15 +40,15 @@ the digital realm, we can unlock new paradigms for training, healing, and connec
 
 ### Prerequisites
 
-| Requirement | Version | Check |
-|---|---|---|
-| Node.js | >= 24 | `node --version` |
-| pnpm | 11.24.0 | `pnpm --version` |
-| Python | 3.12+ | `python3 --version` |
-| uv | latest | `uv --version` |
-| PostgreSQL | 17+ | `psql --version` |
-| Redis | 7+ | `redis-cli --version` |
-| Docker | latest | `docker --version` |
+| Requirement | Version | Check                 |
+| ----------- | ------- | --------------------- |
+| Node.js     | >= 24   | `node --version`      |
+| pnpm        | 11.24.0 | `pnpm --version`      |
+| Python      | 3.12+   | `python3 --version`   |
+| uv          | latest  | `uv --version`        |
+| PostgreSQL  | 17+     | `psql --version`      |
+| Redis       | 7+      | `redis-cli --version` |
+| Docker      | latest  | `docker --version`    |
 
 ### Setup
 
@@ -67,9 +69,10 @@ pnpm dev
 
 The app runs at **http://localhost:5173**.
 
-> **Submodule Note:** This repo uses three git submodules (`ai/`, `foresight/`, `docs/`).
-> After any clone or pull, run `git submodule update --init --recursive` to sync them.
-> Without this step, those directories will be empty — including all 1,969 docs files.
+> **Submodule Note:** This repo uses three git submodules (`ai/`, `foresight/`,
+> `docs/`). After any clone or pull, run
+> `git submodule update --init --recursive` to sync them. Without this step,
+> those directories will be empty — including all 1,969 docs files.
 
 ### All Services
 
@@ -85,18 +88,18 @@ See [WALKTHROUGH.md](WALKTHROUGH.md) for the complete developer guide.
 
 ## The Ecosystem
 
-This platform operates as a cohesive unit across four primary repositories. Together, they form the
-secure, intelligent backbone of our clinical AI engine:
+This platform operates as a cohesive unit across four primary repositories.
+Together, they form the secure, intelligent backbone of our clinical AI engine:
 
-| Repository | Role |
-|---|---|
+| Repository                                                            | Role                                                                                               |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | **[pixelated](https://github.com/daggerstuff/pixelated)** (Main Core) | Primary orchestrator: application surfaces, clinical dashboards, API routes, shared product logic. |
-| **[ai](ai/)** (Cognitive Engine) | Model research and training: inference, emotional signal analysis, clinical validity pipelines. |
-| **[foresight](foresight/)** (Continuity & Memory) | Persistent contextual memory for AI agents across longitudinal therapeutic simulations. |
-| **[docs](docs/)** (Knowledge Base) | HIPAA compliance, security posture, clinical feedback loops, architecture decisions. |
+| **[ai](ai/)** (Cognitive Engine)                                      | Model research and training: inference, emotional signal analysis, clinical validity pipelines.    |
+| **[foresight](foresight/)** (Continuity & Memory)                     | Persistent contextual memory for AI agents across longitudinal therapeutic simulations.            |
+| **[docs](docs/)** (Knowledge Base)                                    | HIPAA compliance, security posture, clinical feedback loops, architecture decisions.               |
 
-`ai/`, `foresight/`, and `docs/` are **git submodules** — run `git submodule update --init --recursive`
-after cloning to populate them.
+`ai/`, `foresight/`, and `docs/` are **git submodules** — run
+`git submodule update --init --recursive` after cloning to populate them.
 
 ---
 
@@ -157,26 +160,28 @@ pnpm submodules:sync                      # Re-sync after pull
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend / SSR | Astro 6 + React 19 (TypeScript, Tailwind CSS) |
-| Backend / AI | FastAPI / Express / Flask (Python 3.12+ via `uv`) |
-| Database | PostgreSQL 17 + pgvector |
-| Caching | Redis |
-| State | Zustand |
-| Package Manager | pnpm 11.24.0 |
-| Runtime | Node.js >= 24 |
+| Layer           | Technology                                        |
+| --------------- | ------------------------------------------------- |
+| Frontend / SSR  | Astro 6 + React 19 (TypeScript, Tailwind CSS)     |
+| Backend / AI    | FastAPI / Express / Flask (Python 3.12+ via `uv`) |
+| Database        | PostgreSQL 17 + pgvector                          |
+| Caching         | Redis                                             |
+| State           | Zustand                                           |
+| Package Manager | pnpm 11.24.0                                      |
+| Runtime         | Node.js >= 24                                     |
 
 ---
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming, commit conventions, testing, and security rules.
-See [WALKTHROUGH.md](WALKTHROUGH.md) for the full developer walkthrough.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming, commit conventions,
+testing, and security rules. See [WALKTHROUGH.md](WALKTHROUGH.md) for the full
+developer walkthrough.
 
 ### Key Rules
 
-- **No error suppression**: Never use `@ts-ignore`, `@ts-nocheck`, `# noqa`, or `# type: ignore`
+- **No error suppression**: Never use `@ts-ignore`, `@ts-nocheck`, `# noqa`, or
+  `# type: ignore`
 - **No credentials in code**: Never commit API keys, passwords, or patient data
 - **Lint before push**: Run `pnpm lint` and `pnpm format:check` before pushing
 - **AI assistants**: See `AGENTS.md` for AI coding assistant conventions
@@ -185,13 +190,16 @@ See [WALKTHROUGH.md](WALKTHROUGH.md) for the full developer walkthrough.
 
 ## Documentation
 
-The `docs/` submodule contains 1,969 files across 27 subdirectories. See [`DOCS.md`](DOCS.md) for a full index of all subdirectories, or browse the key areas below:
+The `docs/` submodule contains 1,969 files across 27 subdirectories. See
+[`DOCS.md`](DOCS.md) for a full index of all subdirectories, or browse the key
+areas below:
 
 - **[Getting Started](docs/getting-started/)** — Onboarding guides
 - **[Architecture](docs/architecture/)** — System design and ADRs
 - **[API Reference](docs/api-reference/)** — API documentation
 - **[Compliance](docs/compliance/)** — HIPAA, security, threat models
-- **[Clinical Validity](docs/clinical-validity/)** — Clinical evaluation protocols
+- **[Clinical Validity](docs/clinical-validity/)** — Clinical evaluation
+  protocols
 - **[Database](docs/database/)** — Schema and migration docs
 - **[Operations](docs/operations/)** — Runbooks and deployment guides
 - **[Guides](docs/guides/)** — Developer tutorials
@@ -202,9 +210,11 @@ The `docs/` submodule contains 1,969 files across 27 subdirectories. See [`DOCS.
 
 ## Security
 
-Report vulnerabilities to [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com).
+Report vulnerabilities to
+[security@pixelatedempathy.com](mailto:security@pixelatedempathy.com).
 
-See [docs/SECURITY.md](docs/SECURITY.md) and [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) for details.
+See [docs/SECURITY.md](docs/SECURITY.md) and
+[docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) for details.
 
 ---
 
@@ -217,6 +227,5 @@ See [docs/SECURITY.md](docs/SECURITY.md) and [docs/THREAT_MODEL.md](docs/THREAT_
   <a href="https://pixelatedempathy.com/case-studies">Case Studies</a> •
   <a href="https://pixelatedempathy.com/team">Our Team</a>
 
-  <br><br>
-  <code>© 2026 Pixelated Empathy. All rights reserved.</code>
+<br><br> <code>© 2026 Pixelated Empathy. All rights reserved.</code>
 </div>

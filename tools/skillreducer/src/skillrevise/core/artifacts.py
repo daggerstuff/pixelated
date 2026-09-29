@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +14,7 @@ class ArtifactStore:
         self.root.mkdir(parents=True, exist_ok=True)
 
     def start_run(self, task_id: str, label: str) -> Path:
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
         run_dir = self.root / task_id / f"{timestamp}-{label}"
         run_dir.mkdir(parents=True, exist_ok=True)
         return run_dir
@@ -27,7 +27,9 @@ class ArtifactStore:
         target.write_text(skill.as_markdown())
         return target
 
-    def write_trace(self, trace: ExecutionTrace, run_dir: str | Path, filename: str = "execution_trace.json") -> Path:
+    def write_trace(
+        self, trace: ExecutionTrace, run_dir: str | Path, filename: str = "execution_trace.json"
+    ) -> Path:
         return self.write_json(filename, to_jsonable(trace), run_dir)
 
     def write_json(self, filename: str, payload: Any, run_dir: str | Path) -> Path:

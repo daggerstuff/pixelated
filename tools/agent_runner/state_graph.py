@@ -12,17 +12,14 @@ Implements:
 
 from __future__ import annotations
 
-import json
 import logging
-import os
-import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Literal, TypedDict
 
 from tools.agent_runner.adapters import AgentAdapter, get_agent_adapter
 from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue
-from tools.agent_runner.verifier import VerificationEngine, VerificationOutcome
+from tools.agent_runner.verifier import VerificationEngine
 
 logger = logging.getLogger("agent_runner.state_graph")
 
@@ -72,7 +69,7 @@ class DeveloperNode:
         )
 
         feedback_history = "\n".join(
-            [f"[Reviewer Iteration {i+1}]: {f}" for i, f in enumerate(state["reviewer_feedback"])]
+            [f"[Reviewer Iteration {i + 1}]: {f}" for i, f in enumerate(state["reviewer_feedback"])]
         )
         if not feedback_history:
             feedback_history = "No previous reviewer feedback. Initial implementation pass."
@@ -124,7 +121,9 @@ class ReviewerNode:
 
         if verification_outcome.passed:
             logger.info("✅ Reviewer verified all tests and lints passed for %s!", state["task_id"])
-            state["reviewer_feedback"].append("VERIFICATION APPROVED: All automated tests, type checks, and lints passed.")
+            state["reviewer_feedback"].append(
+                "VERIFICATION APPROVED: All automated tests, type checks, and lints passed."
+            )
             state["status"] = "approved"
             state["active_agent"] = "System"
         else:
@@ -215,7 +214,12 @@ class CodingStateGraph:
 
         while True:
             next_node = self.route_workflow(state)
-            logger.info("State Graph routing step: next node is '%s' (status: %s, iter: %d)", next_node, state["status"], state["iteration_count"])
+            logger.info(
+                "State Graph routing step: next node is '%s' (status: %s, iter: %d)",
+                next_node,
+                state["status"],
+                state["iteration_count"],
+            )
 
             if next_node == "Developer_Node":
                 res = self.developer_node.execute(state, workdir)
@@ -226,22 +230,36 @@ class CodingStateGraph:
                 history.append(res)
 
             elif next_node == "Human_Proxy_Node":
-                logger.warning("🚨 Human Proxy Breakpoint reached for task %s at iteration %d!", state["task_id"], state["iteration_count"])
+                logger.warning(
+                    "🚨 Human Proxy Breakpoint reached for task %s at iteration %d!",
+                    state["task_id"],
+                    state["iteration_count"],
+                )
                 state["status"] = "escalated"
                 if self.escalation_store:
                     esc_id = self.escalation_store.create_escalation(state)
                     state["escalation_id"] = esc_id
-                history.append(GraphNodeResult(node_name="Human_Proxy_Node", state=state, action_taken="Escalated to Human-in-the-Loop CLI."))
+                history.append(
+                    GraphNodeResult(
+                        node_name="Human_Proxy_Node", state=state, action_taken="Escalated to Human-in-the-Loop CLI."
+                    )
+                )
                 break
 
             elif next_node == "Finalize_Merge":
                 logger.info("🎉 Task %s approved! Ready for PR finalization.", state["task_id"])
-                history.append(GraphNodeResult(node_name="Finalize_Merge", state=state, action_taken="Graph execution approved and finalized."))
+                history.append(
+                    GraphNodeResult(
+                        node_name="Finalize_Merge", state=state, action_taken="Graph execution approved and finalized."
+                    )
+                )
                 break
 
             elif next_node == "Abort_Teardown":
                 logger.info("Task %s aborted by policy or user.", state["task_id"])
-                history.append(GraphNodeResult(node_name="Abort_Teardown", state=state, action_taken="Execution aborted."))
+                history.append(
+                    GraphNodeResult(node_name="Abort_Teardown", state=state, action_taken="Execution aborted.")
+                )
                 break
 
         return state, history

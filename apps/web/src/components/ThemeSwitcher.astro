@@ -35,15 +35,13 @@ const lightPalettes = [
 ]
 ---
 
-{
-  showHint && (
-    <div class="theme-hint" id="theme-hint" aria-label="Click to switch theme">
-      <span class="theme-hint-label" id="theme-hint-label">
-        Light
-      </span>
-    </div>
-  )
-}
+{showHint && (
+  <div class="theme-hint" id="theme-hint" aria-label="Click to switch theme">
+    <span class="theme-hint-label" id="theme-hint-label">
+      Light
+    </span>
+  </div>
+)}
 
 <div class="theme-overlay" id="theme-overlay" hidden>
   <div
@@ -58,28 +56,28 @@ const lightPalettes = [
       role="listbox"
       aria-label="Themes"
     >
-      <div class="theme-sep"><span>Dark</span></div>
-      {
-        palettes.map((p) => (
-          <button type="button" role="option" data-value={p}>
-            {p.replace(/-/g, ' ')}
-          </button>
-        ))
-      }
-      <div class="theme-sep"><span>Light</span></div>
-      {
-        lightPalettes.map((p) => (
-          <button type="button" role="option" data-value={p}>
-            {p.replace(/-/g, ' ')}
-          </button>
-        ))
-      }
+      <div class="theme-sep">
+        <span>Dark</span>
+      </div>
+      {palettes.map((p) => (
+        <button type="button" role="option" data-value={p}>
+          {p.replace(/-/g, ' ')}
+        </button>
+      ))}
+      <div class="theme-sep">
+        <span>Light</span>
+      </div>
+      {lightPalettes.map((p) => (
+        <button type="button" role="option" data-value={p}>
+          {p.replace(/-/g, ' ')}
+        </button>
+      ))}
     </div>
     <div class="theme-overlay-footer">
       <span class="theme-overlay-actions">
-        <button class="theme-close-btn" type="button" id="theme-close-btn"
-          >esc</button
-        >
+        <button class="theme-close-btn" type="button" id="theme-close-btn">
+          esc
+        </button>
       </span>
     </div>
   </div>

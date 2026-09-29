@@ -56,6 +56,12 @@ describe('EncounterRepository', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({
+          rows: [{ encounter_id: 'e-1', fhir_resource: validEncounter }],
+          rowCount: 1,
+        })
+        // create() stamps the DB-generated id into the stored fhir_resource
+        // with a follow-up UPDATE ... RETURNING; mock its result too.
+        .mockResolvedValueOnce({
           rows: [{ fhir_resource: { ...validEncounter, id: 'e-1' } }],
           rowCount: 1,
         })

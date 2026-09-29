@@ -10,8 +10,8 @@ from skillreducer.config import Config
 from skillreducer.llm.client import LLMClient
 from skillreducer.models import ReduceReport, TokenStats, TscgStats
 from skillreducer.parser import parse_skill_md, write_skill_md
-from skillreducer.stage1.compress import compress_description
 from skillreducer.stage1.agent import Stage1RoutingAgent
+from skillreducer.stage1.compress import compress_description
 from skillreducer.stage1.generate import generate_description
 from skillreducer.stage1.oracle import build_stage1_oracle, load_skill_library
 from skillreducer.stage2.disclose import (
@@ -74,7 +74,10 @@ def reduce_skill(
                 else None
             )
 
-            if not description.strip() or count_tokens(description) <= config.short_description_tokens:
+            if (
+                not description.strip()
+                or count_tokens(description) <= config.short_description_tokens
+            ):
                 description = generate_description(
                     skill,
                     llm_for_stage1,
@@ -237,9 +240,7 @@ def _run_tscg_step(
                 return None, files_written, notes
         elif extracted_scripts:
             tools = tools_from_scripts(extracted_scripts)
-            notes.append(
-                f"TSCG: built {len(tools)} tool stubs from Stage 3 scripts"
-            )
+            notes.append(f"TSCG: built {len(tools)} tool stubs from Stage 3 scripts")
         else:
             scripts_dir = skill_dir / "scripts"
             if scripts_dir.is_dir():
@@ -250,9 +251,7 @@ def _run_tscg_step(
                 ]
                 if script_rels:
                     tools = tools_from_scripts(script_rels)
-                    notes.append(
-                        f"TSCG: built {len(tools)} tool stubs from scripts/"
-                    )
+                    notes.append(f"TSCG: built {len(tools)} tool stubs from scripts/")
 
     if not tools:
         notes.append(

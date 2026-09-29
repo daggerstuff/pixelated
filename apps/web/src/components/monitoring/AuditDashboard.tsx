@@ -60,23 +60,23 @@ export function AuditDashboard() {
       <h1 className="text-2xl font-bold">Audit Log Dashboard</h1>
 
       {/* PHI Access Over Time */}
-      <div className="bg-white rounded-lg p-6 shadow">
+      <div className="rounded-none border border-border bg-card p-6">
         <h2 className="mb-4 text-xl font-semibold">PHI Access Patterns</h2>
       </div>
 
       {/* Access by Type Distribution */}
-      <div className="bg-white rounded-lg p-6 shadow">
+      <div className="rounded-none border border-border bg-card p-6">
         <h2 className="mb-4 text-xl font-semibold">Access Type Distribution</h2>
         <div className="h-[300px]">
         </div>
       </div>
 
       {/* Unusual Access Patterns */}
-      <div className="bg-white rounded-lg p-6 shadow">
+      <div className="rounded-none border border-border bg-card p-6">
         <h2 className="mb-4 text-xl font-semibold">
           Unusual Access Patterns
           {metrics.unusualAccess.count > 0 && (
-            <span className="bg-red-100 text-red-800 ml-2 rounded-full px-2 py-1 text-sm">
+            <span className="ml-2 rounded-none bg-primary px-2 py-1 text-sm font-medium text-primary-foreground">
               {metrics.unusualAccess.count} detected
             </span>
           )}
@@ -86,7 +86,7 @@ export function AuditDashboard() {
             {metrics.unusualAccess.details.map((detail, index) => (
               <li
                 key={`unusual-access-${index}`}
-                className="text-red-600 flex items-center"
+                className="flex items-center font-medium text-foreground"
               >
                 <svg
                   className="mr-2 h-5 w-5"
@@ -104,7 +104,7 @@ export function AuditDashboard() {
             ))}
           </ul>
         ) : (
-          <p className="text-green-600">No unusual access patterns detected</p>
+          <p className="text-muted-foreground">No unusual access patterns detected</p>
         )}
       </div>
     </div>

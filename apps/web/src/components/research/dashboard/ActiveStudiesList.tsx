@@ -26,7 +26,7 @@ const ActiveStudiesList: FC<ActiveStudiesListProps> = memo(
 
     return (
       <SlideUp>
-        <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+        <div className="rounded-none border border-border bg-card p-6">
           <h3 className="mb-4 text-lg font-semibold">
             Active Research Studies
           </h3>
@@ -34,25 +34,23 @@ const ActiveStudiesList: FC<ActiveStudiesListProps> = memo(
             {activeStudies.map((study) => (
               <div
                 key={study.id}
-                className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 flex items-center gap-4 rounded-lg border p-4"
+                className="flex items-center gap-4 rounded-none border border-input bg-secondary p-4"
               >
                 <input
                   type="checkbox"
                   aria-label={'Select study ' + study.title}
                   checked={selectedStudies.includes(study.id)}
                   onChange={() => onStudySelect(study.id)}
-                  className="text-blue-600 h-4 w-4 rounded"
+                  className="h-4 w-4 rounded-none accent-primary"
                 />
                 <div className="flex-1">
                   <div className="mb-2 flex items-center justify-between">
-                    <p className="text-gray-900 dark:text-white font-medium">
-                      {study.title}
-                    </p>
-                    <span className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 rounded-full px-2 py-1 text-xs font-medium">
+                    <p className="font-medium text-foreground">{study.title}</p>
+                    <span className="rounded-none border border-border bg-secondary px-2 py-1 text-xs font-medium text-foreground">
                       {study.status}
                     </span>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 mb-2 text-sm">
+                  <p className="mb-2 text-sm text-muted-foreground">
                     {study.description}
                   </p>
                   <div className="flex items-center gap-4 text-sm">
@@ -64,7 +62,7 @@ const ActiveStudiesList: FC<ActiveStudiesListProps> = memo(
               </div>
             ))}
             {activeStudies.length === 0 && (
-              <p className="text-gray-500 py-4 text-center italic">
+              <p className="py-4 text-center italic text-muted-foreground">
                 No active studies found.
               </p>
             )}

@@ -30,11 +30,11 @@ logger = logging.getLogger(__name__)
 class ExtensiveValidationSuite:
     """Comprehensive validation with 50+ edge cases."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.test_cases: list[dict[str, Any]] = []
         self._build_test_cases()
 
-    def _build_test_cases(self):
+    def _build_test_cases(self) -> None:
         """Build comprehensive test suite."""
 
         # Category 1: Crisis Support - True Positives
@@ -320,12 +320,8 @@ class ExtensiveValidationSuite:
 
             # Check result (support multi-label)
             expected = test["expected"]
-            if isinstance(expected, list):
-                # Multi-label: accept any of the expected categories
-                passed = result.category in expected
-            else:
-                # Single label
-                passed = result.category == expected
+            # Multi-label: accept any of the expected categories; else single label
+            passed = result.category in expected if isinstance(expected, list) else result.category == expected
 
             total_by_difficulty[test["difficulty"]] += 1
             if passed:

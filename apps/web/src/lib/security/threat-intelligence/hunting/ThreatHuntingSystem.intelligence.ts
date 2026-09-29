@@ -3,8 +3,10 @@
  * Extracted threat intelligence generation, storage, and notification functions.
  */
 
-import type { Db } from 'mongodb'
 import type Redis from 'ioredis'
+import type { Db } from 'mongodb'
+
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type {
   HuntExecution,
   HuntPattern,
@@ -12,7 +14,10 @@ import type {
   GlobalThreatIntelligence,
   ThreatIndicator,
 } from '../global/types'
-import type { RawHuntFinding, ThreatNotification } from './ThreatHuntingSystem.types'
+import type {
+  RawHuntFinding,
+  ThreatNotification,
+} from './ThreatHuntingSystem.types'
 import {
   generateThreatId,
   generateThreatKey,
@@ -22,7 +27,6 @@ import {
   toDate,
   toStringValue,
 } from './ThreatHuntingSystem.utils'
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('threat-hunting-intelligence')
 
@@ -50,7 +54,9 @@ export async function generateThreatIntelligence(
 
     const uniqueThreats = deduplicateThreats(threats)
 
-    logger.info(`Generated ${uniqueThreats.length} unique threats from hunt results`)
+    logger.info(
+      `Generated ${uniqueThreats.length} unique threats from hunt results`,
+    )
     return uniqueThreats
   } catch (error: unknown) {
     logger.error('Threat intelligence generation failed:', { error })
@@ -129,7 +135,9 @@ async function createThreatFromResult(
   }
 }
 
-function extractIndicatorsFromResult(result: RawHuntFinding): ThreatIndicator[] {
+function extractIndicatorsFromResult(
+  result: RawHuntFinding,
+): ThreatIndicator[] {
   const indicators: ThreatIndicator[] = []
 
   try {

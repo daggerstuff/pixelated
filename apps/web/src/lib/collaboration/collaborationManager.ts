@@ -146,7 +146,6 @@ class CollaborationManager {
       read: false,
     } as Record<string, unknown>)
 
-
     return invitation
   }
 
@@ -217,7 +216,6 @@ class CollaborationManager {
       timestamp: new Date(),
       read: false,
     } as Record<string, unknown>)
-
 
     return { success: true, session }
   }
@@ -370,7 +368,6 @@ class CollaborationManager {
       }
     })
 
-
     return {
       session,
       duration,
@@ -386,7 +383,6 @@ class CollaborationManager {
       messages: this.messages.get(session.id) ?? [],
       archivedAt: new Date(),
     }
-
   }
 
   /**

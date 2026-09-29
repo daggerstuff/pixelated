@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import sys
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -39,9 +39,14 @@ class SkillLearnBenchTaskLoader:
     def load(self, path: str | Path) -> list[TaskSpec]:
         input_path = self._resolve_root_or_manifest(path)
         if input_path.is_file():
-            tasks = [self._record_to_task(record, index) for index, record in enumerate(_load_json_records(input_path))]
+            tasks = [
+                self._record_to_task(record, index)
+                for index, record in enumerate(_load_json_records(input_path))
+            ]
         else:
-            tasks = [self._instance_to_task(instance) for instance in self._iter_instances(input_path)]
+            tasks = [
+                self._instance_to_task(instance) for instance in self._iter_instances(input_path)
+            ]
         tasks.sort(key=lambda item: item.task_id)
         return tasks
 
@@ -52,14 +57,20 @@ class SkillLearnBenchTaskLoader:
         return input_path.resolve()
 
     def _iter_instances(self, root_or_tasks_dir: Path) -> list[Path]:
-        tasks_dir = root_or_tasks_dir / "tasks" if (root_or_tasks_dir / "tasks").is_dir() else root_or_tasks_dir
+        tasks_dir = (
+            root_or_tasks_dir / "tasks"
+            if (root_or_tasks_dir / "tasks").is_dir()
+            else root_or_tasks_dir
+        )
         if not tasks_dir.is_dir():
             raise ValueError(f"SkillLearnBench tasks directory not found: {tasks_dir}")
 
         instances: list[Path] = []
         for family_dir in sorted(path for path in tasks_dir.iterdir() if path.is_dir()):
             for instance_dir in sorted(path for path in family_dir.iterdir() if path.is_dir()):
-                if (instance_dir / "instruction.md").is_file() and (instance_dir / "environment" / "Dockerfile").is_file():
+                if (instance_dir / "instruction.md").is_file() and (
+                    instance_dir / "environment" / "Dockerfile"
+                ).is_file():
                     instances.append(instance_dir)
         return instances
 
@@ -89,7 +100,7 @@ class SkillLearnBenchTaskLoader:
                 "The upstream SkillLearnBench verifier should pass when the skill is injected.",
             ],
             context={
-                    "skilllearnbench_root": str(instance_dir.parents[2].resolve()),
+                "skilllearnbench_root": str(instance_dir.parents[2].resolve()),
                 "instance_dir": str(instance_dir.resolve()),
                 "task_config": task_config,
             },
@@ -99,15 +110,24 @@ class SkillLearnBenchTaskLoader:
                 "skilllearnbench_task": family,
                 "skilllearnbench_instance": query_name,
                 "skilllearnbench_query_id": task_id,
-                "timeout_seconds": int(task_config.get("agent", {}).get("timeout_sec", 1800) or 1800),
+                "timeout_seconds": int(
+                    task_config.get("agent", {}).get("timeout_sec", 1800) or 1800
+                ),
             },
         )
 
     def _record_to_task(self, record: dict[str, Any], index: int) -> TaskSpec:
         task_id = str(record.get("task_id") or record.get("id") or f"task-{index}")
-        family = str(record.get("family") or record.get("skilllearnbench_task") or task_id.split("/")[0])
+        family = str(
+            record.get("family") or record.get("skilllearnbench_task") or task_id.split("/")[0]
+        )
         metadata = dict(record.get("metadata") or {})
-        for key in ("skilllearnbench_root", "skilllearnbench_task", "skilllearnbench_instance", "timeout_seconds"):
+        for key in (
+            "skilllearnbench_root",
+            "skilllearnbench_task",
+            "skilllearnbench_instance",
+            "timeout_seconds",
+        ):
             if key in record and key not in metadata:
                 metadata[key] = record[key]
         return TaskSpec(
@@ -125,10 +145,6 @@ def _read_toml(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     try:
-        if sys.version_info >= (3, 11):
-            import tomllib
-        else:  # pragma: no cover - Python < 3.11 compatibility
-            import tomli as tomllib  # type: ignore[no-redef]
         return tomllib.loads(path.read_text())
-    except Exception:
+    except (tomllib.TOMLDecodeError, OSError):
         return {}

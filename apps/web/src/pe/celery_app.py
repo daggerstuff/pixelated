@@ -8,6 +8,9 @@ Designed to integrate with the AI Persona Engineer's task chain:
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from typing import Any, Protocol
+
 from celery import Celery
 
 from src.pe.config import settings
@@ -40,9 +43,44 @@ celery_app.autodiscover_tasks(
 )
 
 
+# ── Typed task decorator ──────────────────────────────────────────
+
+
+class CeleryTask(Protocol):
+    """Structural type for celery task objects: callable + chain builders.
+
+    Celery ships no ``py.typed`` marker, so without this the decorator
+    collapses task types to ``Any`` (strict ``untyped-decorator``) — and
+    chain call sites like ``run_safety_input_guard.s(...)`` then fail
+    with ``attr-defined`` once the function type is preserved.
+    """
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
+
+    def s(self, *args: Any, **kwargs: Any) -> Any: ...
+
+    def delay(self, *args: Any, **kwargs: Any) -> Any: ...
+
+    def apply_async(self, *args: Any, **kwargs: Any) -> Any: ...
+
+    def run(self, *args: Any, **kwargs: Any) -> Any: ...
+
+    @property
+    def name(self) -> str: ...
+
+
+def task(*args: Any, **kwargs: Any) -> Callable[[Callable[..., Any]], CeleryTask]:
+    """Typed facade over ``celery_app.task`` preserving the callable's type
+    while exposing the chain-builder methods (``.s``, ``.delay``,
+    ``.apply_async``) strict mypy can verify at dispatch sites.
+    """
+    decorator: Callable[[Callable[..., Any]], CeleryTask] = celery_app.task(*args, **kwargs)
+    return decorator
+
+
 # ── Periodic / Scheduled Tasks ────────────────────────────────────
 # These run on a schedule via celery beat
-CELERY_BEAT_SCHEDULE: dict = {}
+CELERY_BEAT_SCHEDULE: dict[str, Any] = {}
 
 # Example: metering daily rollup
 # CELERY_BEAT_SCHEDULE["metering-daily-rollup"] = {

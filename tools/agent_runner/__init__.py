@@ -19,7 +19,7 @@ from tools.agent_runner.dashboard import ClusterDashboard
 from tools.agent_runner.deliberation import DeliberationEngine, Proposal
 from tools.agent_runner.event_bus import EventBus, EventRecord, EventType
 from tools.agent_runner.foresight_bridge import ForesightBridge
-from tools.agent_runner.guardrails import GuardrailsConfig, GuardrailsEngine, GuardrailViolationError
+from tools.agent_runner.guardrails import GuardrailsEngine, GuardrailViolationError
 from tools.agent_runner.langchain_tracer import LangChainAgentTracer
 from tools.agent_runner.lineage import LineageNode, LineageTracker
 from tools.agent_runner.loop_auditor import DimensionScore, WorkLoopAuditor, WorkLoopAuditReport
@@ -28,6 +28,7 @@ from tools.agent_runner.models import (
     AgentConfig,
     AgentRole,
     ExecutionResult,
+    GuardrailsConfig,
     LinearComment,
     LinearIssue,
     LinearState,

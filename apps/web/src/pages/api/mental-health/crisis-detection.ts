@@ -1,5 +1,6 @@
 import type { APIContext } from 'astro'
 import { z } from 'zod'
+
 import { validateRequestBody } from '../../../lib/validation/validateRequestBody'
 
 export const prerender = false
@@ -623,7 +624,8 @@ export const POST = async ({ request }: APIContext) => {
       crisisDetectionSchema,
     )
     if (validationError) {
-      const firstError = Object.values(validationError.details)[0] ?? 'Invalid request body'
+      const firstError =
+        Object.values(validationError.details)[0] ?? 'Invalid request body'
       return new Response(
         JSON.stringify({
           error: firstError,

@@ -13,13 +13,12 @@ export interface AlertProps {
 
 const variantStyles = {
   default: 'border-border bg-background text-foreground',
-  error:
-    'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-300',
-  warning:
-    'border-orange-200 bg-orange-50 text-orange-800 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-300',
-  success:
-    'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-300',
-  info: 'border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-300',
+  // Value-contrast ladder: info/success quiet, warning ring + weight,
+  // error inverted primary (highest emphasis). Icons carry semantics.
+  error: 'border-ring bg-primary font-medium text-primary-foreground',
+  warning: 'border-ring bg-secondary font-medium text-foreground',
+  success: 'border-border bg-secondary text-foreground',
+  info: 'border-border bg-secondary text-foreground',
 }
 
 export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
@@ -40,7 +39,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
         ref={ref}
         role="alert"
         className={cn(
-          'relative w-full rounded-lg border px-4 py-3 text-sm',
+          'relative w-full border px-4 py-3 text-sm',
           variantStyles[variant],
           className,
         )}
@@ -66,16 +65,5 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 )
 
 Alert.displayName = 'Alert'
-
-export const AlertDescription = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
-  return (
-    <div ref={ref} className={cn('text-sm opacity-90', className)} {...props} />
-  )
-})
-
-AlertDescription.displayName = 'AlertDescription'
 
 export default Alert

@@ -1,8 +1,10 @@
 import type { MiddlewareHandler } from 'astro'
 import { sequence, defineMiddleware } from 'astro:middleware'
 
+import { validateToken } from './lib/auth/auth0-jwt-service'
 import {
   authenticateRequest,
+  extractTokenFromRequest,
   type AuthOptions,
 } from './lib/auth/auth0-middleware'
 import { apiVersioningMiddleware } from './lib/middleware/api-versioning'
@@ -115,6 +117,69 @@ function getRouteConfig(request: Request): RouteConfig | null {
 }
 
 /**
+ * Resolve a cookie-based session for a page route and populate
+ * `context.locals.user` / `context.locals.session`.
+ *
+ * Page routes are guarded by the page component itself (which reads
+ * `Astro.locals.session`/`user`), so without this a browser holding only the
+ * `auth-token` cookie set by `/api/auth/signin` would always be bounced to
+ * `/login`. Best-effort: any failure leaves `locals` untouched and the request
+ * continues unauthenticated.
+ */
+async function resolveCookieSession(context: {
+  request: Request
+  locals: App.Locals
+}): Promise<void> {
+  const token = extractTokenFromRequest(context.request)
+  if (!token) {
+    return
+  }
+
+  const validation = await validateToken(token, 'access')
+  if (!validation.valid || !validation.userId) {
+    return
+  }
+
+  const payload = validation.payload
+  // The access token lacks role metadata (no app_metadata custom claim), so
+  // enrich the role via the Auth0 Management API, falling back to the
+  // token-derived role when the lookup fails.
+  let role: string = validation.role ?? 'guest'
+  let fullName: string | undefined =
+    typeof payload?.['name'] === 'string' ? payload['name'] : undefined
+  let avatarUrl: string | undefined =
+    typeof payload?.['picture'] === 'string' ? payload['picture'] : undefined
+
+  try {
+    const { auth0UserService } = await import('./lib/services/auth0.service')
+    const enriched = await auth0UserService.getUserById(validation.userId)
+    if (enriched) {
+      role = enriched.role
+      fullName = enriched.fullName ?? fullName
+      avatarUrl = enriched.avatarUrl ?? avatarUrl
+    }
+  } catch {
+    // Management enrichment is best-effort; token role is the fallback
+  }
+
+  context.locals.user = {
+    id: validation.userId,
+    email: typeof payload?.['email'] === 'string' ? payload['email'] : '',
+    emailVerified: payload?.['email_verified'] === true,
+    role,
+    fullName,
+    avatarUrl,
+  }
+  context.locals.session = {
+    id: validation.tokenId ?? `sess-${validation.userId}`,
+    userId: validation.userId,
+    expiresAt: new Date(
+      (validation.expiresAt ?? Date.now() / 1000 + 3600) * 1000,
+    ),
+  }
+}
+
+/**
  * Auth middleware that uses Auth0 or API Keys for authentication.
  * If a request targets a protected route and there's no valid session, return 401/403.
  */
@@ -155,8 +220,12 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
 
     const routeConfig = getRouteConfig(request)
 
-    // Allow non-protected routes through quickly
+    // Allow non-protected routes through quickly, but first attempt to resolve
+    // a cookie-based session for page routes (e.g. /admin/*). API routes are
+    // handled by routeAuthConfig above; page routes are guarded by the page
+    // component itself, which reads Astro.locals.session/user.
     if (!routeConfig) {
+      await resolveCookieSession(context)
       return next()
     }
 

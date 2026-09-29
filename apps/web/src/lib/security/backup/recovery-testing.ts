@@ -729,7 +729,6 @@ interface TestEnvironment {
  * Docker-based test environment
  */
 class DockerTestEnvironment implements TestEnvironment {
-
   async initialize(): Promise<void> {
     logger.info('Initializing Docker test environment')
     // Implementation would start Docker containers
@@ -770,7 +769,6 @@ class DockerTestEnvironment implements TestEnvironment {
  * Kubernetes-based test environment
  */
 class KubernetesTestEnvironment implements TestEnvironment {
-
   async initialize(): Promise<void> {
     logger.info('Initializing Kubernetes test environment')
     // Implementation would create Kubernetes resources
@@ -811,7 +809,6 @@ class KubernetesTestEnvironment implements TestEnvironment {
  * VM-based test environment
  */
 class VMTestEnvironment implements TestEnvironment {
-
   async initialize(): Promise<void> {
     logger.info('Initializing VM test environment')
     // Implementation would start and configure VMs

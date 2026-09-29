@@ -81,34 +81,33 @@ const trainingMetrics = {
           class="inline-flex items-center gap-4 px-6 py-3 np-elevated mb-8"
           style="border: 1px solid var(--np-line);"
         >
-          <span class="np-mid" aria-hidden="true">⚠️</span>
-          <span class="font-bold np-text tracking-wide"
-            >HIGHLY SENSITIVE MATERIAL</span
-          >
-          <span class="np-mid" aria-hidden="true">⚠️</span>
+          <span class="np-mid" aria-hidden="true">
+            ⚠️
+          </span>
+          <span class="font-bold np-text tracking-wide">
+            HIGHLY SENSITIVE MATERIAL
+          </span>
+          <span class="np-mid" aria-hidden="true">
+            ⚠️
+          </span>
         </div>
       </div>
 
-      <h1
-        class="text-6xl md:text-8xl lg:text-9xl font-black mb-8 np-text tracking-tighter"
-      >
-        NIGHTMARE<br />FUEL
+      <h1 class="text-6xl md:text-8xl lg:text-9xl font-black mb-8 np-text tracking-tighter">
+        NIGHTMARE
+        <br />
+        FUEL
       </h1>
 
-      <p
-        class="text-xl md:text-2xl np-muted mb-8 max-w-4xl mx-auto leading-relaxed"
-      >
-        The ultimate crisis training simulator. <strong class="np-text"
-          >No human supervision needed.</strong
-        ><br />
-        Tackle the scenarios that make experienced counselors quit. <strong
-          class="np-mid">AI-guided intervention.</strong
-        >
+      <p class="text-xl md:text-2xl np-muted mb-8 max-w-4xl mx-auto leading-relaxed">
+        The ultimate crisis training simulator.{' '}
+        <strong class="np-text">No human supervision needed.</strong>
+        <br />
+        Tackle the scenarios that make experienced counselors quit.{' '}
+        <strong class="np-mid">AI-guided intervention.</strong>
       </p>
 
-      <div
-        class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 max-w-4xl mx-auto"
-      >
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 max-w-4xl mx-auto">
         <div class="text-center">
           <div class="text-4xl font-bold np-text">
             {trainingMetrics.counselors_trained}
@@ -144,8 +143,8 @@ const trainingMetrics = {
       </button>
 
       <p class="mt-8 np-muted text-sm max-w-2xl mx-auto">
-        <strong class="np-text">⚠ WARNING:</strong> This demo contains extreme crisis
-        scenarios designed for professional training only.
+        <strong class="np-text">⚠ WARNING:</strong> This demo contains extreme
+        crisis scenarios designed for professional training only.
       </p>
     </div>
   </section>
@@ -172,15 +171,19 @@ const trainingMetrics = {
           <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
               <span class="text-sm np-muted">Timer:</span>
-              <div id="sessionTimer" class="np-text font-bold">05:00</div>
+              <div id="sessionTimer" class="np-text font-bold">
+                05:00
+              </div>
             </div>
             <div class="flex items-center gap-2">
               <span class="text-sm np-muted">Stability:</span>
-              <div id="stabilityMetric" class="np-mid">STABLE</div>
+              <div id="stabilityMetric" class="np-mid">
+                STABLE
+              </div>
             </div>
-            <button id="endSessionBtn" class="px-4 py-2 font-semibold np-cta"
-              >END SESSION</button
-            >
+            <button id="endSessionBtn" class="px-4 py-2 font-semibold np-cta">
+              END SESSION
+            </button>
           </div>
         </div>
       </div>
@@ -226,10 +229,10 @@ const trainingMetrics = {
               class="p-4 mb-6"
               style="background: var(--np-bg); border: 1px solid var(--np-line);"
             >
-              <h3
-                class="text-lg font-semibold np-text mb-3 flex items-center gap-2"
-              >
-                <span class="np-mid" aria-hidden="true">●</span>
+              <h3 class="text-lg font-semibold np-text mb-3 flex items-center gap-2">
+                <span class="np-mid" aria-hidden="true">
+                  ●
+                </span>
                 LIVE AI ANALYSIS
               </h3>
               <div id="aiAnalysis" class="np-muted">
@@ -287,40 +290,40 @@ const trainingMetrics = {
             style="background: var(--np-surface); border: 1px solid var(--np-line);"
           >
             <h3 class="text-xl font-bold np-text mb-4 flex items-center gap-2">
-              <span class="np-mid" aria-hidden="true">💀</span>
+              <span class="np-mid" aria-hidden="true">
+                💀
+              </span>
               ULTRA NIGHTMARE SCENARIOS
             </h3>
             <div id="scenarioList" class="space-y-3">
-              {
-                nightmareScenarios.map((scenario) => (
-                  <div
-                    class="scenario-item p-4 cursor-pointer transition-all group"
-                    data-scenario={scenario.id}
-                    style="background: var(--np-bg); border: 1px solid var(--np-line);"
-                  >
-                    <div class="flex items-center justify-between mb-2">
-                      <h4 class="font-semibold np-text">{scenario.title}</h4>
-                      <div
-                        class="text-xs px-2 py-1 np-mid"
-                        style="background: var(--np-elevated); border: 1px solid var(--np-line);"
-                      >
-                        {scenario.stephenKingFactor}/10 Stephen King Factor
-                      </div>
-                    </div>
-                    <p class="text-sm np-muted mb-2">{scenario.description}</p>
-                    <div class="flex flex-wrap gap-1">
-                      {scenario.tags.map((tag) => (
-                        <span
-                          class="text-xs px-1 py-0.5 np-muted"
-                          style="background: var(--np-elevated);"
-                        >
-                          {tag}
-                        </span>
-                      ))}
+              {nightmareScenarios.map((scenario) => (
+                <div
+                  class="scenario-item p-4 cursor-pointer transition-all group"
+                  data-scenario={scenario.id}
+                  style="background: var(--np-bg); border: 1px solid var(--np-line);"
+                >
+                  <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-semibold np-text">{scenario.title}</h4>
+                    <div
+                      class="text-xs px-2 py-1 np-mid"
+                      style="background: var(--np-elevated); border: 1px solid var(--np-line);"
+                    >
+                      {scenario.stephenKingFactor}/10 Stephen King Factor
                     </div>
                   </div>
-                ))
-              }
+                  <p class="text-sm np-muted mb-2">{scenario.description}</p>
+                  <div class="flex flex-wrap gap-1">
+                    {scenario.tags.map((tag) => (
+                      <span
+                        class="text-xs px-1 py-0.5 np-muted"
+                        style="background: var(--np-elevated);"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -342,12 +345,11 @@ const trainingMetrics = {
                     <div
                       class="h-full"
                       style="width: 0%; background: var(--np-text);"
-                    >
-                    </div>
+                    ></div>
                   </div>
-                  <span id="crisisRecognitionValue" class="np-text font-bold"
-                    >0%</span
-                  >
+                  <span id="crisisRecognitionValue" class="np-text font-bold">
+                    0%
+                  </span>
                 </div>
               </div>
               <div class="flex items-center justify-between">
@@ -361,12 +363,11 @@ const trainingMetrics = {
                     <div
                       class="h-full"
                       style="width: 0%; background: var(--np-text);"
-                    >
-                    </div>
+                    ></div>
                   </div>
-                  <span id="interventionQualityValue" class="np-text font-bold"
-                    >0%</span
-                  >
+                  <span id="interventionQualityValue" class="np-text font-bold">
+                    0%
+                  </span>
                 </div>
               </div>
               <div class="flex items-center justify-between">
@@ -380,12 +381,11 @@ const trainingMetrics = {
                     <div
                       class="h-full"
                       style="width: 0%; background: var(--np-text);"
-                    >
-                    </div>
+                    ></div>
                   </div>
-                  <span id="empathyScoreValue" class="np-text font-bold"
-                    >0%</span
-                  >
+                  <span id="empathyScoreValue" class="np-text font-bold">
+                    0%
+                  </span>
                 </div>
               </div>
               <div class="flex items-center justify-between">
@@ -399,10 +399,11 @@ const trainingMetrics = {
                     <div
                       class="h-full"
                       style="width: 0%; background: var(--np-text);"
-                    >
-                    </div>
+                    ></div>
                   </div>
-                  <span id="boundariesValue" class="np-text font-bold">0%</span>
+                  <span id="boundariesValue" class="np-text font-bold">
+                    0%
+                  </span>
                 </div>
               </div>
             </div>
@@ -416,33 +417,37 @@ const trainingMetrics = {
             <h3 class="text-xl font-bold np-text mb-4">AI SUPERVISOR STATUS</h3>
             <div class="space-y-3">
               <div class="flex items-center gap-2">
-                <span class="np-mid" aria-hidden="true">●</span>
-                <span class="np-muted"
-                  >Real-time Analysis: <strong class="np-text">ACTIVE</strong
-                  ></span
-                >
+                <span class="np-mid" aria-hidden="true">
+                  ●
+                </span>
+                <span class="np-muted">
+                  Real-time Analysis: <strong class="np-text">ACTIVE</strong>
+                </span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="np-mid" aria-hidden="true">●</span>
-                <span class="np-muted"
-                  >Safety Monitoring: <strong class="np-text">SECURE</strong
-                  ></span
-                >
+                <span class="np-mid" aria-hidden="true">
+                  ●
+                </span>
+                <span class="np-muted">
+                  Safety Monitoring: <strong class="np-text">SECURE</strong>
+                </span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="np-muted" aria-hidden="true">○</span>
-                <span class="np-muted"
-                  >Secondary Trauma Prevention: <strong class="np-mid"
-                    >ENABLED</strong
-                  ></span
-                >
+                <span class="np-muted" aria-hidden="true">
+                  ○
+                </span>
+                <span class="np-muted">
+                  Secondary Trauma Prevention:{' '}
+                  <strong class="np-mid">ENABLED</strong>
+                </span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="np-mid" aria-hidden="true">●</span>
-                <span class="np-muted"
-                  >Crisis Protocols: <strong class="np-mid">STANDBY</strong
-                  ></span
-                >
+                <span class="np-mid" aria-hidden="true">
+                  ●
+                </span>
+                <span class="np-muted">
+                  Crisis Protocols: <strong class="np-mid">STANDBY</strong>
+                </span>
               </div>
             </div>
 
@@ -453,7 +458,9 @@ const trainingMetrics = {
               style="background: var(--np-elevated); border: 1px solid var(--np-line);"
             >
               <div class="flex items-center gap-2">
-                <span class="np-text font-bold" aria-hidden="true">⚠</span>
+                <span class="np-text font-bold" aria-hidden="true">
+                  ⚠
+                </span>
                 <span id="alertText" class="np-text font-semibold"></span>
               </div>
             </div>
@@ -466,18 +473,18 @@ const trainingMetrics = {
           >
             <h3 class="text-xl font-bold np-text mb-4">QUICK ACTIONS</h3>
             <div class="grid grid-cols-2 gap-3">
-              <button id="pauseBtn" class="px-4 py-2 font-semibold np-cta"
-                >PAUSE</button
-              >
-              <button id="safetyModeBtn" class="px-4 py-2 font-semibold np-cta"
-                >SAFE MODE</button
-              >
-              <button id="debriefBtn" class="px-4 py-2 font-semibold np-cta"
-                >DEBRIEF</button
-              >
-              <button id="emergencyBtn" class="px-4 py-2 font-semibold np-cta"
-                >EMERGENCY</button
-              >
+              <button id="pauseBtn" class="px-4 py-2 font-semibold np-cta">
+                PAUSE
+              </button>
+              <button id="safetyModeBtn" class="px-4 py-2 font-semibold np-cta">
+                SAFE MODE
+              </button>
+              <button id="debriefBtn" class="px-4 py-2 font-semibold np-cta">
+                DEBRIEF
+              </button>
+              <button id="emergencyBtn" class="px-4 py-2 font-semibold np-cta">
+                EMERGENCY
+              </button>
             </div>
           </div>
         </div>

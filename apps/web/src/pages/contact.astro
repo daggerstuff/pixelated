@@ -2,6 +2,8 @@
 import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
+export const prerender = true
+
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -27,8 +29,7 @@ const organizationSchema = {
     set:html={JSON.stringify(organizationSchema)
       .replace(/</g, '\\u003c')
       .replace(/>/g, '\\u003e')}
-  />
-
+  ></script>
   <MarketingPageHero
     eyebrow="Contact"
     title="Bring the pilot question, the hard case, or the trust review."
@@ -78,8 +79,9 @@ const organizationSchema = {
               <a
                 class="marketing-inline-link"
                 href="mailto:info@pixelatedempathy.com"
-                >info@pixelatedempathy.com</a
               >
+                info@pixelatedempathy.com
+              </a>
             </p>
             <p>United States</p>
             <p>Founded 2025 • Founder-led</p>
@@ -92,14 +94,18 @@ const organizationSchema = {
                 href="https://twitter.com/pixelatedempathy"
                 class="marketing-inline-link"
                 target="_blank"
-                rel="noopener noreferrer">Twitter</a
+                rel="noopener noreferrer"
               >
+                Twitter
+              </a>
               <a
                 href="https://github.com/nochadisfaction/pixelated"
                 class="marketing-inline-link"
                 target="_blank"
-                rel="noopener noreferrer">GitHub</a
+                rel="noopener noreferrer"
               >
+                GitHub
+              </a>
             </div>
           </article>
         </div>
@@ -135,8 +141,7 @@ const organizationSchema = {
                 <div
                   class="mt-1 hidden text-xs form-error-text"
                   id="name-error"
-                >
-                </div>
+                ></div>
               </div>
 
               <div>
@@ -155,8 +160,7 @@ const organizationSchema = {
                 <div
                   class="mt-1 hidden text-xs form-error-text"
                   id="email-error"
-                >
-                </div>
+                ></div>
               </div>
             </div>
 
@@ -176,8 +180,7 @@ const organizationSchema = {
               <div
                 class="mt-1 hidden text-xs form-error-text"
                 id="subject-error"
-              >
-              </div>
+              ></div>
             </div>
 
             <div>
@@ -194,8 +197,10 @@ const organizationSchema = {
                 placeholder="Tell us the case type, evaluation question, or rollout constraint you want to discuss."
               ></textarea>
               <div class="mt-1 flex items-center justify-between">
-                <div class="hidden text-xs form-error-text" id="message-error">
-                </div>
+                <div
+                  class="hidden text-xs form-error-text"
+                  id="message-error"
+                ></div>
                 <div class="text-xs" style="color: var(--text-muted);">
                   <span id="message-count">0</span>/2000
                 </div>
@@ -222,7 +227,8 @@ const organizationSchema = {
                     cy="12"
                     r="10"
                     stroke="currentColor"
-                    stroke-width="4"></circle>
+                    stroke-width="4"
+                  ></circle>
                   <path
                     class="opacity-75"
                     fill="currentColor"
@@ -253,8 +259,7 @@ const organizationSchema = {
               class="text-sm"
               style="color: var(--text-secondary);"
               id="success-text"
-            >
-            </p>
+            ></p>
           </div>
         </div>
       </div>
@@ -471,7 +476,6 @@ const organizationSchema = {
       }
     })
   </script>
-
   <style>
     .contact-grid {
       align-items: start;

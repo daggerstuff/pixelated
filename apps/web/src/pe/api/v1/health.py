@@ -1,5 +1,7 @@
 """Health check endpoint and API route registration."""
 
+from typing import Any
+
 import structlog
 from fastapi import APIRouter
 
@@ -11,7 +13,7 @@ router = APIRouter(tags=["health"])
 
 
 @router.get("/health")
-async def health_check():
+async def health_check() -> dict[str, Any]:
     """Health check endpoint for load balancers and monitoring."""
     try:
         db_status = await check_connection()
@@ -30,12 +32,12 @@ async def health_check():
 
 
 @router.get("/health/ready")
-async def readiness_check():
+async def readiness_check() -> dict[str, Any]:
     """Readiness probe — verifies the service can accept traffic."""
     return {"status": "ready"}
 
 
 @router.get("/health/live")
-async def liveness_check():
+async def liveness_check() -> dict[str, Any]:
     """Liveness probe — verifies the service is running."""
     return {"status": "alive"}

@@ -68,13 +68,13 @@ export default function DatasetSearch() {
       <div className="flex flex-col gap-8">
         {/* Search Header & Controls */}
         <div
-          className="bg-slate-800/50 border-slate-700 flex flex-col items-end gap-4 rounded-2xl border p-6 md:flex-row"
+          className="flex flex-col items-end gap-4 rounded-none border border-border bg-secondary p-6 md:flex-row"
           role="search"
         >
           <div className="w-full flex-grow">
             <label
               htmlFor="dataset-search"
-              className="text-slate-300 mb-2 block text-sm font-medium"
+              className="mb-2 block text-sm font-medium text-foreground"
             >
               Search Datasets
             </label>
@@ -83,7 +83,7 @@ export default function DatasetSearch() {
                 id="dataset-search"
                 type="text"
                 disabled={loading}
-                className="bg-slate-900 border-slate-700 text-white focus:ring-pink-500 focus:border-transparent w-full rounded-lg border px-4 py-3 outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="focus:border-transparent w-full rounded-none border border-border bg-background px-4 py-3 text-foreground outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="e.g., cbt therapy, depression, multi-turn"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -96,7 +96,7 @@ export default function DatasetSearch() {
                 <button
                   onClick={() => void handleSearch()}
                   disabled={loading}
-                  className="bg-pink-600 hover:bg-pink-700 focus:ring-pink-500 text-white focus:ring-offset-slate-900 rounded-md p-2 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-none bg-primary p-2 text-foreground transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={loading ? 'Searching datasets' : 'Run search'}
                 >
                   {loading ? (
@@ -143,10 +143,13 @@ export default function DatasetSearch() {
           <div className="flex w-full gap-4 md:w-auto">
             <div className="w-full md:w-40">
               <div className="mb-1 flex justify-between">
-                <label htmlFor="min-turns" className="text-slate-400 text-xs">
+                <label
+                  htmlFor="min-turns"
+                  className="text-xs text-muted-foreground"
+                >
                   Min Turns
                 </label>
-                <span className="text-pink-400 font-mono text-xs">
+                <span className="font-mono text-xs text-foreground">
                   {minTurns}
                 </span>
               </div>
@@ -157,17 +160,20 @@ export default function DatasetSearch() {
                 max="50"
                 value={minTurns}
                 onChange={(e) => setMinTurns(parseInt(e.target.value))}
-                className="bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg"
+                className="h-2 w-full cursor-pointer appearance-none rounded-none bg-secondary accent-primary"
                 aria-label="Minimum conversation turns"
               />
             </div>
 
             <div className="w-full md:w-40">
               <div className="mb-1 flex justify-between">
-                <label htmlFor="min-quality" className="text-slate-400 text-xs">
+                <label
+                  htmlFor="min-quality"
+                  className="text-xs text-muted-foreground"
+                >
                   Min Quality
                 </label>
-                <span className="text-pink-400 font-mono text-xs">
+                <span className="font-mono text-xs text-foreground">
                   {minQuality.toFixed(1)}
                 </span>
               </div>
@@ -179,7 +185,7 @@ export default function DatasetSearch() {
                 step="0.1"
                 value={minQuality}
                 onChange={(e) => setMinQuality(parseFloat(e.target.value))}
-                className="bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg"
+                className="h-2 w-full cursor-pointer appearance-none rounded-none bg-secondary accent-primary"
                 aria-label="Minimum dataset quality score"
               />
             </div>
@@ -200,14 +206,14 @@ export default function DatasetSearch() {
               aria-busy="true"
             >
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-slate-800 h-64 rounded-xl"></div>
+                <div key={i} className="h-64 rounded-none bg-secondary"></div>
               ))}
             </div>
           )}
 
           {error && (
             <div
-              className="bg-red-900/20 border-red-800 text-red-200 rounded-lg border p-4 text-center"
+              className="rounded-none border border-ring bg-secondary p-4 text-center text-foreground"
               role="alert"
             >
               {error}
@@ -217,16 +223,16 @@ export default function DatasetSearch() {
           {!loading && !hasSearched && (
             <div className="py-20 text-center">
               <ChartBar className="h-24 w-24 opacity-20" />
-              <h3 className="text-slate-200 mb-2 text-2xl font-bold">
+              <h3 className="mb-2 text-2xl font-bold text-foreground">
                 Explore Therapy Datasets
               </h3>
-              <p className="text-slate-400 mx-auto max-w-lg">
+              <p className="mx-auto max-w-lg text-muted-foreground">
                 Search across HuggingFace, Kaggle, and open repositories for
                 high-quality, multi-turn therapeutic conversations.
               </p>
               <button
                 onClick={() => void handleSearch()}
-                className="bg-slate-800 hover:bg-slate-700 text-pink-400 border-slate-700 mt-6 rounded-full border px-6 py-2 transition-colors"
+                className="mt-6 rounded-none border border-border bg-secondary px-6 py-2 text-foreground transition-colors hover:bg-accent"
               >
                 Browse All Datasets
               </button>
@@ -234,7 +240,7 @@ export default function DatasetSearch() {
           )}
 
           {!loading && hasSearched && results.length === 0 && !error && (
-            <div className="text-slate-400 py-20 text-center">
+            <div className="py-20 text-center text-muted-foreground">
               <p>
                 No datasets found matching your criteria. Try adjusting the
                 filters.

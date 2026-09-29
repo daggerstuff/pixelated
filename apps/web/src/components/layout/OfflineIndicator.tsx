@@ -31,9 +31,9 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
     () => offlineManager.getStatus().queueStats,
   )
   const [isVisible, setIsVisible] = React.useState(false)
-  const [previousAutoShow, setPreviousAutoShow] = React.useState<boolean | null>(
-    null,
-  )
+  const [previousAutoShow, setPreviousAutoShow] = React.useState<
+    boolean | null
+  >(null)
 
   const autoShow = networkState.isOffline || queueStats.total > 0
   if (previousAutoShow !== autoShow) {
@@ -80,10 +80,15 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
   }
 
   const getStatusColor = () => {
-    if (networkState.isOffline) return 'bg-red-500'
-    if (networkState.isSlowConnection) return 'bg-yellow-500'
-    if (queueStats.total > 0) return 'bg-blue-500'
-    return 'bg-green-500'
+    // Value-contrast ladder: offline is the highest-emphasis state
+    // (inverted primary); degraded/pending encode via ring border and
+    // surface; online sits quiet on secondary.
+    if (networkState.isOffline) return 'bg-primary text-primary-foreground'
+    if (networkState.isSlowConnection)
+      return 'border border-ring bg-secondary text-foreground font-semibold'
+    if (queueStats.total > 0)
+      return 'border border-border bg-secondary text-foreground'
+    return 'border border-border bg-secondary text-muted-foreground'
   }
 
   const getStatusText = () => {
@@ -167,7 +172,7 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
       className={`${positionClasses[position]} ${className}`}
     >
       <div
-        className={`text-white flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium shadow-lg ${getStatusColor()} bg-opacity-90 backdrop-blur-sm`}
+        className={`flex items-center gap-2 rounded-none px-3 py-2 text-sm font-medium ${getStatusColor()}`}
         role="status"
         aria-live="polite"
       >

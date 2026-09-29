@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 
-def parse_transcript_file(file_path: Path) -> dict | None:
+def parse_transcript_file(file_path: Path) -> dict[str, str] | None:
     """Parse a transcript markdown file into structured data."""
     try:
         content = file_path.read_text(encoding="utf-8")
@@ -71,8 +71,8 @@ def create_passages(text: str, min_words: int = 200, max_words: int = 800) -> li
     sentences = re.split(r"(?<=[.!?])\s+", text)
     sentences = [s.strip() for s in sentences if s.strip() and len(s) > 10]
 
-    passages = []
-    current_passage = []
+    passages: list[str] = []
+    current_passage: list[str] = []
     current_word_count = 0
 
     for sentence in sentences:
@@ -100,7 +100,7 @@ def create_passages(text: str, min_words: int = 200, max_words: int = 800) -> li
     return passages
 
 
-def generate_qa_pair(passage: str, transcript: dict) -> dict | None:
+def generate_qa_pair(passage: str, transcript: dict[str, str]) -> dict[str, str | dict[str, str | int]] | None:
     """Generate a QA pair from a passage."""
     if len(passage) < 150:
         return None
@@ -113,7 +113,7 @@ def generate_qa_pair(passage: str, transcript: dict) -> dict | None:
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Build QA dataset from transcripts")
     parser.add_argument("--transcript-dir", type=Path, default=Path("ai/data/transcripts/ingested"))
     parser.add_argument("--output", type=Path, default=Path("ai/data/qa_pairs_v3.jsonl"))
@@ -147,7 +147,7 @@ def main():
             f.write(json.dumps(pair) + "\n")
 
     if args.sample and all_pairs:
-        for i, pair in enumerate(all_pairs[:3], 1):
+        for _i, _pair in enumerate(all_pairs[:3], 1):
             pass
 
 

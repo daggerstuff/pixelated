@@ -303,18 +303,6 @@ vi.mock("../python-bridge", () => ({
   }),
 }));
 
-vi.mock("../BiasMetricsCollector", () => ({
-  BiasMetricsCollector: vi.fn().mockImplementation(function () {
-    return mockMetricsCollector;
-  }),
-}));
-
-vi.mock("../BiasAlertSystem", () => ({
-  BiasAlertSystem: vi.fn().mockImplementation(function () {
-    return mockAlertSystem;
-  }),
-}));
-
 ddescribe("BiasDetectionEngine Performance Benchmarks", () => {
   let biasEngine: BiasDetectionEngine;
   let mockConfig: BiasDetectionConfig;

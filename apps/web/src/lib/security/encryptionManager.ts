@@ -26,7 +26,7 @@ export interface EncryptedData {
   timestamp: number
 }
 
-export interface KeyMetadata {
+interface KeyMetadata {
   id: string
   algorithm: string
   created: Date
@@ -345,11 +345,17 @@ class EncryptionManager {
       oldMetadata.rotationCount += 1
     }
 
-    const newMetadata = this.keyMetadata.get(newKeyPair.id)
-    if (newMetadata) {
-      newMetadata.status = 'active'
-      newMetadata.usage = ['encrypt', 'decrypt']
-    }
+    // Register the new key so it is usable for encrypt/decrypt; without this,
+    // every rotation left currentKeyId pointing at an unregistered key
+    this.keyStore.set(newKeyPair.id, newKeyPair.key)
+    this.keyMetadata.set(newKeyPair.id, {
+      id: newKeyPair.id,
+      algorithm: this.config.algorithm,
+      created: new Date(),
+      status: 'active',
+      usage: ['encrypt', 'decrypt'],
+      rotationCount: 0,
+    })
 
     // Mark old key for cleanup after grace period
     setTimeout(
@@ -366,14 +372,26 @@ class EncryptionManager {
   private scheduleKeyRotation(): void {
     const rotationInterval = this.config.keyRotationDays * 24 * 60 * 60 * 1000
 
+    // Node clamps timer delays above 2147483647 ms down to 1 ms, which turned
+    // any keyRotationDays above ~24.8 days into a rotation firing every
+    // millisecond. Cap at the ceiling and check the key's actual age in the
+    // callback so long intervals still rotate when genuinely due.
+    const timerInterval = Math.min(rotationInterval, 2_147_483_647)
+
     setInterval(async () => {
-      try {
-        await this.rotateKeys()
-        logger.info('Encryption keys rotated successfully')
-      } catch (error: unknown) {
-        logger.error('Key rotation failed:', error)
+      const currentKey = this.getCurrentKeyInfo()
+      if (!currentKey) {
+        return
       }
-    }, rotationInterval)
+      if (Date.now() - currentKey.created.getTime() >= rotationInterval) {
+        try {
+          await this.rotateKeys()
+          logger.info('Encryption keys rotated successfully')
+        } catch (error: unknown) {
+          logger.error('Key rotation failed:', error)
+        }
+      }
+    }, timerInterval)
   }
 
   /**
@@ -510,4 +528,3 @@ export const encryptionManager = new EncryptionManager({
 
 // Export class for custom instances
 export { EncryptionManager }
-export default encryptionManager

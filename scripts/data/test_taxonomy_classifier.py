@@ -7,6 +7,7 @@ This script validates the classifier works before running full validation.
 
 import sys
 from pathlib import Path
+from typing import Any
 
 # Add ai module to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -14,13 +15,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from ai.pipelines.design.taxonomy_classifier import TaxonomyClassifier, TherapeuticCategory
 
 
-def test_classifier():
+def test_classifier() -> bool:
     """Test classifier on sample conversations."""
 
     classifier = TaxonomyClassifier()
 
     # Test cases representing different categories
-    test_cases = [
+    test_cases: list[dict[str, Any]] = [
         {
             "name": "Crisis Support - Suicidal Ideation",
             "messages": [

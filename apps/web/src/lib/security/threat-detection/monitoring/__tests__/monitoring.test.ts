@@ -21,10 +21,15 @@ import {
 } from '../metrics-utils'
 
 // Mock dependencies
-vi.mock('../../logging/build-safe-logger')
-vi.mock('../../redis')
+vi.mock('@/lib/logging/build-safe-logger', () => ({
+  createBuildSafeLogger: vi.fn(() => ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  })),
+}))
 vi.mock('../../response-orchestration')
-vi.mock('../../ai-services')
 
 describe('Enhanced Monitoring Service', () => {
   let service: EnhancedMonitoringService

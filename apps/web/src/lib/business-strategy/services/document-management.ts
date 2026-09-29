@@ -34,9 +34,16 @@ export class DocumentManagementService extends BaseService {
     data: DocumentCreate,
   ): Promise<Document> {
     await this.validatePermissions(userId, 'document', 'create')
-    this.validateRequired(data as Record<string, unknown>, ['title', 'content', 'type', 'category'])
+    this.validateRequired(data as Record<string, unknown>, [
+      'title',
+      'content',
+      'type',
+      'category',
+    ])
 
-    const sanitized = this.sanitizeInput(data as Record<string, unknown>) as DocumentCreate
+    const sanitized = this.sanitizeInput(
+      data as Record<string, unknown>,
+    ) as DocumentCreate
     const documentId = this.generateId() as DocumentId
     const timestamp = new Date()
 
@@ -205,7 +212,9 @@ export class DocumentManagementService extends BaseService {
       }
 
       const timestamp = new Date()
-      const sanitized = this.sanitizeInput(updates as Record<string, unknown>) as DocumentUpdate
+      const sanitized = this.sanitizeInput(
+        updates as Record<string, unknown>,
+      ) as DocumentUpdate
 
       const currentDoc = await this.getDocument(userId, id)
       const newVersion = currentDoc.version + 1

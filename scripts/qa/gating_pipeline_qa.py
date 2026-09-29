@@ -19,7 +19,7 @@ from ai.memory.gates.trauma_filter import TraumaFilter
 from ai.memory.schema import ConsentGate
 
 
-def test_pii_gate():
+def test_pii_gate() -> None:
     """Gate 0: PII Redaction"""
     gate = PiiRedactor()
 
@@ -37,7 +37,7 @@ def test_pii_gate():
     assert eval_result.decision == GateDecision.BLOCK, f"SSN should block, got {eval_result.decision}"
 
 
-def test_crisis_gate():
+def test_crisis_gate() -> None:
     """Gate 1: Crisis Detection"""
     gate = CrisisDetector()
 
@@ -55,7 +55,7 @@ def test_crisis_gate():
     assert result.confidence < 0.5, f"Negated content should have low confidence, got {result.confidence}"
 
 
-def test_trauma_gate():
+def test_trauma_gate() -> None:
     """Gate 2: Trauma Filter"""
     gate = TraumaFilter()
 
@@ -68,7 +68,7 @@ def test_trauma_gate():
     assert len(result.indicators) > 0, "Trauma lexicon should match"
 
 
-def test_consent_gate():
+def test_consent_gate() -> None:
     """Gate 3: Consent Management"""
     gate = ConsentGateChecker()
 
@@ -83,7 +83,7 @@ def test_consent_gate():
     assert not result.allowed, "Revoked consent should block"
 
 
-def test_gating_report():
+def test_gating_report() -> None:
     """GatingReport integration"""
     report = GatingReport(source_id="qa-test", content="Test content")
     assert not report.blocked, "Empty report should not be blocked"
@@ -92,7 +92,7 @@ def test_gating_report():
     assert report.blocked, "Report should be blocked when PII blocks"
 
 
-def main():
+def main() -> None:
 
     test_pii_gate()
     test_crisis_gate()

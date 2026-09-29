@@ -4,7 +4,7 @@ import axios, { AxiosInstance } from 'axios'
 import Redis from 'ioredis'
 import { MongoClient, type Db } from 'mongodb'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type { ThreatResponse } from '../response-orchestration'
 
 const logger = createBuildSafeLogger('external-threat-intelligence')
@@ -480,10 +480,16 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         severity,
         confidence,
         firstSeen: new Date(
-          (data['first_seen'] ?? data['created'] ?? Date.now()) as string | number | Date,
+          (data['first_seen'] ?? data['created'] ?? Date.now()) as
+            | string
+            | number
+            | Date,
         ),
         lastSeen: new Date(
-          (data['last_seen'] ?? data['updated'] ?? Date.now()) as string | number | Date,
+          (data['last_seen'] ?? data['updated'] ?? Date.now()) as
+            | string
+            | number
+            | Date,
         ),
         expirationDate: data['expiration_date']
           ? new Date(data['expiration_date'] as string)
@@ -574,8 +580,12 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         threatType,
         severity: this.mapSeverity(String(data['confidence'] ?? 'medium')),
         confidence: this.extractConfidence(data['confidence'] ?? 50),
-        firstSeen: new Date((data['created'] ?? Date.now()) as string | number | Date),
-        lastSeen: new Date((data['modified'] ?? Date.now()) as string | number | Date),
+        firstSeen: new Date(
+          (data['created'] ?? Date.now()) as string | number | Date,
+        ),
+        lastSeen: new Date(
+          (data['modified'] ?? Date.now()) as string | number | Date,
+        ),
         source: (data['created_by_ref'] as string) || feed.name,
         tags: Array.isArray(data['labels']) ? (data['labels'] as string[]) : [],
         metadata: {

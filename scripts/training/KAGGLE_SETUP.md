@@ -62,10 +62,12 @@ After training completes:
 ```python
 # Cell to download adapter
 import shutil
-shutil.make_archive('pixelated-v2-adapter', 'zip', './checkpoints/pixelated-v2-qlora')
+
+shutil.make_archive("pixelated-v2-adapter", "zip", "./checkpoints/pixelated-v2-qlora")
 
 from IPython.display import FileLink
-FileLink('pixelated-v2-adapter.zip')
+
+FileLink("pixelated-v2-adapter.zip")
 ```
 
 Click the link to download the adapter.

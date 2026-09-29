@@ -38,10 +38,9 @@ def compute_signals(text: str) -> Signals:
     # Production-quality signal computation using quality assessment frameworks
     # Fallback to heuristics when production validators unavailable (per README)
     try:
-        from ai.dataset_pipeline.quality.validators import (
-            EmpathyMentalHealthValidator,
-            SafetyEthicsValidator,
-        )
+        import importlib.util
+
+        importlib.util.find_spec("ai.dataset_pipeline.quality.validators")
         # Production validator path (KAN-12) — invoked when installed
     except ImportError:
         # Production validators unavailable; heuristics apply (README §Production Features)

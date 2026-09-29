@@ -18,13 +18,13 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
   const getTrendStyle = (trend: string) => {
     switch (trend) {
       case 'improving':
-        return 'text-green-600 bg-green-100'
+        return 'text-foreground bg-secondary border border-input'
       case 'worsening':
-        return 'text-red-600 bg-red-100'
+        return 'text-foreground font-semibold bg-card border border-ring'
       case 'stable':
-        return 'text-blue-600 bg-blue-100'
+        return 'text-foreground bg-secondary border border-input'
       default:
-        return 'text-gray-600 bg-gray-100'
+        return 'text-muted-foreground bg-secondary'
     }
   }
 
@@ -72,15 +72,15 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
   // Helper function to get percentile color
   const getPercentileColor = (percentile: number) => {
     if (percentile >= 80) {
-      return 'text-green-600'
+      return 'text-foreground'
     }
     if (percentile >= 60) {
-      return 'text-yellow-600'
+      return 'text-foreground font-medium'
     }
     if (percentile >= 40) {
-      return 'text-orange-600'
+      return 'text-foreground font-medium'
     }
-    return 'text-red-600'
+    return 'text-foreground font-semibold'
   }
 
   // Calculate improvement/decline from 30-day average
@@ -91,10 +91,10 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
     <div className="historical-progress-tracker space-y-6">
       {/* Header */}
       <div>
-        <h3 className="text-gray-900 mb-2 text-lg font-semibold">
+        <h3 className="mb-2 text-lg font-semibold text-foreground">
           Historical Progress Tracking
         </h3>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Compare current performance against historical bias detection patterns
         </p>
       </div>
@@ -102,43 +102,45 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
       {/* Key Metrics */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         {/* Current vs Average */}
-        <div className="bg-white border-gray-200 rounded-lg border p-4">
+        <div className="rounded-none border border-border bg-card p-4">
           <div className="text-center">
-            <div className="text-gray-900 mb-1 text-2xl font-bold">
+            <div className="mb-1 text-2xl font-bold text-foreground">
               {formatPercentage(currentScore)}
             </div>
-            <div className="text-gray-600 mb-2 text-sm">Current Score</div>
+            <div className="mb-2 text-sm text-muted-foreground">
+              Current Score
+            </div>
             <div
-              className={`text-sm font-medium ${isImprovement ? 'text-green-600' : 'text-red-600'}`}
+              className={`text-sm font-medium ${isImprovement ? 'text-foreground' : 'font-semibold text-foreground'}`}
             >
               {isImprovement ? '↓' : '↑'}{' '}
               {formatPercentage(Math.abs(scoreDifference))}
-              <span className="text-gray-500 ml-1">vs avg</span>
+              <span className="ml-1 text-muted-foreground">vs avg</span>
             </div>
           </div>
         </div>
 
         {/* 30-Day Average */}
-        <div className="bg-blue-50 border-blue-200 rounded-lg border p-4">
+        <div className="rounded-none border border-input bg-secondary p-4">
           <div className="text-center">
-            <div className="text-blue-600 mb-1 text-2xl font-bold">
+            <div className="mb-1 text-2xl font-bold text-foreground">
               {formatPercentage(comparison.thirtyDayAverage)}
             </div>
-            <div className="text-blue-800 mb-2 text-sm">30-Day Average</div>
-            <div className="text-blue-600 text-xs">Historical baseline</div>
+            <div className="mb-2 text-sm text-foreground">30-Day Average</div>
+            <div className="text-xs text-foreground">Historical baseline</div>
           </div>
         </div>
 
         {/* Percentile Rank */}
-        <div className="bg-purple-50 border-purple-200 rounded-lg border p-4">
+        <div className="rounded-none border border-input bg-secondary p-4">
           <div className="text-center">
             <div
               className={`mb-1 text-2xl font-bold ${getPercentileColor(comparison.percentileRank)}`}
             >
               {comparison.percentileRank}th
             </div>
-            <div className="text-purple-800 mb-2 text-sm">Percentile</div>
-            <div className="text-purple-600 text-xs">
+            <div className="mb-2 text-sm text-foreground">Percentile</div>
+            <div className="text-xs text-muted-foreground">
               {comparison.percentileRank >= 80
                 ? 'Excellent'
                 : comparison.percentileRank >= 60
@@ -152,7 +154,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
 
         {/* 7-Day Trend */}
         <div
-          className={`rounded-lg border p-4 ${getTrendStyle(comparison.sevenDayTrend)}`}
+          className={`rounded-none border p-4 ${getTrendStyle(comparison.sevenDayTrend)}`}
         >
           <div className="text-center">
             <div className="mb-2 flex items-center justify-center">
@@ -176,8 +178,8 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
       </div>
 
       {/* Progress Visualization */}
-      <div className="bg-white border-gray-200 rounded-lg border p-6">
-        <h4 className="text-gray-900 mb-4 font-semibold">
+      <div className="rounded-none border border-border bg-card p-6">
+        <h4 className="mb-4 font-semibold text-foreground">
           Performance Comparison
         </h4>
 
@@ -185,16 +187,16 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
         <div className="space-y-4">
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-gray-700 text-sm font-medium">
+              <span className="text-sm font-medium text-foreground">
                 Current Session
               </span>
-              <span className="text-gray-900 text-sm font-bold">
+              <span className="text-sm font-bold text-foreground">
                 {formatPercentage(currentScore)}
               </span>
             </div>
-            <div className="bg-gray-200 h-3 w-full rounded-full">
+            <div className="h-3 w-full rounded-none bg-secondary">
               <div
-                className={`h-3 rounded-full ${
+                className={`h-3 rounded-none ${
                   currentScore >= 0.8
                     ? 'bg-red-500'
                     : currentScore >= 0.6
@@ -210,16 +212,16 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
 
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-gray-700 text-sm font-medium">
+              <span className="text-sm font-medium text-foreground">
                 30-Day Average
               </span>
-              <span className="text-blue-600 text-sm font-bold">
+              <span className="text-sm font-bold text-foreground">
                 {formatPercentage(comparison.thirtyDayAverage)}
               </span>
             </div>
-            <div className="bg-gray-200 h-3 w-full rounded-full">
+            <div className="h-3 w-full rounded-none bg-secondary">
               <div
-                className="bg-blue-500 h-3 rounded-full"
+                className="bg-secondary0 h-3 rounded-none"
                 style={{ width: `${comparison.thirtyDayAverage * 100}%` }}
               />
             </div>
@@ -227,34 +229,34 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
         </div>
 
         {/* Performance Insights */}
-        <div className="bg-gray-50 mt-6 rounded-lg p-4">
-          <h5 className="text-gray-900 mb-2 font-medium">
+        <div className="mt-6 rounded-none bg-secondary p-4">
+          <h5 className="mb-2 font-medium text-foreground">
             Performance Insights
           </h5>
-          <ul className="text-gray-700 space-y-1 text-sm">
+          <ul className="space-y-1 text-sm text-foreground">
             {isImprovement ? (
               <>
                 <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="mr-2 text-foreground">✓</span>
                   Current session shows{' '}
                   {formatPercentage(Math.abs(scoreDifference))} improvement over
                   historical average
                 </li>
                 <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="mr-2 text-foreground">✓</span>
                   Performance is trending in the right direction
                 </li>
               </>
             ) : (
               <>
                 <li className="flex items-start">
-                  <span className="text-orange-500 mr-2">⚠</span>
+                  <span className="mr-2 text-foreground">⚠</span>
                   Current session shows{' '}
                   {formatPercentage(Math.abs(scoreDifference))} higher bias than
                   historical average
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-500 mr-2">ℹ</span>
+                  <span className="mr-2 text-foreground">ℹ</span>
                   Consider reviewing recent changes in approach or client
                   demographics
                 </li>
@@ -262,21 +264,21 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
             )}
 
             <li className="flex items-start">
-              <span className="text-blue-500 mr-2">ℹ</span>
+              <span className="mr-2 text-foreground">ℹ</span>
               You&apos;re performing better than {comparison.percentileRank}% of
               similar sessions
             </li>
 
             {comparison.sevenDayTrend === 'improving' && (
               <li className="flex items-start">
-                <TrendingUp className="text-green-500 mr-2 h-4 w-4" />
+                <TrendingUp className="mr-2 h-4 w-4 text-foreground" />
                 Recent 7-day trend shows consistent improvement
               </li>
             )}
 
             {comparison.sevenDayTrend === 'worsening' && (
               <li className="flex items-start">
-                <span className="text-red-500 mr-2">📉</span>
+                <span className="mr-2 font-semibold text-foreground">📉</span>
                 Recent 7-day trend indicates need for attention
               </li>
             )}
@@ -285,15 +287,15 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
       </div>
 
       {/* Recommendations Based on Historical Data */}
-      <div className="bg-blue-50 border-blue-200 rounded-lg border p-6">
-        <h4 className="text-blue-900 mb-4 font-semibold">
+      <div className="rounded-none border border-input bg-secondary p-6">
+        <h4 className="mb-4 font-semibold text-foreground">
           Historical Recommendations
         </h4>
         <div className="space-y-3">
           {comparison.percentileRank < 50 && (
             <div className="flex items-start">
               <svg
-                className="text-blue-600 mr-2 mt-0.5 h-5 w-5"
+                className="mr-2 mt-0.5 h-5 w-5 text-foreground"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -304,10 +306,10 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
                 />
               </svg>
               <div>
-                <div className="text-blue-900 font-medium">
+                <div className="font-medium text-foreground">
                   Focus on Improvement
                 </div>
-                <div className="text-blue-800 text-sm">
+                <div className="text-sm text-foreground">
                   Your current performance is below the median. Consider
                   additional bias awareness training.
                 </div>
@@ -318,7 +320,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
           {comparison.sevenDayTrend === 'worsening' && (
             <div className="flex items-start">
               <svg
-                className="text-blue-600 mr-2 mt-0.5 h-5 w-5"
+                className="mr-2 mt-0.5 h-5 w-5 text-foreground"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -329,10 +331,10 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
                 />
               </svg>
               <div>
-                <div className="text-blue-900 font-medium">
+                <div className="font-medium text-foreground">
                   Address Recent Decline
                 </div>
-                <div className="text-blue-800 text-sm">
+                <div className="text-sm text-foreground">
                   Recent trend shows increasing bias. Review recent sessions and
                   identify potential causes.
                 </div>
@@ -343,7 +345,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
           {comparison.percentileRank >= 80 && (
             <div className="flex items-start">
               <svg
-                className="text-blue-600 mr-2 mt-0.5 h-5 w-5"
+                className="mr-2 mt-0.5 h-5 w-5 text-foreground"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -354,10 +356,10 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
                 />
               </svg>
               <div>
-                <div className="text-blue-900 font-medium">
+                <div className="font-medium text-foreground">
                   Excellent Performance
                 </div>
-                <div className="text-blue-800 text-sm">
+                <div className="text-sm text-foreground">
                   You&apos;re performing in the top 20%. Consider mentoring
                   others or sharing best practices.
                 </div>
@@ -367,7 +369,7 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
 
           <div className="flex items-start">
             <svg
-              className="text-blue-600 mr-2 mt-0.5 h-5 w-5"
+              className="mr-2 mt-0.5 h-5 w-5 text-foreground"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -378,10 +380,10 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
               />
             </svg>
             <div>
-              <div className="text-blue-900 font-medium">
+              <div className="font-medium text-foreground">
                 Continue Monitoring
               </div>
-              <div className="text-blue-800 text-sm">
+              <div className="text-sm text-foreground">
                 Regular analysis helps maintain awareness and track long-term
                 progress patterns.
               </div>

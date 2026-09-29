@@ -82,8 +82,8 @@ def segment_into_passages(text: str, min_words: int = 100, max_words: int = 500)
     # Split into paragraphs
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
 
-    passages = []
-    current_passage = []
+    passages: list[str] = []
+    current_passage: list[str] = []
     current_word_count = 0
 
     for paragraph in paragraphs:
@@ -114,7 +114,7 @@ def segment_into_passages(text: str, min_words: int = 100, max_words: int = 500)
     return passages
 
 
-def generate_qa_pair(passage: str, transcript: Transcript) -> dict | None:
+def generate_qa_pair(passage: str, transcript: Transcript) -> dict[str, str | dict[str, str | int] | float] | None:
     """Generate a therapeutic QA pair from a passage.
 
     Creates realistic therapeutic conversation based on the content.
@@ -161,7 +161,7 @@ def generate_qa_pair(passage: str, transcript: Transcript) -> dict | None:
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Build QA dataset from transcripts")
     parser.add_argument("--transcript-dir", type=Path, default=Path("ai/data/transcripts/ingested"))
     parser.add_argument("--output", type=Path, default=Path("ai/data/qa_pairs_proper.jsonl"))
@@ -197,7 +197,7 @@ def main():
             f.write(json.dumps(pair) + "\n")
 
     if args.sample and all_pairs:
-        for i, pair in enumerate(all_pairs[:3], 1):
+        for _i, _pair in enumerate(all_pairs[:3], 1):
             pass
 
 

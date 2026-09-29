@@ -36,14 +36,12 @@ const {
         <p class="cta-verdict-copy">{verdictCopy}</p>
 
         <div class="cta-proof-list">
-          {
-            proofItems.map((item) => (
-              <div class="cta-proof-item">
-                <span class="cta-proof-item__label">{item.label}</span>
-                <p>{item.value}</p>
-              </div>
-            ))
-          }
+          {proofItems.map((item) => (
+            <div class="cta-proof-item">
+              <span class="cta-proof-item__label">{item.label}</span>
+              <p>{item.value}</p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -56,20 +54,26 @@ const {
         </p>
 
         <ul class="cta-rubric">
-          {rubric.map((item) => <li>{item}</li>)}
+          {rubric.map((item) => (
+            <li>{item}</li>
+          ))}
         </ul>
 
         <div class="cta-action-cluster">
           <a
             href={primaryCTA.href}
             class="cta-button cta-button--primary"
-            role="button">{primaryCTA.text}</a
+            role="button"
           >
+            {primaryCTA.text}
+          </a>
           <a
             href={secondaryCTA.href}
             class="cta-button cta-button--secondary"
-            role="button">{secondaryCTA.text}</a
+            role="button"
           >
+            {secondaryCTA.text}
+          </a>
         </div>
 
         <p class="cta-meta">{meta}</p>

@@ -4,7 +4,6 @@ import re
 
 from skillrevise.core.models import Skill
 
-
 SECTION_ALIASES = {
     "skill name": "name",
     "name": "name",
@@ -62,7 +61,9 @@ def parse_skill_markdown(
 
 def _strip_outer_fence(text: str) -> str:
     stripped = text.strip()
-    match = re.fullmatch(r"```(?:markdown|md)?\s*(.*?)\s*```", stripped, flags=re.DOTALL | re.IGNORECASE)
+    match = re.fullmatch(
+        r"```(?:markdown|md)?\s*(.*?)\s*```", stripped, flags=re.DOTALL | re.IGNORECASE
+    )
     return match.group(1).strip() if match else stripped
 
 

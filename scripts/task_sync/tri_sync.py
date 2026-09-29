@@ -10,7 +10,7 @@ import shlex
 import shutil
 import subprocess
 import sys
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -371,6 +371,7 @@ def select_canonical_record(records: Sequence[TaskRecord]) -> TaskRecord:
 
     # If there is a Linear record, it is ALWAYS canonical!
     linear_records = [r for r in records if r.provider == "linear"]
+    records_to_sort: Sequence[TaskRecord]
     if linear_records:
         if len(linear_records) == 1:
             return linear_records[0]
@@ -825,7 +826,7 @@ def _jira_adf_mapping_to_text(node: Mapping[str, Any]) -> str:
     return _jira_adf_content_to_text(node)
 
 
-def _resolve_jira_adf_handler(node: Mapping[str, Any]) -> Any:
+def _resolve_jira_adf_handler(node: Mapping[str, Any]) -> Callable[[Mapping[str, Any]], str] | None:
     node_type = _string_or_empty(node.get("type"))
     return _JIRA_ADF_NODE_HANDLERS.get(node_type)
 
@@ -890,7 +891,7 @@ def _jira_adf_list_item_node(node: Mapping[str, Any]) -> str:
     return _jira_adf_list_item_text(node)
 
 
-_JIRA_ADF_NODE_HANDLERS: dict[str, Any] = {
+_JIRA_ADF_NODE_HANDLERS: dict[str, Callable[[Mapping[str, Any]], str]] = {
     "text": _jira_adf_text_node,
     "paragraph": _jira_adf_block_node,
     "heading": _jira_adf_block_node,
@@ -921,8 +922,10 @@ def _jira_updated_at(
     )
 
 
-def get_provider_normalizer(provider: str):
-    normalizers = {
+def get_provider_normalizer(
+    provider: str,
+) -> Callable[[Mapping[str, Any]], TaskRecord | None]:
+    normalizers: dict[str, Callable[[Mapping[str, Any]], TaskRecord | None]] = {
         "asana": normalize_asana_payload,
         "jira": normalize_jira_payload,
         "github": normalize_github_payload,

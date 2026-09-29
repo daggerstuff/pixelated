@@ -12,8 +12,8 @@ function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
   return (
     <div className="flex min-h-[200px] items-center justify-center p-8">
       <div className="flex flex-col items-center gap-2">
-        <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2" />
-        <p className="text-muted-foreground text-sm">{message}</p>
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary" />
+        <p className="text-sm text-muted-foreground">{message}</p>
       </div>
     </div>
   )
@@ -24,8 +24,10 @@ function ErrorFallback({ error }: { error: Error }) {
   return (
     <div className="flex min-h-[200px] items-center justify-center p-8">
       <div className="text-center">
-        <p className="text-red-500 text-sm">Failed to load component</p>
-        <p className="text-muted-foreground mt-1 text-xs">{error.message}</p>
+        <p className="text-sm font-semibold text-foreground">
+          Failed to load component
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">{error.message}</p>
       </div>
     </div>
   )
@@ -126,15 +128,6 @@ export const LazyReportsPage = withLazyLoading(
 )
 
 // Lazy load feature components (heavy components)
-export const LazyDashboard = withLazyLoading(
-  lazy(async () =>
-    import('../features/Dashboard').then((module) => ({
-      default: module.Dashboard,
-    })),
-  ),
-  <LoadingFallback message="Loading dashboard..." />,
-)
-
 export const LazyProgressCharts = withLazyLoading(
   lazy(async () =>
     import('../charts/ProgressCharts').then((module) => ({
@@ -142,41 +135,4 @@ export const LazyProgressCharts = withLazyLoading(
     })),
   ),
   <LoadingFallback message="Loading charts..." />,
-)
-
-export const LazyReportGenerator = withLazyLoading(
-  lazy(async () =>
-    import('../features/ReportGenerator').then((module) => ({
-      default: module.ReportGenerator,
-    })),
-  ),
-  <LoadingFallback message="Loading report generator..." />,
-)
-
-export const LazyReportViewer = withLazyLoading(
-  lazy(async () =>
-    import('../features/ReportViewer').then((module) => ({
-      default: module.ReportViewer,
-    })),
-  ),
-  <LoadingFallback message="Loading report viewer..." />,
-)
-
-// Lazy load chart components
-export const LazyMetricsChart = withLazyLoading(
-  lazy(async () =>
-    import('../charts/MetricsChart').then((module) => ({
-      default: module.MetricsChart,
-    })),
-  ),
-  <LoadingFallback message="Loading metrics chart..." />,
-)
-
-export const LazyPhaseProgressChart = withLazyLoading(
-  lazy(async () =>
-    import('../charts/PhaseProgressChart').then((module) => ({
-      default: module.PhaseProgressChart,
-    })),
-  ),
-  <LoadingFallback message="Loading progress chart..." />,
 )

@@ -7,21 +7,7 @@ more.
 
 ## Available Hooks
 
-### 1. `useResponseGeneration`
-
-Hook for generating AI responses with therapeutic capabilities.
-
-**Key Features:**
-
-- Streaming and non-streaming response generation
-- Therapeutic response mode with intervention detection
-- Batch response generation
-- Progress tracking and analytics
-- Advanced error handling with retry logic
-- Request cancellation support
-- Response insights and confidence scoring
-
-### 2. `useChatCompletion`
+### 1. `useChatCompletion`
 
 Enhanced hook for managing complete chat conversations.
 
@@ -37,7 +23,7 @@ Enhanced hook for managing complete chat conversations.
 - Message history limitations
 - Real-time typing indicators
 
-### 3. `useSentimentAnalysis`
+### 2. `useSentimentAnalysis`
 
 Hook for analyzing the emotional tone of messages.
 
@@ -51,7 +37,7 @@ Hook for analyzing the emotional tone of messages.
 - Custom analysis parameters
 - Error handling and retry logic
 
-### 4. `useCrisisDetection`
+### 3. `useCrisisDetection`
 
 Hook for detecting crisis situations and mental health emergencies.
 
@@ -261,11 +247,6 @@ function CrisisMonitor() {
   )
 }
 ```
-
-## Demo Components
-
-- `ResponseGenerationExample` - Interactive demo of response generation features
-- `ChatCompletionExample` - Full-featured chat interface demo
 
 ## Configuration Options
 

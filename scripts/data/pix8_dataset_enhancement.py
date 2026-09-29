@@ -132,7 +132,7 @@ class PIX8Orchestrator:
             shell=False,
         )
 
-    def _log_section_header(self, title: str):
+    def _log_section_header(self, title: str) -> None:
         """Log a standardized section header."""
         logger.info("\n" + "=" * 80)
         logger.info(title)
@@ -339,7 +339,7 @@ class PIX8Orchestrator:
             return "partial_failure"
         return "in_progress" if TaskStatus.IN_PROGRESS in statuses else "unknown"
 
-    def save_report(self, filename: str = "pix8_completion_report.json"):
+    def save_report(self, filename: str = "pix8_completion_report.json") -> Path:
         """
         Save report to file.
 
@@ -355,7 +355,7 @@ class PIX8Orchestrator:
         logger.info(f"💾 Saved report: {output_path}")
         return output_path
 
-    def print_summary(self):
+    def print_summary(self) -> None:
         """Print human-readable summary."""
         report = self.generate_report()
         summary = report["pix8_dataset_enhancement"]["summary"]
@@ -390,7 +390,7 @@ class PIX8Orchestrator:
         logger.info("=" * 80)
 
 
-def main():
+def main() -> None:
     """Run PIX-8 orchestration."""
     parser = argparse.ArgumentParser(description="Orchestrate PIX-8 dataset enhancement tasks")
     parser.add_argument("--all", action="store_true", help="Run all tasks")

@@ -110,7 +110,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
       <div>
         <label
           htmlFor="scenario"
-          className="text-gray-700 mb-1 block text-sm font-medium"
+          className="mb-1 block text-sm font-medium text-foreground"
         >
           Scenario Name (Optional)
         </label>
@@ -121,20 +121,22 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
           onChange={(e) => handleInputChange('scenario', e.target.value)}
           disabled={disabled}
           placeholder="e.g., anxiety-treatment, depression-session"
-          className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 disabled:cursor-not-allowed"
+          className="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-35"
         />
       </div>
 
       {/* Demographics */}
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="text-gray-900 mb-3 font-medium">Client Demographics</h4>
+      <div className="rounded-none bg-secondary p-4">
+        <h4 className="mb-3 font-medium text-foreground">
+          Client Demographics
+        </h4>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {/* Age Group */}
           <div>
             <label
               htmlFor="age-group"
-              className="text-gray-700 mb-1 block text-sm font-medium"
+              className="mb-1 block text-sm font-medium text-foreground"
             >
               Age Group
             </label>
@@ -143,7 +145,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
               value={formData.demographics.age}
               onChange={(e) => handleDemographicChange('age', e.target.value)}
               disabled={disabled}
-              className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 disabled:cursor-not-allowed"
+              className="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-35"
             >
               <option value="18-25">18-25</option>
               <option value="26-35">26-35</option>
@@ -158,7 +160,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
           <div>
             <label
               htmlFor="gender"
-              className="text-gray-700 mb-1 block text-sm font-medium"
+              className="mb-1 block text-sm font-medium text-foreground"
             >
               Gender
             </label>
@@ -169,7 +171,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
                 handleDemographicChange('gender', e.target.value)
               }
               disabled={disabled}
-              className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 disabled:cursor-not-allowed"
+              className="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-35"
             >
               <option value="female">Female</option>
               <option value="male">Male</option>
@@ -183,7 +185,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
           <div>
             <label
               htmlFor="ethnicity"
-              className="text-gray-700 mb-1 block text-sm font-medium"
+              className="mb-1 block text-sm font-medium text-foreground"
             >
               Ethnicity
             </label>
@@ -194,7 +196,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
                 handleDemographicChange('ethnicity', e.target.value)
               }
               disabled={disabled}
-              className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 disabled:cursor-not-allowed"
+              className="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-35"
             >
               <option value="white">White</option>
               <option value="black">Black/African American</option>
@@ -211,7 +213,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
           <div>
             <label
               htmlFor="primary-language"
-              className="text-gray-700 mb-1 block text-sm font-medium"
+              className="mb-1 block text-sm font-medium text-foreground"
             >
               Primary Language
             </label>
@@ -222,7 +224,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
                 handleDemographicChange('primaryLanguage', e.target.value)
               }
               disabled={disabled}
-              className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 disabled:cursor-not-allowed"
+              className="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-35"
             >
               <option value="en">English</option>
               <option value="es">Spanish</option>
@@ -246,9 +248,9 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
         <div>
           <label
             htmlFor="therapeutic-content"
-            className="text-gray-700 mb-1 block text-sm font-medium"
+            className="mb-1 block text-sm font-medium text-foreground"
           >
-            Therapeutic Content <span className="text-red-500">*</span>
+            Therapeutic Content <span className="text-foreground">*</span>
           </label>
           <textarea
             id="therapeutic-content"
@@ -257,20 +259,22 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
             disabled={disabled}
             rows={6}
             placeholder="Enter the therapeutic conversation content to analyze for bias patterns..."
-            className={`focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 w-full rounded-md border px-3 py-2 shadow-sm transition-colors focus:outline-none focus:ring-2 disabled:cursor-not-allowed ${
-              errors['content'] ? 'border-red-300' : 'border-gray-300'
+            className={`w-full rounded-none border px-3 py-2 transition-colors focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-35 ${
+              errors['content'] ? 'border-ring' : 'border-input'
             }`}
           />
           {errors['content'] && (
-            <p className="text-red-600 mt-1 text-sm">{errors['content']}</p>
+            <p className="mt-1 text-sm font-semibold text-foreground">
+              {errors['content']}
+            </p>
           )}
           <div className="mt-1 flex items-center justify-between">
-            <p className="text-gray-500 text-sm">
+            <p className="text-sm text-muted-foreground">
               {formData.content.length}/1000 characters
             </p>
             {formData.content.length >= 10 && (
-              <div className="text-blue-600 flex items-center space-x-1 text-xs">
-                <div className="bg-blue-600 h-2 w-2 animate-pulse rounded-full"></div>
+              <div className="flex items-center space-x-1 text-xs text-foreground">
+                <div className="h-2 w-2 animate-pulse rounded-none bg-primary"></div>
                 <span>Live analysis active</span>
               </div>
             )}
@@ -285,11 +289,11 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
       </div>
 
       {/* Example Content Suggestions */}
-      <div className="bg-blue-50 border-blue-200 rounded-lg border p-4">
-        <h5 className="text-blue-900 mb-2 font-medium">
+      <div className="rounded-none border border-input bg-secondary p-4">
+        <h5 className="mb-2 font-medium text-foreground">
           Example Content Types:
         </h5>
-        <ul className="text-blue-800 space-y-1 text-sm">
+        <ul className="space-y-1 text-sm text-foreground">
           <li>• Therapist-client dialogue with potential bias patterns</li>
           <li>• Treatment recommendations that may show demographic bias</li>
           <li>
@@ -306,7 +310,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
         <button
           type="submit"
           disabled={disabled || !formData.content.trim()}
-          className="bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:bg-gray-400 rounded-md px-6 py-2 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed"
+          className="rounded-none bg-primary px-6 py-2 font-medium text-primary-foreground transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-35"
         >
           {disabled ? 'Analyzing...' : 'Analyze for Bias'}
         </button>
@@ -314,10 +318,10 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
 
       {/* Character Count Warning */}
       {formData.content.length > 800 && (
-        <div className="bg-yellow-50 border-yellow-200 rounded-lg border p-3">
+        <div className="rounded-none border border-ring bg-secondary p-3">
           <div className="flex">
             <svg
-              className="text-yellow-400 mr-2 h-5 w-5"
+              className="mr-2 h-5 w-5 text-foreground"
               viewBox="0 0 20 20"
               fill="currentColor"
               aria-hidden="true"
@@ -329,10 +333,10 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
               />
             </svg>
             <div>
-              <h4 className="text-yellow-800 text-sm font-medium">
+              <h4 className="text-sm font-medium text-foreground">
                 Long Content Notice
               </h4>
-              <p className="text-yellow-700 mt-1 text-sm">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Very long content may take longer to analyze and could affect
                 accuracy.
               </p>

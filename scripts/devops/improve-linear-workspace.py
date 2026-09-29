@@ -13,6 +13,7 @@ import logging
 import os
 import sys
 from dataclasses import dataclass
+from typing import Any, TypedDict
 
 sys.path.insert(0, os.getcwd())
 from scripts.task_sync.provider_bridge import _extract_graphql_payload, _linear_graphql_query
@@ -65,13 +66,28 @@ class IssueSpec:
     parent_id: str | None = None
 
 
+class EpicDef(TypedDict):
+    name: str
+    project: str
+    priority: int
+    desc: str
+
+
+class TicketDef(TypedDict):
+    title: str
+    project: str
+    state: str
+    priority: int
+    desc: str
+
+
 def create_issue(spec: IssueSpec) -> str | None:
     """Create a Linear issue and return its UUID."""
     if DRY_RUN:
         logging.info("[DRY RUN] Would create: '%s'", spec.title)
         return "dry-run-uuid"
 
-    inp: dict = {
+    inp: dict[str, str | int] = {
         "teamId": TEAM_ID,
         "projectId": spec.project_id,
         "title": spec.title,
@@ -92,14 +108,15 @@ def create_issue(spec: IssueSpec) -> str | None:
         if created.get("success"):
             issue = created.get("issue", {})
             logging.info("  \u2705 Created %s: %s", issue.get("identifier"), spec.title)
-            return issue.get("id")
+            issue_id: str | None = issue.get("id")
+            return issue_id
         logging.error("  \u274c Failed to create: %s -- %s", spec.title, created)
     except Exception as e:
         logging.error("  \u274c Error creating '%s': %s", spec.title, e)
     return None
 
 
-def update_issue(uuid: str, identifier: str, **fields) -> bool:
+def update_issue(uuid: str, identifier: str, **fields: str | int) -> bool:
     """Update a Linear issue."""
     if DRY_RUN:
         logging.info("[DRY RUN] Would update %s: %s", identifier, fields)
@@ -109,7 +126,7 @@ def update_issue(uuid: str, identifier: str, **fields) -> bool:
     try:
         res = _linear_graphql_query(mutation, {"id": uuid, "input": fields})
         data = _extract_graphql_payload(res)
-        ok = data.get("issueUpdate", {}).get("success", False)
+        ok: bool = data.get("issueUpdate", {}).get("success", False)
         if ok:
             logging.info("  ✅ Updated %s", identifier)
         else:
@@ -138,10 +155,11 @@ def add_relation(issue_id: str, related_id: str, rel_type: str = "blocks") -> No
         logging.error("  ❌ Relation error: %s", e)
 
 
-def get_issue_uuid(identifier: str, issues: list) -> str | None:
+def get_issue_uuid(identifier: str, issues: list[dict[str, Any]]) -> str | None:
     for i in issues:
         if i.get("identifier") == identifier:
-            return i.get("id")
+            issue_id: str | None = i.get("id")
+            return issue_id
     return None
 
 
@@ -163,7 +181,7 @@ logging.info("\n" + "═" * 60)
 logging.info("STEP 1: Creating Epic parent issues")
 logging.info("═" * 60)
 
-epics_to_create = [
+epics_to_create: list[EpicDef] = [
     {
         "name": "EPIC: Clinical Validity Enhancement Pipeline",
         "project": "training",
@@ -324,7 +342,7 @@ logging.info("\n" + "═" * 60)
 logging.info("STEP 2: Creating missing technical tickets")
 logging.info("═" * 60)
 
-new_tickets = [
+new_tickets: list[TicketDef] = [
     # Clinical Validity tickets
     {
         "title": "Build clinical validity scorer for SDG pipeline",

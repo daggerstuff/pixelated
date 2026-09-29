@@ -67,11 +67,14 @@ export default function SearchFilters({
   )
 
   return (
-    <div className="bg-slate-800 border-slate-700 rounded-lg border p-6 text-left shadow-xl">
+    <div className="rounded-none border border-border bg-secondary p-6 text-left">
       <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-white text-xl font-bold">Advanced Filters</h3>
+        <h3 className="text-xl font-bold text-foreground">Advanced Filters</h3>
         {onClose && (
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground"
+          >
             <span className="sr-only">Close</span>✕
           </button>
         )}
@@ -80,7 +83,7 @@ export default function SearchFilters({
       <div className="space-y-6">
         {/* Year Range */}
         <div>
-          <label className="text-slate-300 mb-2 block text-sm font-medium">
+          <label className="mb-2 block text-sm font-medium text-foreground">
             Year Range
           </label>
           <div className="flex items-center gap-4">
@@ -90,7 +93,7 @@ export default function SearchFilters({
               max="2026"
               placeholder="From"
               aria-label="Year From"
-              className="bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1"
+              className="w-full rounded border border-border bg-background px-3 py-2 text-foreground outline-none focus:ring-1 focus:ring-ring"
               value={localFilters.yearFrom ?? ''}
               onChange={(e) =>
                 setLocalFilters({
@@ -101,14 +104,14 @@ export default function SearchFilters({
                 })
               }
             />
-            <span className="text-slate-500">-</span>
+            <span className="text-muted-foreground">-</span>
             <input
               type="number"
               min="1900"
               max="2026"
               placeholder="To"
               aria-label="Year To"
-              className="bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1"
+              className="w-full rounded border border-border bg-background px-3 py-2 text-foreground outline-none focus:ring-1 focus:ring-ring"
               value={localFilters.yearTo ?? ''}
               onChange={(e) =>
                 setLocalFilters({
@@ -125,11 +128,11 @@ export default function SearchFilters({
           <div className="mb-2 flex justify-between">
             <label
               htmlFor="min-relevance"
-              className="text-slate-300 block text-sm font-medium"
+              className="block text-sm font-medium text-foreground"
             >
               Min Relevance Score
             </label>
-            <span className="text-pink-400 font-mono text-sm">
+            <span className="font-mono text-sm text-foreground">
               {localFilters.minRelevance.toFixed(1)}
             </span>
           </div>
@@ -139,7 +142,7 @@ export default function SearchFilters({
             min="0"
             max="1"
             step="0.1"
-            className="bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg"
+            className="h-2 w-full cursor-pointer appearance-none rounded-none bg-secondary accent-primary"
             value={localFilters.minRelevance}
             onChange={(e) =>
               setLocalFilters({
@@ -152,7 +155,7 @@ export default function SearchFilters({
 
         {/* Topics */}
         <div>
-          <label className="text-slate-300 mb-3 block text-sm font-medium">
+          <label className="mb-3 block text-sm font-medium text-foreground">
             Therapeutic Topics
           </label>
           <div className="flex flex-wrap gap-2">
@@ -163,10 +166,10 @@ export default function SearchFilters({
                   key={topic}
                   onClick={() => toggleTopic(topic)}
                   aria-pressed={isSelected}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                  className={`rounded-none border px-3 py-1 text-xs font-medium transition-colors ${
                     isSelected
-                      ? 'bg-pink-600/20 text-pink-300 border-pink-600'
-                      : 'bg-slate-700/50 text-slate-400 border-transparent hover:bg-slate-700'
+                      ? 'border-ring bg-secondary font-semibold text-foreground'
+                      : 'border-transparent bg-secondary text-muted-foreground hover:bg-secondary'
                   }`}
                 >
                   {topic}
@@ -180,13 +183,13 @@ export default function SearchFilters({
         <div>
           <label
             htmlFor="sort-by"
-            className="text-slate-300 mb-2 block text-sm font-medium"
+            className="mb-2 block text-sm font-medium text-foreground"
           >
             Sort By
           </label>
           <select
             id="sort-by"
-            className="bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1"
+            className="w-full rounded border border-border bg-background px-3 py-2 text-foreground outline-none focus:ring-1 focus:ring-ring"
             value={localFilters.sortBy}
             onChange={(e) =>
               setLocalFilters({ ...localFilters, sortBy: e.target.value })
@@ -199,16 +202,16 @@ export default function SearchFilters({
         </div>
 
         {/* Actions */}
-        <div className="border-slate-700 flex gap-3 border-t pt-4">
+        <div className="flex gap-3 border-t border-border pt-4">
           <button
             onClick={handleApply}
-            className="bg-pink-600 hover:bg-pink-700 text-white flex-1 rounded py-2 font-medium transition-colors"
+            className="flex-1 rounded bg-primary py-2 font-medium text-foreground transition-colors hover:bg-accent"
           >
             Apply Filters
           </button>
           <button
             onClick={handleReset}
-            className="border-slate-600 text-slate-300 hover:bg-slate-700 rounded border px-4 py-2 transition-colors"
+            className="rounded border border-input px-4 py-2 text-foreground transition-colors hover:bg-secondary"
           >
             Reset
           </button>

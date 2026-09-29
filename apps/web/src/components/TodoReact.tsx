@@ -52,9 +52,7 @@ const loadTodos = (initialTodos: TodoItem[]): TodoItem[] => {
 }
 
 export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
-  const [todos, setTodos] = useState<TodoItem[]>(() =>
-    loadTodos(initialTodos),
-  )
+  const [todos, setTodos] = useState<TodoItem[]>(() => loadTodos(initialTodos))
   const [inputValue, setInputValue] = useState('')
 
   useEffect(() => {

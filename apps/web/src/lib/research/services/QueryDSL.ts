@@ -90,7 +90,11 @@ export function dslToSQL(dsl: QueryDSL): string {
     if (!ALLOWED_AGG_FUNCTIONS.has(agg.function)) {
       throw new Error(`Disallowed aggregation function: ${agg.function}`)
     }
-    validateFieldName(agg.field)
+    // `COUNT(*)` is standard SQL and carries no identifier-injection risk
+    // (the aggregate function itself is validated above).
+    if (!(agg.function === 'count' && agg.field === '*')) {
+      validateFieldName(agg.field)
+    }
     const alias = agg.alias
       ? validateIdentifier(agg.alias, 'alias')
       : `${agg.function}_${agg.field}`

@@ -1,6 +1,12 @@
 /* @vitest-environment node */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+// This file lazy-imports the full security facade per test (vi.resetModules in
+// beforeEach forces a fresh module graph each time). Under full-suite load the
+// first import can exceed the 5s default; allow headroom so the suite is not
+// order/parallelism flaky.
+vi.setConfig({ testTimeout: 20_000 })
+
 // Mock getRandomBytes: real impl only checks window.crypto (undefined in Node);
 // use globalThis.crypto.getRandomValues instead (available in Node 19+).
 vi.mock('../utils', async () => {

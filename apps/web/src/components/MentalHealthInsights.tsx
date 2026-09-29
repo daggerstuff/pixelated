@@ -23,14 +23,14 @@ const getRiskIconComponent = (
 ): React.ReactElement => {
   switch (riskLevel) {
     case 'critical':
-      return <Zap className="text-red-600 h-4 w-4 animate-pulse" />
+      return <Zap className="h-4 w-4 animate-pulse text-foreground" />
     case 'high':
-      return <AlertTriangle className="text-red-500 h-4 w-4" />
+      return <AlertTriangle className="h-4 w-4 text-foreground" />
     case 'medium':
-      return <Shield className="text-yellow-500 h-4 w-4" />
+      return <Shield className="h-4 w-4 text-muted-foreground" />
     case 'low':
     default:
-      return <Heart className="text-green-500 h-4 w-4" />
+      return <Heart className="h-4 w-4 text-muted-foreground" />
   }
 }
 
@@ -51,7 +51,7 @@ export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {getRiskIcon()}
-          <span className="text-green-300 text-sm font-medium">
+          <span className="text-sm font-medium text-foreground">
             Risk Assessment
           </span>
         </div>
@@ -61,23 +61,23 @@ export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
       </div>
 
       {/* Analysis Summary */}
-      <div className="bg-green-900/20 rounded-lg p-3">
+      <div className="rounded-none bg-secondary p-3">
         <div className="mb-2 flex items-center gap-2">
-          <Brain className="text-green-400 h-4 w-4" />
-          <span className="text-green-300 text-sm font-medium">Analysis</span>
+          <Brain className="h-4 w-4 text-foreground" />
+          <span className="text-sm font-medium text-foreground">Analysis</span>
         </div>
-        <p className="text-green-200 mb-2 text-xs">{analysis.explanation}</p>
-        <p className="text-green-300 text-xs">
+        <p className="mb-2 text-xs text-foreground">{analysis.explanation}</p>
+        <p className="text-xs text-muted-foreground">
           Confidence: {Math.round(analysis.confidence * 100)}%
         </p>
       </div>
 
       {/* Emotions Detection */}
       {analysis.emotions && analysis.emotions.length > 0 && (
-        <div className="bg-blue-900/20 rounded-lg p-3">
+        <div className="rounded-none bg-secondary p-3">
           <div className="mb-2 flex items-center gap-2">
-            <Heart className="text-blue-400 h-4 w-4" />
-            <span className="text-blue-300 text-sm font-medium">
+            <Heart className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">
               Detected Emotions
             </span>
           </div>
@@ -86,7 +86,7 @@ export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
               <Badge
                 key={emotion}
                 variant="outline"
-                className="border-blue-400 text-blue-300 text-xs"
+                className="border-input text-xs text-foreground"
               >
                 {emotion}
               </Badge>
@@ -97,17 +97,17 @@ export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
 
       {/* Risk Factors */}
       {analysis.riskFactors && analysis.riskFactors.length > 0 && (
-        <div className="bg-yellow-900/20 rounded-lg p-3">
+        <div className="rounded-none bg-secondary p-3">
           <div className="mb-2 flex items-center gap-2">
-            <AlertTriangle className="text-yellow-400 h-4 w-4" />
-            <span className="text-yellow-300 text-sm font-medium">
+            <AlertTriangle className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">
               Risk Factors
             </span>
           </div>
-          <ul className="text-yellow-200 space-y-1 text-xs">
+          <ul className="space-y-1 text-xs text-muted-foreground">
             {analysis.riskFactors.map((factor) => (
               <li key={factor} className="flex items-start gap-1">
-                <span className="text-yellow-400">•</span>
+                <span className="text-muted-foreground">•</span>
                 {factor}
               </li>
             ))}
@@ -117,17 +117,17 @@ export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
 
       {/* Supporting Evidence */}
       {analysis.supportingEvidence.length > 0 && (
-        <div className="bg-purple-900/20 rounded-lg p-3">
+        <div className="rounded-none bg-secondary p-3">
           <div className="mb-2 flex items-center gap-2">
-            <Zap className="text-purple-400 h-4 w-4" />
-            <span className="text-purple-300 text-sm font-medium">
+            <Zap className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">
               Supporting Evidence
             </span>
           </div>
-          <ul className="text-purple-200 space-y-1 text-xs">
+          <ul className="space-y-1 text-xs text-muted-foreground">
             {analysis.supportingEvidence.map((evidence) => (
               <li key={evidence} className="flex items-start gap-1">
-                <span className="text-purple-400">•</span>
+                <span className="text-muted-foreground">•</span>
                 {evidence}
               </li>
             ))}
@@ -137,21 +137,21 @@ export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
 
       {/* Expert Guidance Indicator */}
       {analysis.expertGuided && (
-        <div className="bg-red-900/20 border-red-500/30 rounded-lg border p-3">
+        <div className="rounded-none border border-ring bg-secondary p-3">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="text-red-400 h-4 w-4" />
-            <span className="text-red-300 text-sm font-medium">
+            <AlertTriangle className="h-4 w-4 text-foreground" />
+            <span className="text-sm font-medium text-foreground">
               Expert Guidance Recommended
             </span>
           </div>
-          <p className="text-red-200 mt-1 text-xs">
+          <p className="mt-1 text-xs text-muted-foreground">
             This case may require professional mental health intervention.
           </p>
         </div>
       )}
 
       {/* Metadata */}
-      <div className="text-gray-400 border-green-700/30 border-t pt-2 text-xs">
+      <div className="border-t border-border pt-2 text-xs text-muted-foreground">
         <div className="flex justify-between">
           <span>Category: {analysis.category}</span>
           <span>{new Date(analysis.timestamp).toLocaleTimeString()}</span>
@@ -160,5 +160,3 @@ export const MentalHealthInsights: FC<MentalHealthInsightsProps> = ({
     </div>
   )
 }
-
-export default MentalHealthInsights

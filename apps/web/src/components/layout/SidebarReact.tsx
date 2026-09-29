@@ -26,7 +26,7 @@ const styles = {
     width: '100%',
     alignItems: 'center',
     padding: '8px 12px',
-    fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+    fontFamily: '"IBM Plex Mono", ui-monospace, monospace',
     fontSize: '0.6875rem',
     letterSpacing: '0.04em',
     textTransform: 'uppercase' as const,
@@ -40,7 +40,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     padding: '8px 12px',
-    fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+    fontFamily: '"IBM Plex Mono", ui-monospace, monospace',
     fontSize: '0.75rem',
     letterSpacing: '0.04em',
     textTransform: 'uppercase' as const,
@@ -61,7 +61,7 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     padding: '6px 12px',
-    fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+    fontFamily: '"IBM Plex Mono", ui-monospace, monospace',
     fontSize: '0.6875rem',
     letterSpacing: '0.03em',
     textTransform: 'uppercase' as const,
@@ -79,7 +79,7 @@ const styles = {
     justifyContent: 'center',
     width: '18px',
     height: '18px',
-    fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+    fontFamily: '"IBM Plex Mono", ui-monospace, monospace',
     fontSize: '0.625rem',
     color: 'var(--np-bg)',
     background: 'var(--np-text)',
@@ -101,7 +101,9 @@ const styles = {
 }
 
 export function Sidebar() {
-  const [pathname] = useState<string>(() => window.location.pathname)
+  const [pathname] = useState<string>(() =>
+    typeof window === 'undefined' ? '' : window.location.pathname,
+  )
 
   const isDashboardPage =
     pathname.startsWith('/dashboard') ||
@@ -504,7 +506,7 @@ export function Sidebar() {
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+              fontFamily: '"IBM Plex Mono", ui-monospace, monospace',
               fontSize: '0.75rem',
               letterSpacing: '0.04em',
               textTransform: 'uppercase' as const,

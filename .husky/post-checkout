@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Version-controlled post-checkout entry point (husky).
+#
+# Auto-syncs pnpm/uv lockfiles after a checkout via the shared template at
+# scripts/devops/hooks/templates/post-sync.tmpl.
+exec bash scripts/devops/hooks/templates/post-sync.tmpl

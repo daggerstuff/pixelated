@@ -212,7 +212,9 @@ paths:
     patch:
       tags: [Patients]
       summary: Update a patient
-      description: Update an existing patient resource by ID. Supports partial updates via PATCH.
+      description:
+        Update an existing patient resource by ID. Supports partial updates via
+        PATCH.
       operationId: updatePatient
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -259,7 +261,9 @@ paths:
     get:
       tags: [Encounters]
       summary: Search encounters
-      description: Search for encounter resources with optional filtering by date range and practitioner.
+      description:
+        Search for encounter resources with optional filtering by date range and
+        practitioner.
       operationId: searchEncounters
       parameters:
         - name: patient
@@ -270,7 +274,9 @@ paths:
           example: 'patient-001'
         - name: status
           in: query
-          description: Encounter status (planned|arrived|triaged|in-progress|finished|cancelled)
+          description:
+            Encounter status
+            (planned|arrived|triaged|in-progress|finished|cancelled)
           schema:
             type: string
             enum: [planned, arrived, triaged, in-progress, finished, cancelled]
@@ -321,7 +327,9 @@ paths:
     post:
       tags: [Encounters]
       summary: Create an encounter
-      description: Create a new encounter resource linking a patient, practitioner, and period.
+      description:
+        Create a new encounter resource linking a patient, practitioner, and
+        period.
       operationId: createEncounter
       requestBody:
         required: true
@@ -359,7 +367,8 @@ paths:
     get:
       tags: [Encounters]
       summary: Get an encounter by ID
-      description: Retrieve a single encounter resource by its unique identifier.
+      description:
+        Retrieve a single encounter resource by its unique identifier.
       operationId: getEncounter
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -375,7 +384,9 @@ paths:
     patch:
       tags: [Encounters]
       summary: Update an encounter
-      description: Update an existing encounter resource by ID. Supports partial updates via PATCH.
+      description:
+        Update an existing encounter resource by ID. Supports partial updates
+        via PATCH.
       operationId: updateEncounter
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -402,7 +413,8 @@ paths:
     get:
       tags: [Observations]
       summary: Search observations
-      description: Requires at least one filter parameter (patient, encounter, or code)
+      description:
+        Requires at least one filter parameter (patient, encounter, or code)
       operationId: searchObservations
       parameters:
         - name: patient
@@ -530,7 +542,8 @@ paths:
     get:
       tags: [Observations]
       summary: Get an observation by ID
-      description: Retrieve a single observation resource by its unique identifier.
+      description:
+        Retrieve a single observation resource by its unique identifier.
       operationId: getObservation
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -546,7 +559,9 @@ paths:
     patch:
       tags: [Observations]
       summary: Update an observation
-      description: Update an existing observation resource by ID. Supports partial updates via PATCH.
+      description:
+        Update an existing observation resource by ID. Supports partial updates
+        via PATCH.
       operationId: updateObservation
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -573,7 +588,9 @@ paths:
     get:
       tags: [Notes]
       summary: List clinical note templates
-      description: List available clinical note templates for the authenticated practitioner.
+      description:
+        List available clinical note templates for the authenticated
+        practitioner.
       operationId: listNoteTemplates
       parameters:
         - name: modality
@@ -602,7 +619,8 @@ paths:
     post:
       tags: [Notes]
       summary: Create a clinical note
-      description: Create a new clinical note from a template for a patient encounter.
+      description:
+        Create a new clinical note from a template for a patient encounter.
       operationId: createNote
       requestBody:
         required: true
@@ -628,7 +646,8 @@ paths:
     post:
       tags: [Notes]
       summary: Sign a clinical note
-      description: Electronically sign a clinical note, locking it from further edits
+      description:
+        Electronically sign a clinical note, locking it from further edits
       operationId: signNote
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -651,7 +670,9 @@ paths:
     get:
       tags: [Analytics]
       summary: Get analytics data
-      description: Retrieve analytics data with optional filtering by metric type and date range.
+      description:
+        Retrieve analytics data with optional filtering by metric type and date
+        range.
       operationId: getAnalytics
       parameters:
         - name: type
@@ -707,7 +728,8 @@ paths:
     get:
       tags: [Analytics]
       summary: List saved analytics views
-      description: List all saved analytics view configurations for the authenticated user.
+      description:
+        List all saved analytics view configurations for the authenticated user.
       operationId: listSavedViews
       responses:
         '200':
@@ -786,7 +808,8 @@ paths:
     put:
       tags: [Analytics]
       summary: Set a saved view as default
-      description: Set a saved analytics view as the default for the authenticated user.
+      description:
+        Set a saved analytics view as the default for the authenticated user.
       operationId: setDefaultView
       parameters:
         - name: id
@@ -865,7 +888,8 @@ paths:
     get:
       tags: [Outcomes]
       summary: List outcome measures
-      description: List outcome measures with optional filtering by patient and date range.
+      description:
+        List outcome measures with optional filtering by patient and date range.
       operationId: listOutcomeMeasures
       responses:
         '200':
@@ -914,7 +938,9 @@ paths:
     get:
       tags: [Outcomes]
       summary: Get outcome alerts for a patient
-      description: Retrieve outcome alerts for a specific patient based on threshold breaches.
+      description:
+        Retrieve outcome alerts for a specific patient based on threshold
+        breaches.
       operationId: getOutcomeAlerts
       parameters:
         - name: patient
@@ -945,7 +971,8 @@ paths:
     get:
       tags: [Outcomes]
       summary: Get outcome configuration for a patient
-      description: Retrieve outcome measurement configuration for a specific patient.
+      description:
+        Retrieve outcome measurement configuration for a specific patient.
       operationId: getOutcomeConfig
       parameters:
         - name: patient
@@ -972,7 +999,8 @@ paths:
     post:
       tags: [Outcomes]
       summary: Update outcome configuration for a patient
-      description: Update outcome measurement configuration for a specific patient.
+      description:
+        Update outcome measurement configuration for a specific patient.
       operationId: updateOutcomeConfig
       parameters:
         - name: patient
@@ -1007,7 +1035,8 @@ paths:
     get:
       tags: [Outcomes]
       summary: Get outcome trending data for a patient
-      description: Retrieve outcome trending data for a specific patient over time.
+      description:
+        Retrieve outcome trending data for a specific patient over time.
       operationId: getOutcomeTrending
       parameters:
         - name: patient
@@ -1042,7 +1071,9 @@ paths:
     get:
       tags: [Appointments]
       summary: Search appointments
-      description: Search for appointment resources with optional filtering by date range, practitioner, and upcoming status.
+      description:
+        Search for appointment resources with optional filtering by date range,
+        practitioner, and upcoming status.
       operationId: searchAppointments
       parameters:
         - name: patient
@@ -1101,7 +1132,8 @@ paths:
     post:
       tags: [Appointments]
       summary: Create an appointment
-      description: Create a new appointment resource linking a patient and practitioner.
+      description:
+        Create a new appointment resource linking a patient and practitioner.
       operationId: createAppointment
       requestBody:
         required: true
@@ -1123,7 +1155,8 @@ paths:
     get:
       tags: [Appointments]
       summary: Get an appointment by ID
-      description: Retrieve a single appointment resource by its unique identifier.
+      description:
+        Retrieve a single appointment resource by its unique identifier.
       operationId: getAppointment
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -1139,7 +1172,9 @@ paths:
     patch:
       tags: [Appointments]
       summary: Update an appointment
-      description: Update an existing appointment resource by ID. Supports partial updates via PATCH.
+      description:
+        Update an existing appointment resource by ID. Supports partial updates
+        via PATCH.
       operationId: updateAppointment
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -1166,7 +1201,8 @@ paths:
     get:
       tags: [Claims]
       summary: Get claim reference data
-      description: Returns available claim statuses and use types (static reference data)
+      description:
+        Returns available claim statuses and use types (static reference data)
       operationId: getClaimReferenceData
       responses:
         '200':
@@ -1243,7 +1279,9 @@ paths:
     patch:
       tags: [Claims]
       summary: Update a claim
-      description: Update an existing claim resource by ID. Supports partial updates via PATCH.
+      description:
+        Update an existing claim resource by ID. Supports partial updates via
+        PATCH.
       operationId: updateClaim
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -1268,7 +1306,10 @@ paths:
     get:
       tags: [Consents]
       summary: Verify consent for a patient
-      description: Verifies whether a patient has consent at the specified minimum level. This is a consent verification operation, not a FHIR Consent resource search.
+      description:
+        Verifies whether a patient has consent at the specified minimum level.
+        This is a consent verification operation, not a FHIR Consent resource
+        search.
       operationId: verifyConsent
       parameters:
         - name: patientId
@@ -1282,12 +1323,15 @@ paths:
           schema:
             type: string
             default: general
-          description: Minimum consent level required (e.g. general, mental_health, substance_abuse)
+          description:
+            Minimum consent level required (e.g. general, mental_health,
+            substance_abuse)
         - name: stateCode
           in: query
           schema:
             type: string
-          description: Optional state code for jurisdiction-specific consent rules
+          description:
+            Optional state code for jurisdiction-specific consent rules
         - name: treatmentCategory
           in: query
           schema:
@@ -1309,7 +1353,9 @@ paths:
     post:
       tags: [Consents]
       summary: Check consent for a patient
-      description: Verifies consent for a specific patient and minimum consent level. This is a consent verification operation, not a FHIR Consent resource create.
+      description:
+        Verifies consent for a specific patient and minimum consent level. This
+        is a consent verification operation, not a FHIR Consent resource create.
       operationId: checkConsent
       requestBody:
         required: true
@@ -1331,7 +1377,10 @@ paths:
     get:
       tags: [Consents]
       summary: Verify consent for a patient by ID
-      description: Verifies consent for the patient identified by the path parameter (id = patientId). This is a consent verification operation, not a FHIR Consent resource read.
+      description:
+        Verifies consent for the patient identified by the path parameter (id =
+        patientId). This is a consent verification operation, not a FHIR Consent
+        resource read.
       operationId: verifyConsentById
       parameters:
         - name: id
@@ -2103,10 +2152,13 @@ components:
           description: Patient ID to verify consent for
         minimumLevel:
           type: string
-          description: Minimum consent level required (e.g. general, mental_health, substance_abuse)
+          description:
+            Minimum consent level required (e.g. general, mental_health,
+            substance_abuse)
         stateCode:
           type: string
-          description: Optional state code for jurisdiction-specific consent rules
+          description:
+            Optional state code for jurisdiction-specific consent rules
         treatmentCategory:
           type: string
           description: Optional treatment category filter
@@ -2120,7 +2172,8 @@ components:
           properties:
             verified:
               type: boolean
-              description: Whether consent is sufficient for the requested operation
+              description:
+                Whether consent is sufficient for the requested operation
             consentLevel:
               type: string
               enum: [none, minimal, limited, full]
@@ -2145,16 +2198,23 @@ components:
         overrideConsentLevel:
           type: string
           enum: [none, minimal, limited, full]
-          description: Optional elevated consent level that overrides the minimum for specific operations
+          description:
+            Optional elevated consent level that overrides the minimum for
+            specific operations
         requiresMentalHealthConsent:
           type: boolean
-          description: Whether mental health treatment requires separate or explicit consent
+          description:
+            Whether mental health treatment requires separate or explicit
+            consent
         requiresSUDConsent:
           type: boolean
-          description: Whether substance use disorder treatment requires separate consent
+          description:
+            Whether substance use disorder treatment requires separate consent
         requiresMinorParentalConsent:
           type: boolean
           description: Whether minors need parental consent
         ageOfMajority:
           type: integer
-          description: The age at which a patient is considered an adult for consent purposes
+          description:
+            The age at which a patient is considered an adult for consent
+            purposes

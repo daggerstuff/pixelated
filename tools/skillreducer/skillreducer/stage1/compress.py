@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import re
+from typing import TYPE_CHECKING
 
-from skillreducer.llm.client import LLMClient
 from skillreducer.llm import prompts
+from skillreducer.llm.client import LLMClient
 from skillreducer.models import Skill
 from skillreducer.stage1.ddmin import ddmin
 from skillreducer.stage1.oracle import (
@@ -16,6 +17,9 @@ from skillreducer.stage1.oracle import (
 from skillreducer.stage1.prompts import POLISH_DESCRIPTION_PROMPT
 from skillreducer.stage1.segment import segment_description
 
+if TYPE_CHECKING:
+    from skillreducer.config import Config
+
 
 def compress_description(
     description: str,
@@ -25,7 +29,7 @@ def compress_description(
     oracle_ctx: Stage1Oracle | None = None,
     skill_library: list[Skill] | None = None,
     max_restore_steps: int = 3,
-    config=None,
+    config: Config | None = None,
 ) -> tuple[str, list[str]]:
     """Compress a verbose routing description using Stage 1 Phase 1 + Phase 2.
 
@@ -61,7 +65,8 @@ def compress_description(
             return _heuristic_oracle_pass(candidate_desc, original)
         if len(ctx.candidate_pool(candidate_desc)) < 2:
             return _heuristic_oracle_pass(candidate_desc, original)
-        return simulated_oracle(candidate_desc, ctx, llm)
+        passed: bool = simulated_oracle(candidate_desc, ctx, llm)
+        return passed
 
     minimal = ddmin(clauses, oracle)
     deleted = [c for c in clauses if c not in minimal]
@@ -124,7 +129,7 @@ def polish_description(description: str, llm: LLMClient | None) -> str:
     """
     text = _join_clauses([description]) if "\n" not in description else description.strip()
     if llm and llm.enabled:
-        polished = llm.complete(POLISH_DESCRIPTION_PROMPT.format(description=text)).strip()
+        polished: str = llm.complete(POLISH_DESCRIPTION_PROMPT.format(description=text)).strip()
         if polished:
             return polished
     return _join_clauses([text])
@@ -170,14 +175,17 @@ def _passes_oracle(
 ) -> bool:
     """Run simulated oracle; Phase 2 uses Q_val baseline queries."""
     queries = oracle_ctx.q_val if phase2 and oracle_ctx.q_val else None
-    return simulated_oracle(description, oracle_ctx, llm, queries=queries)
+    passed: bool = simulated_oracle(description, oracle_ctx, llm, queries=queries)
+    return passed
 
 
 def _paraphrase_clause(clause: str, llm: LLMClient | None) -> str:
     """Rewrite one routing clause to a shorter form (Stage 1 Phase 1)."""
     if llm and llm.enabled:
         return llm.complete(prompts.PARAPHRASE_CLAUSE.format(clause=clause)).strip() or clause
-    return re.sub(r"\b(use when the user mentions|use when)\b", "Use when", clause, flags=re.I)
+    return re.sub(
+        r"\b(use when the user mentions|use when)\b", "Use when", clause, flags=re.IGNORECASE
+    )
 
 
 def _join_clauses(clauses: list[str]) -> str:

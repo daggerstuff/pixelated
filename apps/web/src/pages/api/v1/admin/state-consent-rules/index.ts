@@ -1,5 +1,5 @@
-import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 import { verifyAdmin } from '@/lib/admin/middleware'
+import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 import {
   stateConsentRulesRepository,
   mapAdminRoleToEhrRole,

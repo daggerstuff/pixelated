@@ -320,7 +320,10 @@ def apply_jira_action(action: Mapping[str, Any]) -> dict[str, Any]:
     view = _object_view(action)
     if not view.target_id:
         payload = jira_create_payload(view, project_key, issue_type)
-        return _json_request("POST", f"{site_url}/rest/api/3/issue", headers=headers, payload=payload)
+        created: dict[str, Any] = _json_request(
+            "POST", f"{site_url}/rest/api/3/issue", headers=headers, payload=payload
+        )
+        return created
     payload = jira_update_payload(view)
     _json_request(
         "PUT",

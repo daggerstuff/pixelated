@@ -317,12 +317,10 @@ export class MarketDataService {
       // Technical score based on RSI and MACD
       let technicalScore = 0
       if (technicalData) {
-        if (technicalData.rsi < 30)
-          technicalScore += 0.3 // Oversold
+        if (technicalData.rsi < 30) technicalScore += 0.3 // Oversold
         else if (technicalData.rsi > 70) technicalScore -= 0.3 // Overbought
 
-        if (technicalData.macd > 0)
-          technicalScore += 0.2 // Positive momentum
+        if (technicalData.macd > 0) technicalScore += 0.2 // Positive momentum
         else technicalScore -= 0.2
       }
 

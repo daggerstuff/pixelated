@@ -89,157 +89,142 @@ const sanitizedDetails = details
       b b-[#8884] rounded-lg bg-white dark:bg-black
       shadow-transition-500 hover:(shadow-custom_0_3_20_-5)"
   >
-    {
-      ((images && images.length > 0) || video) && (
-        <MediaContainer
-          class="b-b b-b-[#8884] op-100!"
-          {...(MediaContainer === Link ? { href: link } : {})}
-        >
-          {images &&
-            images.length > 0 &&
-            (images.length > 1 ? (
-              <ImageCarousel
-                images={images}
-                imageProps={{
-                  width: 1200,
-                  height: 675,
-                }}
-              />
-            ) : (
-              <Image
-                class="aspect-[16/9] object-cover"
-                src={images[0]!.src}
-                alt={images[0]!.alt}
-                width={1200}
-                height={675}
-                {...imageProps}
-              />
-            ))}
-
-          {video && (
-            <video
-              class="w-full aspect-[16/9] object-cover"
-              src={video.src}
-              poster={video.thumbnail}
-              aria-label={video.alt}
-              autoplay
-              muted
-              loop
-              playsinline
-              {...videoProps}
+    {((images && images.length > 0) || video) && (
+      <MediaContainer
+        class="b-b b-b-[#8884] op-100!"
+        {...(MediaContainer === Link ? { href: link } : {})}
+      >
+        {images &&
+          images.length > 0 &&
+          (images.length > 1 ? (
+            <ImageCarousel
+              {images}
+              imageProps={{
+                width: 1200,
+                height: 675,
+              }}
             />
-          )}
-        </MediaContainer>
-      )
-    }
-    {
-      external && (
-        <Link
-          class="overflow-hidden flex flex-col b b-[#8884] rounded-lg mt-3 mx-3 op-100! shadow-transition-500 hover:(shadow-custom_0_5_15_-3)"
-          href={external.uri}
-        >
-          {!COMPACT && external.thumb && (
+          ) : (
             <Image
-              class="b-b b-b-[#8884] aspect-[1.91/1] object-cover"
-              src={external.thumb}
-              alt={external.title}
+              class="aspect-[16/9] object-cover"
+              src={images[0]!.src}
+              alt={images[0]!.alt}
               width={1200}
-              height={628}
+              height={675}
+              {...imageProps}
             />
-          )}
-          <div class="flex flex-col px-3 pt-2 pb-1">
-            <div class="flex flex-col gap-1 pb-1.5 b-b b-b-[#8884]">
-              <p class="text-sm font-600">{external.title}</p>
-              <p class="text-xs">{external.description}</p>
-            </div>
-            <div class="flex items-center gap-1 pt-1 text-[0.72rem] op-70">
-              <div u-i-lucide-globe class="size-1em" aria-hidden="true" />
-              <p>{new URL(external.uri).hostname}</p>
-            </div>
+          ))}
+
+        {video && (
+          <video
+            class="w-full aspect-[16/9] object-cover"
+            src={video.src}
+            poster={video.thumbnail}
+            aria-label={video.alt}
+            autoplay
+            muted
+            loop
+            playsinline
+            {...videoProps}
+          />
+        )}
+      </MediaContainer>
+    )}
+    {external && (
+      <Link
+        class="overflow-hidden flex flex-col b b-[#8884] rounded-lg mt-3 mx-3 op-100! shadow-transition-500 hover:(shadow-custom_0_5_15_-3)"
+        href={external.uri}
+      >
+        {!COMPACT && external.thumb && (
+          <Image
+            class="b-b b-b-[#8884] aspect-[1.91/1] object-cover"
+            src={external.thumb}
+            alt={external.title}
+            width={1200}
+            height={628}
+          />
+        )}
+        <div class="flex flex-col px-3 pt-2 pb-1">
+          <div class="flex flex-col gap-1 pb-1.5 b-b b-b-[#8884]">
+            <p class="text-sm font-600">{external.title}</p>
+            <p class="text-xs">{external.description}</p>
           </div>
-        </Link>
-      )
-    }
-    {
-      quote && (
-        <div class="overflow-hidden flex flex-col gap-2 b b-[#8884] rounded-lg p-2 mt-3 mx-3 text-sm shadow-transition-500 hover:(shadow-custom_0_5_15_-3)">
-          <div class="flex items-center gap-1">
-            <Image
-              class="size-1em rounded-full object-cover"
-              src={quote.author.avatar}
-              alt={quote.author.name}
-              inferSize
-            />
-            <p class="truncate">
-              <span class="font-600">{quote.author.name}</span>
-              <Link class="op-transition" href={quote.author.link}>
-                {`@${quote.author.handle}`}
-              </Link>
-            </p>
+          <div class="flex items-center gap-1 pt-1 text-[0.72rem] op-70">
+            <div u-i-lucide-globe class="size-1em" aria-hidden="true" />
+            <p>{new URL(external.uri).hostname}</p>
           </div>
-          <Link class="op-80!" href={quote.uri}>
-            <p class="line-height-normal">{quote.text}</p>
-          </Link>
         </div>
-      )
-    }
+      </Link>
+    )}
+    {quote && (
+      <div class="overflow-hidden flex flex-col gap-2 b b-[#8884] rounded-lg p-2 mt-3 mx-3 text-sm shadow-transition-500 hover:(shadow-custom_0_5_15_-3)">
+        <div class="flex items-center gap-1">
+          <Image
+            class="size-1em rounded-full object-cover"
+            src={quote.author.avatar}
+            alt={quote.author.name}
+            inferSize
+          />
+          <p class="truncate">
+            <span class="font-600">{quote.author.name}</span>
+            <Link class="op-transition" href={quote.author.link}>
+              {`@${quote.author.handle}`}
+            </Link>
+          </p>
+        </div>
+        <Link class="op-80!" href={quote.uri}>
+          <p class="line-height-normal">{quote.text}</p>
+        </Link>
+      </div>
+    )}
     <Content class="p-4 pb-3">
-      {
-        sanitizedHtml && (
-          <div class="prose card-item-prose" set:html={sanitizedHtml} />
-        )
-      }
+      {sanitizedHtml && (
+        <div class="prose card-item-prose" set:html={sanitizedHtml} />
+      )}
       {text && <p class="prose card-item-prose">{text}</p>}
-      {
-        sanitizedDetails && (
-          <div
-            class="card-item-details"
-            style="max-height: 0; overflow-y: clip;"
-          >
-            <ol class="relative border-s border-gray-200 dark:border-gray-700">
-              {sanitizedDetails
-                .slice(0, MAX_DETAILS + 1)
-                .map((detail: string, idx: number) => (
-                  <li class="ms-4 mb-6 last:mb-0">
-                    <div class="absolute start--1.6 w-3 h-3 border rounded-full border-white dark:border-gray-900 mt-1.5 bg-gray-200 dark:bg-gray-700" />
-                    {idx < MAX_DETAILS && (
-                      <div class="prose card-item-prose" set:html={detail} />
-                    )}
-                    {link && idx === MAX_DETAILS && (
-                      <Link class="prose card-item-prose op-100!" href={link}>
-                        View more...
-                      </Link>
-                    )}
-                  </li>
-                ))}
-            </ol>
-          </div>
-        )
-      }
-      {
-        date && (
-          <div class="flex justify-between items-center pt-3 text-sm">
-            {link ? (
-              <Link class="flex-auto op-transition" href={link}>
-                {formatDate(date, false)}
-              </Link>
-            ) : (
-              <p class="op-60">{formatDate(date, false)}</p>
-            )}
-            {sanitizedDetails && (
-              <button
-                type="button"
-                aria-expanded="false"
-                aria-label="Toggle details"
-                class="details-switch op-50 op-transition hover:op-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#888]"
-              >
-                <div u-i-lucide-chevron-down class="icon-down" />
-                <div u-i-lucide-chevron-up class="icon-up hidden" />
-              </button>
-            )}
-          </div>
-        )
-      }
+      {sanitizedDetails && (
+        <div class="card-item-details" style="max-height: 0; overflow-y: clip;">
+          <ol class="relative border-s border-gray-200 dark:border-gray-700">
+            {sanitizedDetails
+              .slice(0, MAX_DETAILS + 1)
+              .map((detail: string, idx: number) => (
+                <li class="ms-4 mb-6 last:mb-0">
+                  <div class="absolute start--1.6 w-3 h-3 border rounded-full border-white dark:border-gray-900 mt-1.5 bg-gray-200 dark:bg-gray-700" />
+                  {idx < MAX_DETAILS && (
+                    <div class="prose card-item-prose" set:html={detail} />
+                  )}
+                  {link && idx === MAX_DETAILS && (
+                    <Link class="prose card-item-prose op-100!" href={link}>
+                      View more...
+                    </Link>
+                  )}
+                </li>
+              ))}
+          </ol>
+        </div>
+      )}
+      {date && (
+        <div class="flex justify-between items-center pt-3 text-sm">
+          {link ? (
+            <Link class="flex-auto op-transition" href={link}>
+              {formatDate(date, false)}
+            </Link>
+          ) : (
+            <p class="op-60">{formatDate(date, false)}</p>
+          )}
+          {sanitizedDetails && (
+            <button
+              type="button"
+              aria-expanded="false"
+              aria-label="Toggle details"
+              class="details-switch op-50 op-transition hover:op-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#888]"
+            >
+              <div u-i-lucide-chevron-down class="icon-down" />
+              <div u-i-lucide-chevron-up class="icon-up hidden" />
+            </button>
+          )}
+        </div>
+      )}
     </Content>
   </div>
 </section>

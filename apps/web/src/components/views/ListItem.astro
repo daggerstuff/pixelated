@@ -38,37 +38,31 @@ const {
   >
     <div slot="title">{title}</div>
     <span slot="end" u-flex="~ gap-2 items-center">
-      {
-        video && (
-          <span
-            u-i-ri-film-line
-            class="flex-none op-50 align-middle"
-            title="Provided in video"
-            aria-label="Provided in video"
-          />
-        )
-      }
-      {
-        radio && (
-          <span
-            u-i-ri-radio-line
-            class="flex-none op-50 align-middle"
-            title="Provided in radio"
-            aria-label="Provided in radio"
-          />
-        )
-      }
+      {video && (
+        <span
+          u-i-ri-film-line
+          class="flex-none op-50 align-middle"
+          title="Provided in video"
+          aria-label="Provided in video"
+        />
+      )}
+      {radio && (
+        <span
+          u-i-ri-radio-line
+          class="flex-none op-50 align-middle"
+          title="Provided in radio"
+          aria-label="Provided in radio"
+        />
+      )}
       <time
         class="op-50 text-sm ws-nowrap"
         datetime={new Date(date).toISOString()}
       >
         {formatDate(date, false)}
       </time>
-      {
-        typeof minutesRead === 'number' && minutesRead > 0 && (
-          <span class="op-40 text-sm ws-nowrap">· {minutesRead} min read</span>
-        )
-      }
+      {typeof minutesRead === 'number' && minutesRead > 0 && (
+        <span class="op-40 text-sm ws-nowrap">· {minutesRead} min read</span>
+      )}
       {platform && <span class="op-40 text-sm ws-nowrap">· {platform}</span>}
     </span>
   </Link>

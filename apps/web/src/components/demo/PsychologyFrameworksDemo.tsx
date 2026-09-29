@@ -246,13 +246,13 @@ export default function PsychologyFrameworksDemo() {
   const getEvidenceBadgeColor = (level: string) => {
     switch (level.toLowerCase()) {
       case 'strong':
-        return 'bg-green-100 text-green-800 border-green-200'
+        return 'bg-secondary border border-input text-foreground'
       case 'moderate':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        return 'bg-secondary border border-ring text-foreground font-medium'
       case 'emerging':
-        return 'bg-blue-100 text-blue-800 border-blue-200'
+        return 'bg-secondary border border-input text-foreground'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-secondary border border-border text-foreground'
     }
   }
 
@@ -260,11 +260,11 @@ export default function PsychologyFrameworksDemo() {
     <div className="mx-auto w-full max-w-7xl space-y-6 p-6">
       {/* Header */}
       <div className="space-y-4 text-center">
-        <h1 className="text-gray-900 flex items-center justify-center gap-3 text-3xl font-bold">
-          <BookOpen className="text-blue-600 h-8 w-8" />
+        <h1 className="flex items-center justify-center gap-3 text-3xl font-bold text-foreground">
+          <BookOpen className="h-8 w-8 text-foreground" />
           Psychology Frameworks Browser
         </h1>
-        <p className="text-gray-600 mx-auto max-w-2xl">
+        <p className="mx-auto max-w-2xl text-muted-foreground">
           Explore evidence-based therapeutic frameworks with detailed
           information about techniques, applications, and clinical evidence.
           Perfect for training, research, and clinical practice.
@@ -272,12 +272,12 @@ export default function PsychologyFrameworksDemo() {
       </div>
 
       {/* Search and Filters */}
-      <Card className="border-gray-200">
+      <Card className="border-border">
         <CardContent className="p-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             {/* Search */}
             <div className="relative md:col-span-2">
-              <Search className="text-gray-400 absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
               <Input
                 placeholder="Search frameworks, techniques, conditions..."
                 value={searchTerm}
@@ -290,7 +290,7 @@ export default function PsychologyFrameworksDemo() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="border-gray-300 focus:ring-blue-500 focus:border-transparent rounded-md border px-3 py-2 focus:ring-2"
+              className="focus:border-transparent rounded-none border border-input px-3 py-2 focus:ring-2 focus:ring-ring"
             >
               <option value="all">All Categories</option>
               {categories.map((category) => (
@@ -304,7 +304,7 @@ export default function PsychologyFrameworksDemo() {
             <select
               value={selectedCondition}
               onChange={(e) => setSelectedCondition(e.target.value)}
-              className="border-gray-300 focus:ring-blue-500 focus:border-transparent rounded-md border px-3 py-2 focus:ring-2"
+              className="focus:border-transparent rounded-none border border-input px-3 py-2 focus:ring-2 focus:ring-ring"
             >
               <option value="all">All Conditions</option>
               {getUniqueConditions().map((condition) => (
@@ -315,7 +315,7 @@ export default function PsychologyFrameworksDemo() {
             </select>
           </div>
 
-          <div className="text-gray-600 mt-4 text-sm">
+          <div className="mt-4 text-sm text-muted-foreground">
             Showing {filteredFrameworks.length} of {frameworks.length}{' '}
             frameworks
           </div>
@@ -324,14 +324,16 @@ export default function PsychologyFrameworksDemo() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="border-blue-600 border-t-transparent h-8 w-8 animate-spin rounded-full border-4"></div>
-          <span className="text-gray-600 ml-3">Loading frameworks...</span>
+          <div className="h-8 w-8 animate-spin rounded-none border-4 border-ring border-t-ring"></div>
+          <span className="ml-3 text-muted-foreground">
+            Loading frameworks...
+          </span>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Frameworks List */}
           <div className="space-y-3 lg:col-span-1">
-            <h2 className="text-gray-900 flex items-center gap-2 text-lg font-semibold">
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
               <Brain className="h-5 w-5" />
               Frameworks ({filteredFrameworks.length})
             </h2>
@@ -340,20 +342,20 @@ export default function PsychologyFrameworksDemo() {
               {filteredFrameworks.map((framework) => (
                 <Card
                   key={framework.id}
-                  className={`cursor-pointer transition-all hover:shadow-md ${
+                  className={`cursor-pointer transition-all ${
                     selectedFramework?.id === framework.id
-                      ? 'ring-blue-500 bg-blue-50 ring-2'
-                      : 'hover:bg-gray-50'
+                      ? 'bg-secondary ring-2 ring-ring'
+                      : 'hover:bg-secondary'
                   }`}
                   onClick={() => setSelectedFramework(framework)}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="text-gray-900 text-sm font-medium">
+                        <h3 className="text-sm font-medium text-foreground">
                           {framework.name}
                         </h3>
-                        <p className="text-gray-600 mt-1 text-xs">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           {framework.category}
                         </p>
                       </div>
@@ -364,10 +366,10 @@ export default function PsychologyFrameworksDemo() {
                         >
                           {framework.evidenceLevel}
                         </Badge>
-                        <ChevronRight className="text-gray-400 h-4 w-4" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       </div>
                     </div>
-                    <p className="text-gray-600 mt-2 line-clamp-2 text-xs">
+                    <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
                       {framework.description}
                     </p>
                   </CardContent>
@@ -383,10 +385,10 @@ export default function PsychologyFrameworksDemo() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-gray-900 text-xl">
+                      <CardTitle className="text-xl text-foreground">
                         {selectedFramework.name}
                       </CardTitle>
-                      <p className="text-gray-600 mt-1">
+                      <p className="mt-1 text-muted-foreground">
                         {selectedFramework.category}
                       </p>
                     </div>
@@ -414,25 +416,25 @@ export default function PsychologyFrameworksDemo() {
 
                     <TabsContent value="overview" className="mt-6 space-y-4">
                       <div>
-                        <h4 className="text-gray-900 mb-2 font-medium">
+                        <h4 className="mb-2 font-medium text-foreground">
                           Description
                         </h4>
-                        <p className="text-gray-700">
+                        <p className="text-foreground">
                           {selectedFramework.description}
                         </p>
                       </div>
 
                       <div>
-                        <h4 className="text-gray-900 mb-2 font-medium">
+                        <h4 className="mb-2 font-medium text-foreground">
                           Key Principles
                         </h4>
                         <ul className="space-y-1">
                           {selectedFramework.keyPrinciples.map((principle) => (
                             <li
                               key={principle}
-                              className="text-gray-700 flex items-start gap-2"
+                              className="flex items-start gap-2 text-foreground"
                             >
-                              <Target className="text-blue-600 mt-0.5 h-4 w-4 flex-shrink-0" />
+                              <Target className="mt-0.5 h-4 w-4 flex-shrink-0 text-foreground" />
                               {principle}
                             </li>
                           ))}
@@ -440,7 +442,7 @@ export default function PsychologyFrameworksDemo() {
                       </div>
 
                       <div>
-                        <h4 className="text-gray-900 mb-2 font-medium">
+                        <h4 className="mb-2 font-medium text-foreground">
                           Primary Conditions
                         </h4>
                         <div className="flex flex-wrap gap-2">
@@ -459,16 +461,16 @@ export default function PsychologyFrameworksDemo() {
 
                     <TabsContent value="techniques" className="mt-6 space-y-4">
                       <div>
-                        <h4 className="text-gray-900 mb-3 font-medium">
+                        <h4 className="mb-3 font-medium text-foreground">
                           Core Techniques
                         </h4>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                           {selectedFramework.techniques.map((technique) => (
                             <div
                               key={technique}
-                              className="bg-gray-50 rounded-lg border p-3"
+                              className="rounded-none border border-border bg-secondary p-3"
                             >
-                              <div className="text-gray-900 text-sm font-medium">
+                              <div className="text-sm font-medium text-foreground">
                                 {technique}
                               </div>
                             </div>
@@ -482,18 +484,18 @@ export default function PsychologyFrameworksDemo() {
                       className="mt-6 space-y-4"
                     >
                       <div>
-                        <h4 className="text-gray-900 mb-3 font-medium">
+                        <h4 className="mb-3 font-medium text-foreground">
                           Clinical Applications
                         </h4>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                           {selectedFramework.applications.map((application) => (
                             <div
                               key={application}
-                              className="bg-blue-50 border-blue-200 rounded-lg border p-3"
+                              className="rounded-none border border-input bg-secondary p-3"
                             >
                               <div className="flex items-center gap-2">
-                                <Users className="text-blue-600 h-4 w-4" />
-                                <span className="text-blue-900 text-sm font-medium">
+                                <Users className="h-4 w-4 text-foreground" />
+                                <span className="text-sm font-medium text-foreground">
                                   {application}
                                 </span>
                               </div>
@@ -506,10 +508,10 @@ export default function PsychologyFrameworksDemo() {
                     <TabsContent value="details" className="mt-6 space-y-4">
                       {selectedFramework.developers && (
                         <div>
-                          <h4 className="text-gray-900 mb-2 font-medium">
+                          <h4 className="mb-2 font-medium text-foreground">
                             Developers
                           </h4>
-                          <p className="text-gray-700">
+                          <p className="text-foreground">
                             {selectedFramework.developers.join(', ')}
                           </p>
                         </div>
@@ -517,17 +519,17 @@ export default function PsychologyFrameworksDemo() {
 
                       {selectedFramework.yearDeveloped && (
                         <div>
-                          <h4 className="text-gray-900 mb-2 font-medium">
+                          <h4 className="mb-2 font-medium text-foreground">
                             Year Developed
                           </h4>
-                          <p className="text-gray-700">
+                          <p className="text-foreground">
                             {selectedFramework.yearDeveloped}
                           </p>
                         </div>
                       )}
 
                       <div>
-                        <h4 className="text-gray-900 mb-2 font-medium">
+                        <h4 className="mb-2 font-medium text-foreground">
                           Evidence Level
                         </h4>
                         <Badge
@@ -544,11 +546,11 @@ export default function PsychologyFrameworksDemo() {
             ) : (
               <Card className="flex h-full items-center justify-center">
                 <CardContent className="text-center">
-                  <BookOpen className="text-gray-400 mx-auto mb-4 h-16 w-16" />
-                  <h3 className="text-gray-900 mb-2 text-lg font-medium">
+                  <BookOpen className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+                  <h3 className="mb-2 text-lg font-medium text-foreground">
                     Select a Framework
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-muted-foreground">
                     Choose a therapeutic framework from the list to view
                     detailed information
                   </p>
@@ -560,7 +562,7 @@ export default function PsychologyFrameworksDemo() {
       )}
 
       {/* Quick Actions */}
-      <Card className="border-gray-200">
+      <Card className="border-border">
         <CardContent className="p-6">
           <div className="flex flex-wrap justify-center gap-4">
             <Button

@@ -7,15 +7,13 @@ import tempfile
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.responses import JSONResponse, PlainTextResponse, Response
-
 from deslop.engine import CleanOptions, apply_deslop_to_file, preview_file
-from deslop.models import CleanReport, PreviewReport, RegenReport, ScanReport, dump_json
+from deslop.models import CleanReport, PreviewReport, RegenReport, ScanReport
 from deslop.regen import OllamaClient, OpenAICompatibleClient, regen_file
-from deslop.reports import write_report
 from deslop.rules.core import DEFAULT_RULE_PACKS, RuleSet, load_rule_set
 from deslop.scanner import ScanOptions, scan_file
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.responses import JSONResponse, Response
 
 app = FastAPI(
     title="Deslop SaaS — Dataset Hygiene API",

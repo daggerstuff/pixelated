@@ -68,7 +68,7 @@ export const PixelatedAuthProvider = ({
 
   if (!domain || !clientId || !redirectUri) {
     return (
-      <section className="border-rose-300 bg-rose-50 text-rose-800 dark:bg-rose-900/25 dark:text-rose-200 rounded-lg border px-4 py-3 text-sm">
+      <section className="rounded-none border-ring bg-secondary px-4 py-3 text-sm text-foreground">
         Auth0 is not fully configured. Set PUBLIC_AUTH0_DOMAIN and
         PUBLIC_AUTH0_CLIENT_ID in your environment before using social login.
       </section>

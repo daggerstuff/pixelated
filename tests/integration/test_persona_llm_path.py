@@ -25,9 +25,43 @@ import pytest
 # ``from orchestration.…`` (expecting ``ai/`` on ``sys.path``).  Add both.
 # ---------------------------------------------------------------------------
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # pixelated/
-for _p in (_PROJECT_ROOT / "src", _PROJECT_ROOT / "ai"):
+for _p in (
+    _PROJECT_ROOT / "apps" / "web",
+    _PROJECT_ROOT / "apps" / "web" / "src",
+    _PROJECT_ROOT / "src",
+    _PROJECT_ROOT / "ai",
+):
     if str(_p) not in sys.path:
         sys.path.insert(0, str(_p))
+
+if "orchestration" not in sys.modules:
+    import ai.pipelines.model_training as _mt
+
+    sys.modules["orchestration"] = _mt
+    import ai.pipelines.model_training.celery_app as _ca
+
+    sys.modules["orchestration.celery_app"] = _ca
+    import ai.pipelines.model_training.core as _core
+
+    sys.modules["orchestration.core"] = _core
+    import ai.pipelines.model_training.core.inference as _inf
+
+    sys.modules["orchestration.core.inference"] = _inf
+    import ai.pipelines.model_training.core.state_machine as _sm
+
+    sys.modules["orchestration.core.state_machine"] = _sm
+    import ai.pipelines.model_training.safety as _safety
+
+    sys.modules["orchestration.safety"] = _safety
+    import ai.pipelines.model_training.safety.guards as _gd
+
+    sys.modules["orchestration.safety.guards"] = _gd
+    import ai.pipelines.model_training.tasks as _tasks
+
+    sys.modules["orchestration.tasks"] = _tasks
+    import ai.pipelines.model_training.tasks.simulation as _sim
+
+    sys.modules["orchestration.tasks.simulation"] = _sim
 
 
 # ---------------------------------------------------------------------------
@@ -186,7 +220,7 @@ class TestPersonaLLMChainNetworkMocked:
 
         mock_client = mocker.MagicMock()
         mock_client.chat.completions.create.return_value = fake_response
-        mocker.patch("ai.orchestration.core.inference.openai.OpenAI", return_value=mock_client)
+        mocker.patch("orchestration.core.inference.openai.OpenAI", return_value=mock_client)
 
         step1 = run_safety_input_guard(
             session_id=ROBERT_CHEN["session_id"],
@@ -209,7 +243,7 @@ class TestPersonaLLMChainNetworkMocked:
 
         mock_client = mocker.MagicMock()
         mock_client.chat.completions.create.side_effect = RuntimeError("Simulated network error")
-        mocker.patch("ai.orchestration.core.inference.openai.OpenAI", return_value=mock_client)
+        mocker.patch("orchestration.core.inference.openai.OpenAI", return_value=mock_client)
 
         step1 = run_safety_input_guard(
             session_id=ROBERT_CHEN["session_id"],

@@ -24,14 +24,12 @@ const { sessionId } = Astro.params
       </a>
     </div>
 
-    {
-      sessionId ? (
-        <LazySessionDetailPage client:load sessionId={sessionId} />
-      ) : (
-        <div class="text-center py-8 text-muted-foreground">
-          <p>Session ID is required</p>
-        </div>
-      )
-    }
+    {sessionId ? (
+      <LazySessionDetailPage client:load {sessionId} />
+    ) : (
+      <div class="text-center py-8 text-muted-foreground">
+        <p>Session ID is required</p>
+      </div>
+    )}
   </div>
 </DashboardLayout>

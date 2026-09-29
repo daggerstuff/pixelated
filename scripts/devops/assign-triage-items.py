@@ -37,7 +37,7 @@ STATE_BACKLOG = "74b11563-2856-45f3-bcb7-e813702cd73f"
 STATE_TODO = "d47f8fab-abb9-474e-879b-9c581a9852ed"
 
 
-def update_issue(issue_id, **fields):
+def update_issue(issue_id: str, **fields: str) -> bool:
     mutation = """
     mutation($id: String!, $input: IssueUpdateInput!) {
       issueUpdate(id: $id, input: $input) { success }
@@ -46,7 +46,8 @@ def update_issue(issue_id, **fields):
     try:
         res = _linear_graphql_query(mutation, {"id": issue_id, "input": fields})
         data = _extract_graphql_payload(res)
-        return data.get("issueUpdate", {}).get("success", False)
+        success: bool = data.get("issueUpdate", {}).get("success", False)
+        return success
     except Exception as e:
         logging.error(f"Update failed: {e}")
         return False
@@ -133,7 +134,7 @@ SPECIFIC = {
 }
 
 
-def main():
+def main() -> int:
     logging.info("=" * 60)
     logging.info("Assigning Triage items to projects")
     logging.info("=" * 60)

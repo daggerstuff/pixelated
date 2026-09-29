@@ -59,9 +59,7 @@ const features = [
 
       <div class="features-badge">
         <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
-          <path
-            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-          ></path>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
         </svg>
         <span>PLATFORM FEATURES</span>
       </div>
@@ -76,35 +74,33 @@ const features = [
 
     <!-- Features Grid -->
     <div class="features-grid">
-      {
-        features.map((feature) => (
-          <div class="feature-card">
-            <div class="feature-icon" style={`background: ${feature.color};`}>
-              <svg
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                style="color: white;"
-              >
-                <path set:html={feature.icon} />
-              </svg>
-            </div>
-
-            <div class="feature-content">
-              <div class="feature-header">
-                <h3 class="feature-title">{feature.title}</h3>
-                <span class="feature-badge" style={`color: ${feature.color};`}>
-                  {feature.stats}
-                </span>
-              </div>
-
-              <p class="feature-text">{feature.description}</p>
-            </div>
+      {features.map((feature) => (
+        <div class="feature-card">
+          <div class="feature-icon" style={`background: ${feature.color};`}>
+            <svg
+              width="24"
+              height="24"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              style="color: white;"
+            >
+              <path set:html={feature.icon} />
+            </svg>
           </div>
-        ))
-      }
+
+          <div class="feature-content">
+            <div class="feature-header">
+              <h3 class="feature-title">{feature.title}</h3>
+              <span class="feature-badge" style={`color: ${feature.color};`}>
+                {feature.stats}
+              </span>
+            </div>
+
+            <p class="feature-text">{feature.description}</p>
+          </div>
+        </div>
+      ))}
     </div>
   </div>
 </section>

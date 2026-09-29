@@ -59,8 +59,8 @@ def read_urls(path: Path) -> list[str]:
         return []
     urls = []
     with open(path) as f:
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if line and not line.startswith("#"):
                 urls.append(line)
     # Deduplicate preserving order
@@ -81,8 +81,8 @@ def get_supadata_api_key() -> str:
         # Also check .env file directly
         env_path = Path(__file__).parent.parent / ".env"
         if env_path.exists():
-            for line in env_path.read_text().splitlines():
-                line = line.strip()
+            for raw_line in env_path.read_text().splitlines():
+                line = raw_line.strip()
                 if line.startswith("SUPADATA_API_KEY="):
                     api_key = line.split("=", 1)[1].strip().strip("'\"")
                     break
@@ -126,9 +126,10 @@ def supadata_transcript(
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 data = json.loads(resp.read().decode())
-                if isinstance(data.get("content"), str):
-                    return data["content"]
-                chunks = data.get("content")
+                content = data.get("content")
+                if isinstance(content, str):
+                    return content
+                chunks = content
                 if isinstance(chunks, list):
                     return " ".join(c.get("text", "") for c in chunks if isinstance(c, dict))
                 return None
@@ -241,7 +242,7 @@ def process_channel(
     return success, fail, existing
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(
         description="Download YouTube transcripts via Supadata API (bypasses cloud IP blocks).",
         epilog="Free tier: 100 transcripts/mo. Basic ($5/mo): 300 transcripts/mo.",

@@ -29,13 +29,17 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     <tbody>
       <tr>
         <td>TypeScript</td>
-        <td><code>@pixelated-empathy/auto-sdk</code></td>
+        <td>
+          <code>@pixelated-empathy/auto-sdk</code>
+        </td>
         <td>npm</td>
         <td>Node.js 18+</td>
       </tr>
       <tr>
         <td>Python</td>
-        <td><code>pixelated-empathy-sdk</code></td>
+        <td>
+          <code>pixelated-empathy-sdk</code>
+        </td>
         <td>PyPI</td>
         <td>Python 3.9+</td>
       </tr>
@@ -148,10 +152,14 @@ print(memory.id, memory.created_at)</code></pre>
   </p>
   <ol>
     <li>Validates the OpenAPI spec with Spectral linting</li>
-    <li>Downloads <code>openapi-generator-cli</code> v7.12.0</li>
+    <li>
+      Downloads <code>openapi-generator-cli</code> v7.12.0
+    </li>
     <li>Generates TypeScript (typescript-fetch) and Python SDKs</li>
     <li>Builds and type-checks both packages</li>
-    <li>Publishes to npm and PyPI on <code>main</code> branch</li>
+    <li>
+      Publishes to npm and PyPI on <code>main</code> branch
+    </li>
     <li>Uploads generated code as CI artifacts</li>
   </ol>
 
@@ -161,9 +169,15 @@ print(memory.id, memory.created_at)</code></pre>
 
   <h2>Related</h2>
   <ul>
-    <li><a href="/docs/developer/getting-started">Getting Started Guide</a></li>
-    <li><a href="/docs/developer/code-examples">Code Examples</a></li>
-    <li><a href="/docs/api/swagger">Interactive API Reference</a></li>
+    <li>
+      <a href="/docs/developer/getting-started">Getting Started Guide</a>
+    </li>
+    <li>
+      <a href="/docs/developer/code-examples">Code Examples</a>
+    </li>
+    <li>
+      <a href="/docs/api/swagger">Interactive API Reference</a>
+    </li>
   </ul>
 </DocumentationLayout>
 
@@ -196,7 +210,7 @@ print(memory.id, memory.created_at)</code></pre>
   }
 
   code {
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-family: var(--np-font-mono, 'Spline Sans Mono Variable', monospace);
   }
 
   :not(pre) > code {

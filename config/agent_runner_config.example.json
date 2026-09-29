@@ -16,9 +16,7 @@
     "enabled": true,
     "auto_repair": true,
     "max_repair_attempts": 2,
-    "commands": [
-      "uv run pytest tests/agent_runner/ -q"
-    ],
+    "commands": ["uv run pytest tests/agent_runner/ -q"],
     "timeout_seconds": 300,
     "block_on_suppression": true
   },
@@ -27,11 +25,7 @@
     "secret_leak_prevention": true,
     "anti_suppression_enforcement": true,
     "allowed_file_patterns": [],
-    "blocked_file_patterns": [
-      ".env*",
-      "*secret*",
-      "*private_key*"
-    ]
+    "blocked_file_patterns": [".env*", "*secret*", "*private_key*"]
   },
   "projects": [
     {
@@ -50,19 +44,45 @@
   ],
   "triage_rules": [
     {
-      "keywords": ["security", "hipaa", "audit", "auth", "phi", "rbac", "encryption"],
+      "keywords": [
+        "security",
+        "hipaa",
+        "audit",
+        "auth",
+        "phi",
+        "rbac",
+        "encryption"
+      ],
       "preferred_agent": "agy",
       "required_role": "security_sentinel",
       "additional_labels": ["security"]
     },
     {
-      "keywords": ["refactor", "bug", "fix", "feature", "backend", "api", "endpoint", "split", "version"],
+      "keywords": [
+        "refactor",
+        "bug",
+        "fix",
+        "feature",
+        "backend",
+        "api",
+        "endpoint",
+        "split",
+        "version"
+      ],
       "preferred_agent": "opencode",
       "required_role": "backend_engineer",
       "additional_labels": []
     },
     {
-      "keywords": ["test", "e2e", "coverage", "playwright", "vitest", "pytest", "benchmark"],
+      "keywords": [
+        "test",
+        "e2e",
+        "coverage",
+        "playwright",
+        "vitest",
+        "pytest",
+        "benchmark"
+      ],
       "preferred_agent": "agy",
       "required_role": "qa_automator",
       "additional_labels": ["testing"]
@@ -93,7 +113,14 @@
       "label": "agent:agy",
       "role": "security_sentinel",
       "cmd": ["agy", "--print", "{prompt_file}"],
-      "capabilities": ["architecture", "review", "security", "design", "audit", "testing"]
+      "capabilities": [
+        "architecture",
+        "review",
+        "security",
+        "design",
+        "audit",
+        "testing"
+      ]
     },
     {
       "name": "mastracode",

@@ -44,17 +44,17 @@ interface TreatmentPlanManagerProps {
 
 // Performance optimization: Extract static maps outside component to prevent recreation on every render and enable O(1) lookups
 const PRIORITY_COLORS_MAP: Record<TreatmentGoal['priority'], string> = {
-  urgent: 'bg-red-500 text-white',
-  high: 'bg-orange-500 text-white',
-  medium: 'bg-yellow-500 text-white',
-  low: 'bg-green-500 text-white',
+  urgent: 'bg-primary text-primary-foreground font-semibold',
+  high: 'bg-secondary border border-ring text-foreground font-semibold',
+  medium: 'bg-secondary border border-ring text-foreground font-medium',
+  low: 'bg-secondary border border-input text-foreground',
 }
 
 const STATUS_COLORS_MAP: Record<TreatmentGoal['status'], string> = {
-  'completed': 'bg-green-100 text-green-800',
-  'in-progress': 'bg-blue-100 text-blue-800',
-  'on-hold': 'bg-yellow-100 text-yellow-800',
-  'not-started': 'bg-gray-100 text-gray-800',
+  'completed': 'bg-secondary border border-input text-foreground',
+  'in-progress': 'bg-secondary border border-ring text-foreground font-medium',
+  'on-hold': 'bg-secondary border border-input text-muted-foreground',
+  'not-started': 'bg-secondary border border-border text-muted-foreground',
 }
 
 const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
@@ -170,11 +170,17 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   }, [currentPlan])
 
   const getPriorityColor = (priority: TreatmentGoal['priority']) => {
-    return PRIORITY_COLORS_MAP[priority] ?? 'bg-gray-500 text-white'
+    return (
+      PRIORITY_COLORS_MAP[priority] ??
+      'bg-secondary border border-border text-muted-foreground'
+    )
   }
 
   const getStatusColor = (status: TreatmentGoal['status']) => {
-    return STATUS_COLORS_MAP[status] ?? 'bg-gray-100 text-gray-800'
+    return (
+      STATUS_COLORS_MAP[status] ??
+      'bg-secondary border border-border text-muted-foreground'
+    )
   }
 
   const getCategoryIcon = (category: TreatmentGoal['category']) => {
@@ -264,32 +270,42 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   if (!currentPlan) {
     return (
       <div className={`flex h-64 items-center justify-center ${className}`}>
-        <div className="border-blue-500 h-8 w-8 animate-spin rounded-full border-b-2"></div>
-        <span className="text-gray-600 ml-2">Loading treatment plan...</span>
+        <div className="h-8 w-8 animate-spin rounded-none border-b-2 border-ring"></div>
+        <span className="ml-2 text-muted-foreground">
+          Loading treatment plan...
+        </span>
       </div>
     )
   }
 
   return (
-    <div className={`bg-white rounded-lg p-6 shadow-lg ${className}`}>
+    <div
+      className={`rounded-none border border-border bg-card p-6 ${className}`}
+    >
       {/* Header */}
-      <div className="border-gray-200 mb-6 border-b">
+      <div className="mb-6 border-b border-border">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-gray-900 text-2xl font-bold">Treatment Plan</h2>
-            <p className="text-gray-600">Client: {currentPlan.clientName}</p>
-            <p className="text-gray-600">
+            <h2 className="text-2xl font-bold text-foreground">
+              Treatment Plan
+            </h2>
+            <p className="text-muted-foreground">
+              Client: {currentPlan.clientName}
+            </p>
+            <p className="text-muted-foreground">
               Therapist: {currentPlan.therapistName}
             </p>
           </div>
           <div className="text-right">
-            <div className="text-gray-500 text-sm">Overall Progress</div>
-            <div className="text-blue-600 text-3xl font-bold">
+            <div className="text-sm text-muted-foreground">
+              Overall Progress
+            </div>
+            <div className="text-3xl font-bold text-foreground">
               {overallProgress}%
             </div>
-            <div className="bg-gray-200 mt-1 h-2 w-32 rounded-full">
+            <div className="mt-1 h-2 w-32 rounded-none bg-secondary">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="h-2 rounded-none bg-primary transition-all duration-300"
                 style={{ width: `${overallProgress}%` }}
               ></div>
             </div>
@@ -304,8 +320,8 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
               onClick={() => setActiveTab(tab)}
               className={`border-b-2 px-4 py-2 capitalize transition-colors ${
                 activeTab === tab
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-ring text-foreground'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               {tab}
@@ -318,24 +334,24 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="bg-blue-50 rounded-lg p-4">
-              <div className="text-blue-600 text-lg font-semibold">
+            <div className="rounded-none bg-secondary p-4">
+              <div className="text-lg font-semibold text-foreground">
                 Duration
               </div>
               <div className="text-2xl font-bold">
                 {currentPlan.duration} weeks
               </div>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
-              <div className="text-green-600 text-lg font-semibold">
+            <div className="rounded-none bg-secondary p-4">
+              <div className="text-lg font-semibold text-foreground">
                 Active Goals
               </div>
               <div className="text-2xl font-bold">
                 {currentPlan.goals.length}
               </div>
             </div>
-            <div className="bg-purple-50 rounded-lg p-4">
-              <div className="text-purple-600 text-lg font-semibold">
+            <div className="rounded-none bg-secondary p-4">
+              <div className="text-lg font-semibold text-foreground">
                 Status
               </div>
               <div className="text-2xl font-bold capitalize">
@@ -360,12 +376,12 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                 return (
                   <div
                     key={category}
-                    className="bg-gray-50 rounded-lg p-3 text-center"
+                    className="rounded-none bg-secondary p-3 text-center"
                   >
                     <div className="mb-1 text-2xl">
                       {getCategoryIcon(category as TreatmentGoal['category'])}
                     </div>
-                    <div className="text-gray-600 text-sm capitalize">
+                    <div className="text-sm capitalize text-muted-foreground">
                       {category}
                     </div>
                     <div className="font-bold">{count}</div>
@@ -384,7 +400,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
             {!readOnly && (
               <button
                 onClick={() => setShowAddGoal(true)}
-                className="bg-blue-500 text-white hover:bg-blue-600 rounded px-4 py-2 transition-colors"
+                className="rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent"
               >
                 Add Goal
               </button>
@@ -393,7 +409,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
 
           {/* Add Goal Form */}
           {showAddGoal && (
-            <div className="bg-gray-50 space-y-3 rounded-lg p-4">
+            <div className="space-y-3 rounded-none bg-secondary p-4">
               <input
                 type="text"
                 placeholder="Goal title"
@@ -462,13 +478,13 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
               <div className="flex gap-2">
                 <button
                   onClick={addNewGoal}
-                  className="bg-green-500 text-white hover:bg-green-600 rounded px-4 py-2"
+                  className="rounded-none bg-primary px-4 py-2 text-primary-foreground hover:bg-accent"
                 >
                   Add Goal
                 </button>
                 <button
                   onClick={() => setShowAddGoal(false)}
-                  className="bg-gray-500 text-white hover:bg-gray-600 rounded px-4 py-2"
+                  className="rounded-none border border-border bg-secondary px-4 py-2 text-foreground hover:bg-accent"
                 >
                   Cancel
                 </button>
@@ -481,7 +497,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
             {currentPlan.goals.map((goal) => (
               <div
                 key={goal.id}
-                className="bg-white rounded-lg border p-4 shadow-sm"
+                className="rounded-none border border-border bg-card p-4"
               >
                 <div className="mb-3 flex items-start justify-between">
                   <div className="flex-1">
@@ -501,20 +517,22 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                         {goal.status.replace('-', ' ')}
                       </span>
                     </div>
-                    <p className="text-gray-600 mb-2">{goal.description}</p>
-                    <div className="text-gray-500 text-sm">
+                    <p className="mb-2 text-muted-foreground">
+                      {goal.description}
+                    </p>
+                    <div className="text-sm text-muted-foreground">
                       Target: {format(goal.targetDate, 'MMM dd, yyyy')}(
                       {differenceInDays(goal.targetDate, new Date())} days
                       remaining)
                     </div>
                   </div>
                   <div className="ml-4 text-right">
-                    <div className="text-blue-600 text-2xl font-bold">
+                    <div className="text-2xl font-bold text-foreground">
                       {goal.progress}%
                     </div>
-                    <div className="bg-gray-200 mt-1 h-2 w-24 rounded-full">
+                    <div className="mt-1 h-2 w-24 rounded-none bg-secondary">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        className="h-2 rounded-none bg-primary transition-all duration-300"
                         style={{ width: `${goal.progress}%` }}
                       ></div>
                     </div>
@@ -523,7 +541,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
 
                 {/* Milestones */}
                 <div className="space-y-2">
-                  <h5 className="text-gray-700 font-medium">Milestones:</h5>
+                  <h5 className="font-medium text-foreground">Milestones:</h5>
                   {goal.milestones.map((milestone) => (
                     <div key={milestone.id} className="flex items-center gap-3">
                       <input
@@ -531,19 +549,19 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                         checked={milestone.completed}
                         onChange={() => toggleMilestone(goal.id, milestone.id)}
                         disabled={readOnly}
-                        className="text-blue-600 h-4 w-4 rounded"
+                        className="h-4 w-4 rounded-none text-foreground"
                       />
                       <span
                         className={
                           milestone.completed
-                            ? 'text-gray-500 line-through'
+                            ? 'text-muted-foreground line-through'
                             : ''
                         }
                       >
                         {milestone.title}
                       </span>
                       {milestone.completed && milestone.completedDate && (
-                        <span className="text-green-600 text-xs">
+                        <span className="text-xs text-foreground">
                           ✓ {format(milestone.completedDate, 'MMM dd')}
                         </span>
                       )}
@@ -561,20 +579,20 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
           <h3 className="text-lg font-semibold">Progress Overview</h3>
           <div className="space-y-4">
             {currentPlan.goals.map((goal) => (
-              <div key={goal.id} className="bg-gray-50 rounded-lg p-4">
+              <div key={goal.id} className="rounded-none bg-secondary p-4">
                 <div className="mb-2 flex items-center justify-between">
                   <h4 className="font-medium">{goal.title}</h4>
-                  <span className="text-blue-600 text-lg font-bold">
+                  <span className="text-lg font-bold text-foreground">
                     {goal.progress}%
                   </span>
                 </div>
-                <div className="bg-gray-200 mb-2 h-3 w-full rounded-full">
+                <div className="mb-2 h-3 w-full rounded-none bg-secondary">
                   <div
-                    className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+                    className="h-3 rounded-none bg-primary transition-all duration-500"
                     style={{ width: `${goal.progress}%` }}
                   ></div>
                 </div>
-                <div className="text-gray-600 text-sm">
+                <div className="text-sm text-muted-foreground">
                   {goal.milestones.filter((m) => m.completed).length} of{' '}
                   {goal.milestones.length} milestones completed
                 </div>
@@ -601,10 +619,10 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
               }
             }}
             readOnly={readOnly}
-            className="h-40 w-full resize-none rounded-lg border p-3"
+            className="h-40 w-full resize-none rounded-none border border-input p-3"
             placeholder="Add treatment notes, observations, and recommendations..."
           />
-          <div className="text-gray-500 text-sm">
+          <div className="text-sm text-muted-foreground">
             Last modified:{' '}
             {format(currentPlan.lastModified, 'MMM dd, yyyy at h:mm a')}
           </div>

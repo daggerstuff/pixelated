@@ -1,22 +1,25 @@
 # Stage 2 — Body restructuring (progressive disclosure)
 
-Classify the `SKILL.md` body, keep actionable **core rules** always loaded, and move examples / templates / background into on-demand reference files.
+Classify the `SKILL.md` body, keep actionable **core rules** always loaded, and
+move examples / templates / background into on-demand reference files.
 
-Paper: Gao et al. 2026, Algorithm 2 ([arXiv:2603.29919](https://arxiv.org/abs/2603.29919)). Background: [PAPER_DETAIL.md](../../PAPER_DETAIL.md) sections 7–8.
+Paper: Gao et al. 2026, Algorithm 2
+([arXiv:2603.29919](https://arxiv.org/abs/2603.29919)). Background:
+[PAPER_DETAIL.md](../../PAPER_DETAIL.md) sections 7–8.
 
 ## What it does
 
-| Input | Output |
-|-------|--------|
+| Input                                                     | Output                                                                                            |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | Monolithic body (and optional existing `*.md` references) | Slim core body + `examples.md` / `templates.md` / `background.md` with `when` / `topics` metadata |
 
-| Type | Destination |
-|------|-------------|
-| `core_rule` | Always-loaded body (`b*`) |
-| `example` | `examples.md` (if ≥ `min_reference_tokens`) |
-| `template` | `templates.md` |
-| `background` | `background.md` (summarized) |
-| `redundant` | Discarded |
+| Type         | Destination                                 |
+| ------------ | ------------------------------------------- |
+| `core_rule`  | Always-loaded body (`b*`)                   |
+| `example`    | `examples.md` (if ≥ `min_reference_tokens`) |
+| `template`   | `templates.md`                              |
+| `background` | `background.md` (summarized)                |
+| `redundant`  | Discarded                                   |
 
 Unclassified paragraphs default to **core rule**.
 
@@ -36,19 +39,22 @@ deduplicate_existing_references()  # disclose.py + dedup.py
 write_reference_file()             # annotate when/topics, write *.md
 ```
 
-Algorithm 2 also specifies **Gate 1**, **Gate 2**, and a **feedback loop** — not implemented; see [Missing gaps](#missing-gaps).
+Algorithm 2 also specifies **Gate 1**, **Gate 2**, and a **feedback loop** — not
+implemented; see [Missing gaps](#missing-gaps).
 
 ## Files
 
-| File | Purpose |
-|------|---------|
+| File          | Purpose                                                                         |
+| ------------- | ------------------------------------------------------------------------------- |
 | `disclose.py` | Classify → compress → reference split; annotate/write refs; dedup existing refs |
-| `classify.py` | Paragraph split; taxonomy classification (LLM + heuristic fallback) |
-| `compress.py` | Type-specific compression |
-| `dedup.py` | Line-level overlap removal between a reference and body text |
-| `__init__.py` | Package marker (no public exports yet) |
+| `classify.py` | Paragraph split; taxonomy classification (LLM + heuristic fallback)             |
+| `compress.py` | Type-specific compression                                                       |
+| `dedup.py`    | Line-level overlap removal between a reference and body text                    |
+| `__init__.py` | Package marker (no public exports yet)                                          |
 
-Prompts used here: `CLASSIFY_PARAGRAPHS`, `SUMMARIZE_BACKGROUND`, `GEN_REFERENCE_META` in `llm/prompts.py`. Types: `ContentType`, `ContentItem`, `ReferenceFile` in `models.py`.
+Prompts used here: `CLASSIFY_PARAGRAPHS`, `SUMMARIZE_BACKGROUND`,
+`GEN_REFERENCE_META` in `llm/prompts.py`. Types: `ContentType`, `ContentItem`,
+`ReferenceFile` in `models.py`.
 
 ## Key functions
 
@@ -90,12 +96,12 @@ remove_overlap(reference, body, min_tokens=30) -> str | None
 
 ```yaml
 thresholds:
-  min_reference_tokens: 30       # wired — drop refs shorter than this
-  max_feedback_iterations: 2     # unused — intended for Gate 2 feedback
+  min_reference_tokens: 30 # wired — drop refs shorter than this
+  max_feedback_iterations: 2 # unused — intended for Gate 2 feedback
 
 models:
-  compression: ...               # classify, background summary, reference meta
-  evaluation: ...                # unused — intended for Gate 2
+  compression: ... # classify, background summary, reference meta
+  evaluation: ... # unused — intended for Gate 2
 ```
 
 ## Run Stage 2 only
@@ -114,24 +120,24 @@ body, refs, notes = restructure_body(skill_body, llm=None)
 
 ## Implementation status
 
-| Paper component | Code | Status |
-|-----------------|------|--------|
-| Paragraph split | `classify.py` | Done |
-| Taxonomy classification (5 types) | `classify.py` | Done |
-| Conservative fallback → core | `classify.py` | Done |
-| Core → bullets in `b*` | `compress.py` | Partial (no semantic merge) |
-| Examples → `examples.md` | `compress.py`, `disclose.py` | Partial (heading-key grouping) |
-| Templates → `templates.md` | `compress.py` | Partial (aliases examples) |
-| Background summary | `compress.py` | Done |
-| Discard redundant | `disclose.py` | Done |
-| Progressive disclosure links | `disclose.py` | Done |
-| Reference `when` / `topics` | `disclose.py` | Done |
-| Cross-file dedup | `dedup.py`, `disclose.py` | Partial |
-| Token gate (keep original if not shorter) | `disclose.py` | Done |
-| Gate 1 faithfulness | — | **Missing** |
-| Gate 2 task eval (D / A / C) | — | **Missing** |
-| Feedback loop (promote to core) | — | **Missing** |
-| Fallback after failed feedback | — | **Missing** |
+| Paper component                           | Code                         | Status                         |
+| ----------------------------------------- | ---------------------------- | ------------------------------ |
+| Paragraph split                           | `classify.py`                | Done                           |
+| Taxonomy classification (5 types)         | `classify.py`                | Done                           |
+| Conservative fallback → core              | `classify.py`                | Done                           |
+| Core → bullets in `b*`                    | `compress.py`                | Partial (no semantic merge)    |
+| Examples → `examples.md`                  | `compress.py`, `disclose.py` | Partial (heading-key grouping) |
+| Templates → `templates.md`                | `compress.py`                | Partial (aliases examples)     |
+| Background summary                        | `compress.py`                | Done                           |
+| Discard redundant                         | `disclose.py`                | Done                           |
+| Progressive disclosure links              | `disclose.py`                | Done                           |
+| Reference `when` / `topics`               | `disclose.py`                | Done                           |
+| Cross-file dedup                          | `dedup.py`, `disclose.py`    | Partial                        |
+| Token gate (keep original if not shorter) | `disclose.py`                | Done                           |
+| Gate 1 faithfulness                       | —                            | **Missing**                    |
+| Gate 2 task eval (D / A / C)              | —                            | **Missing**                    |
+| Feedback loop (promote to core)           | —                            | **Missing**                    |
+| Fallback after failed feedback            | —                            | **Missing**                    |
 
 ## Missing gaps
 
@@ -139,24 +145,38 @@ Stage 2 only — vs Algorithm 2.
 
 ### Quality safeguards
 
-1. **Gate 1 — Faithfulness** — LLM check that operational concepts from the original body are preserved in core ∪ references, with per-type rollback. Only a token-count gate exists.
-2. **Gate 2 — Task eval** — 5 tasks, conditions D / A / C, retention metric. `models.evaluation` is never used.
-3. **Feedback loop** — on Gate 2 failure, promote needed non-core items into core (original form), recompress the rest, retry up to `max_feedback_iterations` (config loaded, never read).
-4. **Post-feedback fallback** — keep best compression (most promoted items) if feedback still fails.
+1. **Gate 1 — Faithfulness** — LLM check that operational concepts from the
+   original body are preserved in core ∪ references, with per-type rollback.
+   Only a token-count gate exists.
+2. **Gate 2 — Task eval** — 5 tasks, conditions D / A / C, retention metric.
+   `models.evaluation` is never used.
+3. **Feedback loop** — on Gate 2 failure, promote needed non-core items into
+   core (original form), recompress the rest, retry up to
+   `max_feedback_iterations` (config loaded, never read).
+4. **Post-feedback fallback** — keep best compression (most promoted items) if
+   feedback still fails.
 
 ### Compression fidelity
 
-5. **Core: no semantic merge** — paper merges by semantic similarity into concise bullets; code only bulletizes and exact-line-dedupes.
-6. **Examples: weak concept grouping** — paper groups by concept and strips comments; code groups by first-line heading key only.
-7. **Templates: no dedicated logic** — `compress_templates` aliases `compress_examples`.
+5. **Core: no semantic merge** — paper merges by semantic similarity into
+   concise bullets; code only bulletizes and exact-line-dedupes.
+6. **Examples: weak concept grouping** — paper groups by concept and strips
+   comments; code groups by first-line heading key only.
+7. **Templates: no dedicated logic** — `compress_templates` aliases
+   `compress_examples`.
 
 ### Deduplication
 
-8. **New references not deduped** — `remove_overlap` runs only on pre-existing refs, not generated `examples.md` / `templates.md` / `background.md`.
-9. **Overlap vs original body only** — paper also checks body-derived modules; code does not compare against compressed core or sibling generated refs.
+8. **New references not deduped** — `remove_overlap` runs only on pre-existing
+   refs, not generated `examples.md` / `templates.md` / `background.md`.
+9. **Overlap vs original body only** — paper also checks body-derived modules;
+   code does not compare against compressed core or sibling generated refs.
 
 ### Recovery / packaging
 
-10. **Misclassification is irreversible** — without Gate 1 / feedback, wrong `redundant` or non-core labels (e.g. example-as-specification) stay out of core.
-11. **No `Stage2Result` / agent entrypoint** — only free functions; `__init__.py` exports nothing.
+10. **Misclassification is irreversible** — without Gate 1 / feedback, wrong
+    `redundant` or non-core labels (e.g. example-as-specification) stay out of
+    core.
+11. **No `Stage2Result` / agent entrypoint** — only free functions;
+    `__init__.py` exports nothing.
 12. **No unit tests** for classify / compress / disclose / dedup.

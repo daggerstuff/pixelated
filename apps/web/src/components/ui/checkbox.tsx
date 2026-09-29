@@ -43,7 +43,7 @@ export const Checkbox: FC<CheckboxProps> = ({
         value={value}
         onChange={handleChange}
         aria-describedby={ariaDescribedBy}
-        className="text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 mr-2 h-4 w-4 rounded focus:ring-2"
+        className="mr-2 h-4 w-4 rounded-none border-input bg-secondary text-primary focus:ring-2 focus:ring-ring"
       />
       {children}
     </label>

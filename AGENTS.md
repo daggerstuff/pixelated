@@ -5,6 +5,25 @@
 
 ---
 
+## CI/CD Pipeline Policy
+
+**EKS with Amazon is production. Vercel is the frontend test center only.**
+`staging` is the main branch.
+
+### Trigger Rules
+
+- Push to `staging` → CI + EKS deploy (backend/infra) **+ Vercel deploy
+  (frontend, path-filtered)**
+- PR to `staging` → Vercel preview (frontend only, path-filtered)
+- Feature branches → no Vercel; use staging for previews
+
+### Files
+
+- `.github/workflows/vercel.yml` — throttled Vercel pipeline
+- `.github/workflows/vercel-policy.md` — full policy doc
+- `.github/branch-pipeline.md` — branch roles diagram
+- `scripts/ci/get-changed-frontend-files.sh` — path filter helper
+
 ## 1. ⚡ Mandatory Session Lifecycle (Foresight Memory Protocol)
 
 Every agent session touching real work must follow this streamlined continuity
@@ -20,26 +39,49 @@ flowchart LR
 
 ### A. Session Startup (Mandatory)
 
-Ambient auto-injection hooks automatically populate `[FORESIGHT CONTINUITY CONTEXT]` on Turn 1 across Claude Code, OpenCode, OMP, and Antigravity.
+Ambient auto-injection hooks automatically populate
+`[FORESIGHT CONTINUITY CONTEXT]` on Turn 1 across Claude Code, OpenCode, OMP,
+and Antigravity.
 
 When calling explicitly (or on topic shifts / subagent starts):
-- **Claude / OpenCode / OMP**: Direct MCP tool call `inject_context(conversation_text="...")` (or `mcp__foresight__inject_context`).
-- **Antigravity / Gemini CLI** (lazy MCP tools): `call_mcp_tool(ServerName="foresight", ToolName="inject_context", Arguments={"conversation_text": "..."})`.
-- **Output**: Surfaces relevant memories, active project directives, `user_preferences`, and `pending_items`.
-- **Action**: Silently incorporate retrieved context into your reasoning and approach.
 
-### B. In-Session Continuity & Capture
+- **Claude / OpenCode / OMP**: Direct MCP tool call
+  `inject_context(conversation_text="...")` (or
+  `mcp__foresight__inject_context`).
+- **Antigravity / Gemini CLI** (lazy MCP tools):
+  `call_mcp_tool(ServerName="foresight", ToolName="inject_context", Arguments={"conversation_text": "..."})`.
+- **Output**: Surfaces relevant memories, active project directives,
+  `user_preferences`, and `pending_items`.
+- **Action**: Silently incorporate retrieved context into your reasoning and
+  approach.
 
-- **When user states a preference or rule** (_"prefer X over Y"_, _"always do Z"_):
-  Update `user_preferences` context block immediately (`manage_context_blocks` or `call_mcp_tool`).
-- **When key decisions or facts are finalized**:
-  Store concise distilled statement (`manage_memories` with `category="decision"|"fact"`).
+### B. Continuous In-Flight Capture (Never Wait for Wrap-Up)
 
-### C. Session Wrap-Up
+Sessions frequently end uncleanly or abruptly (process kill, window close,
+timeout, interruption). **Never defer memory storage or context updates to an
+end-of-session wrap-up.**
 
-Ambient hooks trigger `process_session_transcript` automatically on session completion. When wrapping up explicitly:
-- Update `pending_items` block marking finished tasks and listing follow-ups (`manage_context_blocks`).
-- For long multi-turn sessions without auto-capture: Call `process_session_transcript(session_id="...", messages=[...])`.
+- **When a decision, bug fix, or operational finding occurs**: Store immediately
+  via
+  `manage_memories(action="store", category="decision"|"fact", content="...")`
+  or `capture_in_flight_memory`.
+- **When user states a preference or rule** (_"prefer X over Y"_, _"always do
+  Z"_): Update `user_preferences` context block immediately
+  (`manage_context_blocks`).
+- **Ambient Turn-by-Turn Auto-Capture**: Hooks actively stream messages to
+  Foresight in-flight on every turn, but explicit tool calls guarantee critical
+  items are preserved with high fidelity.
+
+### C. Session Wrap-Up (Fallback Safety Net)
+
+Wrap-up serves as a secondary reconciliation sweep, NOT the primary capture
+phase:
+
+- Update `pending_items` block marking finished tasks and listing remaining
+  follow-ups (`manage_context_blocks`).
+- For long multi-turn sessions: Ambient hooks trigger
+  `process_session_transcript` automatically on `Stop`, but all critical
+  insights should already be saved.
 
 ---
 
@@ -61,11 +103,14 @@ Ambient hooks trigger `process_session_transcript` automatically on session comp
 | **Node / TS**  | Dev Server               | `pnpm dev` _(port 5173)_ or `pnpm dev:all-services`    |
 |                | Lint (type-aware)        | `pnpm lint` (oxlint)                                   |
 |                | Format                   | `pnpm format`                                          |
+|                | Code-quality audits      | `pnpm lint:quality` (see `CONTRIBUTING.md`)            |
 |                | Unit & Integration Tests | `pnpm vitest run -c config/vitest.config.ts`           |
+|                | Test performance         | `pnpm test:perf` (slowest tests + regression gate)     |
 |                | Production Build         | `pnpm build`                                           |
 | **Python**     | Run script / module      | `uv run python <script.py>` / `uv run python -m <pkg>` |
 |                | Pytest Test Suite        | `uv run pytest`                                        |
 |                | Lint & Format            | `uv run ruff check .` / `uv run ruff format .`         |
+|                | Strict types (mypy)      | `pnpm typecheck:python`                                |
 | **Foresight**  | System Health            | `foresight doctor` / `foresight security status`       |
 |                | Run Proof Benchmark      | `foresight prove`                                      |
 
@@ -84,6 +129,9 @@ Ambient hooks trigger `process_session_transcript` automatically on session comp
   isolation. Never expose clinical PHI or sensitive keys.
 - **Verify Explicitly**: Validate every code change with real test/lint
   execution before marking done.
+- **Never hand-resolve pnpm-lock.yaml merge conflicts**: run
+  `make lockfile-resolve` (regenerates from the merged manifests; see
+  CONTRIBUTING.md "Merging PRs").
 
 ### 🚫 Banned Type-Check Tooling (OOM Risk)
 
@@ -146,39 +194,42 @@ branding, inspect `TASTES.md` (if present) and apply its design principles and
 visual hierarchy.
 
 <!-- BEGIN AWS Agent Toolkit rules -->
+
 # AWS Guidance
 
 - Where these AWS rules conflict with the project's own instructions, the
   project's instructions take precedence.
 - Prefer the AWS MCP Server for AWS interactions — it provides sandboxed
-  execution, observability, and audit logging. If unavailable, use the
-  AWS CLI directly.
-- Before starting a task, check whether a relevant AWS skill is available.
-  Load the skill with `retrieve_skill` and prefer its guidance over
-  general knowledge.
+  execution, observability, and audit logging. If unavailable, use the AWS CLI
+  directly.
+- Before starting a task, check whether a relevant AWS skill is available. Load
+  the skill with `retrieve_skill` and prefer its guidance over general
+  knowledge.
 - When uncertain about specific AWS details (API parameters, permissions,
-  limits, error codes), verify against documentation rather than guessing.
-  State uncertainty explicitly if you cannot confirm.
+  limits, error codes), verify against documentation rather than guessing. State
+  uncertainty explicitly if you cannot confirm.
 - When creating infrastructure, prefer infrastructure-as-code (AWS CDK or
   CloudFormation) over direct CLI commands.
 - When working with infrastructure, follow AWS Well-Architected Framework
   principles.
-- Do not use em dashes in AWS resource names or descriptions. Use
-  hyphens instead.
+- Do not use em dashes in AWS resource names or descriptions. Use hyphens
+  instead.
 
 ## Secret Safety
 
-- MUST load the `aws-secrets-manager` skill first for any secret,
-  credential, API key, token, or password task. MUST NOT call
-  `secretsmanager get-secret-value` or `batch-get-secret-value`, and MUST
-  NOT hit the Secrets Manager Agent daemon directly. MUST use
-  `{{resolve:secretsmanager:secret-id:SecretString:json-key}}` with
-  `asm-exec` so the secret resolves at runtime without entering context.
+- MUST load the `aws-secrets-manager` skill first for any secret, credential,
+  API key, token, or password task. MUST NOT call
+  `secretsmanager get-secret-value` or `batch-get-secret-value`, and MUST NOT
+  hit the Secrets Manager Agent daemon directly. MUST use
+  `{{resolve:secretsmanager:secret-id:SecretString:json-key}}` with `asm-exec`
+  so the secret resolves at runtime without entering context.
+
 <!-- END AWS Agent Toolkit rules -->
 
 ## Maintaining this file
 
-Keep this file for knowledge useful to almost every future agent session in this project.
-Do not repeat what the codebase already shows; point to the authoritative file or command instead.
-Prefer rewriting or pruning existing entries over appending new ones.
-When updating this file, preserve this bar for all agents and keep entries concise.
+Keep this file for knowledge useful to almost every future agent session in this
+project. Do not repeat what the codebase already shows; point to the
+authoritative file or command instead. Prefer rewriting or pruning existing
+entries over appending new ones. When updating this file, preserve this bar for
+all agents and keep entries concise.

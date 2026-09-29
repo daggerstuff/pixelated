@@ -141,7 +141,17 @@ if (changedFiles.length === 0) {
   process.exit(0);
 }
 
-runCommand("prettier", ["--check", "--ignore-unknown", ...changedFiles]);
+// oxfmt is the sole formatter for JS/TS code. Running prettier over the same
+// files caused formatter fights (the two disagree on union-type splitting and
+// other constructs), so prettier is used ONLY for .astro, which oxfmt cannot
+// format.
+const ASTRO_FILES = changedFiles.filter((filePath) =>
+  filePath.endsWith(".astro"),
+);
+
+if (ASTRO_FILES.length > 0) {
+  runCommand("prettier", ["--check", ...ASTRO_FILES]);
+}
 
 const oxfmtFiles = changedFiles.filter((filePath) => {
   if (EXCLUDED_FROM_OXFMT.has(filePath)) {

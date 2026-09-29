@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Version-controlled post-merge entry point (husky).
+#
+# Auto-syncs pnpm/uv lockfiles after a merge via the shared template at
+# scripts/devops/hooks/templates/post-sync.tmpl.
+exec bash scripts/devops/hooks/templates/post-sync.tmpl

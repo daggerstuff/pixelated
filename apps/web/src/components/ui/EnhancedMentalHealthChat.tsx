@@ -297,7 +297,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
                   <CardTitle className="text-lg">
                     Enhanced Mental Health Chat
                   </CardTitle>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-sm text-muted-foreground">
                     Real-time psychological analysis
                   </p>
                 </div>
@@ -328,7 +328,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
                   className={`max-w-[80%] rounded-lg p-3 ${
                     message.role === 'user'
                       ? 'from-blue-500 to-purple-600 text-white bg-gradient-to-r'
-                      : 'bg-gray-100 text-gray-800'
+                      : 'rounded-none border border-border bg-secondary text-foreground'
                   }`}
                 >
                   <div className="flex items-start space-x-2">
@@ -343,8 +343,8 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
                       <p
                         className={`mt-1 text-xs ${
                           message.role === 'user'
-                            ? 'text-blue-100'
-                            : 'text-gray-500'
+                            ? 'text-primary-foreground'
+                            : 'text-muted-foreground'
                         }`}
                       >
                         {message.timestamp.toLocaleTimeString()}
@@ -358,7 +358,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
           </CardContent>
 
           {/* Input */}
-          <div className="bg-gray-50 border-t p-4">
+          <div className="border-t border-border bg-card p-4">
             <div className="flex space-x-2">
               <Textarea
                 value={input}

@@ -1,6 +1,6 @@
 import { useId, useMemo, useState } from 'react'
 
-export type SessionTimelineEvent = {
+type SessionTimelineEvent = {
   turn: number
   type: 'intervention' | 'emotion-shift' | 'trust-change' | 'alliance-change'
   label: string
@@ -9,14 +9,14 @@ export type SessionTimelineEvent = {
   allianceScore?: number
 }
 
-export type BeliefChange = {
+type BeliefChange = {
   belief: string
   confidence: number
   turn: number
   interventionCorrelated?: boolean
 }
 
-export type DefenseMechanismReading = {
+type DefenseMechanismReading = {
   mechanism: string
   intensity: number
   turn: number
@@ -59,8 +59,8 @@ const scoreLabel: Record<SessionGoal['score'], string> = {
 }
 
 const eventColor: Record<SessionTimelineEvent['type'], string> = {
-  'intervention': 'bg-[#ff8533]',
-  'emotion-shift': 'bg-[#8fb8a2]',
+  'intervention': 'bg-primary',
+  'emotion-shift': 'bg-primary',
   'trust-change': 'bg-sky-400',
   'alliance-change': 'bg-violet-400',
 }
@@ -89,13 +89,13 @@ function MetricTrend({
     .join(' ')
 
   return (
-    <div className="border-white/10 border bg-[#121212] p-3">
+    <div className="border border-border bg-card p-3">
       <div className="mb-2 flex items-baseline justify-between gap-3">
-        <h4 className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
+        <h4 className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
           {label}
         </h4>
         {value !== undefined && (
-          <span className="font-mono text-sm text-[#f6f1e8]">
+          <span className="font-mono text-sm text-foreground">
             {value.toFixed(1)}/{max}
           </span>
         )}
@@ -126,7 +126,7 @@ function MetricTrend({
           />
         </svg>
       ) : (
-        <p className="text-sm text-[#b0b0b0]">No readings recorded.</p>
+        <p className="text-sm text-muted-foreground">No readings recorded.</p>
       )}
     </div>
   )
@@ -154,11 +154,11 @@ export function SessionTimeline({
       <section className={className} aria-labelledby="session-progress-heading">
         <h2
           id="session-progress-heading"
-          className="text-lg font-semibold text-[#f6f1e8]"
+          className="text-lg font-semibold text-foreground"
         >
           Session progress
         </h2>
-        <p className="mt-2 text-sm text-[#b0b0b0]">
+        <p className="mt-2 text-sm text-muted-foreground">
           Complete a simulation session to review its progress.
         </p>
       </section>
@@ -190,23 +190,23 @@ export function SessionTimeline({
     <section className={className} aria-labelledby="session-progress-heading">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533]">
+          <p className="font-mono text-xs uppercase tracking-[0.16em] text-foreground">
             Simulation review
           </p>
           <h2
             id="session-progress-heading"
-            className="text-xl font-semibold text-[#f6f1e8]"
+            className="text-xl font-semibold text-foreground"
           >
             Session progress
           </h2>
         </div>
         {sessions.length > 1 && (
-          <label className="font-mono text-xs text-[#b0b0b0]">
+          <label className="font-mono text-xs text-muted-foreground">
             Compare session
             <select
               value={session.id}
               onChange={(event) => setSelectedSessionId(event.target.value)}
-              className="border-white/20 ml-2 border bg-[#121212] px-2 py-1 text-sm text-[#f6f1e8] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+              className="ml-2 border border-input bg-card px-2 py-1 text-sm text-foreground focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
             >
               {sessions.map((candidate) => (
                 <option key={candidate.id} value={candidate.id}>
@@ -236,13 +236,13 @@ export function SessionTimeline({
         />
       </div>
 
-      <div className="border-white/10 mb-5 border bg-[#121212] p-4">
-        <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
+      <div className="mb-5 border border-border bg-card p-4">
+        <h3 className="font-mono text-sm uppercase tracking-wide text-foreground">
           Turn timeline
         </h3>
         {session.events.length > 0 ? (
           <ol
-            className="border-white/15 relative mt-4 border-l pl-5"
+            className="relative mt-4 border-l border-input pl-5"
             aria-label={`${session.label} events by turn`}
           >
             {session.events.map((event) => (
@@ -251,39 +251,41 @@ export function SessionTimeline({
                 className="relative mb-4 last:mb-0"
               >
                 <span
-                  className={`absolute -left-[1.55rem] top-1 h-3 w-3 border-2 border-[#121212] ${eventColor[event.type]}`}
+                  className={`absolute -left-[1.55rem] top-1 h-3 w-3 border-2 border-card ${eventColor[event.type]}`}
                   aria-hidden="true"
                 />
-                <p className="font-mono text-xs text-[#b0b0b0]">
+                <p className="font-mono text-xs text-muted-foreground">
                   Turn {event.turn} · {event.type.replace('-', ' ')}
                 </p>
-                <p className="text-sm text-[#f6f1e8]">{event.label}</p>
+                <p className="text-sm text-foreground">{event.label}</p>
                 {event.detail && (
-                  <p className="mt-1 text-sm text-[#b0b0b0]">{event.detail}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {event.detail}
+                  </p>
                 )}
               </li>
             ))}
           </ol>
         ) : (
-          <p className="mt-3 text-sm text-[#b0b0b0]">
+          <p className="mt-3 text-sm text-muted-foreground">
             No meaningful events were detected in this session.
           </p>
         )}
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <div className="border-white/10 border bg-[#121212] p-4">
-          <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
+        <div className="border border-border bg-card p-4">
+          <h3 className="font-mono text-sm uppercase tracking-wide text-foreground">
             Belief changes
           </h3>
           <ul className="mt-3 space-y-3">
             {session.beliefs.map((belief) => (
               <li
                 key={`${belief.belief}-${belief.turn}`}
-                className="border-l-2 border-[#8fb8a2] pl-3"
+                className="border-l-2 border-primary pl-3"
               >
-                <p className="text-sm text-[#f6f1e8]">{belief.belief}</p>
-                <p className="font-mono text-xs text-[#b0b0b0]">
+                <p className="text-sm text-foreground">{belief.belief}</p>
+                <p className="font-mono text-xs text-muted-foreground">
                   Turn {belief.turn} · {Math.round(belief.confidence * 100)}%
                   confidence
                   {belief.interventionCorrelated
@@ -293,17 +295,17 @@ export function SessionTimeline({
               </li>
             ))}
             {session.beliefs.length === 0 && (
-              <li className="text-sm text-[#b0b0b0]">
+              <li className="text-sm text-muted-foreground">
                 No beliefs available from the simulation context.
               </li>
             )}
           </ul>
         </div>
-        <div className="border-white/10 border bg-[#121212] p-4">
-          <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
+        <div className="border border-border bg-card p-4">
+          <h3 className="font-mono text-sm uppercase tracking-wide text-foreground">
             Goal attainment scaling
           </h3>
-          <p className="mt-1 text-sm text-[#b0b0b0]">
+          <p className="mt-1 text-sm text-muted-foreground">
             Set up to three goals and score each from −2 to +2.
           </p>
           <ul className="mt-3 space-y-3">
@@ -312,7 +314,7 @@ export function SessionTimeline({
                 key={goal.id}
                 className="flex items-center justify-between gap-2"
               >
-                <span className="text-sm text-[#f6f1e8]">{goal.label}</span>
+                <span className="text-sm text-foreground">{goal.label}</span>
                 <label className="sr-only" htmlFor={`goal-${goal.id}`}>
                   Score for {goal.label}
                 </label>
@@ -333,7 +335,7 @@ export function SessionTimeline({
                       ),
                     )
                   }
-                  className="border-white/20 border bg-[#0a0a0a] px-2 py-1 font-mono text-xs text-[#f6f1e8] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+                  className="border border-input bg-background px-2 py-1 font-mono text-xs text-foreground focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
                 >
                   {([-2, -1, 0, 1, 2] as const).map((score) => (
                     <option key={score} value={score}>
@@ -360,12 +362,12 @@ export function SessionTimeline({
                   }
                 }}
                 placeholder="Add a session goal"
-                className="border-white/20 min-w-0 flex-1 border bg-[#0a0a0a] px-2 py-1 text-sm text-[#f6f1e8] placeholder:text-[#b0b0b0] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+                className="min-w-0 flex-1 border border-input bg-background px-2 py-1 text-sm text-foreground placeholder:text-muted-foreground focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
               />
               <button
                 type="button"
                 onClick={addGoal}
-                className="border border-[#ff8533] px-3 py-1 font-mono text-xs text-[#ff8533] transition-transform duration-150 hover:-translate-y-px focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+                className="border border-ring px-3 py-1 font-mono text-xs text-foreground transition-transform duration-150 hover:-translate-y-px focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
               >
                 Add
               </button>
@@ -375,25 +377,22 @@ export function SessionTimeline({
       </div>
 
       {sessions.length > 1 && (
-        <div className="border-white/10 mt-5 border bg-[#121212] p-4">
-          <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
+        <div className="mt-5 border border-border bg-card p-4">
+          <h3 className="font-mono text-sm uppercase tracking-wide text-foreground">
             Multi-session progression
           </h3>
           <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {sessions.map((candidate) => (
-              <article
-                key={candidate.id}
-                className="border-white/10 border p-3"
-              >
-                <h4 className="text-sm font-medium text-[#f6f1e8]">
+              <article key={candidate.id} className="border border-border p-3">
+                <h4 className="text-sm font-medium text-foreground">
                   {candidate.label}
                 </h4>
-                <p className="mt-1 font-mono text-xs text-[#b0b0b0]">
+                <p className="mt-1 font-mono text-xs text-muted-foreground">
                   Alliance {candidate.allianceScore?.toFixed(1) ?? '—'}/10 ·
                   Defense {candidate.defenses.at(-1)?.intensity ?? '—'}/5
                 </p>
                 {candidate.milestones?.map((milestone) => (
-                  <p key={milestone} className="mt-2 text-xs text-[#8fb8a2]">
+                  <p key={milestone} className="mt-2 text-xs text-foreground">
                     {milestone}
                   </p>
                 ))}

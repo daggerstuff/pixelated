@@ -1,7 +1,7 @@
 # Pixelated Empathy — Developer Makefile
 # Usage: make <target>
 
-.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build
+.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down lockfile-resolve
 
 .DEFAULT_GOAL := help
 
@@ -45,6 +45,12 @@ lint: ## Run linter (oxlint)
 python-lint: ## Lint Python code via ruff
 	uv run ruff check .
 
+python-typecheck: ## Strict type check the Python pe service (mypy)
+	bash scripts/ci/python-typecheck.sh
+
+quality: ## Run all code-quality audits (boundaries, duplication, complexity, file size, tech debt, naming)
+	pnpm lint:quality
+
 format: ## Format all code
 	pnpm format
 
@@ -58,6 +64,15 @@ check-all: ## Run all checks (typecheck + lint + format)
 	pnpm check:all
 
 # ── Docker ──────────────────────────────────────────────
+
+pe-test-db: ## Start (or reuse) the throwaway pe test database and apply the schema
+	./scripts/devops/pe-test-db.sh
+
+pe-test-db-down: ## Stop the pe test database container
+	docker stop pixelated-pe-test-db
+
+lockfile-resolve: ## Resolve a conflicted pnpm-lock.yaml merge by regenerating it
+	./scripts/devops/resolve-lockfile-conflict.sh --add
 
 docker-up: ## Start database containers
 	docker compose -f infra/docker/docker-compose.db.yml up -d

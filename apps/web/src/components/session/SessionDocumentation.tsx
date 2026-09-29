@@ -50,7 +50,8 @@ export default function SessionDocumentationComponent({
 
   const [editableDocumentation, setEditableDocumentation] =
     useState<SessionDocumentation | null>(null)
-  const [previousDocumentation, setPreviousDocumentation] = useState(documentation)
+  const [previousDocumentation, setPreviousDocumentation] =
+    useState(documentation)
 
   if (documentation && documentation !== previousDocumentation) {
     setPreviousDocumentation(documentation)
@@ -233,14 +234,14 @@ export default function SessionDocumentationComponent({
   // Show loading state
   if (isLoading || isGenerating) {
     return (
-      <div className="bg-white flex flex-col items-center justify-center space-y-4 rounded-lg p-8 shadow-sm">
-        <h3 className="text-gray-800 text-xl font-medium">
+      <div className="flex flex-col items-center justify-center space-y-4 rounded-none bg-card p-8">
+        <h3 className="text-xl font-medium text-foreground">
           {isGenerating
             ? 'Generating Documentation...'
             : 'Loading Documentation...'}
         </h3>
-        <div className="border-gray-200 border-t-blue-600 h-12 w-12 animate-spin rounded-full border-4"></div>
-        <p className="text-gray-600 max-w-md text-center">
+        <div className="h-12 w-12 animate-spin rounded-none border-4 border-border border-t-ring"></div>
+        <p className="max-w-md text-center text-muted-foreground">
           {isGenerating
             ? 'Creating comprehensive clinical documentation based on session data. This may take a moment...'
             : 'Loading session documentation...'}
@@ -252,11 +253,11 @@ export default function SessionDocumentationComponent({
   // Show error state
   if (error) {
     return (
-      <div className="bg-white flex flex-col items-center justify-center space-y-4 rounded-lg p-8 shadow-sm">
-        <h3 className="text-red-600 text-xl font-medium">
+      <div className="flex flex-col items-center justify-center space-y-4 rounded-none bg-card p-8">
+        <h3 className="text-xl font-semibold text-foreground">
           Error Loading Documentation
         </h3>
-        <p className="text-gray-600 max-w-md text-center">
+        <p className="max-w-md text-center text-muted-foreground">
           {error.message ||
             'An error occurred while loading session documentation.'}
         </p>
@@ -265,13 +266,13 @@ export default function SessionDocumentationComponent({
             onClick={() => {
               void loadDocumentation(true)
             }}
-            className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition"
+            className="rounded-none bg-primary px-4 py-2 text-primary-foreground transition hover:bg-accent"
           >
             Retry
           </button>
           <button
             onClick={loadMockDocumentation}
-            className="bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition"
+            className="rounded-none bg-secondary px-4 py-2 text-foreground transition hover:bg-secondary"
           >
             Load Sample Documentation
           </button>
@@ -283,11 +284,11 @@ export default function SessionDocumentationComponent({
   // If no documentation is available yet, show generate button
   if (!editableDocumentation) {
     return (
-      <div className="bg-white flex flex-col items-center justify-center space-y-4 rounded-lg p-8 shadow-sm">
-        <h3 className="text-gray-800 text-xl font-medium">
+      <div className="flex flex-col items-center justify-center space-y-4 rounded-none bg-card p-8">
+        <h3 className="text-xl font-medium text-foreground">
           Session Documentation
         </h3>
-        <p className="text-gray-600 max-w-md text-center">
+        <p className="max-w-md text-center text-muted-foreground">
           Generate comprehensive clinical documentation based on this sessions
           data, including emotion analysis, therapeutic techniques, and progress
           tracking.
@@ -296,14 +297,14 @@ export default function SessionDocumentationComponent({
         <div className="mt-4 flex gap-3">
           <button
             onClick={handleGenerateDocumentation}
-            className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition"
+            className="rounded-none bg-primary px-4 py-2 text-primary-foreground transition hover:bg-accent"
           >
             Generate Documentation
           </button>
 
           <button
             onClick={loadMockDocumentation}
-            className="bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition"
+            className="rounded-none bg-secondary px-4 py-2 text-foreground transition hover:bg-secondary"
           >
             Load Sample Documentation
           </button>
@@ -313,20 +314,20 @@ export default function SessionDocumentationComponent({
   }
 
   return (
-    <div className="bg-white overflow-hidden rounded-lg shadow-sm">
+    <div className="overflow-hidden rounded-none bg-card">
       {/* Header with client info and duration */}
-      <div className="bg-gray-50 border-gray-200 border-b p-4">
+      <div className="border-b border-border bg-secondary p-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h3 className="text-gray-800 text-lg font-medium">
+            <h3 className="text-lg font-medium text-foreground">
               Session Documentation
             </h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-sm text-muted-foreground">
               Client ID: {clientId} | Session ID: {sessionId}
             </p>
           </div>
           {sessionDuration && (
-            <div className="text-gray-600 mt-2 text-sm md:mt-0">
+            <div className="mt-2 text-sm text-muted-foreground md:mt-0">
               Duration: {formatDuration(sessionDuration)}
             </div>
           )}
@@ -334,14 +335,14 @@ export default function SessionDocumentationComponent({
       </div>
 
       {/* Tabs */}
-      <div className="border-gray-200 border-b">
+      <div className="border-b border-border">
         <nav className="flex overflow-x-auto">
           <button
             onClick={() => setActiveTab('summary')}
             className={`whitespace-nowrap px-4 py-2 text-sm font-medium ${
               activeTab === 'summary'
-                ? 'border-blue-500 text-blue-600 border-b-2'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'border-b-2 border-ring text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Summary
@@ -350,8 +351,8 @@ export default function SessionDocumentationComponent({
             onClick={() => setActiveTab('techniques')}
             className={`whitespace-nowrap px-4 py-2 text-sm font-medium ${
               activeTab === 'techniques'
-                ? 'border-blue-500 text-blue-600 border-b-2'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'border-b-2 border-ring text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Techniques
@@ -360,8 +361,8 @@ export default function SessionDocumentationComponent({
             onClick={() => setActiveTab('progress')}
             className={`whitespace-nowrap px-4 py-2 text-sm font-medium ${
               activeTab === 'progress'
-                ? 'border-blue-500 text-blue-600 border-b-2'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'border-b-2 border-ring text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Progress
@@ -370,8 +371,8 @@ export default function SessionDocumentationComponent({
             onClick={() => setActiveTab('patterns')}
             className={`whitespace-nowrap px-4 py-2 text-sm font-medium ${
               activeTab === 'patterns'
-                ? 'border-blue-500 text-blue-600 border-b-2'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'border-b-2 border-ring text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Patterns
@@ -380,8 +381,8 @@ export default function SessionDocumentationComponent({
             onClick={() => setActiveTab('full')}
             className={`whitespace-nowrap px-4 py-2 text-sm font-medium ${
               activeTab === 'full'
-                ? 'border-blue-500 text-blue-600 border-b-2'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'border-b-2 border-ring text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Full Documentation
@@ -394,7 +395,7 @@ export default function SessionDocumentationComponent({
         {activeTab === 'summary' && (
           <div className="space-y-4">
             <section>
-              <h4 className="text-md text-gray-800 mb-2 font-medium">
+              <h4 className="text-md mb-2 font-medium text-foreground">
                 Session Summary
               </h4>
               {!readOnly ? (
@@ -403,15 +404,17 @@ export default function SessionDocumentationComponent({
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('summary', e.target.value)
                   }
-                  className="border-gray-300 min-h-[100px] w-full rounded-md border p-2"
+                  className="min-h-[100px] w-full rounded-none border border-input p-2"
                 />
               ) : (
-                <p className="text-gray-700">{editableDocumentation.summary}</p>
+                <p className="text-foreground">
+                  {editableDocumentation.summary}
+                </p>
               )}
             </section>
 
             <section>
-              <h4 className="text-md text-gray-800 mb-2 font-medium">
+              <h4 className="text-md mb-2 font-medium text-foreground">
                 Key Insights
               </h4>
               <ul className="list-disc space-y-1 pl-5">
@@ -425,7 +428,7 @@ export default function SessionDocumentationComponent({
                     return (
                       <li
                         key={key || 'insight-empty'}
-                        className="text-gray-700"
+                        className="text-foreground"
                       >
                         {!readOnly ? (
                           <input
@@ -441,7 +444,7 @@ export default function SessionDocumentationComponent({
                               newInsights[index] = e.target.value
                               handleChange('keyInsights', newInsights)
                             }}
-                            className="border-gray-300 w-full rounded-md border p-1"
+                            className="w-full rounded-none border border-input p-1"
                           />
                         ) : (
                           insight
@@ -459,7 +462,7 @@ export default function SessionDocumentationComponent({
                       '',
                     ])
                   }}
-                  className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
+                  className="mt-2 text-sm font-medium text-foreground hover:text-foreground"
                 >
                   + Add Insight
                 </button>
@@ -467,7 +470,7 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className="text-md text-gray-800 mb-2 font-medium">
+              <h4 className="text-md mb-2 font-medium text-foreground">
                 Recommended Follow-Up
               </h4>
               {!readOnly ? (
@@ -476,17 +479,17 @@ export default function SessionDocumentationComponent({
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('recommendedFollowUp', e.target.value)
                   }
-                  className="border-gray-300 min-h-[80px] w-full rounded-md border p-2"
+                  className="min-h-[80px] w-full rounded-none border border-input p-2"
                 />
               ) : (
-                <p className="text-gray-700">
+                <p className="text-foreground">
                   {editableDocumentation.recommendedFollowUp}
                 </p>
               )}
             </section>
 
             <section>
-              <h4 className="text-md text-gray-800 mb-2 font-medium">
+              <h4 className="text-md mb-2 font-medium text-foreground">
                 Next Session Plan
               </h4>
               {!readOnly ? (
@@ -495,10 +498,10 @@ export default function SessionDocumentationComponent({
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     handleChange('nextSessionPlan', e.target.value)
                   }
-                  className="border-gray-300 min-h-[80px] w-full rounded-md border p-2"
+                  className="min-h-[80px] w-full rounded-none border border-input p-2"
                 />
               ) : (
-                <p className="text-gray-700">
+                <p className="text-foreground">
                   {editableDocumentation.nextSessionPlan}
                 </p>
               )}
@@ -508,7 +511,7 @@ export default function SessionDocumentationComponent({
 
         {activeTab === 'techniques' && (
           <div className="space-y-4">
-            <h4 className="text-md text-gray-800 mb-2 font-medium">
+            <h4 className="text-md mb-2 font-medium text-foreground">
               Therapeutic Techniques Used
             </h4>
             <div className="space-y-3">
@@ -529,10 +532,10 @@ export default function SessionDocumentationComponent({
                   return (
                     <div
                       key={key || `technique-${technique.description}`}
-                      className="border-gray-200 rounded-md border p-3"
+                      className="rounded-none border border-border p-3"
                     >
                       <div className="mb-2">
-                        <h5 className="text-gray-800 font-medium">
+                        <h5 className="font-medium text-foreground">
                           {!readOnly ? (
                             <input
                               type="text"
@@ -554,7 +557,7 @@ export default function SessionDocumentationComponent({
                                   newTechniques,
                                 )
                               }}
-                              className="border-gray-300 w-full rounded-md border p-1"
+                              className="w-full rounded-none border border-input p-1"
                             />
                           ) : (
                             technique.name
@@ -582,16 +585,16 @@ export default function SessionDocumentationComponent({
                                 newTechniques,
                               )
                             }}
-                            className="border-gray-300 w-full rounded-md border p-1"
+                            className="w-full rounded-none border border-input p-1"
                           />
                         ) : (
-                          <p className="text-gray-700">
+                          <p className="text-foreground">
                             {technique.description}
                           </p>
                         )}
                       </div>
                       <div className="flex items-center">
-                        <span className="text-gray-600 mr-2 text-sm">
+                        <span className="mr-2 text-sm text-muted-foreground">
                           Effectiveness:
                         </span>
                         {!readOnly ? (
@@ -620,9 +623,9 @@ export default function SessionDocumentationComponent({
                             className="mr-2 w-32"
                           />
                         ) : (
-                          <div className="bg-gray-200 mr-2 h-2 w-32 rounded-full">
+                          <div className="mr-2 h-2 w-32 rounded-none bg-secondary">
                             <div
-                              className="bg-blue-600 h-full rounded-full"
+                              className="h-full rounded-none bg-primary"
                               style={{
                                 width: `${(technique.effectiveness / 10) * 100}%`,
                               }}
@@ -650,7 +653,7 @@ export default function SessionDocumentationComponent({
                     },
                   ])
                 }}
-                className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
+                className="mt-2 text-sm font-medium text-foreground hover:text-foreground"
               >
                 + Add Technique
               </button>
@@ -661,12 +664,12 @@ export default function SessionDocumentationComponent({
         {activeTab === 'progress' && (
           <div className="space-y-4">
             <section>
-              <h4 className="text-md text-gray-800 mb-2 font-medium">
+              <h4 className="text-md mb-2 font-medium text-foreground">
                 Treatment Progress
               </h4>
 
               <div className="mt-3 space-y-4">
-                <h5 className="text-gray-700 text-sm font-medium">
+                <h5 className="text-sm font-medium text-foreground">
                   Treatment Goals
                 </h5>
                 {editableDocumentation.treatmentProgress?.goals.map(
@@ -686,7 +689,7 @@ export default function SessionDocumentationComponent({
                     return (
                       <div
                         key={key || 'goal-empty'}
-                        className="border-gray-200 rounded-md border p-3"
+                        className="rounded-none border border-border p-3"
                       >
                         <div className="mb-2">
                           {!readOnly ? (
@@ -709,16 +712,16 @@ export default function SessionDocumentationComponent({
                                   goals: newGoals,
                                 })
                               }}
-                              className="border-gray-300 w-full rounded-md border p-1"
+                              className="w-full rounded-none border border-input p-1"
                             />
                           ) : (
-                            <p className="text-gray-800 font-medium">
+                            <p className="font-medium text-foreground">
                               {goal.description}
                             </p>
                           )}
                         </div>
                         <div className="mb-2 flex items-center">
-                          <span className="text-gray-600 mr-2 text-sm">
+                          <span className="mr-2 text-sm text-muted-foreground">
                             Progress:
                           </span>
                           {!readOnly ? (
@@ -747,9 +750,9 @@ export default function SessionDocumentationComponent({
                               className="mr-2 w-32"
                             />
                           ) : (
-                            <div className="bg-gray-200 mr-2 h-2 w-32 rounded-full">
+                            <div className="mr-2 h-2 w-32 rounded-none bg-secondary">
                               <div
-                                className="bg-blue-600 h-full rounded-full"
+                                className="h-full rounded-none bg-primary"
                                 style={{ width: `${goal.progress}%` }}
                               ></div>
                             </div>
@@ -779,11 +782,11 @@ export default function SessionDocumentationComponent({
                                   goals: newGoals,
                                 })
                               }}
-                              className="border-gray-300 w-full rounded-md border p-1"
+                              className="w-full rounded-none border border-input p-1"
                               placeholder="Notes on goal progress"
                             />
                           ) : (
-                            <p className="text-gray-700 text-sm">
+                            <p className="text-sm text-foreground">
                               {goal.notes}
                             </p>
                           )}
@@ -810,7 +813,7 @@ export default function SessionDocumentationComponent({
                         goals: newGoals,
                       })
                     }}
-                    className="text-blue-600 hover:text-blue-800 text-sm"
+                    className="text-sm font-medium text-foreground hover:text-foreground"
                   >
                     + Add Goal
                   </button>
@@ -818,7 +821,7 @@ export default function SessionDocumentationComponent({
               </div>
 
               <div className="mt-4">
-                <h5 className="text-gray-700 mb-2 text-sm font-medium">
+                <h5 className="mb-2 text-sm font-medium text-foreground">
                   Overall Assessment
                 </h5>
                 {!readOnly ? (
@@ -833,10 +836,10 @@ export default function SessionDocumentationComponent({
                         overallAssessment: e.target.value,
                       })
                     }}
-                    className="border-gray-300 min-h-[100px] w-full rounded-md border p-2"
+                    className="min-h-[100px] w-full rounded-none border border-input p-2"
                   />
                 ) : (
-                  <p className="text-gray-700">
+                  <p className="text-foreground">
                     {editableDocumentation.treatmentProgress?.overallAssessment}
                   </p>
                 )}
@@ -844,7 +847,7 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className="text-md text-gray-800 mb-2 font-medium">
+              <h4 className="text-md mb-2 font-medium text-foreground">
                 Client Strengths
               </h4>
               <ul className="list-disc space-y-1 pl-5">
@@ -858,7 +861,7 @@ export default function SessionDocumentationComponent({
                     return (
                       <li
                         key={key || 'strength-empty'}
-                        className="text-gray-700"
+                        className="text-foreground"
                       >
                         {!readOnly ? (
                           <input
@@ -875,7 +878,7 @@ export default function SessionDocumentationComponent({
                               newStrengths[index] = e.target.value
                               handleChange('clientStrengths', newStrengths)
                             }}
-                            className="border-gray-300 w-full rounded-md border p-1"
+                            className="w-full rounded-none border border-input p-1"
                           />
                         ) : (
                           strength
@@ -893,7 +896,7 @@ export default function SessionDocumentationComponent({
                       '',
                     ])
                   }}
-                  className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
+                  className="mt-2 text-sm font-medium text-foreground hover:text-foreground"
                 >
                   + Add Strength
                 </button>
@@ -904,7 +907,7 @@ export default function SessionDocumentationComponent({
 
         {activeTab === 'patterns' && (
           <div className="space-y-4">
-            <h4 className="text-md text-gray-800 mb-2 font-medium">
+            <h4 className="text-md mb-2 font-medium text-foreground">
               Emotional Patterns Observed
             </h4>
             <div className="space-y-3">
@@ -921,10 +924,10 @@ export default function SessionDocumentationComponent({
                     return (
                       <div
                         key={key || 'pattern-empty'}
-                        className="border-gray-200 rounded-md border p-3"
+                        className="rounded-none border border-border p-3"
                       >
                         <div className="mb-2">
-                          <h5 className="text-gray-800 font-medium">
+                          <h5 className="font-medium text-foreground">
                             {!readOnly ? (
                               <input
                                 type="text"
@@ -943,7 +946,7 @@ export default function SessionDocumentationComponent({
                                   }
                                   handleChange('emotionalPatterns', newPatterns)
                                 }}
-                                className="border-gray-300 w-full rounded-md border p-1"
+                                className="w-full rounded-none border border-input p-1"
                               />
                             ) : (
                               pattern.pattern
@@ -968,10 +971,10 @@ export default function SessionDocumentationComponent({
                                 }
                                 handleChange('emotionalPatterns', newPatterns)
                               }}
-                              className="border-gray-300 w-full rounded-md border p-1"
+                              className="w-full rounded-none border border-input p-1"
                             />
                           ) : (
-                            <p className="text-gray-700">
+                            <p className="text-foreground">
                               {pattern.significance}
                             </p>
                           )}
@@ -992,14 +995,14 @@ export default function SessionDocumentationComponent({
                     },
                   ])
                 }}
-                className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
+                className="mt-2 text-sm font-medium text-foreground hover:text-foreground"
               >
                 + Add Pattern
               </button>
             )}
 
             <section className="mt-4">
-              <h4 className="text-md text-gray-800 mb-2 font-medium">
+              <h4 className="text-md mb-2 font-medium text-foreground">
                 Emergent Issues to Address
               </h4>
               <ul className="list-disc space-y-1 pl-5">
@@ -1011,7 +1014,10 @@ export default function SessionDocumentationComponent({
                       .replace(/\\W+/g, '-')}`
 
                     return (
-                      <li key={key || 'issue-empty'} className="text-gray-700">
+                      <li
+                        key={key || 'issue-empty'}
+                        className="text-foreground"
+                      >
                         {!readOnly ? (
                           <input
                             type="text"
@@ -1026,7 +1032,7 @@ export default function SessionDocumentationComponent({
                               newIssues[index] = e.target.value
                               handleChange('emergentIssues', newIssues)
                             }}
-                            className="border-gray-300 w-full rounded-md border p-1"
+                            className="w-full rounded-none border border-input p-1"
                           />
                         ) : (
                           issue
@@ -1044,7 +1050,7 @@ export default function SessionDocumentationComponent({
                       '',
                     ])
                   }}
-                  className="text-blue-600 hover:text-blue-800 mt-2 text-sm"
+                  className="mt-2 text-sm font-medium text-foreground hover:text-foreground"
                 >
                   + Add Emergent Issue
                 </button>
@@ -1056,14 +1062,14 @@ export default function SessionDocumentationComponent({
         {activeTab === 'full' && (
           <div className="space-y-6">
             <section>
-              <h4 className="text-gray-800 mb-3 text-lg font-medium">
+              <h4 className="mb-3 text-lg font-medium text-foreground">
                 Session Summary
               </h4>
-              <p className="text-gray-700 mb-4">
+              <p className="mb-4 text-foreground">
                 {editableDocumentation.summary}
               </p>
 
-              <h5 className="text-md text-gray-800 mb-2 font-medium">
+              <h5 className="text-md mb-2 font-medium text-foreground">
                 Key Insights
               </h5>
               <ul className="mb-4 list-disc space-y-1 pl-5">
@@ -1077,7 +1083,7 @@ export default function SessionDocumentationComponent({
                     return (
                       <li
                         key={key || 'insight-full-empty'}
-                        className="text-gray-700"
+                        className="text-foreground"
                       >
                         {insight}
                       </li>
@@ -1087,7 +1093,7 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className="text-gray-800 mb-3 text-lg font-medium">
+              <h4 className="mb-3 text-lg font-medium text-foreground">
                 Therapeutic Techniques Used
               </h4>
               <div className="mb-4 space-y-3">
@@ -1107,13 +1113,13 @@ export default function SessionDocumentationComponent({
                           key={key || 'technique-full-empty'}
                           className="mb-3"
                         >
-                          <h5 className="text-gray-800 font-medium">
+                          <h5 className="font-medium text-foreground">
                             {technique.name}{' '}
-                            <span className="text-gray-600 text-sm font-normal">
+                            <span className="text-sm font-normal text-muted-foreground">
                               (Effectiveness: {technique.effectiveness}/10)
                             </span>
                           </h5>
-                          <p className="text-gray-700">
+                          <p className="text-foreground">
                             {technique.description}
                           </p>
                         </div>
@@ -1124,7 +1130,7 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className="text-gray-800 mb-3 text-lg font-medium">
+              <h4 className="mb-3 text-lg font-medium text-foreground">
                 Emotional Patterns Observed
               </h4>
               <div className="mb-4 space-y-3">
@@ -1140,10 +1146,10 @@ export default function SessionDocumentationComponent({
                         .replace(/\\W+/g, '-')}`
                       return (
                         <div key={key || 'pattern-full-empty'} className="mb-3">
-                          <h5 className="text-gray-800 font-medium">
+                          <h5 className="font-medium text-foreground">
                             {pattern.pattern}
                           </h5>
-                          <p className="text-gray-700">
+                          <p className="text-foreground">
                             {pattern.significance}
                           </p>
                         </div>
@@ -1154,11 +1160,11 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className="text-gray-800 mb-3 text-lg font-medium">
+              <h4 className="mb-3 text-lg font-medium text-foreground">
                 Treatment Progress
               </h4>
 
-              <h5 className="text-md text-gray-700 mb-2 font-medium">
+              <h5 className="text-md mb-2 font-medium text-foreground">
                 Treatment Goals
               </h5>
               {editableDocumentation.treatmentProgress?.goals.map(
@@ -1173,16 +1179,16 @@ export default function SessionDocumentationComponent({
                     .replace(/\\W+/g, '-')}`
                   return (
                     <div key={key || 'goal-full-empty'} className="mb-3">
-                      <p className="text-gray-800 font-medium">
+                      <p className="font-medium text-foreground">
                         {goal.description}
                       </p>
                       <div className="mb-1 mt-1 flex items-center">
-                        <span className="text-gray-600 mr-2 text-sm">
+                        <span className="mr-2 text-sm text-muted-foreground">
                           Progress:
                         </span>
-                        <div className="bg-gray-200 mr-2 h-2 w-32 rounded-full">
+                        <div className="mr-2 h-2 w-32 rounded-none bg-secondary">
                           <div
-                            className="bg-blue-600 h-full rounded-full"
+                            className="h-full rounded-none bg-primary"
                             style={{ width: `${goal.progress}%` }}
                           ></div>
                         </div>
@@ -1190,22 +1196,22 @@ export default function SessionDocumentationComponent({
                           {goal.progress}%
                         </span>
                       </div>
-                      <p className="text-gray-700 text-sm">{goal.notes}</p>
+                      <p className="text-sm text-foreground">{goal.notes}</p>
                     </div>
                   )
                 },
               )}
 
-              <h5 className="text-md text-gray-700 mb-2 mt-4 font-medium">
+              <h5 className="text-md mb-2 mt-4 font-medium text-foreground">
                 Overall Assessment
               </h5>
-              <p className="text-gray-700 mb-4">
+              <p className="mb-4 text-foreground">
                 {editableDocumentation.treatmentProgress?.overallAssessment}
               </p>
             </section>
 
             <section>
-              <h4 className="text-gray-800 mb-2 text-lg font-medium">
+              <h4 className="mb-2 text-lg font-medium text-foreground">
                 Client Strengths
               </h4>
               <ul className="mb-4 list-disc space-y-1 pl-5">
@@ -1218,7 +1224,7 @@ export default function SessionDocumentationComponent({
                     return (
                       <li
                         key={key || 'strength-full-empty'}
-                        className="text-gray-700"
+                        className="text-foreground"
                       >
                         {strength}
                       </li>
@@ -1229,7 +1235,7 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className="text-gray-800 mb-2 text-lg font-medium">
+              <h4 className="mb-2 text-lg font-medium text-foreground">
                 Emergent Issues to Address
               </h4>
               <ul className="mb-4 list-disc space-y-1 pl-5">
@@ -1241,7 +1247,7 @@ export default function SessionDocumentationComponent({
                   return (
                     <li
                       key={key || 'issue-full-empty'}
-                      className="text-gray-700"
+                      className="text-foreground"
                     >
                       {issue}
                     </li>
@@ -1251,22 +1257,22 @@ export default function SessionDocumentationComponent({
             </section>
 
             <section>
-              <h4 className="text-gray-800 mb-2 text-lg font-medium">
+              <h4 className="mb-2 text-lg font-medium text-foreground">
                 Follow-Up and Planning
               </h4>
-              <div className="bg-gray-50 mb-3 rounded-md p-3">
-                <h5 className="text-md text-gray-800 mb-1 font-medium">
+              <div className="mb-3 rounded-none bg-secondary p-3">
+                <h5 className="text-md mb-1 font-medium text-foreground">
                   Recommended Follow-Up
                 </h5>
-                <p className="text-gray-700">
+                <p className="text-foreground">
                   {editableDocumentation.recommendedFollowUp}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-md p-3">
-                <h5 className="text-md text-gray-800 mb-1 font-medium">
+              <div className="rounded-none bg-secondary p-3">
+                <h5 className="text-md mb-1 font-medium text-foreground">
                   Next Session Plan
                 </h5>
-                <p className="text-gray-700">
+                <p className="text-foreground">
                   {editableDocumentation.nextSessionPlan}
                 </p>
               </div>
@@ -1275,23 +1281,23 @@ export default function SessionDocumentationComponent({
             {editableDocumentation.outcomePredictions &&
               editableDocumentation.outcomePredictions.length > 0 && (
                 <section className="mt-8">
-                  <h4 className="text-blue-800 mb-3 text-lg font-semibold">
+                  <h4 className="mb-3 text-lg font-medium font-semibold text-foreground">
                     Outcome Predictions
                   </h4>
                   <div className="overflow-x-auto">
-                    <table className="border-gray-200 bg-white min-w-full rounded-lg border">
+                    <table className="min-w-full rounded-none border border-border bg-card">
                       <thead>
-                        <tr className="bg-blue-50">
-                          <th className="text-gray-700 px-4 py-2 text-left text-sm font-medium">
+                        <tr className="bg-secondary">
+                          <th className="px-4 py-2 text-left text-sm font-medium text-foreground">
                             Technique
                           </th>
-                          <th className="text-gray-700 px-4 py-2 text-left text-sm font-medium">
+                          <th className="px-4 py-2 text-left text-sm font-medium text-foreground">
                             Predicted Efficacy
                           </th>
-                          <th className="text-gray-700 px-4 py-2 text-left text-sm font-medium">
+                          <th className="px-4 py-2 text-left text-sm font-medium text-foreground">
                             Confidence
                           </th>
-                          <th className="text-gray-700 px-4 py-2 text-left text-sm font-medium">
+                          <th className="px-4 py-2 text-left text-sm font-medium text-foreground">
                             Rationale
                           </th>
                         </tr>
@@ -1320,9 +1326,9 @@ export default function SessionDocumentationComponent({
                               return (
                                 <tr
                                   key={key || `prediction-${idx}`}
-                                  className="border-gray-100 hover:bg-blue-50 border-t transition-colors"
+                                  className="border-t border-border transition-colors hover:bg-accent"
                                 >
-                                  <td className="text-gray-900 px-4 py-2 font-semibold">
+                                  <td className="px-4 py-2 font-semibold text-foreground">
                                     {pred.technique}
                                   </td>
                                   <td className="px-4 py-2">
@@ -1331,7 +1337,7 @@ export default function SessionDocumentationComponent({
                                   <td className="px-4 py-2">
                                     {(pred.confidence * 100).toFixed(0)}%
                                   </td>
-                                  <td className="text-gray-700 px-4 py-2">
+                                  <td className="px-4 py-2 text-foreground">
                                     {pred.rationale}
                                   </td>
                                 </tr>
@@ -1348,10 +1354,10 @@ export default function SessionDocumentationComponent({
       </div>
 
       {!readOnly && showControls && (
-        <div className="border-gray-200 flex justify-end space-x-3 border-t p-4 pt-4">
+        <div className="flex justify-end space-x-3 border-t border-border p-4 pt-4">
           <button
             onClick={handleSaveChanges}
-            className="bg-green-600 text-white hover:bg-green-700 rounded-md px-4 py-2 transition"
+            className="rounded-none bg-primary px-4 py-2 text-primary-foreground transition hover:bg-accent"
             disabled={isLoading}
           >
             Save Changes
@@ -1359,7 +1365,7 @@ export default function SessionDocumentationComponent({
 
           <button
             onClick={handleGenerateDocumentation}
-            className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 transition"
+            className="rounded-none bg-primary px-4 py-2 text-primary-foreground transition hover:bg-accent"
             disabled={isGenerating}
           >
             Regenerate
@@ -1370,7 +1376,7 @@ export default function SessionDocumentationComponent({
               /* Export functionality could be implemented here */
               alert('Export functionality will be implemented soon!')
             }}
-            className="bg-gray-100 text-gray-800 hover:bg-gray-200 rounded-md px-4 py-2 transition"
+            className="rounded-none bg-secondary px-4 py-2 text-foreground transition hover:bg-secondary"
           >
             Export
           </button>

@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Version-controlled commit-msg entry point (husky).
+#
+# Rejects non-conventional commit messages via the shared template at
+# scripts/devops/hooks/templates/commit-msg.tmpl. $1 is the path to the
+# commit message file, forwarded verbatim to the delegate.
+exec bash scripts/devops/hooks/templates/commit-msg.tmpl "$1"

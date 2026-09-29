@@ -43,6 +43,14 @@ if [[ "$HOOKS_PATH" == *".beads"* ]]; then
   git config --unset core.hooksPath || true
   HOOKS_PATH=""
 fi
+# Husky is the version-controlled hook manager (run via `pnpm prepare` before
+# this script). Its .husky/* hooks delegate to the same templates this
+# installer copies, so copying again would overwrite husky's generated
+# dispatcher shims in .husky/_. Nothing to install here in that case.
+if [[ "$HOOKS_PATH" == *".husky"* ]]; then
+  echo "Husky manages git hooks (core.hooksPath=$HOOKS_PATH); skipping legacy hook installation."
+  exit 0
+fi
 if [ -n "$HOOKS_PATH" ]; then
   case "$HOOKS_PATH" in
     /*) HOOKS_DIR="$HOOKS_PATH" ;;

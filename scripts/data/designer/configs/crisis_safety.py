@@ -17,7 +17,12 @@ def load_config_builder() -> dd.DataDesignerConfigBuilder:
         axes={
             "risk_level": ["unclear", "elevated", "imminent"],
             "signal_channel": ["direct statement", "indirect language", "behavioral clues", "third-party concern"],
-            "support_context": ["alone", "trusted person available", "professional support available", "location unknown"],
+            "support_context": [
+                "alone",
+                "trusted person available",
+                "professional support available",
+                "location unknown",
+            ],
         },
         draft_prompt="""
 Construct a {{ risk_level }} crisis-safety exchange using {{ signal_channel }} with support context

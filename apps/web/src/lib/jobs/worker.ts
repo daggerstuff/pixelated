@@ -153,20 +153,20 @@ const jobsWorker = {
             request: RequestInfo
           })
           const batchStartTime = Date.now()
-          results = await (biasDetectionEngine as { analyzeSessionsBatch?: (...args: unknown[]) => Promise<unknown> }).analyzeSessionsBatch(
-            sessions,
-            user,
-            {
-              ipAddress:
-                typeof request?.metadata?.['ipAddress'] === 'string'
-                  ? request.metadata['ipAddress']
-                  : '',
-              userAgent:
-                typeof request?.metadata?.['userAgent'] === 'string'
-                  ? request.metadata['userAgent']
-                  : '',
-            },
-          )
+          results = await (
+            biasDetectionEngine as {
+              analyzeSessionsBatch?: (...args: unknown[]) => Promise<unknown>
+            }
+          ).analyzeSessionsBatch(sessions, user, {
+            ipAddress:
+              typeof request?.metadata?.['ipAddress'] === 'string'
+                ? request.metadata['ipAddress']
+                : '',
+            userAgent:
+              typeof request?.metadata?.['userAgent'] === 'string'
+                ? request.metadata['userAgent']
+                : '',
+          })
           const batchDurationMs = Date.now() - batchStartTime
           distributionMetric(
             'jobs.bias_analysis_batch.duration',

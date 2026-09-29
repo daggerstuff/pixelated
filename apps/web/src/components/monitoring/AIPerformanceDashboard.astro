@@ -41,20 +41,20 @@ const showOperationTypes = operationTypes || defaultOperationTypes
 const allMetrics = aiPerformanceMonitor.getAllMetrics()
 ---
 
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+<div class="bg-card rounded-none border border-border overflow-hidden">
   <div class="p-6">
     <div class="flex justify-between items-center mb-4">
       <div>
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+        <h2 class="text-xl font-semibold text-foreground">
           {title}
         </h2>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p class="mt-1 text-sm text-muted-foreground">
           {description}
         </p>
       </div>
       <button
         id="refresh-button"
-        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-none bg-primary text-primary-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -76,24 +76,24 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="bg-secondary rounded-none p-4">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Total Operations
         </h3>
         <p
           id="total-operations"
-          class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+          class="mt-1 text-2xl font-semibold text-foreground"
         >
           {allMetrics.length || 0}
         </p>
       </div>
-      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="bg-secondary rounded-none p-4">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Avg. Processing Time
         </h3>
         <p
           id="avg-processing-time"
-          class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+          class="mt-1 text-2xl font-semibold text-foreground"
         >
           {
             allMetrics.length > 0
@@ -102,13 +102,13 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
           }
         </p>
       </div>
-      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="bg-secondary rounded-none p-4">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Avg. Token Usage
         </h3>
         <p
           id="avg-token-usage"
-          class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+          class="mt-1 text-2xl font-semibold text-foreground"
         >
           {
             allMetrics.length > 0
@@ -122,13 +122,13 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
           }
         </p>
       </div>
-      <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+      <div class="bg-secondary rounded-none p-4">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Success Rate
         </h3>
         <p
           id="success-rate"
-          class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white"
+          class="mt-1 text-2xl font-semibold text-foreground"
         >
           {
             allMetrics.length > 0
@@ -142,7 +142,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
     <!-- Charts -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div>
-        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+        <h3 class="text-sm font-medium text-foreground mb-4">
           Processing Time by Operation Type
         </h3>
         <div class="h-80">
@@ -150,7 +150,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
         </div>
       </div>
       <div>
-        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+        <h3 class="text-sm font-medium text-foreground mb-4">
           Token Usage by Operation Type
         </h3>
         <div class="h-80">
@@ -161,11 +161,11 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
 
     <!-- Operation Type Tabs -->
     <div class="mb-6">
-      <div class="border-b border-gray-200 dark:border-gray-700">
+      <div class="border-b border-border">
         <nav class="flex space-x-8" aria-label="Tabs">
           <button
             id="tab-all"
-            class="border-green-500 text-green-600 dark:text-green-500 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button"
+            class="border-ring text-foreground whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button"
             data-tab="all"
           >
             All Operations
@@ -174,7 +174,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
             showOperationTypes.map((opType: string) => (
               <button
                 id={`tab-${opType}`}
-                class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button"
+                class="border-transparent text-muted-foreground hover:text-foreground hover:border-border whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button"
                 data-tab={opType}
               >
                 {opType
@@ -193,40 +193,40 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
 
     <!-- Recent Operations Table -->
     <div>
-      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+      <h3 class="text-sm font-medium text-foreground mb-4">
         Recent Operations
       </h3>
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-700">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-secondary">
             <tr>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Operation Type
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Processing Time
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Tokens (In/Out)
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Status
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Timestamp
               </th>
@@ -234,7 +234,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
           </thead>
           <tbody
             id="operations-table-body"
-            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+            class="bg-card divide-y divide-border"
           >
             <!-- Table rows will be inserted here by JavaScript -->
             {
@@ -242,7 +242,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
                 <tr>
                   <td
                     colspan="5"
-                    class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
+                    class="px-6 py-4 text-center text-sm text-muted-foreground"
                   >
                     No operations recorded yet
                   </td>
@@ -403,7 +403,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
     if (metrics.length === 0) {
       const row = document.createElement('tr')
       row.innerHTML = `
-        <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+        <td colspan="5" class="px-6 py-4 text-center text-sm text-muted-foreground">
           No operations recorded
         </td>
       `
@@ -425,7 +425,7 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
 
     recentMetrics.forEach((m) => {
       const row = document.createElement('tr')
-      row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700'
+      row.className = 'hover:bg-secondary'
 
       const formattedType = m.operationType
         .split('-')
@@ -440,23 +440,23 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
       }).format(m.endTime)
 
       row.innerHTML = `
-        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
           ${formattedType}
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
           ${m.processingTimeMs}ms
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
           ${m.inputTokens} / ${m.outputTokens}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm">
           ${
             m.success
-              ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">Success</span>'
-              : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100">Failed</span>'
+              ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">Success</span>'
+              : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-card border border-ring text-foreground font-semibold">Failed</span>'
           }
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
           ${formattedTime}
         </td>
       `
@@ -649,20 +649,12 @@ const allMetrics = aiPerformanceMonitor.getAllMetrics()
       button.addEventListener('click', (_event) => {
         // Update active tab
         tabButtons.forEach((btn) => {
-          btn.classList.remove(
-            'border-green-500',
-            'text-green-600',
-            'dark:text-green-500',
-          )
-          btn.classList.add('border-transparent', 'text-gray-500')
+          btn.classList.remove('border-ring', 'text-foreground')
+          btn.classList.add('border-transparent', 'text-muted-foreground')
         })
 
-        button.classList.remove('border-transparent', 'text-gray-500')
-        button.classList.add(
-          'border-green-500',
-          'text-green-600',
-          'dark:text-green-500',
-        )
+        button.classList.remove('border-transparent', 'text-muted-foreground')
+        button.classList.add('border-ring', 'text-foreground')
 
         // Update current tab and refresh data
         currentTab = button.dataset['tab']

@@ -1,0 +1,9 @@
+{
+  "$schema": "Boundary violation baseline for .dependency-cruiser.cjs",
+  "description": "Per-rule dependency-cruiser violation counts. Lower is better. The audit fails when a rule regresses above its pinned count; update with `pnpm lint:boundaries -- --update` only after intentionally changing the architecture.",
+  "generatedAt": "2026-09-14T23:13:03.935Z",
+  "target": "apps/web/src",
+  "rules": {
+    "no-circular": 28
+  }
+}

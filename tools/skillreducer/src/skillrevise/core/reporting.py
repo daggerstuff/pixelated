@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from typing import Any
 
 from skillrevise.core.metrics import trace_outcome_score
 from skillrevise.core.models import ExecutionTrace, HarnessResult, PairedEvaluation, TaskSpec
-
 
 METRIC_KEYS = (
     "success_rate",
@@ -41,7 +40,9 @@ def summarize_results(results: Sequence[HarnessResult]) -> dict[str, Any]:
         for iteration in result.iterations:
             failure_counts.update(label.value for label in iteration.diagnosis.labels)
         if result.iterations:
-            initial_failure_counts.update(label.value for label in result.iterations[0].diagnosis.labels)
+            initial_failure_counts.update(
+                label.value for label in result.iterations[0].diagnosis.labels
+            )
 
     version_counts = Counter(result.selected_skill.version for result in results)
     accepted = sum(int(_skill_is_accepted(result)) for result in results)
@@ -53,7 +54,9 @@ def summarize_results(results: Sequence[HarnessResult]) -> dict[str, Any]:
             "no_skill": _aggregate_no_skill(no_skill_evals),
             "initial_skill": _aggregate_evaluations(initial_evals),
             "selected_skill": _aggregate_evaluations(selected_evals),
-            "revision_delta": _delta(_aggregate_evaluations(selected_evals), _aggregate_evaluations(initial_evals)),
+            "revision_delta": _delta(
+                _aggregate_evaluations(selected_evals), _aggregate_evaluations(initial_evals)
+            ),
         },
         "transfer_table": {
             "initial_skill": _aggregate_transfer(initial_evals),
@@ -66,7 +69,8 @@ def summarize_results(results: Sequence[HarnessResult]) -> dict[str, Any]:
         "selection_table": {
             "selected_versions": dict(sorted(version_counts.items())),
             "changed_by_revision": sum(
-                int(result.selected_skill.version != result.initial_skill.version) for result in results
+                int(result.selected_skill.version != result.initial_skill.version)
+                for result in results
             ),
             "accepted_skills": accepted,
             "rejected_skills": len(results) - accepted,
@@ -132,12 +136,16 @@ def _aggregate_evaluations(evaluations: Sequence[PairedEvaluation]) -> dict[str,
         "success_gain": _mean(evaluation.utility.success_gain for evaluation in evaluations),
         "efficiency_gain": _mean(evaluation.utility.efficiency_gain for evaluation in evaluations),
         "transfer_gain": _mean(evaluation.utility.transfer_gain for evaluation in evaluations),
-        "interference_cost": _mean(evaluation.utility.interference_cost for evaluation in evaluations),
+        "interference_cost": _mean(
+            evaluation.utility.interference_cost for evaluation in evaluations
+        ),
         "overall_score": _mean(evaluation.utility.overall_score for evaluation in evaluations),
         "tokens": _mean(evaluation.with_skill.tokens for evaluation in evaluations),
         "tool_calls": _mean(evaluation.with_skill.tool_calls for evaluation in evaluations),
         "steps": _mean(evaluation.with_skill.steps for evaluation in evaluations),
-        "latency_seconds": _mean(evaluation.with_skill.latency_seconds for evaluation in evaluations),
+        "latency_seconds": _mean(
+            evaluation.with_skill.latency_seconds for evaluation in evaluations
+        ),
     }
 
 
@@ -149,8 +157,12 @@ def _aggregate_transfer(evaluations: Sequence[PairedEvaluation]) -> dict[str, fl
         return {"num_evaluated": 0.0, "avg_transfer_gain": 0.0, "avg_interference_rate": 0.0}
     return {
         "num_evaluated": float(len(evaluated)),
-        "avg_transfer_gain": _mean(item.transfer_summary.get("transfer_gain", 0.0) for item in evaluated),
-        "avg_interference_rate": _mean(item.transfer_summary.get("interference_rate", 0.0) for item in evaluated),
+        "avg_transfer_gain": _mean(
+            item.transfer_summary.get("transfer_gain", 0.0) for item in evaluated
+        ),
+        "avg_interference_rate": _mean(
+            item.transfer_summary.get("interference_rate", 0.0) for item in evaluated
+        ),
     }
 
 
@@ -162,7 +174,9 @@ def _summarize_by_family(results: Sequence[HarnessResult]) -> list[dict[str, flo
     rows: list[dict[str, float | str]] = []
     for family, items in sorted(grouped.items()):
         selected = _aggregate_evaluations([item.selected_evaluation for item in items])
-        initial = _aggregate_evaluations([item.iterations[0].evaluation for item in items if item.iterations])
+        initial = _aggregate_evaluations(
+            [item.iterations[0].evaluation for item in items if item.iterations]
+        )
         rows.append(
             {
                 "family": family,
@@ -206,7 +220,7 @@ def _empty_metrics() -> dict[str, float]:
     return {key: 0.0 for key in METRIC_KEYS}
 
 
-def _score_or_zero(trace) -> float:
+def _score_or_zero(trace: ExecutionTrace) -> float:
     score = trace_outcome_score(trace)
     return 0.0 if score is None else score
 
@@ -216,10 +230,10 @@ def _round_optional(value: float | None) -> float | None:
 
 
 def _skill_is_accepted(result: HarnessResult) -> bool:
-    return result.selected_evaluation.utility.overall_score > 0.0
+    return bool(result.selected_evaluation.utility.overall_score > 0.0)
 
 
-def _mean(values) -> float:
+def _mean(values: Iterable[float]) -> float:
     items = [float(value) for value in values]
     if not items:
         return 0.0

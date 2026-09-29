@@ -36,7 +36,7 @@ vi.mock('../../ai/GestaltClient', () => ({
   GestaltClient: (...args: unknown[]) => mockGestaltClient(...args),
 }))
 
-vi.mock('../../auth/jwt-service', () => ({
+vi.mock('../../../auth/jwt-service', () => ({
   validateToken: (...args: unknown[]) => mockValidateToken(...args),
 }))
 

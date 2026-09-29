@@ -9,15 +9,15 @@ import os
 import re
 import sys
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Any
+from typing import Any, TextIO
 from urllib import parse, request
 from urllib.error import HTTPError
 
 
-def print_out(msg: str = "", file=sys.stdout) -> None:
+def print_out(msg: str = "", file: TextIO = sys.stdout) -> None:
     file.write(f"{msg}\n")
     file.flush()
 
@@ -73,7 +73,7 @@ def resolve_asana_token() -> str:
 
 
 def resolve_asana_project_id() -> str:
-    project_id = _resolve_asana_project_defaults_from_sources().get("project_id", "")
+    project_id: str = _resolve_asana_project_defaults_from_sources().get("project_id", "")
     if project_id:
         return project_id
 
@@ -100,7 +100,8 @@ def resolve_asana_project_ids() -> tuple[str, ...]:
 
 
 def read_default_asana_project_id(config_path: Path | None = None) -> str:
-    return _read_asana_project_defaults(config_path).get("project_id", "")
+    project_id: str = _read_asana_project_defaults(config_path).get("project_id", "")
+    return project_id
 
 
 def read_default_asana_project_ids(config_path: Path | None = None) -> tuple[str, ...]:
@@ -1027,7 +1028,7 @@ def _fetch_asana_project_tasks(
 def _iter_asana_project_task_payloads(
     project_id: str,
     headers: Mapping[str, str],
-):
+) -> Iterator[Mapping[str, Any]]:
     fields = "gid,name,notes,completed,modified_at"
     offset = ""
     while True:
@@ -1052,10 +1053,11 @@ def _request_asana_project_task_page(
     if offset:
         query["offset"] = offset
     url = f"https://app.asana.com/api/1.0/projects/{project_id}/tasks?{parse.urlencode(query)}"
-    return _json_request("GET", url, headers=headers)
+    payload: dict[str, Any] = _json_request("GET", url, headers=headers)
+    return payload
 
 
-def _extract_asana_task_payloads(payload: Mapping[str, Any]):
+def _extract_asana_task_payloads(payload: Mapping[str, Any]) -> Iterator[Mapping[str, Any]]:
     for task in payload.get("data", []):
         if isinstance(task, Mapping):
             yield task
@@ -1185,7 +1187,7 @@ def apply_jira_action(action: Mapping[str, Any]) -> dict[str, Any]:
             project_key,
             resolve_jira_issue_type(project_key),
         )
-        response = _json_request(
+        response: dict[str, Any] = _json_request(
             "POST",
             f"{site_url}/rest/api/3/issue",
             headers=headers,
@@ -1380,9 +1382,9 @@ def _resolve_linear_label_ids(label_names: Sequence[str]) -> list[str]:
 
     resolved: list[str] = []
     for name in label_names:
-        label_id = _LINEAR_LABEL_IDS_CACHE.get(name.strip().lower())
-        if label_id:
-            resolved.append(label_id)
+        cached_label_id = _LINEAR_LABEL_IDS_CACHE.get(name.strip().lower())
+        if cached_label_id:
+            resolved.append(cached_label_id)
     return resolved
 
 
@@ -1432,7 +1434,7 @@ def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
             "issueUpdate(id: $id, input: $input) { success issue { id title } } }"
         )
         key = "issueUpdate"
-        variables: dict[str, Any] = {"input": input_payload, "id": target_id}
+        variables = {"input": input_payload, "id": target_id}
 
     response = _extract_graphql_payload(_linear_graphql_query(mutation, variables))
     container = response.get(key)

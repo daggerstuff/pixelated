@@ -176,8 +176,8 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
   }, [data, height])
 
   return (
-    <div className="bg-gray-800/50 border-gray-600/30 rounded-lg border p-6">
-      <h3 className="text-blue-200 mb-4 text-lg font-semibold">{title}</h3>
+    <div className="rounded-none border border-border bg-card p-6">
+      <h3 className="mb-4 text-lg font-semibold text-foreground">{title}</h3>
       <div className="relative">
         <canvas
           ref={canvasRef}
@@ -189,7 +189,7 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
           Your browser does not support the canvas element.
         </canvas>
         {data.length === 0 && (
-          <div className="text-gray-400 absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
             <div className="text-center">
               <ChartBarIcon className="mx-auto mb-2 h-8 w-8" />
               <p>No data available</p>

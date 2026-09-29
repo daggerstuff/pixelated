@@ -29,18 +29,8 @@ const {
 ---
 
 <div class="w-full max-w-6xl mx-auto transition-colors duration-300">
-  {
-    title && (
-      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
-        {title}
-      </h2>
-    )
-  }
-  {
-    description && (
-      <p class="mb-6 text-gray-600 dark:text-gray-400">{description}</p>
-    )
-  }
+  {title && <h2 class="text-2xl font-bold mb-4 text-foreground">{title}</h2>}
+  {description && <p class="mb-6 text-muted-foreground">{description}</p>}
 
   <MentalHealthChatDemoComponent
     client:only="react"

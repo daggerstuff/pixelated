@@ -1,0 +1,413 @@
+name: Quality
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'apps/web/src/**'
+      # Gitlink: a submodule bump can change pinned strict-typing debt.
+      - 'ai'
+      - 'agents/**'
+      - 'packages/**'
+      - 'scripts/ci/**'
+      - 'scripts/**/*.py'
+      - 'tools/**'
+      - 'tests/**'
+      - '.dependency-cruiser.cjs'
+      - '.jscpd.json'
+      - '.oxlintrc.complexity.json'
+      - '.eslintrc.naming.mjs'
+      - 'eslint.config.js'
+      - 'astro.config.*'
+      - 'config/**'
+      - 'pyproject.toml'
+      - 'package.json'
+      - '.github/workflows/quality.yml'
+  pull_request:
+    branches: [staging]
+  workflow_dispatch:
+
+# Cancel superseded runs so feedback on the newest commit is not queued
+# behind stale ones.
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Static code-quality gates. Each audit compares the current state against a
+  # pinned baseline and fails only on regressions, so existing debt does not
+  # block work but cannot grow. Baselines live in scripts/ci/*-baseline.json.
+  code-quality:
+    name: Code quality audits
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Module boundaries (dependency-cruiser)
+        run: pnpm lint:boundaries
+
+      - name: Duplicate code (jscpd)
+        run: pnpm lint:duplication
+
+      - name: Cyclomatic complexity (oxlint)
+        run: pnpm lint:complexity
+
+      - name: Large files
+        run: pnpm lint:file-size
+
+      - name: Technical debt markers
+        run: pnpm lint:tech-debt
+
+      - name: Naming conventions
+        run: pnpm lint:naming
+
+      - name: Mock-path resolution (vi.mock specifiers must resolve)
+        run: pnpm lint:mock-paths
+
+      - name: AGENTS.md validation (sections, paths, commands)
+        run: node scripts/ci/agents-md-audit.mjs
+
+  # Strict typing for the Python `pe` service. Scoped deliberately: the wider
+  # Python tree is not yet strict-clean (see pyproject.toml [tool.mypy]).
+  python-strict-types:
+    name: Python strict types (mypy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: mypy --strict (pe service, scripts/, tools/)
+        run: bash scripts/ci/python-typecheck.sh
+
+      - name: Python correctness ratchet (F821/F401/E722/B904)
+        run: node scripts/ci/python-ruff-audit.mjs
+
+      - name: Ruff lint gate (scripts/, tools/ — zero findings)
+        run: uv run ruff check scripts tools
+
+  # Strict-typing ratchet for the ai submodule's research tree. The
+  # submodule is legacy-exempt from the pe mypy gate; the ratchet pins
+  # its existing strict-error debt per file/code and fails CI when it
+  # grows or when a NEW file arrives with strict errors. Runs
+  # dependency-light (uv --no-project --with mypy), so the submodule's
+  # heavy ML dependency tree is not installed here.
+  ai-strict-ratchet:
+    name: ai submodule strict ratchet
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - name: Init submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Strict-typing ratchet (ai/research)
+        run: node scripts/ci/ai-strict-ratchet.mjs
+
+  # pe service test suite against a real postgres (the DB-backed tests are
+  # integration tests; there is no in-memory escape hatch for asyncpg).
+  # Coverage floor is a regression gate: current coverage is ~79%; the
+  # threshold is set at 75% so the floor fails only on real regression, not
+  # noise. Ratchet upward deliberately, never lower.
+  pe-integration-tests:
+    name: pe tests (postgres + coverage floor)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      PE_DATABASE_URL: postgresql+asyncpg://pe_test@localhost:5432/pixelated_empathy
+      PE_TESTING: '1'
+      # Same path layout as the documented local invocation: `.` for
+      # apps/web (src.* packages), `..` for the repo root (ai submodule).
+      PYTHONPATH: '.:..'
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: pixelated_empathy
+          POSTGRES_USER: pe_test
+          # Local-network service container for a throwaway CI database;
+          # GitHub does not expose it outside the runner.
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pe_test" --health-interval 5s
+          --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+      - name: Init submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # pe's audits route imports ai.research.quadit at module load, so
+        # the test suite needs the real submodule (mypy-only jobs use the
+        # structural-Protocol path instead and skip this step).
+        run: bash scripts/devops/init-submodules.sh
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      # Schema: alembic is not a runtime dependency, so run it ephemerally.
+      # env.py derives the sync URL from PE_DATABASE_URL itself.
+      - name: Apply pe schema (alembic)
+        working-directory: apps/web
+        run: |
+          cat > /tmp/pe-alembic.ini <<'EOF'
+          [alembic]
+          script_location = src/pe/migrations
+
+          [loggers]
+          keys = root
+          [handlers]
+          keys = console
+          [formatters]
+          keys = generic
+          [logger_root]
+          level = WARN
+          handlers = console
+          qualname =
+          [handler_console]
+          class = StreamHandler
+          args = (sys.stderr,)
+          level = NOTSET
+          formatter = generic
+          [formatter_generic]
+          format = %(levelname)-5.5s [%(name)s] %(message)s
+          EOF
+          uv run --with alembic --with psycopg2-binary \
+            python -m alembic -c /tmp/pe-alembic.ini upgrade head
+      - name: Run pe suite with coverage floor (75%)
+        working-directory: apps/web
+        run: |
+          uv run --with pytest-cov python -m pytest src/pe/tests -q \
+            --cov=src.pe --cov-report=term --cov-fail-under=75
+
+  # N+1 query detection. The detector lives in production code
+  # (apps/web/src/lib/db/query-counting.ts) and is exercised here so a
+  # regression in the instrumentation or a new N+1 becomes a test failure.
+  n-plus-one:
+    name: N+1 query detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Run N+1 detection tests
+        run: pnpm test:nplusone
+
+  # Test performance. Runs a bounded hermetic slice of the Vitest suite with the
+  # JSON reporter and gates total/slowest per-test durations against a pinned
+  # baseline, so a slow test is visible and cannot regress unnoticed.
+  test-performance:
+    name: Test performance tracking
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Measure test durations and enforce budget
+        run: pnpm test:perf
+
+      - name: Publish report to step summary
+        if: always()
+        run: cat .test-perf/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test-performance report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-performance-report
+          path: .test-perf/
+          retention-days: 14
+
+  # Test reliability. Three gates over the same hermetic slice used by the
+  # N+1 and test-performance jobs, so the numbers are comparable across jobs:
+  #   - flaky detection: repeat runs diffed for outcome changes (with a pinned
+  #     tolerance list in scripts/ci/flaky-baseline.json)
+  #   - isolation: ordered vs shuffled execution; tests must pass in both
+  #   - coverage ratchet: per-metric budget pinned in
+  #     scripts/ci/coverage-baseline.json (the global thresholds in
+  #     config/vitest.config.ts target full, non-hermetic runs)
+  test-reliability:
+    name: Test reliability (flaky / isolation / coverage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Flaky test detection (3 repeat runs)
+        run: pnpm test:flaky
+
+      - name: Test isolation (ordered vs shuffled)
+        run: pnpm test:isolation
+
+      - name: Coverage ratchet (hermetic slice)
+        run: pnpm test:coverage:gate
+
+      - name: Publish reports to step summary
+        if: always()
+        run: |
+          for f in .test-reliability/*.md; do
+            if [ -f "$f" ]; then
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              cat "$f" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - name: Upload test-reliability reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reliability-report
+          path: .test-reliability/
+          retention-days: 14
+
+  # Build performance. Times `pnpm build` (the same command CI and developers
+  # run) and gates wall-clock duration against a pinned budget
+  # (scripts/ci/build-perf-baseline.json), so build-time regressions — a new
+  # heavy dependency, bundle growth, a plugin misconfiguration — fail CI
+  # instead of silently stretching every subsequent run.
+  build-performance:
+    name: Build performance tracking
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Time the production build and enforce budget
+        run: pnpm build:perf
+
+      - name: Publish report to step summary
+        if: always()
+        run: cat .build-perf/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload build-performance report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-performance-report
+          path: .build-perf/
+          retention-days: 14
+
+  # Dependency health. Four ratcheted audits that fail only on NEW problems,
+  # so existing debt does not block work but cannot grow:
+  #   - heavy dependencies (install weight, scripts/ci/heavy-deps-baseline.json)
+  #   - version drift (duplicate resolved versions, version-drift-baseline.json)
+  #   - dead feature flags (flag-baseline.json)
+  #   - unused dependencies (knip ratchet, unused-deps-baseline.json)
+  dependency-health:
+    name: Dependency health audits
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Heavy dependencies (install weight)
+        run: pnpm lint:heavy-deps
+
+      - name: Version drift (duplicate versions)
+        run: pnpm lint:version-drift
+
+      - name: Dead feature flags
+        run: pnpm lint:flags
+
+      - name: Unused dependencies (knip ratchet)
+        run: pnpm lint:unused-deps
+
+      - name: Publish heavy-deps report to step summary
+        if: always() && hashFiles('.deps-audit/heavy-deps.md') != ''
+        run: cat .deps-audit/heavy-deps.md >> "$GITHUB_STEP_SUMMARY"

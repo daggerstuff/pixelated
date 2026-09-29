@@ -137,7 +137,9 @@ const description =
   <div class="max-w-4xl mx-auto px-4 py-12">
     <header class="mb-12">
       <div class="flex items-center gap-2 mb-4 text-sm text-slate-400">
-        <a href="/blog" class="hover:text-green-400 transition-colors">Blog</a>
+        <a href="/blog" class="hover:text-green-400 transition-colors">
+          Blog
+        </a>
         <span>/</span>
         <span class="text-green-400">All Posts</span>
       </div>
@@ -148,90 +150,86 @@ const description =
     </header>
 
     <div class="space-y-8 mb-12">
-      {
-        page.data.map((post: any) => (
-          <article class="group">
-            <div class="flex flex-col sm:flex-row gap-4">
-              <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
-                {formatDate(new Date(post.data.pubDate))}
-                <span class="hidden sm:block mt-1">
-                  {getReadingTime(post.body)}
-                </span>
-              </div>
-
-              <div class="flex-1">
-                <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
-                  <a href={`/blog/${post.slug}`} class="block">
-                    {post.data.title}
-                  </a>
-                </h3>
-
-                <p class="text-slate-300 mb-3 leading-relaxed">
-                  {post.data.description}
-                </p>
-
-                {post.data.tags && post.data.tags.length > 0 && (
-                  <div class="flex flex-wrap gap-2 mb-3">
-                    {post.data.tags.map((tag: string) => (
-                      <a
-                        href={`/blog/tags/${tag}`}
-                        class="text-xs text-green-400 hover:text-green-300 transition-colors"
-                      >
-                        #{tag}
-                      </a>
-                    ))}
-                  </div>
-                )}
-
-                <a
-                  href={`/blog/${post.slug}`}
-                  class="inline-flex items-center text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
-                >
-                  Read article
-                  <span class="ml-1 group-hover:translate-x-1 transition-transform">
-                    →
-                  </span>
-                </a>
-              </div>
-            </div>
-          </article>
-        ))
-      }
-
-      <!-- Pagination -->
-      {
-        (page.url.prev || page.url.next) && (
-          <div class="border-t border-slate-700 pt-8">
-            <div class="flex justify-between items-center">
-              <div>
-                {page.url.prev && (
-                  <a
-                    href={page.url.prev}
-                    class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
-                  >
-                    ← Previous page
-                  </a>
-                )}
-              </div>
-
-              <span class="text-sm text-slate-400">
-                Page {page.currentPage} of {page.lastPage}
+      {page.data.map((post: any) => (
+        <article class="group">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
+              {formatDate(new Date(post.data.pubDate))}
+              <span class="hidden sm:block mt-1">
+                {getReadingTime(post.body)}
               </span>
+            </div>
 
-              <div>
-                {page.url.next && (
-                  <a
-                    href={page.url.next}
-                    class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
-                  >
-                    Next page →
-                  </a>
-                )}
-              </div>
+            <div class="flex-1">
+              <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
+                <a href={`/blog/${post.slug}`} class="block">
+                  {post.data.title}
+                </a>
+              </h3>
+
+              <p class="text-slate-300 mb-3 leading-relaxed">
+                {post.data.description}
+              </p>
+
+              {post.data.tags && post.data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mb-3">
+                  {post.data.tags.map((tag: string) => (
+                    <a
+                      href={`/blog/tags/${tag}`}
+                      class="text-xs text-green-400 hover:text-green-300 transition-colors"
+                    >
+                      #{tag}
+                    </a>
+                  ))}
+                </div>
+              )}
+
+              <a
+                href={`/blog/${post.slug}`}
+                class="inline-flex items-center text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
+              >
+                Read article
+                <span class="ml-1 group-hover:translate-x-1 transition-transform">
+                  →
+                </span>
+              </a>
             </div>
           </div>
-        )
-      }
+        </article>
+      ))}
+
+      <!-- Pagination -->
+      {(page.url.prev || page.url.next) && (
+        <div class="border-t border-slate-700 pt-8">
+          <div class="flex justify-between items-center">
+            <div>
+              {page.url.prev && (
+                <a
+                  href={page.url.prev}
+                  class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
+                >
+                  ← Previous page
+                </a>
+              )}
+            </div>
+
+            <span class="text-sm text-slate-400">
+              Page {page.currentPage} of {page.lastPage}
+            </span>
+
+            <div>
+              {page.url.next && (
+                <a
+                  href={page.url.next}
+                  class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
+                >
+                  Next page →
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <!-- Navigation -->
       <div class="border-t border-slate-700 pt-8 mt-8">

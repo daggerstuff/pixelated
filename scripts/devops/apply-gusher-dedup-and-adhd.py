@@ -11,6 +11,7 @@ import json
 import re
 import subprocess
 from pathlib import Path
+from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 GUSHER_JSON = REPO_ROOT / "gusher-pix.json"
@@ -107,9 +108,9 @@ def load_jira_ref_updates(key_map: dict[str, str]) -> list[tuple[str, str]]:
 
 
 def merge_jira_import_dupes(
-    issues: list[dict],
+    issues: list[dict[str, Any]],
     key_map: dict[str, str],
-) -> tuple[list[dict], int, int]:
+) -> tuple[list[dict[str, Any]], int, int]:
     """Close beads created by jira pull when a Linear-linked canonical exists."""
     adhd_to_pix = {adhd: pix for pix, adhd in key_map.items()}
     issues_by_id = {issue["id"]: issue for issue in issues}
@@ -190,7 +191,7 @@ def apply_jsonl_batch(
     """Single-pass JSONL edit + one bd import (avoids per-issue Dolt round-trips)."""
     jsonl_path = REPO_ROOT / ".beads/issues.jsonl"
     lines = jsonl_path.read_text().splitlines()
-    issue_rows: list[dict] = []
+    issue_rows: list[dict[str, Any]] = []
     other_lines: list[str] = []
     for line in lines:
         if not line.strip():

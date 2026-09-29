@@ -114,10 +114,10 @@ export default function SessionAnalysis({
   if (error) {
     return (
       <div className="space-y-6">
-        <h2 className="text-gray-800 text-2xl font-semibold">
+        <h2 className="text-2xl font-semibold text-foreground">
           Session Analysis
         </h2>
-        <div className="bg-red-50 border-red-200 text-red-600 rounded-lg border p-4">
+        <div className="rounded-none border border-ring bg-secondary p-4 text-foreground">
           <p>Error loading session data: {error}</p>
         </div>
       </div>
@@ -126,10 +126,12 @@ export default function SessionAnalysis({
 
   return (
     <div className="space-y-6">
-      <h2 className="text-gray-800 text-2xl font-semibold">Session Analysis</h2>
+      <h2 className="text-2xl font-semibold text-foreground">
+        Session Analysis
+      </h2>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="bg-white rounded-lg p-4 shadow-sm">
+        <div className="rounded-none border border-border bg-card p-4">
           <h3 className="mb-4 text-lg font-medium">Emotional Tracking</h3>
           <EmotionTrackingChart
             data={emotionData}
@@ -137,20 +139,20 @@ export default function SessionAnalysis({
             height={300}
           />
 
-          <p className="text-gray-500 mt-4 text-sm">
+          <p className="mt-4 text-sm text-muted-foreground">
             This chart shows the client&apos;s emotional dimensions throughout
             the session, helping identify patterns and significant shifts.
           </p>
         </div>
 
         {/* Other session analysis components would go here */}
-        <div className="bg-white rounded-lg p-4 shadow-sm">
+        <div className="rounded-none border border-border bg-card p-4">
           <h3 className="mb-4 text-lg font-medium">Session Insights</h3>
           {isLoading ? (
             <div className="animate-pulse space-y-3">
-              <div className="bg-gray-200 h-4 w-3/4 rounded"></div>
-              <div className="bg-gray-200 h-4 w-1/2 rounded"></div>
-              <div className="bg-gray-200 h-4 w-5/6 rounded"></div>
+              <div className="bg-secondary-foreground/10 h-4 w-3/4 rounded-none"></div>
+              <div className="bg-secondary-foreground/10 h-4 w-1/2 rounded-none"></div>
+              <div className="bg-secondary-foreground/10 h-4 w-5/6 rounded-none"></div>
             </div>
           ) : (
             <div className="space-y-4">

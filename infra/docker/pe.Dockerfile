@@ -1,7 +1,7 @@
 # Pixelated Empathy — FastAPI Backend (src/pe)
 # Multi-stage build for the clinical simulation platform
 
-FROM python:3.13-slim AS builder
+FROM python:3.14-slim AS builder
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -26,7 +26,7 @@ RUN uv venv /app/.venv && \
     uv pip install --python /app/.venv/bin/python asyncpg
 
 # ── Runtime stage ──────────────────────────────────────────────────
-FROM python:3.13-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \

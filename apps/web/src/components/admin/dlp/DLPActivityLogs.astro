@@ -67,64 +67,62 @@ const getEventBadge = (
 <div>
   <h2 class="text-xl font-semibold">DLP Activity Log</h2>
 
-  {
-    logs.length === 0 ? (
-      <Card class="mt-4">
-        <CardContent class="py-8">
-          <p class="text-center text-muted-foreground">
-            No DLP activity logs found.
-          </p>
-        </CardContent>
-      </Card>
-    ) : (
-      <div class="space-y-4 mt-4">
-        {logs.map((log: DLPActivityLog) => {
-          const eventBadge = getEventBadge(log.eventType)
-          return (
-            <Card>
-              <CardHeader class="pb-2">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <CardTitle class="text-base font-medium">
-                      {log.action}
-                    </CardTitle>
-                    <div class="text-sm text-muted-foreground">
-                      {formatDate(log.timestamp)} • User: {log.userId}
-                    </div>
+  {logs.length === 0 ? (
+    <Card class="mt-4">
+      <CardContent class="py-8">
+        <p class="text-center text-muted-foreground">
+          No DLP activity logs found.
+        </p>
+      </CardContent>
+    </Card>
+  ) : (
+    <div class="space-y-4 mt-4">
+      {logs.map((log: DLPActivityLog) => {
+        const eventBadge = getEventBadge(log.eventType)
+        return (
+          <Card>
+            <CardHeader class="pb-2">
+              <div class="flex justify-between items-start">
+                <div>
+                  <CardTitle class="text-base font-medium">
+                    {log.action}
+                  </CardTitle>
+                  <div class="text-sm text-muted-foreground">
+                    {formatDate(log.timestamp)} • User: {log.userId}
                   </div>
-                  <Badge variant={eventBadge.variant}>{eventBadge.text}</Badge>
                 </div>
-              </CardHeader>
-              <CardContent class="pt-0">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <div>
-                    <p class="text-sm font-medium">Triggered Rules:</p>
-                    <div class="flex flex-wrap gap-1 mt-1">
-                      {log.triggeredRules.map((rule: string) => (
-                        <span>
-                          <Badge variant="outline">{rule}</Badge>
-                        </span>
-                      ))}
-                    </div>
+                <Badge variant={eventBadge.variant}>{eventBadge.text}</Badge>
+              </div>
+            </CardHeader>
+            <CardContent class="pt-0">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div>
+                  <p class="text-sm font-medium">Triggered Rules:</p>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    {log.triggeredRules.map((rule: string) => (
+                      <span>
+                        <Badge variant="outline">{rule}</Badge>
+                      </span>
+                    ))}
                   </div>
-                  {log.destination && (
-                    <div>
-                      <p class="text-sm font-medium">Destination:</p>
-                      <p class="text-sm">{log.destination}</p>
-                    </div>
-                  )}
-                  {log.reason && (
-                    <div class="md:col-span-2">
-                      <p class="text-sm font-medium">Reason:</p>
-                      <p class="text-sm">{log.reason}</p>
-                    </div>
-                  )}
                 </div>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
-    )
-  }
+                {log.destination && (
+                  <div>
+                    <p class="text-sm font-medium">Destination:</p>
+                    <p class="text-sm">{log.destination}</p>
+                  </div>
+                )}
+                {log.reason && (
+                  <div class="md:col-span-2">
+                    <p class="text-sm font-medium">Reason:</p>
+                    <p class="text-sm">{log.reason}</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )
+      })}
+    </div>
+  )}
 </div>

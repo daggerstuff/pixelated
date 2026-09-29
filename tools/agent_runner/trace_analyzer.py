@@ -12,16 +12,19 @@ from typing import Any
 logger = logging.getLogger("agent_runner.trace_analyzer")
 
 try:
-    from dotenv import load_dotenv  # type: ignore[import-untyped]
+    from dotenv import load_dotenv
 
     load_dotenv(override=True)
 except ImportError:
     pass
 
+LangSmithClient: Any = None
 try:
-    from langsmith import Client as LangSmithClient  # type: ignore[import-untyped]
+    from langsmith import Client as _LangSmithClient
+
+    LangSmithClient = _LangSmithClient
 except ImportError:
-    LangSmithClient = None
+    pass
 
 
 @dataclass
@@ -92,9 +95,11 @@ class TraceAnalyzer:
             if res.returncode == 0 and res.stdout.strip():
                 data = json.loads(res.stdout)
                 if isinstance(data, list):
-                    return data
+                    cli_traces: list[dict[str, Any]] = data
+                    return cli_traces
                 if isinstance(data, dict) and "runs" in data:
-                    return data["runs"]
+                    cli_runs: list[dict[str, Any]] = data["runs"]
+                    return cli_runs
         except Exception as e:
             logger.debug("LangSmith CLI list failed: %s", e)
 

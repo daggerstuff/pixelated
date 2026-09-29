@@ -12,6 +12,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import TypedDict
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -33,28 +34,38 @@ def get_git_branch() -> str:
         return "unknown"
 
 
-def mock_provider_status(provider: str) -> dict:
+class ProviderStatus(TypedDict):
+    """Status payload for a single CI/CD provider."""
+
+    status: str
+    pipelineUrl: str
+    checks: dict[str, str]
+
+
+class ProviderStatusSkipped(TypedDict):
+    status: str
+    checks: dict[str, str]
+
+
+class QualityGate(TypedDict):
+    status: str
+    value: float
+    target: float
+
+
+def mock_provider_status(provider: str) -> ProviderStatus | ProviderStatusSkipped:
     """Generate simulated status response for testing/dry-runs."""
     if provider == "github":
         return {
             "status": "pass",
             "pipelineUrl": "https://github.com/daggerstuff/pixelated/actions/runs/123456",
-            "checks": {
-                "build": "pass",
-                "ai-validation": "pass",
-                "security-scanning": "pass",
-                "bias-detection": "pass"
-            }
+            "checks": {"build": "pass", "ai-validation": "pass", "security-scanning": "pass", "bias-detection": "pass"},
         }
     if provider == "gitlab":
         return {
             "status": "pass",
             "pipelineUrl": "https://gitlab.com/daggerstuff/pixelated/-/pipelines/789012",
-            "checks": {
-                "validate:dependencies": "pass",
-                "validate:lint": "pass",
-                "validate:typecheck": "pass"
-            }
+            "checks": {"validate:dependencies": "pass", "validate:lint": "pass", "validate:typecheck": "pass"},
         }
     if provider == "bitbucket":
         return {
@@ -64,15 +75,15 @@ def mock_provider_status(provider: str) -> dict:
                 "governance-validate": "pass",
                 "ingestion-stub-check": "pass",
                 "quality-scoring-test": "pass",
-                "sonarcloud-scan": "pass"
-            }
+                "sonarcloud-scan": "pass",
+            },
         }
     return {"status": "skipped", "checks": {}}
 
 
-def gather_provider_statuses(dry_run: bool) -> dict:
+def gather_provider_statuses(dry_run: bool) -> dict[str, ProviderStatus | ProviderStatusSkipped]:
     """Gather statuses from the active providers."""
-    providers = {}
+    providers: dict[str, ProviderStatus | ProviderStatusSkipped] = {}
     for name in ["github", "gitlab", "bitbucket"]:
         token = os.environ.get(f"{name.upper()}_TOKEN")
         if token and not dry_run:
@@ -83,7 +94,10 @@ def gather_provider_statuses(dry_run: bool) -> dict:
     return providers
 
 
-def calculate_statistics(providers: dict, quality_gates: dict) -> tuple:
+def calculate_statistics(
+    providers: dict[str, ProviderStatus | ProviderStatusSkipped],
+    quality_gates: dict[str, QualityGate],
+) -> tuple[int, int, int, int]:
     """Calculate summary statistics and return (total, passed, failed, warnings)."""
     total_checks = 0
     passed_checks = 0
@@ -126,17 +140,17 @@ def aggregate_readiness(dry_run: bool = False, output_path: str | None = None) -
     security_vulns_val = 0
     security_vulns_target = 0
 
-    quality_gates = {
+    quality_gates: dict[str, QualityGate] = {
         "testCoverage": {
             "status": "pass" if test_coverage_val >= test_coverage_target else "fail",
             "value": test_coverage_val,
-            "target": test_coverage_target
+            "target": test_coverage_target,
         },
         "securityVulnerabilities": {
             "status": "pass" if security_vulns_val <= security_vulns_target else "fail",
             "value": security_vulns_val,
-            "target": security_vulns_target
-        }
+            "target": security_vulns_target,
+        },
     }
 
     total_checks, passed_checks, failed_checks, warnings = calculate_statistics(providers, quality_gates)
@@ -156,7 +170,7 @@ def aggregate_readiness(dry_run: bool = False, output_path: str | None = None) -
         "overallStatus": overall_status,
         "overallScore": round(overall_score, 1),
         "providers": providers,
-        "qualityGates": quality_gates
+        "qualityGates": quality_gates,
     }
 
     logger.info("\n==================================================")
@@ -188,7 +202,7 @@ def aggregate_readiness(dry_run: bool = False, output_path: str | None = None) -
     return 0
 
 
-def main():
+def main() -> None:
     """Main execution function."""
     parser = argparse.ArgumentParser(description="Aggregates CI/CD statuses across multiple providers.")
     parser.add_argument("--dry-run", action="store_true", help="Simulate API calls with mock responses")

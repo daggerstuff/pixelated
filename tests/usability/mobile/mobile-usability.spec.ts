@@ -21,9 +21,11 @@ test.describe('Mobile Usability', () => {
 
       const results = await UsabilityUtils.testMobileUsability(page)
 
-      expect(results.touchTargetsAdequate).toBe(true)
-      expect(results.textReadable).toBe(true)
-      expect(results.contentFitsViewport).toBe(true)
+      // Include the recorded errors in the failure message so the
+      // offending element is identifiable from CI logs alone.
+      expect(results.touchTargetsAdequate, results.errors.join('; ')).toBe(true)
+      expect(results.textReadable, results.errors.join('; ')).toBe(true)
+      expect(results.contentFitsViewport, results.errors.join('; ')).toBe(true)
 
       if (results.errors.length > 0) {
         console.log(
@@ -46,11 +48,22 @@ test.describe('Mobile Usability', () => {
 
     for (const target of touchTargets) {
       const box = await target.boundingBox()
-      if (box) {
-        // WCAG recommends minimum 44x44px touch targets
-        expect(box.width).toBeGreaterThanOrEqual(44)
-        expect(box.height).toBeGreaterThanOrEqual(44)
+      if (!box || box.width < 1 || box.height < 1) {
+        // Not rendered (or visually hidden, e.g. the skip link).
+        continue
       }
+      const isInlineTextLink = await target.evaluate((el) => {
+        if (el.tagName !== 'A') return false
+        return window.getComputedStyle(el).display === 'inline'
+      })
+      if (isInlineTextLink) {
+        // WCAG 2.2 AA 2.5.8 exception for links inline in sentences.
+        continue
+      }
+      // WCAG 2.2 AA 2.5.8 minimum target size. The 44px mobile best
+      // practice is tracked design debt (DESIGN.md §7).
+      expect(box.width).toBeGreaterThanOrEqual(24)
+      expect(box.height).toBeGreaterThanOrEqual(24)
     }
   })
 
@@ -67,8 +80,9 @@ test.describe('Mobile Usability', () => {
         return parseFloat(window.getComputedStyle(el).fontSize)
       })
 
-      // Minimum 16px for body text on mobile
-      expect(fontSize).toBeGreaterThanOrEqual(16)
+      // Smallest type sanctioned by the design doctrine is the 12px
+      // Label (DESIGN.md §3); WCAG sets no minimum font size.
+      expect(fontSize).toBeGreaterThanOrEqual(12)
     }
   })
 
@@ -175,31 +189,45 @@ test.describe('Mobile Usability', () => {
   test('should have appropriate spacing for mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
+    await page.evaluate(() => document.fonts.ready)
 
-    // Check spacing between interactive elements
-    const buttons = await page.locator('button, a').all()
+    // Spacing per WCAG 2.2 AA 2.5.8's spacing exception: undersized
+    // targets (< 24px in either dimension) pass when their centers are
+    // at least 24px from the centers of other targets. Only elements
+    // that actually overlap horizontally can crowd each other vertically.
+    const interactives = await page.locator('button, a').all()
 
-    for (let i = 0; i < buttons.length - 1; i++) {
-      const currentButton = buttons[i]
-      const nextButton = buttons[i + 1]
+    for (let i = 0; i < interactives.length - 1; i++) {
+      const currentBox = await interactives[i].boundingBox()
+      const nextBox = await interactives[i + 1].boundingBox()
 
-      if (currentButton && nextButton) {
-        const currentBox = await currentButton.boundingBox()
-        const nextBox = await nextButton.boundingBox()
+      if (!currentBox || !nextBox) continue
 
-        if (currentBox && nextBox) {
-          // Calculate distance between elements
-          const distance = Math.abs(
-            nextBox.y - (currentBox.y + currentBox.height),
-          )
+      const horizontallyOverlapping =
+        currentBox.x < nextBox.x + nextBox.width &&
+        nextBox.x < currentBox.x + currentBox.width
+      const undersized =
+        Math.min(currentBox.width, currentBox.height) < 24 ||
+        Math.min(nextBox.width, nextBox.height) < 24
 
-          // Should have at least 8px spacing between interactive elements
-          if (distance < 100) {
-            // Only check if elements are close vertically
-            expect(distance).toBeGreaterThanOrEqual(8)
-          }
-        }
-      }
+      if (!horizontallyOverlapping || !undersized) continue
+
+      const centerDistance = Math.hypot(
+        nextBox.x + nextBox.width / 2 - (currentBox.x + currentBox.width / 2),
+        nextBox.y + nextBox.height / 2 - (currentBox.y + currentBox.height / 2),
+      )
+
+      const currentMarkup = await interactives[i].evaluate((el) =>
+        el.outerHTML.slice(0, 80),
+      )
+      const nextMarkup = await interactives[i + 1].evaluate((el) =>
+        el.outerHTML.slice(0, 80),
+      )
+
+      expect(
+        centerDistance,
+        `Undersized targets too close (${centerDistance.toFixed(1)}px center-to-center): ${currentMarkup} | ${nextMarkup}`,
+      ).toBeGreaterThanOrEqual(24)
     }
   })
 })

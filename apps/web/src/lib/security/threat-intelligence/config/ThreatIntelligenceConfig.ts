@@ -6,7 +6,7 @@
 import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('threat-intelligence-config')
 

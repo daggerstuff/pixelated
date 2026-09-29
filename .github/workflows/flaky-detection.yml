@@ -1,0 +1,46 @@
+# Flaky test detection. Runs nightly and on demand: executes the advisory
+# frontend buckets twice with NO retries (retries would mask the
+# non-determinism we are hunting) and fails when a test's outcome differs
+# between the two runs. A test failing in BOTH runs is a real bug, not
+# flakiness — that surfaces as a listed consistently-failing test so it is
+# not silently lost, but it should be triaged as a normal failure.
+name: Flaky Test Detection
+
+on:
+  schedule:
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  flaky-hunt:
+    name: Double-run advisory buckets (no retries)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        bucket: [frontend-components, frontend-hooks, frontend-utils]
+    env:
+      VITEST_SUITE: advisory
+      VITEST_BUCKET: ${{ matrix.bucket }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+      - name: Init submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: 24.16.0
+      - name: Run bucket twice and compare outcomes
+        run: node scripts/ci/flaky-detect.mjs

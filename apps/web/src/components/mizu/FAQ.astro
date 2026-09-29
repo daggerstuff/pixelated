@@ -35,35 +35,31 @@ const faqs = [
     </div>
 
     <div class="space-y-4">
-      {
-        faqs.map((faq) => (
-          <details class="group bg-slate-900/50 border border-white/5 rounded-2xl open:bg-slate-800/50 transition-all duration-300">
-            <summary class="flex justify-between items-center p-6 cursor-pointer list-none">
-              <span class="text-base font-medium text-white">
-                {faq.question}
-              </span>
-              <span class="transition-transform group-open:rotate-180">
-                <svg
-                  class="w-6 h-6 text-slate-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </span>
-            </summary>
-            <div class="px-6 pb-6 text-slate-400 leading-relaxed">
-              {faq.answer}
-            </div>
-          </details>
-        ))
-      }
+      {faqs.map((faq) => (
+        <details class="group bg-slate-900/50 border border-white/5 rounded-2xl open:bg-slate-800/50 transition-all duration-300">
+          <summary class="flex justify-between items-center p-6 cursor-pointer list-none">
+            <span class="text-base font-medium text-white">{faq.question}</span>
+            <span class="transition-transform group-open:rotate-180">
+              <svg
+                class="w-6 h-6 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </span>
+          </summary>
+          <div class="px-6 pb-6 text-slate-400 leading-relaxed">
+            {faq.answer}
+          </div>
+        </details>
+      ))}
     </div>
   </div>
 </section>

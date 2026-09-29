@@ -210,22 +210,22 @@ export const AgentMonitorDemo: React.FC = () => {
           <AgentPerformanceHeatmap stats={stats} />
           <button 
             onClick={resetPerformanceStats}
-            className="absolute top-6 right-6 p-1.5 rounded-md bg-black/40 text-white/20 hover:text-white/60 transition-all opacity-0 group-hover:opacity-100"
+            className="absolute top-6 right-6 p-1.5 rounded-none bg-secondary border border-border text-muted-foreground hover:text-foreground transition-all opacity-0 group-hover:opacity-100"
             title="Reset Statistics"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
+        <div className="p-6 rounded-none border border-border bg-card">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-white">Controls</h3>
-            <div className="flex bg-black/40 p-1 rounded-lg border border-white/5">
+            <div className="flex bg-secondary p-1 rounded-none border border-border">
               <button 
                 onClick={() => setMode('simulation')}
                 className={cn(
-                  "px-3 py-1 text-[10px] font-bold uppercase rounded-md transition-all",
-                  mode === 'simulation' ? "bg-indigo-500 text-white shadow-lg" : "text-white/40 hover:text-white/60"
+                  "px-3 py-1 text-[10px] font-bold uppercase rounded-none transition-all",
+                  mode === 'simulation' ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Sim
@@ -233,8 +233,8 @@ export const AgentMonitorDemo: React.FC = () => {
               <button 
                 onClick={() => setMode('backend')}
                 className={cn(
-                  "px-3 py-1 text-[10px] font-bold uppercase rounded-md transition-all",
-                  mode === 'backend' ? "bg-emerald-500 text-white shadow-lg" : "text-white/40 hover:text-white/60"
+                  "px-3 py-1 text-[10px] font-bold uppercase rounded-none transition-all",
+                  mode === 'backend' ? "bg-secondary border border-ring text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Live
@@ -249,7 +249,7 @@ export const AgentMonitorDemo: React.FC = () => {
                   onClick={toggleSimulation}
                   className={cn(
                     "w-full flex items-center justify-center gap-2 h-12",
-                    isSimulating ? "bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30" : "bg-indigo-500/20 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/30"
+                    isSimulating ? "bg-secondary border-ring text-foreground font-bold hover:bg-accent" : "bg-primary text-primary-foreground hover:bg-accent"
                   )}
                   variant="outline"
                 >
@@ -259,7 +259,7 @@ export const AgentMonitorDemo: React.FC = () => {
                 <Button 
                   onClick={addRandomActivity}
                   variant="outline"
-                  className="w-full flex items-center justify-center gap-2 border-white/10 text-white/70 hover:bg-white/10 h-11"
+                  className="w-full flex items-center justify-center gap-2 border border-border text-foreground hover:bg-accent h-11"
                 >
                   <Plus className="w-4 h-4" />
                   Inject Step
@@ -272,17 +272,17 @@ export const AgentMonitorDemo: React.FC = () => {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Enter user query to test backend..."
-                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-xs text-white placeholder:text-white/20 focus:outline-none focus:border-emerald-500/50 min-h-[100px] resize-none"
+                    className="w-full bg-background border border-input rounded-none p-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring min-h-[100px] resize-none"
                   />
                   <Button
                     onClick={handleBackendInfer}
                     disabled={!query.trim() || isStreaming}
-                    className="absolute bottom-2 right-2 h-8 w-8 p-0 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full"
+                    className="absolute bottom-2 right-2 h-8 w-8 p-0 bg-primary text-primary-foreground hover:bg-accent rounded-none"
                   >
                     {isStreaming ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </Button>
                 </div>
-                <p className="text-[10px] text-white/30 italic text-center">
+                <p className="text-[10px] text-muted-foreground italic text-center">
                   This will call the actual FastAPI endpoint `/infer-stream`
                 </p>
               </div>
@@ -291,7 +291,7 @@ export const AgentMonitorDemo: React.FC = () => {
             <Button 
               onClick={clearLog}
               variant="outline"
-              className="w-full flex items-center justify-center gap-2 border-white/10 text-white/40 hover:text-white/70 h-11"
+              className="w-full flex items-center justify-center gap-2 border border-border text-muted-foreground hover:text-foreground h-11"
             >
               <Trash2 className="w-4 h-4" />
               Clear Feed
@@ -301,7 +301,7 @@ export const AgentMonitorDemo: React.FC = () => {
               onClick={exportForAudit}
               variant="outline"
               disabled={currentActivities.length === 0}
-              className="w-full flex items-center justify-center gap-2 border-indigo-500/20 text-indigo-300 hover:bg-indigo-500/10 h-11"
+              className="w-full flex items-center justify-center gap-2 border border-border text-muted-foreground hover:bg-accent h-11"
             >
               <Download className="w-4 h-4" />
               Export for Audit
@@ -309,20 +309,20 @@ export const AgentMonitorDemo: React.FC = () => {
           </div>
 
           <div className="mt-8">
-            <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-4">Active Agents</h4>
+            <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Active Agents</h4>
             <div className="space-y-3">
               {SAMPLE_AGENTS.map(agent => (
-                <div key={agent.name} className="flex items-center justify-between p-3 rounded-lg bg-black/40 border border-white/5">
+                <div key={agent.name} className="flex items-center justify-between p-3 rounded-none bg-secondary border border-border">
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-white/90">{agent.name}</span>
-                    <span className="text-[10px] text-white/40 uppercase">{agent.role}</span>
+                    <span className="text-sm font-bold text-foreground">{agent.name}</span>
+                    <span className="text-[10px] text-muted-foreground uppercase">{agent.role}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <span className={cn(
-                      "h-1.5 w-1.5 rounded-full shadow-[0_0_5px_rgba(34,197,94,0.5)]",
-                      mode === 'backend' ? "bg-emerald-500 shadow-emerald-500/50" : "bg-indigo-500 shadow-indigo-500/50"
+                      "h-1.5 w-1.5 rounded-none",
+                      mode === 'backend' ? "bg-primary" : "bg-muted-foreground"
                     )}></span>
-                    <span className="text-[10px] font-medium text-white/60">Ready</span>
+                    <span className="text-[10px] font-medium text-muted-foreground">Ready</span>
                   </div>
                 </div>
               ))}
@@ -330,12 +330,12 @@ export const AgentMonitorDemo: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-6 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
-          <h3 className="text-sm font-bold text-indigo-300 mb-2 uppercase tracking-tight flex items-center gap-2">
+        <div className="p-6 rounded-none border border-border bg-card">
+          <h3 className="text-sm font-bold text-foreground mb-2 uppercase tracking-tight flex items-center gap-2">
             <Zap className="w-3 h-3" />
             System Protocol
           </h3>
-          <p className="text-xs text-white/60 leading-relaxed">
+          <p className="text-xs text-muted-foreground leading-relaxed">
             {mode === 'simulation' 
               ? "Currently in Simulation Mode. This uses generated events to test the UI layout and responsiveness."
               : "Currently in Live Mode. This establishes a real Server-Sent Events (SSE) connection to the Python inference engine."

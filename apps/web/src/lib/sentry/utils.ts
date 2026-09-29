@@ -61,7 +61,11 @@ type SentryShim = {
 
 function getSentry(): SentryShim | null {
   // Primary: use the bundled @sentry/astro SDK
-  if (SentrySDK && typeof (SentrySDK as Record<string, unknown>).captureException === 'function') {
+  if (
+    SentrySDK &&
+    typeof (SentrySDK as Record<string, unknown>).captureException ===
+      'function'
+  ) {
     return SentrySDK as unknown as SentryShim
   }
   // Fallback: window.Sentry global (for pages that load Sentry via script tag)

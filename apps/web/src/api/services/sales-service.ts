@@ -1,10 +1,7 @@
 import { v4 as uuid } from 'uuid'
 
 // Sales Opportunities Service Layer
-import {
-  getMongoConnection,
-  getPostgresPool,
-} from '../../lib/db/connection'
+import { getMongoConnection, getPostgresPool } from '../../lib/db/connection'
 import { slug } from '../../utils/common'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 

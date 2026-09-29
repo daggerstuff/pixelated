@@ -26,47 +26,139 @@ import AdminLayout from '../../components/admin/AdminLayout.astro'
       <section class="admin-section">
         <h2 class="admin-section__title">Team Management</h2>
         <ul class="admin-list">
-          <li><a href="/admin/users" class="admin-link">Manage Users</a></li>
-          <li><a href="/admin/api-keys" class="admin-link">API Key Management</a></li>
-          <li><a href="/admin/rate-limits" class="admin-link">Rate Limits &amp; Quota</a></li>
+          <li>
+            <a href="/admin/users" class="admin-link">
+              Manage Users
+            </a>
+          </li>
+          <li>
+            <a href="/admin/api-keys" class="admin-link">
+              API Key Management
+            </a>
+          </li>
+          <li>
+            <a href="/admin/rate-limits" class="admin-link">
+              Rate Limits &amp; Quota
+            </a>
+          </li>
         </ul>
       </section>
 
       <section class="admin-section">
         <h2 class="admin-section__title">Security &amp; Compliance</h2>
         <ul class="admin-list">
-          <li><a href="/admin/audit-logs" class="admin-link">View Audit Logs</a></li>
-          <li><a href="/admin/security-dashboard" class="admin-link">Security Dashboard</a></li>
-          <li><a href="/admin/security-settings" class="admin-link">Security Settings</a></li>
-          <li><a href="/admin/data-retention" class="admin-link">Data Retention</a></li>
-          <li><a href="/admin/consent-management" class="admin-link">Consent Management</a></li>
-          <li><a href="/admin/patient-rights" class="admin-link">Patient Rights</a></li>
-          <li><a href="/admin/data-transfer" class="admin-link">Data Transfer</a></li>
-          <li><a href="/admin/backup-security" class="admin-link">Backup Security</a></li>
+          <li>
+            <a href="/admin/audit-logs" class="admin-link">
+              View Audit Logs
+            </a>
+          </li>
+          <li>
+            <a href="/admin/security-dashboard" class="admin-link">
+              Security Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/admin/security-settings" class="admin-link">
+              Security Settings
+            </a>
+          </li>
+          <li>
+            <a href="/admin/data-retention" class="admin-link">
+              Data Retention
+            </a>
+          </li>
+          <li>
+            <a href="/admin/consent-management" class="admin-link">
+              Consent Management
+            </a>
+          </li>
+          <li>
+            <a href="/admin/patient-rights" class="admin-link">
+              Patient Rights
+            </a>
+          </li>
+          <li>
+            <a href="/admin/data-transfer" class="admin-link">
+              Data Transfer
+            </a>
+          </li>
+          <li>
+            <a href="/admin/backup-security" class="admin-link">
+              Backup Security
+            </a>
+          </li>
         </ul>
       </section>
 
       <section class="admin-section">
         <h2 class="admin-section__title">AI &amp; Analytics</h2>
         <ul class="admin-list">
-          <li><a href="/admin/ai/evidence-assistant" class="admin-link">AI Evidence Assistant</a></li>
-          <li><a href="/admin/ai-explainability" class="admin-link">AI Explainability Dashboard</a></li>
-          <li><a href="/admin/ai-performance" class="admin-link">AI Performance</a></li>
-          <li><a href="/admin/bias-detection" class="admin-link">Bias Detection</a></li>
-          <li><a href="/admin/evidence-reports" class="admin-link">Evidence Reports</a></li>
-          <li><a href="/admin/oversight" class="admin-link">Human Oversight</a></li>
+          <li>
+            <a href="/admin/ai/evidence-assistant" class="admin-link">
+              AI Evidence Assistant
+            </a>
+          </li>
+          <li>
+            <a href="/admin/ai-explainability" class="admin-link">
+              AI Explainability Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/admin/ai-performance" class="admin-link">
+              AI Performance
+            </a>
+          </li>
+          <li>
+            <a href="/admin/bias-detection" class="admin-link">
+              Bias Detection
+            </a>
+          </li>
+          <li>
+            <a href="/admin/evidence-reports" class="admin-link">
+              Evidence Reports
+            </a>
+          </li>
+          <li>
+            <a href="/admin/oversight" class="admin-link">
+              Human Oversight
+            </a>
+          </li>
         </ul>
       </section>
 
       <section class="admin-section">
         <h2 class="admin-section__title">Operations</h2>
         <ul class="admin-list">
-          <li><a href="/admin/performance-dashboard" class="admin-link">Performance Dashboard</a></li>
-          <li><a href="/admin/cache" class="admin-link">Cache Performance</a></li>
-          <li><a href="/admin/compatibility-dashboard" class="admin-link">Compatibility Dashboard</a></li>
-          <li><a href="/admin/research-query" class="admin-link">Research Query Engine</a></li>
-          <li><a href="/admin/therapeutic" class="admin-link">Therapeutic Oversight</a></li>
-          <li><a href="/admin/state-consent-rules" class="admin-link">State Consent Rules</a></li>
+          <li>
+            <a href="/admin/performance-dashboard" class="admin-link">
+              Performance Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/admin/cache" class="admin-link">
+              Cache Performance
+            </a>
+          </li>
+          <li>
+            <a href="/admin/compatibility-dashboard" class="admin-link">
+              Compatibility Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/admin/research-query" class="admin-link">
+              Research Query Engine
+            </a>
+          </li>
+          <li>
+            <a href="/admin/therapeutic" class="admin-link">
+              Therapeutic Oversight
+            </a>
+          </li>
+          <li>
+            <a href="/admin/state-consent-rules" class="admin-link">
+              State Consent Rules
+            </a>
+          </li>
         </ul>
       </section>
     </div>
@@ -113,7 +205,9 @@ import AdminLayout from '../../components/admin/AdminLayout.astro'
       border: 1px solid var(--border-primary, #383838);
       border-radius: 0.25rem;
       cursor: pointer;
-      transition: background 0.15s ease-out, border-color 0.15s ease-out;
+      transition:
+        background 0.15s ease-out,
+        border-color 0.15s ease-out;
     }
     .admin-btn--primary {
       background: var(--text-primary, #ededed);

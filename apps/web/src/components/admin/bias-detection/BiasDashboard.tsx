@@ -57,6 +57,8 @@ import {
   timeRangeOptions,
   demographicFilterOptions,
 } from './BiasDashboard.types'
+import { ChartErrorBoundary } from './ChartErrorBoundary'
+import { DashboardErrorBoundary } from './DashboardErrorBoundary'
 
 export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   className = '',
@@ -324,225 +326,262 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   }
 
   if (!dashboardData) {
-    return null
+    return (
+      <div
+        className={`p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}
+      >
+        <AccessibilitySkipLinks
+          skipLinkRef={skipLinkRef}
+          mainContentRef={mainContentRef}
+          announceToScreenReader={announceToScreenReader}
+          announcements={announcements}
+        />
+        <Alert
+          variant="error"
+          title="Dashboard Unavailable"
+          description={
+            <div>
+              No dashboard data could be loaded. This can happen if your session
+              expired or the data service is temporarily unreachable.
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={fetchDashboardData}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Retry
+              </Button>
+            </div>
+          }
+          icon={<AlertTriangle className="h-4 w-4" />}
+        />
+      </div>
+    )
   }
 
   // ── Main render ────────────────────────────────────────────────────
   return (
-    <div
-      className={`space-y-6 p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}
-    >
-      <HighBiasAlertNotification
-        newHighBiasAlert={newHighBiasAlert}
-        onDismiss={() => setNewHighBiasAlert(null)}
-      />
-
-      <AccessibilitySkipLinks
-        skipLinkRef={skipLinkRef}
-        mainContentRef={mainContentRef}
-        announceToScreenReader={announceToScreenReader}
-        announcements={announcements}
-      />
-
-      <Header
-        isMobile={isMobile}
-        lastUpdated={lastUpdated}
-        enableRealTimeUpdates={enableRealTimeUpdates}
-        connectionStatus={connectionStatus}
-        autoRefresh={autoRefresh}
-        loading={loading}
-        wsConnectionStatus={wsConnectionStatus}
-        showNotificationSettings={showNotificationSettings}
-        onAutoRefreshChange={setAutoRefresh}
-        onRefresh={fetchDashboardData}
-        onReconnect={reconnectWebSocket}
-        onToggleNotificationSettings={() =>
-          setShowNotificationSettings((prev) => !prev)
-        }
-        onToggleExportDialog={() => setShowExportDialog((prev) => !prev)}
-      />
-
-      <NotificationSettingsPanel
-        showNotificationSettings={showNotificationSettings}
-        notificationSettings={notificationSettings}
-        onUpdate={updateNotificationSettings}
-        onTestNotification={sendTestNotification}
-        onClose={() => setShowNotificationSettings(false)}
-      />
-
-      <ExportDialog
-        showExportDialog={showExportDialog}
-        exportFormat={exportFormat}
-        setExportFormat={setExportFormat}
-        exportDateRange={exportDateRange}
-        setExportDateRange={setExportDateRange}
-        exportDataTypes={exportDataTypes}
-        setExportDataTypes={setExportDataTypes}
-        exportFilters={exportFilters}
-        setExportFilters={setExportFilters}
-        exportProgress={exportProgress}
-        isExportFormat={isExportFormat}
-        onExport={exportDataWithOptions}
-        onClose={() => setShowExportDialog(false)}
-      />
-
-      <FilteringControls
-        selectedTimeRange={selectedTimeRange}
-        setSelectedTimeRange={setSelectedTimeRange}
-        customDateRange={customDateRange}
-        setCustomDateRange={setCustomDateRange}
-        biasScoreFilter={biasScoreFilter}
-        setBiasScoreFilter={setBiasScoreFilter}
-        alertLevelFilter={alertLevelFilter}
-        setAlertLevelFilter={setAlertLevelFilter}
-        selectedDemographicFilter={selectedDemographicFilter}
-        setSelectedDemographicFilter={setSelectedDemographicFilter}
-        timeRangeOptions={timeRangeOptions}
-        demographicFilterOptions={demographicFilterOptions}
-        isAlertLevel={isAlertLevel}
-      />
-
-      <CriticalAlerts filteredAlerts={filteredAlerts} />
-
-      <SummaryCards
-        summary={summary}
-        filteredSessions={filteredSessions}
-        filteredAlerts={filteredAlerts}
-        alerts={alerts}
-      />
-
-      {/* Main Content Tabs */}
-      <main
-        ref={mainContentRef}
-        id="main-content"
-        tabIndex={-1}
-        className="focus:outline-none"
-        aria-label="Dashboard main content"
+    <DashboardErrorBoundary>
+      <div
+        className={`space-y-6 p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}
       >
-        <Tabs defaultValue="trends" className="w-full">
-          <TabsList
-            className={`grid w-full ${isMobile ? 'grid-cols-2' : isTablet ? 'grid-cols-3' : 'grid-cols-5'} ${isMobile ? 'h-auto' : ''}`}
-          >
-            <TabsTrigger
-              value="trends"
-              className={isMobile ? 'py-3 text-xs' : ''}
-              aria-label="Trends Tab - View bias trends and analytics"
-              data-testid="trends-tab"
+        <HighBiasAlertNotification
+          newHighBiasAlert={newHighBiasAlert}
+          onDismiss={() => setNewHighBiasAlert(null)}
+        />
+
+        <AccessibilitySkipLinks
+          skipLinkRef={skipLinkRef}
+          mainContentRef={mainContentRef}
+          announceToScreenReader={announceToScreenReader}
+          announcements={announcements}
+        />
+
+        <Header
+          isMobile={isMobile}
+          lastUpdated={lastUpdated}
+          enableRealTimeUpdates={enableRealTimeUpdates}
+          connectionStatus={connectionStatus}
+          autoRefresh={autoRefresh}
+          loading={loading}
+          wsConnectionStatus={wsConnectionStatus}
+          showNotificationSettings={showNotificationSettings}
+          onAutoRefreshChange={setAutoRefresh}
+          onRefresh={fetchDashboardData}
+          onReconnect={reconnectWebSocket}
+          onToggleNotificationSettings={() =>
+            setShowNotificationSettings((prev) => !prev)
+          }
+          onToggleExportDialog={() => setShowExportDialog((prev) => !prev)}
+        />
+
+        <NotificationSettingsPanel
+          showNotificationSettings={showNotificationSettings}
+          notificationSettings={notificationSettings}
+          onUpdate={updateNotificationSettings}
+          onTestNotification={sendTestNotification}
+          onClose={() => setShowNotificationSettings(false)}
+        />
+
+        <ExportDialog
+          showExportDialog={showExportDialog}
+          exportFormat={exportFormat}
+          setExportFormat={setExportFormat}
+          exportDateRange={exportDateRange}
+          setExportDateRange={setExportDateRange}
+          exportDataTypes={exportDataTypes}
+          setExportDataTypes={setExportDataTypes}
+          exportFilters={exportFilters}
+          setExportFilters={setExportFilters}
+          exportProgress={exportProgress}
+          isExportFormat={isExportFormat}
+          onExport={exportDataWithOptions}
+          onClose={() => setShowExportDialog(false)}
+        />
+
+        <FilteringControls
+          selectedTimeRange={selectedTimeRange}
+          setSelectedTimeRange={setSelectedTimeRange}
+          customDateRange={customDateRange}
+          setCustomDateRange={setCustomDateRange}
+          biasScoreFilter={biasScoreFilter}
+          setBiasScoreFilter={setBiasScoreFilter}
+          alertLevelFilter={alertLevelFilter}
+          setAlertLevelFilter={setAlertLevelFilter}
+          selectedDemographicFilter={selectedDemographicFilter}
+          setSelectedDemographicFilter={setSelectedDemographicFilter}
+          timeRangeOptions={timeRangeOptions}
+          demographicFilterOptions={demographicFilterOptions}
+          isAlertLevel={isAlertLevel}
+        />
+
+        <CriticalAlerts filteredAlerts={filteredAlerts} />
+
+        <SummaryCards
+          summary={summary}
+          filteredSessions={filteredSessions}
+          filteredAlerts={filteredAlerts}
+          alerts={alerts}
+        />
+
+        {/* Main Content Tabs */}
+        <main
+          ref={mainContentRef}
+          id="main-content"
+          tabIndex={-1}
+          className="focus:outline-none"
+          aria-label="Dashboard main content"
+        >
+          <Tabs defaultValue="trends" className="w-full">
+            <TabsList
+              className={`grid w-full ${isMobile ? 'grid-cols-2' : isTablet ? 'grid-cols-3' : 'grid-cols-5'} ${isMobile ? 'h-auto' : ''}`}
             >
-              {isMobile ? 'Trends' : 'Trends Tab'}
-            </TabsTrigger>
-            <TabsTrigger
-              value="demographics"
-              className={isMobile ? 'py-3 text-xs' : ''}
-              aria-label="Demographics Tab - View demographic breakdown"
-              data-testid="demographics-tab"
-            >
-              {isMobile ? 'Demo' : 'Demographics Tab'}
-            </TabsTrigger>
-            <TabsTrigger
-              value="alerts"
-              className={isMobile ? 'py-3 text-xs' : ''}
-              aria-label={`Alerts Tab - View alerts. ${filteredAlerts.length} alerts currently active`}
-              data-testid="alerts-tab"
-            >
-              {isMobile ? 'Alerts' : 'Alerts Tab'}
-              {filteredAlerts.length > 0 && (
-                <span
-                  className="bg-red-100 text-red-800 ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                  aria-label={`${filteredAlerts.length} active alerts`}
-                >
-                  {filteredAlerts.length}
-                </span>
+              <TabsTrigger
+                value="trends"
+                className={isMobile ? 'py-3 text-xs' : ''}
+                aria-label="Trends Tab - View bias trends and analytics"
+                data-testid="trends-tab"
+              >
+                {isMobile ? 'Trends' : 'Trends Tab'}
+              </TabsTrigger>
+              <TabsTrigger
+                value="demographics"
+                className={isMobile ? 'py-3 text-xs' : ''}
+                aria-label="Demographics Tab - View demographic breakdown"
+                data-testid="demographics-tab"
+              >
+                {isMobile ? 'Demo' : 'Demographics Tab'}
+              </TabsTrigger>
+              <TabsTrigger
+                value="alerts"
+                className={isMobile ? 'py-3 text-xs' : ''}
+                aria-label={`Alerts Tab - View alerts. ${filteredAlerts.length} alerts currently active`}
+                data-testid="alerts-tab"
+              >
+                {isMobile ? 'Alerts' : 'Alerts Tab'}
+                {filteredAlerts.length > 0 && (
+                  <span
+                    className="ml-2 inline-flex items-center rounded-none border border-ring bg-card px-2 py-0.5 text-xs font-medium text-foreground"
+                    aria-label={`${filteredAlerts.length} active alerts`}
+                  >
+                    {filteredAlerts.length}
+                  </span>
+                )}
+              </TabsTrigger>
+              {!isMobile && (
+                <>
+                  <TabsTrigger
+                    value="sessions"
+                    aria-label="Recent Sessions Tab - View recent session data"
+                    data-testid="sessions-tab"
+                  >
+                    Recent Sessions Tab
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="recommendations"
+                    aria-label="Recommendations Tab - View system recommendations"
+                    data-testid="recommendations-tab"
+                  >
+                    Recommendations Tab
+                  </TabsTrigger>
+                </>
               )}
-            </TabsTrigger>
-            {!isMobile && (
-              <>
+            </TabsList>
+
+            {/* Mobile-specific additional tabs */}
+            {isMobile && (
+              <TabsList className="mt-2 grid w-full grid-cols-2">
                 <TabsTrigger
                   value="sessions"
+                  className="py-3 text-xs"
                   aria-label="Recent Sessions Tab - View recent session data"
-                  data-testid="sessions-tab"
+                  data-testid="sessions-tab-mobile"
                 >
-                  Recent Sessions Tab
+                  Sessions Tab
                 </TabsTrigger>
                 <TabsTrigger
                   value="recommendations"
+                  className="py-3 text-xs"
                   aria-label="Recommendations Tab - View system recommendations"
-                  data-testid="recommendations-tab"
+                  data-testid="recommendations-tab-mobile"
                 >
                   Recommendations Tab
                 </TabsTrigger>
-              </>
+              </TabsList>
             )}
-          </TabsList>
 
-          {/* Mobile-specific additional tabs */}
-          {isMobile && (
-            <TabsList className="mt-2 grid w-full grid-cols-2">
-              <TabsTrigger
-                value="sessions"
-                className="py-3 text-xs"
-                aria-label="Recent Sessions Tab - View recent session data"
-                data-testid="sessions-tab-mobile"
-              >
-                Sessions Tab
-              </TabsTrigger>
-              <TabsTrigger
-                value="recommendations"
-                className="py-3 text-xs"
-                aria-label="Recommendations Tab - View system recommendations"
-                data-testid="recommendations-tab-mobile"
-              >
-                Recommendations Tab
-              </TabsTrigger>
-            </TabsList>
-          )}
+            <TabsContent value="trends" className="space-y-6">
+              <ChartErrorBoundary label="Trends chart">
+                <TrendsTab
+                  filteredTrends={filteredTrends}
+                  isMobile={isMobile}
+                  isTablet={isTablet}
+                  reducedMotion={reducedMotion}
+                />
+              </ChartErrorBoundary>
+            </TabsContent>
 
-          <TabsContent value="trends" className="space-y-6">
-            <TrendsTab
-              filteredTrends={filteredTrends}
-              isMobile={isMobile}
-              isTablet={isTablet}
-              reducedMotion={reducedMotion}
-            />
-          </TabsContent>
+            <TabsContent value="demographics" className="space-y-6">
+              <ChartErrorBoundary label="Demographics chart">
+                <DemographicsTab demographics={demographics} />
+              </ChartErrorBoundary>
+            </TabsContent>
 
-          <TabsContent value="demographics" className="space-y-6">
-            <DemographicsTab demographics={demographics} />
-          </TabsContent>
+            <TabsContent value="alerts" className="space-y-6">
+              <AlertsTab
+                filteredAlerts={filteredAlerts}
+                alerts={alerts}
+                selectedAlerts={selectedAlerts}
+                alertActions={alertActions}
+                alertNotes={alertNotes}
+                onAlertAction={handleAlertAction}
+                onBulkAlertAction={handleBulkAlertAction}
+                onToggleAlertSelection={toggleAlertSelection}
+                onSelectAllAlerts={selectAllAlerts}
+                onClearAlertSelection={clearAlertSelection}
+                onSetAlertLevelFilter={setAlertLevelFilter}
+                onSetSelectedTimeRange={setSelectedTimeRange}
+                onSetAlertNotes={setAlertNotes}
+              />
+            </TabsContent>
 
-          <TabsContent value="alerts" className="space-y-6">
-            <AlertsTab
-              filteredAlerts={filteredAlerts}
-              alerts={alerts}
-              selectedAlerts={selectedAlerts}
-              alertActions={alertActions}
-              alertNotes={alertNotes}
-              onAlertAction={handleAlertAction}
-              onBulkAlertAction={handleBulkAlertAction}
-              onToggleAlertSelection={toggleAlertSelection}
-              onSelectAllAlerts={selectAllAlerts}
-              onClearAlertSelection={clearAlertSelection}
-              onSetAlertLevelFilter={setAlertLevelFilter}
-              onSetSelectedTimeRange={setSelectedTimeRange}
-              onSetAlertNotes={setAlertNotes}
-            />
-          </TabsContent>
+            <TabsContent value="sessions" className="space-y-6">
+              <SessionsTab
+                filteredSessions={filteredSessions}
+                recentAnalyses={recentAnalyses}
+                onSetBiasScoreFilter={setBiasScoreFilter}
+                onSetSelectedTimeRange={setSelectedTimeRange}
+              />
+            </TabsContent>
 
-          <TabsContent value="sessions" className="space-y-6">
-            <SessionsTab
-              filteredSessions={filteredSessions}
-              recentAnalyses={recentAnalyses}
-              onSetBiasScoreFilter={setBiasScoreFilter}
-              onSetSelectedTimeRange={setSelectedTimeRange}
-            />
-          </TabsContent>
-
-          <TabsContent value="recommendations" className="space-y-6">
-            <RecommendationsTab recommendations={recommendations} />
-          </TabsContent>
-        </Tabs>
-      </main>
-    </div>
+            <TabsContent value="recommendations" className="space-y-6">
+              <RecommendationsTab recommendations={recommendations} />
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
+    </DashboardErrorBoundary>
   )
 }
 

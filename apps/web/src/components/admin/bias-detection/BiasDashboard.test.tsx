@@ -349,7 +349,12 @@ describe('BiasDashboard', () => {
     render(<BiasDashboard enableRealTimeUpdates={true} />)
 
     await waitFor(() => {
-      expect(screen.getByText(/bias detection dashboard/i)).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: /bias detection dashboard/i,
+        }),
+      ).toBeInTheDocument()
     })
 
     // Simulate connection error
@@ -1239,8 +1244,19 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
+      })
+
+      // The responsive header classes apply once the dashboard finishes
+      // loading — the heading is present during loading too.
+      await waitFor(() => {
+        expect(
+          screen.queryByText(/loading bias detection dashboard/i),
+        ).not.toBeInTheDocument()
       })
 
       // Should have mobile-specific classes and layout
@@ -1258,12 +1274,20 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
       // Should adapt for tablet layout
-      expect(screen.getByText(/bias detection dashboard/i)).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: /bias detection dashboard/i,
+        }),
+      ).toBeInTheDocument()
     })
 
     it('handles window resize events', async () => {
@@ -1271,7 +1295,10 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
@@ -1283,7 +1310,12 @@ describe('BiasDashboard', () => {
       fireEvent(window, new Event('resize'))
 
       // Component should handle resize
-      expect(screen.getByText(/bias detection dashboard/i)).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: /bias detection dashboard/i,
+        }),
+      ).toBeInTheDocument()
     })
   })
 
@@ -1313,7 +1345,10 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
@@ -1330,7 +1365,10 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
@@ -1344,7 +1382,12 @@ describe('BiasDashboard', () => {
       fireEvent.keyDown(document, { key: 'Escape' })
 
       // Should handle keyboard events without errors
-      expect(screen.getByText(/bias detection dashboard/i)).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: /bias detection dashboard/i,
+        }),
+      ).toBeInTheDocument()
     })
 
     it('provides proper ARIA labels and descriptions', async () => {
@@ -1352,7 +1395,10 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
@@ -1388,7 +1434,10 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
@@ -1417,12 +1466,20 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
       // Component should handle reduced motion preference
-      expect(screen.getByText(/bias detection dashboard/i)).toBeInTheDocument()
+      expect(
+        screen.getByRole('heading', {
+          level: 1,
+          name: /bias detection dashboard/i,
+        }),
+      ).toBeInTheDocument()
     })
 
     it('provides screen reader announcements', async () => {
@@ -1430,7 +1487,10 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
@@ -1449,7 +1509,10 @@ describe('BiasDashboard', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
@@ -1551,7 +1614,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 
@@ -1578,7 +1644,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 
@@ -1602,7 +1671,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 
@@ -1665,7 +1737,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 
@@ -1851,7 +1926,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 
@@ -1900,7 +1978,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 
@@ -1931,7 +2012,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 
@@ -1954,7 +2038,10 @@ describe('BiasDashboard', () => {
 
         // Should handle gracefully without errors
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
@@ -1965,7 +2052,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 
@@ -1985,7 +2075,10 @@ describe('BiasDashboard', () => {
 
         // Should handle gracefully without crashing
         expect(
-          screen.getByText(/bias detection dashboard/i),
+          screen.getByRole('heading', {
+            level: 1,
+            name: /bias detection dashboard/i,
+          }),
         ).toBeInTheDocument()
       })
 
@@ -1996,7 +2089,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 
@@ -2024,7 +2120,10 @@ describe('BiasDashboard', () => {
 
         await waitFor(() => {
           expect(
-            screen.getByText(/bias detection dashboard/i),
+            screen.getByRole('heading', {
+              level: 1,
+              name: /bias detection dashboard/i,
+            }),
           ).toBeInTheDocument()
         })
 

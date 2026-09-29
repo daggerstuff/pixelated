@@ -3,7 +3,9 @@
  * Handles OAuth2 flow with Auth0 for social providers like Google
  */
 
-import { AuthenticationClient, ManagementClient, UserInfoClient } from 'auth0'
+import { ManagementClient } from 'auth0'
+import type { Management } from 'auth0'
+import { AuthenticationClient, UserInfoClient } from 'auth0-legacy'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -140,10 +142,8 @@ export class Auth0SocialAuthService {
     this.domain = config.domain
     this.clientId = config.clientId
 
-    if (!this.domain || !this.clientId) {
-      if (shouldWarnAuth0Configuration) {
-        logger.warn('Auth0 is not properly configured')
-      }
+    if ((!this.domain || !this.clientId) && shouldWarnAuth0Configuration) {
+      logger.warn('Auth0 is not properly configured')
     }
     initializeAuth0Clients()
   }
@@ -209,14 +209,14 @@ export class Auth0SocialAuthService {
         code,
         redirect_uri: redirectUri,
       })
-      const data = response.data
+      const { data: tokenData } = response
 
       return {
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token,
-        idToken: data.id_token,
-        expiresIn: data.expires_in,
-        tokenType: data.token_type,
+        accessToken: tokenData.access_token,
+        refreshToken: tokenData.refresh_token,
+        idToken: tokenData.id_token,
+        expiresIn: tokenData.expires_in,
+        tokenType: tokenData.token_type,
       }
     } catch (error: unknown) {
       logger.error('Token exchange failed:', error)
@@ -269,14 +269,14 @@ export class Auth0SocialAuthService {
       const response = await auth0Authentication.oauth.refreshTokenGrant({
         refresh_token: refreshToken,
       })
-      const data = response.data
+      const { data: tokenData } = response
 
       return {
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token,
-        idToken: data.id_token,
-        expiresIn: data.expires_in,
-        tokenType: data.token_type,
+        accessToken: tokenData.access_token,
+        refreshToken: tokenData.refresh_token,
+        idToken: tokenData.id_token,
+        expiresIn: tokenData.expires_in,
+        tokenType: tokenData.token_type,
       }
     } catch (error: unknown) {
       logger.error('Token refresh failed:', error)
@@ -370,16 +370,11 @@ export class Auth0SocialAuthService {
 
     try {
       // Link the social account to the user
-      await auth0Management.users.link(
-        {
-          id: userId,
-        },
-        {
-          provider: connection,
-          connection_id: connection,
-          user_id: accessToken,
-        },
-      )
+      await auth0Management.users.identities.link(userId, {
+        provider: connection,
+        connection_id: connection,
+        user_id: accessToken,
+      })
 
       // Log the linking event
       logSecurityEvent(SecurityEventType.ACCOUNT_LINKED, null, {
@@ -418,10 +413,11 @@ export class Auth0SocialAuthService {
 
     try {
       // Unlink the social account from the user
-      await auth0Management.users.unlink(userId, {
-        provider: connection,
-        user_id: providerUserId,
-      })
+      await auth0Management.users.identities.delete(
+        userId,
+        connection as Management.UserIdentityProviderEnum,
+        providerUserId,
+      )
 
       // Log the unlinking event
       logSecurityEvent(SecurityEventType.ACCOUNT_UNLINKED, null, {

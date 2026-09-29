@@ -332,13 +332,13 @@ export const EnhancedBiasDetectionInterface: React.FC<
   return (
     <div className={`enhanced-bias-detection-interface ${className}`}>
       {/* Enhanced Header with Progress */}
-      <div className="bg-white border-gray-100 mb-6 rounded-2xl border p-6 shadow-lg">
+      <div className="mb-6 rounded-none border border-border bg-card p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h1 className="text-gray-900 mb-2 text-3xl font-bold">
+            <h1 className="mb-2 text-3xl font-bold text-foreground">
               Enhanced Bias Detection
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Advanced AI-powered analysis with real-time insights and
               recommendations
             </p>
@@ -352,12 +352,12 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 className={`flex items-center ${index < 3 ? 'mr-2' : ''}`}
               >
                 <div
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium transition-all duration-300 ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-none text-sm font-medium transition-all duration-300 ${
                     currentStep === step
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-primary text-primary-foreground'
                       : index < analysisStepOrder.indexOf(currentStep)
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-200 text-gray-500'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-secondary text-muted-foreground'
                   }`}
                 >
                   {index + 1}
@@ -366,8 +366,8 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   <div
                     className={`mx-1 h-0.5 w-8 transition-all duration-300 ${
                       index < analysisStepOrder.indexOf(currentStep)
-                        ? 'bg-green-500'
-                        : 'bg-gray-200'
+                        ? 'bg-primary'
+                        : 'bg-secondary'
                     }`}
                   />
                 )}
@@ -379,13 +379,13 @@ export const EnhancedBiasDetectionInterface: React.FC<
         {/* Progress Bar for Analysis */}
         {isAnalyzing && (
           <div className="mt-4">
-            <div className="text-gray-600 mb-2 flex items-center justify-between text-sm">
+            <div className="mb-2 flex items-center justify-between text-sm text-muted-foreground">
               <span>Analyzing bias patterns...</span>
               <span>{Math.round(progressPercent)}%</span>
             </div>
-            <div className="bg-gray-200 h-2 w-full rounded-full">
+            <div className="h-2 w-full rounded-none bg-secondary">
               <div
-                className="from-blue-500 to-purple-600 h-2 rounded-full bg-gradient-to-r"
+                className="h-2 rounded-none bg-primary"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -397,8 +397,8 @@ export const EnhancedBiasDetectionInterface: React.FC<
       {currentStep === 'input' && (
         <div className="space-y-6">
           {/* Quick Filters */}
-          <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
-            <h3 className="text-gray-900 mb-4 text-lg font-semibold">
+          <div className="rounded-none border border-border bg-card p-6">
+            <h3 className="mb-4 text-lg font-semibold text-foreground">
               Quick Start Options
             </h3>
 
@@ -406,7 +406,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
               <div>
                 <label
                   htmlFor="risk-level-filter"
-                  className="text-gray-700 mb-2 block text-sm font-medium"
+                  className="mb-2 block text-sm font-medium text-foreground"
                 >
                   Risk Level Filter
                 </label>
@@ -428,7 +428,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                       }))
                     }
                   }}
-                  className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full rounded-lg border px-3 py-2 focus:ring-2"
+                  className="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:ring-2 focus:ring-ring"
                 >
                   <option value="all">All Risk Levels</option>
                   <option value="low">Low Risk</option>
@@ -441,7 +441,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
               <div>
                 <label
                   htmlFor="bias-category-filter"
-                  className="text-gray-700 mb-2 block text-sm font-medium"
+                  className="mb-2 block text-sm font-medium text-foreground"
                 >
                   Bias Category Filter
                 </label>
@@ -464,7 +464,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                       }))
                     }
                   }}
-                  className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 w-full rounded-lg border px-3 py-2 focus:ring-2"
+                  className="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:ring-2 focus:ring-ring"
                 >
                   <option value="all">All Categories</option>
                   <option value="cultural">Cultural Bias</option>
@@ -480,7 +480,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
             <div className="border-t pt-4">
               <button
                 onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-                className="text-blue-600 hover:text-blue-700 flex items-center gap-2 text-sm font-medium transition-colors"
+                className="flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-foreground"
               >
                 <span>Advanced Settings</span>
                 <svg
@@ -505,7 +505,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
               {showAdvancedSettings && (
                 <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label className="text-gray-700 mb-2 block text-sm font-medium">
+                    <label className="mb-2 block text-sm font-medium text-foreground">
                       Sensitivity: {analysisSettings.sensitivity.toFixed(1)}
                     </label>
                     <input
@@ -525,7 +525,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   </div>
 
                   <div>
-                    <label className="text-gray-700 mb-2 block text-sm font-medium">
+                    <label className="mb-2 block text-sm font-medium text-foreground">
                       Confidence Threshold:{' '}
                       {analysisSettings.confidenceThreshold.toFixed(1)}
                     </label>
@@ -560,7 +560,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                     />
                     <label
                       htmlFor="includeCounterfactuals"
-                      className="text-gray-700 text-sm"
+                      className="text-sm text-foreground"
                     >
                       Include Counterfactual Analysis
                     </label>
@@ -581,7 +581,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                     />
                     <label
                       htmlFor="includeHistorical"
-                      className="text-gray-700 text-sm"
+                      className="text-sm text-foreground"
                     >
                       Include Historical Comparison
                     </label>
@@ -592,8 +592,8 @@ export const EnhancedBiasDetectionInterface: React.FC<
           </div>
 
           {/* Enhanced Preset Scenarios */}
-          <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
-            <h3 className="text-gray-900 mb-4 text-lg font-semibold">
+          <div className="rounded-none border border-border bg-card p-6">
+            <h3 className="mb-4 text-lg font-semibold text-foreground">
               Preset Scenarios ({filteredPresets.length} available)
             </h3>
             <PresetScenarioSelector
@@ -605,8 +605,8 @@ export const EnhancedBiasDetectionInterface: React.FC<
           </div>
 
           {/* Custom Session Input */}
-          <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
-            <h3 className="text-gray-900 mb-4 text-lg font-semibold">
+          <div className="rounded-none border border-border bg-card p-6">
+            <h3 className="mb-4 text-lg font-semibold text-foreground">
               Custom Analysis
             </h3>
             <SessionInputForm
@@ -617,8 +617,8 @@ export const EnhancedBiasDetectionInterface: React.FC<
 
           {/* Session History */}
           {savedSessions.length > 0 && (
-            <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
-              <h3 className="text-gray-900 mb-4 text-lg font-semibold">
+            <div className="rounded-none border border-border bg-card p-6">
+              <h3 className="mb-4 text-lg font-semibold text-foreground">
                 Recent Sessions
               </h3>
               <div className="space-y-2">
@@ -626,7 +626,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   <button
                     type="button"
                     key={session.sessionId}
-                    className="bg-gray-50 hover:bg-gray-100 flex w-full cursor-pointer items-center justify-between rounded-lg p-3 text-left transition-colors"
+                    className="flex w-full cursor-pointer items-center justify-between rounded-none bg-secondary p-3 text-left transition-colors hover:bg-secondary"
                     onClick={() => {
                       void handleAnalyze(session)
                     }}
@@ -635,14 +635,14 @@ export const EnhancedBiasDetectionInterface: React.FC<
                       <div className="text-sm font-medium">
                         {session.scenario || 'Custom Session'}
                       </div>
-                      <div className="text-gray-500 text-xs">
+                      <div className="text-xs text-muted-foreground">
                         {session.timestamp.toLocaleDateString()} -
                         {session.demographics.age},{' '}
                         {session.demographics.gender},{' '}
                         {session.demographics.ethnicity}
                       </div>
                     </div>
-                    <span className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    <span className="text-sm font-medium text-foreground hover:text-foreground">
                       Re-analyze
                     </span>
                   </button>
@@ -654,10 +654,10 @@ export const EnhancedBiasDetectionInterface: React.FC<
       )}
 
       {currentStep === 'analyzing' && (
-        <div className="bg-white border-gray-100 rounded-xl border p-12 text-center shadow-sm">
+        <div className="rounded-none border border-border bg-card p-12 text-center">
           <div className="mx-auto mb-6 h-16 w-16">
             <svg
-              className="text-blue-600 h-full w-full animate-spin"
+              className="h-full w-full animate-spin text-foreground"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -676,21 +676,21 @@ export const EnhancedBiasDetectionInterface: React.FC<
               />
             </svg>
           </div>
-          <h3 className="text-gray-900 mb-2 text-xl font-semibold">
+          <h3 className="mb-2 text-xl font-semibold text-foreground">
             Analyzing Bias Patterns
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="mb-4 text-muted-foreground">
             Running comprehensive analysis across multiple bias detection
             layers...
           </p>
           <div className="mx-auto max-w-md">
-            <div className="text-gray-600 mb-2 flex items-center justify-between text-sm">
+            <div className="mb-2 flex items-center justify-between text-sm text-muted-foreground">
               <span>Progress</span>
               <span>{Math.round(progressPercent)}%</span>
             </div>
-            <div className="bg-gray-200 h-2 w-full rounded-full">
+            <div className="h-2 w-full rounded-none bg-secondary">
               <div
-                className="from-blue-500 to-purple-600 h-2 rounded-full bg-gradient-to-r"
+                className="h-2 rounded-none bg-primary"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -703,13 +703,13 @@ export const EnhancedBiasDetectionInterface: React.FC<
         sessionData && (
           <div className="space-y-6">
             {/* Results Header */}
-            <div className="bg-white border-gray-100 rounded-xl border p-6 shadow-sm">
+            <div className="rounded-none border border-border bg-card p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-gray-900 text-2xl font-bold">
+                  <h2 className="text-2xl font-bold text-foreground">
                     Analysis Results
                   </h2>
-                  <p className="text-gray-600">
+                  <p className="text-muted-foreground">
                     Session ID: {analysisResults.sessionId} • Confidence:{' '}
                     {(analysisResults.confidence * 100).toFixed(1)}%
                   </p>
@@ -717,7 +717,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                 <div className="flex gap-2">
                   <button
                     onClick={handleExport}
-                    className="bg-green-600 text-white hover:bg-green-700 flex items-center gap-2 rounded-lg px-4 py-2 transition-colors"
+                    className="flex items-center gap-2 rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent"
                   >
                     <svg
                       className="h-4 w-4"
@@ -736,7 +736,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                   </button>
                   <button
                     onClick={resetAnalysis}
-                    className="bg-gray-600 text-white hover:bg-gray-700 rounded-lg px-4 py-2 transition-colors"
+                    className="rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent"
                   >
                     New Analysis
                   </button>
@@ -744,7 +744,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
               </div>
 
               {/* Enhanced Tab Navigation */}
-              <div className="border-gray-200 mt-6 border-b">
+              <div className="mt-6 border-b border-border">
                 <div className="flex space-x-8">
                   {tabConfig.map((tab) => (
                     <button
@@ -752,14 +752,14 @@ export const EnhancedBiasDetectionInterface: React.FC<
                       onClick={() => setActiveTab(tab.id)}
                       className={`flex items-center gap-2 border-b-2 px-1 pb-4 text-sm font-medium transition-colors ${
                         activeTab === tab.id
-                          ? 'border-blue-500 text-blue-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          ? 'border-ring text-foreground'
+                          : 'border-transparent text-muted-foreground hover:border-input hover:text-foreground'
                       }`}
                     >
                       {TAB_ICONS[tab.icon]}
                       <span>{tab.label}</span>
                       {tab.badge && (
-                        <span className="bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 text-xs">
+                        <span className="rounded-none border border-input bg-secondary px-2 py-0.5 text-xs text-foreground">
                           {tab.badge}
                         </span>
                       )}

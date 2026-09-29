@@ -69,23 +69,36 @@ const ADVISORY_BUCKET_DIRS = {
     "apps/web/src/lib/websocket",
     "apps/web/src/lib/crypto",
   ],
-  // Bucket 2: heaviest lib subdirs + auxiliary top-level suites (~170 files)
-  lib: [
+  // Bucket 2: the former ~248-file `lib` bucket, split into four balanced
+  // sub-buckets (~60 files each) so no single advisory process runs 15+
+  // minutes; wall time is bounded by the largest sub-bucket, not the sum.
+  "lib-ai": [
     "apps/web/src/lib/ai",
+  ],
+  "lib-ehr": [
+    "apps/web/src/lib/ehr-native",
+  ],
+  "lib-services": [
     "apps/web/src/lib/services",
-    "apps/web/src/lib/memory",
     "apps/web/src/lib/metaaligner",
-    "apps/web/src/lib/security/threat-detection",
+    "apps/web/src/lib/fhe",
+  ],
+  "lib-security-hooks": [
     "apps/web/src/lib/security",
     "apps/web/src/lib/hooks",
-    "apps/web/src/lib/fhe",
-    "apps/web/src/lib/ehr-native",
-    "tests/bias-detection",
-    "tests/crisis-detection",
+    "apps/web/src/lib/memory",
     "tests/memory",
-    "tests/usability",
     "tests/hooks",
+    // tests/usability intentionally excluded — Playwright specs, not Vitest
+    // (importing @playwright/test at collection time hangs the vitest process
+    // for ~15 minutes with 0 tests collected; same reason as tests/api). They
+    // are not covered by any suite until wired into playwright.config.ts.
   ],
+  // Accuracy benchmarks (bias/crisis detection ML accuracy): a single
+  // ~15-minute accuracy-tests file that cannot be parallelized. Removed from
+  // the per-push advisory gate; runs nightly via the accuracy-gate workflow
+  // (same precedent as the CPU-bound load/performance excludes).
+  accuracy: ["tests/bias-detection", "tests/crisis-detection"],
   // Bucket 3: frontend split into sub-buckets to reduce per-process memory pressure.
   // src/components (React/JSX) is the heaviest and gets its own bucket.
   // src/hooks is moderate but has many small files that benefit from isolation.

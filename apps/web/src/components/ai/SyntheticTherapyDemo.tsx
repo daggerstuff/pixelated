@@ -436,9 +436,9 @@ export default function SyntheticTherapyDemo() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className='space-y-4'>
-                      <div className='bg-secondary/50 rounded-lg p-4'>
+                      <div className='bg-secondary/50 rounded-none p-4'>
                         <div className='flex items-start gap-4'>
-                          <div className='bg-primary text-white flex h-8 w-8 items-center justify-center rounded-full'>
+                          <div className='bg-primary text-white flex h-8 w-8 items-center justify-center rounded-none'>
                             P
                           </div>
                           <div className='flex-1'>
@@ -450,9 +450,9 @@ export default function SyntheticTherapyDemo() {
                         </div>
                       </div>
 
-                      <div className='bg-muted rounded-lg p-4'>
+                      <div className='bg-muted rounded-none p-4'>
                         <div className='flex items-start gap-4'>
-                          <div className='bg-blue-600 text-white flex h-8 w-8 items-center justify-center rounded-full'>
+                          <div className='bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-none'>
                             T
                           </div>
                           <div className='flex-1'>
@@ -480,7 +480,7 @@ export default function SyntheticTherapyDemo() {
                         {selectedConversation.encodedSymptoms.map((symptom) => (
                           <div
                             key={`${symptom.name}-${symptom.duration}`}
-                            className='space-y-2 rounded-lg border p-4'
+                            className='space-y-2 rounded-none border p-4'
                           >
                             <div className='flex items-center justify-between'>
                               <h3 className='font-medium'>{symptom.name}</h3>
@@ -492,9 +492,9 @@ export default function SyntheticTherapyDemo() {
                               <div className='text-muted-foreground text-sm'>
                                 Severity: {(symptom.severity * 100).toFixed(0)}%
                               </div>
-                              <div className='bg-secondary h-2 w-full rounded-full'>
+                              <div className='bg-secondary h-2 w-full rounded-none'>
                                 <div
-                                  className='bg-primary h-2 rounded-full'
+                                  className='bg-primary h-2 rounded-none'
                                   style={{
                                     width: `${symptom.severity * 100}%`,
                                   }}
@@ -544,7 +544,7 @@ export default function SyntheticTherapyDemo() {
                         </CardDescription>
                       </CardHeader>
                       <CardContent className='space-y-4'>
-                        <div className='space-y-2 rounded-lg border p-4'>
+                        <div className='space-y-2 rounded-none border p-4'>
                           <div className='font-medium'>Identified Symptoms</div>
                           <div className='mt-2 flex flex-wrap gap-2'>
                             {selectedConversation.decodedSymptoms.map(
@@ -568,7 +568,7 @@ export default function SyntheticTherapyDemo() {
                           </div>
                         </div>
 
-                        <div className='space-y-2 rounded-lg border p-4'>
+                        <div className='space-y-2 rounded-none border p-4'>
                           <div className='font-medium'>
                             Correctly Identified
                           </div>
@@ -584,7 +584,7 @@ export default function SyntheticTherapyDemo() {
                           </div>
                         </div>
 
-                        <div className='space-y-2 rounded-lg border p-4'>
+                        <div className='space-y-2 rounded-none border p-4'>
                           <div className='font-medium'>Missed by Therapist</div>
                           <div className='mt-2 flex flex-wrap gap-2'>
                             {missedSymptoms.map((symptom) => (
@@ -598,7 +598,7 @@ export default function SyntheticTherapyDemo() {
                           </div>
                         </div>
 
-                        <div className='space-y-2 rounded-lg border p-4'>
+                        <div className='space-y-2 rounded-none border p-4'>
                           <div className='font-medium'>
                             Incorrectly Identified
                           </div>
@@ -627,7 +627,7 @@ export default function SyntheticTherapyDemo() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className='space-y-4'>
-                      <div className='bg-muted whitespace-pre-wrap rounded-lg p-4 font-mono text-sm'>
+                      <div className='bg-muted whitespace-pre-wrap rounded-none p-4 font-mono text-sm'>
                         {selectedConversation.sessionSummary}
                       </div>
                       <div className='flex justify-end'>

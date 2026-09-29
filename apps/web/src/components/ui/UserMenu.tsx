@@ -37,7 +37,7 @@ export function UserMenu({ className = '' }: UserMenuProps) {
   if (isPending) {
     return (
       <div className={className}>
-        <div className="text-gray-700 dark:text-gray-300 inline-flex items-center rounded-lg px-4 py-2 text-center text-sm font-medium">
+        <div className="inline-flex items-center rounded-none px-4 py-2 text-center text-sm font-medium text-foreground">
           Loading...
         </div>
       </div>
@@ -49,7 +49,7 @@ export function UserMenu({ className = '' }: UserMenuProps) {
       <div className={className}>
         <a
           href="/login"
-          className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-gray-300 inline-flex items-center rounded-lg px-4 py-2 text-center text-sm font-medium focus:ring-4"
+          className="inline-flex items-center rounded-none px-4 py-2 text-center text-sm font-medium text-foreground transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring"
         >
           Sign in
         </a>
@@ -61,7 +61,7 @@ export function UserMenu({ className = '' }: UserMenuProps) {
     <div className={`relative ${className}`} ref={menuRef}>
       <button
         type="button"
-        className="bg-gray-800 focus:ring-gray-300 dark:focus:ring-gray-600 flex rounded-full text-sm focus:ring-4 md:me-0"
+        className="flex rounded-none text-sm focus:outline-none focus:ring-2 focus:ring-ring md:me-0"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="sr-only">Open user menu</span>
@@ -79,12 +79,12 @@ export function UserMenu({ className = '' }: UserMenuProps) {
       </button>
 
       {isOpen && (
-        <div className="bg-white divide-gray-100 dark:bg-gray-700 dark:divide-gray-600 absolute right-0 z-50 mt-2 w-56 list-none divide-y rounded-lg text-base shadow">
+        <div className="absolute right-0 z-50 mt-2 w-56 list-none divide-y divide-border rounded-none border border-border bg-card text-base">
           <div className="px-4 py-3">
-            <span className="text-gray-900 dark:text-white block text-sm">
+            <span className="block text-sm font-medium text-foreground">
               {user.user_metadata?.full_name ?? user.email}
             </span>
-            <span className="text-gray-500 dark:text-gray-400 block truncate text-sm">
+            <span className="block truncate text-sm text-muted-foreground">
               {user.email?.toString() ?? ''}
             </span>
           </div>
@@ -92,7 +92,7 @@ export function UserMenu({ className = '' }: UserMenuProps) {
             <li>
               <a
                 href="/dashboard"
-                className="text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white block px-4 py-2 text-sm"
+                className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-secondary"
                 role="menuitem"
               >
                 Dashboard
@@ -101,7 +101,7 @@ export function UserMenu({ className = '' }: UserMenuProps) {
             <li>
               <a
                 href="/settings"
-                className="text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white block px-4 py-2 text-sm"
+                className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-secondary"
                 role="menuitem"
               >
                 Settings
@@ -113,7 +113,7 @@ export function UserMenu({ className = '' }: UserMenuProps) {
                   await authClient.signOut()
                   window.location.href = '/'
                 }}
-                className="text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white block w-full px-4 py-2 text-left text-sm"
+                className="block w-full px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 role="menuitem"
               >
                 Sign out
@@ -125,5 +125,3 @@ export function UserMenu({ className = '' }: UserMenuProps) {
     </div>
   )
 }
-
-export default UserMenu

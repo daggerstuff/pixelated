@@ -47,7 +47,9 @@ export const GET = async ({
 
     if (session?.user) {
       userId =
-        (session.user.id || (session.user as { _id?: { toString(): string } })._id?.toString()) ?? null
+        (session.user.id ||
+          (session.user as { _id?: { toString(): string } })._id?.toString()) ??
+        null
     } else {
       const authHeader = request.headers.get('Authorization') ?? null
       if (!authHeader) {
@@ -120,7 +122,6 @@ export const GET = async ({
       },
     )
   } catch (error: any) {
-
     logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'get_profile',
       error: detectAndRedactPHI(
@@ -178,7 +179,9 @@ export const PUT = async ({
 
     if (session?.user) {
       userId =
-        (session.user.id || (session.user as { _id?: { toString(): string } })._id?.toString()) ?? null
+        (session.user.id ||
+          (session.user as { _id?: { toString(): string } })._id?.toString()) ??
+        null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (authHeader) {
@@ -261,7 +264,6 @@ export const PUT = async ({
       },
     )
   } catch (error: unknown) {
-
     logSecurityEvent(SecurityEventType.CONFIG_CHANGE, null, {
       action: 'update_profile',
       success: false,

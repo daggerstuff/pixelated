@@ -38,7 +38,10 @@ const { defaultMessage = 'This is a secure message' } = Astro.props
       <Badge variant="outline" id="encryption-mode-badge">
         Mode: Not initialized
       </Badge>
-      <Badge variant="outline" id="key-id-badge"> Key ID: Not generated </Badge>
+      <Badge variant="outline" id="key-id-badge">
+        {' '}
+        Key ID: Not generated{' '}
+      </Badge>
     </div>
   </CardHeader>
   <CardContent>
@@ -60,18 +63,20 @@ const { defaultMessage = 'This is a secure message' } = Astro.props
             />
           </div>
 
-          <Button id="encrypt-btn" className="w-full"> Encrypt Message </Button>
+          <Button id="encrypt-btn" className="w-full">
+            {' '}
+            Encrypt Message{' '}
+          </Button>
 
           <div
             id="encrypted-message-container"
-            class="mt-4 p-3 bg-muted rounded-md hidden"
+            class="mt-4 p-3 bg-muted rounded-none hidden"
           >
             <Label>Encrypted Message</Label>
             <p
               id="encrypted-message-display"
               class="text-xs font-mono break-all mt-1"
-            >
-            </p>
+            ></p>
           </div>
         </div>
       </TabsContent>
@@ -82,7 +87,7 @@ const { defaultMessage = 'This is a secure message' } = Astro.props
             <Label htmlFor="operation">Operation</Label>
             <select
               id="operation"
-              class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              class="flex h-10 w-full rounded-none border border-input bg-background px-3 py-2 text-sm"
             >
               <option value="sentiment">Sentiment Analysis</option>
               <option value="entities">Entity Extraction</option>
@@ -97,7 +102,7 @@ const { defaultMessage = 'This is a secure message' } = Astro.props
 
           <div
             id="operation-result-container"
-            class="mt-4 p-3 bg-muted rounded-md hidden"
+            class="mt-4 p-3 bg-muted rounded-none hidden"
           >
             <Label>Operation Result</Label>
             <div id="operation-result" class="text-sm mt-1"></div>
@@ -115,11 +120,14 @@ const { defaultMessage = 'This is a secure message' } = Astro.props
             />
           </div>
 
-          <Button id="decrypt-btn" className="w-full"> Decrypt Data </Button>
+          <Button id="decrypt-btn" className="w-full">
+            {' '}
+            Decrypt Data{' '}
+          </Button>
 
           <div
             id="decrypted-message-container"
-            class="mt-4 p-3 bg-muted rounded-md hidden"
+            class="mt-4 p-3 bg-muted rounded-none hidden"
           >
             <Label>Decrypted Message</Label>
             <p id="decrypted-message" class="mt-1"></p>
@@ -133,12 +141,15 @@ const { defaultMessage = 'This is a secure message' } = Astro.props
       <Button id="rotate-key-btn" variant="outline" className="mr-2">
         Rotate Encryption Keys
       </Button>
-      <Button id="initialize-btn" variant="outline"> Initialize FHE </Button>
+      <Button id="initialize-btn" variant="outline">
+        {' '}
+        Initialize FHE{' '}
+      </Button>
     </div>
 
     <div
       id="error-container"
-      class="mt-4 p-3 bg-red-50 text-red-700 rounded-md hidden"
+      class="mt-4 p-3 bg-secondary border border-ring text-foreground rounded-none hidden"
     >
       <p id="error-message"></p>
     </div>
@@ -220,13 +231,13 @@ const { defaultMessage = 'This is a secure message' } = Astro.props
       if (initialized) {
         initializationBadge.textContent = 'FHE Initialized'
         initializationBadge.setAttribute('variant', 'default')
-        initializationBadge.classList.remove('bg-red-500')
-        initializationBadge.classList.add('bg-green-500')
+        initializationBadge.classList.remove('bg-secondary')
+        initializationBadge.classList.add('bg-primary')
       } else {
         initializationBadge.textContent = 'Not Initialized'
         initializationBadge.setAttribute('variant', 'destructive')
-        initializationBadge.classList.add('bg-red-500')
-        initializationBadge.classList.remove('bg-green-500')
+        initializationBadge.classList.add('bg-secondary')
+        initializationBadge.classList.remove('bg-primary')
       }
     }
 

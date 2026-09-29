@@ -265,7 +265,7 @@ export function TableWidget({
         <div className="flex justify-between">
           {enableSearch && (
             <div className="relative w-64">
-              <Search className="text-muted-foreground absolute left-2 top-2.5 h-4 w-4" />
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search..."
                 className="pl-8"

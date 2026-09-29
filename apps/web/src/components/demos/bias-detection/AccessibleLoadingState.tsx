@@ -25,7 +25,7 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-white border-gray-200 space-y-6 rounded-lg border p-6"
+      className="space-y-6 rounded-none border border-border bg-card p-6"
       role="status"
       aria-live="polite"
       aria-label={message}
@@ -34,14 +34,14 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
       <div className="space-y-2 text-center">
         <div className="flex justify-center">
           <motion.div
-            className="border-blue-200 border-t-blue-600 h-8 w-8 rounded-full border-4"
+            className="h-8 w-8 rounded-none border-4 border-ring border-t-ring"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
             aria-hidden="true"
           />
         </div>
-        <h3 className="text-gray-900 text-lg font-medium">{message}</h3>
-        <p className="text-gray-600 text-sm">
+        <h3 className="text-lg font-medium text-foreground">{message}</h3>
+        <p className="text-sm text-muted-foreground">
           This may take a few moments for comprehensive analysis
         </p>
       </div>
@@ -49,13 +49,13 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
       {/* Progress bar */}
       {progress > 0 && (
         <div className="space-y-2">
-          <div className="text-gray-600 flex justify-between text-sm">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>Progress</span>
             <span>{Math.round(progress)}%</span>
           </div>
-          <div className="bg-gray-200 h-2 w-full rounded-full">
+          <div className="h-2 w-full rounded-none bg-secondary">
             <motion.div
-              className="bg-blue-600 h-2 rounded-full"
+              className="h-2 rounded-none bg-primary"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.3 }}
@@ -78,12 +78,12 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
             className="flex items-center space-x-3"
           >
             <div
-              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-medium ${
+              className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-none text-xs font-medium ${
                 index < currentStep
-                  ? 'bg-green-100 text-green-800'
+                  ? 'bg-primary text-primary-foreground'
                   : index === currentStep
-                    ? 'bg-blue-100 text-blue-800'
-                    : 'bg-gray-100 text-gray-600'
+                    ? 'border border-ring bg-secondary font-medium text-foreground'
+                    : 'bg-secondary text-muted-foreground'
               }`}
             >
               {index < currentStep ? (
@@ -100,7 +100,7 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
                 </svg>
               ) : index === currentStep ? (
                 <motion.div
-                  className="bg-blue-600 h-2 w-2 rounded-full"
+                  className="h-2 w-2 rounded-none bg-primary"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 />
@@ -110,7 +110,9 @@ export const AccessibleLoadingState: React.FC<AccessibleLoadingStateProps> = ({
             </div>
             <span
               className={`text-sm ${
-                index <= currentStep ? 'text-gray-900' : 'text-gray-500'
+                index <= currentStep
+                  ? 'text-foreground'
+                  : 'text-muted-foreground'
               }`}
             >
               {step}

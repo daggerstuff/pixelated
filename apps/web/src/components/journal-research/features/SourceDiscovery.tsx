@@ -47,13 +47,13 @@ export function SourceDiscovery({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Source Discovery</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             Discover and identify relevant journal sources
           </p>
         </div>
         <button
           onClick={() => setIsInitiating(true)}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
+          className="hover:bg-primary/90 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
           disabled={initiateMutation.isPending}
         >
           {initiateMutation.isPending ? 'Discovering...' : 'Start Discovery'}
@@ -88,7 +88,7 @@ export function SourceDiscovery({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-muted-foreground py-8 text-center">
+            <div className="py-8 text-center text-muted-foreground">
               Loading sources...
             </div>
           ) : (

@@ -70,7 +70,7 @@ export default function LoginForm() {
       h(
         'label',
         {
-          className: 'block text-sm font-medium text-gray-700',
+          className: 'block text-sm font-medium text-foreground',
           htmlFor: field,
         },
         isEmail ? 'Email Address' : 'Password',
@@ -82,13 +82,13 @@ export default function LoginForm() {
         onChange: handleChange,
         autoComplete: isEmail ? 'email' : 'current-password',
         className:
-          'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:ring-offset-0',
+          'mt-1 border-input bg-background w-full rounded-none border focus:border-ring focus:ring-ring sm:ring-offset-0',
         required: true,
       }),
       !isEmail &&
         h(
           'p',
-          { className: 'text-xs text-gray-400 indent-2 mt-1' },
+          { className: 'text-xs text-muted-foreground indent-2 mt-1' },
           'Must be at least 6 characters',
         ),
     )
@@ -98,7 +98,7 @@ export default function LoginForm() {
     'div',
     {
       className:
-        'auth-container max-w-md w-full p-6 bg-white rounded-lg shadow-md',
+        'auth-container max-w-md w-full p-6 bg-card border border-border rounded-none',
     },
     h('h2', { className: 'text-2xl font-bold mb-6 text-center' }, 'Sign In'),
     h(
@@ -109,7 +109,8 @@ export default function LoginForm() {
         h(
           'div',
           {
-            className: 'mb-4 p-3 bg-red-100 text-red-800 rounded-lg',
+            className:
+              'mb-4 p-3 bg-secondary border border-ring text-foreground rounded-none',
             role: 'alert',
           },
           error,
@@ -120,7 +121,7 @@ export default function LoginForm() {
           type: 'submit',
           disabled: isLoading,
           className:
-            'w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-75 transition-colors',
+            'w-full bg-primary text-primary-foreground py-2 px-4 rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-35 transition-colors',
         },
         isLoading ? 'Signing in...' : 'Sign In',
       ),
@@ -130,14 +131,14 @@ export default function LoginForm() {
       { className: 'mt-6 text-center' },
       h(
         'span',
-        { className: 'text-sm text-gray-500' },
+        { className: 'text-sm text-muted-foreground' },
         "Don't have an account?",
       ),
       h(
         'a',
         {
           href: '/register',
-          className: 'text-sm text-indigo-600 hover:text-indigo-500 underline',
+          className: 'text-sm text-foreground hover:underline',
         },
         'Sign up',
       ),

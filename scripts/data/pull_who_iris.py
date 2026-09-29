@@ -17,6 +17,7 @@ import json
 import logging
 import time
 from pathlib import Path
+from typing import Any
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -37,12 +38,13 @@ SEARCH_PARAMS = {
 }
 
 
-def _search(params: dict) -> dict:
+def _search(params: dict[str, str | int]) -> dict[str, Any]:
     """Search WHO IRIS for mental health publications."""
     url = f"{WHO_IRIS_API}?{urlencode(params)}"
     try:
         with urlopen(url, timeout=30) as resp:
-            return json.loads(resp.read().decode())
+            data: dict[str, Any] = json.loads(resp.read().decode())
+            return data
     except (HTTPError, Exception) as e:
         logger.warning("WHO IRIS API error: %s", e)
         return {}
@@ -58,7 +60,7 @@ def pull_reports(output_dir: Path, limit: int) -> int:
     logger.info("Pulling up to %d reports from WHO IRIS...", limit)
 
     while count < limit:
-        params = {**SEARCH_PARAMS, "start": start}
+        params: dict[str, str | int] = {**SEARCH_PARAMS, "start": start}
         data = _search(params)
         docs = data.get("response", {}).get("docs", [])
         if not docs:
@@ -75,11 +77,12 @@ def pull_reports(output_dir: Path, limit: int) -> int:
                 if not doc_id:
                     continue
 
-                def _get_field(doc, field_name):
+                def _get_field(doc: dict[str, Any], field_name: str) -> str:
                     val = doc.get(field_name)
                     if isinstance(val, list):
                         if val and isinstance(val[0], dict):
-                            return val[0].get("value", "")
+                            value: str = val[0].get("value", "")
+                            return value
                         return " ".join(str(v) for v in val if v)
                     return str(val) if val else ""
 
@@ -120,7 +123,7 @@ def pull_reports(output_dir: Path, limit: int) -> int:
     return count
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(description="PIX-30: WHO IRIS Mental Health Reports")
     parser.add_argument("--limit", type=int, default=500, help="Max reports to pull")
     parser.add_argument("--output", type=Path, default=Path("data/raw/who_iris/"))

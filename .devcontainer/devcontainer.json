@@ -1,0 +1,35 @@
+// Devcontainer: the only outright zero on the readiness report.
+// Matches the documented toolchain exactly: Node 24 + pnpm 11.24
+// (packageManager pin), Python 3.14 via uv (ai/ requires-python),
+// and docker-outside-of-docker for the throwaway pe test database
+// (make pe-test-db). Submodules are checked out by the post-create
+// command, same as CI's init.
+{
+  "name": "pixelated-empathy",
+  "build": {
+    "dockerfile": "Dockerfile.devcontainer",
+    "context": "."
+  },
+  "containerEnv": {
+    "NODE_ENV": "development"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "postCreateCommand": "pnpm install --frozen-lockfile && git submodule update --init --recursive && uv sync",
+  "forwardPorts": [5173, 4321, 5434],
+  "portsAttributes": {
+    "5173": { "label": "Astro dev" },
+    "4321": { "label": "Astro preview" },
+    "5434": { "label": "pe test postgres" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "astro-build.astro-vscode",
+        "bierner.markdown-mermaid",
+        "charliermarsh.ruff"
+      ]
+    }
+  }
+}

@@ -25,16 +25,11 @@ def normalize_swe_task_id(value: Any) -> str:
         for key in ("task_id", "id", "name"):
             if value.get(key):
                 return normalize_swe_task_id(value[key])
-        metadata = value.get("metadata") if isinstance(value.get("metadata"), Mapping) else {}
-        batch = (
-            value.get("batch")
-            or value.get("source_batch")
-            or metadata.get("source_batch")
-        )
+        raw_metadata = value.get("metadata")
+        metadata: Mapping[str, Any] = raw_metadata if isinstance(raw_metadata, Mapping) else {}
+        batch = value.get("batch") or value.get("source_batch") or metadata.get("source_batch")
         skill_id = (
-            value.get("skill_id")
-            or value.get("source_skill_id")
-            or metadata.get("source_skill_id")
+            value.get("skill_id") or value.get("source_skill_id") or metadata.get("source_skill_id")
         )
         if batch and skill_id:
             return f"swe-{batch}-{skill_id}".lower()
@@ -100,9 +95,7 @@ def select_tasks(
         )
 
     kept_ids = [
-        task_id
-        for task_id in selected_ids
-        if task_id in tasks_by_id and task_id in jobs_by_id
+        task_id for task_id in selected_ids if task_id in tasks_by_id and task_id in jobs_by_id
     ]
     selected_tasks = [tasks_by_id[task_id] for task_id in kept_ids]
     selected_jobs = [jobs_by_id[task_id] for task_id in kept_ids]
@@ -117,8 +110,12 @@ def select_tasks(
     )
     tasks_output.parent.mkdir(parents=True, exist_ok=True)
     jobs_output.parent.mkdir(parents=True, exist_ok=True)
-    tasks_output.write_text(json.dumps(output_manifest, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
-    jobs_output.write_text(json.dumps(selected_jobs, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    tasks_output.write_text(
+        json.dumps(output_manifest, indent=2, ensure_ascii=True) + "\n", encoding="utf-8"
+    )
+    jobs_output.write_text(
+        json.dumps(selected_jobs, indent=2, ensure_ascii=True) + "\n", encoding="utf-8"
+    )
 
     return {
         "selection": selection_name,

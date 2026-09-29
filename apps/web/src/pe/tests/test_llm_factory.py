@@ -27,7 +27,7 @@ class TestLLMConfigDefaults:
         s = Settings()
         assert s.LLM_MODEL_ID is None
 
-    def test_env_override_without_prefix(self, monkeypatch) -> None:
+    def test_env_override_without_prefix(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setenv("LLM_PROVIDER", "openai")
         monkeypatch.setenv("LLM_API_KEY", "sk-test")
         monkeypatch.setenv("LLM_MODEL_ID", "gpt-4-test")

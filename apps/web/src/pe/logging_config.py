@@ -1,10 +1,25 @@
 """Structured logging configuration for the backend."""
 
 import logging
+import os
 import sys
 from typing import Any
 
 import structlog
+
+
+def _renderer() -> Any:
+    """Pick the output renderer for the deployment context.
+
+    Deployed processes (containers, CI, log shippers) get newline-delimited
+    JSON; an interactive terminal gets the human console renderer. This
+    mirrors the bias-detection services' bootstrap logging. ``PE_LOG_FORMAT``
+    overrides the auto-detection: ``json`` or ``console``.
+    """
+    configured = os.environ.get("PE_LOG_FORMAT", "auto").lower()
+    if configured == "json" or (configured == "auto" and not sys.stdout.isatty()):
+        return structlog.processors.JSONRenderer()
+    return structlog.dev.ConsoleRenderer(colors=sys.stdout.isatty())
 
 
 def setup_logging(level: str = "INFO") -> None:
@@ -39,7 +54,7 @@ def setup_logging(level: str = "INFO") -> None:
     formatter = structlog.stdlib.ProcessorFormatter(
         processors=[
             structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-            structlog.dev.ConsoleRenderer(colors=sys.stdout.isatty()),
+            _renderer(),
         ],
     )
 

@@ -5,8 +5,16 @@ interface UserPreferences {
   theme: 'light' | 'dark' | 'system'
   language: string
   notifications: { email: boolean; push: boolean; sms: boolean }
-  accessibility: { reducedMotion: boolean; highContrast: boolean; fontSize: 'small' | 'medium' | 'large' }
-  privacy: { analytics: boolean; crashReporting: boolean; personalization: boolean }
+  accessibility: {
+    reducedMotion: boolean
+    highContrast: boolean
+    fontSize: 'small' | 'medium' | 'large'
+  }
+  privacy: {
+    analytics: boolean
+    crashReporting: boolean
+    personalization: boolean
+  }
 }
 
 interface UIState {
@@ -26,8 +34,12 @@ interface PreferencesState {
   updatePreferences: (preferences: Partial<UserPreferences>) => void
   setTheme: (theme: UserPreferences['theme']) => void
   setLanguage: (language: string) => void
-  updateNotificationSettings: (notifications: Partial<UserPreferences['notifications']>) => void
-  updateAccessibilitySettings: (accessibility: Partial<UserPreferences['accessibility']>) => void
+  updateNotificationSettings: (
+    notifications: Partial<UserPreferences['notifications']>,
+  ) => void
+  updateAccessibilitySettings: (
+    accessibility: Partial<UserPreferences['accessibility']>,
+  ) => void
   updatePrivacySettings: (privacy: Partial<UserPreferences['privacy']>) => void
   updateUIState: (uiState: Partial<UIState>) => void
   toggleSidebar: () => void
@@ -42,7 +54,11 @@ const defaultPreferences: UserPreferences = {
   theme: 'dark',
   language: 'en',
   notifications: { email: true, push: true, sms: false },
-  accessibility: { reducedMotion: false, highContrast: false, fontSize: 'medium' },
+  accessibility: {
+    reducedMotion: false,
+    highContrast: false,
+    fontSize: 'medium',
+  },
   privacy: { analytics: true, crashReporting: true, personalization: true },
 }
 
@@ -64,29 +80,76 @@ export const usePreferencesStore = create<PreferencesState>()(
           preferences: defaultPreferences,
           uiState: defaultUIState,
 
-          updatePreferences: (prefs) => set((state) => ({ preferences: { ...state.preferences, ...prefs } })),
-          setTheme: (theme) => set((state) => ({ preferences: { ...state.preferences, theme } })),
-          setLanguage: (language) => set((state) => ({ preferences: { ...state.preferences, language } })),
-          updateNotificationSettings: (notifications) => set((state) => ({
-            preferences: { ...state.preferences, notifications: { ...state.preferences.notifications, ...notifications } },
-          })),
-          updateAccessibilitySettings: (accessibility) => set((state) => ({
-            preferences: { ...state.preferences, accessibility: { ...state.preferences.accessibility, ...accessibility } },
-          })),
-          updatePrivacySettings: (privacy) => set((state) => ({
-            preferences: { ...state.preferences, privacy: { ...state.preferences.privacy, ...privacy } },
-          })),
-          updateUIState: (ui) => set((state) => ({ uiState: { ...state.uiState, ...ui } })),
-          toggleSidebar: () => set((state) => ({ uiState: { ...state.uiState, sidebarOpen: !state.uiState.sidebarOpen } })),
-          setActiveTab: (tab) => set((state) => ({ uiState: { ...state.uiState, activeTab: tab } })),
-          setLayout: (layout) => set((state) => ({ uiState: { ...state.uiState, layout } })),
-          setViewMode: (viewMode) => set((state) => ({ uiState: { ...state.uiState, viewMode } })),
-          updateFilters: (filters) => set((state) => ({ uiState: { ...state.uiState, filters: { ...state.uiState.filters, ...filters } } })),
-          setSortBy: (sortBy, sortOrder: UIState['sortOrder'] = 'desc') => set((state): Partial<PreferencesState> => ({ uiState: { ...state.uiState, sortBy, sortOrder } })),
+          updatePreferences: (prefs) =>
+            set((state) => ({
+              preferences: { ...state.preferences, ...prefs },
+            })),
+          setTheme: (theme) =>
+            set((state) => ({ preferences: { ...state.preferences, theme } })),
+          setLanguage: (language) =>
+            set((state) => ({
+              preferences: { ...state.preferences, language },
+            })),
+          updateNotificationSettings: (notifications) =>
+            set((state) => ({
+              preferences: {
+                ...state.preferences,
+                notifications: {
+                  ...state.preferences.notifications,
+                  ...notifications,
+                },
+              },
+            })),
+          updateAccessibilitySettings: (accessibility) =>
+            set((state) => ({
+              preferences: {
+                ...state.preferences,
+                accessibility: {
+                  ...state.preferences.accessibility,
+                  ...accessibility,
+                },
+              },
+            })),
+          updatePrivacySettings: (privacy) =>
+            set((state) => ({
+              preferences: {
+                ...state.preferences,
+                privacy: { ...state.preferences.privacy, ...privacy },
+              },
+            })),
+          updateUIState: (ui) =>
+            set((state) => ({ uiState: { ...state.uiState, ...ui } })),
+          toggleSidebar: () =>
+            set((state) => ({
+              uiState: {
+                ...state.uiState,
+                sidebarOpen: !state.uiState.sidebarOpen,
+              },
+            })),
+          setActiveTab: (tab) =>
+            set((state) => ({ uiState: { ...state.uiState, activeTab: tab } })),
+          setLayout: (layout) =>
+            set((state) => ({ uiState: { ...state.uiState, layout } })),
+          setViewMode: (viewMode) =>
+            set((state) => ({ uiState: { ...state.uiState, viewMode } })),
+          updateFilters: (filters) =>
+            set((state) => ({
+              uiState: {
+                ...state.uiState,
+                filters: { ...state.uiState.filters, ...filters },
+              },
+            })),
+          setSortBy: (sortBy, sortOrder: UIState['sortOrder'] = 'desc') =>
+            set((state): Partial<PreferencesState> => ({
+              uiState: { ...state.uiState, sortBy, sortOrder },
+            })),
         }),
         {
           name: 'therapy-state-preferences',
-          partialize: (state) => ({ preferences: state.preferences, uiState: state.uiState }),
+          partialize: (state) => ({
+            preferences: state.preferences,
+            uiState: state.uiState,
+          }),
         },
       ),
     ),

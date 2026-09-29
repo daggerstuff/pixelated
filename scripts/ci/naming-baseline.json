@@ -1,0 +1,25 @@
+{
+  "$schema": "Naming-convention baseline for .eslintrc.naming.mjs",
+  "description": "Per-file @typescript-eslint/naming-convention violation counts. The audit fails when a file regresses above its pinned count. Re-pin with `pnpm lint:naming -- --update` only after intentional changes.",
+  "generatedAt": "2026-09-14T23:35:53.041Z",
+  "total": 37,
+  "files": {
+    "agents/qa-agent/agent/tools/summarize_cohort.ts": 2,
+    "apps/web/src/components/chat/PixelMultimodalChat.tsx": 2,
+    "apps/web/src/components/research/DatasetCard.tsx": 5,
+    "apps/web/src/components/research/ResultCard.tsx": 4,
+    "apps/web/src/components/ui/EnhancedMentalHealthChat.tsx": 6,
+    "apps/web/src/components/ui/MindMirrorDashboard.tsx": 1,
+    "apps/web/src/data/compatibility-placeholder.ts": 1,
+    "apps/web/src/lib/ai/bias-detection/BiasDetectionEngine.ts": 2,
+    "apps/web/src/lib/ai/services/MultiModalRiskAssessmentService.ts": 1,
+    "apps/web/src/lib/auth/auth0-jwt-service.ts": 2,
+    "apps/web/src/lib/ehr-native/integrations/clearinghouse/stub-adapter.ts": 1,
+    "apps/web/src/lib/polyfills/browser-polyfills.ts": 1,
+    "apps/web/src/lib/security/threat-detection/threat-hunting/utils/threat-data-utils.ts": 2,
+    "apps/web/src/pages/api/developer/api-keys/index.ts": 2,
+    "apps/web/src/pages/api/ehr/v1/notes/[id]/sign.ts": 3,
+    "apps/web/src/pages/api/psychology/generate-scenario.ts": 1,
+    "apps/web/src/types.ts": 1
+  }
+}

@@ -2,15 +2,6 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 
 /* global vi, describe, it, expect, beforeEach */
 
-vi.mock('../lib/services/notification/NotificationService', () => ({
-  NotificationChannel: {
-    IN_APP: 'in_app',
-    EMAIL: 'email',
-    PUSH: 'push',
-    SMS: 'sms',
-  },
-}))
-
 vi.mock('@/lib/services/notification/NotificationService', () => ({
   NotificationChannel: {
     IN_APP: 'in_app',

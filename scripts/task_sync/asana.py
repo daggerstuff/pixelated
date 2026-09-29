@@ -97,7 +97,8 @@ def apply_asana_action(action: Mapping[str, Any]) -> dict[str, Any]:
     if not view.target_id:
         payload = asana_create_payload(view, project_id)
         response = _json_request("POST", "https://app.asana.com/api/1.0/tasks", headers=headers, payload=payload)
-        return response.get("data", {})
+        created: dict[str, Any] = response.get("data", {})
+        return created
     payload = asana_update_payload(view)
     response = _json_request(
         "PUT",
@@ -105,4 +106,5 @@ def apply_asana_action(action: Mapping[str, Any]) -> dict[str, Any]:
         headers=headers,
         payload=payload,
     )
-    return response.get("data", {})
+    updated: dict[str, Any] = response.get("data", {})
+    return updated

@@ -16,9 +16,11 @@ from scripts.data.designer.release_manifest import (
 from scripts.data.designer.schemas import (
     ChatMessage,
     ConstructionRecord,
+    ContributionMode,
     HumanReviewStatus,
     JudgeResult,
     TargetProduct,
+    UsePolicy,
 )
 
 
@@ -33,8 +35,8 @@ def _make_record(
         source_id=source_id,
         analysis_id=analysis_id,
         source_unit_refs=["annomi:dialogue-001:turn-04"],
-        use_policies=["direct"],
-        contribution_mode="direct_seed",
+        use_policies=[UsePolicy.DIRECT],
+        contribution_mode=ContributionMode.DIRECT_SEED,
         construction_spec_version=CONSTRUCTION_SPEC_VERSION,
         model_alias="nvidia-text",
         prompt_version=PROMPT_VERSION,

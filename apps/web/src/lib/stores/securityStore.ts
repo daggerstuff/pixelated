@@ -19,8 +19,13 @@ interface SecurityState {
   setEncryptionEnabled: (enabled: boolean) => void
   setFHEInitialized: (initialized: boolean) => void
   setAIService: (service: AIService) => void
-  initializeMentalHealthChat: () => ReturnType<typeof createMentalHealthChat> | null
-  configureMentalHealthAnalysis: (enableAnalysis: boolean, useExpertGuidance: boolean) => void
+  initializeMentalHealthChat: () => ReturnType<
+    typeof createMentalHealthChat
+  > | null
+  configureMentalHealthAnalysis: (
+    enableAnalysis: boolean,
+    useExpertGuidance: boolean,
+  ) => void
 }
 
 export const useSecurityStore = create<SecurityState>()(
@@ -38,22 +43,33 @@ export const useSecurityStore = create<SecurityState>()(
           expertGuidanceEnabled: true,
 
           setSecurityLevel: (level) => set({ securityLevel: level }),
-          setEncryptionEnabled: (enabled) => set({ encryptionEnabled: enabled }),
-          setFHEInitialized: (initialized) => set({ fheInitialized: initialized }),
+          setEncryptionEnabled: (enabled) =>
+            set({ encryptionEnabled: enabled }),
+          setFHEInitialized: (initialized) =>
+            set({ fheInitialized: initialized }),
           setAIService: (service) => set({ aiService: service }),
           initializeMentalHealthChat: () => {
             if (get().fheService) {
-              const mentalHealthChat = createMentalHealthChat(get().fheService!, {
-                enableAnalysis: get().mentalHealthAnalysisEnabled,
-                useExpertGuidance: get().expertGuidanceEnabled,
-              })
+              const mentalHealthChat = createMentalHealthChat(
+                get().fheService!,
+                {
+                  enableAnalysis: get().mentalHealthAnalysisEnabled,
+                  useExpertGuidance: get().expertGuidanceEnabled,
+                },
+              )
               set({ mentalHealthChat })
               return mentalHealthChat
             }
             return null
           },
-          configureMentalHealthAnalysis: (enableAnalysis, useExpertGuidance) => {
-            set({ mentalHealthAnalysisEnabled: enableAnalysis, expertGuidanceEnabled: useExpertGuidance })
+          configureMentalHealthAnalysis: (
+            enableAnalysis,
+            useExpertGuidance,
+          ) => {
+            set({
+              mentalHealthAnalysisEnabled: enableAnalysis,
+              expertGuidanceEnabled: useExpertGuidance,
+            })
             const { mentalHealthChat } = get()
             if (mentalHealthChat) {
               mentalHealthChat.configure({ enableAnalysis, useExpertGuidance })

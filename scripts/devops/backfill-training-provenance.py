@@ -17,7 +17,7 @@ import tempfile
 from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 AI_ROOT = PROJECT_ROOT / "ai"
@@ -25,10 +25,13 @@ for import_path in (PROJECT_ROOT, AI_ROOT):
     if str(import_path) not in sys.path:
         sys.path.insert(0, str(import_path))
 
-try:
+if TYPE_CHECKING:
     from ai.training.provenance import ProvenanceOptions, attach_provenance, build_provenance
-except ModuleNotFoundError:
-    from training.provenance import ProvenanceOptions, attach_provenance, build_provenance
+else:
+    try:
+        from ai.training.provenance import ProvenanceOptions, attach_provenance, build_provenance
+    except ModuleNotFoundError:
+        from training.provenance import ProvenanceOptions, attach_provenance, build_provenance
 
 
 @dataclass(frozen=True)
@@ -166,9 +169,7 @@ def backfill_path(
 
     total = BackfillStats()
     for path in iter_jsonl_paths(root):
-        total = total.add(
-            backfill_file(path, source_type=source_type, acquired_at=acquired_at, dry_run=dry_run)
-        )
+        total = total.add(backfill_file(path, source_type=source_type, acquired_at=acquired_at, dry_run=dry_run))
     return total
 
 

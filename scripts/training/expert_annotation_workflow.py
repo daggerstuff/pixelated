@@ -23,6 +23,7 @@ import logging
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "ai"))
 
@@ -34,7 +35,7 @@ DEFAULT_REVIEW_ZONE = (0.35, 0.65)
 MAX_SAMPLES_PER_SESSION = 100
 
 
-def _score_sample(sample: dict) -> tuple[float, dict]:
+def _score_sample(sample: dict[str, Any]) -> tuple[float, dict[str, Any]]:
     response = sample.get("chosen", sample.get("output", ""))
     if not response:
         return 0.0, {}
@@ -47,17 +48,17 @@ def extract_borderline_samples(
     dataset_path: Path,
     review_zone: tuple[float, float],
     max_samples: int = MAX_SAMPLES_PER_SESSION,
-) -> list[dict]:
+) -> list[dict[str, Any]]:
     """Extract samples within the review zone from a dataset."""
     if not dataset_path.exists():
         raise FileNotFoundError(f"Dataset not found: {dataset_path}")
 
     lower, upper = review_zone
-    borderline: list[dict] = []
+    borderline: list[dict[str, Any]] = []
 
     with open(dataset_path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if not line:
                 continue
             try:
@@ -76,7 +77,7 @@ def extract_borderline_samples(
 
 
 def export_review_package(
-    samples: list[dict],
+    samples: list[dict[str, Any]],
     output_dir: Path,
     dataset_name: str,
     review_zone: tuple[float, float],

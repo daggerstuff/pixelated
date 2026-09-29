@@ -8,6 +8,7 @@ rate limiting, and output directory management.
 import json
 import logging
 import time
+from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Any
 
@@ -53,7 +54,7 @@ def build_record(
     }
 
 
-def rate_limited_iter(items, delay: float = 0.34):
+def rate_limited_iter[T](items: Iterable[T], delay: float = 0.34) -> Iterator[T]:
     """Yield items with rate limiting."""
     for item in items:
         yield item

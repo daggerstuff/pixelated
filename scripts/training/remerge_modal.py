@@ -32,7 +32,7 @@ volume = modal.Volume.from_name("pixel-merged-models", create_if_missing=True)
     timeout=3600,
     volumes={"/root/models": volume},
 )
-def remerge_with_scale(scale: float = 0.5):
+def remerge_with_scale(scale: float = 0.5) -> str:
     """Re-merge LoRA with scaled adapter weights."""
     from pathlib import Path
 
@@ -87,7 +87,7 @@ def remerge_with_scale(scale: float = 0.5):
 
     # Merge
     print("🔄 Merging...")
-    merged = model.merge_and_unload(safe_merge=True)  # type: ignore
+    merged = model.merge_and_unload(safe_merge=True)
 
     # Save to volume
     output_path = Path(f"/root/models/{output_name}")
@@ -105,7 +105,7 @@ def remerge_with_scale(scale: float = 0.5):
 
 
 @app.local_entrypoint()
-def main(scale: float = 0.5):
+def main(scale: float = 0.5) -> None:
     """Run re-merge with specified scale factor."""
     print(f"📡 Triggering Modal re-merge with scale={scale}...")
     result = remerge_with_scale.remote(scale)

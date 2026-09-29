@@ -48,15 +48,6 @@ vi.mock('../../../lib/db/connection', () => ({
   }),
 }))
 
-// Mirror the same module path used by the middleware import (defensive for Vitest resolution quirks)
-vi.mock('../../lib/db/connection', () => ({
-  getRedisClient: () => ({
-    incr: mockIncr,
-    expire: mockExpire,
-    multi: mockMulti,
-  }),
-}))
-
 // Import after mock setup
 import {
   rateLimiter,

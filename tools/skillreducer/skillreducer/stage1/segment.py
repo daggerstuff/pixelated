@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import re
 
-from skillreducer.llm.client import LLMClient
 from skillreducer.llm import prompts
+from skillreducer.llm.client import LLMClient
 
 
 def segment_description(description: str, llm: LLMClient | None) -> list[str]:

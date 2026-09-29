@@ -1,7 +1,7 @@
 import React from 'react'
 
 // Common source types based on SourceType enum in backend
-export type SourceType =
+type SourceType =
   | 'all'
   | 'publisher' // Generic publisher category
   | 'api' // Generic API category
@@ -97,7 +97,7 @@ const SourceSelector = React.memo(function SourceSelector({
       </button>
 
       {/* Divider if we want to show specific popular sources */}
-      <div className="bg-slate-700 mx-2 h-6 w-px self-center"></div>
+      <div className="mx-2 h-6 w-px self-center bg-secondary"></div>
 
       <button
         className={`source-chip ${isSelected('arxiv') ? 'active' : ''}`}

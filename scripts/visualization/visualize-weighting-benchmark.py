@@ -25,7 +25,8 @@ def load_benchmark_data(json_file: str) -> dict[str, Any]:
     Dict[str, Any]: Parsed benchmark data.
     """
     with open(json_file) as f:
-        return json.load(f)
+        data: dict[str, Any] = json.load(f)
+        return data
 
 
 def plot_performance_summary(data: dict[str, Any], output_dir: Path | str) -> None:

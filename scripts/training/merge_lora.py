@@ -17,7 +17,7 @@ from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Merge LoRA adapter into base model")
     parser.add_argument("--base", type=str, required=True, help="Base model name or path")
     parser.add_argument("--adapter", type=str, required=True, help="LoRA adapter path")
@@ -76,7 +76,7 @@ def main():
 
     # Merge weights
     print("[3/4] Merging LoRA weights into base...")
-    merged_model = model_with_adapter.merge_and_unload()  # type: ignore
+    merged_model = model_with_adapter.merge_and_unload()
     print("✅ Merge complete")
 
     # Save merged model

@@ -9,7 +9,11 @@ import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getUserById, getAllUsers, updateUser } from '@/lib/services/auth0.service'
+import {
+  getUserById,
+  getAllUsers,
+  updateUser,
+} from '@/lib/services/auth0.service'
 
 export const prerender = false
 

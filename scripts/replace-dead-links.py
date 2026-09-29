@@ -48,8 +48,8 @@ def load_mapping(mapping_path: Path) -> set[str]:
         sys.exit(f"Mapping file not found: {mapping_path}")
     with mapping_path.open() as f:
         next(f)  # skip header
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if not line:
                 continue
             old, *_ = line.split("\t")
@@ -73,7 +73,7 @@ def replace_in_file(path: Path, archived_paths: set[str], dry_run: bool) -> int:
     replacements = 0
     base_dir = path.parent
 
-    def replacer(m: re.Match) -> str:
+    def replacer(m: re.Match[str]) -> str:
         nonlocal replacements
         if m.group(2):  # inline link: [text](target)
             target = m.group(2)

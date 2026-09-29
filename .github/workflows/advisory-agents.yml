@@ -38,7 +38,10 @@ jobs:
           node-version: '24.16.0'
       - name: Run advisory suite (agents)
         id: test-run
-        continue-on-error: true
+        # Blocking: advisory suites now fail CI. They were silently
+        # continue-on-error for months, which let real test debt accumulate
+        # invisible to every gate. Keep this blocking; if a bucket needs to be
+        # non-blocking, do that explicitly with a comment saying why.
         run: |
           set -o pipefail
           timeout 20m pnpm test:advisory 2>&1 | tee "advisory-test-agents.log"

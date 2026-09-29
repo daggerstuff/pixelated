@@ -205,7 +205,7 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium">Enable Automated Backups</h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                <p className="text-sm text-muted-foreground">
                   Automatically backup your data according to the schedule
                 </p>
               </div>
@@ -219,7 +219,7 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium">Encrypt Backups</h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                <p className="text-sm text-muted-foreground">
                   Enable end-to-end encryption for all backup data
                 </p>
               </div>
@@ -490,7 +490,9 @@ const BackupConfigurationTab: FC<BackupConfigurationTabProps> = ({
                 min="1"
               />
 
-              <p className="text-gray-500 mt-1 text-xs">Recommended: 90 days</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Recommended: 90 days
+              </p>
             </div>
           </div>
         </CardContent>

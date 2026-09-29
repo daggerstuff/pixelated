@@ -83,7 +83,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 - Provides a consistent HTML document structure (`<html>`, `<head>`, `<body>`).
 - Sets up the dark theme by default.
 - Includes the site-wide `Header` component.
-- Defines global styles, including the `Geist Sans` font.
+- Defines global styles, including the `Instrument Sans Variable` font.
 - Handles essential meta tags for SEO (`title`, `description`, `viewport`,
   etc.).
 - Contains a `<slot />` for page-specific content.

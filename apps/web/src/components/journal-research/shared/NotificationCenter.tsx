@@ -35,10 +35,10 @@ const typeIcons = {
 }
 
 const typeColors = {
-  success: 'text-green-600 dark:text-green-400',
-  error: 'text-red-600 dark:text-red-400',
-  warning: 'text-yellow-600 dark:text-yellow-400',
-  info: 'text-blue-600 dark:text-blue-400',
+  success: 'text-foreground',
+  error: 'text-foreground font-bold',
+  warning: 'text-foreground font-semibold',
+  info: 'text-muted-foreground',
 }
 
 const mapNotificationLevelToType = (
@@ -106,13 +106,13 @@ export function NotificationCenter({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="text-muted-foreground hover:bg-muted relative rounded-lg p-2 transition-colors"
+        className="relative rounded-none p-2 text-muted-foreground transition-colors hover:bg-muted"
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         aria-expanded={isOpen}
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <span className="bg-red-500 text-white absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full text-xs font-bold">
+          <span className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-none bg-primary text-xs font-bold text-primary-foreground">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -125,7 +125,7 @@ export function NotificationCenter({
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <Card className="absolute right-0 top-12 z-50 max-h-[600px] w-96 overflow-hidden shadow-lg">
+          <Card className="absolute right-0 top-12 z-50 max-h-[600px] w-96 overflow-hidden border border-border">
             <CardHeader className="border-b">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-semibold">
@@ -134,7 +134,7 @@ export function NotificationCenter({
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="text-muted-foreground hover:bg-muted rounded p-1"
+                  className="rounded p-1 text-muted-foreground hover:bg-muted"
                   aria-label="Close notifications"
                 >
                   <X className="h-4 w-4" />
@@ -151,15 +151,15 @@ export function NotificationCenter({
                   <button
                     type="button"
                     onClick={handleMarkAllAsRead}
-                    className="text-primary text-xs hover:underline"
+                    className="text-xs text-primary hover:underline"
                   >
                     Mark all as read
                   </button>
-                  <span className="text-muted-foreground text-xs">•</span>
+                  <span className="text-xs text-muted-foreground">•</span>
                   <button
                     type="button"
                     onClick={handleDismissAll}
-                    className="text-destructive text-xs hover:underline"
+                    className="text-xs text-destructive hover:underline"
                   >
                     Dismiss all
                   </button>
@@ -170,8 +170,8 @@ export function NotificationCenter({
             <CardContent className="p-0">
               {visibleNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <Bell className="text-muted-foreground mb-4 h-12 w-12" />
-                  <p className="text-muted-foreground text-sm">
+                  <Bell className="mb-4 h-12 w-12 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
                     No notifications
                   </p>
                 </div>
@@ -212,11 +212,11 @@ export function NotificationCenter({
                                   {notification.title}
                                 </p>
                                 {notification.message && (
-                                  <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
+                                  <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
                                     {notification.message}
                                   </p>
                                 )}
-                                <p className="text-muted-foreground mt-1 text-xs">
+                                <p className="mt-1 text-xs text-muted-foreground">
                                   {notification.timestamp.toLocaleTimeString()}
                                 </p>
                               </div>
@@ -225,7 +225,7 @@ export function NotificationCenter({
                                 onClick={(e) =>
                                   handleDismiss(notification.id, e)
                                 }
-                                className="text-muted-foreground hover:bg-muted mt-0.5 rounded p-1"
+                                className="mt-0.5 rounded p-1 text-muted-foreground hover:bg-muted"
                                 aria-label="Dismiss notification"
                               >
                                 <X className="h-4 w-4" />
@@ -235,7 +235,7 @@ export function NotificationCenter({
                               <a
                                 href={notification.actionUrl}
                                 onClick={(e) => e.stopPropagation()}
-                                className="text-primary mt-2 inline-block text-sm font-medium hover:underline"
+                                className="mt-2 inline-block text-sm font-medium text-primary hover:underline"
                               >
                                 View details
                               </a>

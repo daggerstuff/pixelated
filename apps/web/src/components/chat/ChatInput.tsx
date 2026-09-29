@@ -1,6 +1,5 @@
 import { useEffect, useRef, SyntheticEvent } from 'react'
 
-import { useTheme } from '@/components/theme/ThemeProvider'
 import { cn } from '@/lib/utils'
 
 import { IconSend } from './icons'
@@ -23,7 +22,6 @@ export function ChatInput({
   placeholder,
 }: ChatInputProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const { resolvedTheme } = useTheme()
 
   // Auto-resize textarea based on content
   useEffect(() => {
@@ -40,33 +38,27 @@ export function ChatInput({
     }
   }
 
-  // Determine classes for theme
-  const isDark = resolvedTheme === 'dark'
   const inputClasses = cn(
     'flex-1 resize-none p-2 min-h-[40px] max-h-[200px]',
-    'focus:outline-none focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500',
-    'transition-shadow',
-    isDark
-      ? 'text-white bg-gray-800 placeholder-gray-300'
-      : 'text-gray-900 bg-white placeholder-gray-500',
+    'focus:outline-none focus-visible:outline-2 focus-visible:outline-ring focus-visible:ring-2 focus-visible:ring-ring',
+    'transition-colors',
+    'text-foreground bg-card placeholder:text-muted-foreground',
   )
 
   const buttonClasses = cn(
-    'flex h-10 w-10 items-center justify-center rounded-lg',
+    'flex h-10 w-10 items-center justify-center rounded-none',
     'transition-colors',
     'disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none',
-    'focus-visible:outline-2 focus-visible:outline-blue-500 focus-visible:ring-2 focus-visible:ring-blue-500',
-    isDark
-      ? 'bg-blue-700 text-white hover:bg-blue-800'
-      : 'bg-blue-600 text-white hover:bg-blue-700',
+    'focus-visible:outline-2 focus-visible:outline-ring focus-visible:ring-2 focus-visible:ring-ring',
+    'bg-primary text-primary-foreground hover:bg-accent',
   )
 
   return (
     <form
       onSubmit={onSubmit}
       className={cn(
-        'relative flex items-end space-x-3 rounded-lg border p-3 shadow-sm',
-        isDark ? 'border-gray-700 bg-black' : 'border-gray-200 bg-white',
+        'relative flex items-end space-x-3 rounded-none border p-3',
+        'border-border bg-card',
       )}
     >
       <textarea

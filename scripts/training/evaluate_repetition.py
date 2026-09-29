@@ -16,21 +16,22 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import math
 import re
 from collections import Counter
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BatchEncoding, PreTrainedTokenizerBase
 
-try:
+# peft is optional at runtime (only required with --adapter-path).
+_PEFT_AVAILABLE = importlib.util.find_spec("peft") is not None
+if _PEFT_AVAILABLE:
     from peft import PeftModel
-except ImportError:
-    PeftModel = None
 
 
 WORD_RE = re.compile(r"\b\w+\b", flags=re.UNICODE)
@@ -121,14 +122,24 @@ def infer_device() -> str:
     return "cuda" if torch.cuda.is_available() else "cpu"
 
 
-def load_model_and_tokenizer(model_path: str, adapter_path: str | None, device: str):
+def load_model_and_tokenizer(
+    model_path: str,
+    adapter_path: str | None,
+    device: str,
+) -> tuple[Any, PreTrainedTokenizerBase]:
+    """Load a causal LM (optionally peft-wrapped) plus its tokenizer.
+
+    The model is typed as ``Any``: it is either a transformers model or a
+    peft-wrapped variant whose concrete runtime class (e.g.
+    ``PeftModelForCausalLM``) is selected dynamically by peft.
+    """
     dtype = torch.bfloat16 if device == "cuda" else torch.float32
 
     tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = AutoModelForCausalLM.from_pretrained(
+    model: Any = AutoModelForCausalLM.from_pretrained(
         model_path,
         torch_dtype=dtype,
         device_map="auto" if device == "cuda" else None,
@@ -136,27 +147,29 @@ def load_model_and_tokenizer(model_path: str, adapter_path: str | None, device: 
     )
 
     if adapter_path:
-        if PeftModel is None:
+        if not _PEFT_AVAILABLE:
             raise RuntimeError("peft is required when --adapter-path is provided")
         model = PeftModel.from_pretrained(model, adapter_path)
 
     model.eval()
     if device != "cuda":
-        model.to(torch.device(device))  # type: ignore
+        model.to(torch.device(device))
 
     return model, tokenizer
 
 
 def generate_response(
-    model,
-    tokenizer,
+    model: Any,
+    tokenizer: PreTrainedTokenizerBase,
     prompt: str,
     device: str,
     max_new_tokens: int,
     temperature: float,
     top_p: float,
 ) -> str:
-    inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024)
+    inputs: BatchEncoding | dict[str, torch.Tensor] = tokenizer(
+        prompt, return_tensors="pt", truncation=True, max_length=1024
+    )
     if device != "cuda":
         inputs = {k: v.to(device) for k, v in inputs.items()}
 
@@ -173,7 +186,10 @@ def generate_response(
         )
 
     generated_ids = output_ids[0][inputs["input_ids"].shape[1] :]
-    return tokenizer.decode(generated_ids, skip_special_tokens=True).strip()
+    # ``decode`` is annotated ``str | list[str]`` by transformers because it
+    # also accepts token-id lists; with a single sequence it returns a str.
+    decoded: str = cast(str, tokenizer.decode(generated_ids, skip_special_tokens=True))
+    return decoded.strip()
 
 
 def build_parser() -> argparse.ArgumentParser:

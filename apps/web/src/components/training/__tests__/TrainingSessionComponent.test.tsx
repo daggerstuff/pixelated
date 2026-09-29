@@ -28,7 +28,7 @@ vi.mock('@/lib/auth-client.ts', () => ({
 }))
 
 // Mock hooks
-vi.mock('../../hooks/useMemory', () => ({
+vi.mock('../../../hooks/useMemory', () => ({
   useConversationMemory: () => ({
     getConversationHistory: vi.fn().mockResolvedValue([]),
     addMessage: vi.fn().mockResolvedValue({}),

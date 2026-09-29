@@ -31,7 +31,7 @@ env:
   GHA_LOCAL_RUN: 'false'
   TRACE_TRIVY_DEPRECATION: ${{ vars.TRACE_TRIVY_DEPRECATION || 'false' }}
   NODE_VERSION: 24.16.0
-  PYTHON_VERSION: 3.13.13
+  PYTHON_VERSION: 3.14.7
   REDIS_URL: ${{ secrets['REDIS_URL'] }}
   UPSTASH_REDIS_REST_URL: ${{ secrets['UPSTASH_REDIS_REST_URL'] }}
   UPSTASH_REDIS_REST_TOKEN: ${{ secrets['UPSTASH_REDIS_REST_TOKEN'] }}
@@ -247,7 +247,7 @@ jobs:
 
       - name: Upload coverage reports
         if: hashFiles('coverage/lcov.info') != ''
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           files: ./coverage/lcov.info
           flags: typescript
@@ -392,7 +392,7 @@ jobs:
           DATABASE_URL: postgresql://postgres@localhost:5432/bias_detection
 
       - name: Upload Python coverage
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           files: ./apps/web/src/lib/ai/bias-detection/python-service/coverage.xml
           flags: python

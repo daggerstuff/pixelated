@@ -1,12 +1,13 @@
 import json
 from contextlib import suppress
 from pathlib import Path
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_flow_dynamics(flow_data, output_dir):
+def plot_flow_dynamics(flow_data: dict[str, Any], output_dir: Path) -> None:
     """Plot flow dynamics data."""
     velocity = np.array(flow_data["velocity"])
     acceleration = np.array(flow_data["acceleration"])
@@ -24,7 +25,7 @@ def plot_flow_dynamics(flow_data, output_dir):
     plt.close()
 
 
-def plot_meta_intelligence(meta_data, output_dir):
+def plot_meta_intelligence(meta_data: dict[str, Any], output_dir: Path) -> None:
     """Plot meta intelligence metrics."""
     metrics = {"Deviation": meta_data["deviation"], "Reflection Score": meta_data["reflection_score"]}
 
@@ -37,7 +38,7 @@ def plot_meta_intelligence(meta_data, output_dir):
     plt.close()
 
 
-def visualize_latest_run():
+def visualize_latest_run() -> None:
     log_file = Path("logs/pipeline_runs.jsonl")
     output_dir = Path("output")
     output_dir.mkdir(exist_ok=True)

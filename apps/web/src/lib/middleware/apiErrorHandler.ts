@@ -72,10 +72,7 @@ const defaultErrorMappers: NonNullable<ErrorHandlerOptions['errorMappers']> = [
 
 // ── Response Helpers ──────────────────────────────────────────────────
 
-function jsonResponse(
-  body: Record<string, unknown>,
-  status: number,
-): Response {
+function jsonResponse(body: Record<string, unknown>, status: number): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: { 'Content-Type': 'application/json' },
@@ -108,7 +105,8 @@ function logError(
     ? `${options.method ?? 'GET'} ${options.endpoint}`
     : 'API'
 
-  const errorType = error instanceof Error ? error.constructor.name : typeof error
+  const errorType =
+    error instanceof Error ? error.constructor.name : typeof error
   const errorMsg = error instanceof Error ? error.message : String(error)
 
   if (isDev) {
@@ -154,16 +152,10 @@ export function withErrorHandler(
       }
 
       // Auto-wrap data as success response
-      return jsonResponse(
-        { data: result, statusCode: 200 },
-        200,
-      )
+      return jsonResponse({ data: result, statusCode: 200 }, 200)
     } catch (error: unknown) {
       // Run custom error mappers first, then defaults
-      const mappers = [
-        ...(options?.errorMappers ?? []),
-        ...defaultErrorMappers,
-      ]
+      const mappers = [...(options?.errorMappers ?? []), ...defaultErrorMappers]
 
       let status = 500
       let message = 'An unexpected error occurred'
@@ -180,7 +172,8 @@ export function withErrorHandler(
       // If no mapper matched, use error message for generic Error
       if (status === 500 && error instanceof Error) {
         // Don't leak internal error messages in production
-        const isDev = import.meta.env?.DEV ?? process.env.NODE_ENV !== 'production'
+        const isDev =
+          import.meta.env?.DEV ?? process.env.NODE_ENV !== 'production'
         if (isDev) {
           message = error.message
         }
@@ -208,9 +201,6 @@ export function createApiError(
 /**
  * Creates a standard success response.
  */
-export function createApiSuccess(
-  data: unknown,
-  status = 200,
-): Response {
+export function createApiSuccess(data: unknown, status = 200): Response {
   return jsonResponse({ data, statusCode: status }, status)
 }

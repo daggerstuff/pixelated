@@ -9,9 +9,11 @@ from scripts.data.designer.lineage_audit import AuditStatus, audit_lineage
 from scripts.data.designer.schemas import (
     ChatMessage,
     ConstructionRecord,
+    ContributionMode,
     HumanReviewStatus,
     JudgeResult,
     TargetProduct,
+    UsePolicy,
     lineage_columns,
 )
 from scripts.data.designer.source_registry import SourceRegistry
@@ -27,8 +29,8 @@ def registry() -> SourceRegistry:
 def _make_construction_record(
     source_id: str = "SRC-047",
     analysis_id: str = "src047.mi-reflection",
-    use_policies: list[str] | None = None,
-    contribution_mode: str = "direct_seed",
+    use_policies: list[UsePolicy] | None = None,
+    contribution_mode: ContributionMode = ContributionMode.DIRECT_SEED,
     human_review_status: HumanReviewStatus = HumanReviewStatus.APPROVED,
 ) -> ConstructionRecord:
     return ConstructionRecord(
@@ -36,7 +38,7 @@ def _make_construction_record(
         source_id=source_id,
         analysis_id=analysis_id,
         source_unit_refs=["annomi:dialogue-001:turn-04"],
-        use_policies=use_policies or ["direct"],
+        use_policies=use_policies or [UsePolicy.DIRECT],
         contribution_mode=contribution_mode,
         construction_spec_version=CONSTRUCTION_SPEC_VERSION,
         model_alias="nvidia-text",
@@ -98,7 +100,7 @@ class TestLineageAuditFailures:
         assert any("not found in" in f.message for f in report.findings)
 
     def test_mismatched_use_policies(self, registry: SourceRegistry) -> None:
-        record = _make_construction_record(use_policies=["eval_only"])
+        record = _make_construction_record(use_policies=[UsePolicy.EVAL_ONLY])
         report = audit_lineage(
             construction_records=[lineage_columns(record)],
             source_registry=registry,
@@ -108,7 +110,7 @@ class TestLineageAuditFailures:
         assert any("not declared by" in f.message for f in report.findings)
 
     def test_mismatched_contribution_mode(self, registry: SourceRegistry) -> None:
-        record = _make_construction_record(contribution_mode="evaluation_structure")
+        record = _make_construction_record(contribution_mode=ContributionMode.EVALUATION_STRUCTURE)
         report = audit_lineage(
             construction_records=[lineage_columns(record)],
             source_registry=registry,

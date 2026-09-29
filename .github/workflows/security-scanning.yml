@@ -44,7 +44,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7.0.0
         with:
-          python-version: '3.13.13'
+          python-version: '3.14.7'
 
       - name: Set up uv
         uses: ./.github/actions/setup-uv
@@ -88,7 +88,7 @@ jobs:
       - name: Run Checkov infrastructure scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_infra
-        uses: bridgecrewio/checkov-action@v12.3122.0
+        uses: bridgecrewio/checkov-action@v12.3125.0
         with:
           directory: .
           framework: terraform,terraform_plan,bicep
@@ -103,7 +103,7 @@ jobs:
       - name: Run Checkov Kubernetes and Helm scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_helm
-        uses: bridgecrewio/checkov-action@v12.3122.0
+        uses: bridgecrewio/checkov-action@v12.3125.0
         with:
           directory: ai/inference/deployment/pixel-voice
           framework: kubernetes,helm
@@ -190,7 +190,8 @@ jobs:
           category: checkov-helm
 
       - name: Create diagnostic artifact when Checkov SARIF is missing
-        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if:
+          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         run: |
           if [ "${{ steps.checkov_infra_sarif.outputs.found }}" != "true" ]; then
@@ -201,7 +202,8 @@ jobs:
           fi
 
       - name: Upload Checkov diagnostic artifact
-        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if:
+          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -321,7 +323,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7.0.0
         with:
-          python-version: '3.13.13'
+          python-version: '3.14.7'
 
       - name: Set up uv
         uses: ./.github/actions/setup-uv
@@ -434,7 +436,7 @@ jobs:
             dockerfile: infra/docker/Dockerfile.production
           - image: node:24-alpine
             dockerfile: infra/docker/Dockerfile.prod
-          - image: python:3.13-slim
+          - image: python:3.14-slim
             dockerfile: infra/docker/backend.Dockerfile
           - image: mcr.microsoft.com/playwright:v1.60.0-jammy
             dockerfile: infra/docker/Dockerfile.playwright

@@ -10,6 +10,7 @@ import path from 'node:path'
 import { Pool, PoolClient } from 'pg'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { recordQuery } from './query-counting'
 const logger = createBuildSafeLogger('index')
 
 // pg does not export these types; define locally
@@ -116,6 +117,7 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
   text: string,
   params?: unknown[],
 ): Promise<DbQueryResult<T>> {
+  recordQuery(text)
   const client = await getPool().connect()
   try {
     return (await client.query<T>(text, params)) as unknown as DbQueryResult<T>
@@ -134,8 +136,10 @@ export async function transaction<T>(
   initializeDatabase()
   const client = await getPool().connect()
   try {
+    recordQuery('BEGIN')
     await client.query('BEGIN')
     const result = await callback(client)
+    recordQuery('COMMIT')
     await client.query('COMMIT')
     return result
   } catch (error: unknown) {

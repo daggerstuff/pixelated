@@ -2,6 +2,7 @@ import type { APIContext } from 'astro'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
 import { AstroCookies } from '../../../../../../node_modules/astro/dist/core/cookies/cookies.js'
+import { initializeDatabase } from '../../../lib/db'
 import { POST, GET } from '../../../pages/api/session/skills'
 
 type MockPoolClient = {
@@ -174,11 +175,21 @@ const createGetContext = (url: string): Parameters<typeof GET>[0] =>
 
 vi.mock('pg', () => ({
   Pool: class {
+    // initializeDatabase() registers pool error/connect listeners.
+    on() {
+      return this
+    }
+
     async connect() {
       return mockConnect()
     }
   },
 }))
+
+// lib/db requires initializeDatabase() before getPool() will return a pool
+// (gate added 2026-08-26). With 'pg' mocked above this only constructs the
+// mock pool and sets the module flag; no real connection is made.
+initializeDatabase()
 
 describe('Session Skills API', () => {
   beforeEach(() => {

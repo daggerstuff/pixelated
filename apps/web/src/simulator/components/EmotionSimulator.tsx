@@ -30,7 +30,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       aria-hidden="true"
     />
 
-    <span className="text-muted-foreground text-sm">
+    <span className="text-sm text-muted-foreground">
       {isConnected ? 'Connected' : 'Disconnected'}
     </span>
   </div>

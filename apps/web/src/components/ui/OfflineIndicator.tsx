@@ -48,12 +48,12 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
 
   return (
     <div
-      className={`bg-white dark:bg-gray-800 ease-in-ou fixed bottom-4 left-4 z-50 transform rounded-lg p-4 shadow-lg transition-all duration-300 ${className} ${isOffline ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'} `}
+      className={`fixed bottom-4 left-4 z-50 transform rounded-none border border-border bg-card p-4 transition-all duration-300 ${className} ${isOffline ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'} `}
     >
       <div className="flex items-center space-x-3">
         <div className="flex-shrink-0">
           <svg
-            className="text-yellow-500 h-6 w-6"
+            className="h-6 w-6 text-foreground"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -68,10 +68,10 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
           </svg>
         </div>
         <div>
-          <h3 className="text-gray-900 dark:text-gray-100 text-sm font-medium">
+          <h3 className="text-sm font-medium text-foreground">
             You&apos;re Offline
           </h3>
-          <div className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
+          <div className="mt-1 text-sm text-muted-foreground">
             {connectionInfo.type && (
               <p>
                 Connection: {connectionInfo.type}
@@ -88,13 +88,13 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
       <div className="mt-3 flex justify-end space-x-2">
         <button
           onClick={() => window.location.reload()}
-          className="border-transparent text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 inline-flex items-center rounded-md border px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
+          className="border-transparent hover:bg-primary/90 inline-flex items-center rounded-none border bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
           Retry Connection
         </button>
         <a
           href="/offline"
-          className="border-gray-300 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:ring-indigo-500 inline-flex items-center rounded-md border px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
+          className="inline-flex items-center rounded-none border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
           Offline Mode
         </a>

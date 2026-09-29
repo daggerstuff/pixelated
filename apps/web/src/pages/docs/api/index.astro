@@ -28,8 +28,7 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-          ></path>
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
           <line x1="16" y1="13" x2="8" y2="13"></line>
           <line x1="16" y1="17" x2="8" y2="17"></line>
@@ -55,9 +54,7 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path
-            d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-          ></path>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
         </svg>
         OpenAPI Specification
       </div>
@@ -98,8 +95,9 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        ><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg
       >
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
       Security Warning
     </div>
     <p>
@@ -129,19 +127,17 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
   <h2>Request Format</h2>
 
   <p>
-    The API accepts requests with <code>Content-Type: application/json</code> for
-    POST, PUT, and PATCH requests. GET requests should include query parameters in
-    the URL.
+    The API accepts requests with <code>Content-Type: application/json</code>{' '}
+    for POST, PUT, and PATCH requests. GET requests should include query
+    parameters in the URL.
   </p>
 
   <h2>Response Format</h2>
 
   <p>
-    All responses are returned as JSON. Successful responses include a <code
-      >data</code
-    > field containing the requested information. Error responses include an <code
-      >error</code
-    > field with details about the error.
+    All responses are returned as JSON. Successful responses include a{' '}
+    <code>data</code> field containing the requested information. Error
+    responses include an <code>error</code> field with details about the error.
   </p>
 
   <h3>Successful Response Example</h3>
@@ -200,11 +196,10 @@ X-RateLimit-Reset: 1620000000</code></pre>
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          ><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle
-            cx="12"
-            cy="7"
-            r="4"></circle></svg
         >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
         Users
       </div>
       <p>User management endpoints</p>
@@ -222,10 +217,9 @@ X-RateLimit-Reset: 1620000000</code></pre>
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          ><path
-            d="M12 20l-3 3v-3H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-8z"
-          ></path></svg
         >
+          <path d="M12 20l-3 3v-3H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-8z"></path>
+        </svg>
         Sessions
       </div>
       <p>Session management endpoints</p>
@@ -243,8 +237,9 @@ X-RateLimit-Reset: 1620000000</code></pre>
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          ><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg
         >
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
         Analytics
       </div>
       <p>Analytics and reporting endpoints</p>
@@ -262,14 +257,11 @@ X-RateLimit-Reset: 1620000000</code></pre>
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          ><circle cx="12" cy="12" r="10"></circle><line
-            x1="2"
-            y1="12"
-            x2="22"
-            y2="12"></line><path
-            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
-          ></path></svg
         >
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
         Webhooks
       </div>
       <p>Webhook configuration and events</p>
@@ -296,14 +288,15 @@ X-RateLimit-Reset: 1620000000</code></pre>
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          ><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
-          ></path><polyline points="13 2 13 9 20 9"></polyline></svg
         >
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+          <polyline points="13 2 13 9 20 9"></polyline>
+        </svg>
         JavaScript/TypeScript
       </div>
       <p>
-        <a href="https://github.com/pixelated/pixelated-js">pixelated-js</a> - Official
-        JavaScript/TypeScript SDK
+        <a href="https://github.com/pixelated/pixelated-js">pixelated-js</a> -
+        Official JavaScript/TypeScript SDK
       </p>
       <pre><code>npm install @pixelated/sdk</code></pre>
     </div>
@@ -320,15 +313,17 @@ X-RateLimit-Reset: 1620000000</code></pre>
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          ><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
-          ></path><polyline points="13 2 13 9 20 9"></polyline></svg
         >
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+          <polyline points="13 2 13 9 20 9"></polyline>
+        </svg>
         Python
       </div>
       <p>
-        <a href="https://github.com/pixelated/pixelated-python"
-          >pixelated-python</a
-        > - Official Python SDK
+        <a href="https://github.com/pixelated/pixelated-python">
+          pixelated-python
+        </a>{' '}
+        - Official Python SDK
       </p>
       <pre><code>pip install pixelated</code></pre>
     </div>
@@ -356,13 +351,17 @@ X-RateLimit-Reset: 1620000000</code></pre>
     <tbody>
       <tr>
         <td>v1</td>
-        <td><span class="badge badge-success">Current</span></td>
+        <td>
+          <span class="badge badge-success">Current</span>
+        </td>
         <td>April 2025</td>
         <td>No planned sunset</td>
       </tr>
       <tr>
         <td>Legacy (no version)</td>
-        <td><span class="badge badge-warning">Deprecated</span></td>
+        <td>
+          <span class="badge badge-warning">Deprecated</span>
+        </td>
         <td>January 2025</td>
         <td>October 2025</td>
       </tr>
@@ -397,12 +396,11 @@ X-RateLimit-Reset: 1620000000</code></pre>
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        ><circle cx="12" cy="12" r="10"></circle><line
-          x1="12"
-          y1="8"
-          x2="12"
-          y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg
       >
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
       Important Note
     </div>
     <p>
@@ -424,6 +422,8 @@ X-RateLimit-Reset: 1620000000</code></pre>
     <li>
       <a href="mailto:api-support@pixelated.dev">api-support@pixelated.dev</a>
     </li>
-    <li><a href="https://discord.gg/pixelated">Discord Community</a></li>
+    <li>
+      <a href="https://discord.gg/pixelated">Discord Community</a>
+    </li>
   </ul>
 </DocumentationLayout>

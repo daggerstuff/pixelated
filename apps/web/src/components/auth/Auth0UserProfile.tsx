@@ -15,7 +15,7 @@ const UserProfileInner = () => {
         <h2 className="mb-4 text-xl">You are not logged in.</h2>
         <button
           onClick={async () => loginWithRedirect()}
-          className="bg-white text-slate-950 hover:bg-slate-200 rounded-full px-6 py-3 font-semibold transition-colors"
+          className="rounded-none bg-primary px-6 py-3 font-semibold text-primary-foreground transition-colors hover:bg-accent"
         >
           Log In to View Profile
         </button>
@@ -30,20 +30,20 @@ const UserProfileInner = () => {
           <img
             src={user.picture}
             alt={user.name}
-            className="border-white/10 h-20 w-20 rounded-full border-2"
+            className="h-20 w-20 rounded-none border-2 border-border"
           />
         )}
         <div>
           <h2 className="text-white text-2xl font-bold">{user?.name}</h2>
-          <p className="text-slate-400">{user?.email}</p>
+          <p className="text-muted-foreground">{user?.email}</p>
         </div>
       </div>
 
-      <div className="bg-slate-900/50 border-white/10 rounded-lg border p-6">
+      <div className="rounded-none border border-border bg-secondary p-6">
         <h3 className="text-white mb-4 text-lg font-semibold">
           User Profile Data (Auth0 SDK)
         </h3>
-        <pre className="text-slate-300 overflow-auto whitespace-pre-wrap font-mono text-xs">
+        <pre className="overflow-auto whitespace-pre-wrap font-mono text-xs text-muted-foreground">
           {JSON.stringify(user, null, 2)}
         </pre>
       </div>

@@ -4,9 +4,10 @@ description: >-
   Product marketing, positioning, GTM strategy, competitive intelligence, ICP
   definition, messaging frameworks, launch playbooks, battlecards, and market
   entry guides. Use when developing positioning, planning product launches,
-  creating messaging, analyzing competitors, entering new markets, enabling sales,
-  or when user mentions product marketing, positioning, GTM, go-to-market,
-  competitive analysis, ICP, personas, launch plan, battlecard, or HubSpot config.
+  creating messaging, analyzing competitors, entering new markets, enabling
+  sales, or when user mentions product marketing, positioning, GTM,
+  go-to-market, competitive analysis, ICP, personas, launch plan, battlecard, or
+  HubSpot config.
 ---
 
 # Product Marketing Strategy
@@ -15,7 +16,8 @@ description: >-
 
 Follow **April Dunford** positioning steps:
 
-1. Identify competitive alternatives (what would customers use if you didn't exist).
+1. Identify competitive alternatives (what would customers use if you didn't
+   exist).
 2. List unique attributes (capabilities competitors lack).
 3. Map attributes to value themes (outcomes customers care about).
 4. Define best-fit customers (ICP).
@@ -30,21 +32,23 @@ Follow **April Dunford** positioning steps:
 
 ## Decision criteria
 
-- Positioning statement must fit in one sentence: For [ICP] who [need], [product] is [category] that [benefit]. Unlike [alternative], we [differentiator].
+- Positioning statement must fit in one sentence: For [ICP] who [need],
+  [product] is [category] that [benefit]. Unlike [alternative], we
+  [differentiator].
 - Reject messaging that lists features without customer outcome.
 - GTM motion: PLG vs sales-led must match ACV and buying committee size.
 
 ## Examples
 
-**Persona: VP Engineering**
+### Persona: VP Engineering
 
-Pain: toolchain sprawl, slow incident response.
-Message: "Unify observability and deploy confidence in one control plane."
+Pain: toolchain sprawl, slow incident response. Message: "Unify observability
+and deploy confidence in one control plane."
 
-**Persona: CFO**
+### Persona: CFO
 
-Pain: unpredictable cloud spend.
-Message: "Attribute every dollar of infra cost to product and team."
+Pain: unpredictable cloud spend. Message: "Attribute every dollar of infra cost
+to product and team."
 
 ## Templates
 
@@ -62,7 +66,7 @@ Overview | Strengths | Weaknesses | Landmines | Objection handling
 
 ## Background
 
-Product marketing sits between product, sales, and demand gen. Positioning is not
-taglines — it is the context buyers use to understand why your product matters.
-GTM plans should name ICP, channel, launch tier (T1/T2/T3), and success metrics
-before copy or creative work begins.
+Product marketing sits between product, sales, and demand gen. Positioning is
+not taglines — it is the context buyers use to understand why your product
+matters. GTM plans should name ICP, channel, launch tier (T1/T2/T3), and success
+metrics before copy or creative work begins.

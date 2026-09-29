@@ -10,7 +10,6 @@ try:
 except ModuleNotFoundError:
     asyncpg = None
 import structlog
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from bias_detection.config import settings
@@ -24,8 +23,6 @@ class DatabaseService:
 
     def __init__(self):
         self.pg_pool: Any | None = None
-        self.async_engine = None
-        self.async_session = None
         self.is_connected = False
 
     async def connect(self) -> bool:
@@ -89,17 +86,6 @@ class DatabaseService:
             assert self.pg_pool is not None
             async with self.pg_pool.acquire() as conn:
                 await conn.execute("SELECT 1")
-
-            # Create SQLAlchemy async engine for ORM operations
-            self.async_engine = create_async_engine(
-                str(settings.database_url),
-                pool_size=10,
-                max_overflow=20,
-                pool_pre_ping=True,
-                pool_recycle=3600,
-            )
-
-            self.async_session = async_sessionmaker(bind=self.async_engine, class_=AsyncSession, expire_on_commit=False)
 
             logger.info("PostgreSQL connection established")
             return True

@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Version-controlled pre-push entry point (husky).
+#
+# The hook logic lives in scripts/devops/hooks/templates/pre-push.tmpl so
+# that the same checks (submodule gitlink mirror check, smoke tests) run
+# whether the hook is installed by husky or by
+# scripts/devops/install-git-hooks.sh.
+exec bash scripts/devops/hooks/templates/pre-push.tmpl

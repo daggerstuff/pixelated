@@ -29,11 +29,11 @@ CAVING_PHRASES = [
 ]
 
 
-def analyze_directory(dir_path: Path, name: str):
+def analyze_directory(dir_path: Path, name: str) -> None:
     if not dir_path.exists():
         print(f"Directory {dir_path} not found.")
         return
-    files = sorted(list(dir_path.glob("*.json")))
+    files = sorted(dir_path.glob("*.json"))
     files = [f for f in files if f.name != "summary.json"]
     total_sessions = len(files)
     total_asst_turns = 0

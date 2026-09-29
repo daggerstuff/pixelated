@@ -49,7 +49,11 @@ def validate_source_record(record: SourceAnalysisRecord) -> None:
                 raise PolicyViolationError(f"{record.source_id} evaluation source text cannot enter the registry")
 
         if UsePolicy.COPYRIGHTED_KNOWLEDGE in policies:
-            allowed = {ContributionMode.ABSTRACTED_PATTERN, ContributionMode.RAG_KNOWLEDGE, ContributionMode.RESEARCH_ONLY}
+            allowed = {
+                ContributionMode.ABSTRACTED_PATTERN,
+                ContributionMode.RAG_KNOWLEDGE,
+                ContributionMode.RESEARCH_ONLY,
+            }
             if selected.contribution_mode not in allowed:
                 raise PolicyViolationError(
                     f"{record.source_id} copyrighted material requires knowledge or abstracted use"

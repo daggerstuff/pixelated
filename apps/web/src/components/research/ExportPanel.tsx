@@ -105,19 +105,19 @@ export default function ExportPanel({
       {/* Backdrop - Semantic button for native accessibility (Review suggestion) */}
       <button
         type="button"
-        className="bg-black/50 absolute inset-0 h-full w-full cursor-default appearance-none border-0 p-0 backdrop-blur-sm"
+        className="bg-foreground/60 absolute inset-0 h-full w-full cursor-default appearance-none border-0 p-0"
         onClick={onClose}
         aria-label={TEXT.backdropAriaLabel}
       />
 
       {/* Panel */}
-      <div className="bg-slate-900 border-slate-700 animate-slide-in-right relative flex h-full w-full max-w-md flex-col border-l shadow-2xl">
-        <div className="border-slate-800 flex items-center justify-between border-b p-6">
-          <h2 className="text-white text-xl font-bold">{TEXT.title}</h2>
+      <div className="animate-slide-in-right relative flex h-full w-full max-w-md flex-col border-l border-border bg-card">
+        <div className="flex items-center justify-between border-b border-border p-6">
+          <h2 className="text-xl font-bold text-foreground">{TEXT.title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-slate-400 hover:text-white focus:ring-pink-500 rounded-md focus:outline-none focus:ring-2"
+            className="rounded-none text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             aria-label={TEXT.closeAriaLabel}
           >
             <svg
@@ -137,15 +137,15 @@ export default function ExportPanel({
         </div>
 
         <div className="flex-grow space-y-8 p-6">
-          <div className="bg-slate-800/50 border-slate-700 rounded-lg border p-4">
-            <p className="text-slate-300">
+          <div className="rounded-none border border-border bg-secondary p-4">
+            <p className="text-foreground">
               {TEXT.readyMessage(results.length)}
             </p>
           </div>
 
           {/* Format Selection - Use fieldset for semantic grouping (Review suggestion) */}
           <fieldset>
-            <legend className="text-slate-300 mb-3 block text-sm font-medium">
+            <legend className="mb-3 block text-sm font-medium text-foreground">
               {TEXT.formatLegend}
             </legend>
             <div
@@ -160,10 +160,10 @@ export default function ExportPanel({
                   role="radio"
                   onClick={() => setFormat(f)}
                   aria-checked={format === f}
-                  className={`focus:ring-pink-500 rounded-lg border px-4 py-3 text-sm font-medium transition-all focus:outline-none focus:ring-2 ${
+                  className={`rounded-none border px-4 py-3 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-ring ${
                     format === f
-                      ? 'bg-pink-600/20 border-pink-500 text-pink-300'
-                      : 'bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-700'
+                      ? 'border-ring bg-secondary font-semibold text-foreground'
+                      : 'border-border bg-secondary text-muted-foreground hover:bg-secondary'
                   }`}
                 >
                   {f.toUpperCase()}
@@ -174,7 +174,7 @@ export default function ExportPanel({
 
           {/* Options */}
           <fieldset>
-            <legend className="text-slate-300 mb-3 block text-sm font-medium">
+            <legend className="mb-3 block text-sm font-medium text-foreground">
               {TEXT.optionsLegend}
             </legend>
             <div className="space-y-3">
@@ -182,13 +182,13 @@ export default function ExportPanel({
                 <input
                   type="checkbox"
                   id="include-abstract"
-                  className="border-slate-600 bg-slate-800 text-pink-600 focus:ring-pink-500 h-4 w-4 rounded"
+                  className="h-4 w-4 rounded border-input bg-secondary text-primary focus:ring-ring"
                   checked={includeAbstract}
                   onChange={(e) => setIncludeAbstract(e.target.checked)}
                 />
                 <label
                   htmlFor="include-abstract"
-                  className="text-slate-300 ml-2 cursor-pointer text-sm"
+                  className="ml-2 cursor-pointer text-sm text-foreground"
                 >
                   {TEXT.includeAbstracts}
                 </label>
@@ -200,30 +200,30 @@ export default function ExportPanel({
           <div>
             <label
               htmlFor="export-filename"
-              className="text-slate-300 mb-2 block text-sm font-medium"
+              className="mb-2 block text-sm font-medium text-foreground"
             >
               {TEXT.filenameLabel}
             </label>
-            <div className="bg-slate-800 border-slate-700 focus-within:ring-pink-500 flex overflow-hidden rounded-lg border focus-within:ring-2">
+            <div className="flex overflow-hidden rounded-none border border-border bg-secondary focus-within:ring-2 focus-within:ring-ring">
               <input
                 id="export-filename"
                 type="text"
                 value={filename}
                 onChange={(e) => setFilename(e.target.value)}
-                className="bg-transparent text-white w-full border-none px-3 py-2 outline-none focus:ring-0"
+                className="bg-transparent w-full border-none px-3 py-2 text-foreground outline-none focus:ring-0"
               />
-              <span className="text-slate-500 bg-slate-900 border-slate-700 border-l px-3 py-2">
+              <span className="border-l border-border bg-background px-3 py-2 text-muted-foreground">
                 .{format === 'bibtex' ? 'bib' : format}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="border-slate-800 bg-slate-900 border-t p-6">
+        <div className="border-t border-border bg-background p-6">
           <button
             type="button"
             onClick={handleExport}
-            className="bg-pink-600 hover:bg-pink-700 text-white focus:ring-pink-500 focus:ring-offset-slate-900 flex w-full items-center justify-center gap-2 rounded-lg py-3 font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+            className="flex w-full items-center justify-center gap-2 rounded-none bg-primary py-3 font-bold text-foreground transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
           >
             <svg
               className="h-5 w-5"

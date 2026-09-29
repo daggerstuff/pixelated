@@ -1,0 +1,1951 @@
+{
+  "components": {
+    "schemas": {
+      "ApiKeyCreateRequest": {
+        "properties": {
+          "label": {
+            "maxLength": 255,
+            "title": "Label",
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole",
+            "default": "manager"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "ApiKeyCreateRequest",
+        "type": "object"
+      },
+      "ApiKeyResponse": {
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "full_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Key"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "key_prefix": {
+            "title": "Key Prefix",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "key_prefix",
+          "label",
+          "role",
+          "created_at"
+        ],
+        "title": "ApiKeyResponse",
+        "type": "object"
+      },
+      "AuditItemIn": {
+        "description": "One piece of content submitted for auditing.",
+        "properties": {
+          "author_role": {
+            "default": "",
+            "description": "Who produced the item.",
+            "title": "Author Role",
+            "type": "string"
+          },
+          "content": {
+            "description": "The content text to audit.",
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "context": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Adapter metadata.",
+            "title": "Context",
+            "type": "object"
+          },
+          "id": {
+            "description": "Stable identifier for this item.",
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "default": "ai_response",
+            "description": "Content kind, e.g. 'ai_response'.",
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "content"
+        ],
+        "title": "AuditItemIn",
+        "type": "object"
+      },
+      "AuditRequest": {
+        "description": "Request body for POST /api/v1/audits.",
+        "properties": {
+          "auditors": {
+            "default": [
+              "brene_brown"
+            ],
+            "description": "Adversarial auditor persona names (TOML descriptors shipped with quadit).",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 0,
+            "title": "Auditors",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AuditItemIn"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Items",
+            "type": "array"
+          },
+          "mode": {
+            "default": "deterministic",
+            "description": "'deterministic' for pattern scans, 'llm' for full judge prompts.",
+            "pattern": "^(deterministic|llm)$",
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "AuditRequest",
+        "type": "object"
+      },
+      "CreateSimulationRequest": {
+        "properties": {
+          "learner_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Learner user ID (defaults to current user)",
+            "title": "Learner Id"
+          },
+          "scenario_id": {
+            "description": "UUID of the scenario to simulate",
+            "title": "Scenario Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scenario_id"
+        ],
+        "title": "CreateSimulationRequest",
+        "type": "object"
+      },
+      "Finding": {
+        "description": "A single auditor finding pinned to one item.",
+        "properties": {
+          "example_excerpt": {
+            "default": "",
+            "maxLength": 400,
+            "title": "Example Excerpt",
+            "type": "string"
+          },
+          "item_id": {
+            "title": "Item Id",
+            "type": "string"
+          },
+          "rationale": {
+            "default": "",
+            "title": "Rationale",
+            "type": "string"
+          },
+          "severity": {
+            "description": "One of: info, warning, critical.",
+            "title": "Severity",
+            "type": "string"
+          },
+          "signature": {
+            "default": "",
+            "description": "Anti-signal label, e.g. 'clinical_abstraction_over_warmth'.",
+            "title": "Signature",
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "severity"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "InstitutionCreateRequest": {
+        "properties": {
+          "institution_type": {
+            "default": "medical_school",
+            "title": "Institution Type",
+            "type": "string"
+          },
+          "max_seats": {
+            "default": 10,
+            "maximum": 10000.0,
+            "minimum": 1.0,
+            "title": "Max Seats",
+            "type": "integer"
+          },
+          "name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "maxLength": 100,
+            "minLength": 2,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Slug",
+            "type": "string"
+          },
+          "subscription_tier": {
+            "default": "starter",
+            "title": "Subscription Tier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "slug"
+        ],
+        "title": "InstitutionCreateRequest",
+        "type": "object"
+      },
+      "InstitutionResponse": {
+        "properties": {
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "institution_type": {
+            "title": "Institution Type",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "max_seats": {
+            "title": "Max Seats",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "subscription_tier": {
+            "title": "Subscription Tier",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "institution_type",
+          "subscription_tier",
+          "max_seats",
+          "is_active",
+          "created_at"
+        ],
+        "title": "InstitutionResponse",
+        "type": "object"
+      },
+      "LoginRequest": {
+        "properties": {
+          "email": {
+            "description": "User email address",
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "description": "User password",
+            "minLength": 8,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "type": "object"
+      },
+      "LoginResponse": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "tenant_id": {
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "token_type": {
+            "default": "bearer",
+            "title": "Token Type",
+            "type": "string"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token",
+          "user_id",
+          "role",
+          "tenant_id"
+        ],
+        "title": "LoginResponse",
+        "type": "object"
+      },
+      "PersonaVerdict": {
+        "description": "One persona's judgment over the full item set.",
+        "properties": {
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "flagged_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Flagged Ids",
+            "type": "array"
+          },
+          "notes": {
+            "default": "",
+            "title": "Notes",
+            "type": "string"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "persona": {
+            "title": "Persona",
+            "type": "string"
+          },
+          "role": {
+            "default": "",
+            "description": "'judge' or 'adversarial_auditor'.",
+            "title": "Role",
+            "type": "string"
+          },
+          "score": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "persona",
+          "passed",
+          "score"
+        ],
+        "title": "PersonaVerdict",
+        "type": "object"
+      },
+      "QuadAuditReport": {
+        "description": "Full quad-audit result \u2014 all judges plus adversarial auditors.",
+        "properties": {
+          "critical_count": {
+            "default": 0,
+            "title": "Critical Count",
+            "type": "integer"
+          },
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "item_count": {
+            "default": 0,
+            "title": "Item Count",
+            "type": "integer"
+          },
+          "mode": {
+            "description": "'llm' or 'deterministic'.",
+            "title": "Mode",
+            "type": "string"
+          },
+          "model": {
+            "default": "deterministic",
+            "title": "Model",
+            "type": "string"
+          },
+          "passed": {
+            "title": "Passed",
+            "type": "boolean"
+          },
+          "summary": {
+            "default": "",
+            "title": "Summary",
+            "type": "string"
+          },
+          "verdicts": {
+            "items": {
+              "$ref": "#/components/schemas/PersonaVerdict"
+            },
+            "title": "Verdicts",
+            "type": "array"
+          },
+          "warning_count": {
+            "default": 0,
+            "title": "Warning Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "passed",
+          "mode"
+        ],
+        "title": "QuadAuditReport",
+        "type": "object"
+      },
+      "RefreshRequest": {
+        "properties": {
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshRequest",
+        "type": "object"
+      },
+      "RefreshResponse": {
+        "properties": {
+          "access_token": {
+            "title": "Access Token",
+            "type": "string"
+          },
+          "refresh_token": {
+            "title": "Refresh Token",
+            "type": "string"
+          },
+          "token_type": {
+            "default": "bearer",
+            "title": "Token Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token"
+        ],
+        "title": "RefreshResponse",
+        "type": "object"
+      },
+      "ScenarioDetailResponse": {
+        "properties": {
+          "accuracy_pass_threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Pass Threshold"
+          },
+          "accuracy_rules": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Rules"
+          },
+          "clinical_focus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinical Focus"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "difficulty_level": {
+            "title": "Difficulty Level",
+            "type": "string"
+          },
+          "expected_duration_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Duration Minutes"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_published": {
+            "default": false,
+            "title": "Is Published",
+            "type": "boolean"
+          },
+          "persona_config": {
+            "default": [],
+            "items": {},
+            "title": "Persona Config",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          },
+          "version": {
+            "default": 1,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "difficulty_level",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ScenarioDetailResponse",
+        "type": "object"
+      },
+      "ScenarioResponse": {
+        "properties": {
+          "clinical_focus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinical Focus"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "difficulty_level": {
+            "title": "Difficulty Level",
+            "type": "string"
+          },
+          "expected_duration_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expected Duration Minutes"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_published": {
+            "default": false,
+            "title": "Is Published",
+            "type": "boolean"
+          },
+          "persona_config": {
+            "default": [],
+            "items": {},
+            "title": "Persona Config",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "default": 1,
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "difficulty_level",
+          "created_at"
+        ],
+        "title": "ScenarioResponse",
+        "type": "object"
+      },
+      "SimulationResponse": {
+        "properties": {
+          "accuracy_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accuracy Score"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "educator_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Educator Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "learner_id": {
+            "title": "Learner Id",
+            "type": "string"
+          },
+          "safety_violations": {
+            "default": 0,
+            "title": "Safety Violations",
+            "type": "integer"
+          },
+          "scenario_id": {
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "scenario_id",
+          "learner_id",
+          "status",
+          "created_at"
+        ],
+        "title": "SimulationResponse",
+        "type": "object"
+      },
+      "UserCreateRequest": {
+        "properties": {
+          "display_name": {
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "description": "User email address",
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "minLength": 8,
+            "title": "Password",
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole",
+            "default": "learner"
+          }
+        },
+        "required": [
+          "email",
+          "display_name",
+          "password"
+        ],
+        "title": "UserCreateRequest",
+        "type": "object"
+      },
+      "UserResponse": {
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email_hash": {
+            "title": "Email Hash",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "last_login_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login At"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email_hash",
+          "display_name",
+          "role",
+          "is_active"
+        ],
+        "title": "UserResponse",
+        "type": "object"
+      },
+      "UserRole": {
+        "description": "Enumerated user roles with hierarchy level.",
+        "enum": [
+          "super_admin",
+          "institution_admin",
+          "manager",
+          "educator",
+          "learner"
+        ],
+        "title": "UserRole",
+        "type": "string"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Multi-tenant clinical simulation platform. Zero-PHI by design.",
+    "title": "Pixelated Empathy",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Root endpoint \u2014 API information.",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Root  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Root"
+      }
+    },
+    "/api/v1/audits": {
+      "post": {
+        "description": "Run the quadit audit over the submitted items.",
+        "operationId": "run_audit_api_v1_audits_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuditRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuadAuditReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Run Audit",
+        "tags": [
+          "audits"
+        ]
+      }
+    },
+    "/api/v1/auth/api-keys": {
+      "get": {
+        "description": "List API keys for the current tenant.",
+        "operationId": "list_api_keys_api_v1_auth_api_keys_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ApiKeyResponse"
+                  },
+                  "title": "Response List Api Keys Api V1 Auth Api Keys Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Api Keys",
+        "tags": [
+          "authentication"
+        ]
+      },
+      "post": {
+        "description": "Create an API key for programmatic access.",
+        "operationId": "create_api_key_api_v1_auth_api_keys_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApiKeyCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeyResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Api Key",
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/api/v1/auth/api-keys/{key_id}": {
+      "delete": {
+        "description": "Revoke an API key (soft delete).",
+        "operationId": "revoke_api_key_api_v1_auth_api_keys__key_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key_id",
+            "required": true,
+            "schema": {
+              "title": "Key Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Revoke Api Key",
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/api/v1/auth/institutions": {
+      "get": {
+        "description": "List all institutions. Super admin only.",
+        "operationId": "list_institutions_api_v1_auth_institutions_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InstitutionResponse"
+                  },
+                  "title": "Response List Institutions Api V1 Auth Institutions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Institutions",
+        "tags": [
+          "authentication"
+        ]
+      },
+      "post": {
+        "description": "Create a new institution/tenant. Super admin only.",
+        "operationId": "create_institution_api_v1_auth_institutions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstitutionCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstitutionResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Institution",
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "description": "Authenticate user and return JWT tokens.\n\nLooks up user by email_hash, verifies password with bcrypt,\nand returns access + refresh tokens.",
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Login",
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "description": "Refresh an access token using a valid refresh token.\n\nImplements token rotation: old refresh token is invalidated,\nnew access + refresh tokens are issued.",
+        "operationId": "refresh_token_api_v1_auth_refresh_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Refresh Token",
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/api/v1/auth/users": {
+      "get": {
+        "description": "List all users in the current tenant.",
+        "operationId": "list_users_api_v1_auth_users_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UserResponse"
+                  },
+                  "title": "Response List Users Api V1 Auth Users Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Users",
+        "tags": [
+          "authentication"
+        ]
+      },
+      "post": {
+        "description": "Create a new user within the current tenant.\n\nInstitution admins can create users in their own tenant.",
+        "operationId": "create_user_api_v1_auth_users_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create User",
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/api/v1/auth/users/me": {
+      "get": {
+        "description": "Get the current user's profile.",
+        "operationId": "get_current_user_profile_api_v1_auth_users_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Current User Profile",
+        "tags": [
+          "authentication"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "description": "Health check endpoint for load balancers and monitoring.",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Check Api V1 Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Check",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/health/live": {
+      "get": {
+        "description": "Liveness probe \u2014 verifies the service is running.",
+        "operationId": "liveness_check_api_v1_health_live_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Liveness Check Api V1 Health Live Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness Check",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "description": "Readiness probe \u2014 verifies the service can accept traffic.",
+        "operationId": "readiness_check_api_v1_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Readiness Check Api V1 Health Ready Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readiness Check",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/scenarios": {
+      "get": {
+        "description": "List scenarios available to the current tenant.\n\nLearners see only published scenarios. Educators+ see all.",
+        "operationId": "list_scenarios_api_v1_scenarios_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "clinical_focus",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Clinical Focus"
+            }
+          },
+          {
+            "in": "query",
+            "name": "difficulty",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Difficulty"
+            }
+          },
+          {
+            "in": "query",
+            "name": "published_only",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Published Only",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioResponse"
+                  },
+                  "title": "Response List Scenarios Api V1 Scenarios Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Scenarios",
+        "tags": [
+          "scenarios"
+        ]
+      }
+    },
+    "/api/v1/scenarios/{scenario_id}": {
+      "get": {
+        "description": "Get detailed information about a specific scenario.",
+        "operationId": "get_scenario_api_v1_scenarios__scenario_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioDetailResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Scenario",
+        "tags": [
+          "scenarios"
+        ]
+      }
+    },
+    "/api/v1/simulations": {
+      "get": {
+        "description": "List simulation sessions for the current tenant.\n\nLearners see only their own sessions. Educators+ see all.",
+        "operationId": "list_simulations_api_v1_simulations_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status_filter",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status Filter"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SimulationResponse"
+                  },
+                  "title": "Response List Simulations Api V1 Simulations Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "List Simulations",
+        "tags": [
+          "simulations"
+        ]
+      },
+      "post": {
+        "description": "Create a new simulation session.\n\nInitializes the session with pending status, creates persona instances\nfrom the scenario config, and returns the session details.",
+        "operationId": "create_simulation_api_v1_simulations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSimulationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Create Simulation",
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/api/v1/simulations/{sim_id}": {
+      "get": {
+        "description": "Get details of a specific simulation session.",
+        "operationId": "get_simulation_api_v1_simulations__sim_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sim_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Sim Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Get Simulation",
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/api/v1/simulations/{sim_id}/abort": {
+      "post": {
+        "description": "Abort a simulation (admin only \u2014 terminates any status except completed).",
+        "operationId": "abort_simulation_api_v1_simulations__sim_id__abort_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sim_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Sim Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Abort Simulation",
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/api/v1/simulations/{sim_id}/pause": {
+      "post": {
+        "description": "Pause an active simulation.",
+        "operationId": "pause_simulation_api_v1_simulations__sim_id__pause_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sim_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Sim Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Pause Simulation",
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/api/v1/simulations/{sim_id}/resume": {
+      "post": {
+        "description": "Resume a paused simulation, accounting for elapsed pause time.",
+        "operationId": "resume_simulation_api_v1_simulations__sim_id__resume_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sim_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Sim Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Resume Simulation",
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/api/v1/simulations/{sim_id}/start": {
+      "post": {
+        "description": "Start a pending simulation session.",
+        "operationId": "start_simulation_api_v1_simulations__sim_id__start_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sim_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Sim Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "Start Simulation",
+        "tags": [
+          "simulations"
+        ]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Health check endpoint.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health"
+      }
+    }
+  }
+}

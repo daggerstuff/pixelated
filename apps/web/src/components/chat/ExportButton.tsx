@@ -118,10 +118,10 @@ export default function ExportButton({
         <button
           onClick={async () => handleExport(exportFormat)}
           disabled={disabled || isExporting}
-          className={`inline-flex items-center rounded-l-md px-3 py-2 text-sm font-medium ${
+          className={`inline-flex items-center rounded-l-none px-3 py-2 text-sm font-medium ${
             disabled || isExporting
-              ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-              : 'bg-purple-600 hover:bg-purple-700 text-white'
+              ? 'cursor-not-allowed bg-secondary text-muted-foreground'
+              : 'bg-primary text-primary-foreground hover:bg-accent'
           }`}
           aria-label="Export conversation"
         >
@@ -131,10 +131,10 @@ export default function ExportButton({
         </button>
         <button
           type="button"
-          className={`border-purple-700 inline-flex items-center rounded-r-md border-l px-2 py-2 ${
+          className={`inline-flex items-center rounded-r-none border-l border-primary px-2 py-2 ${
             disabled || isExporting
-              ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
-              : 'bg-purple-600 hover:bg-purple-700 text-white'
+              ? 'cursor-not-allowed bg-secondary text-muted-foreground'
+              : 'bg-primary text-primary-foreground hover:bg-accent'
           }`}
           onClick={() => setShowOptions(!showOptions)}
           disabled={disabled || isExporting}
@@ -145,43 +145,43 @@ export default function ExportButton({
       </div>
 
       {showOptions && (
-        <div className="bg-gray-800 ring-black absolute right-0 z-10 mt-2 w-56 rounded-md shadow-lg ring-1 ring-opacity-5">
+        <div className="absolute right-0 z-10 mt-2 w-56 rounded-none border border-border bg-card">
           <div className="py-1" role="menu" aria-orientation="vertical">
             <button
-              className="text-white hover:bg-gray-700 flex w-full items-center px-4 py-2 text-left text-sm"
+              className="flex w-full items-center px-4 py-2 text-left text-sm text-foreground hover:bg-accent"
               onClick={async () => handleExport('json')}
               role="menuitem"
             >
               {renderFormatIcon('json')}
               <span>JSON (.json)</span>
               <IconLock
-                className="text-green-400 ml-auto h-3 w-3"
+                className="ml-auto h-3 w-3 text-foreground"
                 aria-label="Encrypted"
               />
             </button>
 
             <button
-              className="text-white hover:bg-gray-700 flex w-full items-center px-4 py-2 text-left text-sm"
+              className="flex w-full items-center px-4 py-2 text-left text-sm text-foreground hover:bg-accent"
               onClick={async () => handleExport('pdf')}
               role="menuitem"
             >
               {renderFormatIcon('pdf')}
               <span>PDF Document (.pdf)</span>
               <IconLock
-                className="text-green-400 ml-auto h-3 w-3"
+                className="ml-auto h-3 w-3 text-foreground"
                 aria-label="Encrypted"
               />
             </button>
 
             <button
-              className="text-white hover:bg-gray-700 flex w-full items-center px-4 py-2 text-left text-sm"
+              className="flex w-full items-center px-4 py-2 text-left text-sm text-foreground hover:bg-accent"
               onClick={async () => handleExport('encrypted_archive')}
               role="menuitem"
             >
               {renderFormatIcon('encrypted_archive')}
               <span>Secure Archive (.secz)</span>
               <IconLock
-                className="text-green-400 ml-auto h-3 w-3"
+                className="ml-auto h-3 w-3 text-foreground"
                 aria-label="Maximum Encryption"
               />
             </button>
@@ -190,7 +190,7 @@ export default function ExportButton({
       )}
 
       {exportError && (
-        <div className="text-red-500 mt-2 text-sm">{exportError}</div>
+        <div className="mt-2 text-sm text-foreground">{exportError}</div>
       )}
     </div>
   )

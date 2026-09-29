@@ -22,7 +22,7 @@ interface ComparativeProgressDisplayProps {
 // Helper components for different states. These can be moved to separate files if preferred.
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center py-12">
-    <div className="border-indigo-500 h-8 w-8 animate-spin rounded-full border-b-2 border-t-2"></div>
+    <div className="h-8 w-8 animate-spin rounded-none border-b-2 border-t-2 border-ring"></div>
   </div>
 )
 
@@ -33,12 +33,12 @@ const ErrorState = ({
   message: string
   retry: () => void
 }) => (
-  <div className="bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-300 rounded-md p-4">
+  <div className="rounded-none border border-ring bg-secondary p-4 font-medium text-foreground">
     <p className="font-medium">Error loading data</p>
     <p className="text-sm">{message}</p>
     <button
       onClick={retry}
-      className="bg-red-100 hover:bg-red-200 dark:bg-red-800/30 dark:hover:bg-red-800/50 mt-2 rounded-md px-4 py-2 text-sm font-medium"
+      className="mt-2 rounded-none border border-border bg-secondary px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
     >
       Retry
     </button>
@@ -46,11 +46,11 @@ const ErrorState = ({
 )
 
 const EmptyState = () => (
-  <div className="border-gray-300 dark:border-gray-700 rounded-md border border-dashed p-8 text-center">
-    <p className="text-gray-500 dark:text-gray-400">
+  <div className="rounded-none border border-dashed border-border p-8 text-center">
+    <p className="text-muted-foreground">
       No data available for the selected metric and time period.
     </p>
-    <p className="text-gray-400 dark:text-gray-500 mt-2 text-sm">
+    <p className="mt-2 text-sm text-muted-foreground">
       Try selecting a different metric or expanding the date range.
     </p>
   </div>

@@ -20,12 +20,12 @@ export function SecurityBadge({
   return (
     <div
       className={cn(
-        'flex items-center gap-1 rounded-lg border px-2 py-1 text-xs',
+        'flex items-center gap-1 rounded-none border px-2 py-1 text-xs',
         securityLevel === 'maximum'
-          ? 'border-green-700 bg-green-900/30 text-green-400'
+          ? 'border-input bg-secondary text-foreground'
           : securityLevel === 'hipaa'
-            ? 'border-blue-700 bg-blue-900/30 text-blue-400'
-            : 'border-purple-700 bg-purple-900/30 text-purple-400',
+            ? 'border-ring bg-secondary text-foreground'
+            : 'border-border bg-secondary text-muted-foreground',
       )}
     >
       <IconShieldLock className="h-3 w-3" />

@@ -4,11 +4,11 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
-from skillrevise.llm import LLMClient
+
 from skillrevise.core.models import DiagnosisReport, FailureType, Skill, TaskSpec
+from skillrevise.llm import LLMClient
 from skillrevise.method.principles import PrincipleBank
 from skillrevise.method.skill_parser import parse_skill_markdown
-
 
 WORKFLOW_MARKERS = ("first", "then", "before", "after", "step", "workflow")
 VALIDATION_MARKERS = ("verify", "validate", "check", "inspect", "confirm", "test")
@@ -22,7 +22,14 @@ ENVIRONMENT_MARKERS = (
     "local environment",
     "environment-supported",
 )
-FALLBACK_MARKERS = ("fallback", "if unavailable", "if missing", "otherwise", "alternative", "recover")
+FALLBACK_MARKERS = (
+    "fallback",
+    "if unavailable",
+    "if missing",
+    "otherwise",
+    "alternative",
+    "recover",
+)
 STRICT_CONSTRAINT_MARKERS = ("do not", "only after", "before", "avoid", "stop", "must not")
 GENERIC_MARKERS = (
     "be careful",
@@ -63,7 +70,10 @@ class SkillConstraintChecker:
         constraints_text = " ".join(skill.constraints).lower()
         violations: list[SkillConstraintViolation] = []
 
-        if not skill.when_to_use.strip() or "similar to the current task" in skill.when_to_use.lower():
+        if (
+            not skill.when_to_use.strip()
+            or "similar to the current task" in skill.when_to_use.lower()
+        ):
             violations.append(
                 SkillConstraintViolation(
                     code="unclear_trigger",
@@ -74,7 +84,9 @@ class SkillConstraintChecker:
                 )
             )
 
-        if len(skill.procedure) < self.prior.min_procedure_steps or not self._has_any(procedure_text, WORKFLOW_MARKERS):
+        if len(skill.procedure) < self.prior.min_procedure_steps or not self._has_any(
+            procedure_text, WORKFLOW_MARKERS
+        ):
             violations.append(
                 SkillConstraintViolation(
                     code="missing_workflow_explicitness",
@@ -154,7 +166,9 @@ class SkillConstraintChecker:
             )
 
         generic_hits = sum(marker in text for marker in GENERIC_MARKERS)
-        action_hits = sum(marker in text for marker in VALIDATION_MARKERS + ("run", "edit", "open", "create"))
+        action_hits = sum(
+            marker in text for marker in VALIDATION_MARKERS + ("run", "edit", "open", "create")
+        )
         if generic_hits >= 2 and action_hits <= 3:
             violations.append(
                 SkillConstraintViolation(
@@ -183,19 +197,7 @@ class SkillConstraintChecker:
         return violations
 
     def render_prompt_prior(self) -> str:
-        return "\n".join(
-            [
-                "Use these platform-agnostic skill authoring constraints:",
-                "1. Write a reusable task-family procedure, not a task-instance answer.",
-                "2. Keep the skill concise; include only details that change execution behavior.",
-                "3. Make the workflow explicit: order, checkpoints, and decision points must be clear.",
-                "4. Validate inputs, files, tools, and assumptions before taking irreversible actions.",
-                "5. Ground the procedure in the actual environment using discovery before fixed commands.",
-                "6. Include fallback handling for missing tools, failed checks, and ambiguous requirements.",
-                "7. Add strict constraints that prevent brittle or unsafe behavior.",
-                "8. Avoid hard-coded paths, versions, and commands unless they are verified invariants.",
-            ]
-        )
+        return "Use these platform-agnostic skill authoring constraints:\n1. Write a reusable task-family procedure, not a task-instance answer.\n2. Keep the skill concise; include only details that change execution behavior.\n3. Make the workflow explicit: order, checkpoints, and decision points must be clear.\n4. Validate inputs, files, tools, and assumptions before taking irreversible actions.\n5. Ground the procedure in the actual environment using discovery before fixed commands.\n6. Include fallback handling for missing tools, failed checks, and ambiguous requirements.\n7. Add strict constraints that prevent brittle or unsafe behavior.\n8. Avoid hard-coded paths, versions, and commands unless they are verified invariants."
 
     def _has_any(self, text: str, markers: tuple[str, ...]) -> bool:
         return any(marker in text for marker in markers)
@@ -373,51 +375,8 @@ class SkillAuthoringPromptBuilder:
 
     def _render_output_template(self) -> str:
         if self.principle_interface == "legacy":
-            return "\n".join(
-                [
-                    "Return only Markdown in exactly this structure:",
-                    "# <Skill Name>",
-                    "",
-                    "## Purpose",
-                    "<1 concise paragraph>",
-                    "",
-                    "## When to Use",
-                    "<1 concise paragraph describing the reusable task family trigger>",
-                    "",
-                    "## Procedure",
-                    "- <ordered, executable step 1>",
-                    "- <ordered, executable step 2>",
-                    "- <ordered, executable step 3>",
-                    "- <ordered, executable step 4>",
-                    "",
-                    "## Constraints / Pitfalls",
-                    "- <strict constraint or pitfall 1>",
-                    "- <strict constraint or pitfall 2>",
-                ]
-            )
-        return "\n".join(
-            [
-                "Return only Markdown in exactly this structure:",
-                "# <Skill Name>",
-                "",
-                "## Purpose",
-                "<1 concise paragraph naming the reusable task-family capability and the concrete outcome it protects>",
-                "",
-                "## When to Use",
-                "<1 concise paragraph with positive triggers and at least one boundary where the skill should not be used>",
-                "",
-                "## Procedure",
-                "- Preflight: <inspect task-visible inputs, file/container structure, available tools, and verifier/output contract before choosing an implementation route>",
-                "- Strategy: <choose an implementation route from the inspected evidence; include the fallback route if the preferred parser/tool/library is unavailable or incomplete>",
-                "- Execute: <perform the smallest scoped transformation/analysis needed for the task, preserving source data and avoiding hidden-answer or single-instance constants>",
-                "- Validate: <run task-visible checks that mirror the acceptance criteria, including schema, counts, tolerances, artifact existence, and semantic sanity checks as applicable>",
-                "- Fallback: <when validation fails or evidence is inconclusive, re-inspect the failing artifact/log and switch to a lower-level or independently verified method>",
-                "",
-                "## Constraints / Pitfalls",
-                "- <principle-derived pitfall that would cause verifier-visible failure if ignored>",
-                "- <principle-derived pitfall about overfitting, unsupported assumptions, brittle paths/tools, or missing validation>",
-            ]
-        )
+            return "Return only Markdown in exactly this structure:\n# <Skill Name>\n\n## Purpose\n<1 concise paragraph>\n\n## When to Use\n<1 concise paragraph describing the reusable task family trigger>\n\n## Procedure\n- <ordered, executable step 1>\n- <ordered, executable step 2>\n- <ordered, executable step 3>\n- <ordered, executable step 4>\n\n## Constraints / Pitfalls\n- <strict constraint or pitfall 1>\n- <strict constraint or pitfall 2>"
+        return "Return only Markdown in exactly this structure:\n# <Skill Name>\n\n## Purpose\n<1 concise paragraph naming the reusable task-family capability and the concrete outcome it protects>\n\n## When to Use\n<1 concise paragraph with positive triggers and at least one boundary where the skill should not be used>\n\n## Procedure\n- Preflight: <inspect task-visible inputs, file/container structure, available tools, and verifier/output contract before choosing an implementation route>\n- Strategy: <choose an implementation route from the inspected evidence; include the fallback route if the preferred parser/tool/library is unavailable or incomplete>\n- Execute: <perform the smallest scoped transformation/analysis needed for the task, preserving source data and avoiding hidden-answer or single-instance constants>\n- Validate: <run task-visible checks that mirror the acceptance criteria, including schema, counts, tolerances, artifact existence, and semantic sanity checks as applicable>\n- Fallback: <when validation fails or evidence is inconclusive, re-inspect the failing artifact/log and switch to a lower-level or independently verified method>\n\n## Constraints / Pitfalls\n- <principle-derived pitfall that would cause verifier-visible failure if ignored>\n- <principle-derived pitfall about overfitting, unsupported assumptions, brittle paths/tools, or missing validation>"
 
     def _render_principle_bank_guidance(self, task: TaskSpec) -> str:
         if self.principle_bank is None or self.principle_limit <= 0:
@@ -457,43 +416,15 @@ class SkillAuthoringPromptBuilder:
                         f"  Avoid: {principle.transfer_constraint}",
                     ]
                 )
-        )
-        rendered = "\n".join(blocks) if blocks else "- No principle matched strongly enough; rely on the authoring prior."
-        if self.principle_interface == "legacy":
-            return "\n".join(
-                [
-                    "Most relevant reusable operating principles for the initial skill:",
-                    rendered,
-                    (
-                        "Use at most the relevant parts as operating guidance. The final skill must be a concrete "
-                        "task-family workflow, not a list of meta-principles. Do not copy task-specific answers, "
-                        "identifiers, constants, paths, or verifier-local values."
-                    ),
-                ]
             )
-        return "\n".join(
-            [
-                "Most relevant reusable operating principles for the initial skill:",
-                rendered,
-                "Direct-design operationalization contract:",
-                (
-                    "Before writing the final skill, internally map each relevant principle into an executable "
-                    "task-specific design move: task feature -> preflight action -> implementation choice -> "
-                    "validation hook -> fallback/boundary. Discard principles whose trigger does not match the "
-                    "source task."
-                ),
-                (
-                    "The final skill must not merely restate or summarize the principles. It must embed the mapped "
-                    "moves inside Procedure and Constraints / Pitfalls as concrete actions an agent can perform "
-                    "before seeing any failure trace."
-                ),
-                (
-                    "Do not copy task-specific answers, identifiers, constants, hidden verifier values, or one-off "
-                    "file paths unless the source task explicitly requires that visible path. Do not mention "
-                    "principle IDs in the final skill."
-                ),
-            ]
+        rendered = (
+            "\n".join(blocks)
+            if blocks
+            else "- No principle matched strongly enough; rely on the authoring prior."
         )
+        if self.principle_interface == "legacy":
+            return f"Most relevant reusable operating principles for the initial skill:\n{rendered}\nUse at most the relevant parts as operating guidance. The final skill must be a concrete task-family workflow, not a list of meta-principles. Do not copy task-specific answers, identifiers, constants, paths, or verifier-local values."
+        return f"Most relevant reusable operating principles for the initial skill:\n{rendered}\nDirect-design operationalization contract:\nBefore writing the final skill, internally map each relevant principle into an executable task-specific design move: task feature -> preflight action -> implementation choice -> validation hook -> fallback/boundary. Discard principles whose trigger does not match the source task.\nThe final skill must not merely restate or summarize the principles. It must embed the mapped moves inside Procedure and Constraints / Pitfalls as concrete actions an agent can perform before seeing any failure trace.\nDo not copy task-specific answers, identifiers, constants, hidden verifier values, or one-off file paths unless the source task explicitly requires that visible path. Do not mention principle IDs in the final skill."
 
 
 class NaiveSkillAuthoringPromptBuilder:
@@ -507,27 +438,7 @@ class NaiveSkillAuthoringPromptBuilder:
 
     def build(self, task: TaskSpec) -> str:
         criteria = "\n".join(f"- {item}" for item in task.acceptance_criteria) or "- Not specified"
-        output_template = "\n".join(
-            [
-                "Return only Markdown in exactly this structure:",
-                "# <Skill Name>",
-                "",
-                "## Purpose",
-                "<1 concise paragraph>",
-                "",
-                "## When to Use",
-                "<1 concise paragraph>",
-                "",
-                "## Procedure",
-                "- <step 1>",
-                "- <step 2>",
-                "- <step 3>",
-                "",
-                "## Constraints / Pitfalls",
-                "- <constraint or pitfall 1>",
-                "- <constraint or pitfall 2>",
-            ]
-        )
+        output_template = "Return only Markdown in exactly this structure:\n# <Skill Name>\n\n## Purpose\n<1 concise paragraph>\n\n## When to Use\n<1 concise paragraph>\n\n## Procedure\n- <step 1>\n- <step 2>\n- <step 3>\n\n## Constraints / Pitfalls\n- <constraint or pitfall 1>\n- <constraint or pitfall 2>"
         return "\n\n".join(
             [
                 "You are writing a skill for an LLM agent.",
@@ -551,28 +462,7 @@ class SkillCreatorPromptBuilder:
 
     def build(self, task: TaskSpec) -> str:
         criteria = "\n".join(f"- {item}" for item in task.acceptance_criteria) or "- Not specified"
-        output_template = "\n".join(
-            [
-                "Return only Markdown in exactly this structure:",
-                "# <Skill Name>",
-                "",
-                "## Purpose",
-                "<1 concise paragraph>",
-                "",
-                "## When to Use",
-                "<1 concise paragraph describing when this reusable skill should trigger>",
-                "",
-                "## Procedure",
-                "- <ordered, action-driving step 1>",
-                "- <ordered, action-driving step 2>",
-                "- <ordered, action-driving step 3>",
-                "- <ordered, action-driving step 4>",
-                "",
-                "## Constraints / Pitfalls",
-                "- <constraint or pitfall 1>",
-                "- <constraint or pitfall 2>",
-            ]
-        )
+        output_template = "Return only Markdown in exactly this structure:\n# <Skill Name>\n\n## Purpose\n<1 concise paragraph>\n\n## When to Use\n<1 concise paragraph describing when this reusable skill should trigger>\n\n## Procedure\n- <ordered, action-driving step 1>\n- <ordered, action-driving step 2>\n- <ordered, action-driving step 3>\n- <ordered, action-driving step 4>\n\n## Constraints / Pitfalls\n- <constraint or pitfall 1>\n- <constraint or pitfall 2>"
         return "\n\n".join(
             [
                 "You are creating a reusable SKILL.md-style guide for an LLM coding/tool agent.",
@@ -597,7 +487,10 @@ class LLMSkillAuthor:
         self,
         llm: LLMClient,
         *,
-        prompt_builder: SkillAuthoringPromptBuilder | NaiveSkillAuthoringPromptBuilder | SkillCreatorPromptBuilder | None = None,
+        prompt_builder: SkillAuthoringPromptBuilder
+        | NaiveSkillAuthoringPromptBuilder
+        | SkillCreatorPromptBuilder
+        | None = None,
         fallback_author: SkillAuthor | None = None,
         checker: SkillConstraintChecker | None = None,
         allow_fallback: bool = True,
@@ -628,7 +521,9 @@ class LLMSkillAuthor:
                 raise RuntimeError(f"LLM skill authoring failed: {exc}") from exc
             skill = self.fallback_author.author(task)
             skill.metadata["author"] = "llm_fallback"
-            skill.metadata["prompt_strategy"] = getattr(self.prompt_builder, "strategy_name", "unknown")
+            skill.metadata["prompt_strategy"] = getattr(
+                self.prompt_builder, "strategy_name", "unknown"
+            )
             skill.metadata["llm_error"] = str(exc)
             return skill
 

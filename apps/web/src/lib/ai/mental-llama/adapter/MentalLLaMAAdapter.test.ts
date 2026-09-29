@@ -53,7 +53,7 @@ const crisisSessionFlaggingServiceMockConstructor = vi.hoisted(() => {
     return crisisSessionFlaggingServiceMockInstance
   })
 });
-vi.mock("../crisis/CrisisSessionFlaggingService", () => ({
+vi.mock("../../crisis/CrisisSessionFlaggingService", () => ({
   CrisisSessionFlaggingService: crisisSessionFlaggingServiceMockConstructor,
 }));
 

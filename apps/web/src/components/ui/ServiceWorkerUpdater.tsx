@@ -40,28 +40,28 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
       toast.custom(
         (t) => (
           <div
-            className={` ${t.visible ? 'animate-enter' : 'animate-leave'} bg-white dark:bg-gray-800 ring-black pointer-events-auto flex w-full max-w-md rounded-lg shadow-lg ring-1 ring-opacity-5`}
+            className={` ${t.visible ? 'animate-enter' : 'animate-leave'} pointer-events-auto flex w-full max-w-md rounded-none border border-border bg-card`}
           >
             <div className="w-0 flex-1 p-4">
               <div className="flex items-start">
                 <div className="ml-3 flex-1">
-                  <p className="text-gray-900 dark:text-gray-100 text-sm font-medium">
+                  <p className="text-sm font-medium text-foreground">
                     Update Available
                   </p>
-                  <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     A new version is available. Refresh to update.
                   </p>
                 </div>
               </div>
             </div>
-            <div className="border-gray-200 dark:border-gray-700 flex border-l">
+            <div className="flex border-l border-border">
               <button
                 onClick={() => {
                   toast.dismiss(t.id)
                   onUpdateComplete?.()
                   window.location.reload()
                 }}
-                className="border-transparent text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 focus:ring-indigo-500 flex w-full items-center justify-center rounded-none rounded-r-lg border p-4 text-sm font-medium focus:outline-none focus:ring-2"
+                className="border-transparent flex w-full items-center justify-center rounded-none border p-4 text-sm font-medium text-foreground transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 Refresh
               </button>

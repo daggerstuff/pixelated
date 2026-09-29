@@ -2,6 +2,21 @@ name: Deploy to AWS EKS
 
 on:
   workflow_dispatch:
+  # Auto-deploy: a successful CI run on staging deploys to EKS, so shipping
+  # is the default instead of a manual step. CI must pass first. The app
+  # rolls out in stages (blue/green): the new image is deployed to the idle
+  # slot, health-verified pre-live, then promoted with a service-selector
+  # flip; failures roll back with the same flip (seconds). Agents roll out
+  # directly with rollout-undo rollback on failure.
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [staging]
+
+# Deploys must not overlap: a newer run waits for the current one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
 
 permissions:
   id-token: write
@@ -16,6 +31,11 @@ env:
 
 jobs:
   build-and-push:
+    # Auto-deploys only follow a successful CI run; manual dispatch is always allowed.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'staging')
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.vars.outputs.image_tag }}
@@ -58,7 +78,10 @@ jobs:
           context: .
           file: ./infra/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
@@ -72,7 +95,10 @@ jobs:
           build-args: |
             AGENT_DIR=agents/session-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.SESSION_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=session-agent
           cache-to: type=gha,mode=max,scope=session-agent
           platforms: linux/amd64
@@ -86,7 +112,10 @@ jobs:
           build-args: |
             AGENT_DIR=agents/qa-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.QA_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=qa-agent
           cache-to: type=gha,mode=max,scope=qa-agent
           platforms: linux/amd64
@@ -100,7 +129,10 @@ jobs:
           build-args: |
             AGENT_DIR=agents/pipeline-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.PIPELINE_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=pipeline-agent
           cache-to: type=gha,mode=max,scope=pipeline-agent
           platforms: linux/amd64
@@ -128,14 +160,16 @@ jobs:
           persist-credentials: false
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           role-session-name: pixelated-eks-deploy
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Update kubeconfig
-        run: aws eks update-kubeconfig --region "$AWS_REGION" --name "$EKS_CLUSTER_NAME"
+        run:
+          aws eks update-kubeconfig --region "$AWS_REGION" --name
+          "$EKS_CLUSTER_NAME"
 
       - name: Install kubectl, kustomize, and helm
         run: |
@@ -242,17 +276,72 @@ jobs:
           kubectl apply -f agents/pipeline-agent/k8s/deployment.yaml
           kubectl delete deployment/pixelated-empathy -n pixelated-empathy --ignore-not-found
 
-          kubectl set image deployment/pixelated-empathy-blue pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
+          # Product analytics: inject the Umami website id (repo variable,
+          # created in the Umami admin at analytics.pixelatedempathy.com).
+          # Empty/unset disables analytics client-side — UmamiAnalytics only
+          # renders when the id is non-empty.
+          kubectl patch configmap pixelated-empathy-config -n pixelated-empathy --type merge -p '{"data":{"PUBLIC_UMAMI_WEBSITE_ID":"${{ vars.PUBLIC_UMAMI_WEBSITE_ID }}"}}'
+
+          # ── Staged rollout (blue/green) ────────────────────────────────
+          # The service routes by slot label. The deploy stages the new image
+          # on the IDLE slot, verifies it pre-live, then flips the service
+          # selector. A failure before the flip touches zero user traffic; a
+          # failure after the flip rolls back with a selector flip (seconds)
+          # instead of a rollout undo (minutes).
+          LIVE_SLOT="$(kubectl get svc pixelated-empathy -n pixelated-empathy -o jsonpath='{.spec.selector.slot}')"
+          if [[ "$LIVE_SLOT" != "green" ]]; then
+            TARGET_SLOT="green"
+          else
+            TARGET_SLOT="blue"
+          fi
+          PREVIOUS_SLOT="$LIVE_SLOT"
+          echo "Staging new image on idle slot '$TARGET_SLOT' (live: '$LIVE_SLOT')."
+
+          kubectl scale deployment/pixelated-empathy-"$TARGET_SLOT" -n pixelated-empathy --replicas=2
+          kubectl set image deployment/pixelated-empathy-"$TARGET_SLOT" pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
           kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.session_digest }} -n pixelated-empathy
           kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.qa_digest }} -n pixelated-empathy
           kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
 
-          kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=10m
+          kubectl rollout status deployment/pixelated-empathy-"$TARGET_SLOT" -n pixelated-empathy --timeout=10m
           kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=10m
           kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=10m
           kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=10m
 
+          # Persist for the promote/rollback steps (shell vars do not survive
+          # across steps).
+          echo "TARGET_SLOT=$TARGET_SLOT" >> "$GITHUB_ENV"
+          echo "PREVIOUS_SLOT=$PREVIOUS_SLOT" >> "$GITHUB_ENV"
+
+      # Pre-live verification: the staged slot must serve /health before any
+      # traffic moves. A failure here has zero user impact.
+      - name: Pre-live smoke on staged slot
+        id: presmoke
+        run: |
+          kubectl port-forward -n pixelated-empathy "deployment/pixelated-empathy-${TARGET_SLOT}" 8080:4321 &
+          PF_PID=$!
+          trap 'kill $PF_PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/health; then
+              echo "Staged slot '${TARGET_SLOT}' pre-live health check passed."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Staged slot '${TARGET_SLOT}' pre-live health check failed."
+          exit 1
+
+      # Promote: flip the service selector. This is the only moment user
+      # traffic moves, and it is reversible in seconds.
+      - name: Promote staged slot to live
+        id: promote
+        run: |
+          kubectl patch svc pixelated-empathy -n pixelated-empathy --type merge \
+            -p '{"spec":{"selector":{"app":"pixelated-empathy","slot":"'"${TARGET_SLOT}"'"}}}'
+          echo "Service selector flipped to '${TARGET_SLOT}'."
+
       - name: Smoke test through cluster service
+        id: smoke
         run: |
           kubectl port-forward -n pixelated-empathy svc/pixelated-empathy 8080:80 &
           PF_PID=$!
@@ -265,6 +354,39 @@ jobs:
             sleep 2
           done
           echo "Service health check failed."
+          exit 1
+
+      # Success: park the previous slot at zero replicas. Its pods stay
+      # defined (image + replicas are Deployment-managed), so the next deploy
+      # stages onto it the same way.
+      - name: Scale down previous slot
+        if: success()
+        run: |
+          kubectl scale deployment/pixelated-empathy-"$PREVIOUS_SLOT" -n pixelated-empathy --replicas=0
+          echo "Previous slot '${PREVIOUS_SLOT}' parked at 0 replicas."
+
+      # Automatic rollback: restore the service selector to the previous
+      # slot (seconds, unlike a rollout undo) and undo the agent rollouts.
+      # Safe in every failure case — before the flip it is a no-op for
+      # traffic, after the flip it restores the known-good slot.
+      - name: Roll back failed deployment
+        if:
+          failure() && (steps.promote.outcome == 'failure' ||
+          steps.smoke.outcome == 'failure')
+        run: |
+          set -u
+          echo "::error::Rollout failed — restoring service selector to '$PREVIOUS_SLOT' and rolling back agents."
+          kubectl patch svc pixelated-empathy -n pixelated-empathy --type merge \
+            -p '{"spec":{"selector":{"app":"pixelated-empathy","slot":"'"${PREVIOUS_SLOT}"'"}}}'
+          for deployment in session-agent qa-agent pipeline-agent; do
+            echo "Rolling back deployment/$deployment ..."
+            kubectl rollout undo "deployment/$deployment" -n pixelated-empathy
+          done
+          for deployment in session-agent qa-agent pipeline-agent; do
+            kubectl rollout status "deployment/$deployment" -n pixelated-empathy --timeout=5m
+          done
+          kubectl rollout status deployment/pixelated-empathy-"$PREVIOUS_SLOT" -n pixelated-empathy --timeout=5m
+          echo "Rollback complete."
           exit 1
 
       - name: Show DNS target

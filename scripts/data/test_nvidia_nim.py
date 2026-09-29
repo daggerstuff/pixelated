@@ -10,6 +10,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -21,7 +22,7 @@ logging.basicConfig(level=logging.INFO, format="[%(asctime)s] [%(levelname)s] %(
 logger = logging.getLogger(__name__)
 
 
-def test_nvidia_nim_connection():
+def test_nvidia_nim_connection() -> LLMTaxonomyClassifier | None:
     """Test basic NVIDIA NIM API connection."""
     logger.info("=" * 80)
     logger.info("🧪 Testing NVIDIA NIM GLM4.7 Connection")
@@ -33,7 +34,7 @@ def test_nvidia_nim_connection():
         logger.error("❌ OPENAI_API_KEY not set in environment")
         logger.info("Please set your NVIDIA API key:")
         logger.info("  export OPENAI_API_KEY='nvapi-...'")
-        return False
+        return None
 
     logger.info(f"✅ API Key found: {api_key[:10]}...{api_key[-4:]}")
 
@@ -45,15 +46,15 @@ def test_nvidia_nim_connection():
         logger.info(f"✅ Base URL: {config.base_url}")
     except Exception as e:
         logger.error(f"❌ Failed to initialize classifier: {e}")
-        return False
+        return None
 
     return classifier
 
 
-def test_classifications(classifier):
+def test_classifications(classifier: LLMTaxonomyClassifier) -> list[dict[str, Any]]:
     """Test various classification scenarios."""
 
-    test_cases = [
+    test_cases: list[dict[str, Any]] = [
         {
             "name": "Crisis Support",
             "text": """Patient: I can't take it anymore. I've been thinking about ending my life.
@@ -85,7 +86,7 @@ Therapist: Let's work on using 'I' statements to express your feelings.""",
     logger.info("🎯 Running Classification Tests")
     logger.info("=" * 80)
 
-    results = []
+    results: list[dict[str, Any]] = []
     for i, test_case in enumerate(test_cases, 1):
         logger.info(f"\n📝 Test {i}/{len(test_cases)}: {test_case['name']}")
         logger.info("-" * 80)
@@ -127,7 +128,7 @@ Therapist: Let's work on using 'I' statements to express your feelings.""",
     return results
 
 
-def print_summary(results):
+def print_summary(results: list[dict[str, Any]]) -> bool:
     """Print test summary."""
     logger.info("\n" + "=" * 80)
     logger.info("📊 TEST SUMMARY")
@@ -160,7 +161,7 @@ def print_summary(results):
     return accuracy == 100
 
 
-def main():
+def main() -> None:
     """Run all tests."""
     # Test connection
     classifier = test_nvidia_nim_connection()

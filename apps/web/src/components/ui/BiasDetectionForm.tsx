@@ -240,7 +240,7 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
         <div className="form-group">
           <label htmlFor="session-text" className="form-label">
             Therapy Session Text *
-            <span className="text-gray-400 ml-2 text-sm">
+            <span className="ml-2 text-sm text-muted-foreground">
               ({characterCount}/{maxLength} characters)
             </span>
           </label>
@@ -256,7 +256,7 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
             disabled={isLoading}
           />
           {errors.text && <div className="form-error">{errors.text}</div>}
-          <div className="text-gray-400 mt-1 text-sm">
+          <div className="mt-1 text-sm text-muted-foreground">
             Include therapist-patient dialogue, observations, and key
             interactions
           </div>

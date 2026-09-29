@@ -12,7 +12,7 @@ import art
 from art.serverless.backend import ServerlessBackend
 
 
-async def main():
+async def main() -> None:
     print("Testing 30B model registration...")
     model = art.TrainableModel(
         name="qwen3-30b-serverless-test",

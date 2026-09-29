@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import re
+from typing import TYPE_CHECKING
 
-from skillreducer.llm.client import LLMClient
 from skillreducer.llm import prompts
+from skillreducer.llm.client import LLMClient
 from skillreducer.models import Skill
 from skillreducer.stage1.oracle import Stage1Oracle, build_stage1_oracle, simulated_oracle
+
+if TYPE_CHECKING:
+    from skillreducer.config import Config
 
 
 def generate_description(
@@ -15,7 +19,7 @@ def generate_description(
     llm: LLMClient | None,
     *,
     oracle_ctx: Stage1Oracle | None = None,
-    config=None,
+    config: Config | None = None,
 ) -> str:
     """Generate a routing description when missing or too short (<=40 tokens).
 
@@ -50,7 +54,8 @@ def _validate_generated(
     """Validate a generated description through Phase 1 simulated oracle."""
     if oracle_ctx is None:
         return bool(description.strip())
-    return simulated_oracle(description, oracle_ctx, llm)
+    passed: bool = simulated_oracle(description, oracle_ctx, llm)
+    return passed
 
 
 def _heuristic_description(skill: Skill) -> str:

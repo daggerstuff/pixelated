@@ -66,18 +66,18 @@ def _tokenize(text: str) -> list[str]:
     return _TOKEN_RE.findall(text.lower())
 
 
-def _tfidf_vectors(documents: list[list[str]]) -> list[Counter[str]]:
+def _tfidf_vectors(documents: list[list[str]]) -> list[dict[str, float]]:
     """Compute TF vectors scaled by IDF across a document corpus."""
     doc_count = len(documents)
     df: Counter[str] = Counter()
     for doc in documents:
         df.update(set(doc))
 
-    vectors: list[Counter[str]] = []
+    vectors: list[dict[str, float]] = []
     for doc in documents:
         tf = Counter(doc)
         total = sum(tf.values()) or 1
-        vec: Counter[str] = Counter()
+        vec: dict[str, float] = {}
         for term, count in tf.items():
             idf = math.log((1 + doc_count) / (1 + df[term])) + 1.0
             vec[term] = (count / total) * idf
@@ -85,7 +85,7 @@ def _tfidf_vectors(documents: list[list[str]]) -> list[Counter[str]]:
     return vectors
 
 
-def _cosine_similarity(a: Counter[str], b: Counter[str]) -> float:
+def _cosine_similarity(a: dict[str, float], b: dict[str, float]) -> float:
     """Cosine similarity between two sparse TF-IDF vectors."""
     if not a or not b:
         return 0.0
@@ -121,10 +121,7 @@ def select_tfidf_distractors(
         scored.append((_cosine_similarity(target_vec, vec), skill))
     scored.sort(key=lambda x: x[0], reverse=True)
 
-    return [
-        CandidateSkill(name=s.name, description=s.description)
-        for _, s in scored[:k]
-    ]
+    return [CandidateSkill(name=s.name, description=s.description) for _, s in scored[:k]]
 
 
 def generate_adversarial_skill(
@@ -219,9 +216,7 @@ def route_query(
     Stage 1 Phase 1: candidate order in C should be randomized per query by caller.
     """
     if llm and llm.enabled:
-        block = "\n".join(
-            f"- {c.name}: {c.description}" for c in candidates
-        )
+        block = "\n".join(f"- {c.name}: {c.description}" for c in candidates)
         result = llm.complete_json(
             ROUTING_SELECT_PROMPT.format(query=query, candidates=block),
             model=None,

@@ -284,7 +284,9 @@ export class EducationalContextRecognizer {
         confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.8)),
         educationalType: type, // Use pattern-detected type
         complexity: this.validateComplexity(
-          typeof parsed.complexity === 'string' ? parsed.complexity : 'intermediate',
+          typeof parsed.complexity === 'string'
+            ? parsed.complexity
+            : 'intermediate',
         ),
         topicArea, // Use pattern-detected topic
         learningObjectives: Array.isArray(parsed.learningObjectives)

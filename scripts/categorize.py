@@ -27,8 +27,8 @@ print()
 
 # Find all file paths with errors
 file_errors = re.findall(r"^(src/[^:]+):\d+:\d+ - error ts(\d+):", clean, re.MULTILINE)
-file_code_counts = Counter()
-file_counts = Counter()
+file_code_counts: Counter[str] = Counter()
+file_counts: Counter[str] = Counter()
 for fpath, _ in file_errors:
     file_counts[fpath] += 1
 

@@ -1,8 +1,6 @@
 # F3.5 Mobile Parity Hardening — Audit & Compliance
 
-**Ticket**: PIX-4417
-**Branch**: `fm/ehr-f35-mobile-parity`
-**Date**: 2026-09-09
+**Ticket**: PIX-4417 **Branch**: `fm/ehr-f35-mobile-parity` **Date**: 2026-09-09
 
 ---
 
@@ -66,7 +64,8 @@ engine supporting four item types:
 - **Static assets**: CacheFirst strategy
 - **API routes**: StaleWhileRevalidate (non-PHI routes only)
 - **Navigation**: NetworkFirst with cache fallback
-- **PHI protection**: Never intercepts `/api/sessions/`, `/api/auth/`, `/api/ehr/`, `/api/portal/`, `/fhir/`
+- **PHI protection**: Never intercepts `/api/sessions/`, `/api/auth/`,
+  `/api/ehr/`, `/api/portal/`, `/fhir/`
 
 ---
 
@@ -149,17 +148,23 @@ target size minimum of 44×44 CSS pixels:
 ### Verification Approach
 
 1. **CI Integration**: Lighthouse CI can run against preview builds
-2. **Manual Audit**: Run `npx lighthouse http://localhost:4321/portal --emulated-form-factor=mobile` against preview server
-3. **Budget Enforcement**: Lighthouse budget JSON at `.lighthouserc.json` (future work)
+2. **Manual Audit**: Run
+   `npx lighthouse http://localhost:4321/portal --emulated-form-factor=mobile`
+   against preview server
+3. **Budget Enforcement**: Lighthouse budget JSON at `.lighthouserc.json`
+   (future work)
 
 ### Key Optimizations Already In Place
 
 - Service worker caching (CacheFirst for static, SWR for API)
-- Mobile-first CSS with `overflow-x-hidden` (prevents CLS from horizontal scroll)
+- Mobile-first CSS with `overflow-x-hidden` (prevents CLS from horizontal
+  scroll)
 - Fixed bottom navigation (no layout shift during navigation)
-- Offline sync status banner only renders when needed (no unnecessary DOM weight)
+- Offline sync status banner only renders when needed (no unnecessary DOM
+  weight)
 - Draft notes auto-save with debounce (reduces API calls)
-- Optimistic UI updates for scheduling (immediate feedback, no loading state CLS)
+- Optimistic UI updates for scheduling (immediate feedback, no loading state
+  CLS)
 
 ### PWA Installability Checklist
 

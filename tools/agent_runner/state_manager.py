@@ -65,14 +65,15 @@ class StateManager:
         if pool_size <= 0:
             return 0
         with self._lock:
-            idx = self._state.get("round_robin_index", 0) % pool_size
+            idx: int = self._state.get("round_robin_index", 0) % pool_size
             self._state["round_robin_index"] = (idx + 1) % pool_size
             self._save_locked()
             return idx
 
     def get_last_skeptic_comment_id(self, team_key: str) -> str | None:
         with self._lock:
-            return self._state.get("last_skeptic_comment_ids", {}).get(team_key)
+            comment_id: str | None = self._state.get("last_skeptic_comment_ids", {}).get(team_key)
+            return comment_id
 
     def set_last_skeptic_comment_id(self, team_key: str, comment_id: str) -> None:
         with self._lock:

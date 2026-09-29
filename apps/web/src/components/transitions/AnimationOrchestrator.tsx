@@ -292,31 +292,34 @@ export function AdvancedSequence({
   const [, setCurrentStep] = useState(0)
 
   // Execute sequence
-  const executeSequence = useCallback(async function executeSequence() {
-    for (let i = 0; i < steps.length; i++) {
-      const step = steps[i]
-      if (!step) {
-        continue
+  const executeSequence = useCallback(
+    async function executeSequence() {
+      for (let i = 0; i < steps.length; i++) {
+        const step = steps[i]
+        if (!step) {
+          continue
+        }
+
+        const animateStep = step.variants['animate']
+        setCurrentStep(i)
+        await controls.start(animateStep ?? 'animate')
+        await new Promise((resolve) =>
+          setTimeout(resolve, (step.duration ?? TIMING.normal) * 1000),
+        )
       }
 
-      const animateStep = step.variants['animate']
-      setCurrentStep(i)
-      await controls.start(animateStep ?? 'animate')
-      await new Promise((resolve) =>
-        setTimeout(resolve, (step.duration ?? TIMING.normal) * 1000),
-      )
-    }
+      onSequenceComplete?.()
 
-    onSequenceComplete?.()
-
-    if (loop) {
-      setCurrentStep(0)
-      if (steps[0]) {
-        await controls.start(steps[0].variants['initial'] ?? 'initial')
+      if (loop) {
+        setCurrentStep(0)
+        if (steps[0]) {
+          await controls.start(steps[0].variants['initial'] ?? 'initial')
+        }
+        void executeSequence()
       }
-      void executeSequence()
-    }
-  }, [steps, controls, loop, onSequenceComplete])
+    },
+    [steps, controls, loop, onSequenceComplete],
+  )
 
   useEffect(() => {
     const timer = window.setTimeout(() => {

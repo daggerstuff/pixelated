@@ -140,21 +140,21 @@ export function PreCallCheck({ onComplete, onCancel }: PreCallCheckProps) {
 
   return (
     <div
-      className="border-gray-200 bg-white flex min-h-[400px] flex-col items-center justify-center gap-6 rounded-lg border p-8 shadow-sm"
+      className="flex min-h-[400px] flex-col items-center justify-center gap-6 rounded-none border border-border bg-card p-8"
       role="dialog"
       aria-label="Pre-call device check"
     >
       <div className="text-center">
-        <h2 className="text-gray-900 text-xl font-semibold">Device Check</h2>
-        <p className="text-gray-600 mt-1 text-sm">
+        <h2 className="text-xl font-semibold text-foreground">Device Check</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
           Verifying your camera and microphone before joining the session.
         </p>
       </div>
 
       {state.checking && (
-        <div className="text-gray-500 flex items-center gap-3">
+        <div className="flex items-center gap-3 text-muted-foreground">
           <span
-            className="border-gray-300 border-t-blue-500 h-5 w-5 animate-spin rounded-full border-2"
+            className="border-t-transparent h-5 w-5 animate-spin rounded-full border-2 border-ring"
             aria-hidden="true"
           />
           <span>Checking devices…</span>
@@ -164,27 +164,29 @@ export function PreCallCheck({ onComplete, onCancel }: PreCallCheckProps) {
       {state.checked && state.result && (
         <>
           <div className="w-full max-w-md space-y-3">
-            <div className="flex items-center justify-between rounded-md border px-4 py-3">
-              <span className="text-gray-700 text-sm font-medium">Camera</span>
+            <div className="flex items-center justify-between rounded-none border px-4 py-3">
+              <span className="text-sm font-medium text-foreground">
+                Camera
+              </span>
               <span
                 className={
                   state.result.cameraAvailable
-                    ? 'text-green-600 text-sm font-medium'
-                    : 'text-red-600 text-sm font-medium'
+                    ? 'text-sm font-medium text-foreground'
+                    : 'text-sm font-medium text-muted-foreground'
                 }
               >
                 {state.result.cameraAvailable ? '✓ Available' : '✗ Unavailable'}
               </span>
             </div>
-            <div className="flex items-center justify-between rounded-md border px-4 py-3">
-              <span className="text-gray-700 text-sm font-medium">
+            <div className="flex items-center justify-between rounded-none border px-4 py-3">
+              <span className="text-sm font-medium text-foreground">
                 Microphone
               </span>
               <span
                 className={
                   state.result.microphoneAvailable
-                    ? 'text-green-600 text-sm font-medium'
-                    : 'text-red-600 text-sm font-medium'
+                    ? 'text-sm font-medium text-foreground'
+                    : 'text-sm font-medium text-muted-foreground'
                 }
               >
                 {state.result.microphoneAvailable
@@ -196,10 +198,10 @@ export function PreCallCheck({ onComplete, onCancel }: PreCallCheckProps) {
 
           {state.result.errors.length > 0 && (
             <div
-              className="border-amber-200 bg-amber-50 w-full max-w-md rounded-md border p-4"
+              className="w-full max-w-md rounded-none border border-ring bg-secondary p-4"
               role="alert"
             >
-              <ul className="text-amber-800 list-disc space-y-1 pl-5 text-sm">
+              <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
                 {state.result.errors.map((error, index) => (
                   <li key={index}>{error}</li>
                 ))}
@@ -211,14 +213,14 @@ export function PreCallCheck({ onComplete, onCancel }: PreCallCheckProps) {
             <button
               type="button"
               onClick={() => void checkDevices()}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md border px-4 py-2 text-sm font-medium"
+              className="rounded-none border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
             >
               Re-check
             </button>
             <button
               type="button"
               onClick={onCancel}
-              className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md border px-4 py-2 text-sm font-medium"
+              className="rounded-none border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
             >
               Cancel
             </button>
@@ -228,8 +230,8 @@ export function PreCallCheck({ onComplete, onCancel }: PreCallCheckProps) {
               onClick={() => state.result && onComplete(state.result)}
               className={
                 canJoin
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2 text-sm font-medium'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed rounded-md px-4 py-2 text-sm font-medium'
+                  ? 'hover:bg-primary/90 rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground'
+                  : 'cursor-not-allowed rounded-none bg-secondary px-4 py-2 text-sm font-medium text-muted-foreground'
               }
             >
               Join Session

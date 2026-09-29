@@ -101,7 +101,7 @@ class ConnectionBundle:
     """
 
     redis_client: redis.Redis
-    mongo_db: pymongo.database.Database
+    mongo_db: pymongo.database.Database[Any]
     pg_conn: Any  # psycopg2.extensions.connection (avoid import-time type resolution)
     _open_pg_cursors: set[Any] = field(default_factory=set, repr=False)
 
@@ -150,7 +150,7 @@ class ConnectionBundle:
         redis_client.ping()
 
         # -- MongoDB -------------------------------------------------------
-        mongo_client = pymongo.MongoClient(
+        mongo_client: pymongo.MongoClient[Any] = pymongo.MongoClient(
             mongo_url,
             serverSelectionTimeoutMS=_CONNECT_TIMEOUT_S * 1000,
         )

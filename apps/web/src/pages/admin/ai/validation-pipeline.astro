@@ -86,27 +86,27 @@ const cronSchedules = [
     <div class="mb-8 flex justify-between items-center">
       <div>
         <h1 class="text-3xl font-bold mb-2">{title}</h1>
-        <p class="text-gray-600 dark:text-gray-400">{description}</p>
+        <p class="text-muted-foreground">{description}</p>
       </div>
 
       <div class="flex gap-4">
         <button
           id="run-validation"
-          class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          class="px-4 py-2 bg-primary text-white rounded-none hover:bg-primary transition-colors"
         >
           Run Validation
         </button>
 
         <button
           id="start-continuous"
-          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
         >
           Start Continuous
         </button>
 
         <button
           id="stop-continuous"
-          class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
         >
           Stop Continuous
         </button>
@@ -115,11 +115,11 @@ const cronSchedules = [
 
     {
       validationInitError && (
-        <div class="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-800 rounded-md p-4 mb-6">
+        <div class="bg-card border border-ring rounded-none p-4 mb-6">
           <div class="flex items-start">
             <div class="shrink-0">
               <svg
-                class="h-5 w-5 text-red-500"
+                class="h-5 w-5 text-foreground"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -131,10 +131,10 @@ const cronSchedules = [
               </svg>
             </div>
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+              <h3 class="text-sm font-medium text-foreground">
                 Validation Pipeline Error
               </h3>
-              <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+              <div class="mt-2 text-sm text-muted-foreground">
                 <p>{validationInitError}</p>
               </div>
             </div>
@@ -145,17 +145,17 @@ const cronSchedules = [
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
       <!-- Validation Status -->
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <div class="bg-card p-6 rounded-none">
         <h2 class="text-xl font-semibold mb-4">Validation Status</h2>
 
         <div id="status-indicator" class="flex items-center mb-6">
-          <div class="h-4 w-4 rounded-full bg-green-500 mr-2"></div>
+          <div class="h-4 w-4 rounded-none bg-primary mr-2"></div>
           <span>Pipeline Initialized</span>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Last Run</p>
+            <p class="text-sm text-muted-foreground">Last Run</p>
             <p id="last-run" class="font-medium">
               {
                 validationStats?.lastRun
@@ -166,7 +166,7 @@ const cronSchedules = [
           </div>
 
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Run Count</p>
+            <p class="text-sm text-muted-foreground">Run Count</p>
             <p id="run-count" class="font-medium">
               {validationStats?.runCount || 0}
             </p>
@@ -175,19 +175,19 @@ const cronSchedules = [
       </div>
 
       <!-- Test Coverage -->
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <div class="bg-card p-6 rounded-none">
         <h2 class="text-xl font-semibold mb-4">Test Coverage</h2>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Total Tests</p>
+            <p class="text-sm text-muted-foreground">Total Tests</p>
             <p id="total-tests" class="font-medium">
               {validationStats?.totalTests || 0}
             </p>
           </div>
 
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="text-sm text-muted-foreground">
               Models Covered
             </p>
             <p id="models-count" class="font-medium">
@@ -198,19 +198,19 @@ const cronSchedules = [
       </div>
 
       <!-- Overall Performance -->
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <div class="bg-card p-6 rounded-none">
         <h2 class="text-xl font-semibold mb-4">Overall Performance</h2>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Passed Tests</p>
+            <p class="text-sm text-muted-foreground">Passed Tests</p>
             <p id="passed-tests" class="font-medium">
               {validationStats?.passedTests || 0}
             </p>
           </div>
 
           <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Pass Rate</p>
+            <p class="text-sm text-muted-foreground">Pass Rate</p>
             <p id="pass-rate" class="font-medium">
               {
                 validationStats?.totalTests && validationStats?.passedTests
@@ -224,40 +224,40 @@ const cronSchedules = [
     </div>
 
     <!-- Validation Results -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-8">
+    <div class="bg-card p-6 rounded-none mb-8">
       <h2 class="text-xl font-semibold mb-4">Validation Results</h2>
 
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <table class="min-w-full divide-y divide-border">
           <thead>
             <tr>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Test ID
               </th>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Model
               </th>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Provider
               </th>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Result
               </th>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Score
               </th>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Timestamp
               </th>
@@ -265,10 +265,10 @@ const cronSchedules = [
           </thead>
           <tbody
             id="results-body"
-            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+            class="bg-card divide-y divide-border"
           >
             <tr>
-              <td class="px-6 py-4 text-gray-500 dark:text-gray-400" colspan="6"
+              <td class="px-6 py-4 text-muted-foreground" colspan="6"
                 >No validation results yet</td
               >
             </tr>
@@ -278,7 +278,7 @@ const cronSchedules = [
     </div>
 
     <!-- Continuous Validation Settings -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-8">
+    <div class="bg-card p-6 rounded-none mb-8">
       <h2 class="text-xl font-semibold mb-4">Continuous Validation</h2>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -288,13 +288,13 @@ const cronSchedules = [
           <div class="mb-4">
             <label
               for="cron-schedule"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              class="block text-sm font-medium text-foreground mb-1"
             >
               Schedule Frequency
             </label>
             <select
               id="cron-schedule"
-              class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+              class="w-full rounded-none border-input focus:border-ring focus:ring focus:ring-ring"
             >
               {
                 cronSchedules.map((schedule) => (
@@ -308,7 +308,7 @@ const cronSchedules = [
           <div id="custom-schedule-container" class="mb-4 hidden">
             <label
               for="custom-cron"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              class="block text-sm font-medium text-foreground mb-1"
             >
               Custom Cron Expression
             </label>
@@ -316,9 +316,9 @@ const cronSchedules = [
               type="text"
               id="custom-cron"
               placeholder="0 0 * * *"
-              class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+              class="w-full rounded-none border-input focus:border-ring focus:ring focus:ring-ring"
             />
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-xs text-muted-foreground">
               Format: minute hour day-of-month month day-of-week
             </p>
           </div>
@@ -326,14 +326,14 @@ const cronSchedules = [
           <div class="flex space-x-4 mt-4">
             <button
               id="schedule-validation"
-              class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+              class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
             >
               Set Schedule
             </button>
 
             <button
               id="unschedule-validation"
-              class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+              class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
               disabled={!runnerState?.isScheduled}
             >
               Cancel Schedule
@@ -346,15 +346,15 @@ const cronSchedules = [
 
           {
             runnerState?.isScheduled ? (
-              <div class="rounded bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-800 p-4">
+              <div class="rounded-none bg-secondary border border-input p-4">
                 <div class="flex items-center mb-2">
-                  <div class="h-4 w-4 rounded-full bg-green-500 mr-2" />
+                  <div class="h-4 w-4 rounded-none bg-primary mr-2" />
                   <p class="font-medium">Schedule Active</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mt-3">
                   <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-muted-foreground">
                       Current Schedule
                     </p>
                     <p id="current-schedule" class="font-medium">
@@ -363,7 +363,7 @@ const cronSchedules = [
                   </div>
 
                   <div>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-muted-foreground">
                       Next Run
                     </p>
                     <p id="next-run" class="font-medium">
@@ -377,13 +377,13 @@ const cronSchedules = [
                 </div>
               </div>
             ) : (
-              <div class="rounded bg-gray-100 dark:bg-gray-900/30 border border-gray-300 dark:border-gray-700 p-4">
+              <div class="rounded-none bg-secondary border border-input p-4">
                 <div class="flex items-center mb-2">
-                  <div class="h-4 w-4 rounded-full bg-gray-500 mr-2" />
+                  <div class="h-4 w-4 rounded-none bg-secondary0 mr-2" />
                   <p class="font-medium">No Active Schedule</p>
                 </div>
 
-                <p class="text-gray-600 dark:text-gray-400 text-sm">
+                <p class="text-muted-foreground text-sm">
                   Set up a schedule to run validation automatically.
                 </p>
               </div>
@@ -394,35 +394,35 @@ const cronSchedules = [
     </div>
 
     <!-- Validation History -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow mb-8">
+    <div class="bg-card p-6 rounded-none mb-8">
       <h2 class="text-xl font-semibold mb-4">Run History</h2>
 
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <table class="min-w-full divide-y divide-border">
           <thead>
             <tr>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Run ID
               </th>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Timestamp
               </th>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Status
               </th>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Tests
               </th>
               <th
-                class="px-6 py-3 bg-gray-50 dark:bg-gray-900/50 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                class="px-6 py-3 bg-secondary text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
               >
                 Pass Rate
               </th>
@@ -430,10 +430,10 @@ const cronSchedules = [
           </thead>
           <tbody
             id="history-body"
-            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+            class="bg-card divide-y divide-border"
           >
             <tr>
-              <td class="px-6 py-4 text-gray-500 dark:text-gray-400" colspan="5"
+              <td class="px-6 py-4 text-muted-foreground" colspan="5"
                 >No history available</td
               >
             </tr>
@@ -443,27 +443,27 @@ const cronSchedules = [
     </div>
 
     <!-- Integration & Documentation -->
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+    <div class="bg-card p-6 rounded-none">
       <h2 class="text-xl font-semibold mb-4">CI/CD Integration</h2>
 
       <div class="mb-4">
-        <p class="text-gray-700 dark:text-gray-300 mb-2">
+        <p class="text-foreground mb-2">
           The continuous validation pipeline integrates with your CI/CD
           workflows for automated model validation.
         </p>
 
         <div
-          class="rounded bg-gray-100 dark:bg-gray-900/30 border border-gray-300 dark:border-gray-700 p-4 mt-2"
+          class="rounded-none bg-secondary border border-input p-4 mt-2"
         >
           <h3 class="font-medium mb-2">GitHub Actions Integration</h3>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <p class="text-sm text-muted-foreground mb-2">
             A GitHub Actions workflow is included at <code
-              class="bg-gray-200 dark:bg-gray-800 px-1 py-0.5 rounded"
+              class="bg-secondary px-1 py-0.5 rounded-none"
               >.github/workflows/ai-validation.yml</code
             >
           </p>
           <ul
-            class="list-disc list-inside text-sm text-gray-600 dark:text-gray-400"
+            class="list-disc list-inside text-sm text-muted-foreground"
           >
             <li>Runs validation daily at midnight UTC</li>
             <li>Triggers validation on successful deployments</li>
@@ -475,11 +475,11 @@ const cronSchedules = [
 
       <div class="mb-4">
         <h3 class="font-medium mb-2">Webhook API</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400">
+        <p class="text-sm text-muted-foreground">
           Validation can be triggered via webhook:
         </p>
         <pre
-          class="bg-gray-100 dark:bg-gray-900/30 p-2 rounded text-xs overflow-auto mt-2">
+          class="bg-secondary p-2 rounded-none text-xs overflow-auto mt-2">
 POST /api/ai/validation/webhook
 Headers: Content-Type: application/json, x-github-event: workflow_dispatch
 Body: JSON with action and environment
@@ -726,26 +726,26 @@ Body: JSON with action and environment
 
               const row = document.createElement('tr')
               row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                   ${entry.runId}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                   ${new Date(entry.timestamp).toLocaleString()}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                   ${
                     entry.success
-                      ? '<span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">Success</span>'
-                      : '<span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">Failed</span>'
+                      ? '<span class="px-2 py-1 text-xs rounded-none bg-secondary border border-input text-foreground">Success</span>'
+                      : '<span class="px-2 py-1 text-xs rounded-none bg-card border border-ring text-foreground">Failed</span>'
                   }
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                   ${entry.passedCount} / ${entry.resultsCount}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                   <div class="flex items-center">
-                    <div class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mr-2">
-                      <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${passRate}%"></div>
+                    <div class="w-16 bg-secondary rounded-none h-2.5 mr-2">
+                      <div class="bg-primary h-2.5 rounded-none" style="width: ${passRate}%"></div>
                     </div>
                     <span>${passRate}%</span>
                   </div>

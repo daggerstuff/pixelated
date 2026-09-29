@@ -16,16 +16,19 @@ from tools.agent_runner.verifier import VerificationOutcome
 logger = logging.getLogger("agent_runner.langchain")
 
 try:
-    from dotenv import load_dotenv  # type: ignore[import-untyped]
+    from dotenv import load_dotenv
 
     load_dotenv(override=True)
 except ImportError:
     pass
 
+RunTree: Any = None
 try:
-    from langsmith.run_trees import RunTree  # type: ignore[import-untyped]
+    from langsmith.run_trees import RunTree as _RunTree
+
+    RunTree = _RunTree
 except ImportError:
-    RunTree = None
+    pass
 
 
 class LangChainAgentTracer:
@@ -136,7 +139,7 @@ class LangChainAgentTracer:
             "priority": issue.priority,
         }
 
-        if self._has_langsmith and self._RunTree and hasattr(parent_tree, "create_child"):
+        if self._has_langsmith and self._RunTree and parent_tree is not None and hasattr(parent_tree, "create_child"):
             try:
                 child = parent_tree.create_child(
                     name=f"Execute-{issue.identifier}-{agent.name}",

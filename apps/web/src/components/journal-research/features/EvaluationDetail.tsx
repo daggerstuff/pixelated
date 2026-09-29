@@ -56,14 +56,14 @@ export function EvaluationDetail({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Evaluation Details</h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="mt-1 text-muted-foreground">
             Evaluated {format(evaluation.evaluationDate, 'MMM d, yyyy')} by{' '}
             {evaluation.evaluator}
           </p>
         </div>
         <button
           onClick={() => setIsEditing(!isEditing)}
-          className="border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium"
+          className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
         >
           {isEditing ? 'Cancel' : 'Edit'}
         </button>
@@ -108,19 +108,19 @@ export function EvaluationDetail({
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Evaluation ID
               </p>
               <p className="mt-1">{evaluation.evaluationId}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Source ID
               </p>
               <p className="mt-1">{evaluation.sourceId}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Overall Score
               </p>
               <p className="mt-1 text-lg font-semibold">
@@ -128,37 +128,37 @@ export function EvaluationDetail({
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Priority Tier
               </p>
               <p className="mt-1 capitalize">{evaluation.priorityTier}</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Therapeutic Relevance
               </p>
               <p className="mt-1">{evaluation.therapeuticRelevance} / 10</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Data Structure Quality
               </p>
               <p className="mt-1">{evaluation.dataStructureQuality} / 10</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Training Integration
               </p>
               <p className="mt-1">{evaluation.trainingIntegration} / 10</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Ethical Accessibility
               </p>
               <p className="mt-1">{evaluation.ethicalAccessibility} / 10</p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Evaluation Date
               </p>
               <p className="mt-1">
@@ -166,7 +166,7 @@ export function EvaluationDetail({
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground text-sm font-medium">
+              <p className="text-sm font-medium text-muted-foreground">
                 Evaluator
               </p>
               <p className="mt-1">{evaluation.evaluator}</p>

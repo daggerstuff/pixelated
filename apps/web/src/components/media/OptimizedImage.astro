@@ -37,33 +37,31 @@ const aspectRatio = width && height ? width / height : undefined
   class={`optimized-image-wrapper ${className}`}
   style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''}
 >
-  {
-    typeof src === 'string' ? (
-      <img
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        loading={priority ? 'eager' : loading}
-        fetchpriority={priority ? 'high' : undefined}
-        decoding="async"
-        class="optimized-image"
-        style={`background-size: cover; background-image: url(${base64Placeholder});`}
-      />
-    ) : (
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        loading={priority ? 'eager' : loading}
-        fetchpriority={priority ? 'high' : undefined}
-        decoding="async"
-        class="optimized-image"
-        style={`background-size: cover; background-image: url(${base64Placeholder});`}
-      />
-    )
-  }
+  {typeof src === 'string' ? (
+    <img
+      {src}
+      {alt}
+      {width}
+      {height}
+      loading={priority ? 'eager' : loading}
+      fetchpriority={priority ? 'high' : undefined}
+      decoding="async"
+      class="optimized-image"
+      style={`background-size: cover; background-image: url(${base64Placeholder});`}
+    />
+  ) : (
+    <Image
+      {src}
+      {alt}
+      {width}
+      {height}
+      loading={priority ? 'eager' : loading}
+      fetchpriority={priority ? 'high' : undefined}
+      decoding="async"
+      class="optimized-image"
+      style={`background-size: cover; background-image: url(${base64Placeholder});`}
+    />
+  )}
 </div>
 
 <style>

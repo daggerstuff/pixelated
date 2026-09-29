@@ -3,16 +3,16 @@
  * Comprehensive patient data management with privacy and security
  */
 
-import {
-  encryptPHIFields,
-  decryptPHIFields,
-  PHI_FIELDS,
-} from '../fhe/field-encryption'
 import type {
   PatientProfile,
   TreatmentPlan,
   ProgressMetrics,
 } from '../../types/patient'
+import {
+  encryptPHIFields,
+  decryptPHIFields,
+  PHI_FIELDS,
+} from '../fhe/field-encryption'
 
 export interface PatientSearchCriteria {
   name?: string
@@ -97,7 +97,6 @@ class PatientManager {
 
     // Cache patient data
     this.patientCache.set(patientId, patientProfile)
-
 
     return patientProfile
   }
@@ -290,7 +289,6 @@ class PatientManager {
       reason,
     )
 
-
     return patient
   }
 
@@ -330,7 +328,6 @@ class PatientManager {
     }
 
     const transferId = `transfer_${Date.now()}`
-
 
     return {
       success: true,
@@ -634,7 +631,6 @@ class PatientManager {
         newData as Record<string, unknown>,
       ),
     }
-
   }
 
   private calculateChanges(

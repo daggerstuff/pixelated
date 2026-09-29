@@ -54,30 +54,30 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
   const getRiskLevelStyle = (level: string) => {
     switch (level) {
       case 'critical':
-        return 'bg-red-100 text-red-800 border-red-200'
+        return 'bg-card border border-ring text-foreground font-semibold'
       case 'high':
-        return 'bg-orange-100 text-orange-800 border-orange-200'
+        return 'bg-secondary border border-ring text-foreground font-medium'
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        return 'bg-secondary border border-ring text-foreground font-medium'
       case 'low':
-        return 'bg-green-100 text-green-800 border-green-200'
+        return 'bg-secondary border border-input text-foreground'
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return 'bg-secondary text-foreground border-border'
     }
   }
 
   // Helper function to get category color
   const getCategoryColor = (category: string) => {
     const colors = {
-      cultural: 'bg-purple-100 text-purple-800',
-      gender: 'bg-pink-100 text-pink-800',
-      age: 'bg-blue-100 text-blue-800',
-      linguistic: 'bg-indigo-100 text-indigo-800',
-      intersectional: 'bg-gray-100 text-gray-800',
-      inclusive: 'bg-green-100 text-green-800',
+      cultural: 'bg-secondary border border-input text-foreground',
+      gender: 'bg-secondary border border-input text-foreground',
+      age: 'bg-secondary border border-input text-foreground',
+      linguistic: 'bg-secondary border border-input text-foreground',
+      intersectional: 'bg-secondary text-foreground',
+      inclusive: 'bg-secondary border border-input text-foreground',
     }
     return (
-      colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800'
+      colors[category as keyof typeof colors] || 'bg-secondary text-foreground'
     )
   }
 
@@ -90,7 +90,7 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
           <div>
             <label
               htmlFor="category-filter"
-              className="text-gray-700 mb-1 block text-sm font-medium"
+              className="mb-1 block text-sm font-medium text-foreground"
             >
               Category
             </label>
@@ -99,7 +99,7 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               disabled={disabled}
-              className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 disabled:cursor-not-allowed"
+              className="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-35"
             >
               <option value="all">All Categories</option>
               {categories.map((category) => (
@@ -114,7 +114,7 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
           <div>
             <label
               htmlFor="risk-level-filter"
-              className="text-gray-700 mb-1 block text-sm font-medium"
+              className="mb-1 block text-sm font-medium text-foreground"
             >
               Risk Level
             </label>
@@ -123,7 +123,7 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
               value={filterRiskLevel}
               onChange={(e) => setFilterRiskLevel(e.target.value)}
               disabled={disabled}
-              className="border-gray-300 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 disabled:cursor-not-allowed"
+              className="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-35"
             >
               <option value="all">All Risk Levels</option>
               {riskLevels.map((level) => (
@@ -136,7 +136,7 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
         </div>
 
         {/* Results Count */}
-        <div className="text-gray-600 text-sm">
+        <div className="text-sm text-muted-foreground">
           Showing {filteredScenarios.length} of {scenarios.length} scenarios
         </div>
       </div>
@@ -146,10 +146,10 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
         {filteredScenarios.map((scenario) => (
           <button
             key={scenario.id}
-            className={`w-full cursor-pointer rounded-lg border p-4 text-left transition-all hover:shadow-md ${
+            className={`hover: w-full cursor-pointer rounded-none border p-4 text-left transition-all ${
               selectedScenario?.id === scenario.id
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-ring bg-secondary'
+                : 'border-border hover:border-ring'
             } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
             onClick={() => !disabled && onScenarioSelect(scenario)}
             onKeyDown={(e) => {
@@ -166,15 +166,15 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
           >
             {/* Header */}
             <div className="mb-2 flex items-start justify-between">
-              <h4 className="text-gray-900 font-semibold">{scenario.name}</h4>
+              <h4 className="font-semibold text-foreground">{scenario.name}</h4>
               <div className="flex space-x-2">
                 <span
-                  className={`rounded-full px-2 py-1 text-xs font-medium ${getCategoryColor(scenario.category)}`}
+                  className={`rounded-none px-2 py-1 text-xs font-medium ${getCategoryColor(scenario.category)}`}
                 >
                   {scenario.category}
                 </span>
                 <span
-                  className={`rounded-full border px-2 py-1 text-xs font-medium ${getRiskLevelStyle(scenario.riskLevel)}`}
+                  className={`rounded-none border px-2 py-1 text-xs font-medium ${getRiskLevelStyle(scenario.riskLevel)}`}
                 >
                   {scenario.riskLevel}
                 </span>
@@ -182,30 +182,32 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
             </div>
 
             {/* Description */}
-            <p className="text-gray-600 mb-3 text-sm">{scenario.description}</p>
+            <p className="mb-3 text-sm text-muted-foreground">
+              {scenario.description}
+            </p>
 
             {/* Demographics */}
             <div className="mb-3 grid grid-cols-2 gap-2 md:grid-cols-4">
               <div className="text-xs">
-                <span className="text-gray-500">Age:</span>
+                <span className="text-muted-foreground">Age:</span>
                 <span className="ml-1 font-medium">
                   {scenario.demographics.age}
                 </span>
               </div>
               <div className="text-xs">
-                <span className="text-gray-500">Gender:</span>
+                <span className="text-muted-foreground">Gender:</span>
                 <span className="ml-1 font-medium">
                   {scenario.demographics.gender}
                 </span>
               </div>
               <div className="text-xs">
-                <span className="text-gray-500">Ethnicity:</span>
+                <span className="text-muted-foreground">Ethnicity:</span>
                 <span className="ml-1 font-medium">
                   {scenario.demographics.ethnicity}
                 </span>
               </div>
               <div className="text-xs">
-                <span className="text-gray-500">Language:</span>
+                <span className="text-muted-foreground">Language:</span>
                 <span className="ml-1 font-medium">
                   {scenario.demographics.primaryLanguage}
                 </span>
@@ -213,9 +215,11 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
             </div>
 
             {/* Content Preview */}
-            <div className="bg-gray-50 mb-3 rounded p-3">
-              <div className="text-gray-500 mb-1 text-xs">Sample Content:</div>
-              <div className="text-gray-700 text-sm italic">
+            <div className="mb-3 rounded bg-secondary p-3">
+              <div className="mb-1 text-xs text-muted-foreground">
+                Sample Content:
+              </div>
+              <div className="text-sm italic text-foreground">
                 &quot;
                 {scenario.content.length > 100
                   ? scenario.content.substring(0, 100) + '...'
@@ -226,18 +230,18 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
 
             {/* Learning Objectives */}
             <div className="border-t pt-3">
-              <div className="text-gray-500 mb-2 text-xs">
+              <div className="mb-2 text-xs text-muted-foreground">
                 Learning Objectives:
               </div>
-              <ul className="text-gray-600 space-y-1 text-xs">
+              <ul className="space-y-1 text-xs text-muted-foreground">
                 {scenario.learningObjectives.slice(0, 2).map((objective) => (
                   <li key={objective} className="flex items-start">
-                    <span className="text-blue-500 mr-1">•</span>
+                    <span className="mr-1 text-foreground">•</span>
                     {objective}
                   </li>
                 ))}
                 {scenario.learningObjectives.length > 2 && (
-                  <li className="text-gray-500 italic">
+                  <li className="italic text-muted-foreground">
                     +{scenario.learningObjectives.length - 2} more objectives
                   </li>
                 )}
@@ -246,7 +250,7 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
 
             {/* Selection Indicator */}
             {selectedScenario?.id === scenario.id && (
-              <div className="text-blue-600 mt-3 flex items-center">
+              <div className="mt-3 flex items-center text-foreground">
                 <svg
                   className="mr-1 h-4 w-4"
                   fill="currentColor"
@@ -267,9 +271,9 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
 
       {/* No Results */}
       {filteredScenarios.length === 0 && (
-        <div className="text-gray-500 py-8 text-center">
+        <div className="py-8 text-center text-muted-foreground">
           <svg
-            className="text-gray-400 mx-auto mb-4 h-12 w-12"
+            className="mx-auto mb-4 h-12 w-12 text-muted-foreground"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -287,7 +291,7 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
               setFilterCategory('all')
               setFilterRiskLevel('all')
             }}
-            className="text-blue-600 hover:text-blue-800 mt-2 text-sm font-medium"
+            className="mt-2 text-sm font-medium text-foreground hover:text-foreground"
           >
             Clear filters
           </button>
@@ -297,14 +301,14 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
       {/* Preview Modal */}
       {previewScenario && (
         <div className="bg-black fixed inset-0 z-50 flex items-center justify-center bg-opacity-50 p-4">
-          <div className="bg-white max-h-96 w-full max-w-2xl overflow-y-auto rounded-lg p-6">
+          <div className="max-h-96 w-full max-w-2xl overflow-y-auto rounded-none bg-card p-6">
             <div className="mb-4 flex items-start justify-between">
-              <h3 className="text-gray-900 text-lg font-semibold">
+              <h3 className="text-lg font-semibold text-foreground">
                 {previewScenario.name}
               </h3>
               <button
                 onClick={() => setPreviewScenario(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-muted-foreground hover:text-muted-foreground"
               >
                 <svg
                   className="h-6 w-6"
@@ -324,22 +328,22 @@ export const PresetScenarioSelector: FC<PresetScenarioSelectorProps> = ({
 
             <div className="space-y-4">
               <div>
-                <h4 className="text-gray-900 mb-2 font-medium">
+                <h4 className="mb-2 font-medium text-foreground">
                   Full Content:
                 </h4>
-                <div className="bg-gray-50 text-gray-700 rounded p-3 text-sm italic">
+                <div className="rounded bg-secondary p-3 text-sm italic text-foreground">
                   &quot;{previewScenario.content}&quot;
                 </div>
               </div>
 
               <div>
-                <h4 className="text-gray-900 mb-2 font-medium">
+                <h4 className="mb-2 font-medium text-foreground">
                   All Learning Objectives:
                 </h4>
-                <ul className="text-gray-600 space-y-1 text-sm">
+                <ul className="space-y-1 text-sm text-muted-foreground">
                   {previewScenario.learningObjectives.map((objective) => (
                     <li key={objective} className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
+                      <span className="mr-2 text-foreground">•</span>
                       {objective}
                     </li>
                   ))}

@@ -156,7 +156,6 @@ export const GET: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-
     // Create audit log for the error
     await createAuditLog(
       AuditEventType.SYSTEM,
@@ -260,7 +259,6 @@ export const PUT: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-
     // Create audit log for the error
     await createAuditLog(
       AuditEventType.SYSTEM,
@@ -359,7 +357,6 @@ export const DELETE: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-
     // Create audit log for the error
     await createAuditLog(
       AuditEventType.SYSTEM,

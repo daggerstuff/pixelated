@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
+from typing import Any
 
 
 class ContentType(str, Enum):
@@ -35,7 +36,7 @@ class Skill:
     name: str
     description: str
     body: str
-    frontmatter: dict
+    frontmatter: dict[str, Any]
     references: list[ReferenceFile] = field(default_factory=list)
 
     @property

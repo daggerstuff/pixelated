@@ -123,7 +123,7 @@ class SyncDaemon:
         except OSError as e:
             logger.error(f"Failed to save state: {e}")
 
-    def _handle_shutdown(self, signum: int, frame: Any) -> None:
+    def _handle_shutdown(self, signum: int, _frame: Any) -> None:
         """Handle SIGTERM/SIGINT for graceful shutdown."""
         sig_name = signal.Signals(signum).name
         logger.info(f"Received {sig_name}, shutting down gracefully...")
@@ -176,7 +176,6 @@ class SyncDaemon:
 
             # Log results
             summary = output.get("summary", {})
-            actions = output.get("actions", [])
 
             logger.info(
                 f"Sync completed in {duration:.1f}s: "

@@ -161,7 +161,7 @@ describe('TherapistProgressTracker', () => {
 
     const sections = screen.getAllByRole('region')
     sections.forEach((section) => {
-      expect(section).toHaveClass('bg-muted', 'rounded-md', 'p-4')
+      expect(section).toHaveClass('bg-secondary', 'rounded-none', 'p-4')
     })
   })
 

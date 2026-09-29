@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -26,23 +28,9 @@ from skillreducer.model import (
 )
 
 
-@pytest.fixture(autouse=True)
-def clear_credential_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("api_key", raising=False)
-    monkeypatch.delenv("api_base_url", raising=False)
-    monkeypatch.delenv("compression_model", raising=False)
-    monkeypatch.delenv("compression", raising=False)
-    monkeypatch.delenv("routing_model", raising=False)
-    monkeypatch.delenv("routing_oracle", raising=False)
-    monkeypatch.delenv("evaluation_model", raising=False)
-    monkeypatch.delenv("evaluation", raising=False)
-    monkeypatch.delenv("azure_subscription", raising=False)
-    monkeypatch.delenv("azure_endpoint", raising=False)
-    monkeypatch.delenv("api_version", raising=False)
-    monkeypatch.delenv("azure_api_version", raising=False)
-
-
-def test_load_dotenv_finds_env_in_parent_directory(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_load_dotenv_finds_env_in_parent_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     work = tmp_path / "nested" / "run"
     work.mkdir(parents=True)
     (tmp_path / ".env").write_text("api_key=parent-key\n", encoding="utf-8")
@@ -54,7 +42,7 @@ def test_load_dotenv_finds_env_in_parent_directory(tmp_path, monkeypatch: pytest
     assert os.environ.get("api_key") == "parent-key"
 
 
-def test_load_dotenv_cwd_overrides_parent(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_load_dotenv_cwd_overrides_parent(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     work = tmp_path / "nested" / "run"
     work.mkdir(parents=True)
     (tmp_path / ".env").write_text("api_key=parent-key\n", encoding="utf-8")
@@ -79,7 +67,9 @@ def test_resolve_api_base_url_prefers_environment_over_config() -> None:
         assert resolve_api_base_url(config) == "https://env.example/v1"
 
 
-def test_config_load_merges_env_credentials(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+def test_config_load_merges_env_credentials(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         "api_key: yaml-key\napi_base_url: https://yaml.example/v1\n",
@@ -114,7 +104,7 @@ def test_resolve_model_ids_prefers_environment_over_config() -> None:
         assert resolve_routing_model(config) == "env-routing"
 
 
-def test_config_load_merges_env_model_ids(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+def test_config_load_merges_env_model_ids(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         "models:\n"
@@ -142,24 +132,26 @@ def test_all_agents_use_same_resolved_credentials() -> None:
         routing_model="routing-model",
         evaluation_model="evaluation-model",
     )
-    captured: list[dict] = []
+    captured: list[dict[str, Any]] = []
 
     class FakeOpenAIChat:
-        def __init__(self, **kwargs) -> None:
+        def __init__(self, **kwargs: object) -> None:
             captured.append(kwargs)
 
-    with patch.dict(
-        os.environ,
-        {
-            "api_key": "shared-env-key",
-            "api_base_url": "https://shared.example/v1",
-        },
+    with (
+        patch.dict(
+            os.environ,
+            {
+                "api_key": "shared-env-key",
+                "api_base_url": "https://shared.example/v1",
+            },
+        ),
+        patch("skillreducer.model.OpenAIChat", FakeOpenAIChat),
     ):
-        with patch("skillreducer.model.OpenAIChat", FakeOpenAIChat):
-            create_openai_chat(config)
-            create_compression_model(config)
-            create_routing_model(config)
-            create_evaluation_model(config)
+        create_openai_chat(config)
+        create_compression_model(config)
+        create_routing_model(config)
+        create_evaluation_model(config)
 
     assert len(captured) == 4
     assert captured[0]["id"] == "compression-model"
@@ -178,24 +170,26 @@ def test_agents_use_env_model_ids_over_config() -> None:
         routing_model="yaml-routing",
         evaluation_model="yaml-evaluation",
     )
-    captured: list[dict] = []
+    captured: list[dict[str, Any]] = []
 
     class FakeOpenAIChat:
-        def __init__(self, **kwargs) -> None:
+        def __init__(self, **kwargs: object) -> None:
             captured.append(kwargs)
 
-    with patch.dict(
-        os.environ,
-        {
-            "compression_model": "env-compression",
-            "routing_model": "env-routing",
-            "evaluation_model": "env-evaluation",
-        },
+    with (
+        patch.dict(
+            os.environ,
+            {
+                "compression_model": "env-compression",
+                "routing_model": "env-routing",
+                "evaluation_model": "env-evaluation",
+            },
+        ),
+        patch("skillreducer.model.OpenAIChat", FakeOpenAIChat),
     ):
-        with patch("skillreducer.model.OpenAIChat", FakeOpenAIChat):
-            create_compression_model(config)
-            create_routing_model(config)
-            create_evaluation_model(config)
+        create_compression_model(config)
+        create_routing_model(config)
+        create_evaluation_model(config)
 
     assert [kwargs["id"] for kwargs in captured] == [
         "env-compression",
@@ -207,15 +201,17 @@ def test_agents_use_env_model_ids_over_config() -> None:
 def test_llm_client_uses_same_resolved_credentials() -> None:
     config = Config(api_key="yaml-key", api_base_url="https://yaml.example/v1")
 
-    with patch.dict(
-        os.environ,
-        {
-            "api_key": "shared-env-key",
-            "api_base_url": "https://shared.example/v1",
-        },
+    with (
+        patch.dict(
+            os.environ,
+            {
+                "api_key": "shared-env-key",
+                "api_base_url": "https://shared.example/v1",
+            },
+        ),
+        patch("skillreducer.llm.client.OpenAI") as mock_openai,
     ):
-        with patch("skillreducer.llm.client.OpenAI") as mock_openai:
-            LLMClient(config)
+        LLMClient(config)
 
     mock_openai.assert_called_once_with(
         api_key="shared-env-key",
@@ -236,7 +232,7 @@ def test_resolve_azure_subscription_prefers_environment_over_config() -> None:
         assert resolve_azure_subscription(config) is True
 
 
-def test_config_load_merges_azure_settings(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+def test_config_load_merges_azure_settings(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         "azure_subscription: false\n"
@@ -264,10 +260,10 @@ def test_agents_use_azure_openai_when_subscription_enabled() -> None:
         routing_model="routing-deployment",
         evaluation_model="eval-deployment",
     )
-    captured: list[dict] = []
+    captured: list[dict[str, Any]] = []
 
     class FakeAzureOpenAI:
-        def __init__(self, **kwargs) -> None:
+        def __init__(self, **kwargs: object) -> None:
             captured.append(kwargs)
 
     with patch("skillreducer.model.AzureOpenAI", FakeAzureOpenAI):

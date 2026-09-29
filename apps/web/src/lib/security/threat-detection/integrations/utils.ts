@@ -7,7 +7,7 @@
 
 import * as crypto from 'node:crypto'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type {
   ThreatData,
   ThreatResponse,

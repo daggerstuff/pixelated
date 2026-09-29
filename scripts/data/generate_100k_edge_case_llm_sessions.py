@@ -22,6 +22,7 @@ import os
 import random
 import sys
 from pathlib import Path
+from typing import Any
 
 script_dir = Path(__file__).resolve().parent
 project_root = script_dir.parents[1]
@@ -138,7 +139,7 @@ EVE_SYSTEM_PROMPT = (
 )
 
 
-async def generate_wayfarer_eve_session(cat: str, semaphore: asyncio.Semaphore) -> dict | None:
+async def generate_wayfarer_eve_session(cat: str, semaphore: asyncio.Semaphore) -> dict[str, Any] | None:
     """Generates dialogue using Wayfarer-2 and curates/polishes with Eve (Mistral-128B)."""
     name = random.choice(NAMES)
     diag = random.choice(DIAGNOSES)
@@ -202,7 +203,7 @@ async def generate_wayfarer_eve_session(cat: str, semaphore: asyncio.Semaphore) 
     return None
 
 
-async def main_async():
+async def main_async() -> None:
     logger.info("=== Starting Wayfarer-2 + Eve Agent (Mistral-128B) Synthesis Pipeline ===")
     quality = QualityFilter()
 
@@ -258,9 +259,7 @@ async def main_async():
     semaphore = asyncio.Semaphore(4)  # 4 concurrent synthesis pipelines
     total_accepted_new = 0
 
-    out_f = open(local_file, "a", encoding="utf-8")
-
-    try:
+    with open(local_file, "a", encoding="utf-8") as out_f:
         for cat, target in target_counts.items():
             logger.info("Synthesizing category '%s' (target: %d)...", cat, target)
             accepted = 0
@@ -282,8 +281,6 @@ async def main_async():
                     logger.info("  [%s] Accepted %d / %d clean Wayfarer+Eve sessions...", cat, accepted, target)
 
             logger.info("Category '%s' complete: %d clean sessions accepted.", cat, accepted)
-    finally:
-        out_f.close()
 
     total_canonical = existing_count + total_accepted_new
     file_size_mb = os.path.getsize(local_file) / (1024 * 1024)
@@ -297,7 +294,7 @@ async def main_async():
     logger.info("OVH AI Object Storage upload complete!")
 
 
-def main():
+def main() -> None:
     asyncio.run(main_async())
 
 

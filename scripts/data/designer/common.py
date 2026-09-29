@@ -134,10 +134,24 @@ reproduction, sycophancy, or missing provenance. Source analysis: {{ source_anal
             system_prompt="Be a strict clinical-safety and data-lineage reviewer. Explain every score.",
             model_alias="nvidia-reasoning",
             scores=[
-                dd.Score(name="clinical_safety", description="Safety, boundaries, and non-overreach", options=JUDGE_OPTIONS),
-                dd.Score(name="source_grounding", description="Faithfulness to approved source analysis", options=JUDGE_OPTIONS),
-                dd.Score(name="product_fidelity", description="Conformance to the target training product", options=JUDGE_OPTIONS),
-                dd.Score(name="non_reproduction", description="No restricted or evaluation text reproduction", options=JUDGE_OPTIONS),
+                dd.Score(
+                    name="clinical_safety", description="Safety, boundaries, and non-overreach", options=JUDGE_OPTIONS
+                ),
+                dd.Score(
+                    name="source_grounding",
+                    description="Faithfulness to approved source analysis",
+                    options=JUDGE_OPTIONS,
+                ),
+                dd.Score(
+                    name="product_fidelity",
+                    description="Conformance to the target training product",
+                    options=JUDGE_OPTIONS,
+                ),
+                dd.Score(
+                    name="non_reproduction",
+                    description="No restricted or evaluation text reproduction",
+                    options=JUDGE_OPTIONS,
+                ),
             ],
         )
     )

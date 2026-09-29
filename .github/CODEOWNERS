@@ -1,0 +1,12 @@
+# Default owners for everything. Refine per-directory owners as the team grows:
+# more specific paths must be listed BELOW this line.
+* @daggerstuff
+
+# Security-sensitive surfaces need an explicit review; the org owner is the
+# required reviewer for now.
+/.github/workflows/ @daggerstuff
+/apps/web/src/lib/security/ @daggerstuff
+/apps/web/src/lib/auth/ @daggerstuff
+/apps/web/src/lib/config/env.ts @daggerstuff
+/apps/web/src/middleware.ts @daggerstuff
+/infra/ @daggerstuff

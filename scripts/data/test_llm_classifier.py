@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 class TestLLMClassifier:
     """Test cases for LLM classifier."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.test_cases = [
             {
                 "name": "Crisis - Suicidal Ideation",
@@ -105,7 +105,7 @@ class TestLLMClassifier:
             },
         ]
 
-    def test_with_mock(self):
+    def test_with_mock(self) -> bool:
         """Test LLM classifier with mocked API responses."""
         logger.info("\n" + "=" * 80)
         logger.info("🧪 TESTING LLM CLASSIFIER (MOCKED)")
@@ -156,7 +156,7 @@ class TestLLMClassifier:
 class TestHybridClassifier:
     """Test cases for hybrid classifier."""
 
-    def test_hybrid_logic(self):
+    def test_hybrid_logic(self) -> bool:
         """Test hybrid classifier decision logic."""
         logger.info("\n" + "=" * 80)
         logger.info("🧪 TESTING HYBRID CLASSIFIER LOGIC")
@@ -226,7 +226,7 @@ class TestHybridClassifier:
 
         return True
 
-    def test_file_processing(self):
+    def test_file_processing(self) -> bool:
         """Test processing a JSONL file."""
         logger.info("\n" + "=" * 80)
         logger.info("🧪 TESTING FILE PROCESSING")
@@ -301,7 +301,7 @@ class TestHybridClassifier:
             output_path.unlink()
 
 
-def main():
+def main() -> int:
     """Run all tests."""
     logger.info("\n" + "=" * 80)
     logger.info("🚀 STARTING LLM & HYBRID CLASSIFIER TESTS")

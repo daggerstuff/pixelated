@@ -5,10 +5,10 @@
 
 import { ManagementClient } from 'auth0'
 
-import { auth0UserService } from '../services/auth0.service'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
+import { auth0UserService } from '../services/auth0.service'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 const logger = createBuildSafeLogger('auth0-impersonation-service')

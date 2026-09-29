@@ -9,40 +9,35 @@ const { showTopCTA = true } = Astro.props
 
 <footer class="marketing-footer">
   <div class="marketing-shell">
-    {
-      showTopCTA && (
-        <div class="marketing-footer__cta">
-          <div>
-            <span class="marketing-eyebrow">Therapist training AI</span>
-            <h2 class="marketing-title marketing-title--medium">
-              Practice sessions your supervisors can actually review.
-            </h2>
-            <p class="marketing-lede">
-              Pixelated Empathy helps training programs assign realistic AI
-              client simulations, preserve transcripts, and turn practice into
-              structured instructor feedback.
-            </p>
-          </div>
-          <div class="marketing-footer__cta-actions">
-            <a
-              class="marketing-button marketing-button--primary"
-              href="/contact"
-            >
-              Book a pilot
-            </a>
-            <a
-              class="marketing-button marketing-button--secondary"
-              href="/demo-hub"
-            >
-              Watch the demo
-            </a>
-            <p class="marketing-note">
-              Founder-led • United States • Sensitive-workflow review on request
-            </p>
-          </div>
+    {showTopCTA && (
+      <div class="marketing-footer__cta">
+        <div>
+          <span class="marketing-eyebrow">Therapist training AI</span>
+          <h2 class="marketing-title marketing-title--medium">
+            Practice sessions your supervisors can actually review.
+          </h2>
+          <p class="marketing-lede">
+            Pixelated Empathy helps training programs assign realistic AI client
+            simulations, preserve transcripts, and turn practice into structured
+            instructor feedback.
+          </p>
         </div>
-      )
-    }
+        <div class="marketing-footer__cta-actions">
+          <a class="marketing-button marketing-button--primary" href="/contact">
+            Book a pilot
+          </a>
+          <a
+            class="marketing-button marketing-button--secondary"
+            href="/demo-hub"
+          >
+            Watch the demo
+          </a>
+          <p class="marketing-note">
+            Founder-led • United States • Sensitive-workflow review on request
+          </p>
+        </div>
+      </div>
+    )}
 
     <div class="marketing-footer__grid">
       <div class="marketing-footer__brand">
@@ -65,49 +60,81 @@ const { showTopCTA = true } = Astro.props
             href="https://twitter.com/pixelatedempathy"
             target="_blank"
             rel="noopener noreferrer"
-            class="marketing-inline-link">Twitter</a
+            class="marketing-inline-link"
           >
+            Twitter
+          </a>
           <a
             href="https://github.com/nochadisfaction/pixelated"
             target="_blank"
             rel="noopener noreferrer"
-            class="marketing-inline-link">GitHub</a
+            class="marketing-inline-link"
           >
+            GitHub
+          </a>
           <a
             href="mailto:info@pixelatedempathy.com"
-            class="marketing-inline-link">Email</a
+            class="marketing-inline-link"
           >
+            Email
+          </a>
         </div>
       </div>
 
       <div>
         <span class="marketing-list-label">Product</span>
         <ul class="marketing-footer__list">
-          <li><a href="/features">Features</a></li>
-          <li><a href="/demo-hub">Demo hub</a></li>
-          <li><a href="/trust">Trust center</a></li>
-          <li><a href="/training">Training</a></li>
+          <li>
+            <a href="/features">Features</a>
+          </li>
+          <li>
+            <a href="/demo-hub">Demo hub</a>
+          </li>
+          <li>
+            <a href="/trust">Trust center</a>
+          </li>
+          <li>
+            <a href="/training">Training</a>
+          </li>
         </ul>
       </div>
 
       <div>
         <span class="marketing-list-label">Company</span>
         <ul class="marketing-footer__list">
-          <li><a href="/about">About</a></li>
-          <li><a href="/company">Company</a></li>
-          <li><a href="/team">Founder</a></li>
-          <li><a href="/press">Press</a></li>
-          <li><a href="/contact">Contact</a></li>
+          <li>
+            <a href="/about">About</a>
+          </li>
+          <li>
+            <a href="/company">Company</a>
+          </li>
+          <li>
+            <a href="/team">Founder</a>
+          </li>
+          <li>
+            <a href="/press">Press</a>
+          </li>
+          <li>
+            <a href="/contact">Contact</a>
+          </li>
         </ul>
       </div>
 
       <div>
         <span class="marketing-list-label">Policies</span>
         <ul class="marketing-footer__list">
-          <li><a href="/privacy">Privacy</a></li>
-          <li><a href="/terms">Terms</a></li>
-          <li><a href="/cookie-policy">Cookies</a></li>
-          <li><a href="/accessibility">Accessibility</a></li>
+          <li>
+            <a href="/privacy">Privacy</a>
+          </li>
+          <li>
+            <a href="/terms">Terms</a>
+          </li>
+          <li>
+            <a href="/cookie-policy">Cookies</a>
+          </li>
+          <li>
+            <a href="/accessibility">Accessibility</a>
+          </li>
         </ul>
       </div>
     </div>

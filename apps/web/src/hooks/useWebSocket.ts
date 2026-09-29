@@ -43,82 +43,85 @@ export function useWebSocket({
   const [error, setError] = useState<Error | null>(null)
   const wsRef = useRef<WebSocket | null>(null)
 
-  const connect = useCallback(function connect() {
-    try {
-      const ws = new WebSocket(url)
-      wsRef.current = ws
+  const connect = useCallback(
+    function connect() {
+      try {
+        const ws = new WebSocket(url)
+        wsRef.current = ws
 
-      ws.onopen = () => {
-        setIsConnected(true)
-        setError(null)
+        ws.onopen = () => {
+          setIsConnected(true)
+          setError(null)
 
-        // Send initial status message
-        ws.send(
-          JSON.stringify({
-            type: 'status',
-            data: { status: 'connected' },
-            sessionId,
-            encrypted,
-          }),
-        )
-      }
-
-      ws.onclose = () => {
-        setIsConnected(false)
-        // Attempt to reconnect after a delay
-        setTimeout(connect, 3000)
-      }
-
-      ws.onerror = () => {
-        const wsError = new Error('WebSocket error')
-        setError(wsError)
-        if (onError) {
-          onError(wsError)
+          // Send initial status message
+          ws.send(
+            JSON.stringify({
+              type: 'status',
+              data: { status: 'connected' },
+              sessionId,
+              encrypted,
+            }),
+          )
         }
-      }
 
-      ws.onmessage = (event) => {
-        try {
-          const message: WebSocketMessage = JSON.parse(event.data)
-          let wsError: Error
+        ws.onclose = () => {
+          setIsConnected(false)
+          // Attempt to reconnect after a delay
+          setTimeout(connect, 3000)
+        }
 
-          switch (message.type) {
-            case 'message':
-              if (onMessage && message.data) {
-                onMessage(message.data)
-              }
-              break
-            case 'status':
-              if (
-                message.sessionId === sessionId &&
-                onStatusChange &&
-                message.data?.status
-              ) {
-                onStatusChange(message.data.status)
-              }
-              break
-            case 'error':
-              wsError = new Error(message.data?.message ?? 'Unknown error')
-              setError(wsError)
-              if (onError) {
-                onError(wsError)
-              }
-              break
-          }
-        } catch (error: unknown) {
-          console.error('Error parsing WebSocket message:', error)
+        ws.onerror = () => {
+          const wsError = new Error('WebSocket error')
+          setError(wsError)
           if (onError) {
-            onError(error as Error)
+            onError(wsError)
           }
         }
+
+        ws.onmessage = (event) => {
+          try {
+            const message: WebSocketMessage = JSON.parse(event.data)
+            let wsError: Error
+
+            switch (message.type) {
+              case 'message':
+                if (onMessage && message.data) {
+                  onMessage(message.data)
+                }
+                break
+              case 'status':
+                if (
+                  message.sessionId === sessionId &&
+                  onStatusChange &&
+                  message.data?.status
+                ) {
+                  onStatusChange(message.data.status)
+                }
+                break
+              case 'error':
+                wsError = new Error(message.data?.message ?? 'Unknown error')
+                setError(wsError)
+                if (onError) {
+                  onError(wsError)
+                }
+                break
+            }
+          } catch (error: unknown) {
+            console.error('Error parsing WebSocket message:', error)
+            if (onError) {
+              onError(error as Error)
+            }
+          }
+        }
+      } catch (error: unknown) {
+        setError(error as Error)
+        if (onError) {
+          onError(error as Error)
+        }
       }
-    } catch (error: unknown) {
-      setError(error as Error)
-      if (onError) {
-        onError(error as Error)
-      }
-    }
-  }, [url, sessionId, onMessage, onStatusChange, onError, encrypted])
+    },
+    [url, sessionId, onMessage, onStatusChange, onError, encrypted],
+  )
 
   useEffect(() => {
     const timer = window.setTimeout(connect, 0)

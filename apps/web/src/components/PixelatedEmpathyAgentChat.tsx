@@ -313,15 +313,15 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
 
   return (
     <div
-      className={`bg-white border-gray-200 mx-auto flex h-full max-w-4xl flex-col rounded-lg border shadow-lg ${className}`}
+      className={`mx-auto flex h-full max-w-4xl flex-col rounded-none border border-border bg-card ${className}`}
     >
       {/* Header */}
-      <div className="border-gray-200 bg-blue-50 flex items-center justify-between border-b p-4">
+      <div className="flex items-center justify-between border-b border-border bg-secondary p-4">
         <div className="flex items-center space-x-3">
           <div
-            className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
+            className={`h-3 w-3 rounded-full ${isConnected ? 'bg-primary' : 'bg-muted-foreground'}`}
           />
-          <h3 className="text-gray-800 text-lg font-semibold">
+          <h3 className="text-lg font-semibold text-foreground">
             Pixelated Empathy AI Assistant
           </h3>
         </div>
@@ -332,7 +332,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
               setContext(e.target.value)
             }
           }}
-          className="border-gray-300 focus:ring-blue-500 rounded border px-3 py-1 text-sm focus:outline-none focus:ring-2"
+          className="rounded-none border border-input bg-background px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="general">General</option>
           <option value="scenario_generation">Scenario Generation</option>
@@ -344,7 +344,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
       </div>
 
       {/* Quick Actions */}
-      <div className="border-gray-100 bg-gray-50 border-b p-3">
+      <div className="border-b border-border bg-card p-3">
         <div className="flex flex-wrap gap-2">
           {quickActions.map((action) => (
             <button
@@ -353,7 +353,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
                 setContext(action.context)
                 action.action()
               }}
-              className="bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full px-3 py-1 text-xs transition-colors"
+              className="rounded-none border border-border bg-secondary px-3 py-1 text-xs text-foreground transition-colors hover:bg-accent"
             >
               {action.label}
             </button>
@@ -369,18 +369,20 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-3xl rounded-lg p-3 ${
+              className={`max-w-3xl rounded-none p-3 ${
                 message.role === 'user'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-primary text-primary-foreground'
                   : message.context === 'error'
-                    ? 'bg-red-100 text-red-800 border-red-200 border'
-                    : 'bg-gray-100 text-gray-800'
+                    ? 'border border-ring bg-secondary text-foreground'
+                    : 'bg-secondary text-foreground'
               }`}
             >
               <div className="whitespace-pre-wrap">{message.content}</div>
               <div
                 className={`mt-2 text-xs ${
-                  message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                  message.role === 'user'
+                    ? 'text-primary-foreground/70'
+                    : 'text-muted-foreground'
                 }`}
               >
                 {message.timestamp.toLocaleTimeString()}
@@ -391,9 +393,9 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 text-gray-800 rounded-lg p-3">
+            <div className="rounded-none bg-secondary p-3 text-foreground">
               <div className="flex items-center space-x-2">
-                <div className="border-blue-600 border-t-transparent h-4 w-4 animate-spin rounded-full border-2" />
+                <div className="border-t-transparent h-4 w-4 animate-spin rounded-full border-2 border-ring" />
                 <span>AI Assistant is thinking...</span>
               </div>
             </div>
@@ -403,7 +405,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
       </div>
 
       {/* Input */}
-      <div className="border-gray-200 border-t p-4">
+      <div className="border-t border-border p-4">
         <div className="flex space-x-3">
           <input
             type="text"
@@ -415,13 +417,13 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
               }
             }}
             placeholder={`Ask about ${context.replace('_', ' ')}...`}
-            className="border-gray-300 focus:ring-blue-500 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2"
+            className="flex-1 rounded-none border border-input bg-background px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             disabled={!isConnected || isLoading}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || !isConnected || isLoading}
-            className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 rounded-lg px-6 py-2 transition-colors disabled:cursor-not-allowed"
+            className="hover:bg-primary/90 rounded-none bg-primary px-6 py-2 text-primary-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-35"
           >
             Send
           </button>

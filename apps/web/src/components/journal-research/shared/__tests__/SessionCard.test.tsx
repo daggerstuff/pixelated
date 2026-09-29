@@ -92,7 +92,7 @@ describe('SessionCard', () => {
 
     const phaseIndicator = screen.getByLabelText(/Current phase: discovery/)
     expect(phaseIndicator).toBeInTheDocument()
-    expect(phaseIndicator).toHaveClass('bg-blue-500')
+    expect(phaseIndicator).toHaveClass('bg-primary')
   })
 
   it('displays target sources in footer', () => {

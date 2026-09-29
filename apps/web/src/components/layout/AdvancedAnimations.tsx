@@ -183,7 +183,7 @@ export const SkeletonLoader: FC<{ className?: string; lines?: number }> = ({
     {Array.from({ length: lines }).map((_, index) => (
       <div
         key={index}
-        className="bg-gray-200 dark:bg-gray-700 h-4 animate-pulse rounded"
+        className="h-4 animate-pulse rounded-none bg-secondary"
         style={{ animationDelay: `${index * 200}ms` }}
       />
     ))}

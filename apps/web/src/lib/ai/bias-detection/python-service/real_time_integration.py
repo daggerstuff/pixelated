@@ -242,7 +242,15 @@ class RealTimeBiasDetector:
 
     async def _trigger_real_time_alert(self, session: StreamingSession, bias_score: float) -> None:
         """Trigger real-time alert for high bias detection"""
-        alert_level = self.bias_detector._determine_alert_level(combined_results)  # type: ignore
+        # Score-to-level thresholds mirror AnalysisOrchestrator's aggregation
+        if bias_score >= 0.7:
+            alert_level = "critical"
+        elif bias_score >= 0.4:
+            alert_level = "high"
+        elif bias_score >= 0.2:
+            alert_level = "warning"
+        else:
+            alert_level = "low"
 
         # Emit metrics
         bias_metrics.alert_triggered(alert_level, "real_time", bias_score)

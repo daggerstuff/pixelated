@@ -15,6 +15,13 @@ const filteredSessions = sessions.filter((session: any) => {
   return diffDays <= 30
 })
 
+const SERIES_PALETTE = {
+  line: '#8884d8',
+  completed: '#0088FE',
+  inProgress: '#00C49F',
+  cancelled: '#FFBB28',
+}
+
 const moodData = filteredSessions.map((session: any) => ({
   date: new Date(session.timestamp).toLocaleDateString('en-US', {
     month: 'short',
@@ -28,30 +35,28 @@ const moodData = filteredSessions.map((session: any) => ({
   <div class="flex justify-between items-center">
     <h2 class="text-2xl font-bold">Therapy Progress Analytics</h2>
     <div class="flex gap-4">
-      <select
-        class="px-3 py-2 border rounded-md"
-        aria-label="Select time range"
-      >
+      <select class="px-3 py-2 border" aria-label="Select time range">
         <option value="7d">Last 7 days</option>
-        <option value="30d" selected>Last 30 days</option>
+        <option value="30d" selected>
+          Last 30 days
+        </option>
       </select>
-      <select
-        class="px-3 py-2 border rounded-md"
-        aria-label="Select tracking metric"
-      >
-        <option value="mood" selected>Mood Tracking</option>
+      <select class="px-3 py-2 border" aria-label="Select tracking metric">
+        <option value="mood" selected>
+          Mood Tracking
+        </option>
         <option value="engagement">Engagement</option>
       </select>
     </div>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div class="bg-white p-6 rounded-lg shadow">
+    <div class="bg-card p-6 border">
       <h3 class="text-lg font-semibold mb-4">Session Progress</h3>
       <div class="w-full h-72">
         <svg viewBox="0 0 800 300" class="w-full h-full">
           <!-- Grid lines -->
-          <g stroke="#e5e7eb" stroke-width="1">
+          <g stroke="var(--np-line, rgba(255,255,255,0.06))" stroke-width="1">
             <line x1="50" y1="20" x2="750" y2="20"></line>
             <line x1="50" y1="70" x2="750" y2="70"></line>
             <line x1="50" y1="120" x2="750" y2="120"></line>
@@ -61,85 +66,107 @@ const moodData = filteredSessions.map((session: any) => ({
           </g>
 
           <!-- X-axis labels -->
-          <g fill="#6b7280" font-size="12">
-            {
-              moodData.map((item, index) => (
-                <text
-                  x={50 + (index * 700) / (moodData.length - 1)}
-                  y="290"
-                  text-anchor="middle"
-                >
-                  {item.date}
-                </text>
-              ))
-            }
+          <g fill="var(--np-muted, #8c8c8c)" font-size="12">
+            {moodData.map((item, index) => (
+              <text
+                x={50 + (index * 700) / (moodData.length - 1)}
+                y="290"
+                text-anchor="middle"
+              >
+                {item.date}
+              </text>
+            ))}
           </g>
 
           <!-- Y-axis labels -->
-          <g fill="#6b7280" font-size="12">
-            <text x="20" y="270" text-anchor="end">0</text>
-            <text x="20" y="220" text-anchor="end">2</text>
-            <text x="20" y="170" text-anchor="end">4</text>
-            <text x="20" y="120" text-anchor="end">6</text>
-            <text x="20" y="70" text-anchor="end">8</text>
-            <text x="20" y="20" text-anchor="end">10</text>
+          <g fill="var(--np-muted, #8c8c8c)" font-size="12">
+            <text x="20" y="270" text-anchor="end">
+              0
+            </text>
+            <text x="20" y="220" text-anchor="end">
+              2
+            </text>
+            <text x="20" y="170" text-anchor="end">
+              4
+            </text>
+            <text x="20" y="120" text-anchor="end">
+              6
+            </text>
+            <text x="20" y="70" text-anchor="end">
+              8
+            </text>
+            <text x="20" y="20" text-anchor="end">
+              10
+            </text>
           </g>
 
           <!-- Line chart -->
           <polyline
             fill="none"
-            stroke="#8884d8"
+            stroke={SERIES_PALETTE.line}
             stroke-width="3"
             points={moodData
               .map(
                 (item, index) =>
                   `${50 + (index * 700) / (moodData.length - 1)},${270 - item.value * 25}`,
               )
-              .join(' ')}></polyline>
+              .join(' ')}
+          ></polyline>
 
           <!-- Data points -->
-          <g fill="#8884d8">
-            {
-              moodData.map((item, index) => (
-                <circle
-                  cx={50 + (index * 700) / (moodData.length - 1)}
-                  cy={270 - item.value * 25}
-                  r="4"
-                />
-              ))
-            }
+          <g fill={SERIES_PALETTE.line}>
+            {moodData.map((item, index) => (
+              <circle
+                cx={50 + (index * 700) / (moodData.length - 1)}
+                cy={270 - item.value * 25}
+                r="4"
+              />
+            ))}
           </g>
         </svg>
       </div>
     </div>
 
-    <div class="bg-white p-6 rounded-lg shadow">
+    <div class="bg-card p-6 border">
       <h3 class="text-lg font-semibold mb-4">Session Status</h3>
       <div class="w-full h-72 flex items-center justify-center">
         <svg viewBox="0 0 300 300" class="w-64 h-64">
           <!-- Pie chart -->
-          <circle cx="150" cy="150" r="100" fill="#e5e7eb"></circle>
+          <circle
+            cx="150"
+            cy="150"
+            r="100"
+            fill="var(--np-elevated, #2e2e2e)"
+          ></circle>
 
           <!-- Completed slice -->
           <path
             d="M150 50 A100 100 0 1 1 50 150 L150 150 Z"
-            fill="#0088FE"
-            opacity="0.8"></path>
+            fill={SERIES_PALETTE.completed}
+            opacity="0.8"
+          ></path>
 
           <!-- In Progress slice -->
           <path
             d="M50 150 A100 100 0 1 1 150 250 L150 150 Z"
-            fill="#00C49F"
-            opacity="0.8"></path>
+            fill={SERIES_PALETTE.inProgress}
+            opacity="0.8"
+          ></path>
 
           <!-- Cancelled slice -->
           <path
             d="M150 250 A100 100 0 1 1 150 50 L150 150 Z"
-            fill="#FFBB28"
-            opacity="0.8"></path>
+            fill={SERIES_PALETTE.cancelled}
+            opacity="0.8"
+          ></path>
 
           <!-- Center circle -->
-          <circle cx="150" cy="150" r="40" fill="white"></circle>
+          <circle
+            cx="150"
+            cy="150"
+            r="40"
+            fill="var(--np-surface, #242424)"
+          ></circle>
 
           <!-- Labels -->
           <text
@@ -147,21 +174,23 @@ const moodData = filteredSessions.map((session: any) => ({
             y="155"
             text-anchor="middle"
             font-size="14"
-            fill="#374151">Status</text
+            fill="var(--np-text, #ededed)"
           >
+            Status
+          </text>
         </svg>
 
         <div class="ml-4 space-y-2">
           <div class="flex items-center gap-2">
-            <div class="w-3 h-3 bg-[#0088FE] rounded-full"></div>
+            <div class="w-3 h-3 bg-[#0088FE]"></div>
             <span class="text-sm">Completed</span>
           </div>
           <div class="flex items-center gap-2">
-            <div class="w-3 h-3 bg-[#00C49F] rounded-full"></div>
+            <div class="w-3 h-3 bg-[#00C49F]"></div>
             <span class="text-sm">In Progress</span>
           </div>
           <div class="flex items-center gap-2">
-            <div class="w-3 h-3 bg-[#FFBB28] rounded-full"></div>
+            <div class="w-3 h-3 bg-[#FFBB28]"></div>
             <span class="text-sm">Cancelled</span>
           </div>
         </div>
@@ -170,15 +199,15 @@ const moodData = filteredSessions.map((session: any) => ({
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="bg-white p-6 rounded-lg shadow">
+    <div class="bg-card p-6 border">
       <h4 class="font-semibold mb-2">Total Sessions</h4>
       <p class="text-2xl font-bold">{metrics.totalSessions || 0}</p>
     </div>
-    <div class="bg-white p-6 rounded-lg shadow">
+    <div class="bg-card p-6 border">
       <h4 class="font-semibold mb-2">Average Mood</h4>
       <p class="text-2xl font-bold">{(metrics.averageMood || 0).toFixed(1)}</p>
     </div>
-    <div class="bg-white p-6 rounded-lg shadow">
+    <div class="bg-card p-6 border">
       <h4 class="font-semibold mb-2">Completion Rate</h4>
       <p class="text-2xl font-bold">
         {(metrics.completionRate || 0).toFixed(1)}%
@@ -228,23 +257,18 @@ const moodData = filteredSessions.map((session: any) => ({
     gap: 1.5rem;
   }
 
-  .bg-white {
-    background-color: white;
+  .bg-card {
+    background-color: var(--np-surface, #242424);
+  }
+
+  .border {
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--np-line, rgba(255, 255, 255, 0.06));
   }
 
   .p-6 {
     padding: 1.5rem;
-  }
-
-  .rounded-lg {
-    border-radius: 0.5rem;
-  }
-
-  .shadow {
-    box-shadow:
-      0 1px 3px 0 rgb(0 0 0 / 0.1),
-      0 1px 2px -1px rgb(0 0 0 / 0.1),
-      0 0 0 1px rgb(0 0 0 / 0.06);
   }
 
   .text-2xl {
@@ -329,10 +353,6 @@ const moodData = filteredSessions.map((session: any) => ({
 
   .h-3 {
     height: 0.75rem;
-  }
-
-  .rounded-full {
-    border-radius: 9999px;
   }
 
   .text-sm {

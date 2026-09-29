@@ -84,7 +84,8 @@ def _post_graphql(api_key: str, payload: dict[str, Any]) -> dict[str, Any]:
     try:
         with urlopen(req, timeout=15) as resp:
             raw = resp.read().decode("utf-8")
-            return json.loads(raw)
+            result: dict[str, Any] = json.loads(raw)
+            return result
     except HTTPError as exc:  # pragma: no cover - network failure path
         text = exc.read().decode("utf-8", errors="ignore")
         raise RuntimeError(f"Linear HTTP error {exc.code}: {text}") from exc

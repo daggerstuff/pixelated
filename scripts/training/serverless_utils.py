@@ -4,11 +4,23 @@ import json
 import logging
 import math
 import random
+from collections.abc import Callable
 from functools import lru_cache
+from typing import Any, cast
 
 import art
 import weave
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, PreTrainedTokenizerBase
+
+
+def _typed_op[F: Callable[..., object]](func: F) -> F:
+    """Typed pass-through for the untyped ``weave.op`` decorator.
+
+    weave ships no type information, so applying ``@weave.op()`` directly
+    erases the decorated function's signature for mypy. Anchoring the
+    decorator result keeps the wrapped functions fully typed.
+    """
+    return cast(F, weave.op()(func))
 
 
 # Suppress harmless W&B artifact-pruning warnings from serverless backend
@@ -24,7 +36,7 @@ def apply_prune_filter() -> None:
         logging.getLogger(logger_name).addFilter(_PruneWarningFilter())
 
 
-@weave.op()
+@_typed_op
 def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
     """Compute n-gram Jaccard similarity for better semantic overlap estimation."""
     res_words = response.lower().split()
@@ -45,7 +57,7 @@ def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
 
 
 @lru_cache(maxsize=1)
-def _get_tokenizer():
+def _get_tokenizer() -> PreTrainedTokenizerBase:
     """Load and cache the Qwen3 tokenizer for local token-id injection."""
     return AutoTokenizer.from_pretrained(
         "Qwen/Qwen3-30B-A3B-Instruct-2507",
@@ -53,10 +65,10 @@ def _get_tokenizer():
     )
 
 
-@weave.op()
+@_typed_op
 async def rollout(
     _model: art.Model,
-    messages: list,
+    messages: list[dict[str, Any]],
     _step: int = 0,
 ) -> art.Trajectory:
     """Generate a response and compute reward via the model's serverless inference endpoint."""
@@ -93,9 +105,7 @@ async def rollout(
     prompt_msgs = trajectory.messages()
 
     # 1) prompt_token_ids — tokenize the formatted prompt
-    prompt_text = tokenizer.apply_chat_template(
-        prompt_msgs, tokenize=False, add_generation_prompt=True
-    )
+    prompt_text = tokenizer.apply_chat_template(prompt_msgs, tokenize=False, add_generation_prompt=True)
     prompt_token_ids = tokenizer.encode(prompt_text, add_special_tokens=False)
     if hasattr(completion, "model_extra") and completion.model_extra is not None:
         completion.model_extra["prompt_token_ids"] = prompt_token_ids
@@ -121,7 +131,7 @@ async def rollout(
         response_token_ids = tokenizer.encode(full_text, add_special_tokens=False)
 
         if len(response_token_ids) == len(choice.logprobs.content):
-            for lp, tid in zip(choice.logprobs.content, response_token_ids):
+            for lp, tid in zip(choice.logprobs.content, response_token_ids, strict=True):
                 object.__setattr__(lp, "token", f"token_id:{tid}")
         else:
             # Fallback: tokenize each token individually
@@ -165,12 +175,12 @@ async def rollout(
     return trajectory
 
 
-@weave.op()
+@_typed_op
 def log_rl_step(
     step: int,
     avg_reward: float,
     metrics: dict[str, float],
-) -> dict:
+) -> dict[str, Any]:
     """Log per-step RL metrics to Weave."""
     return {
         "step": step,
@@ -183,7 +193,7 @@ def log_rl_step(
 
 
 def compute_step_metrics(
-    train_groups: list,
+    train_groups: list[Any],
 ) -> tuple[float, dict[str, float]]:
     """Compute average reward and metrics dict from train groups."""
     all_rewards = [t.reward for g in train_groups for t in g.trajectories]
@@ -206,7 +216,7 @@ def compute_step_metrics(
 class ShuffledEpochIterator:
     """Yield batches from a shuffled dataset, reshuffling at epoch boundaries."""
 
-    def __init__(self, examples: list, batch_size: int, seed: int = 42):
+    def __init__(self, examples: list[list[dict[str, Any]]], batch_size: int, seed: int = 42):
         self.examples = examples
         self.batch_size = batch_size
         self.seed = seed
@@ -233,7 +243,7 @@ class ShuffledEpochIterator:
                 self.index += n
                 n = 0
 
-    def next_batch(self) -> list:
+    def next_batch(self) -> list[list[dict[str, Any]]]:
         """Return the next batch of examples."""
         if self.index + self.batch_size > len(self._indices):
             self.epoch += 1
@@ -243,10 +253,10 @@ class ShuffledEpochIterator:
         return [self.examples[i] for i in batch_indices]
 
 
-def load_dataset(path: str) -> list:
+def load_dataset(path: str) -> list[list[dict[str, Any]]]:
     """Load, filter, and deduplicate training dataset."""
     seen: set[str] = set()
-    examples = []
+    examples: list[list[dict[str, Any]]] = []
     with open(path) as f:
         for line in f:
             data = json.loads(line)
