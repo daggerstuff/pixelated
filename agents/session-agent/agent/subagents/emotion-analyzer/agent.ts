@@ -1,5 +1,4 @@
 import { defineAgent } from 'eve'
-import { z } from 'zod'
 
 import {
   AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
@@ -16,19 +15,4 @@ export default defineAgent({
   model: agentModel,
   modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   reasoning: 'medium',
-  outputSchema: z.object({
-    primary_emotion: z.string(),
-    intensity: z.number().min(0).max(1),
-    valence: z.number().min(-1).max(1),
-    risk_flags: z.array(
-      z.enum([
-        'crisis_ideation',
-        'harm_to_others',
-        'medical_emergency',
-        'distress',
-      ]),
-    ),
-    confidence: z.number().min(0).max(1),
-    evidence_span: z.string().max(280),
-  }),
 })
