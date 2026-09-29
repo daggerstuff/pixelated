@@ -74,18 +74,18 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-gray-900 mb-2 text-3xl font-bold">{pageTitle}</h1>
-        <p className="text-gray-600">{pageDescription}</p>
+        <h1 className="mb-2 text-3xl font-bold text-foreground">{pageTitle}</h1>
+        <p className="text-muted-foreground">{pageDescription}</p>
       </div>
       <form
-        className="bg-white mb-8 rounded-lg p-6 shadow"
+        className="mb-8 rounded-none border border-border bg-card p-6"
         onSubmit={fetchRecommendations}
         autoComplete="off"
       >
         <div className="mb-4">
           <label
             htmlFor="clientId"
-            className="text-gray-700 mb-1 block text-sm font-medium"
+            className="mb-1 block text-sm font-medium text-foreground"
           >
             Client ID (UUID)
           </label>
@@ -95,7 +95,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
             type="text"
             required
             pattern="[0-9a-fA-F-]{36}"
-            className="border-gray-300 w-full rounded border px-3 py-2"
+            className="w-full rounded-none border border-input px-3 py-2"
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
             placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
@@ -104,7 +104,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
         <div className="mb-4">
           <label
             htmlFor="indications"
-            className="text-gray-700 mb-1 block text-sm font-medium"
+            className="mb-1 block text-sm font-medium text-foreground"
           >
             Indications (comma-separated)
           </label>
@@ -113,7 +113,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
             name="indications"
             type="text"
             required
-            className="border-gray-300 w-full rounded border px-3 py-2"
+            className="w-full rounded-none border border-input px-3 py-2"
             value={indications}
             onChange={(e) => setIndications(e.target.value)}
             placeholder="e.g. depression, anxiety"
@@ -121,7 +121,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
         </div>
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded px-6 py-2 font-semibold transition disabled:opacity-50"
+          className="hover:bg-primary/90 rounded-none bg-primary px-6 py-2 font-semibold text-primary-foreground transition disabled:opacity-35"
           disabled={loading}
         >
           Fetch Recommendations
@@ -160,9 +160,9 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
       </div>
 
       {loading && (
-        <div className="text-blue-600">Loading recommendations...</div>
+        <div className="text-muted-foreground">Loading recommendations...</div>
       )}
-      {error && <div className="text-red-600">{error}</div>}
+      {error && <div className="font-medium text-foreground">{error}</div>}
 
       {!loading && !error && filteredRecommendations.length > 0 && (
         <RecommendationDisplay recommendations={filteredRecommendations} />
