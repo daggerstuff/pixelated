@@ -3,6 +3,8 @@ import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
 import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
+export const prerender = true
+
 const operatingProfile = [
   {
     label: 'Company stage',
@@ -54,15 +56,13 @@ const operatingProfile = [
       </div>
 
       <div class="marketing-grid marketing-grid--3">
-        {
-          operatingProfile.map((item) => (
-            <article class="marketing-card">
-              <span class="marketing-card__label">{item.label}</span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))
-        }
+        {operatingProfile.map((item) => (
+          <article class="marketing-card">
+            <span class="marketing-card__label">{item.label}</span>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>

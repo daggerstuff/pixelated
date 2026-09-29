@@ -23,7 +23,11 @@ interface UsageStats {
   totalTimeSpent: number
   featureUsage: Record<string, number>
   lastSessionEnd: number | null
-  performanceMetrics: { averageLoadTime: number; errorCount: number; crashCount: number }
+  performanceMetrics: {
+    averageLoadTime: number
+    errorCount: number
+    crashCount: number
+  }
 }
 
 interface AppDataState {
@@ -53,7 +57,10 @@ interface AppDataState {
   trackFeatureUsage: (featureName: string) => void
   incrementSessionCount: () => void
   recordSessionEnd: () => void
-  updatePerformanceMetric: (metric: keyof UsageStats['performanceMetrics'], value: number) => void
+  updatePerformanceMetric: (
+    metric: keyof UsageStats['performanceMetrics'],
+    value: number,
+  ) => void
 }
 
 const defaultSessionState: SessionState = {
@@ -83,50 +90,144 @@ export const useAppDataStore = create<AppDataState>()(
           formDrafts: {},
           usageStats: defaultUsageStats,
 
-          updateSessionState: (ss) => set((state) => ({ sessionState: { ...state.sessionState, ...ss } })),
-          setCurrentRoute: (route) => set((state) => ({ sessionState: { ...state.sessionState, lastRoute: route, lastActivity: Date.now() } })),
-          setCurrentWorkspace: (workspace) => set((state) => ({ sessionState: { ...state.sessionState, currentWorkspace: workspace } })),
-          addOpenTab: (tab) => set((state) => {
-            const openTabs = [...state.sessionState.openTabs]
-            if (!openTabs.includes(tab)) { openTabs.push(tab); if (openTabs.length > 10) openTabs.shift() }
-            return { sessionState: { ...state.sessionState, openTabs } }
-          }),
-          removeOpenTab: (tab) => set((state) => ({ sessionState: { ...state.sessionState, openTabs: state.sessionState.openTabs.filter((t) => t !== tab) } })),
-          addRecentItem: (item) => set((state) => {
-            const recentItems = [item, ...state.sessionState.recentItems.filter((i) => i !== item)]
-            if (recentItems.length > 20) recentItems.splice(20)
-            return { sessionState: { ...state.sessionState, recentItems } }
-          }),
-          addSearchHistory: (query) => set((state) => {
-            const searchHistory = [query, ...state.sessionState.searchHistory.filter((q) => q !== query)]
-            if (searchHistory.length > 50) searchHistory.splice(50)
-            return { sessionState: { ...state.sessionState, searchHistory } }
-          }),
-          updateLastActivity: () => set((state) => ({ sessionState: { ...state.sessionState, lastActivity: Date.now() } })),
+          updateSessionState: (ss) =>
+            set((state) => ({
+              sessionState: { ...state.sessionState, ...ss },
+            })),
+          setCurrentRoute: (route) =>
+            set((state) => ({
+              sessionState: {
+                ...state.sessionState,
+                lastRoute: route,
+                lastActivity: Date.now(),
+              },
+            })),
+          setCurrentWorkspace: (workspace) =>
+            set((state) => ({
+              sessionState: {
+                ...state.sessionState,
+                currentWorkspace: workspace,
+              },
+            })),
+          addOpenTab: (tab) =>
+            set((state) => {
+              const openTabs = [...state.sessionState.openTabs]
+              if (!openTabs.includes(tab)) {
+                openTabs.push(tab)
+                if (openTabs.length > 10) openTabs.shift()
+              }
+              return { sessionState: { ...state.sessionState, openTabs } }
+            }),
+          removeOpenTab: (tab) =>
+            set((state) => ({
+              sessionState: {
+                ...state.sessionState,
+                openTabs: state.sessionState.openTabs.filter((t) => t !== tab),
+              },
+            })),
+          addRecentItem: (item) =>
+            set((state) => {
+              const recentItems = [
+                item,
+                ...state.sessionState.recentItems.filter((i) => i !== item),
+              ]
+              if (recentItems.length > 20) recentItems.splice(20)
+              return { sessionState: { ...state.sessionState, recentItems } }
+            }),
+          addSearchHistory: (query) =>
+            set((state) => {
+              const searchHistory = [
+                query,
+                ...state.sessionState.searchHistory.filter((q) => q !== query),
+              ]
+              if (searchHistory.length > 50) searchHistory.splice(50)
+              return { sessionState: { ...state.sessionState, searchHistory } }
+            }),
+          updateLastActivity: () =>
+            set((state) => ({
+              sessionState: { ...state.sessionState, lastActivity: Date.now() },
+            })),
 
-          queueOfflineAction: (type, payload) => set((state) => ({
-            offlineQueue: [...state.offlineQueue, { id: `${Date.now()}_${Math.random().toString(36).substring(2)}`, type, payload, timestamp: Date.now(), retryCount: 0 }],
-          })),
-          removeOfflineAction: (id) => set((state) => ({ offlineQueue: state.offlineQueue.filter((a) => a.id !== id) })),
+          queueOfflineAction: (type, payload) =>
+            set((state) => ({
+              offlineQueue: [
+                ...state.offlineQueue,
+                {
+                  id: `${Date.now()}_${Math.random().toString(36).substring(2)}`,
+                  type,
+                  payload,
+                  timestamp: Date.now(),
+                  retryCount: 0,
+                },
+              ],
+            })),
+          removeOfflineAction: (id) =>
+            set((state) => ({
+              offlineQueue: state.offlineQueue.filter((a) => a.id !== id),
+            })),
           clearOfflineQueue: () => set({ offlineQueue: [] }),
 
-          saveDraft: (formId, data) => set((state) => ({ formDrafts: { ...state.formDrafts, [formId]: { data, timestamp: Date.now() } } })),
-          getDraft: (formId) => { const draft = get().formDrafts[formId]; return draft?.data ?? null },
-          clearDraft: (formId) => set((state) => { const { [formId]: _, ...rest } = state.formDrafts; return { formDrafts: rest } }),
+          saveDraft: (formId, data) =>
+            set((state) => ({
+              formDrafts: {
+                ...state.formDrafts,
+                [formId]: { data, timestamp: Date.now() },
+              },
+            })),
+          getDraft: (formId) => {
+            const draft = get().formDrafts[formId]
+            return draft?.data ?? null
+          },
+          clearDraft: (formId) =>
+            set((state) => {
+              const { [formId]: _, ...rest } = state.formDrafts
+              return { formDrafts: rest }
+            }),
           clearAllDrafts: () => set({ formDrafts: {} }),
 
-          trackFeatureUsage: (featureName) => set((state) => ({
-            usageStats: { ...state.usageStats, featureUsage: { ...state.usageStats.featureUsage, [featureName]: (state.usageStats.featureUsage[featureName] ?? 0) + 1 } },
-          })),
-          incrementSessionCount: () => set((state) => ({ usageStats: { ...state.usageStats, sessionCount: state.usageStats.sessionCount + 1 } })),
-          recordSessionEnd: () => set((state) => {
-            const now = Date.now()
-            const sessionDuration = state.usageStats.lastSessionEnd ? now - state.usageStats.lastSessionEnd : 0
-            return { usageStats: { ...state.usageStats, lastSessionEnd: now, totalTimeSpent: state.usageStats.totalTimeSpent + sessionDuration } }
-          }),
-          updatePerformanceMetric: (metric, value) => set((state) => ({
-            usageStats: { ...state.usageStats, performanceMetrics: { ...state.usageStats.performanceMetrics, [metric]: value } },
-          })),
+          trackFeatureUsage: (featureName) =>
+            set((state) => ({
+              usageStats: {
+                ...state.usageStats,
+                featureUsage: {
+                  ...state.usageStats.featureUsage,
+                  [featureName]:
+                    (state.usageStats.featureUsage[featureName] ?? 0) + 1,
+                },
+              },
+            })),
+          incrementSessionCount: () =>
+            set((state) => ({
+              usageStats: {
+                ...state.usageStats,
+                sessionCount: state.usageStats.sessionCount + 1,
+              },
+            })),
+          recordSessionEnd: () =>
+            set((state) => {
+              const now = Date.now()
+              const sessionDuration = state.usageStats.lastSessionEnd
+                ? now - state.usageStats.lastSessionEnd
+                : 0
+              return {
+                usageStats: {
+                  ...state.usageStats,
+                  lastSessionEnd: now,
+                  totalTimeSpent:
+                    state.usageStats.totalTimeSpent + sessionDuration,
+                },
+              }
+            }),
+          updatePerformanceMetric: (metric, value) =>
+            set((state) => ({
+              usageStats: {
+                ...state.usageStats,
+                performanceMetrics: {
+                  ...state.usageStats.performanceMetrics,
+                  [metric]: value,
+                },
+              },
+            })),
         }),
         {
           name: 'therapy-state-appdata',

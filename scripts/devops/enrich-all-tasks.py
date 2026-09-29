@@ -68,7 +68,7 @@ def parse_md_all_tasks(md_path: str) -> dict[str, dict[str, str]]:
     tasks = {}
     current_task_num = None
     current_task_name = ""
-    current_task_lines = []
+    current_task_lines: list[str] = []
 
     for line in lines:
         header_match = re.match(r"^###\s+(?:\*|†|‡)?(\d+\.\d+)\s+(.*)", line)
@@ -725,7 +725,7 @@ def _extract_linkages(clean_body: str) -> tuple[list[str], str]:
 def _parse_sections(body_text: str) -> dict[str, str]:
     sections = {}
     current_section = "General"
-    current_lines = []
+    current_lines: list[str] = []
     for line in body_text.splitlines():
         header_match = re.match(r"^##+\s+(.*)", line)
         if header_match:
@@ -767,7 +767,7 @@ def _add_bullets_to_checklist(sec_content: str, sec_name: str, checklist_items: 
 def _build_sections_data(sections: dict[str, str]) -> tuple[list[str], list[str], list[str]]:
     objective_parts = []
     specs_parts = []
-    checklist_items = []
+    checklist_items: list[str] = []
     for sec_name, sec_content in list(sections.items()):
         content = sec_content.strip()
         if not content:

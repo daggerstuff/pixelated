@@ -156,13 +156,13 @@ export function ChatDemo({
   if (!isAuthenticated) {
     return (
       <div
-        className={`bg-gray-50 border-gray-300 flex h-64 items-center justify-center rounded-lg border-2 border-dashed ${className}`}
+        className={`flex h-64 items-center justify-center rounded-none border-2 border-dashed border-border bg-secondary ${className}`}
       >
         <div className="text-center">
-          <h3 className="text-gray-900 mb-2 text-lg font-medium">
+          <h3 className="mb-2 text-lg font-medium text-foreground">
             Authentication Required
           </h3>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Please sign in to access the chat interface.
           </p>
         </div>
@@ -172,16 +172,16 @@ export function ChatDemo({
 
   return (
     <div
-      className={`bg-white flex h-full flex-col rounded-lg border shadow-sm ${className}`}
+      className={`flex h-full flex-col rounded-none border bg-card ${className}`}
     >
       {/* Crisis Alert Banner */}
       {crisisAlertShown && crisisResult?.isCrisis && (
-        <div className="bg-neutral-800 border-neutral-700 text-white mb-4 rounded-md border p-4">
+        <div className="mb-4 rounded-none bg-primary p-4 text-primary-foreground">
           <div className="flex items-center justify-between">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg
-                  className="text-neutral-400 h-5 w-5"
+                  className="h-5 w-5"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -193,10 +193,8 @@ export function ChatDemo({
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-neutral-200 text-sm font-medium">
-                  Crisis Detected
-                </h3>
-                <p className="text-neutral-300 text-sm">
+                <h3 className="text-sm font-medium">Crisis Detected</h3>
+                <p className="text-sm">
                   Risk Level: {crisisResult.riskLevel} | Confidence:{' '}
                   {(crisisResult.confidence * 100).toFixed(0)}%
                 </p>
@@ -204,7 +202,7 @@ export function ChatDemo({
             </div>
             <button
               onClick={() => setCrisisAlertShown(false)}
-              className="text-neutral-400 hover:text-neutral-200"
+              className="opacity-70 hover:opacity-100"
             >
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path
@@ -220,8 +218,8 @@ export function ChatDemo({
 
       {/* Rate Limit Warning */}
       {rateLimitExceeded && (
-        <div className="bg-neutral-100 border-neutral-200 mb-4 rounded-md border p-4">
-          <p className="text-neutral-700 text-sm">
+        <div className="mb-4 rounded-none border border-border bg-secondary p-4">
+          <p className="text-sm text-foreground">
             Please wait before sending another message.
           </p>
         </div>
@@ -250,12 +248,12 @@ export function ChatDemo({
       </div>
 
       {/* Analysis Panel */}
-      <div className="border-gray-200 bg-gray-50 border-t">
+      <div className="border-t border-border bg-secondary">
         <div className="p-4">
           <div className="mb-3 flex items-center justify-between">
             <button
               onClick={() => setShowAnalysis(!showAnalysis)}
-              className="text-gray-700 bg-white border-gray-300 hover:bg-gray-50 focus:ring-neutral-500 flex items-center rounded-md border px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
+              className="flex items-center rounded-none border border-border bg-card px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               <svg
                 className={`mr-2 h-4 w-4 transform transition-transform ${showAnalysis ? 'rotate-180' : ''}`}
@@ -272,7 +270,7 @@ export function ChatDemo({
               </svg>
               {showAnalysis ? 'Hide Analysis' : 'Show Analysis'}
             </button>
-            <div className="text-gray-500 text-xs">
+            <div className="text-xs text-muted-foreground">
               Messages: {messageCount}/{MAX_MESSAGES_PER_HOUR}
             </div>
           </div>
@@ -280,32 +278,36 @@ export function ChatDemo({
           {showAnalysis && (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Sentiment Analysis */}
-              <div className="bg-white border-gray-200 rounded-lg border p-4">
+              <div className="rounded-none border border-border bg-card p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-gray-900 text-sm font-semibold">
+                  <h3 className="text-sm font-semibold text-foreground">
                     Sentiment Analysis
                   </h3>
                   {sentimentLoading && (
-                    <div className="border-neutral-200 h-4 w-4 animate-spin rounded-full border-b-2"></div>
+                    <div className="border-t-transparent h-4 w-4 animate-spin rounded-full border-2 border-ring"></div>
                   )}
                 </div>
                 {sentimentResult ? (
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Sentiment:</span>
+                      <span className="text-sm text-muted-foreground">
+                        Sentiment:
+                      </span>
                       <span className="text-sm font-medium">
                         {sentimentResult.sentiment}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Confidence:</span>
+                      <span className="text-sm text-muted-foreground">
+                        Confidence:
+                      </span>
                       <span className="text-sm font-medium">
                         {(sentimentResult.confidence * 100).toFixed(0)}%
                       </span>
                     </div>
                     {sentimentResult.emotions && (
                       <div className="mt-3">
-                        <p className="text-gray-900 mb-2 text-sm font-medium">
+                        <p className="mb-2 text-sm font-medium text-foreground">
                           Emotions:
                         </p>
                         <div className="space-y-1">
@@ -317,7 +319,7 @@ export function ChatDemo({
                                 key={emotion}
                                 className="flex justify-between text-xs"
                               >
-                                <span className="text-gray-600 capitalize">
+                                <span className="capitalize text-muted-foreground">
                                   {emotion}:
                                 </span>
                                 <span className="font-medium">
@@ -330,57 +332,65 @@ export function ChatDemo({
                     )}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-sm">No analysis available</p>
+                  <p className="text-sm text-muted-foreground">
+                    No analysis available
+                  </p>
                 )}
               </div>
 
               {/* Crisis Detection */}
-              <div className="bg-white border-gray-200 rounded-lg border p-4">
+              <div className="rounded-none border border-border bg-card p-4">
                 <div className="mb-3 flex items-center justify-between">
-                  <h3 className="text-gray-900 text-sm font-semibold">
+                  <h3 className="text-sm font-semibold text-foreground">
                     Crisis Detection
                   </h3>
                   {crisisLoading && (
-                    <div className="border-neutral-200 h-4 w-4 animate-spin rounded-full border-b-2"></div>
+                    <div className="border-t-transparent h-4 w-4 animate-spin rounded-full border-2 border-ring"></div>
                   )}
                 </div>
                 {crisisResult ? (
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">
+                      <span className="text-sm text-muted-foreground">
                         Crisis Detected:
                       </span>
                       <span
-                        className={`text-sm font-medium ${crisisResult.isCrisis ? 'text-neutral-800' : 'text-neutral-400'}`}
+                        className={`text-sm font-medium ${crisisResult.isCrisis ? 'text-foreground' : 'text-muted-foreground'}`}
                       >
                         {crisisResult.isCrisis ? 'Yes' : 'No'}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Confidence:</span>
+                      <span className="text-sm text-muted-foreground">
+                        Confidence:
+                      </span>
                       <span className="text-sm font-medium">
                         {(crisisResult.confidence * 100).toFixed(0)}%
                       </span>
                     </div>
                     {crisisResult.category && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600 text-sm">Type:</span>
+                        <span className="text-sm text-muted-foreground">
+                          Type:
+                        </span>
                         <span className="text-sm font-medium">
                           {crisisResult.category}
                         </span>
                       </div>
                     )}
                     <div className="flex justify-between">
-                      <span className="text-gray-600 text-sm">Risk Level:</span>
+                      <span className="text-sm text-muted-foreground">
+                        Risk Level:
+                      </span>
                       <span
                         className={`text-sm font-medium ${
                           crisisResult.riskLevel === 'critical'
-                            ? 'text-neutral-800'
+                            ? 'font-bold text-foreground'
                             : crisisResult.riskLevel === 'high'
-                              ? 'text-neutral-600'
+                              ? 'text-foreground'
                               : crisisResult.riskLevel === 'medium'
-                                ? 'text-neutral-500'
-                                : 'text-neutral-400'
+                                ? 'text-muted-foreground'
+                                : 'text-muted-foreground'
                         }`}
                       >
                         {crisisResult.riskLevel}
@@ -389,10 +399,10 @@ export function ChatDemo({
                     {crisisResult.suggestedActions &&
                       crisisResult.suggestedActions.length > 0 && (
                         <div className="mt-3">
-                          <p className="text-gray-900 mb-1 text-sm font-medium">
+                          <p className="mb-1 text-sm font-medium text-foreground">
                             Suggested Actions:
                           </p>
-                          <ul className="text-gray-600 space-y-1 text-xs">
+                          <ul className="space-y-1 text-xs text-muted-foreground">
                             {crisisResult.suggestedActions
                               .slice(0, 2)
                               .map((action: string) => (
@@ -406,7 +416,9 @@ export function ChatDemo({
                       )}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-sm">No analysis available</p>
+                  <p className="text-sm text-muted-foreground">
+                    No analysis available
+                  </p>
                 )}
               </div>
             </div>
@@ -415,56 +427,4 @@ export function ChatDemo({
       </div>
     </div>
   )
-}
-
-// Error Boundary Component
-export class ChatDemoErrorBoundary extends React.Component<
-  { children: React.ReactNode; fallback?: React.ReactNode },
-  { hasError: boolean; error?: Error }
-> {
-  constructor(props: {
-    children: React.ReactNode
-    fallback?: React.ReactNode
-  }) {
-    super(props)
-    this.state = { hasError: false }
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error }
-  }
-
-  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('ChatDemo Error:', error, errorInfo)
-    // Log to monitoring service in production
-  }
-
-  override async render() {
-    if (this.state.hasError) {
-      return (
-        this.props.fallback ?? (
-          <div className="bg-neutral-50 border-neutral-200 flex h-64 items-center justify-center rounded-lg border">
-            <div className="text-center">
-              <h3 className="text-neutral-900 mb-2 text-lg font-medium">
-                Something went wrong
-              </h3>
-              <p className="text-neutral-700 mb-4">
-                The chat interface encountered an error.
-              </p>
-              <button
-                onClick={() =>
-                  this.setState({ hasError: false, error: undefined })
-                }
-                className="bg-neutral-600 text-white hover:bg-neutral-700 focus:ring-neutral-500 rounded-md px-4 py-2 focus:outline-none focus:ring-2"
-              >
-                Try Again
-              </button>
-            </div>
-          </div>
-        )
-      )
-    }
-
-    return this.props.children
-  }
 }

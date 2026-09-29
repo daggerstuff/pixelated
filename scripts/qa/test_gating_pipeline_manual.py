@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import sys
+from typing import Any
 
 sys.path.insert(0, ".")
 
@@ -14,26 +15,43 @@ from ai.memory.schema import ConsentGate
 
 # Mock protocol adapter for QA
 class MockProtocol:
-    def retain_items(self, bank_id, items):
+    """In-memory stand-in; implements the two methods the write service calls.
+
+    Structural (no base class): the write service's ``protocol=`` parameter is
+    typed against ``LocalForesightProtocolAdapter`` where that module is
+    importable, but CI environments without the ``ai`` submodule check out see
+    it as ``Any`` — and strict mypy forbids subclassing an Any base. Every
+    method signature matches the adapter's interface.
+    """
+
+    def __init__(self) -> None:
+        pass  # no backing document store needed for QA
+
+    def retain_items(self, _bank_id: str, items: list[dict[str, Any]]) -> dict[str, Any]:
         return {"results": [{"id": f"doc-{len(items)}"}]}
 
-    def build_add_memory_item(self, user_id, content, metadata):
+    def build_add_memory_item(
+        self,
+        *,
+        user_id: str,
+        content: str,
+        metadata: dict[str, Any],
+    ) -> dict[str, Any]:
         return {"user_id": user_id, "content": content, "metadata": metadata}
 
 
-def test_gate(name, fn, expected):
-    result = fn()
-    status = "PASS" if result == expected else "FAIL"
-    print(f"  [{status}] {name}: expected={expected}, got={result}")
+def test_gate(name: str, value: object, expected: object) -> bool:
+    status = "PASS" if value == expected else "FAIL"
+    print(f"  [{status}] {name}: expected={expected}, got={value}")
     return status == "PASS"
 
 
-def main():
+def main() -> bool:
     passed = 0
     failed = 0
 
     service = LocalForesightMemoryWriteService(
-        protocol=MockProtocol(),  # type: ignore
+        protocol=MockProtocol(),
         default_bank_id="test-bank",
     )
 

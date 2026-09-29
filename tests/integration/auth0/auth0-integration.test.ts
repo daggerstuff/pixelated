@@ -126,18 +126,18 @@ const mockManagementClient = {
     listUsersByEmail: vi.fn() as MockedFunction<
       (params: UnknownRecord) => Promise<MockManagementDataResponse[]>
     >,
-    link: vi.fn() as MockedFunction<
-      (
-        params: UnknownRecord,
-        body: UnknownRecord,
-      ) => Promise<MockManagementDataResponse>
-    >,
-    unlink: vi.fn() as MockedFunction<
-      (
-        params: UnknownRecord,
-        body: UnknownRecord,
-      ) => Promise<MockManagementDataResponse>
-    >,
+    identities: {
+      link: vi.fn() as MockedFunction<
+        (id: string, body: UnknownRecord) => Promise<MockManagementDataResponse>
+      >,
+      delete: vi.fn() as MockedFunction<
+        (
+          id: string,
+          provider: string,
+          user_id: string,
+        ) => Promise<MockManagementDataResponse>
+      >,
+    },
   },
   assignRolestoUser: vi.fn() as MockedFunction<
     (params: { id: string; roles: string[] }) => Promise<void>
@@ -185,18 +185,23 @@ type Auth0SocialAuthServiceCtor = new () => Auth0SocialAuthService
 const EXAMPLE_TEST_SECRET_PLACEHOLDER = 'example-password-placeholder'
 
 // Mock the auth0 module
-vi.mock('auth0', () => {
+vi.mock('auth0-legacy', () => {
   return {
     AuthenticationClient: vi.fn<() => typeof mockAuthenticationClient>(
       function () {
         return mockAuthenticationClient
       },
     ),
-    ManagementClient: vi.fn<() => typeof mockManagementClient>(function () {
-      return mockManagementClient
-    }),
     UserInfoClient: vi.fn<() => typeof mockUserInfoClient>(function () {
       return mockUserInfoClient
+    }),
+  }
+})
+
+vi.mock('auth0', () => {
+  return {
+    ManagementClient: vi.fn<() => typeof mockManagementClient>(function () {
+      return mockManagementClient
     }),
   }
 })
@@ -285,8 +290,10 @@ describe('Auth0 Integration Tests', () => {
       }
     Auth0SocialAuthServiceClass = socialAuthMod.Auth0SocialAuthService
 
-    auth0JwtService = await import('../../../apps/web/src/lib/auth/auth0-jwt-service')
-    auth0RbacService = await import('../../../apps/web/src/lib/auth/auth0-rbac-service')
+    auth0JwtService =
+      await import('../../../apps/web/src/lib/auth/auth0-jwt-service')
+    auth0RbacService =
+      await import('../../../apps/web/src/lib/auth/auth0-rbac-service')
   })
 
   afterAll(() => {
@@ -319,8 +326,8 @@ describe('Auth0 Integration Tests', () => {
     mockManagementClient.users.update.mockReset()
     mockManagementClient.users.list.mockReset()
     mockManagementClient.users.listUsersByEmail.mockReset()
-    mockManagementClient.users.link.mockReset()
-    mockManagementClient.users.unlink.mockReset()
+    mockManagementClient.users.identities.link.mockReset()
+    mockManagementClient.users.identities.delete.mockReset()
     mockManagementClient.assignRolestoUser.mockReset()
     mockManagementClient.getUserRoles.mockReset()
     mockManagementClient.getUserPermissions.mockReset()
@@ -402,7 +409,8 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Verify security event was logged
-      const securityModule = await import('../../../apps/web/src/lib/security/index')
+      const securityModule =
+        await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
@@ -437,9 +445,9 @@ describe('Auth0 Integration Tests', () => {
         user_metadata: { role: 'user', created_at: '2023-01-01T00:00:00Z' },
       }
 
-      mockManagementClient.users.create.mockResolvedValue({
-        data: mockAuth0User,
-      })
+      // auth0 v5 returns the created user record directly (no axios-style
+      // { data: ... } envelope)
+      mockManagementClient.users.create.mockResolvedValue(mockAuth0User)
 
       const result = await auth0UserService.createUser(
         'newuser@example.com',
@@ -615,7 +623,8 @@ describe('Auth0 Integration Tests', () => {
       expect(typeof result.user.createdAt).toBe('string')
 
       // Verify security event was logged
-      const securityModule = await import('../../../apps/web/src/lib/security/index')
+      const securityModule =
+        await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
@@ -786,7 +795,8 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Verify security event was logged
-      const securityModule = await import('../../../apps/web/src/lib/security/index')
+      const securityModule =
+        await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         null,
@@ -902,7 +912,8 @@ describe('Auth0 Integration Tests', () => {
       await auth0UserService.signIn('test@example.com', 'password123')
 
       // Verify security event was logged
-      const securityModule = await import('../../../apps/web/src/lib/security/index')
+      const securityModule =
+        await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
@@ -929,7 +940,8 @@ describe('Auth0 Integration Tests', () => {
       await auth0RbacService.assignRoleToUser('auth0|user123', 'therapist')
 
       // Verify security event was logged
-      const securityModule = await import('../../../apps/web/src/lib/security/index')
+      const securityModule =
+        await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         null,
@@ -962,7 +974,8 @@ describe('Auth0 Integration Tests', () => {
       )
 
       // Verify security event was logged
-      const securityModule = await import('../../../apps/web/src/lib/security/index')
+      const securityModule =
+        await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_VALIDATED,
         null,
@@ -1001,7 +1014,8 @@ describe('Auth0 Integration Tests', () => {
       await auth0JwtService.refreshAccessToken('valid-refresh-token', {})
 
       // Verify security event was logged
-      const securityModule = await import('../../../apps/web/src/lib/security/index')
+      const securityModule =
+        await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_REFRESHED,
         null,
@@ -1079,7 +1093,7 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should properly link social account to existing user', async () => {
-      mockManagementClient.users.link.mockResolvedValue({ data: {} })
+      mockManagementClient.users.identities.link.mockResolvedValue({ data: {} })
 
       await auth0SocialAuthService.linkSocialAccount(
         'auth0|user123',
@@ -1087,10 +1101,8 @@ describe('Auth0 Integration Tests', () => {
         'access-token-123',
       )
 
-      expect(mockManagementClient.users.link).toHaveBeenCalledWith(
-        {
-          id: 'auth0|user123',
-        },
+      expect(mockManagementClient.users.identities.link).toHaveBeenCalledWith(
+        'auth0|user123',
         {
           provider: 'google-oauth2',
           connection_id: 'google-oauth2',
@@ -1099,7 +1111,8 @@ describe('Auth0 Integration Tests', () => {
       )
 
       // Verify security event was logged
-      const securityModule = await import('../../../apps/web/src/lib/security/index')
+      const securityModule =
+        await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ACCOUNT_LINKED,
         null,

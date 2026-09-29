@@ -26,6 +26,8 @@ Usage::
 
 from __future__ import annotations
 
+from typing import Any
+
 import psycopg2
 
 # Wall budget: 3 minutes for DDL execution.
@@ -80,7 +82,7 @@ def setup_postgres_tables(pg_conn: psycopg2.extensions.connection) -> None:
         cur.close()
 
 
-def verify_postgres_tables(pg_conn: psycopg2.extensions.connection) -> dict[str, list[dict]]:
+def verify_postgres_tables(pg_conn: psycopg2.extensions.connection) -> dict[str, list[dict[str, Any]]]:
     """Verify both tables exist with correct schema.
 
     Returns a dict mapping table names to their column info.
@@ -93,7 +95,7 @@ def verify_postgres_tables(pg_conn: psycopg2.extensions.connection) -> dict[str,
         Dict mapping table name to list of column info dicts.
     """
     cur = pg_conn.cursor()
-    result = {}
+    result: dict[str, list[dict[str, Any]]] = {}
 
     try:
         # -- Verify audit_findings_table -------------------------------------

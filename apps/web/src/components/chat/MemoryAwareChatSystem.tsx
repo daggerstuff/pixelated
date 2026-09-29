@@ -32,10 +32,13 @@ import {
   UseChatWithMemoryReturn,
 } from '@/hooks/useChatWithMemory'
 import { authClient } from '@/lib/auth-client'
+import { EmotionClassifier } from '@/lib/memory/emotion-classifier'
 import { cn } from '@/lib/utils'
 import type { Message } from '@/types/chat'
 
 import { ChatContainer } from './ChatContainer'
+
+const emotionClassifier = new EmotionClassifier()
 
 interface MemoryAwareChatSystemProps {
   className?: string
@@ -63,20 +66,60 @@ export function MemoryAwareChatSystem({
   const [showSettings, setShowSettings] = useState(false)
   const [conversationSummary, setConversationSummary] = useState<string>('')
 
-  const { messages, isLoading, sendMessage, memory }: UseChatWithMemoryReturn =
-    useChatWithMemory({
-      sessionId: sessionId!,
-      enableMemory,
-      enableAnalysis,
-      maxMemoryContext: 15,
-      api: '/api/mental-health/chat', // Use the actual therapeutic AI endpoint
-    })
+  const {
+    messages,
+    isLoading,
+    sendMessage,
+    setMessages,
+    memory,
+  }: UseChatWithMemoryReturn = useChatWithMemory({
+    sessionId: sessionId!,
+    enableMemory,
+    enableAnalysis,
+    maxMemoryContext: 15,
+    api: '/api/mental-health/chat', // Use the actual therapeutic AI endpoint
+  })
 
   const getConversationSummary = async () => {
-    // This is a placeholder. In a real implementation, you might call an API.
-    return `This has been a productive conversation about ${
-      memory.stats?.totalMemories
-    } topics.`
+    if (messages.length === 0) {
+      return 'This conversation has not started yet.'
+    }
+
+    const userMessages = messages.filter((m) => m.role === 'user')
+    const results = emotionClassifier.classifyBatch(
+      userMessages.map((m) => m.content),
+    )
+    const trajectory = emotionClassifier.sessionTrajectory(results)
+
+    const categoryCounts = new Map<string, number>()
+    for (const result of results) {
+      for (const category of result.categories) {
+        categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1)
+      }
+    }
+    const themes = [...categoryCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([category]) => category)
+
+    const parts = [
+      `${messages.length} messages exchanged (${userMessages.length} from you)`,
+    ]
+    if (themes.length > 0) {
+      parts.push(`emotional themes: ${themes.join(', ')}`)
+    }
+    if (userMessages.length > 0) {
+      parts.push(`affective trend: ${trajectory.trend}`)
+    }
+    if (trajectory.crisisIndicators.length > 0) {
+      parts.push(
+        `crisis indicators: ${[...new Set(trajectory.crisisIndicators)].join(', ')}`,
+      )
+    }
+    if (memory.memories.length > 0) {
+      parts.push(`${memory.memories.length} memories retained`)
+    }
+    return `This conversation has ${parts.join('; ')}.`
   }
 
   // Generate conversation summary when messages change
@@ -127,44 +170,40 @@ export function MemoryAwareChatSystem({
     }
 
     return (
-      <Card className="border-blue-200 dark:border-blue-800">
+      <Card className="border-input">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <Brain className="text-blue-600 h-4 w-4" />
+            <Brain className="h-4 w-4 text-foreground" />
             Memory Statistics
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-3 gap-3 text-sm">
-            <div className="bg-blue-50 dark:bg-blue-950/20 rounded p-2 text-center">
-              <div className="text-blue-700 dark:text-blue-300 font-semibold">
+            <div className="rounded-none bg-secondary p-2 text-center">
+              <div className="font-semibold text-foreground">
                 {memory.stats?.totalMemories ?? 0}
               </div>
-              <div className="text-blue-600 dark:text-blue-400 text-xs">
+              <div className="text-xs text-muted-foreground">
                 Total Memories
               </div>
             </div>
-            <div className="bg-green-50 dark:bg-green-950/20 rounded p-2 text-center">
-              <div className="text-green-700 dark:text-green-300 font-semibold">
+            <div className="rounded-none bg-secondary p-2 text-center">
+              <div className="font-semibold text-foreground">
                 {memory.memories.length}
               </div>
-              <div className="text-green-600 dark:text-green-400 text-xs">
-                This Session
-              </div>
+              <div className="text-xs text-muted-foreground">This Session</div>
             </div>
-            <div className="bg-purple-50 dark:bg-purple-950/20 rounded p-2 text-center">
-              <div className="text-purple-700 dark:text-purple-300 font-semibold">
+            <div className="rounded-none bg-secondary p-2 text-center">
+              <div className="font-semibold text-foreground">
                 {/* Context Used: Not available in MemoryStats, so remove or replace */}
                 N/A
               </div>
-              <div className="text-purple-600 dark:text-purple-400 text-xs">
-                Context Used
-              </div>
+              <div className="text-xs text-muted-foreground">Context Used</div>
             </div>
           </div>
 
           {enableMemory && (
-            <div className="text-gray-600 dark:text-gray-400 flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Brain className="h-3 w-3" />
               AI is using conversation memory for personalized responses
             </div>
@@ -180,17 +219,15 @@ export function MemoryAwareChatSystem({
     }
 
     return (
-      <Card className="border-amber-200 dark:border-amber-800">
+      <Card className="border-ring">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
-            <Lightbulb className="text-amber-600 h-4 w-4" />
+            <Lightbulb className="h-4 w-4 text-foreground" />
             Conversation Insights
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-700 dark:text-gray-300 text-sm">
-            {conversationSummary}
-          </p>
+          <p className="text-sm text-foreground">{conversationSummary}</p>
         </CardContent>
       </Card>
     )
@@ -202,7 +239,7 @@ export function MemoryAwareChatSystem({
     }
 
     return (
-      <Card className="border-gray-200 dark:border-gray-700">
+      <Card className="border-border">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-sm font-medium">
             <Settings className="h-4 w-4" />
@@ -216,7 +253,7 @@ export function MemoryAwareChatSystem({
                 <Label htmlFor="memory-toggle" className="text-sm font-medium">
                   Enable Memory
                 </Label>
-                <p className="text-gray-600 dark:text-gray-400 text-xs">
+                <p className="text-xs text-muted-foreground">
                   Allow AI to remember and learn from conversations
                 </p>
               </div>
@@ -233,7 +270,7 @@ export function MemoryAwareChatSystem({
               <Label htmlFor="analysis-toggle" className="text-sm font-medium">
                 Enable Analysis
               </Label>
-              <p className="text-gray-600 dark:text-gray-400 text-xs">
+              <p className="text-xs text-muted-foreground">
                 Analyze messages for emotions and topics
               </p>
             </div>
@@ -249,15 +286,24 @@ export function MemoryAwareChatSystem({
   }
 
   const handleRegenerate = () => {
-    // This is a placeholder. A real implementation would be more complex.
-    if (messages.length > 0) {
-      void sendMessage('Please regenerate the last response.')
+    const lastUserIndex = messages.map((m) => m.role).lastIndexOf('user')
+    if (lastUserIndex === -1) {
+      return
     }
+    const messageToResend = messages[lastUserIndex]
+    setMessages(messages.slice(0, lastUserIndex))
+    void sendMessage(messageToResend.content)
   }
 
   const handleClear = () => {
-    // This is a placeholder.
-    // In a real implementation, you might want to confirm with the user.
+    if (
+      !window.confirm(
+        'Clear all messages and stored memories for this session?',
+      )
+    ) {
+      return
+    }
+    setMessages([])
     memory.clearMemories()
   }
 
@@ -326,13 +372,13 @@ export function MemoryAwareChatSystem({
               size="sm"
               onClick={handleClear}
               disabled={messages.length === 0}
-              className="text-red-600 hover:text-red-700 flex items-center gap-1"
+              className="flex items-center gap-1 text-foreground hover:text-muted-foreground"
             >
               <Trash2 className="h-3 w-3" />
               Clear
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Clear all messages</TooltipContent>
+          <TooltipContent>Clear all messages and memories</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     </div>
@@ -344,10 +390,10 @@ export function MemoryAwareChatSystem({
     }
 
     return (
-      <div className="text-gray-500 dark:text-gray-400 flex items-center gap-2 text-xs">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
         {messages.filter((m) => m.role === 'assistant').length > 0 && (
           <div className="flex items-center gap-1">
-            <div className="bg-green-500 h-2 w-2 animate-pulse rounded-full" />
+            <div className="h-2 w-2 animate-pulse rounded-none bg-primary" />
             <span>Messages stored in memory</span>
           </div>
         )}
@@ -367,20 +413,16 @@ export function MemoryAwareChatSystem({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-gray-900 dark:text-gray-100 text-xl font-semibold">
-              {title}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              {subtitle}
-            </p>
+            <h2 className="text-xl font-semibold text-foreground">{title}</h2>
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
           </div>
           <div className="flex items-center gap-2">
             {user && (
-              <div className="text-gray-500 dark:text-gray-400 text-xs">
+              <div className="text-xs text-muted-foreground">
                 User: {user.fullName ?? user.email}
               </div>
             )}
-            <Brain className="text-blue-600 h-5 w-5" />
+            <Brain className="h-5 w-5 text-foreground" />
           </div>
         </div>
 
@@ -390,12 +432,12 @@ export function MemoryAwareChatSystem({
 
       {/* Error Display */}
       {memory.error && (
-        <div className="bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800 rounded-lg border p-3">
-          <div className="text-red-700 dark:text-red-300 flex items-center gap-2">
+        <div className="rounded-none border border-ring bg-secondary p-3">
+          <div className="flex items-center gap-2 text-foreground">
             <Info className="h-4 w-4" />
             <span className="text-sm font-medium">Error</span>
           </div>
-          <p className="text-red-600 dark:text-red-400 mt-1 text-sm">
+          <p className="mt-1 text-sm font-semibold text-foreground">
             {memory.error}
           </p>
         </div>
@@ -424,14 +466,14 @@ export function MemoryAwareChatSystem({
           {renderSettings()}
 
           {/* Info Panel */}
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-border">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-sm font-medium">
                 <Info className="h-4 w-4" />
                 How Memory Works
               </CardTitle>
             </CardHeader>
-            <CardContent className="text-gray-600 dark:text-gray-400 space-y-2 text-xs">
+            <CardContent className="space-y-2 text-xs text-muted-foreground">
               <div className="flex items-start gap-2">
                 <MessageSquare className="mt-1 h-3 w-3 flex-shrink-0" />
                 <span>

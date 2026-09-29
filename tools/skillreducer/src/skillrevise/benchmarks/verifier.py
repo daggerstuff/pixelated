@@ -60,8 +60,13 @@ class CommandVerifier:
             capture_output=True,
             text=True,
             timeout=int(task.metadata.get("timeout_seconds", self.timeout_seconds)),
+            check=False,
         )
-        summary = completed.stdout.strip().splitlines()[-1] if completed.stdout.strip() else "Verifier finished."
+        summary = (
+            completed.stdout.strip().splitlines()[-1]
+            if completed.stdout.strip()
+            else "Verifier finished."
+        )
         return VerifierResult(
             success=completed.returncode == 0,
             summary=summary,

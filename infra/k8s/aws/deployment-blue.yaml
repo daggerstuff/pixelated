@@ -12,7 +12,9 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 1
+      # Zero-downtime progressive rollout: new pods must be Ready before any
+      # old pod is terminated (matches deployment-green.yaml).
+      maxUnavailable: 0
       maxSurge: 1
   selector:
     matchLabels:

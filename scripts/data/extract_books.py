@@ -95,18 +95,20 @@ try:
 except ImportError:
     CRISIS_DETECTOR_AVAILABLE = False
 
+
+class _ClientError(Exception):
+    """Fallback error type when botocore is unavailable."""
+
+
 try:
     import boto3
-    from botocore.exceptions import ClientError
+    from botocore.exceptions import ClientError as _BotocoreClientError
 
     BOTO3_AVAILABLE = True
+    ClientError: type[Exception] = _BotocoreClientError
 except ImportError:
     boto3 = None
-
-    class _ClientError(Exception):
-        """Fallback error type when botocore is unavailable."""
-
-    ClientError: type[Exception] = _ClientError
+    ClientError = _ClientError
     BOTO3_AVAILABLE = False
 
 PIPELINE_COMPONENTS_AVAILABLE = HybridTaxonomyClassifier is not None
@@ -272,7 +274,7 @@ class BooksExtractor:
             return min(total_pages, self.config.max_pages)
         return total_pages
 
-    def _extract_book_identity(self, reader: "PdfReader", file_path: Path, total_pages: int) -> tuple[str, str]:
+    def _extract_book_identity(self, reader: PdfReader, file_path: Path, total_pages: int) -> tuple[str, str]:
         """Extract title and author metadata from the first PDF page."""
         book_title = file_path.stem
         author = "Unknown"
@@ -287,7 +289,7 @@ class BooksExtractor:
             author = metadata["author"]
         return book_title, author
 
-    def _collect_pdf_chapters(self, reader: "PdfReader", total_pages: int) -> dict[str, list[tuple[int, str]]]:
+    def _collect_pdf_chapters(self, reader: PdfReader, total_pages: int) -> dict[str, list[tuple[int, str]]]:
         """Collect text for each chapter from a PDF."""
         full_text_by_chapter: dict[str, list[tuple[int, str]]] = {}
         current_chapter_pages: list[tuple[int, str]] = []
@@ -701,7 +703,7 @@ class BooksExtractor:
             return False
 
 
-def main():
+def main() -> int:
     """Main entry point for books extraction."""
     parser = argparse.ArgumentParser(description="PIX-2: Extract therapeutic content from books (PDF/EPUB/TXT)")
 

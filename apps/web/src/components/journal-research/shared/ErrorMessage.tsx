@@ -70,7 +70,7 @@ export function ErrorMessage({
       {showDetails && normalizedError && (
         <details className="mt-2 text-xs">
           <summary className="cursor-pointer">Technical details</summary>
-          <pre className="bg-muted mt-2 overflow-auto rounded p-2">
+          <pre className="mt-2 overflow-auto rounded bg-muted p-2">
             {normalizedError.message}
             {normalizedError.code && `\nCode: ${normalizedError.code}`}
           </pre>
@@ -91,7 +91,10 @@ export function FieldError({ error, className }: FieldErrorProps) {
   }
 
   return (
-    <p className={cn('text-sm text-red-500 mt-1', className)} role="alert">
+    <p
+      className={cn('text-sm text-foreground font-semibold mt-1', className)}
+      role="alert"
+    >
       {error}
     </p>
   )

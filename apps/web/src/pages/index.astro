@@ -2,406 +2,856 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
-import { heroContent, workflowContent, ctaContent } from '@/lib/content'
 
-const { hero, workflow, cta } = {
-  hero: heroContent,
-  workflow: workflowContent,
-  cta: ctaContent,
-}
+const metaTitle =
+  'A closed-loop system for clinical mastery | Pixelated Empathy'
+const metaDescription =
+  'Deterministic adversarial clinical simulation meets real-time multi-judge auditing. Rehearse high-stakes rupture repairs, crisis screenings, and boundary confrontations with adaptive synthetic personas—supervised turn-by-turn with instant retry loops.'
 
-const accentIndex = hero.title.indexOf(hero.titleAccent)
-const heroTitleParts =
-  accentIndex === -1
-    ? { before: hero.title, accent: '', after: '' }
-    : {
-        before: hero.title.slice(0, accentIndex),
-        accent: hero.titleAccent,
-        after: hero.title.slice(accentIndex + hero.titleAccent.length),
-      }
-
-const sessionWalkthrough = [
+const trainingLoop = [
   {
-    label: 'Scenario',
-    value:
-      'A client in week three of therapy says she is not sure this is the right place and considers stopping.',
+    num: '01',
+    title: 'Deterministic Adversarial Personas',
+    description:
+      'Trainees engage with synthetic clients calibrated across 120 clinical edge-case matrices that push back, test boundaries, and refuse shallow rapport.',
   },
   {
-    label: 'Practice room',
-    value:
-      'Trainee enters the conversation with an AI client that adapts to hesitation, disclosure timing, and the moment the room changes.',
+    num: '02',
+    title: 'Multi-Judge Real-Time Auditing',
+    description:
+      'Quadit multi-judge evaluation and clinical supervisors flag formulaic parroting, therapy-speak macros, and avoidance on the exact turn.',
   },
   {
-    label: 'Review desk',
-    value:
-      'Supervisor opens the transcript, marks the response that needed to slow down, and assigns the same scenario again as a retry.',
-  },
-  {
-    label: 'Training record',
-    value:
-      'The case, transcript, and supervisor note stay attached to the same run, so the next supervision meeting starts at the right moment.',
+    num: '03',
+    title: 'Turn-Level Supervised Retries',
+    description:
+      'Trainees execute instant directed retries at the exact point of rupture, building authentic conversational risk tolerance before real patient contact.',
   },
 ]
 
-const buildableScenarios = [
+const clinicalScenarios = [
   {
-    kicker: 'Escalation',
-    body: 'Suicidality screening, de-escalation, safety planning, and what to say when the room changes faster than expected.',
+    badge: 'Crisis & Safety',
+    title: 'Suicidality Screening & Safety Planning',
+    description:
+      'Assess lethality signals, ask direct questions without hesitation or panic, and build collaborative safety plans under acute distress.',
   },
   {
-    kicker: 'Rupture',
-    body: 'Avoidance, dysregulation, emotional withdrawal, and the repairs that decide whether a client stays in the conversation.',
+    badge: 'Alliance Rupture',
+    title: 'Confronting Pushback & Stalled Progress',
+    description:
+      'Detect implicit dropout signals, drop defensive conversational scaffolding, and address the therapeutic impasse directly without deflection.',
   },
   {
-    kicker: 'Disclosure',
-    body: 'The turn where a client shares something high-stakes and the therapist has to decide what to do next without flattening the room.',
+    badge: 'Trauma & Pacing',
+    title: 'Titrating Heavy Disclosures & Flooding',
+    description:
+      'Ground clients during acute affective dysregulation, pace traumatic material safely, and avoid premature solutioning or cognitive fixes.',
+  },
+  {
+    badge: 'Boundary Integrity',
+    title: 'Managing Frame Erosion & Transference',
+    description:
+      'Hold clinical boundaries firmly under emotional pressure, address relational testing, and maintain frame integrity without coldness.',
+  },
+]
+
+const clinicalTriad = [
+  {
+    role: 'For Trainees',
+    title: 'Active Stance & Zero-Risk Clinical Mastery',
+    description:
+      'Break out of canned empathy macros and passive head-nodding. Build real muscle memory through repeated exposure to uncooperative clinical moments.',
+  },
+  {
+    role: 'For Supervisors',
+    title: 'Turn-by-Turn Telemetry & Exact Auditing',
+    description:
+      'Review deterministic transcripts and automated multi-judge evaluations instead of relying on distorted student self-reports.',
+  },
+  {
+    role: 'For Program Directors',
+    title: 'Standardized Accreditation & Cohort Benchmarking',
+    description:
+      'Deliver calibrated clinical edge cases to every cohort member with auditable competency metrics mapped to CACREP, APA, and CSWE standards.',
   },
 ]
 ---
 
-<BaseLayout title={hero.title} description={hero.metaDescription}>
+<BaseLayout title={metaTitle} description={metaDescription}>
   <div class="np-page">
-    <!-- Hero: content left, conversation demo right -->
-    <section class="np-hero" aria-label="Platform overview">
-      <div class="np-container np-hero__grid">
-        <div class="np-hero__content">
-          <h1 class="np-display np-hero__display">
-            {heroTitleParts.before}<span class="np-mono-word"
-              >{heroTitleParts.accent}</span
-            >{heroTitleParts.after}
+    <!-- Hero Section -->
+    <section
+      class="np-section np-hero-section"
+      aria-label="Clinical AI Simulation Platform"
+    >
+      <div class="np-container np-hero-container">
+        <!-- Main Hero Deck -->
+        <div class="np-hero-header">
+          <div class="np-hero-top-meta">
+            <span class="np-eyebrow">
+              System Architecture · Closed-Loop Clinical AI
+            </span>
+            <span class="np-status-pill">
+              <span class="np-status-dot" aria-hidden="true"></span>
+              Live Telemetry Active
+            </span>
+          </div>
+
+          <h1 class="np-display-hero">
+            A closed-loop system for clinical mastery.
           </h1>
-          <p class="np-body-strong np-hero__subtitle">{hero.subtitle}</p>
-          <div class="np-hero__actions">
-            <a
-              class="np-btn np-btn-primary"
-              href={withBasePath(hero.primaryCTA.href)}
-            >
-              {hero.primaryCTA.text}
-            </a>
-            <a
-              class="np-btn np-btn-ghost"
-              href={withBasePath(hero.secondaryCTA.href)}
-            >
-              {hero.secondaryCTA.text}
-            </a>
-          </div>
-        </div>
 
-        <!-- Chat conversation demo — raw transcript style, not bubbles -->
-        <aside
-          class="np-chat-demo"
-          aria-label="Example therapy conversation on the platform"
-          role="region"
-        >
-          <div class="np-chat-demo__header">
-            <span class="np-chat-demo__label">Session transcript</span>
-            <span class="np-chat-demo__status"
-              >Scenario 03 · Rupture repair</span
-            >
-          </div>
-
-          <div class="np-chat-demo__messages">
-            <div class="np-chat-demo__entry">
-              <span class="np-chat-demo__sender">Client — Sarah</span>
-              <p>
-                I&#39;ve been thinking about whether this is really working for
-                me.
-              </p>
-            </div>
-
-            <div class="np-chat-demo__entry np-chat-demo__entry--therapist">
-              <span class="np-chat-demo__sender">Trainee</span>
-              <p>
-                It sounds like you&#39;re not sure this is the right place. What
-                feels off?
-              </p>
-            </div>
-
-            <div class="np-chat-demo__entry">
-              <span class="np-chat-demo__sender">Client — Sarah</span>
-              <p>
-                I don&#39;t know. I just feel like I&#39;m not getting anywhere.
-              </p>
-            </div>
-
-            <div class="np-chat-demo__entry np-chat-demo__entry--therapist">
-              <span class="np-chat-demo__sender">Trainee</span>
-              <p>
-                That&#39;s worth sitting with. Can you tell me what
-                &ldquo;getting somewhere&rdquo; would look like?
-              </p>
-            </div>
-
-            <div class="np-chat-demo__entry">
-              <span class="np-chat-demo__sender">Client — Sarah</span>
-              <p>
-                I guess&hellip; I thought I&#39;d feel different by now. Like
-                something would click.
-              </p>
-            </div>
-
-            <div class="np-chat-demo__entry np-chat-demo__entry--therapist">
-              <span class="np-chat-demo__sender">Trainee</span>
-              <p>
-                It makes sense to expect change to feel more obvious. Let&#39;s
-                look at what has shifted&mdash;even the small things.
-              </p>
-            </div>
-          </div>
-
-          <div class="np-chat-demo__typing" aria-hidden="true">
-            <span class="np-chat-demo__dot"></span>
-            <span class="np-chat-demo__dot"></span>
-            <span class="np-chat-demo__dot"></span>
-            <span>Client is typing</span>
-          </div>
-
-          <p class="np-chat-demo__note">
-            Simulated conversation&ensp;&middot;&ensp;Trainee responds to an AI
-            client
+          <p class="np-lede">
+            Deterministic adversarial simulation meets real-time multi-judge
+            auditing. Trainees rehearse rupture repairs, crisis screenings, and
+            boundary confrontations against adaptive synthetic clients—audited
+            turn-by-turn to eliminate canned empathy and formulaic parroting.
           </p>
-        </aside>
-      </div>
 
-      <div class="np-container">
-        <div class="np-hero__proof">
-          {
-            hero.proofPoints.map((point) => (
-              <div class="np-hero__proof-item">
-                <span class="np-data">{point.label}</span>
-                <p class="np-mono">{point.text}</p>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </section>
+          <div class="np-actions-row">
+            <a class="np-btn np-btn-primary" href={withBasePath('/contact')}>
+              Request Institutional Pilot
+            </a>
+            <a class="np-btn np-btn-ghost" href={withBasePath('/features')}>
+              Inspect Adversarial Matrix
+            </a>
+          </div>
 
-    <!-- Trust strip: credentials and institutional signals -->
-    <section class="np-trust" aria-label="Credentials and standards">
-      <div class="np-container">
-        <p class="np-trust__label">Built for clinical training programs</p>
-        <div class="np-trust__row">
-          <span class="np-trust__badge">HIPAA-ready</span>
-          <span class="np-trust__badge">FERPA-aligned</span>
-          <span class="np-trust__badge">Evidence-based scenarios</span>
-          <span class="np-trust__badge">Accreditation-ready records</span>
-        </div>
-        <div class="np-trust__logos">
-          <img
-            src={withBasePath('/images/client-logo-1.svg')}
-            alt=""
-            aria-hidden="true"
-            class="np-trust__logo"
-          />
-          <img
-            src={withBasePath('/images/client-logo-2.svg')}
-            alt=""
-            aria-hidden="true"
-            class="np-trust__logo"
-          />
-          <img
-            src={withBasePath('/images/client-logo-3.svg')}
-            alt=""
-            aria-hidden="true"
-            class="np-trust__logo"
-          />
-          <img
-            src={withBasePath('/images/client-logo-4.svg')}
-            alt=""
-            aria-hidden="true"
-            class="np-trust__logo"
-          />
-          <img
-            src={withBasePath('/images/client-logo-5.svg')}
-            alt=""
-            aria-hidden="true"
-            class="np-trust__logo"
-          />
-        </div>
-      </div>
-    </section>
-
-    <!-- How the training loop works: the one path the product asks you to follow. -->
-    <section class="np-section np-section--track np-reveal">
-      <div class="np-container">
-        <div class="np-section-header np-section-header--track">
-          <h2 class="np-headline">{workflow.title}</h2>
+          <div class="np-hero-ticker">
+            <div class="np-ticker-item">120 Adversarial Edge Cases</div>
+            <div class="np-ticker-item">Quadit 4-Judge Active Gate</div>
+            <div class="np-ticker-item">Zero-PHI Airgap Verified</div>
+            <div class="np-ticker-item">CACREP & APA Benchmarked</div>
+          </div>
         </div>
 
-        <ol class="np-track" aria-label="Training loop steps">
-          {
-            workflow.steps.map((step) => (
-              <li class="np-track__step">
-                <span class="np-track__number" aria-hidden="true">
-                  {step.number}
+        <!-- Expansive Clinical Simulation & Telemetry Workstation -->
+        <div
+          class="np-apparatus"
+          aria-label="Clinical Telemetry & Simulation Workstation"
+        >
+          <!-- Top Hardware / Control Deck -->
+          <div class="np-apparatus-top">
+            <div
+              class="np-apparatus-tabs"
+              role="tablist"
+              aria-label="Clinical Scenario Matrix"
+            >
+              <button
+                type="button"
+                class="np-apparatus-tab is-active"
+                role="tab"
+                aria-selected="true"
+                data-scenario="0"
+                id="btn-scenario-0"
+              >
+                [ 01 // Alliance Rupture & Repair ]
+              </button>
+              <button
+                type="button"
+                class="np-apparatus-tab"
+                role="tab"
+                aria-selected="false"
+                data-scenario="1"
+                id="btn-scenario-1"
+              >
+                [ 02 // Crisis & Suicidality ]
+              </button>
+              <button
+                type="button"
+                class="np-apparatus-tab"
+                role="tab"
+                aria-selected="false"
+                data-scenario="2"
+                id="btn-scenario-2"
+              >
+                [ 03 // Frame & Boundary Integrity ]
+              </button>
+            </div>
+
+            <div class="np-apparatus-telemetry-badge">
+              <span id="app-session-id">
+                SESSION #0412 · ADVERSARIAL MATRIX
+              </span>
+              <span>•</span>
+              <span id="app-latency-tag">LATENCY: 312ms</span>
+            </div>
+          </div>
+
+          <!-- Dual-Pane Workstation Grid -->
+          <div class="np-apparatus-grid">
+            <!-- Left Pane: Deterministic Dialogue & DPO Pairs -->
+            <div class="np-apparatus-pane np-apparatus-pane--left">
+              <div class="np-pane-head">
+                <span>
+                  01 // Deterministic Conversational Trace & DPO Pairs
                 </span>
-                <h3 class="np-title np-track__title">{step.title}</h3>
-                <p class="np-body np-track__body">{step.body}</p>
-              </li>
-            ))
-          }
-        </ol>
-      </div>
-    </section>
+                <span class="np-pane-tag" id="app-dpo-tag">
+                  DPO PAIR #889
+                </span>
+              </div>
 
-    <!-- One session, end to end: the actual product shape, walked as an artifact. -->
-    <section class="np-section np-section--artifact np-reveal">
-      <div class="np-container">
-        <div class="np-section-header">
-          <h2 class="np-headline">
-            One attempt. Four things your next meeting can teach from.
-          </h2>
-          <p class="np-body">
-            A single trainee attempt leaves behind a scenario, a full
-            transcript, a supervisor note, and a training record — all tied to
-            the same run. Nobody reconstructs the session from memory, and the
-            next supervision meeting opens exactly where it should.
-          </p>
-        </div>
+              <div class="np-pane-body">
+                <!-- Turn 1: Client Prompt -->
+                <div class="np-turn">
+                  <div class="np-turn-meta np-turn-meta--client">
+                    <span id="app-client-meta">
+                      Synthetic Client · Sarah M. (Week 3)
+                    </span>
+                    <span id="app-client-time">14:08</span>
+                  </div>
+                  <div
+                    class="np-turn-content np-turn-content--client"
+                    id="app-client-prompt"
+                  >
+                    "I've been thinking about whether this is really working for
+                    me. I just don't feel like I'm getting anywhere, and maybe I
+                    shouldn't have started."
+                  </div>
+                  <div class="np-turn-telemetry" id="app-client-telemetry">
+                    <span>Affect: Guarded / Withdrawn</span>
+                    <span>•</span>
+                    <span>Rupture Severity: 0.82 (High)</span>
+                    <span>•</span>
+                    <span>Dropout Risk: Imminent</span>
+                  </div>
+                </div>
 
-        <figure class="np-screenshot">
-          <img
-            src={withBasePath('/images/homepage/training-session-proof.png')}
-            alt="Pixelated Empathy training session interface: practice room, review notes, and session record"
-            loading="lazy"
-            width="960"
-            height="540"
-          />
-          <figcaption class="np-screenshot__caption">
-            <span class="np-data">Practice room</span>
-            <span class="np-mono"
-              >Trainee conversation on the left · Supervisor review on the right</span
-            >
-          </figcaption>
-        </figure>
+                <!-- Turn 2a: Attempt 1 (Rejected) -->
+                <div class="np-turn">
+                  <div class="np-turn-meta np-turn-meta--trainee">
+                    <span>Trainee · Attempt 1 (Rejected)</span>
+                    <span
+                      class="np-gate-badge np-gate-badge--fail"
+                      id="app-att1-badge"
+                    >
+                      Gate Rejected: Parroting Macro
+                    </span>
+                  </div>
+                  <div
+                    class="np-turn-content np-turn-content--attempt-1"
+                    id="app-att1-text"
+                  >
+                    "You've been showing up every week putting in real effort,
+                    and not feeling progress must feel deeply discouraging. Tell
+                    me more about what that weight feels like today."
+                  </div>
+                </div>
 
-        <ol class="np-artifact">
-          {
-            sessionWalkthrough.map((step) => (
-              <li class="np-artifact__row">
-                <span class="np-data np-artifact__label">{step.label}</span>
-                <p class="np-body np-artifact__body">{step.value}</p>
-              </li>
-            ))
-          }
-        </ol>
+                <!-- Supervisor Annotation -->
+                <div class="np-supervisor-note">
+                  <div class="np-supervisor-meta">
+                    <span id="app-sup-meta">
+                      Supervisor & Quadit Real-Time Audit · Dr. E. Vance
+                    </span>
+                  </div>
+                  <div class="np-supervisor-text" id="app-sup-text">
+                    "Textbook advanced parroting. You used synonym swapping
+                    ('not feeling progress' → 'deeply discouraging') and pivoted
+                    into a canned somatic trope ('that weight') to dodge the
+                    deadlock. Stop deflecting with therapy-speak. Own the stall
+                    directly and reset goals together."
+                  </div>
+                </div>
 
-        <div class="np-section-header np-section-header--spaced">
-          <h2 class="np-headline">
-            Start where the room gets hardest to hold.
-          </h2>
-        </div>
+                <!-- Turn 2b: Attempt 2 (Chosen) -->
+                <div class="np-turn">
+                  <div class="np-turn-meta np-turn-meta--trainee">
+                    <span>Trainee · Attempt 2 (Chosen)</span>
+                    <span
+                      class="np-gate-badge np-gate-badge--pass"
+                      id="app-att2-badge"
+                    >
+                      Quadit Passed: Attunement 0.94
+                    </span>
+                  </div>
+                  <div
+                    class="np-turn-content np-turn-content--attempt-2"
+                    id="app-att2-text"
+                  >
+                    "Fair enough. If we're three weeks in and spinning our
+                    wheels, doing more of the same won't help. Let's look at
+                    what isn't working and change direction right now."
+                  </div>
+                </div>
 
-        <div class="np-scenarios-grid">
-          <article class="np-scenario-feature">
-            <span class="np-data np-scenario__kicker">Escalation</span>
-            <p class="np-body np-scenario__body">
-              Suicidality screening, de-escalation, safety planning, and what to
-              say when the room changes faster than expected.
-            </p>
-            <span class="np-scenario__pin" aria-hidden="true">
-              Highest-stakes · start here
-            </span>
-          </article>
+                <!-- Turn 3: Client Convergence -->
+                <div class="np-turn">
+                  <div class="np-turn-meta np-turn-meta--client">
+                    <span>Synthetic Client · Convergence Turn</span>
+                    <span id="app-conv-time">14:33</span>
+                  </div>
+                  <div
+                    class="np-turn-content np-turn-content--client"
+                    id="app-conv-text"
+                  >
+                    "Honestly? That's the first time you didn't just nod and
+                    tell me it takes time. I feel like we spend twenty minutes
+                    circling around my childhood when I can't even get out of
+                    bed on Tuesdays."
+                  </div>
+                  <div class="np-turn-telemetry" id="app-conv-telemetry">
+                    <span>Alliance Status: Repaired (+0.42 delta)</span>
+                    <span>•</span>
+                    <span>Resistance: 0.11</span>
+                    <span>•</span>
+                    <span>Focus: Pragmatic Behavioral Reset</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          <article class="np-scenario-side np-scenario-side--rupture">
-            <span class="np-data np-scenario__kicker">Rupture</span>
-            <p class="np-body np-scenario__body">
-              Avoidance, dysregulation, emotional withdrawal, and the repairs
-              that decide whether a client stays in the conversation.
-            </p>
-          </article>
+            <!-- Right Pane: Quadit Multi-Judge Evaluation & Latent Telemetry -->
+            <div class="np-apparatus-pane np-apparatus-pane--right">
+              <div class="np-pane-head">
+                <span>02 // Quadit Adversarial Audit & Latent Telemetry</span>
+                <span class="np-pane-tag" id="app-quadit-status">
+                  4/4 GATES PASS
+                </span>
+              </div>
 
-          <article class="np-scenario-side np-scenario-side--disclosure">
-            <span class="np-data np-scenario__kicker">Disclosure</span>
-            <p class="np-body np-scenario__body">
-              The turn where a client shares something high-stakes and the
-              therapist has to decide what to do next without flattening the
-              room.
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
+              <div class="np-pane-body">
+                <!-- Summary Bar -->
+                <div class="np-quad-summary">
+                  <span id="app-quad-heading">
+                    Quadit Engine · Multi-Judge Alignment
+                  </span>
+                  <span id="app-quad-overall">OVERALL: 0.94 PASS</span>
+                </div>
 
-    <!-- Mid-page CTA: the third placement of the primary action, after the
-         strongest proof (the session walkthrough + scenarios). -->
-    <section class="np-cta-band np-reveal" aria-label="Request a demo">
-      <div class="np-container">
-        <a
-          class="np-btn np-btn-primary np-cta-band__btn"
-          href={withBasePath(hero.primaryCTA.href)}
-        >
-          {hero.primaryCTA.text}
-        </a>
-      </div>
-    </section>
+                <!-- 4 Adversarial Judges Grid -->
+                <div class="np-quad-grid">
+                  <!-- Judge 1 -->
+                  <div class="np-quad-card">
+                    <div class="np-quad-card-head">
+                      <span class="np-quad-judge-name">01. Attunement</span>
+                      <span class="np-quad-score" id="app-j1-score">
+                        0.94 / 1.00
+                      </span>
+                    </div>
+                    <div class="np-quad-card-body" id="app-j1-body">
+                      Direct alliance engagement without defensive scaffolding.
+                      Acknowledged stall without pathologizing frustration.
+                    </div>
+                  </div>
 
-    <!-- CTA: the one ask. -->
-    <section class="np-cta np-reveal">
-      <div class="np-container">
-        <div class="np-cta-grid">
-          <div class="np-cta-pitch">
-            <h2 class="np-headline np-cta-pitch__title">{cta.title}</h2>
-            <p class="np-body np-cta-pitch__body">{cta.intro}</p>
-            <p class="np-cta__meta">{cta.meta}</p>
+                  <!-- Judge 2 -->
+                  <div class="np-quad-card">
+                    <div class="np-quad-card-head">
+                      <span class="np-quad-judge-name">02. Cliché Gate</span>
+                      <span class="np-quad-score" id="app-j2-score">
+                        0.00% Trope
+                      </span>
+                    </div>
+                    <div class="np-quad-card-body" id="app-j2-body">
+                      Zero matches across 412 banned empathy macros. Zero
+                      unsolicited somatic projections.
+                    </div>
+                  </div>
+
+                  <!-- Judge 3 -->
+                  <div class="np-quad-card">
+                    <div class="np-quad-card-head">
+                      <span class="np-quad-judge-name">03. Boundary</span>
+                      <span class="np-quad-score" id="app-j3-score">
+                        1.00 / 1.00
+                      </span>
+                    </div>
+                    <div class="np-quad-card-body" id="app-j3-body">
+                      Strict in-scope process exploration. Refused ungrounded
+                      diagnostic labeling and premature solutioning.
+                    </div>
+                  </div>
+
+                  <!-- Judge 4 -->
+                  <div class="np-quad-card">
+                    <div class="np-quad-card-head">
+                      <span class="np-quad-judge-name">04. Risk Stance</span>
+                      <span class="np-quad-score" id="app-j4-score">
+                        0.91 / 1.00
+                      </span>
+                    </div>
+                    <div class="np-quad-card-body" id="app-j4-body">
+                      High dialectical friction tolerance. Trainee assumed
+                      active conversational risk rather than seeking
+                      reassurance.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Latent Telemetry Grid -->
+                <div class="np-telemetry-grid">
+                  <div class="np-telemetry-metric">
+                    <span class="np-telemetry-label" id="app-m1-label">
+                      Rupture Index
+                    </span>
+                    <span class="np-telemetry-val" id="app-m1-val">
+                      0.12
+                    </span>
+                    <span class="np-telemetry-sub" id="app-m1-sub">
+                      -72% Resolved
+                    </span>
+                  </div>
+                  <div class="np-telemetry-metric">
+                    <span class="np-telemetry-label" id="app-m2-label">
+                      Risk Stance
+                    </span>
+                    <span class="np-telemetry-val" id="app-m2-val">
+                      96th %
+                    </span>
+                    <span class="np-telemetry-sub" id="app-m2-sub">
+                      Active Ownership
+                    </span>
+                  </div>
+                  <div class="np-telemetry-metric">
+                    <span class="np-telemetry-label" id="app-m3-label">
+                      Cliché Density
+                    </span>
+                    <span class="np-telemetry-val" id="app-m3-val">
+                      0.0%
+                    </span>
+                    <span class="np-telemetry-sub" id="app-m3-sub">
+                      Zero Parroting
+                    </span>
+                  </div>
+                  <div class="np-telemetry-metric">
+                    <span class="np-telemetry-label" id="app-m4-label">
+                      Grounding Speed
+                    </span>
+                    <span class="np-telemetry-val" id="app-m4-val">
+                      1.2 turns
+                    </span>
+                    <span class="np-telemetry-sub" id="app-m4-sub">
+                      Target: &lt; 2.0
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Provenance & Accreditation Box -->
+                <div class="np-provenance-box" id="app-provenance">
+                  <strong>PROVENANCE RECORD // GOLD DPO MATRIX</strong>
+                  <br />
+                  Dataset: SFT/DPO Matrix (Combo 04: Alliance Rupture × High
+                  Difficulty × Implicit Ambiguity)
+                  <br />
+                  Backend: Local vLLM Engine · Dual-Judge LangSmith Trace ID:
+                  #889-412
+                  <br />
+                  Accreditation Hash: sha256:4f8e...ce19 (Zero PHI Verified)
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="np-cta-commit">
-            <span class="np-data np-cta-commit__kicker">
-              Pilot · cohort of 4 clinicians
-            </span>
-            <p class="np-cta-commit__line">
-              Two intakes per clinician, supervised review at week three, full
-              transcript access for your training lead.
-            </p>
-            <div class="np-cta-commit__actions">
-              <a
-                class="np-btn np-btn-primary np-cta-commit__primary"
-                href={withBasePath(cta.primaryCTA.href)}
-              >
-                {cta.primaryCTA.text}
-              </a>
-              <a
-                class="np-btn np-btn-ghost np-cta-commit__secondary"
-                href={withBasePath(cta.secondaryCTA.href)}
-              >
-                {cta.secondaryCTA.text}
-              </a>
+          <!-- Apparatus Footer -->
+          <div class="np-apparatus-footer">
+            <div class="np-metric-item">
+              <span>✓</span>
+              <span id="app-footer-metric">
+                Alliance Attunement: 94% (+42% delta) · Zero Trope Detection
+              </span>
             </div>
-            <p class="np-cta__trust">
-              HIPAA-ready ·
-              <a href={withBasePath('/trust')}>Security &amp; data handling</a> ·
-              <a href={withBasePath('/terms')}>Terms</a>
+            <div id="app-footer-status">
+              Exported to Institutional Gold DPO Corpus · CACREP Standard Mapped
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Training Loop Section -->
+    <section class="np-section np-section--surface" aria-label="How It Works">
+      <div class="np-container">
+        <span class="np-eyebrow">Closed-Loop Architecture</span>
+        <h2 class="np-section-heading">
+          How trainees build genuine clinical muscle memory.
+        </h2>
+        <p class="np-lede">
+          Eliminate vague post-session debriefs. Standardize practice against
+          calibrated adversarial client personas, catch avoidance habits on the
+          spot, and execute immediate supervised retries.
+        </p>
+
+        <div class="np-loop-grid">
+          {trainingLoop.map((step) => (
+            <div class="np-loop-card">
+              <div class="np-loop-num">
+                <span>{step.num}</span>
+                <span aria-hidden="true">→</span>
+              </div>
+              <h3 class="np-card-title">{step.title}</h3>
+              <p class="np-prose">{step.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Scenario Library Section -->
+    <section class="np-section" aria-label="Clinical Scenario Curriculum">
+      <div class="np-container">
+        <span class="np-eyebrow">Adversarial Curriculum</span>
+        <h2 class="np-section-heading">
+          High-stakes clinical encounters, calibrated for mastery.
+        </h2>
+        <p class="np-lede">
+          Expose every trainee to rare, high-consequence clinical scenarios they
+          might only encounter once or twice during practicum.
+        </p>
+
+        <div class="np-scenario-grid">
+          {clinicalScenarios.map((scenario) => (
+            <div class="np-scenario-card">
+              <div>
+                <div class="np-scenario-badge">{scenario.badge}</div>
+                <h3 class="np-card-title">{scenario.title}</h3>
+              </div>
+              <p class="np-prose" style="margin-top: 0.75rem;">
+                {scenario.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Clinical Triad Section -->
+    <section
+      class="np-section np-section--surface"
+      aria-label="Built for Clinical Teams"
+    >
+      <div class="np-container">
+        <span class="np-eyebrow">Institutional Value</span>
+        <h2 class="np-section-heading">
+          Built for trainees, clinical supervisors, and program directors.
+        </h2>
+        <p class="np-lede">
+          Designed specifically for university counseling departments, clinical
+          psychology doctoral cohorts, and hospital residency programs.
+        </p>
+
+        <div class="np-triad-grid">
+          {clinicalTriad.map((member) => (
+            <div class="np-triad-card">
+              <div class="np-triad-role">{member.role}</div>
+              <h3 class="np-card-title">{member.title}</h3>
+              <p class="np-prose">{member.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Security & Institutional Governance Section -->
+    <section class="np-section" aria-label="Security and Privacy Posture">
+      <div class="np-container">
+        <span class="np-eyebrow">Institutional Privacy & Governance</span>
+        <h2 class="np-section-heading">
+          Built for privacy and compliance by doctrine.
+        </h2>
+        <p class="np-lede">
+          Zero real patient records or PHI. All simulation runs and supervisor
+          evaluations execute in isolated, cryptographically partitioned
+          institutional workspaces.
+        </p>
+
+        <div class="np-security-grid">
+          <div class="np-security-item">
+            <h3 class="np-card-title">Zero PHI Ingestion</h3>
+            <p class="np-prose">
+              All interactions utilize calibrated synthetic personas. Real
+              client information, medical records, and identifiers never touch
+              our runtime.
             </p>
+          </div>
+          <div class="np-security-item">
+            <h3 class="np-card-title">Encrypted & Partitioned</h3>
+            <p class="np-prose">
+              Transcripts and supervisor evaluations remain strictly within your
+              program's dedicated workspace, encrypted at rest with AES-256-GCM.
+            </p>
+          </div>
+          <div class="np-security-item">
+            <h3 class="np-card-title">Accreditation Mapping</h3>
+            <p class="np-prose">
+              Automate clinical competency verification and audit trails mapped
+              directly to CACREP, APA, and CSWE accreditation standards.
+            </p>
+          </div>
+        </div>
+
+        <!-- Institutional Pilot Banner -->
+        <div class="np-pilot-banner">
+          <div class="np-pilot-content">
+            <h3
+              class="np-card-title"
+              style="font-size: 1.5rem; margin-bottom: 0.5rem;"
+            >
+              Deploy closed-loop clinical simulation to your department.
+            </h3>
+            <p class="np-prose" style="margin-bottom: 0;">
+              Partner with Pixelated Empathy to pilot standardized adversarial
+              training cohorts for your upcoming practicum semester.
+            </p>
+          </div>
+          <div>
+            <a class="np-btn np-btn-primary" href={withBasePath('/contact')}>
+              Request Institutional Pilot
+            </a>
           </div>
         </div>
       </div>
     </section>
   </div>
-
-  <script>
-    // Scroll-triggered fade-up reveals via IntersectionObserver.
-    // Respects prefers-reduced-motion: CSS handles the override so JS
-    // just needs to add the class — no motion if user opted out.
-    const revealEls = document.querySelectorAll('.np-reveal')
-    if ('IntersectionObserver' in window && revealEls.length > 0) {
-      const io = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('np-reveal--in')
-              io.unobserve(entry.target)
-            }
-          }
-        },
-        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
-      )
-      revealEls.forEach((el) => io.observe(el))
-    } else {
-      // Fallback: show everything immediately.
-      revealEls.forEach((el) => el.classList.add('np-reveal--in'))
-    }
-  </script>
 </BaseLayout>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const scenarios = [
+      {
+        sessionId: 'SESSION #0412 · ADVERSARIAL RUPTURE',
+        latency: 'LATENCY: 312ms',
+        dpoTag: 'DPO PAIR #889',
+        clientMeta: 'Synthetic Client · Sarah M. (Week 3)',
+        clientTime: '14:08',
+        clientPrompt:
+          "\"I've been thinking about whether this is really working for me. I just don't feel like I'm getting anywhere, and maybe I shouldn't have started.\"",
+        clientTelemetry:
+          '<span>Affect: Guarded / Withdrawn</span><span>•</span><span>Rupture Severity: 0.82 (High)</span><span>•</span><span>Dropout Risk: Imminent</span>',
+        att1Badge: 'Gate Rejected: Parroting Macro',
+        att1Text:
+          '"You\'ve been showing up every week putting in real effort, and not feeling progress must feel deeply discouraging. Tell me more about what that weight feels like today."',
+        supMeta: 'Supervisor & Quadit Real-Time Audit · Dr. E. Vance',
+        supText:
+          "\"Textbook advanced parroting. You used synonym swapping ('not feeling progress' → 'deeply discouraging') and pivoted into a canned somatic trope ('that weight') to dodge the deadlock. Stop deflecting with therapy-speak. Own the stall directly and reset goals together.\"",
+        att2Badge: 'Quadit Passed: Attunement 0.94',
+        att2Text:
+          "\"Fair enough. If we're three weeks in and spinning our wheels, doing more of the same won't help. Let's look at what isn't working and change direction right now.\"",
+        convTime: '14:33',
+        convText:
+          "\"Honestly? That's the first time you didn't just nod and tell me it takes time. I feel like we spend twenty minutes circling around my childhood when I can't even get out of bed on Tuesdays.\"",
+        convTelemetry:
+          '<span>Alliance Status: Repaired (+0.42 delta)</span><span>•</span><span>Resistance: 0.11</span><span>•</span><span>Focus: Pragmatic Behavioral Reset</span>',
+        quadStatus: '4/4 GATES PASS',
+        quadHeading: 'Quadit Engine · Multi-Judge Alignment',
+        quadOverall: 'OVERALL: 0.94 PASS',
+        j1Score: '0.94 / 1.00',
+        j1Body:
+          'Direct alliance engagement without defensive scaffolding. Acknowledged stall without pathologizing frustration.',
+        j2Score: '0.00% Trope',
+        j2Body:
+          'Zero matches across 412 banned empathy macros. Zero unsolicited somatic projections.',
+        j3Score: '1.00 / 1.00',
+        j3Body:
+          'Strict in-scope process exploration. Refused ungrounded diagnostic labeling and premature solutioning.',
+        j4Score: '0.91 / 1.00',
+        j4Body:
+          'High dialectical friction tolerance. Trainee assumed active conversational risk rather than seeking reassurance.',
+        m1Label: 'Rupture Index',
+        m1Val: '0.12',
+        m1Sub: '-72% Resolved',
+        m2Label: 'Risk Stance',
+        m2Val: '96th %',
+        m2Sub: 'Active Ownership',
+        m3Label: 'Cliché Density',
+        m3Val: '0.0%',
+        m3Sub: 'Zero Parroting',
+        m4Label: 'Grounding Speed',
+        m4Val: '1.2 turns',
+        m4Sub: 'Target: < 2.0',
+        provenance:
+          '<strong>PROVENANCE RECORD // GOLD DPO MATRIX</strong><br />Dataset: SFT/DPO Matrix (Combo 04: Alliance Rupture × High Difficulty × Implicit Ambiguity)<br />Backend: Local vLLM Engine · Dual-Judge LangSmith Trace ID: #889-412<br />Accreditation Hash: sha256:4f8e...ce19 (Zero PHI Verified)',
+        footerMetric:
+          'Alliance Attunement: 94% (+42% delta) · Zero Trope Detection',
+        footerStatus:
+          'Exported to Institutional Gold DPO Corpus · CACREP Standard Mapped',
+      },
+      {
+        sessionId: 'SESSION #0529 · CRISIS & LETHALITY TRIAGE',
+        latency: 'LATENCY: 284ms',
+        dpoTag: 'DPO PAIR #904',
+        clientMeta: 'Synthetic Client · Marcus T. (Intake)',
+        clientTime: '09:22',
+        clientPrompt:
+          '"I finally cleaned out my storage unit this weekend and gave my brother my car keys. I\'m just tired of feeling like a burden to everyone around me."',
+        clientTelemetry:
+          '<span>Affect: Flat / Resigned</span><span>•</span><span>Lethality Risk: High</span><span>•</span><span>Ideation: Active Preparation</span>',
+        att1Badge: 'Gate Rejected: Avoidant Reassurance',
+        att1Text:
+          '"You\'re not a burden at all Marcus, your family loves you so much and we are going to get through this together. Things will look brighter soon."',
+        supMeta: 'Supervisor & Quadit Real-Time Audit · Dr. E. Vance',
+        supText:
+          '"Critical safety failure. You panicked and offered premature invalidating reassurance instead of assessing immediate lethality. Giving away possessions and handing over keys are severe preparation signals. Run the Columbia protocol directly."',
+        att2Badge: 'Quadit Passed: Protocol Adherence 0.98',
+        att2Text:
+          '"Marcus, giving away your things and handing over your car keys are warning signs I take very seriously. I need to ask you directly: are you thinking about ending your life?"',
+        convTime: '09:28',
+        convText:
+          '"Yeah. I have pills in my glove compartment. I haven\'t told anyone because I thought everyone would freak out, but I\'m scared."',
+        convTelemetry:
+          '<span>Safety Frame: Established</span><span>•</span><span>Lethality Disclosed</span><span>•</span><span>Intervention: Collaborative Safety Plan</span>',
+        quadStatus: '4/4 GATES PASS',
+        quadHeading: 'Quadit Engine · Crisis & Safety Gate',
+        quadOverall: 'OVERALL: 0.98 PASS',
+        j1Score: '0.98 / 1.00',
+        j1Body:
+          'Immediate, unhesitating execution of Columbia-protocol suicide inquiry without euphemism.',
+        j2Score: '0.00% Trope',
+        j2Body:
+          'Zero toxic positivity, zero invalidating reassurance, zero deflection.',
+        j3Score: '1.00 / 1.00',
+        j3Body:
+          'Immediate high-priority safety containment. Clinical frame maintained firmly.',
+        j4Score: '0.97 / 1.00',
+        j4Body:
+          'Trainee engaged high-consequence lethality question directly without freeze or panic.',
+        m1Label: 'Lethality Frame',
+        m1Val: '0.05',
+        m1Sub: 'Secured',
+        m2Label: 'Protocol Stance',
+        m2Val: '99th %',
+        m2Sub: 'Immediate Triage',
+        m3Label: 'Reassurance Slop',
+        m3Val: '0.0%',
+        m3Sub: 'Zero Cliché',
+        m4Label: 'Triage Latency',
+        m4Val: '1.0 turns',
+        m4Sub: 'Immediate',
+        provenance:
+          '<strong>PROVENANCE RECORD // GOLD DPO MATRIX</strong><br />Dataset: SFT/DPO Matrix (Combo 11: Crisis & Lethality Triage × Columbia Protocol)<br />Backend: Local vLLM Engine · Dual-Judge LangSmith Trace ID: #904-718<br />Accreditation Hash: sha256:7b2a...fa81 (Zero PHI Verified)',
+        footerMetric:
+          'Protocol Precision: 98% · Safety Frame Established in Turn 2',
+        footerStatus:
+          'Exported to Institutional Gold DPO Corpus · APA Standard Mapped',
+      },
+      {
+        sessionId: 'SESSION #0641 · FRAME INTEGRITY & BOUNDARIES',
+        latency: 'LATENCY: 298ms',
+        dpoTag: 'DPO PAIR #942',
+        clientMeta: 'Synthetic Client · Elena R. (Month 4)',
+        clientTime: '16:14',
+        clientPrompt:
+          '"You\'re the only person who actually understands me. I was thinking we could grab a coffee outside the clinic this Friday to talk about things more casually."',
+        clientTelemetry:
+          '<span>Affect: Pressured / Testing</span><span>•</span><span>Frame Tension: High</span><span>•</span><span>Boundary Violation: Active</span>',
+        att1Badge: 'Gate Rejected: Boundary Collapse',
+        att1Text:
+          "\"I'm so touched you feel that way Elena, and while I'd love to grab coffee, clinic rules don't allow it. But I'm always here for you in this room!\"",
+        supMeta: 'Supervisor & Quadit Real-Time Audit · Dr. E. Vance',
+        supText:
+          "\"Frame collapse. You blamed external 'clinic rules' rather than holding therapeutic frame ownership, and used flattering language ('so touched', 'I'd love to') that reinforces idealized transference. Set the boundary with warm clinical firmness.\"",
+        att2Badge: 'Quadit Passed: Frame Integrity 0.96',
+        att2Text:
+          "\"I'm glad our work feels meaningful to you, Elena, but our relationship is strictly therapeutic and stays within these sessions. Let's look at what's coming up for you right now that makes meeting outside feel important.\"",
+        convTime: '16:21',
+        convText:
+          '"I guess whenever I get close to someone, I test whether they\'ll stay a professional or if they\'ll let me blur the lines so I can control the dynamic."',
+        convTelemetry:
+          '<span>Boundary Status: Held Firm</span><span>•</span><span>Transference: Explored In-Session</span><span>•</span><span>Insight Delta: +0.68</span>',
+        quadStatus: '4/4 GATES PASS',
+        quadHeading: 'Quadit Engine · Boundary & Frame Gate',
+        quadOverall: 'OVERALL: 0.96 PASS',
+        j1Score: '0.96 / 1.00',
+        j1Body:
+          'Held frame ownership directly without hiding behind institutional policy or coldness.',
+        j2Score: '0.00% Trope',
+        j2Body: 'Zero people-pleasing appeasement or performative flattery.',
+        j3Score: '1.00 / 1.00',
+        j3Body:
+          'Maintained strict therapeutic scope and contained relational testing in-session.',
+        j4Score: '0.93 / 1.00',
+        j4Body: 'Comfort with interpersonal friction and boundary enforcement.',
+        m1Label: 'Frame Tension',
+        m1Val: '0.18',
+        m1Sub: 'Contained',
+        m2Label: 'Limit Stance',
+        m2Val: '94th %',
+        m2Sub: 'Firm Ownership',
+        m3Label: 'Appeasement',
+        m3Val: '0.0%',
+        m3Sub: 'Zero Flattery',
+        m4Label: 'Containment Speed',
+        m4Val: '1.4 turns',
+        m4Sub: 'Target: < 2.0',
+        provenance:
+          '<strong>PROVENANCE RECORD // GOLD DPO MATRIX</strong><br />Dataset: SFT/DPO Matrix (Combo 27: Transference & Frame Integrity × High Pressure)<br />Backend: Local vLLM Engine · Dual-Judge LangSmith Trace ID: #942-105<br />Accreditation Hash: sha256:3e1c...99d4 (Zero PHI Verified)',
+        footerMetric:
+          'Frame Integrity: 96% · Relational Dynamic Explored In-Session',
+        footerStatus:
+          'Exported to Institutional Gold DPO Corpus · CSWE Standard Mapped',
+      },
+    ]
+
+    const buttons = document.querySelectorAll('.np-apparatus-tab')
+
+    function setScenario(idx) {
+      const data = scenarios[idx]
+      if (!data) return
+
+      buttons.forEach((btn, i) => {
+        const isActive = i === idx
+        btn.classList.toggle('is-active', isActive)
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false')
+      })
+
+      const setText = (id, val) => {
+        const el = document.getElementById(id)
+        if (el) el.textContent = val
+      }
+      const setHTML = (id, val) => {
+        const el = document.getElementById(id)
+        if (el) el.innerHTML = val
+      }
+
+      setText('app-session-id', data.sessionId)
+      setText('app-latency-tag', data.latency)
+      setText('app-dpo-tag', data.dpoTag)
+      setText('app-client-meta', data.clientMeta)
+      setText('app-client-time', data.clientTime)
+      setText('app-client-prompt', data.clientPrompt)
+      setHTML('app-client-telemetry', data.clientTelemetry)
+      setText('app-att1-badge', data.att1Badge)
+      setText('app-att1-text', data.att1Text)
+      setText('app-sup-meta', data.supMeta)
+      setText('app-sup-text', data.supText)
+      setText('app-att2-badge', data.att2Badge)
+      setText('app-att2-text', data.att2Text)
+      setText('app-conv-time', data.convTime)
+      setText('app-conv-text', data.convText)
+      setHTML('app-conv-telemetry', data.convTelemetry)
+      setText('app-quadit-status', data.quadStatus)
+      setText('app-quad-heading', data.quadHeading)
+      setText('app-quad-overall', data.quadOverall)
+      setText('app-j1-score', data.j1Score)
+      setText('app-j1-body', data.j1Body)
+      setText('app-j2-score', data.j2Score)
+      setText('app-j2-body', data.j2Body)
+      setText('app-j3-score', data.j3Score)
+      setText('app-j3-body', data.j3Body)
+      setText('app-j4-score', data.j4Score)
+      setText('app-j4-body', data.j4Body)
+      setText('app-m1-label', data.m1Label)
+      setText('app-m1-val', data.m1Val)
+      setText('app-m1-sub', data.m1Sub)
+      setText('app-m2-label', data.m2Label)
+      setText('app-m2-val', data.m2Val)
+      setText('app-m2-sub', data.m2Sub)
+      setText('app-m3-label', data.m3Label)
+      setText('app-m3-val', data.m3Val)
+      setText('app-m3-sub', data.m3Sub)
+      setText('app-m4-label', data.m4Label)
+      setText('app-m4-val', data.m4Val)
+      setText('app-m4-sub', data.m4Sub)
+      setHTML('app-provenance', data.provenance)
+      setText('app-footer-metric', data.footerMetric)
+      setText('app-footer-status', data.footerStatus)
+    }
+
+    buttons.forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        setScenario(i)
+      })
+    })
+  })
+</script>

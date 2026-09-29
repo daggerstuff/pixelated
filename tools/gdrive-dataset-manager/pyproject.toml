@@ -2,7 +2,7 @@
 name = "gdrive-dataset-manager"
 version = "0.1.0"
 description = "Indexes Google Drive files (docs, PDFs, spreadsheets, transcribed media) into pgvector for semantic search"
-requires-python = ">=3.13,<3.14"
+requires-python = ">=3.14"
 dependencies = [
   "google-api-python-client>=2.150.0",
   "google-auth-oauthlib>=1.2.1",

@@ -225,28 +225,28 @@ export default function EnterpriseAdminDashboard() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'healthy':
-        return 'text-green-600 bg-green-50 border-green-200'
+        return 'text-foreground bg-secondary border-input'
       case 'degraded':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
+        return 'text-foreground font-medium bg-secondary border-ring'
       case 'down':
-        return 'text-red-600 bg-red-50 border-red-200'
+        return 'text-foreground font-semibold bg-card border-ring'
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200'
+        return 'text-muted-foreground bg-secondary border-border'
     }
   }
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'low':
-        return 'text-blue-600 bg-blue-50 border-blue-200'
+        return 'text-foreground bg-secondary border-input'
       case 'medium':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
+        return 'text-foreground font-medium bg-secondary border-ring'
       case 'high':
-        return 'text-orange-600 bg-orange-50 border-orange-200'
+        return 'text-foreground font-medium bg-secondary border-ring'
       case 'critical':
-        return 'text-red-600 bg-red-50 border-red-200'
+        return 'text-foreground font-semibold bg-card border-ring'
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200'
+        return 'text-muted-foreground bg-secondary border-border'
     }
   }
 
@@ -274,8 +274,8 @@ export default function EnterpriseAdminDashboard() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <div className="border-blue-600 border-t-transparent mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4"></div>
-          <p className="text-gray-600">Loading admin dashboard...</p>
+          <div className="border-t-transparent mx-auto mb-4 h-8 w-8 animate-spin rounded-none border-4 border-ring"></div>
+          <p className="text-muted-foreground">Loading admin dashboard...</p>
         </div>
       </div>
     )
@@ -286,10 +286,10 @@ export default function EnterpriseAdminDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-gray-900 text-3xl font-bold">
+          <h1 className="text-3xl font-bold text-foreground">
             Enterprise Admin Dashboard
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="mt-1 text-muted-foreground">
             Comprehensive system monitoring and analytics • Last updated:{' '}
             {lastRefresh.toLocaleTimeString()}
           </p>
@@ -299,7 +299,7 @@ export default function EnterpriseAdminDashboard() {
             variant="outline"
             size="sm"
             onClick={() => setAutoRefresh(!autoRefresh)}
-            className={autoRefresh ? 'bg-green-50 border-green-200' : ''}
+            className={autoRefresh ? 'border-input bg-secondary' : ''}
           >
             <RefreshCw
               className={`mr-2 h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`}
@@ -312,7 +312,7 @@ export default function EnterpriseAdminDashboard() {
           </Button>
           <Badge
             variant="outline"
-            className="bg-green-50 text-green-700 border-green-200"
+            className="border-input bg-secondary font-medium text-foreground"
           >
             <Shield className="mr-2 h-4 w-4" />
             System Healthy
@@ -325,11 +325,11 @@ export default function EnterpriseAdminDashboard() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="bg-green-100 rounded-lg p-2">
-                <Activity className="text-green-600 h-5 w-5" />
+              <div className="rounded-none border border-input bg-secondary p-2">
+                <Activity className="h-5 w-5 text-foreground" />
               </div>
               <div>
-                <p className="text-gray-600 text-sm">System Uptime</p>
+                <p className="text-sm text-muted-foreground">System Uptime</p>
                 <p className="text-2xl font-bold">{systemMetrics?.uptime}%</p>
               </div>
             </div>
@@ -339,11 +339,11 @@ export default function EnterpriseAdminDashboard() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-100 rounded-lg p-2">
-                <Users className="text-blue-600 h-5 w-5" />
+              <div className="rounded-none border border-input bg-secondary p-2">
+                <Users className="h-5 w-5 text-foreground" />
               </div>
               <div>
-                <p className="text-gray-600 text-sm">Active Users</p>
+                <p className="text-sm text-muted-foreground">Active Users</p>
                 <p className="text-2xl font-bold">
                   {systemMetrics?.activeUsers.toLocaleString()}
                 </p>
@@ -355,11 +355,11 @@ export default function EnterpriseAdminDashboard() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="bg-purple-100 rounded-lg p-2">
-                <BarChart3 className="text-purple-600 h-5 w-5" />
+              <div className="rounded-none border border-input bg-secondary p-2">
+                <BarChart3 className="h-5 w-5 text-foreground" />
               </div>
               <div>
-                <p className="text-gray-600 text-sm">Total Requests</p>
+                <p className="text-sm text-muted-foreground">Total Requests</p>
                 <p className="text-2xl font-bold">
                   {systemMetrics?.totalRequests.toLocaleString()}
                 </p>
@@ -371,11 +371,11 @@ export default function EnterpriseAdminDashboard() {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="bg-yellow-100 rounded-lg p-2">
-                <Clock className="text-yellow-600 h-5 w-5" />
+              <div className="rounded-none border border-input bg-secondary p-2">
+                <Clock className="h-5 w-5 font-medium text-foreground" />
               </div>
               <div>
-                <p className="text-gray-600 text-sm">Avg Response</p>
+                <p className="text-sm text-muted-foreground">Avg Response</p>
                 <p className="text-2xl font-bold">
                   {systemMetrics?.averageResponseTime}ms
                 </p>
@@ -417,7 +417,9 @@ export default function EnterpriseAdminDashboard() {
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">CPU Usage</span>
+                    <span className="text-sm text-muted-foreground">
+                      CPU Usage
+                    </span>
                     <span className="font-medium">
                       {systemMetrics?.cpuUsage}%
                     </span>
@@ -427,7 +429,9 @@ export default function EnterpriseAdminDashboard() {
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">Memory Usage</span>
+                    <span className="text-sm text-muted-foreground">
+                      Memory Usage
+                    </span>
                     <span className="font-medium">
                       {systemMetrics?.memoryUsage}%
                     </span>
@@ -440,7 +444,7 @@ export default function EnterpriseAdminDashboard() {
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-sm text-muted-foreground">
                       Cache Hit Rate
                     </span>
                     <span className="font-medium">
@@ -454,7 +458,7 @@ export default function EnterpriseAdminDashboard() {
                 </div>
 
                 <div className="flex items-center justify-between border-t pt-2">
-                  <span className="text-gray-600 text-sm">
+                  <span className="text-sm text-muted-foreground">
                     Database Connections
                   </span>
                   <span className="font-medium">
@@ -473,20 +477,22 @@ export default function EnterpriseAdminDashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">Error Rate</span>
+                  <span className="text-sm text-muted-foreground">
+                    Error Rate
+                  </span>
                   <Badge
                     variant="outline"
                     className={
                       systemMetrics && systemMetrics.errorRate < 1
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-red-50 text-red-700 border-red-200'
+                        ? 'border-input bg-secondary font-medium text-foreground'
+                        : 'border-ring bg-card font-semibold text-foreground'
                     }
                   >
                     {systemMetrics?.errorRate}%
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">
+                  <span className="text-sm text-muted-foreground">
                     Average Response Time
                   </span>
                   <span className="font-medium">
@@ -494,10 +500,10 @@ export default function EnterpriseAdminDashboard() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">Uptime</span>
+                  <span className="text-sm text-muted-foreground">Uptime</span>
                   <Badge
                     variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
+                    className="border-input bg-secondary font-medium text-foreground"
                   >
                     <CheckCircle className="mr-1 h-3 w-3" />
                     {systemMetrics?.uptime}%
@@ -519,7 +525,7 @@ export default function EnterpriseAdminDashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">
+                  <span className="text-sm text-muted-foreground">
                     Total Auth Attempts
                   </span>
                   <span className="font-medium">
@@ -527,29 +533,35 @@ export default function EnterpriseAdminDashboard() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">Failed Logins</span>
+                  <span className="text-sm text-muted-foreground">
+                    Failed Logins
+                  </span>
                   <Badge
                     variant="outline"
                     className={
                       securityMetrics && securityMetrics.failedLogins < 200
-                        ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                        ? 'border-input bg-secondary font-medium text-foreground'
+                        : 'border-ring bg-secondary font-medium text-foreground'
                     }
                   >
                     {securityMetrics?.failedLogins}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">Blocked IPs</span>
+                  <span className="text-sm text-muted-foreground">
+                    Blocked IPs
+                  </span>
                   <span className="font-medium">
                     {securityMetrics?.blockedIPs.length}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">Vulnerabilities</span>
+                  <span className="text-sm text-muted-foreground">
+                    Vulnerabilities
+                  </span>
                   <Badge
                     variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
+                    className="border-input bg-secondary font-medium text-foreground"
                   >
                     {securityMetrics?.vulnerabilities}
                   </Badge>
@@ -567,7 +579,7 @@ export default function EnterpriseAdminDashboard() {
               <CardContent>
                 <div className="max-h-60 space-y-3 overflow-y-auto">
                   {securityMetrics?.securityAlerts.map((alert) => (
-                    <div key={alert.id} className="rounded-lg border p-3">
+                    <div key={alert.id} className="rounded-none border p-3">
                       <div className="mb-2 flex items-center justify-between">
                         <Badge
                           variant="outline"
@@ -575,12 +587,12 @@ export default function EnterpriseAdminDashboard() {
                         >
                           {alert.severity.toUpperCase()}
                         </Badge>
-                        <span className="text-gray-500 text-xs">
+                        <span className="text-xs text-muted-foreground">
                           {new Date(alert.timestamp).toLocaleTimeString()}
                         </span>
                       </div>
                       <p className="text-sm font-medium">{alert.type}</p>
-                      <p className="text-gray-600 mt-1 text-xs">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {alert.message}
                       </p>
                     </div>
@@ -602,19 +614,23 @@ export default function EnterpriseAdminDashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">Total Users</span>
+                  <span className="text-sm text-muted-foreground">
+                    Total Users
+                  </span>
                   <span className="font-medium">
                     {userAnalytics?.totalUsers.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">Active Today</span>
+                  <span className="text-sm text-muted-foreground">
+                    Active Today
+                  </span>
                   <span className="font-medium">
                     {userAnalytics?.activeToday.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">
+                  <span className="text-sm text-muted-foreground">
                     Active This Week
                   </span>
                   <span className="font-medium">
@@ -622,7 +638,7 @@ export default function EnterpriseAdminDashboard() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">
+                  <span className="text-sm text-muted-foreground">
                     New Registrations
                   </span>
                   <span className="font-medium">
@@ -630,10 +646,12 @@ export default function EnterpriseAdminDashboard() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-600 text-sm">Retention Rate</span>
+                  <span className="text-sm text-muted-foreground">
+                    Retention Rate
+                  </span>
                   <Badge
                     variant="outline"
-                    className="bg-green-50 text-green-700 border-green-200"
+                    className="border-input bg-secondary font-medium text-foreground"
                   >
                     {userAnalytics?.userRetention}%
                   </Badge>
@@ -653,7 +671,9 @@ export default function EnterpriseAdminDashboard() {
                   {userAnalytics?.mostUsedFeatures.map((feature) => (
                     <div key={feature.feature} className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">{feature.feature}</span>
+                        <span className="text-muted-foreground">
+                          {feature.feature}
+                        </span>
                         <span className="font-medium">{feature.usage}%</span>
                       </div>
                       <Progress value={feature.usage} className="h-2" />
@@ -678,7 +698,7 @@ export default function EnterpriseAdminDashboard() {
                 {apiHealth?.endpoints.map((endpoint) => (
                   <div
                     key={endpoint.name + endpoint.url}
-                    className="flex items-center justify-between rounded-lg border p-4"
+                    className="flex items-center justify-between rounded-none border p-4"
                   >
                     <div className="flex items-center gap-3">
                       <Badge
@@ -698,14 +718,16 @@ export default function EnterpriseAdminDashboard() {
                       </Badge>
                       <div>
                         <h4 className="font-medium">{endpoint.name}</h4>
-                        <p className="text-gray-500 text-sm">{endpoint.url}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {endpoint.url}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-medium">
                         {endpoint.responseTime}ms
                       </div>
-                      <div className="text-gray-500 text-xs">
+                      <div className="text-xs text-muted-foreground">
                         {endpoint.successRate}% success
                       </div>
                     </div>
@@ -719,11 +741,13 @@ export default function EnterpriseAdminDashboard() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 rounded-lg p-2">
-                    <BarChart3 className="text-blue-600 h-5 w-5" />
+                  <div className="rounded-none border border-input bg-secondary p-2">
+                    <BarChart3 className="h-5 w-5 text-foreground" />
                   </div>
                   <div>
-                    <p className="text-gray-600 text-sm">Total Requests</p>
+                    <p className="text-sm text-muted-foreground">
+                      Total Requests
+                    </p>
                     <p className="text-2xl font-bold">
                       {apiHealth?.totalRequests.toLocaleString()}
                     </p>
@@ -735,11 +759,11 @@ export default function EnterpriseAdminDashboard() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
-                  <div className="bg-green-100 rounded-lg p-2">
-                    <CheckCircle className="text-green-600 h-5 w-5" />
+                  <div className="rounded-none border border-input bg-secondary p-2">
+                    <CheckCircle className="h-5 w-5 text-foreground" />
                   </div>
                   <div>
-                    <p className="text-gray-600 text-sm">Successful</p>
+                    <p className="text-sm text-muted-foreground">Successful</p>
                     <p className="text-2xl font-bold">
                       {apiHealth?.successfulRequests.toLocaleString()}
                     </p>
@@ -751,11 +775,11 @@ export default function EnterpriseAdminDashboard() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
-                  <div className="bg-red-100 rounded-lg p-2">
-                    <AlertTriangle className="text-red-600 h-5 w-5" />
+                  <div className="rounded-none border border-ring bg-card p-2">
+                    <AlertTriangle className="h-5 w-5 font-semibold text-foreground" />
                   </div>
                   <div>
-                    <p className="text-gray-600 text-sm">Failed</p>
+                    <p className="text-sm text-muted-foreground">Failed</p>
                     <p className="text-2xl font-bold">
                       {apiHealth?.failedRequests.toLocaleString()}
                     </p>

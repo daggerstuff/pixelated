@@ -1,6 +1,7 @@
 # Developer Walkthrough
 
-A step-by-step guide to setting up and working in the Pixelated Empathy codebase.
+A step-by-step guide to setting up and working in the Pixelated Empathy
+codebase.
 
 ---
 
@@ -8,15 +9,15 @@ A step-by-step guide to setting up and working in the Pixelated Empathy codebase
 
 ### Required Software
 
-| Tool | Version | Install |
-|---|---|---|
-| Node.js | >= 24 | `nvm install 24` or [nodejs.org](https://nodejs.org) |
-| pnpm | 11.24.0 | `npm install -g pnpm@11.24.0` |
-| Python | 3.12+ | [python.org](https://www.python.org/downloads/) |
-| uv | latest | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| PostgreSQL | 17+ | [postgresql.org](https://www.postgresql.org/download/) |
-| Redis | 7+ | [redis.io](https://redis.io/docs/getting-started/) |
-| Docker | latest | [docker.com](https://www.docker.com/get-started) |
+| Tool       | Version | Install                                                |
+| ---------- | ------- | ------------------------------------------------------ |
+| Node.js    | >= 24   | `nvm install 24` or [nodejs.org](https://nodejs.org)   |
+| pnpm       | 11.24.0 | `npm install -g pnpm@11.24.0`                          |
+| Python     | 3.12+   | [python.org](https://www.python.org/downloads/)        |
+| uv         | latest  | `curl -LsSf https://astral.sh/uv/install.sh \| sh`     |
+| PostgreSQL | 17+     | [postgresql.org](https://www.postgresql.org/download/) |
+| Redis      | 7+      | [redis.io](https://redis.io/docs/getting-started/)     |
+| Docker     | latest  | [docker.com](https://www.docker.com/get-started)       |
 
 ### Environment Variables
 
@@ -30,7 +31,8 @@ Key variables:
 
 - `DATABASE_URL` — PostgreSQL connection string
 - `REDIS_URL` — Redis connection string (default: `redis://localhost:6379/0`)
-- `UPSTASH_REDIS_REST_URL` — Upstash Redis REST URL (use `redis://localhost:6379/0` for local)
+- `UPSTASH_REDIS_REST_URL` — Upstash Redis REST URL (use
+  `redis://localhost:6379/0` for local)
 - `AUTH_SECRET` — JWT signing secret
 - `PHI_ENCRYPTION_KEY` — AES-256 key for PHI encryption (required in production)
 
@@ -58,6 +60,7 @@ git submodule update --init --recursive
 ```
 
 This script:
+
 1. Verifies Node.js, pnpm, Python, and uv are installed
 2. Syncs git submodules (`ai/`, `foresight/`, `docs/`)
 3. Installs Node.js dependencies (`pnpm install`)
@@ -72,7 +75,8 @@ This script:
 pnpm dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173). You should see the Pixelated Empathy landing page.
+Open [http://localhost:5173](http://localhost:5173). You should see the
+Pixelated Empathy landing page.
 
 ---
 
@@ -93,6 +97,7 @@ pnpm dev:all-services
 ```
 
 Starts concurrently:
+
 - Web app (port 5173)
 - Bias detection service
 - AI inference service
@@ -162,8 +167,8 @@ pnpm format                 # Auto-format (oxfmt + prettier)
 pnpm format:check           # Check formatting without changes
 ```
 
-> **Do not use** `astro check`, `pnpm typecheck`, or `tsc` — they cause OOM failures.
-> Use `pnpm lint` (type-aware oxlint) instead.
+> **Do not use** `astro check`, `pnpm typecheck`, or `tsc` — they cause OOM
+> failures. Use `pnpm lint` (type-aware oxlint) instead.
 
 ### Python
 
@@ -189,11 +194,11 @@ Output goes to `apps/web/dist/`.
 
 This repo uses three git submodules:
 
-| Submodule | Path | Remote |
-|---|---|---|
-| AI inference engine | `ai/` | `daggerstuff/ai.git` (branch: `staging`) |
-| Foresight MCP | `foresight/` | `daggerstuff/foresight.git` (branch: `master`) |
-| Documentation | `docs/` | `daggerstuff/docs.git` (branch: `master`) |
+| Submodule           | Path         | Remote                                         |
+| ------------------- | ------------ | ---------------------------------------------- |
+| AI inference engine | `ai/`        | `daggerstuff/ai.git` (branch: `staging`)       |
+| Foresight MCP       | `foresight/` | `daggerstuff/foresight.git` (branch: `master`) |
+| Documentation       | `docs/`      | `daggerstuff/docs.git` (branch: `master`)      |
 
 ### After Pulling
 
@@ -275,7 +280,8 @@ pnpm dev
 
 ### OOM During Build or Lint
 
-Do **not** use `astro check`, `pnpm typecheck`, or `tsc`. Use `pnpm lint` (oxlint) instead.
+Do **not** use `astro check`, `pnpm typecheck`, or `tsc`. Use `pnpm lint`
+(oxlint) instead.
 
 ### pnpm Install Fails
 
@@ -293,14 +299,16 @@ pnpm install
 - **Never** use `@ts-ignore`, `@ts-nocheck`, or `# type: ignore`
 - **Always** validate API input with Zod schemas
 - **Always** use parameterized SQL queries (never interpolate user input)
-- Report vulnerabilities to [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)
+- Report vulnerabilities to
+  [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)
 
 ---
 
 ## 11. AI Assistant Instructions
 
-This repo includes `AGENTS.md` with detailed instructions for AI coding assistants.
-If you're using an AI tool (Cursor, Copilot, Claude Code, etc.), it should pick up
-those conventions automatically.
+This repo includes `AGENTS.md` with detailed instructions for AI coding
+assistants. If you're using an AI tool (Cursor, Copilot, Claude Code, etc.), it
+should pick up those conventions automatically.
 
-See also: [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming and commit conventions.
+See also: [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming and commit
+conventions.

@@ -18,6 +18,8 @@ from src.pe.api import api_v1_router
 from src.pe.config import settings
 from src.pe.database import close_db, init_db
 from src.pe.logging_config import setup_logging
+from src.pe.middleware.profiling import ProfilingMiddleware
+from src.pe.tracing import current_trace_headers, setup_tracing
 
 logger = structlog.get_logger(__name__)
 
@@ -57,8 +59,17 @@ app.add_middleware(
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID", "X-Profile-Request"],
 )
+
+# Opt-in request profiler (see src/pe/middleware/profiling.py). Disabled
+# unless PE_PROFILING_ENABLED or the X-Profile-Request header is present,
+# so normal runs pay no overhead.
+app.add_middleware(ProfilingMiddleware)
+
+# Distributed tracing (see src/pe/tracing.py). Initializes only when an OTLP
+# endpoint is configured; otherwise this is a no-op.
+setup_tracing(app)
 
 
 @app.middleware("http")
@@ -76,6 +87,7 @@ async def log_requests(request: Request, call_next: Any) -> Any:
     logger.info(
         "request_completed",
         status_code=response.status_code,
+        **current_trace_headers(),
     )
     return response
 
@@ -123,7 +135,7 @@ app.include_router(api_v1_router)
 
 
 @app.get("/")
-async def root() -> dict:
+async def root() -> dict[str, Any]:
     """Root endpoint — API information."""
     return {
         "name": settings.APP_NAME,
@@ -133,6 +145,6 @@ async def root() -> dict:
 
 
 @app.get("/health")
-async def health() -> dict:
+async def health() -> dict[str, Any]:
     """Health check endpoint."""
     return {"status": "ok", "name": settings.APP_NAME}

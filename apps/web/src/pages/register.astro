@@ -33,19 +33,19 @@ export const prerender = false
       <!-- RegisterForm renders the page H1 ("Create Account") -->
     </header>
 
-    {
-      error && (
-        <p class="auth-card__error" role="alert">
-          {decodeURIComponent(error)}
-        </p>
-      )
-    }
+    {error && (
+      <p class="auth-card__error" role="alert">
+        {decodeURIComponent(error)}
+      </p>
+    )}
 
     <RegisterForm client:load showLogin={true} />
 
     <p class="auth-card__alt">
       Already have an account?
-      <a href="/login" data-astro-prefetch>Log in</a>
+      <a href="/login" data-astro-prefetch>
+        Log in
+      </a>
     </p>
 
     <p class="auth-card__meta">Protected by encryption.</p>

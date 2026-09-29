@@ -42,8 +42,8 @@ export function ExportToEHR({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-      <h3 className="text-gray-900 dark:text-white mb-4 text-lg font-semibold">
+    <div className="rounded-none border border-border bg-card p-6">
+      <h3 className="mb-4 text-lg font-semibold text-foreground">
         Export to EHR System
       </h3>
 
@@ -51,13 +51,13 @@ export function ExportToEHR({
         <div>
           <label
             htmlFor="export-format"
-            className="text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium"
+            className="mb-1 block text-sm font-medium text-foreground"
           >
             Export Format
           </label>
           <select
             id="export-format"
-            className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full rounded-md border px-3 py-2"
+            className="w-full rounded-none border border-input bg-background px-3 py-2 text-foreground"
             value={exportFormat}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
               setExportFormat(e.target.value as 'fhir' | 'ccda' | 'pdf')
@@ -72,7 +72,7 @@ export function ExportToEHR({
             </option>
             <option value="pdf">PDF Document</option>
           </select>
-          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
+          <p className="mt-1 text-sm text-muted-foreground">
             {exportFormat === 'fhir'
               ? 'Standard format for exchanging healthcare information electronically.'
               : exportFormat === 'ccda'
@@ -85,7 +85,7 @@ export function ExportToEHR({
           <input
             id="include-emotion-data"
             type="checkbox"
-            className="border-gray-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4 rounded"
+            className="h-4 w-4 rounded-none border border-input focus:ring-ring"
             checked={includeEmotionData}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setIncludeEmotionData(e.target.checked)
@@ -95,7 +95,7 @@ export function ExportToEHR({
 
           <label
             htmlFor="include-emotion-data"
-            className="text-gray-700 dark:text-gray-300 ml-2 block text-sm"
+            className="ml-2 block text-sm text-foreground"
           >
             Include emotion analysis data
           </label>
@@ -105,10 +105,10 @@ export function ExportToEHR({
       <div className="flex flex-col space-y-4">
         <button
           type="button"
-          className={`text-white rounded-md px-4 py-2 font-medium ${
+          className={`rounded-none px-4 py-2 font-medium text-primary-foreground ${
             isExporting
-              ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-green-600 hover:bg-green-700 focus:ring-green-500 focus:outline-none focus:ring-2 focus:ring-offset-2'
+              ? 'bg-primary/35 cursor-not-allowed'
+              : 'hover:bg-primary/90 bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2'
           }`}
           onClick={handleExport}
           disabled={isExporting}
@@ -118,17 +118,17 @@ export function ExportToEHR({
 
         {exportResult && (
           <div
-            className={`rounded-md p-4 ${
+            className={`rounded-none border p-4 ${
               exportResult.success
-                ? 'bg-green-50 dark:bg-green-900/30'
-                : 'bg-red-50 dark:bg-red-900/30'
+                ? 'border-border bg-secondary'
+                : 'border-ring bg-secondary'
             }`}
           >
             <div className="flex">
               <div className="flex-shrink-0">
                 {exportResult.success ? (
                   <svg
-                    className="text-green-400 h-5 w-5"
+                    className="h-5 w-5 text-foreground"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -140,7 +140,7 @@ export function ExportToEHR({
                   </svg>
                 ) : (
                   <svg
-                    className="text-red-400 h-5 w-5"
+                    className="h-5 w-5 text-foreground"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -156,8 +156,8 @@ export function ExportToEHR({
                 <h3
                   className={`text-sm font-medium ${
                     exportResult.success
-                      ? 'text-green-800 dark:text-green-200'
-                      : 'text-red-800 dark:text-red-200'
+                      ? 'text-foreground'
+                      : 'font-bold text-foreground'
                   }`}
                 >
                   {exportResult.success
@@ -165,20 +165,20 @@ export function ExportToEHR({
                     : 'Failed to export documentation'}
                 </h3>
                 {exportResult.errors && exportResult.errors.length > 0 && (
-                  <div className="text-red-700 dark:text-red-300 mt-2 text-sm">
+                  <div className="mt-2 text-sm text-muted-foreground">
                     {exportResult.errors[0]}
                   </div>
                 )}
 
                 {exportResult.success && showSuccessDetails && (
                   <div className="mt-2">
-                    <p className="text-green-700 dark:text-green-300 text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Format: {exportFormat.toUpperCase()}
                     </p>
                     {typeof exportResult === 'object' &&
                       'documentId' in exportResult &&
                       Boolean(exportResult.documentId) && (
-                        <p className="text-green-700 dark:text-green-300 text-sm">
+                        <p className="text-sm text-muted-foreground">
                           Document ID: {String(exportResult.documentId)}
                         </p>
                       )}
@@ -190,7 +190,7 @@ export function ExportToEHR({
                             href={String(exportResult.documentUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-green-600 dark:text-green-400 text-sm font-medium hover:underline"
+                            className="text-sm font-medium text-foreground hover:underline"
                           >
                             View Document in EHR System
                           </a>

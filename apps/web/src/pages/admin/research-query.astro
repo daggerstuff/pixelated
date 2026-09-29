@@ -17,23 +17,33 @@ await requirePageAuth(Astro, 'admin')
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">Total Queries</div>
-        <div class="stat-value" id="total-queries">—</div>
+        <div class="stat-value" id="total-queries">
+          —
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Successful</div>
-        <div class="stat-value" id="successful-queries">—</div>
+        <div class="stat-value" id="successful-queries">
+          —
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Failed</div>
-        <div class="stat-value" id="failed-queries">—</div>
+        <div class="stat-value" id="failed-queries">
+          —
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Cache Hits</div>
-        <div class="stat-value" id="cache-hits">—</div>
+        <div class="stat-value" id="cache-hits">
+          —
+        </div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Avg Exec Time</div>
-        <div class="stat-value" id="avg-exec-time">—</div>
+        <div class="stat-value" id="avg-exec-time">
+          —
+        </div>
       </div>
     </div>
 
@@ -65,7 +75,9 @@ await requirePageAuth(Astro, 'admin')
         <div class="form-row">
           <label for="anonymization-level">Anonymization Level</label>
           <select id="anonymization-level" name="anonymizationLevel">
-            <option value="high" selected>High (Full Anonymization)</option>
+            <option value="high" selected>
+              High (Full Anonymization)
+            </option>
             <option value="medium">Medium (Limited)</option>
             <option value="low">Low (Minimal)</option>
             <option value="none">None (Not Recommended)</option>
@@ -83,16 +95,17 @@ await requirePageAuth(Astro, 'admin')
             step="0.01"
             value="0.1"
           />
-          <small
-            >Lower = more privacy, more noise. Higher = less privacy, less
-            noise.</small
-          >
+          <small>
+            Lower = more privacy, more noise. Higher = less privacy, less noise.
+          </small>
         </div>
 
         <div class="form-row">
           <label for="output-format">Output Format</label>
           <select id="output-format" name="outputFormat">
-            <option value="json" selected>JSON (aggregated)</option>
+            <option value="json" selected>
+              JSON (aggregated)
+            </option>
             <option value="csv">CSV (anonymized)</option>
             <option value="summary">Summary Statistics Only</option>
           </select>
@@ -142,7 +155,9 @@ await requirePageAuth(Astro, 'admin')
           />
         </div>
 
-        <button type="submit" class="btn-primary">Execute Query</button>
+        <button type="submit" class="btn-primary">
+          Execute Query
+        </button>
       </form>
     </section>
 
@@ -162,9 +177,9 @@ await requirePageAuth(Astro, 'admin')
         All queries are logged with requester, timestamp, and result shape
         (never raw data).
       </p>
-      <button id="refresh-audit" class="btn-secondary"
-        >Refresh Audit Trail</button
-      >
+      <button id="refresh-audit" class="btn-secondary">
+        Refresh Audit Trail
+      </button>
       <table class="audit-table">
         <thead>
           <tr>
@@ -181,9 +196,11 @@ await requirePageAuth(Astro, 'admin')
           </tr>
         </thead>
         <tbody id="audit-trail-body">
-          <tr
-            ><td colspan="10" class="empty-state">No queries logged yet</td></tr
-          >
+          <tr>
+            <td colspan="10" class="empty-state">
+              No queries logged yet
+            </td>
+          </tr>
         </tbody>
       </table>
     </section>

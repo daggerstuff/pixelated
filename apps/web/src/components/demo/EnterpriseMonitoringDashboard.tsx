@@ -259,15 +259,15 @@ export default function EnterpriseMonitoringDashboard() {
     switch (status) {
       case 'good':
       case 'online':
-        return 'text-green-600 bg-green-50 border-green-200'
+        return 'text-foreground bg-secondary border-input'
       case 'warning':
       case 'degraded':
-        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
+        return 'text-foreground bg-secondary border-ring font-semibold'
       case 'critical':
       case 'offline':
-        return 'text-red-600 bg-red-50 border-red-200'
+        return 'text-primary-foreground bg-primary border-primary'
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200'
+        return 'text-muted-foreground bg-secondary border-border'
     }
   }
 
@@ -290,11 +290,13 @@ export default function EnterpriseMonitoringDashboard() {
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case 'up':
-        return <TrendingUp className="text-green-600 h-4 w-4" />
+        return <TrendingUp className="h-4 w-4 text-foreground" />
       case 'down':
-        return <TrendingUp className="text-red-600 h-4 w-4 rotate-180" />
+        return (
+          <TrendingUp className="h-4 w-4 rotate-180 text-muted-foreground" />
+        )
       default:
-        return <Activity className="text-gray-600 h-4 w-4" />
+        return <Activity className="h-4 w-4 text-muted-foreground" />
     }
   }
 
@@ -302,8 +304,10 @@ export default function EnterpriseMonitoringDashboard() {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <div className="border-blue-600 border-t-transparent mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4"></div>
-          <p className="text-gray-600">Loading monitoring dashboard...</p>
+          <div className="border-t-transparent mx-auto mb-4 h-8 w-8 animate-spin rounded-none border-4 border-ring"></div>
+          <p className="text-muted-foreground">
+            Loading monitoring dashboard...
+          </p>
         </div>
       </div>
     )
@@ -314,17 +318,17 @@ export default function EnterpriseMonitoringDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-gray-900 text-3xl font-bold">
+          <h1 className="text-3xl font-bold text-foreground">
             Enterprise Monitoring Dashboard
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="mt-1 text-muted-foreground">
             Real-time system performance and analytics • Last updated:{' '}
             {lastUpdate.toLocaleTimeString()}
           </p>
         </div>
         <Badge
           variant="outline"
-          className="bg-green-50 text-green-700 border-green-200"
+          className="border-input bg-secondary text-foreground"
         >
           <Activity className="mr-2 h-4 w-4" />
           All Systems Operational
@@ -354,7 +358,7 @@ export default function EnterpriseMonitoringDashboard() {
               <Card key={metric.id}>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-gray-600 text-sm font-medium">
+                    <CardTitle className="text-sm font-medium text-muted-foreground">
                       {metric.name}
                     </CardTitle>
                     {getTrendIcon(metric.trend)}
@@ -362,14 +366,16 @@ export default function EnterpriseMonitoringDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="mb-2 flex items-baseline gap-2">
-                    <span className="text-gray-900 text-2xl font-bold">
+                    <span className="text-2xl font-bold text-foreground">
                       {metric.value.toLocaleString()}
                     </span>
-                    <span className="text-gray-500 text-sm">{metric.unit}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {metric.unit}
+                    </span>
                   </div>
 
                   <div className="space-y-2">
-                    <div className="text-gray-500 flex justify-between text-xs">
+                    <div className="flex justify-between text-xs text-muted-foreground">
                       <span>
                         Threshold: {metric.threshold}
                         {metric.unit}
@@ -408,7 +414,7 @@ export default function EnterpriseMonitoringDashboard() {
                 {systemHealth?.apis.map((api) => (
                   <div
                     key={api.endpoint}
-                    className="flex items-center justify-between rounded-lg border p-3"
+                    className="flex items-center justify-between rounded-none border p-3"
                   >
                     <div className="flex items-center gap-3">
                       <Badge
@@ -420,14 +426,16 @@ export default function EnterpriseMonitoringDashboard() {
                       </Badge>
                       <div>
                         <h4 className="font-medium">{api.name}</h4>
-                        <p className="text-gray-500 text-sm">{api.endpoint}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {api.endpoint}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-medium">
                         {api.responseTime}ms
                       </div>
-                      <div className="text-gray-500 text-xs">
+                      <div className="text-xs text-muted-foreground">
                         {api.successRate}% uptime
                       </div>
                     </div>
@@ -449,7 +457,9 @@ export default function EnterpriseMonitoringDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">Status</span>
+                    <span className="text-sm text-muted-foreground">
+                      Status
+                    </span>
                     <Badge
                       variant="outline"
                       className={getStatusColor(
@@ -463,13 +473,17 @@ export default function EnterpriseMonitoringDashboard() {
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">Response Time</span>
+                    <span className="text-sm text-muted-foreground">
+                      Response Time
+                    </span>
                     <span className="font-medium">
                       {systemHealth?.database.responseTime}ms
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">Connections</span>
+                    <span className="text-sm text-muted-foreground">
+                      Connections
+                    </span>
                     <span className="font-medium">
                       {systemHealth?.database.connections}/
                       {systemHealth?.database.maxConnections}
@@ -497,7 +511,9 @@ export default function EnterpriseMonitoringDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">Status</span>
+                    <span className="text-sm text-muted-foreground">
+                      Status
+                    </span>
                     <Badge
                       variant="outline"
                       className={getStatusColor(
@@ -511,13 +527,17 @@ export default function EnterpriseMonitoringDashboard() {
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">Hit Rate</span>
+                    <span className="text-sm text-muted-foreground">
+                      Hit Rate
+                    </span>
                     <span className="font-medium">
                       {systemHealth?.cache.hitRate}%
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">Memory Usage</span>
+                    <span className="text-sm text-muted-foreground">
+                      Memory Usage
+                    </span>
                     <span className="font-medium">
                       {systemHealth?.cache.memory}GB /{' '}
                       {systemHealth?.cache.maxMemory}GB
@@ -543,11 +563,13 @@ export default function EnterpriseMonitoringDashboard() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 rounded-lg p-2">
-                    <Activity className="text-blue-600 h-5 w-5" />
+                  <div className="rounded-none bg-secondary p-2">
+                    <Activity className="h-5 w-5 text-foreground" />
                   </div>
                   <div>
-                    <p className="text-gray-600 text-sm">Active Sessions</p>
+                    <p className="text-sm text-muted-foreground">
+                      Active Sessions
+                    </p>
                     <p className="text-2xl font-bold">
                       {usageAnalytics?.activeSessions.toLocaleString()}
                     </p>
@@ -559,11 +581,11 @@ export default function EnterpriseMonitoringDashboard() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
-                  <div className="bg-green-100 rounded-lg p-2">
-                    <Heart className="text-green-600 h-5 w-5" />
+                  <div className="rounded-none bg-secondary p-2">
+                    <Heart className="h-5 w-5 text-foreground" />
                   </div>
                   <div>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Crisis Interventions
                     </p>
                     <p className="text-2xl font-bold">
@@ -577,11 +599,11 @@ export default function EnterpriseMonitoringDashboard() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
-                  <div className="bg-purple-100 rounded-lg p-2">
-                    <Clock className="text-purple-600 h-5 w-5" />
+                  <div className="rounded-none bg-secondary p-2">
+                    <Clock className="h-5 w-5 text-foreground" />
                   </div>
                   <div>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-sm text-muted-foreground">
                       Avg Session Duration
                     </p>
                     <p className="text-2xl font-bold">
@@ -595,11 +617,13 @@ export default function EnterpriseMonitoringDashboard() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
-                  <div className="bg-yellow-100 rounded-lg p-2">
-                    <TrendingUp className="text-yellow-600 h-5 w-5" />
+                  <div className="rounded-none bg-secondary p-2">
+                    <TrendingUp className="h-5 w-5 text-foreground" />
                   </div>
                   <div>
-                    <p className="text-gray-600 text-sm">User Satisfaction</p>
+                    <p className="text-sm text-muted-foreground">
+                      User Satisfaction
+                    </p>
                     <p className="text-2xl font-bold">
                       {usageAnalytics?.userSatisfaction}/5
                     </p>
@@ -618,7 +642,7 @@ export default function EnterpriseMonitoringDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-sm text-muted-foreground">
                       Daily Active Users
                     </span>
                     <span className="font-medium">
@@ -626,7 +650,7 @@ export default function EnterpriseMonitoringDashboard() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-sm text-muted-foreground">
                       Weekly Active Users
                     </span>
                     <span className="font-medium">
@@ -634,7 +658,7 @@ export default function EnterpriseMonitoringDashboard() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-sm text-muted-foreground">
                       Monthly Active Users
                     </span>
                     <span className="font-medium">
@@ -642,7 +666,7 @@ export default function EnterpriseMonitoringDashboard() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-sm text-muted-foreground">
                       Peak Usage Time
                     </span>
                     <span className="font-medium">
@@ -660,7 +684,7 @@ export default function EnterpriseMonitoringDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-sm text-muted-foreground">
                       Total Interventions
                     </span>
                     <span className="font-medium">
@@ -668,7 +692,7 @@ export default function EnterpriseMonitoringDashboard() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-sm text-muted-foreground">
                       Successful Interventions
                     </span>
                     <span className="font-medium">
@@ -676,7 +700,9 @@ export default function EnterpriseMonitoringDashboard() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-gray-600 text-sm">Success Rate</span>
+                    <span className="text-sm text-muted-foreground">
+                      Success Rate
+                    </span>
                     <span className="font-medium">
                       {(
                         ((usageAnalytics?.successfulInterventions ?? 0) /

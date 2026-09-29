@@ -29,14 +29,18 @@ class ALFWorldTaskLoader:
         source_path = Path(source)
         if source_path.exists():
             records = _load_records(source_path)
-            items = [self._record_to_task(record, index=index) for index, record in enumerate(records)]
+            items = [
+                self._record_to_task(record, index=index) for index, record in enumerate(records)
+            ]
         else:
             split = str(source)
             records = [
                 {"split": split, "problem_path": str(path)}
                 for path in _find_problem_dirs(self.root, split)
             ]
-            items = [self._record_to_task(record, index=index) for index, record in enumerate(records)]
+            items = [
+                self._record_to_task(record, index=index) for index, record in enumerate(records)
+            ]
         items.sort(key=lambda item: item.task_id)
         return items
 
@@ -46,11 +50,17 @@ class ALFWorldTaskLoader:
             problem_path = _resolve_problem_path(self.root, record)
         else:
             record_data = dict(record)
-            raw_path = record_data.get("problem_path") or record_data.get("path") or record_data.get("task_path")
+            raw_path = (
+                record_data.get("problem_path")
+                or record_data.get("path")
+                or record_data.get("task_path")
+            )
             if raw_path:
                 problem_path = _resolve_problem_path(self.root, str(raw_path))
             else:
-                problem_path = _problem_path_from_id(self.root, str(record_data.get("task_id") or ""))
+                problem_path = _problem_path_from_id(
+                    self.root, str(record_data.get("task_id") or "")
+                )
 
         task_data = _read_public_task_data(problem_path)
         split = str(record_data.get("split") or task_data["split"])
@@ -140,7 +150,9 @@ def _problem_path_from_id(root: Path, task_id: str) -> Path:
     if len(parts) == 3:
         split, scenario, trial = parts
         return (root / "json_2.1.1" / split / scenario / trial).resolve()
-    raise ValueError("ALFWorld manifest record needs problem_path/path when task_id is not split__scenario__trial.")
+    raise ValueError(
+        "ALFWorld manifest record needs problem_path/path when task_id is not split__scenario__trial."
+    )
 
 
 def _read_public_task_data(problem_path: Path) -> dict[str, str]:

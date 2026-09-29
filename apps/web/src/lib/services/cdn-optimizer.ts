@@ -9,6 +9,10 @@ import { getLogger } from '@/lib/logging'
 
 const logger = getLogger({ prefix: 'cdn-optimizer' })
 
+// Named so the cast fits both formatters' line width (prettier and oxfmt
+// disagree on splitting the inline union in the expression below).
+type CdnImageFormat = 'webp' | 'avif' | 'jpeg' | 'png'
+
 // CDN configuration
 interface CDNConfig {
   provider: 'cloudflare' | 'aws' | 'azure' | 'custom'
@@ -306,12 +310,7 @@ export class CDNEdgeOptimizer {
           width: asset.options?.width,
           height: asset.options?.height,
           quality: asset.options?.quality,
-          format: asset.options?.format as
-            | 'webp'
-            | 'avif'
-            | 'jpeg'
-            | 'png'
-            | undefined,
+          format: asset.options?.format as CdnImageFormat | undefined,
         }),
       )
 
@@ -512,7 +511,7 @@ export class CDNUtility {
       // Assets to cache for offline functionality
       const CACHE_ASSETS = [
         '/',
-        '/manifest.json',
+        '/manifest.webmanifest',
         // Add critical CDN assets here
       ]
 

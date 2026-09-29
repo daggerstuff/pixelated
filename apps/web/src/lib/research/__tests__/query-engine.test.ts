@@ -666,7 +666,7 @@ describe('QueryDSL', () => {
         demographicSegment: { gender: 'female', ageRange: [25, 45] },
       },
       aggregations: [
-        { field: 'emotion_score', function: 'avg', alias: 'avg_emotion' },
+        { field: 'emotion_scores', function: 'avg', alias: 'avg_emotion' },
         { field: '*', function: 'count', alias: 'total' },
       ],
       groupBy: ['technique_type'],
@@ -674,7 +674,7 @@ describe('QueryDSL', () => {
     })
 
     expect(sql).toContain(
-      'SELECT technique_type, AVG(emotion_score) AS avg_emotion',
+      'SELECT technique_type, AVG(emotion_scores) AS avg_emotion',
     )
     expect(sql).toContain('FROM research_data')
     expect(sql).toContain('session_type = $1')
@@ -697,7 +697,7 @@ describe('QueryDSL', () => {
         anonymizationLevel: 'medium',
         dsl: {
           filters: { sessionType: 'group' },
-          aggregations: [{ field: 'score', function: 'avg' }],
+          aggregations: [{ field: 'technique_effectiveness', function: 'avg' }],
         },
       },
       'researcher-001',
@@ -744,7 +744,7 @@ describe('QueryDSL', () => {
         techniqueType: 'CBT',
         minConfidence: 0.8,
       },
-      aggregations: [{ field: 'score', function: 'sum' }],
+      aggregations: [{ field: 'technique_effectiveness', function: 'sum' }],
     })
 
     expect(sql).toContain('session_type')

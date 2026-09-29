@@ -11,263 +11,261 @@ const perfMode = Astro.url.searchParams.get('perf') === '1'
   title="Dashboard | Pixelated Empathy Therapy"
   description="Your therapy dashboard"
 >
-  {
-    perfMode ? (
-      <div class="np-db">
-        <h1 class="np-db-title">Dashboard</h1>
-        <div class="np-stat-grid">
-          <div class="np-stat-card">
-            <p class="np-stat-label">Sessions</p>
-            <p class="np-stat-value">42</p>
-          </div>
-          <div class="np-stat-card">
-            <p class="np-stat-label">Practice Hours</p>
-            <p class="np-stat-value">18.5</p>
-          </div>
-          <div class="np-stat-card">
-            <p class="np-stat-label">Avg. Score</p>
-            <p class="np-stat-value">4.2</p>
-          </div>
-          <div class="np-stat-card">
-            <p class="np-stat-label">Growth</p>
-            <p class="np-stat-value">+15%</p>
-          </div>
+  {perfMode ? (
+    <div class="np-db">
+      <h1 class="np-db-title">Dashboard</h1>
+      <div class="np-stat-grid">
+        <div class="np-stat-card">
+          <p class="np-stat-label">Sessions</p>
+          <p class="np-stat-value">42</p>
         </div>
-        <div class="np-card">
-          <div class="np-card-body">
-            <div class="np-chart-placeholder">Charts omitted in perf mode</div>
-          </div>
+        <div class="np-stat-card">
+          <p class="np-stat-label">Practice Hours</p>
+          <p class="np-stat-value">18.5</p>
+        </div>
+        <div class="np-stat-card">
+          <p class="np-stat-label">Avg. Score</p>
+          <p class="np-stat-value">4.2</p>
+        </div>
+        <div class="np-stat-card">
+          <p class="np-stat-label">Growth</p>
+          <p class="np-stat-value">+15%</p>
         </div>
       </div>
-    ) : (
-      <div class="np-db">
-        {/* Welcome */}
-        <div class="np-welcome">
-          <h1 class="np-db-welcome">
-            Welcome{user?.name ? `, ${user.name.split(' ')[0]}` : ''}
-          </h1>
+      <div class="np-card">
+        <div class="np-card-body">
+          <div class="np-chart-placeholder">Charts omitted in perf mode</div>
         </div>
+      </div>
+    </div>
+  ) : (
+    <div class="np-db">
+      {/* Welcome */}
+      <div class="np-welcome">
+        <h1 class="np-db-welcome">
+          Welcome{user?.name ? `, ${user.name.split(' ')[0]}` : ''}
+        </h1>
+      </div>
 
-        {/* Stats grid */}
-        <div class="np-stat-grid">
-          <div class="np-stat-card">
-            <p class="np-stat-label">Total Sessions</p>
-            <p class="np-stat-value">42</p>
-          </div>
-          <div class="np-stat-card">
-            <p class="np-stat-label">Practice Hours</p>
-            <p class="np-stat-value">18.5</p>
-          </div>
-          <div class="np-stat-card">
-            <p class="np-stat-label">Avg. Score</p>
-            <p class="np-stat-value">4.2</p>
-          </div>
-          <div class="np-stat-card">
-            <p class="np-stat-label">Growth</p>
-            <p class="np-stat-value">+15%</p>
-          </div>
+      {/* Stats grid */}
+      <div class="np-stat-grid">
+        <div class="np-stat-card">
+          <p class="np-stat-label">Total Sessions</p>
+          <p class="np-stat-value">42</p>
         </div>
+        <div class="np-stat-card">
+          <p class="np-stat-label">Practice Hours</p>
+          <p class="np-stat-value">18.5</p>
+        </div>
+        <div class="np-stat-card">
+          <p class="np-stat-label">Avg. Score</p>
+          <p class="np-stat-value">4.2</p>
+        </div>
+        <div class="np-stat-card">
+          <p class="np-stat-label">Growth</p>
+          <p class="np-stat-value">+15%</p>
+        </div>
+      </div>
 
-        {/* Quick actions */}
-        <div class="np-action-grid">
-          <a href="/chat" class="np-action-card">
-            <h3 class="np-action-title">Mental Health Chat</h3>
-            <p class="np-action-desc">AI-powered therapeutic conversation</p>
-            <span class="np-action-link">Open Chat</span>
-          </a>
-          <a href="/simulator" class="np-action-card">
-            <h3 class="np-action-title">Practice Simulator</h3>
-            <p class="np-action-desc">Safe, private practice environment</p>
-            <span class="np-action-link">Start Practice</span>
-          </a>
-          <a href="/components/analytics-dashboard" class="np-action-card">
-            <h3 class="np-action-title">Progress Analytics</h3>
-            <p class="np-action-desc">Insights from your therapeutic journey</p>
-            <span class="np-action-link">View Analytics</span>
-          </a>
-          <a href="/dashboard/agent-notes" class="np-action-card">
-            <h3 class="np-action-title">Agent Note Collaboration</h3>
-            <p class="np-action-desc">
-              Monitor unresolved questions and phase progression
-            </p>
-            <span class="np-action-link">Open Agent Notes</span>
-          </a>
-          <a href="/journal-research" class="np-action-card">
-            <h3 class="np-action-title">Journal Research</h3>
-            <p class="np-action-desc">
-              Dataset discovery, evaluation, and pipeline integration
-            </p>
-            <span class="np-action-link">Open Journal Research</span>
+      {/* Quick actions */}
+      <div class="np-action-grid">
+        <a href="/chat" class="np-action-card">
+          <h3 class="np-action-title">Mental Health Chat</h3>
+          <p class="np-action-desc">AI-powered therapeutic conversation</p>
+          <span class="np-action-link">Open Chat</span>
+        </a>
+        <a href="/simulator" class="np-action-card">
+          <h3 class="np-action-title">Practice Simulator</h3>
+          <p class="np-action-desc">Safe, private practice environment</p>
+          <span class="np-action-link">Start Practice</span>
+        </a>
+        <a href="/components/analytics-dashboard" class="np-action-card">
+          <h3 class="np-action-title">Progress Analytics</h3>
+          <p class="np-action-desc">Insights from your therapeutic journey</p>
+          <span class="np-action-link">View Analytics</span>
+        </a>
+        <a href="/dashboard/agent-notes" class="np-action-card">
+          <h3 class="np-action-title">Agent Note Collaboration</h3>
+          <p class="np-action-desc">
+            Monitor unresolved questions and phase progression
+          </p>
+          <span class="np-action-link">Open Agent Notes</span>
+        </a>
+        <a href="/journal-research" class="np-action-card">
+          <h3 class="np-action-title">Journal Research</h3>
+          <p class="np-action-desc">
+            Dataset discovery, evaluation, and pipeline integration
+          </p>
+          <span class="np-action-link">Open Journal Research</span>
+        </a>
+      </div>
+
+      {/* Mini tools */}
+      <div class="np-tool-grid">
+        <a href="/journal-research" class="np-tool-card">
+          <h4 class="np-tool-name">Dataset Pipeline</h4>
+          <p class="np-tool-desc">Journal research & training</p>
+        </a>
+        <a href="/components/emotion-visualization" class="np-tool-card">
+          <h4 class="np-tool-name">3D Emotions</h4>
+          <p class="np-tool-desc">Interactive emotion mapping</p>
+        </a>
+        <a href="/components/treatment-plans" class="np-tool-card">
+          <h4 class="np-tool-name">Treatment Plans</h4>
+          <p class="np-tool-desc">Goal tracking & milestones</p>
+        </a>
+        <a href="/components/security-demo" class="np-tool-card">
+          <h4 class="np-tool-name">Privacy Demo</h4>
+          <p class="np-tool-desc">FHE encryption showcase</p>
+        </a>
+        <a href="/components/ui-showcase" class="np-tool-card">
+          <h4 class="np-tool-name">UI Components</h4>
+          <p class="np-tool-desc">Interactive carousels</p>
+        </a>
+      </div>
+
+      {/* Enhanced dashboard banner */}
+      <div class="np-banner">
+        <div class="np-banner-content">
+          <h3 class="np-banner-title">Enhanced Dashboard Available</h3>
+          <p class="np-banner-desc">
+            3D visualizations, real-time analytics, and advanced treatment
+            planning.
+          </p>
+        </div>
+        <a href="/dashboard/enhanced" class="np-btn">
+          Try Enhanced Dashboard
+        </a>
+      </div>
+
+      {/* Analytics */}
+      <div class="np-card">
+        <div class="np-card-header">
+          <h3 class="np-section-title">Analytics Overview</h3>
+          <a href="/components/analytics-dashboard" class="np-link">
+            View Detailed Analytics
           </a>
         </div>
-
-        {/* Mini tools */}
-        <div class="np-tool-grid">
-          <a href="/journal-research" class="np-tool-card">
-            <h4 class="np-tool-name">Dataset Pipeline</h4>
-            <p class="np-tool-desc">Journal research & training</p>
-          </a>
-          <a href="/components/emotion-visualization" class="np-tool-card">
-            <h4 class="np-tool-name">3D Emotions</h4>
-            <p class="np-tool-desc">Interactive emotion mapping</p>
-          </a>
-          <a href="/components/treatment-plans" class="np-tool-card">
-            <h4 class="np-tool-name">Treatment Plans</h4>
-            <p class="np-tool-desc">Goal tracking & milestones</p>
-          </a>
-          <a href="/components/security-demo" class="np-tool-card">
-            <h4 class="np-tool-name">Privacy Demo</h4>
-            <p class="np-tool-desc">FHE encryption showcase</p>
-          </a>
-          <a href="/components/ui-showcase" class="np-tool-card">
-            <h4 class="np-tool-name">UI Components</h4>
-            <p class="np-tool-desc">Interactive carousels</p>
-          </a>
+        <div class="np-card-body">
+          <div class="np-chart-placeholder" aria-hidden="true" />
+          <AnalyticsCharts client:visible />
         </div>
+      </div>
 
-        {/* Enhanced dashboard banner */}
-        <div class="np-banner">
-          <div class="np-banner-content">
-            <h3 class="np-banner-title">Enhanced Dashboard Available</h3>
-            <p class="np-banner-desc">
-              3D visualizations, real-time analytics, and advanced treatment
-              planning.
-            </p>
-          </div>
-          <a href="/dashboard/enhanced" class="np-btn">
-            Try Enhanced Dashboard
-          </a>
-        </div>
-
-        {/* Analytics */}
+      {/* Sessions + Improvement areas */}
+      <div class="np-split-grid">
         <div class="np-card">
           <div class="np-card-header">
-            <h3 class="np-section-title">Analytics Overview</h3>
-            <a href="/components/analytics-dashboard" class="np-link">
-              View Detailed Analytics
-            </a>
+            <h3 class="np-section-title">Recent Sessions</h3>
           </div>
-          <div class="np-card-body">
-            <div class="np-chart-placeholder" aria-hidden="true" />
-            <AnalyticsCharts client:visible />
+          <div class="np-card-body np-card-body--flush">
+            <div class="np-session-list">
+              <div class="np-session-row">
+                <div class="np-session-info">
+                  <span class="np-session-icon">V</span>
+                  <div>
+                    <p class="np-session-name">CBT Practice Session</p>
+                    <p class="np-session-meta">30 minutes</p>
+                  </div>
+                </div>
+                <div class="np-session-time">
+                  <p class="np-session-day">Today</p>
+                  <p class="np-session-meta">10:30 AM</p>
+                </div>
+              </div>
+              <div class="np-session-row">
+                <div class="np-session-info">
+                  <span class="np-session-icon">C</span>
+                  <div>
+                    <p class="np-session-name">Therapy Chat Session</p>
+                    <p class="np-session-meta">45 minutes</p>
+                  </div>
+                </div>
+                <div class="np-session-time">
+                  <p class="np-session-day">Yesterday</p>
+                  <p class="np-session-meta">2:15 PM</p>
+                </div>
+              </div>
+              <div class="np-session-row">
+                <div class="np-session-info">
+                  <span class="np-session-icon">M</span>
+                  <div>
+                    <p class="np-session-name">Mindfulness Practice</p>
+                    <p class="np-session-meta">20 minutes</p>
+                  </div>
+                </div>
+                <div class="np-session-time">
+                  <p class="np-session-day">2 days ago</p>
+                  <p class="np-session-meta">9:00 AM</p>
+                </div>
+              </div>
+            </div>
+            <div class="np-card-footer">
+              <a href="/sessions" class="np-link">
+                View all sessions
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Sessions + Improvement areas */}
-        <div class="np-split-grid">
-          <div class="np-card">
-            <div class="np-card-header">
-              <h3 class="np-section-title">Recent Sessions</h3>
-            </div>
-            <div class="np-card-body np-card-body--flush">
-              <div class="np-session-list">
-                <div class="np-session-row">
-                  <div class="np-session-info">
-                    <span class="np-session-icon">V</span>
-                    <div>
-                      <p class="np-session-name">CBT Practice Session</p>
-                      <p class="np-session-meta">30 minutes</p>
-                    </div>
-                  </div>
-                  <div class="np-session-time">
-                    <p class="np-session-day">Today</p>
-                    <p class="np-session-meta">10:30 AM</p>
-                  </div>
-                </div>
-                <div class="np-session-row">
-                  <div class="np-session-info">
-                    <span class="np-session-icon">C</span>
-                    <div>
-                      <p class="np-session-name">Therapy Chat Session</p>
-                      <p class="np-session-meta">45 minutes</p>
-                    </div>
-                  </div>
-                  <div class="np-session-time">
-                    <p class="np-session-day">Yesterday</p>
-                    <p class="np-session-meta">2:15 PM</p>
-                  </div>
-                </div>
-                <div class="np-session-row">
-                  <div class="np-session-info">
-                    <span class="np-session-icon">M</span>
-                    <div>
-                      <p class="np-session-name">Mindfulness Practice</p>
-                      <p class="np-session-meta">20 minutes</p>
-                    </div>
-                  </div>
-                  <div class="np-session-time">
-                    <p class="np-session-day">2 days ago</p>
-                    <p class="np-session-meta">9:00 AM</p>
-                  </div>
-                </div>
-              </div>
-              <div class="np-card-footer">
-                <a href="/sessions" class="np-link">
-                  View all sessions
-                </a>
-              </div>
-            </div>
+        <div class="np-card">
+          <div class="np-card-header">
+            <h3 class="np-section-title">Improvement Areas</h3>
           </div>
-
-          <div class="np-card">
-            <div class="np-card-header">
-              <h3 class="np-section-title">Improvement Areas</h3>
+          <div class="np-card-body">
+            <div class="np-progress-list">
+              <div class="np-progress-row">
+                <div class="np-progress-label">
+                  <span>Active Listening</span>
+                  <span class="np-progress-pct">85%</span>
+                </div>
+                <div class="np-progress-track">
+                  <div class="np-progress-fill" style="width:85%" />
+                </div>
+              </div>
+              <div class="np-progress-row">
+                <div class="np-progress-label">
+                  <span>Empathetic Responses</span>
+                  <span class="np-progress-pct">72%</span>
+                </div>
+                <div class="np-progress-track">
+                  <div class="np-progress-fill" style="width:72%" />
+                </div>
+              </div>
+              <div class="np-progress-row">
+                <div class="np-progress-label">
+                  <span>CBT Techniques</span>
+                  <span class="np-progress-pct">60%</span>
+                </div>
+                <div class="np-progress-track">
+                  <div class="np-progress-fill" style="width:60%" />
+                </div>
+              </div>
+              <div class="np-progress-row">
+                <div class="np-progress-label">
+                  <span>Trauma-Informed Care</span>
+                  <span class="np-progress-pct">45%</span>
+                </div>
+                <div class="np-progress-track">
+                  <div class="np-progress-fill" style="width:45%" />
+                </div>
+              </div>
             </div>
-            <div class="np-card-body">
-              <div class="np-progress-list">
-                <div class="np-progress-row">
-                  <div class="np-progress-label">
-                    <span>Active Listening</span>
-                    <span class="np-progress-pct">85%</span>
-                  </div>
-                  <div class="np-progress-track">
-                    <div class="np-progress-fill" style="width:85%" />
-                  </div>
-                </div>
-                <div class="np-progress-row">
-                  <div class="np-progress-label">
-                    <span>Empathetic Responses</span>
-                    <span class="np-progress-pct">72%</span>
-                  </div>
-                  <div class="np-progress-track">
-                    <div class="np-progress-fill" style="width:72%" />
-                  </div>
-                </div>
-                <div class="np-progress-row">
-                  <div class="np-progress-label">
-                    <span>CBT Techniques</span>
-                    <span class="np-progress-pct">60%</span>
-                  </div>
-                  <div class="np-progress-track">
-                    <div class="np-progress-fill" style="width:60%" />
-                  </div>
-                </div>
-                <div class="np-progress-row">
-                  <div class="np-progress-label">
-                    <span>Trauma-Informed Care</span>
-                    <span class="np-progress-pct">45%</span>
-                  </div>
-                  <div class="np-progress-track">
-                    <div class="np-progress-fill" style="width:45%" />
-                  </div>
-                </div>
-              </div>
-              <div class="np-card-footer">
-                <a href="/resources" class="np-link">
-                  View improvement resources
-                </a>
-              </div>
+            <div class="np-card-footer">
+              <a href="/resources" class="np-link">
+                View improvement resources
+              </a>
             </div>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )}
 </DashboardLayout>
 
 <style is:global>
   /* NP Dashboard — "Monitor" work pattern
-   Zero-chroma grayscale, flat surfaces, JetBrains Mono labels */
+   Zero-chroma grayscale, flat surfaces, Spline Sans Mono labels */
 
   .np-db {
     display: flex;

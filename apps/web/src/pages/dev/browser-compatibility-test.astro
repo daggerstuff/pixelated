@@ -51,62 +51,60 @@ const TEST_SECTIONS: TestSections = {
       Firefox, Safari, and Edge to verify compatibility.
     </p>
 
-    {
-      Object.entries(TEST_SECTIONS).map(([key, section]) => (
-        <section class="test-section" aria-labelledby={`${key}-title`}>
-          <h2 id={`${key}-title`}>{section.title}</h2>
-          <div class="component-test">
-            {section.instructions && (
-              <>
-                <h3>Test Instructions</h3>
-                <ul>
-                  {section.instructions.map((instruction) => (
-                    <li>{instruction}</li>
-                  ))}
-                </ul>
-              </>
+    {Object.entries(TEST_SECTIONS).map(([key, section]) => (
+      <section class="test-section" aria-labelledby={`${key}-title`}>
+        <h2 id={`${key}-title`}>{section.title}</h2>
+        <div class="component-test">
+          {section.instructions && (
+            <>
+              <h3>Test Instructions</h3>
+              <ul>
+                {section.instructions.map((instruction) => (
+                  <li>{instruction}</li>
+                ))}
+              </ul>
+            </>
+          )}
+          <div class="component-container">
+            {key === 'browserInfo' && (
+              <BrowserCompatibilityTester client:load />
             )}
-            <div class="component-container">
-              {key === 'browserInfo' && (
-                <BrowserCompatibilityTester client:load />
-              )}
-              {key === 'aiChat' && (
-                <AIChat
-                  title={section.props?.title}
-                  description={section.props?.description}
-                  showModelSelector={section.props?.showModelSelector}
-                />
-              )}
-              {key === 'loadingIndicator' && (
-                <div class="loading-indicators-test">
-                  {Object.entries(LOADING_SIZES).map(([size, dimensions]) => (
-                    <div>
-                      <h4>{size}</h4>
+            {key === 'aiChat' && (
+              <AIChat
+                title={section.props?.title}
+                description={section.props?.description}
+                showModelSelector={section.props?.showModelSelector}
+              />
+            )}
+            {key === 'loadingIndicator' && (
+              <div class="loading-indicators-test">
+                {Object.entries(LOADING_SIZES).map(([size, dimensions]) => (
+                  <div>
+                    <h4>{size}</h4>
+                    <div
+                      class="loading-indicator"
+                      role="status"
+                      aria-live="polite"
+                    >
                       <div
-                        class="loading-indicator"
-                        role="status"
-                        aria-live="polite"
-                      >
-                        <div
-                          class="loading-skeleton"
-                          style={`width: ${dimensions.width}px; height: ${dimensions.height}px;`}
-                        />
-                        <p class="loading-message">
-                          Loading {size.toLowerCase()}...
-                        </p>
-                        <span class="sr-only">
-                          Loading {size.toLowerCase()} content, please wait.
-                        </span>
-                      </div>
+                        class="loading-skeleton"
+                        style={`width: ${dimensions.width}px; height: ${dimensions.height}px;`}
+                      />
+                      <p class="loading-message">
+                        Loading {size.toLowerCase()}...
+                      </p>
+                      <span class="sr-only">
+                        Loading {size.toLowerCase()} content, please wait.
+                      </span>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </section>
-      ))
-    }
+        </div>
+      </section>
+    ))}
 
     <section class="test-section" aria-labelledby="compatibility-log-title">
       <h2 id="compatibility-log-title">Compatibility Issues Log</h2>
@@ -120,11 +118,9 @@ const TEST_SECTIONS: TestSections = {
             <label for="component">Component</label>
             <select id="component" name="component" required>
               <option value="">Select a component</option>
-              {
-                Object.entries(TEST_SECTIONS).map(([key, section]) => (
-                  <option value={key}>{section.title}</option>
-                ))
-              }
+              {Object.entries(TEST_SECTIONS).map(([key, section]) => (
+                <option value={key}>{section.title}</option>
+              ))}
             </select>
           </div>
           <div class="form-group">
@@ -135,14 +131,17 @@ const TEST_SECTIONS: TestSections = {
             <label for="severity">Severity</label>
             <select id="severity" name="severity" required>
               <option value="">Select severity</option>
-              <option value="critical">Critical - Blocking functionality</option
-              >
+              <option value="critical">
+                Critical - Blocking functionality
+              </option>
               <option value="major">Major - Significant impact</option>
               <option value="minor">Minor - Cosmetic issues</option>
             </select>
           </div>
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Log Issue</button>
+            <button type="submit" class="btn btn-primary">
+              Log Issue
+            </button>
           </div>
         </form>
 

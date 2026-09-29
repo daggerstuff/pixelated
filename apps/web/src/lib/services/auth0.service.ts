@@ -5,7 +5,8 @@
  * previous MongoDB-based authentication system.
  */
 
-import { ManagementClient, AuthenticationClient, UserInfoClient } from 'auth0'
+import { ManagementClient } from 'auth0'
+import { AuthenticationClient, UserInfoClient } from 'auth0-legacy'
 
 import type { AuthRole } from '../../config/auth.config'
 
@@ -22,6 +23,17 @@ export type ManagementClientOptionsWithClientCredentials = {
 // Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
 type ExtendedAuthenticationClient = AuthenticationClient & {
   oauth: AuthenticationClient['oauth'] & {
+    authorizationCodeGrant: (params: {
+      code: string
+      redirect_uri: string
+    }) => Promise<{
+      data: {
+        access_token: string
+        refresh_token?: string
+        id_token?: string
+        expires_in: number
+      }
+    }>
     passwordGrant: (params: {
       username: string
       password: string
@@ -54,6 +66,7 @@ function isExtendedAuthenticationClient(
   }
 
   const oauthMethods: Array<keyof ExtendedAuthenticationClient['oauth']> = [
+    'authorizationCodeGrant',
     'passwordGrant',
     'refreshTokenGrant',
     'revokeRefreshToken',
@@ -184,12 +197,10 @@ function initializeAuth0Clients() {
       clientId: config.managementClientId,
       clientSecret: config.managementClientSecret,
     })
-  } else {
-    if (shouldWarnAuth0Configuration) {
-      authLogger.warn(
-        'Auth0 Management configuration is incomplete. User management features may not work.',
-      )
-    }
+  } else if (shouldWarnAuth0Configuration) {
+    authLogger.warn(
+      'Auth0 Management configuration is incomplete. User management features may not work.',
+    )
   }
 
   // Initialize Authentication Client if config is available
@@ -208,12 +219,10 @@ function initializeAuth0Clients() {
     auth0UserInfo ??= new UserInfoClient({
       domain: config.domain,
     }) as ExtendedUserInfoClient
-  } else {
-    if (shouldWarnAuth0Configuration) {
-      authLogger.warn(
-        'Auth0 Authentication configuration is incomplete. Login features will not work.',
-      )
-    }
+  } else if (shouldWarnAuth0Configuration) {
+    authLogger.warn(
+      'Auth0 Authentication configuration is incomplete. Login features will not work.',
+    )
   }
 
   return config
@@ -268,6 +277,8 @@ export class Auth0UserService {
           ...userResponse,
           user_id: userResponse.user_id ?? userResponse.sub,
         }
+
+        userResponse = await this.enrichWithManagementMetadata(userResponse)
       } catch (e) {
         authLogger.warn(
           'Failed to fetch user info, falling back to token decode if possible or error',
@@ -292,6 +303,64 @@ export class Auth0UserService {
     } catch (error: unknown) {
       authLogger.error('Auth0 sign in error', error)
       throw new Error('Invalid credentials')
+    }
+  }
+
+  /**
+   * Verify an OAuth authorization code and exchange it for tokens and user profile
+   * @param code Authorization code from OAuth callback
+   * @param redirectUri Optional redirect URI
+   * @returns User and tokens
+   */
+  async verifyOAuthCode(code: string, redirectUri?: string) {
+    if (!auth0Authentication) {
+      throw new Error('Auth0 authentication client not initialized')
+    }
+
+    try {
+      const uri =
+        redirectUri ??
+        process.env['AUTH0_CALLBACK_URL'] ??
+        process.env['AUTH0_REDIRECT_URI'] ??
+        'http://localhost:5173/api/auth/callback'
+
+      const response = await auth0Authentication.oauth.authorizationCodeGrant({
+        code,
+        redirect_uri: uri,
+      })
+      const tokenResponse = response.data
+
+      if (!auth0UserInfo) {
+        throw new Error('Auth0 UserInfo client not initialized')
+      }
+
+      const userInfoRes = await auth0UserInfo.getUserInfo(
+        tokenResponse.access_token,
+      )
+      let userResponse = this.parseAuth0UserRecord(userInfoRes.data)
+      userResponse = {
+        ...userResponse,
+        user_id: userResponse.user_id ?? userResponse.sub,
+      }
+      userResponse = await this.enrichWithManagementMetadata(userResponse)
+
+      logSecurityEvent(SecurityEventType.LOGIN, null, {
+        userId: this.toStringOrUndefined(userResponse.user_id),
+        email: this.toStringOrUndefined(userResponse.email),
+        method: 'oauth_code',
+      })
+
+      const authenticatedUser = this.toAuthenticatedUser(userResponse)
+      return {
+        user: authenticatedUser,
+        token: tokenResponse.access_token,
+        refreshToken: tokenResponse.refresh_token,
+        idToken: tokenResponse.id_token,
+        expiresIn: tokenResponse.expires_in,
+      }
+    } catch (error: unknown) {
+      authLogger.error('Auth0 verify OAuth code error', error)
+      throw new Error('Invalid authorization code', { cause: error })
     }
   }
 
@@ -323,7 +392,7 @@ export class Auth0UserService {
           created_at: new Date().toISOString(),
         },
       })
-      const auth0User = this.parseAuth0UserRecord(createRes.data)
+      const auth0User = this.parseAuth0UserRecord(createRes)
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
@@ -343,8 +412,8 @@ export class Auth0UserService {
     }
 
     try {
-      const getUserRes = await auth0Management.users.get({ id: userId })
-      const auth0User = this.parseAuth0UserRecord(getUserRes.data)
+      const getUserRes = await auth0Management.users.get(userId)
+      const auth0User = this.parseAuth0UserRecord(getUserRes)
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
@@ -460,7 +529,7 @@ export class Auth0UserService {
       }
 
       const updateRes = await auth0Management.users.update(userId, updateParams)
-      const auth0User = this.parseAuth0UserRecord(updateRes.data)
+      const auth0User = this.parseAuth0UserRecord(updateRes)
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
@@ -935,10 +1004,24 @@ export class Auth0UserService {
   }
 
   private parseAuth0UserRecord(value: unknown): Auth0UserRecord {
-    return this.toRecord(value) ?? {}
+    const record = this.toRecord(value)
+    if (
+      record &&
+      'data' in record &&
+      record.data !== null &&
+      typeof record.data === 'object' &&
+      !Array.isArray(record.data)
+    ) {
+      return this.toRecord(record.data) ?? {}
+    }
+    return record ?? {}
   }
 
   private parseAuth0UserList(value: unknown): Auth0UserRecord[] {
+    const record = this.toRecord(value)
+    if (record && 'data' in record && Array.isArray(record.data)) {
+      return record.data.map((item) => this.parseAuth0UserRecord(item))
+    }
     if (!Array.isArray(value)) {
       return []
     }
@@ -961,6 +1044,47 @@ export class Auth0UserService {
     return typeof value === 'number' && Number.isFinite(value)
       ? value
       : fallback
+  }
+
+  /**
+   * Enrich a user record with `app_metadata`/`user_metadata` from the Auth0
+   * Management API. The `/userinfo` endpoint omits metadata, so the role would
+   * otherwise always resolve to 'user'. Best-effort: on failure (or when the
+   * Management client is unavailable) the original record is returned, so the
+   * caller falls back to the token-derived role.
+   */
+  private async enrichWithManagementMetadata(
+    userResponse: Auth0UserRecord,
+  ): Promise<Auth0UserRecord> {
+    if (!auth0Management) {
+      return userResponse
+    }
+
+    const managementId = this.toStringOrUndefined(
+      userResponse.user_id ?? userResponse.sub,
+    )
+    if (!managementId) {
+      return userResponse
+    }
+
+    try {
+      const mgmtRes = await auth0Management.users.get(managementId)
+      const enriched = this.parseAuth0UserRecord(mgmtRes)
+      const enrichedId = enriched.user_id ?? enriched.sub
+      if (!enrichedId) {
+        // An unusable Management response must not wipe the /userinfo record;
+        // fall back to the original so callers keep the token-derived data.
+        authLogger.warn(
+          'Management metadata enrichment returned no user id; keeping userinfo record',
+          { managementId },
+        )
+        return userResponse
+      }
+      return { ...enriched, user_id: enrichedId }
+    } catch (enrichError) {
+      authLogger.warn('Failed to enrich user with role metadata', enrichError)
+      return userResponse
+    }
   }
 }
 
@@ -1134,9 +1258,8 @@ export async function getAllUsers() {
   return await auth0UserService.getAllUsers()
 }
 
-// Placeholder for OAuth verification (to be implemented)
-export async function verifyOAuthCode(_code: string) {
-  throw new Error('OAuth verification not implemented yet')
+export async function verifyOAuthCode(code: string, redirectUri?: string) {
+  return await auth0UserService.verifyOAuthCode(code, redirectUri)
 }
 
 export default {

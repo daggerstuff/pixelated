@@ -15,7 +15,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
         <li className="inline-flex items-center">
           <a
             href="/"
-            className="text-gray-700 hover:text-purple-600 dark:text-gray-400 dark:hover:text-white inline-flex items-center text-sm font-medium"
+            className="inline-flex items-center text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <svg
               className="mr-2 h-4 w-4"
@@ -34,7 +34,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
           >
             <div className="flex items-center">
               <svg
-                className="text-gray-400 h-6 w-6"
+                className="h-6 w-6 text-muted-foreground"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -48,8 +48,8 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
                 href={item.href}
                 className={`ml-1 text-sm font-medium md:ml-2 ${
                   item.current
-                    ? 'text-gray-500 dark:text-gray-400'
-                    : 'text-purple-600 dark:text-purple-500 hover:text-purple-700 dark:hover:text-purple-400'
+                    ? 'text-muted-foreground'
+                    : 'font-medium text-foreground'
                 }`}
               >
                 {item.name}

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export type BeliefEntry = {
+type BeliefEntry = {
   id: string
   belief: string
   category: 'core' | 'intermediate' | 'automatic'
@@ -32,32 +32,32 @@ function BeliefSlider({ belief }: { belief: BeliefEntry }) {
 
   const changeColor =
     change > 0
-      ? 'text-[#ff8533]'
+      ? 'text-foreground'
       : change < 0
-        ? 'text-[#8fb8a2]'
-        : 'text-[#b0b0b0]'
+        ? 'text-foreground'
+        : 'text-muted-foreground'
 
   const percentage = (belief.currentStrength / 10) * 100
 
   return (
-    <div className="border-white/10 border bg-[#121212] p-4">
+    <div className="border border-border bg-card p-4">
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+        className="w-full text-left focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-ring"
         aria-expanded={expanded}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
+              <span className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
                 {belief.category}
               </span>
             </div>
-            <p className="mt-1 text-sm text-[#f6f1e8]">{belief.belief}</p>
+            <p className="mt-1 text-sm text-foreground">{belief.belief}</p>
           </div>
           <div className="text-right">
-            <p className="font-mono text-sm text-[#f6f1e8]">
+            <p className="font-mono text-sm text-foreground">
               {belief.currentStrength.toFixed(1)}/10
             </p>
             <p className={`font-mono text-xs ${changeColor}`}>{changeLabel}</p>
@@ -65,9 +65,9 @@ function BeliefSlider({ belief }: { belief: BeliefEntry }) {
         </div>
 
         <div className="mt-3">
-          <div className="bg-white/10 h-2 w-full">
+          <div className="h-2 w-full bg-secondary">
             <div
-              className="h-full bg-[#8fb8a2] transition-all duration-300"
+              className="h-full bg-primary transition-all duration-300"
               style={{ width: `${percentage}%` }}
             />
           </div>
@@ -75,8 +75,8 @@ function BeliefSlider({ belief }: { belief: BeliefEntry }) {
       </button>
 
       {expanded && belief.history.length > 0 && (
-        <div className="border-white/10 mt-4 border-t pt-3">
-          <h4 className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
+        <div className="mt-4 border-t border-border pt-3">
+          <h4 className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
             Change history
           </h4>
           <div className="mt-2 space-y-2">
@@ -85,12 +85,12 @@ function BeliefSlider({ belief }: { belief: BeliefEntry }) {
                 key={entry.sessionId}
                 className="flex items-center justify-between text-xs"
               >
-                <span className="text-[#f6f1e8]">{entry.sessionLabel}</span>
+                <span className="text-foreground">{entry.sessionLabel}</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[#b0b0b0]">
+                  <span className="font-mono text-muted-foreground">
                     {entry.strength.toFixed(1)}/10
                   </span>
-                  <span className="font-mono text-[#b0b0b0]">
+                  <span className="font-mono text-muted-foreground">
                     {new Date(entry.date).toLocaleDateString()}
                   </span>
                 </div>
@@ -112,11 +112,11 @@ export function BeliefChangeTracker({
       <section className={className} aria-labelledby="belief-tracker-heading">
         <h2
           id="belief-tracker-heading"
-          className="text-lg font-semibold text-[#f6f1e8]"
+          className="text-lg font-semibold text-foreground"
         >
           Belief change tracker
         </h2>
-        <p className="mt-2 text-sm text-[#b0b0b0]">
+        <p className="mt-2 text-sm text-muted-foreground">
           No beliefs tracked yet. Beliefs are identified during therapy
           sessions.
         </p>
@@ -133,16 +133,16 @@ export function BeliefChangeTracker({
   return (
     <section className={className} aria-labelledby="belief-tracker-heading">
       <div className="mb-4">
-        <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533]">
+        <p className="font-mono text-xs uppercase tracking-[0.16em] text-foreground">
           Cognitive restructuring
         </p>
         <h2
           id="belief-tracker-heading"
-          className="text-xl font-semibold text-[#f6f1e8]"
+          className="text-xl font-semibold text-foreground"
         >
           Belief change tracker
         </h2>
-        <p className="mt-1 text-sm text-[#b0b0b0]">
+        <p className="mt-1 text-sm text-muted-foreground">
           {beliefs.length} beliefs tracked across sessions
         </p>
       </div>
@@ -150,7 +150,7 @@ export function BeliefChangeTracker({
       <div className="space-y-6">
         {coreBeliefs.length > 0 && (
           <div>
-            <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
+            <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-foreground">
               Core beliefs ({coreBeliefs.length})
             </h3>
             <div className="space-y-3">
@@ -163,7 +163,7 @@ export function BeliefChangeTracker({
 
         {intermediateBeliefs.length > 0 && (
           <div>
-            <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
+            <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-foreground">
               Intermediate beliefs ({intermediateBeliefs.length})
             </h3>
             <div className="space-y-3">
@@ -176,7 +176,7 @@ export function BeliefChangeTracker({
 
         {automaticThoughts.length > 0 && (
           <div>
-            <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
+            <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-foreground">
               Automatic thoughts ({automaticThoughts.length})
             </h3>
             <div className="space-y-3">

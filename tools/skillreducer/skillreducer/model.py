@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from skillreducer.config import (
     Config,
@@ -21,13 +21,17 @@ if TYPE_CHECKING:
 
 try:
     from agno.models.azure import AzureOpenAI
+
+    _AZURE_AVAILABLE = True
 except ImportError:  # pragma: no cover - optional at type-check time
-    AzureOpenAI = None  # type: ignore[misc, assignment]
+    _AZURE_AVAILABLE = False
 
 try:
     from agno.models.openai import OpenAIChat
+
+    _OPENAI_CHAT_AVAILABLE = True
 except ImportError:  # pragma: no cover - optional at type-check time
-    OpenAIChat = None  # type: ignore[misc, assignment]
+    _OPENAI_CHAT_AVAILABLE = False
 
 
 def create_openai_chat(
@@ -39,19 +43,17 @@ def create_openai_chat(
     """Build an Agno chat model from SkillReducer config."""
     api_key = resolve_api_key(config)
     if not api_key:
-        raise ValueError(
-            "No API key found. Set api_key in the environment, .env, or config.yaml."
-        )
+        raise ValueError("No API key found. Set api_key in the environment, .env, or config.yaml.")
 
     deployment = model_id or resolve_compression_model(config)
-    kwargs: dict = {
+    kwargs: dict[str, Any] = {
         "id": deployment,
         "api_key": api_key,
         "temperature": temperature,
     }
 
     if resolve_azure_subscription(config):
-        if AzureOpenAI is None:
+        if not _AZURE_AVAILABLE:
             raise ImportError("agno is not installed. Install with: pip install agno")
         kwargs["azure_deployment"] = deployment
         endpoint = resolve_azure_endpoint(config)
@@ -60,7 +62,7 @@ def create_openai_chat(
         kwargs["api_version"] = resolve_api_version(config)
         return AzureOpenAI(**kwargs)
 
-    if OpenAIChat is None:
+    if not _OPENAI_CHAT_AVAILABLE:
         raise ImportError("agno is not installed. Install with: pip install agno")
 
     base_url = resolve_api_base_url(config)

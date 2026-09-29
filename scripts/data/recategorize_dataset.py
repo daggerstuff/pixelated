@@ -7,6 +7,7 @@ Processes "Other" labeled records through the Hybrid Taxonomy Classifier.
 import json
 import logging
 from pathlib import Path
+from typing import Any
 
 from ai.pipelines.design.hybrid_classifier import HybridTaxonomyClassifier
 
@@ -15,17 +16,17 @@ logger = logging.getLogger("recategorizer")
 
 
 class DatasetRecategorizer:
-    def __init__(self):
+    def __init__(self) -> None:
         self.classifier = HybridTaxonomyClassifier(enable_llm=False)  # Disable LLM for audit stub
         self.input_dir = Path("ai/training/ready_packages/datasets/stage2_reasoning")
         self.output_file = self.input_dir / "categorized_dataset.jsonl"
 
-    def run(self):
+    def run(self) -> None:
         logger.info("Starting dataset re-categorization...")
 
         # Mocking source records for the audit reconstruction
         # In production, this would stream from S3 or local processed files
-        mock_records = [
+        mock_records: list[dict[str, Any]] = [
             {
                 "text": "I feel so anxious today, my heart is racing and I can't breathe.",
                 "label": "Other",

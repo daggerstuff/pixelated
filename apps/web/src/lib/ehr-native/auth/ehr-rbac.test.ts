@@ -194,9 +194,13 @@ describe('checkPermission', () => {
     expect(result.consentVerified).toBe(false)
   })
 
-  it('grants permission without consent check when patientId is omitted', async () => {
+  it('denies consent-required permission when no patient context is provided', async () => {
+    // Security hardening (2026-08-26): permissions that require patient
+    // consent fail closed when no patientId is given — a role grant alone
+    // is not enough to touch patient data without a patient context.
     const result = await checkPermission('physician', 'read_patient')
-    expect(result.granted).toBe(true)
+    expect(result.granted).toBe(false)
+    expect(result.reason).toContain('no patient context')
     expect(result.consentVerified).toBeNull()
   })
 

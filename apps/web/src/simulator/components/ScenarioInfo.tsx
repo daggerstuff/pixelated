@@ -169,4 +169,3 @@ const ScenarioInfo: React.FC<ScenarioInfoProps> = ({
 export default ScenarioInfo
 
 // Example PHI audit logging - uncomment and customize as needed
-

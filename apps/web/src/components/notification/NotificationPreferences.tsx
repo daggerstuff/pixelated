@@ -65,7 +65,7 @@ export function NotificationPreferences({
       <div className="space-y-6">
         <div>
           <h2 className="text-lg font-semibold">Notification Channels</h2>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Choose how you want to receive notifications
           </p>
         </div>
@@ -119,7 +119,7 @@ export function NotificationPreferences({
         <div className="space-y-4">
           <div>
             <h2 className="text-lg font-semibold">Notification Frequency</h2>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Choose how often you want to receive notifications
             </p>
           </div>
@@ -157,7 +157,7 @@ export function NotificationPreferences({
         <div className="space-y-4">
           <div>
             <h2 className="text-lg font-semibold">Quiet Hours</h2>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Set hours during which notifications will be muted
             </p>
           </div>
@@ -214,7 +214,7 @@ export function NotificationPreferences({
         <div className="space-y-4">
           <div>
             <h2 className="text-lg font-semibold">Notification Categories</h2>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               Choose which types of notifications you want to receive
             </p>
           </div>

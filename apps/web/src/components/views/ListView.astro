@@ -142,139 +142,127 @@ const warningHTML = `The '${collectionType}' collection type does no
 
 {tocEnabled && <Toc anchors={years} />}
 
-{
-  (collectionType === 'blog' || collectionType === 'changelog') && (
-    <div aria-label="Post list">
-      {sortedBlogItems.length === 0 ? (
-        <div class="py-2 op-50">nothing here yet</div>
-      ) : (
-        sortedBlogItems.map(async (item, idx) => {
-          const data = item.data
-          const slug = item.id
-          const rendered = await render(item)
-          const remarkPluginFrontmatter = rendered.remarkPluginFrontmatter
+{(collectionType === 'blog' || collectionType === 'changelog') && (
+  <div aria-label="Post list">
+    {sortedBlogItems.length === 0 ? (
+      <div class="py-2 op-50">nothing here yet</div>
+    ) : (
+      sortedBlogItems.map(async (item, idx) => {
+        const data = item.data
+        const slug = item.id
+        const rendered = await render(item)
+        const remarkPluginFrontmatter = rendered.remarkPluginFrontmatter
 
-          const minutesRead =
-            'minutesRead' in data
-              ? data.minutesRead
-              : remarkPluginFrontmatter &&
-                  'minutesRead' in remarkPluginFrontmatter
-                ? remarkPluginFrontmatter.minutesRead
-                : undefined
+        const minutesRead =
+          'minutesRead' in data
+            ? data.minutesRead
+            : remarkPluginFrontmatter &&
+                'minutesRead' in remarkPluginFrontmatter
+              ? remarkPluginFrontmatter.minutesRead
+              : undefined
 
-          return (
-            <>
-              {!isSameYear(
-                data.pubDate,
-                sortedBlogItems[idx - 1]?.data.pubDate,
+        return (
+          <>
+            {!isSameYear(
+              data.pubDate,
+              sortedBlogItems[idx - 1]?.data.pubDate,
+            ) && (
+              <Categorizer
+                {idx}
+                needId={tocEnabled}
+                text={getYear(data.pubDate).toString()}
+              />
+            )}
+            <ListItem
+              {idx}
+              {collectionType}
+              redirect={
+                'redirect' in data ? (data.redirect as string) : undefined
+              }
+              postSlug={slug}
+              title={data.title}
+              video={'video' in data ? (data.video as boolean) : undefined}
+              radio={'radio' in data ? (data.radio as boolean) : undefined}
+              date={data.pubDate}
+              minutesRead={minutesRead || undefined}
+              platform={
+                'platform' in data ? (data.platform as string) : undefined
+              }
+            />
+          </>
+        )
+      })
+    )}
+  </div>
+)}
+
+{collectionType === 'streams' && (
+  <div aria-label="Stream list">
+    {sortedStreamItems.length === 0 ? (
+      <div class="py-2 op-50">nothing here yet</div>
+    ) : (
+      sortedStreamItems.map((item, idx) => {
+        return (
+          <>
+            {!isSameYear(item.pubDate, sortedStreamItems[idx - 1]?.pubDate) && (
+              <Categorizer
+                {idx}
+                needId={tocEnabled}
+                text={getYear(item.pubDate).toString()}
+              />
+            )}
+            <ListItem
+              {idx}
+              {collectionType}
+              redirect={item.link}
+              title={item.id}
+              video={item.video}
+              radio={item.radio}
+              date={item.pubDate}
+              platform={item.platform}
+            />
+          </>
+        )
+      })
+    )}
+  </div>
+)}
+
+{collectionType === 'feeds' && (
+  <div aria-label="Feed list">
+    {sortedFeedItems.length === 0 ? (
+      <div class="py-2 op-50">nothing here yet</div>
+    ) : (
+      sortedFeedItems.map((item, idx) => {
+        if (!item.link) throw new Error(`Feed item is missing 'link' field.`)
+        if (!item.title) throw new Error(`Feed item is missing 'title' field.`)
+
+        return (
+          <>
+            {idx > 0 &&
+              !isSameYear(
+                new Date(item.pubDate),
+                new Date(sortedFeedItems[idx - 1]?.pubDate || ''),
               ) && (
                 <Categorizer
                   {idx}
                   needId={tocEnabled}
-                  text={getYear(data.pubDate).toString()}
+                  text={getYear(new Date(item.pubDate)).toString()}
                 />
               )}
-              <ListItem
-                idx={idx}
-                collectionType={collectionType}
-                redirect={
-                  'redirect' in data ? (data.redirect as string) : undefined
-                }
-                postSlug={slug}
-                title={data.title}
-                video={'video' in data ? (data.video as boolean) : undefined}
-                radio={'radio' in data ? (data.radio as boolean) : undefined}
-                date={data.pubDate}
-                minutesRead={minutesRead || undefined}
-                platform={
-                  'platform' in data ? (data.platform as string) : undefined
-                }
-              />
-            </>
-          )
-        })
-      )}
-    </div>
-  )
-}
-
-{
-  collectionType === 'streams' && (
-    <div aria-label="Stream list">
-      {sortedStreamItems.length === 0 ? (
-        <div class="py-2 op-50">nothing here yet</div>
-      ) : (
-        sortedStreamItems.map((item, idx) => {
-          return (
-            <>
-              {!isSameYear(
-                item.pubDate,
-                sortedStreamItems[idx - 1]?.pubDate,
-              ) && (
-                <Categorizer
-                  {idx}
-                  needId={tocEnabled}
-                  text={getYear(item.pubDate).toString()}
-                />
-              )}
-              <ListItem
-                {idx}
-                {collectionType}
-                redirect={item.link}
-                title={item.id}
-                video={item.video}
-                radio={item.radio}
-                date={item.pubDate}
-                platform={item.platform}
-              />
-            </>
-          )
-        })
-      )}
-    </div>
-  )
-}
-
-{
-  collectionType === 'feeds' && (
-    <div aria-label="Feed list">
-      {sortedFeedItems.length === 0 ? (
-        <div class="py-2 op-50">nothing here yet</div>
-      ) : (
-        sortedFeedItems.map((item, idx) => {
-          if (!item.link) throw new Error(`Feed item is missing 'link' field.`)
-          if (!item.title)
-            throw new Error(`Feed item is missing 'title' field.`)
-
-          return (
-            <>
-              {idx > 0 &&
-                !isSameYear(
-                  new Date(item.pubDate),
-                  new Date(sortedFeedItems[idx - 1]?.pubDate || ''),
-                ) && (
-                  <Categorizer
-                    {idx}
-                    needId={tocEnabled}
-                    text={getYear(new Date(item.pubDate)).toString()}
-                  />
-                )}
-              <ListItem
-                {idx}
-                {collectionType}
-                redirect={item.link}
-                title={item.title}
-                date={item.pubDate}
-              />
-            </>
-          )
-        })
-      )}
-    </div>
-  )
-}
-{
-  !['blog', 'changelog', 'feeds', 'streams'].includes(collectionType) && (
-    <Warning html={warningHTML} />
-  )
-}
+            <ListItem
+              {idx}
+              {collectionType}
+              redirect={item.link}
+              title={item.title}
+              date={item.pubDate}
+            />
+          </>
+        )
+      })
+    )}
+  </div>
+)}
+{!['blog', 'changelog', 'feeds', 'streams'].includes(collectionType) && (
+  <Warning html={warningHTML} />
+)}

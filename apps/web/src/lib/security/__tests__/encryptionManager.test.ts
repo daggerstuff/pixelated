@@ -231,6 +231,31 @@ describe('EncryptionManager', () => {
       expect(result.oldKeyId).toBe(currentKey?.id)
       expect(result.newKeyId).not.toBe(currentKey?.id)
     })
+
+    it('should register the rotated key so it stays usable', async () => {
+      const { newKeyId } = await manager.rotateKeys()
+
+      const currentKey = manager.getCurrentKeyInfo()
+      expect(currentKey?.id).toBe(newKeyId)
+      expect(currentKey?.status).toBe('active')
+
+      const encrypted = await manager.encrypt('post-rotation data')
+      expect(encrypted.keyId).toBe(newKeyId)
+      expect(await manager.decrypt(encrypted)).toBe('post-rotation data')
+    })
+
+    it('should not auto-rotate before the configured interval elapses', async () => {
+      const initialKey = manager.getCurrentKeyInfo()
+      expect(initialKey).not.toBeNull()
+
+      // keyRotationDays above ~24.8 days exceeds Node's 2^31-1 ms timer
+      // ceiling; Node clamps such intervals to 1 ms, causing a rotation
+      // every millisecond. Let the (now capped) timer run and assert the
+      // current key is unchanged.
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
+      expect(manager.getCurrentKeyInfo()?.id).toBe(initialKey!.id)
+    })
   })
 
   describe('key revocation', () => {

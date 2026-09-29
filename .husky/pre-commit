@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+# Version-controlled pre-commit entry point (husky).
+#
+# The hook logic lives in scripts/devops/hooks/templates/pre-commit.tmpl so
+# that the same hardened checks (secret scanning, lockfile sync check,
+# lint-staged, markdownlint suppression guard) run whether the hook is
+# installed by husky or by scripts/devops/install-git-hooks.sh.
+exec bash scripts/devops/hooks/templates/pre-commit.tmpl

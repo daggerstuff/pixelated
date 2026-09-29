@@ -197,7 +197,8 @@ class PIX8EdgeCaseGenerator:
                 difficulty_level=difficulty,
                 unwinnable=unwinnable,
             )
-            return res.get("data", [])
+            data: list[dict[str, Any]] = res.get("data", [])
+            return data
         except Exception as nemo_err:
             logger.warning(f"NeMo service failed, using LLM fallback: {nemo_err}")
             return self._generate_fallback_profiles(edge_type, chunk_size, difficulty, unwinnable)
@@ -267,19 +268,24 @@ class PIX8EdgeCaseGenerator:
         edge_type: EdgeCaseType,
         is_nightmare: bool,
         unwinnable: bool,
-    ):
+    ) -> None:
         """Save partial results to a temporary file."""
         filename = f"partial_{edge_type.value}_{'nightmare' if is_nightmare else 'standard'}_{'unw' if unwinnable else 'norm'}.jsonl"
         self.save_results(results, filename)
 
-    def save_results(self, results: list[dict[str, Any]], filename: str):
+    def save_results(self, results: list[dict[str, Any]], filename: str) -> None:
         path = self.output_dir / filename
         with open(path, "w") as f:
             for r in results:
                 f.write(json.dumps(r) + "\n")
         logger.info(f"Saved {len(results)} records to {path}")
 
-    def run(self, nightmare_target=25000, standard_target=50000, limit=None):
+    def run(
+        self,
+        nightmare_target: int = 25000,
+        standard_target: int = 50000,
+        limit: int | None = None,
+    ) -> None:
         """Execute the full enhancement."""
         if limit:
             nightmare_target = limit // 2
@@ -341,7 +347,7 @@ class PIX8EdgeCaseGenerator:
             json.dump(stats, f, indent=2)
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--nightmare", type=int, default=25000)
     parser.add_argument("--standard", type=int, default=50000)

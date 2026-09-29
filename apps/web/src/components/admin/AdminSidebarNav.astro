@@ -44,45 +44,43 @@ const iconPaths: Record<string, string> = {
 ---
 
 <ul class:list={[isPortal ? 'space-y-2 font-medium' : 'space-y-1']}>
-  {
-    items.map((item) => {
-      const isActive = activeItem === item.id
-      return (
-        <li>
-          <a
-            href={item.href}
-            aria-current={isActive ? 'page' : undefined}
-            class:list={
-              isPortal
-                ? [
-                    'flex items-center p-2 rounded-lg',
-                    isActive
-                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700',
-                  ]
-                : [
-                    'nav-link-refined flex items-center px-6 py-3',
-                    { 'nav-link-refined--active': isActive },
-                  ]
-            }
-          >
-            {showIcons && item.icon && iconPaths[item.icon] && (
-              <span class={isPortal ? 'mr-3' : 'mr-3'}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d={iconPaths[item.icon]} />
-                </svg>
-              </span>
-            )}
-            <span class={isPortal ? 'ms-3' : undefined}>{item.label}</span>
-          </a>
-        </li>
-      )
-    })
-  }
+  {items.map((item) => {
+    const isActive = activeItem === item.id
+    return (
+      <li>
+        <a
+          href={item.href}
+          aria-current={isActive ? 'page' : undefined}
+          class:list={
+            isPortal
+              ? [
+                  'flex items-center p-2 rounded-lg',
+                  isActive
+                    ? 'bg-secondary border border-input text-foreground'
+                    : 'text-muted-foreground hover:bg-accent',
+                ]
+              : [
+                  'nav-link-refined flex items-center px-6 py-3',
+                  { 'nav-link-refined--active': isActive },
+                ]
+          }
+        >
+          {showIcons && item.icon && iconPaths[item.icon] && (
+            <span class={isPortal ? 'mr-3' : 'mr-3'}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d={iconPaths[item.icon]} />
+              </svg>
+            </span>
+          )}
+          <span class={isPortal ? 'ms-3' : undefined}>{item.label}</span>
+        </a>
+      </li>
+    )
+  })}
 </ul>

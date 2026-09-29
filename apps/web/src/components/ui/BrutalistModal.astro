@@ -25,29 +25,27 @@ const { id = 'modal', title, open = false } = Astro.props
     aria-modal="true"
     aria-labelledby={title ? `${id}-title` : undefined}
   >
-    {
-      title && (
-        <div class="modal-header">
-          <span class="label-mono">{title}</span>
-          <button class="modal-close" aria-label="Close modal" data-close={id}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
-      )
-    }
+    {title && (
+      <div class="modal-header">
+        <span class="label-mono">{title}</span>
+        <button class="modal-close" aria-label="Close modal" data-close={id}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+    )}
     <div class="modal-content">
       <slot />
     </div>

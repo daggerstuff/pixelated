@@ -69,12 +69,12 @@ export default function AIChatReact({
   }
 
   return (
-    <div className="border-gray-200 dark:border-gray-700 mx-auto max-w-2xl overflow-hidden rounded-lg border shadow-lg">
+    <div className="mx-auto max-w-2xl overflow-hidden rounded-none border border-border bg-card">
       {showModelSelector && (
-        <div className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b p-4">
+        <div className="border-b border-border bg-secondary p-4">
           <label
             htmlFor="model-select"
-            className="text-gray-700 dark:text-gray-300 mb-1 block text-sm font-medium"
+            className="mb-1 block text-sm font-medium text-foreground"
           >
             Select AI Model
           </label>
@@ -84,7 +84,7 @@ export default function AIChatReact({
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
               setSelectedModel(e.target.value)
             }
-            className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white w-full rounded-md border p-2"
+            className="w-full rounded-none border border-input bg-background p-2 text-foreground"
             aria-label="AI model selection"
           >
             {availableModels.map((model) => (
@@ -96,15 +96,13 @@ export default function AIChatReact({
         </div>
       )}
 
-      <div className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b p-4">
-        <h2 className="text-gray-900 dark:text-white text-lg font-medium">
-          AI Chat
-        </h2>
+      <div className="border-b border-border bg-secondary p-4">
+        <h2 className="text-lg font-medium text-foreground">AI Chat</h2>
       </div>
 
-      <div className="bg-white dark:bg-gray-900 h-96 space-y-4 overflow-y-auto p-4">
+      <div className="h-96 space-y-4 overflow-y-auto bg-background p-4">
         {messages.length === 0 ? (
-          <div className="text-gray-500 dark:text-gray-400 py-8 text-center">
+          <div className="py-8 text-center text-muted-foreground">
             <p>Send a message to start chatting with the AI assistant</p>
           </div>
         ) : (
@@ -114,10 +112,10 @@ export default function AIChatReact({
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                className={`max-w-[80%] rounded-none px-4 py-2 ${
                   message.role === 'user'
-                    ? 'bg-blue-500 text-white rounded-br-none'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-bl-none'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-foreground'
                 }`}
               >
                 {message.content}
@@ -134,15 +132,15 @@ export default function AIChatReact({
             aria-live="polite"
             aria-atomic="true"
           >
-            <div className="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 max-w-[80%] rounded-lg rounded-bl-none px-4 py-2">
+            <div className="max-w-[80%] rounded-none bg-secondary px-4 py-2 text-foreground">
               <div className="flex space-x-2">
-                <div className="bg-gray-500 animate-typing-dot h-2 w-2 rounded-full"></div>
+                <div className="animate-typing-dot h-2 w-2 rounded-full bg-muted-foreground"></div>
                 <div
-                  className="bg-gray-500 animate-typing-dot h-2 w-2 rounded-full"
+                  className="animate-typing-dot h-2 w-2 rounded-full bg-muted-foreground"
                   style={{ animationDelay: '0.2s' }}
                 ></div>
                 <div
-                  className="bg-gray-500 animate-typing-dot h-2 w-2 rounded-full"
+                  className="animate-typing-dot h-2 w-2 rounded-full bg-muted-foreground"
                   style={{ animationDelay: '0.4s' }}
                 ></div>
               </div>
@@ -153,7 +151,7 @@ export default function AIChatReact({
 
       <form
         onSubmit={handleSubmit}
-        className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex border-t p-4"
+        className="flex border-t border-border bg-background p-4"
       >
         <input
           type="text"
@@ -161,7 +159,7 @@ export default function AIChatReact({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setInputValue(e.target.value)
           }
-          className="border-gray-300 dark:border-gray-600 focus:ring-blue-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex-1 rounded-l-lg border px-4 py-2 focus:outline-none focus:ring-2"
+          className="flex-1 rounded-none border border-input bg-background px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           placeholder="Type your message..."
           disabled={isLoading}
           aria-label="Type a message to the AI assistant"
@@ -170,7 +168,7 @@ export default function AIChatReact({
         <button
           type="submit"
           disabled={isLoading || !inputValue.trim()}
-          className="bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-800 rounded-r-lg px-4 py-2 focus:outline-none focus:ring-2"
+          className="hover:bg-primary/90 rounded-none bg-primary px-4 py-2 text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-35"
           aria-label={isLoading ? 'Sending message...' : 'Send message'}
         >
           Send

@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from openai import AzureOpenAI, OpenAI
+from openai.types.chat import ChatCompletionMessageParam
 
 from skillreducer.config import (
     Config,
@@ -19,9 +20,10 @@ from skillreducer.llm.json_util import parse_llm_json
 class LLMClient:
     def __init__(self, config: Config) -> None:
         api_key = resolve_api_key(config)
+        self._client: AzureOpenAI | OpenAI | None = None
+        self._enabled = False
         if not api_key:
-            self._client = None
-            self._enabled = False
+            pass
         elif resolve_azure_subscription(config):
             kwargs: dict[str, Any] = {
                 "api_key": api_key,
@@ -46,11 +48,11 @@ class LLMClient:
         return bool(self._client and self._enabled)
 
     def complete(self, prompt: str, model: str | None = None, system: str | None = None) -> str:
-        if not self.enabled:
+        if self._client is None or not self._enabled:
             raise RuntimeError(
                 "LLM client is not configured. Set api_key in the environment, .env, or config.yaml."
             )
-        messages: list[dict[str, str]] = []
+        messages: list[ChatCompletionMessageParam] = []
         if system:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
@@ -61,7 +63,9 @@ class LLMClient:
         )
         return (response.choices[0].message.content or "").strip()
 
-    def complete_json(self, prompt: str, model: str | None = None, system: str | None = None) -> Any:
+    def complete_json(
+        self, prompt: str, model: str | None = None, system: str | None = None
+    ) -> Any:
         """Return parsed JSON, or None if the model reply is empty / not JSON."""
         text = self.complete(prompt, model=model, system=system)
         return parse_llm_json(text)

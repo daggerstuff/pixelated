@@ -13,9 +13,9 @@ export interface ProgressBarProps {
 
 const variantStyles = {
   default: 'bg-primary',
-  success: 'bg-green-500',
-  warning: 'bg-yellow-500',
-  error: 'bg-red-500',
+  success: 'bg-primary',
+  warning: 'bg-foreground',
+  error: 'bg-foreground',
 }
 
 export function ProgressBar({
@@ -42,7 +42,7 @@ export function ProgressBar({
         </div>
       )}
       <div
-        className="bg-muted relative h-2 w-full overflow-hidden rounded-full"
+        className="relative h-2 w-full overflow-hidden rounded-none bg-muted"
         role="progressbar"
         aria-valuenow={Math.round(percentage)}
         aria-valuemin={0}
@@ -59,7 +59,7 @@ export function ProgressBar({
         />
       </div>
       {showValue && !label && (
-        <div className="text-muted-foreground mt-1 text-right text-xs">
+        <div className="mt-1 text-right text-xs text-muted-foreground">
           {Math.round(percentage)}%
         </div>
       )}

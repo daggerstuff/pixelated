@@ -69,5 +69,5 @@ export function handleJournalResearchUnauthorized(redirectPath?: string): void {
   }
 
   const currentPath = redirectPath ?? window.location.pathname
-  window.location.href = `/auth/sign-in?redirect=${encodeURIComponent(currentPath)}`
+  window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
 }

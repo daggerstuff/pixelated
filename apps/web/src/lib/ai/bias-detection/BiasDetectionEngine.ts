@@ -845,7 +845,7 @@ export class BiasDetectionEngine {
     });
     return report;
   }
-  async getDashboardData(_options: { timeRange?: string; includeDetails?: boolean } = {}): Promise<{
+  async getDashboardData(_options: { timeRange?: string; demographicFilter?: string; includeDetails?: boolean } = {}): Promise<{
     summary: {
       totalSessions: number;
       averageBiasScore: number;

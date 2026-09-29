@@ -1,0 +1,21 @@
+{
+  "$schema": "Test-performance baseline for scripts/ci/test-perf-tracker.mjs",
+  "description": "Pinned test-duration metrics for the hermetic perf slice. The gate allows totalTestMs * 1.5 and maxTestMs * 2.0. Re-pin with `pnpm test:perf -- --update` after an intentional change.",
+  "generatedAt": "2026-09-15T01:58:15.123Z",
+  "targets": [
+    "apps/web/src/lib/db",
+    "apps/web/src/lib/logging",
+    "apps/web/src/lib/audit",
+    "apps/web/src/lib/utils"
+  ],
+  "tolerances": {
+    "totalTestMs": 1.5,
+    "maxTestMs": 2
+  },
+  "baseline": {
+    "totalTestMs": 38625,
+    "maxTestMs": 22912,
+    "wallClockMs": 42058,
+    "testCount": 238
+  }
+}

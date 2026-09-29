@@ -33,16 +33,14 @@ const {
 
   <div class="container hero-shell">
     <div class="hero-content-wrapper">
-      {
-        kicker && (
-          <div class="hero-kicker-wrapper">
-            <div class="hero-kicker-pill">
-              <span class="hero-kicker-dot" />
-              <span class="hero-kicker">{kicker}</span>
-            </div>
+      {kicker && (
+        <div class="hero-kicker-wrapper">
+          <div class="hero-kicker-pill">
+            <span class="hero-kicker-dot" />
+            <span class="hero-kicker">{kicker}</span>
           </div>
-        )
-      }
+        </div>
+      )}
 
       <div class="hero-text-content">
         <h1 class="hero-title">{title}</h1>
@@ -52,53 +50,44 @@ const {
 
       <div class="hero-actions">
         <div class="hero-action-buttons">
-          {
-            primaryCTA && (
-              <a href={primaryCTA.href} class="btn-primary" role="button">
-                {primaryCTA.text}
-              </a>
-            )
-          }
-          {
-            secondaryCTA && (
-              <a href={secondaryCTA.href} class="btn-secondary" role="button">
-                {secondaryCTA.text}
-              </a>
-            )
-          }
+          {primaryCTA && (
+            <a href={primaryCTA.href} class="btn-primary" role="button">
+              {primaryCTA.text}
+            </a>
+          )}
+          {secondaryCTA && (
+            <a href={secondaryCTA.href} class="btn-secondary" role="button">
+              {secondaryCTA.text}
+            </a>
+          )}
         </div>
       </div>
 
-      {
-        proofPoints.length > 0 && (
-          <div
-            class="hero-proof-grid"
-            aria-label="Why choose Pixelated Empathy"
-          >
-            {proofPoints.map((point) => (
-              <div class="hero-proof-card">
-                <div class="hero-proof-icon">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <polyline points="22 4 12 14.01 9 11.01" />
-                  </svg>
-                </div>
-                <div class="hero-proof-content">
-                  <span class="hero-proof-label">{point.label}</span>
-                  <p>{point.text}</p>
-                </div>
+      {proofPoints.length > 0 && (
+        <div class="hero-proof-grid" aria-label="Why choose Pixelated Empathy">
+          {proofPoints.map((point) => (
+            <div class="hero-proof-card">
+              <div class="hero-proof-icon">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
               </div>
-            ))}
-          </div>
-        )
-      }
+              <div class="hero-proof-content">
+                <span class="hero-proof-label">{point.label}</span>
+                <p>{point.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div class="hero-trust-indicators">
         <div class="trust-badge">

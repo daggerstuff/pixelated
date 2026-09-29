@@ -16,9 +16,10 @@ import argparse
 import json
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 
-def load_transcript_data(data_dir: Path) -> dict[str, list[dict]]:
+def load_transcript_data(data_dir: Path) -> dict[str, list[dict[str, Any]]]:
     """Load all transcript chunks grouped by channel."""
     channel_data = defaultdict(list)
 
@@ -36,13 +37,13 @@ def load_transcript_data(data_dir: Path) -> dict[str, list[dict]]:
     return dict(channel_data)
 
 
-def reconstruct_passages(records: list[dict], max_words: int = 500) -> list[str]:
+def reconstruct_passages(records: list[dict[str, Any]], max_words: int = 500) -> list[str]:
     """Reconstruct longer passages from chunked records."""
     # Sort by chunk index if available
     sorted_records = sorted(records, key=lambda x: x.get("provenance", {}).get("metadata", {}).get("chunk_index", 0))
 
-    passages = []
-    current_passage = []
+    passages: list[str] = []
+    current_passage: list[str] = []
     current_word_count = 0
 
     for record in sorted_records:
@@ -68,7 +69,7 @@ def reconstruct_passages(records: list[dict], max_words: int = 500) -> list[str]
     return passages
 
 
-def generate_qa_pair(passage: str, channel_name: str) -> dict | None:
+def generate_qa_pair(passage: str, channel_name: str) -> dict[str, str | float] | None:
     """Generate小龙Generate a therapeutic QA pair from a passage.
 
     This is a placeholder - in production, this would use an LLM
@@ -102,7 +103,7 @@ def generate_qa_pair(passage: str, channel_name: str) -> dict | None:
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Generate QA pairs from transcript data")
     parser.add_argument("--input-dir", type=Path, default=Path("data/therapeutic"))
     parser.add_argument("--output", type=Path, default=Path("data/qa_pairs.jsonl"))

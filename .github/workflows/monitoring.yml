@@ -14,30 +14,22 @@ env:
 
 jobs:
   health-check:
-    name: Health Check
+    name: Health Check & Alert Routing
     runs-on: ubuntu-24.04
-    env:
-      HAS_SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
 
-      - name: Initialize submodules
-        run: bash scripts/devops/init-submodules.sh
-
-      - uses: ./.github/actions/setup-node-pnpm
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: '24.16.0'
-          install-native-deps: 'false'
-          install-deps: 'false'
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: Notify on failure (optional)
-        if: failure() && env.HAS_SLACK_WEBHOOK == 'true'
-        uses: slackapi/slack-github-action@v4.0.0
-        with:
-          webhook-type: incoming-webhook
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          payload: |
-            {
-              "text": "🚨 Monitoring failed in workflow run ${{ github.run_id }}"
-            }
+      # Severity-routed alerts (scripts/ci/health-alerts.mjs): CRITICAL/HIGH
+      # post to Slack (paging @here on CRITICAL) and fail the run; WARN goes
+      # to the step output. The routing table and per-surface ownership live
+      # in the script.
+      - name: Probe production and route alerts
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          BASE_URL: ${{ vars.BASE_URL }}
+        run: node scripts/ci/health-alerts.mjs

@@ -1,6 +1,6 @@
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('threat-ml-inference')
-import { runInParallelBatches } from '../../utils/concurrency'
+import { runInParallelBatches } from '../../../utils/concurrency'
 import { IRedisClient, ThreatHuntingConfig, HuntFinding } from './types'
 
 export class ThreatMLInferenceManager {

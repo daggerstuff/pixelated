@@ -1,6 +1,6 @@
 ---
 // NP Header — The Quiet Instrument
-// Flat, zero-chroma, Fraunces branding, JetBrains Mono nav, no glass/gradients
+// Flat, zero-chroma, Instrument Serif/Sans throughout, no glass/gradients
 import ThemeToggle from '@/components/ui/ThemeToggle.astro'
 
 const navLinks = [
@@ -36,26 +36,27 @@ const navLinks = [
 
     <nav class="np-nav">
       <ul class="np-nav-list">
-        {
-          navLinks.map((link) => (
-            <li>
-              <a
-                href={link.href}
-                class="np-nav-link"
-                class:list={[{ 'np-nav-link--hl': link.highlight }]}
-              >
-                {link.highlight && <span class="np-badge">NEW</span>}
-                {link.name}
-              </a>
-            </li>
-          ))
-        }
+        {navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="np-nav-link"
+              class:list={[{ 'np-nav-link--hl': link.highlight }]}
+            >
+              {link.highlight && <span class="np-badge">NEW</span>}
+              {link.name}
+            </a>
+          </li>
+        ))}
       </ul>
 
       <div class="np-header-actions">
         <ThemeToggle />
 
-        <a href="/contact" class="np-btn-primary"> Get Started </a>
+        <a href="/contact" class="np-header-cta">
+          {' '}
+          Get Started{' '}
+        </a>
       </div>
     </nav>
 
@@ -80,7 +81,8 @@ const navLinks = [
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h16"></path>
+            d="M4 6h16M4 12h16M4 18h16"
+          ></path>
         </svg>
         <svg
           id="np-close-icon"
@@ -95,7 +97,8 @@ const navLinks = [
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"></path>
+            d="M6 18L18 6M6 6l12 12"
+          ></path>
         </svg>
       </button>
     </div>
@@ -104,41 +107,35 @@ const navLinks = [
   <!-- Mobile menu -->
   <div id="np-mobile-menu" class="np-mobile-menu" aria-hidden="true">
     <div class="np-mobile-menu-inner">
-      <div
-        style="display:flex;align-items:center;gap:12px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--np-line);"
-      >
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--np-line);">
         <img src="/apple-touch-icon.png" alt="PE" width="28" height="28" />
-        <span
-          style="font-family:var(--np-font-display);font-size:1.25rem;font-weight:350;letter-spacing:-0.02em;color:var(--np-text)"
-          >Pixelated Empathy</span
-        >
+        <span style="font-family:var(--np-font-display);font-size:1.25rem;font-weight:700;letter-spacing:-0.02em;color:var(--np-text)">
+          Pixelated Empathy
+        </span>
       </div>
 
       <nav>
-        {
-          navLinks.map((link) => (
-            <a
-              href={link.href}
-              class="np-mobile-link"
-              onclick="document.getElementById('np-mobile-menu').classList.remove('np-mobile-menu--open'); document.getElementById('np-mobile-btn').setAttribute('aria-expanded','false');"
-            >
-              {link.highlight && <span class="np-badge">NEW</span>}
-              {link.name}
-            </a>
-          ))
-        }
+        {navLinks.map((link) => (
+          <a
+            href={link.href}
+            class="np-mobile-link"
+            onclick="document.getElementById('np-mobile-menu').classList.remove('np-mobile-menu--open'); document.getElementById('np-mobile-btn').setAttribute('aria-expanded','false');"
+          >
+            {link.highlight && <span class="np-badge">NEW</span>}
+            {link.name}
+          </a>
+        ))}
       </nav>
 
-      <div
-        style="margin-top:24px;padding-top:16px;border-top:1px solid var(--np-line);"
-      >
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--np-line);">
         <a
           href="/contact"
-          class="np-btn-primary"
+          class="np-header-cta"
           style="display:block;text-align:center"
           onclick="document.getElementById('np-mobile-menu').classList.remove('np-mobile-menu--open'); document.getElementById('np-mobile-btn').setAttribute('aria-expanded','false');"
-          >Get Started</a
         >
+          Get Started
+        </a>
       </div>
     </div>
   </div>
@@ -146,7 +143,7 @@ const navLinks = [
 
 <style is:global>
   /* NP Header — The Quiet Instrument
-   Flat, zero-chroma, Fraunces brand, JetBrains Mono nav, no glass/gradients */
+   Flat, zero-chroma, Instrument Serif/Sans throughout, no glass/gradients */
 
   .np-header {
     position: fixed;
@@ -212,14 +209,14 @@ const navLinks = [
   .np-brand-name {
     font-family: var(--np-font-display);
     font-size: 1rem;
-    font-weight: 350;
+    font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.1;
     color: var(--np-text);
   }
 
   .np-brand-sub {
-    font-family: var(--np-font-mono);
+    font-family: var(--np-font-label);
     font-size: 0.625rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -247,7 +244,7 @@ const navLinks = [
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    font-family: var(--np-font-mono);
+    font-family: var(--np-font-label);
     font-size: 0.6875rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -273,11 +270,11 @@ const navLinks = [
     gap: 12px;
   }
 
-  .np-btn-primary {
+  .np-header-cta {
     display: inline-flex;
     align-items: center;
     padding: 8px 20px;
-    font-family: var(--np-font-mono);
+    font-family: var(--np-font-label);
     font-size: 0.6875rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -287,16 +284,16 @@ const navLinks = [
     transition: opacity 0.15s var(--np-ease);
   }
 
-  .np-btn-primary:hover {
+  .np-header-cta:hover {
     opacity: 0.85;
   }
 
-  .np-btn-primary:active {
+  .np-header-cta:active {
     opacity: 0.7;
   }
 
-  .np-btn-primary:disabled,
-  .np-btn-primary[aria-disabled='true'] {
+  .np-header-cta:disabled,
+  .np-header-cta[aria-disabled='true'] {
     opacity: 0.35;
     pointer-events: none;
   }
@@ -310,7 +307,7 @@ const navLinks = [
     display: inline-flex;
     align-items: center;
     padding: 1px 5px;
-    font-family: var(--np-font-mono);
+    font-family: var(--np-font-label);
     font-size: 0.5625rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -371,7 +368,7 @@ const navLinks = [
     align-items: center;
     gap: 8px;
     padding: 12px 0;
-    font-family: var(--np-font-mono);
+    font-family: var(--np-font-label);
     font-size: 0.75rem;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -405,7 +402,7 @@ const navLinks = [
     .np-brand-text {
       display: none;
     }
-    .np-nav .np-btn-primary {
+    .np-nav .np-header-cta {
       padding: 8px 12px;
       font-size: 0.625rem;
     }
@@ -418,7 +415,7 @@ const navLinks = [
     .np-nav-link {
       transition-duration: 0.01ms;
     }
-    .np-btn-primary {
+    .np-header-cta {
       transition-duration: 0.01ms;
     }
     .np-theme-toggle {

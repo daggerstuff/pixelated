@@ -41,8 +41,7 @@ interface LoadingIndicatorProps {
             <div
               class="loading-skeleton"
               style={`width: ${sizeMap.small.width}px; height: ${sizeMap.small.height}px;`}
-            >
-            </div>
+            ></div>
             <p class="loading-message">Loading small...</p>
           </div>
         </div>
@@ -52,8 +51,7 @@ interface LoadingIndicatorProps {
             <div
               class="loading-skeleton"
               style={`width: ${sizeMap.medium.width}px; height: ${sizeMap.medium.height}px;`}
-            >
-            </div>
+            ></div>
             <p class="loading-message">Loading medium...</p>
           </div>
         </div>
@@ -63,8 +61,7 @@ interface LoadingIndicatorProps {
             <div
               class="loading-skeleton"
               style={`width: ${sizeMap.large.width}px; height: ${sizeMap.large.height}px;`}
-            >
-            </div>
+            ></div>
             <p class="loading-message">Loading large...</p>
           </div>
         </div>
@@ -89,8 +86,9 @@ interface LoadingIndicatorProps {
       </p>
       <div class="screen-reader-test">
         <div aria-live="polite" class="live-region">
-          <button id="announce-btn" class="test-button">Announce Message</button
-          >
+          <button id="announce-btn" class="test-button">
+            Announce Message
+          </button>
           <div id="announcement-area" class="announcement-area">
             No announcement ye
           </div>
@@ -126,7 +124,6 @@ interface LoadingIndicatorProps {
       }
     })
   </script>
-
   <style>
     .container {
       max-width: 1200px;

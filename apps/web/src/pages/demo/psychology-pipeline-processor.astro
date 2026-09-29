@@ -155,9 +155,7 @@ const universityResults = [
 >
   <div class="relative min-h-screen text-white">
     <!-- Floating Particles -->
-    <div
-      class="particles-container absolute inset-0 overflow-hidden pointer-events-none"
-    >
+    <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
       <div class="particle particle-1"></div>
       <div class="particle particle-2"></div>
       <div class="particle particle-3"></div>
@@ -170,16 +168,10 @@ const universityResults = [
         <!-- Header -->
         <div class="text-center mb-12">
           <div class="mb-8 animate-breathe">
-            <Badge
-              class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-orange-500/20 border border-orange-400/40 text-orange-200 rounded-full"
-            >
+            <Badge class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-orange-500/20 border border-orange-400/40 text-orange-200 rounded-full">
               <span class="relative flex h-3 w-3">
-                <span
-                  class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"
-                ></span>
-                <span
-                  class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"
-                ></span>
+                <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
               </span>
               Content Processing Active
             </Badge>
@@ -187,61 +179,51 @@ const universityResults = [
 
           <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
             {currentVariant.headline}
-            <span class="text-orange-400 golden-shimmer block mt-2"
-              >Psychology Pipeline Processor</span
-            >
+            <span class="text-orange-400 golden-shimmer block mt-2">
+              Psychology Pipeline Processor
+            </span>
           </h1>
 
-          <p
-            class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed"
-          >
+          <p class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed">
             {currentVariant.subheadline}
           </p>
         </div>
 
         <!-- Processing Specifications -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {
-            processingSpecs.map((spec) => (
-              <Card class="border border-orange-600/30 bg-orange-900/20 hover:border-orange-400/60 transition-all duration-700 organic-card">
-                <CardHeader class="pb-2">
-                  <CardTitle class="text-orange-300 text-sm">
-                    {spec.metric}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div class="text-2xl font-bold text-orange-400 mb-1">
-                    {spec.value}
-                  </div>
-                  <div class="text-xs text-orange-200/70">
-                    {spec.comparison}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          }
+          {processingSpecs.map((spec) => (
+            <Card class="border border-orange-600/30 bg-orange-900/20 hover:border-orange-400/60 transition-all duration-700 organic-card">
+              <CardHeader class="pb-2">
+                <CardTitle class="text-orange-300 text-sm">
+                  {spec.metric}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div class="text-2xl font-bold text-orange-400 mb-1">
+                  {spec.value}
+                </div>
+                <div class="text-xs text-orange-200/70">{spec.comparison}</div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <!-- Live Processing Demo -->
         <div class="mb-16">
-          <Card
-            class="border border-orange-600/30 bg-slate-900/50 overflow-hidden"
-          >
+          <Card class="border border-orange-600/30 bg-slate-900/50 overflow-hidden">
             <CardHeader>
               <div class="flex justify-between items-start">
                 <div>
-                  <CardTitle class="text-orange-100 text-xl mb-2"
-                    >Live Content Processing Demo</CardTitle
-                  >
+                  <CardTitle class="text-orange-100 text-xl mb-2">
+                    Live Content Processing Demo
+                  </CardTitle>
                   <CardDescription class="text-orange-200/80">
                     Watch AI transform a psychology textbook into interactive
                     training content
                   </CardDescription>
                 </div>
                 <Badge class="bg-orange-500/20 text-orange-300">
-                  <span
-                    class="animate-pulse w-2 h-2 bg-orange-400 rounded-full mr-2"
-                  ></span>
+                  <span class="animate-pulse w-2 h-2 bg-orange-400 rounded-full mr-2"></span>
                   Processing...
                 </Badge>
               </div>
@@ -252,9 +234,7 @@ const universityResults = [
                   <div class="text-orange-300 font-medium mb-2">
                     Input Content:
                   </div>
-                  <div
-                    class="bg-slate-700/50 rounded p-3 text-green-100 text-sm"
-                  >
+                  <div class="bg-slate-700/50 rounded p-3 text-green-100 text-sm">
                     {processingDemo.input}
                   </div>
                 </div>
@@ -264,21 +244,19 @@ const universityResults = [
                     Processing Steps:
                   </div>
                   <div class="bg-slate-700/50 rounded p-4 space-y-2">
-                    {
-                      processingDemo.processing.map((step, index) => (
-                        <div class="flex items-center gap-3 text-sm">
-                          <div class="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center">
-                            <span class="text-orange-400 text-xs">
-                              {index + 1}
-                            </span>
-                          </div>
-                          <div class="text-green-100/90">{step}</div>
-                          <div class="ml-auto">
-                            <div class="w-4 h-4 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
-                          </div>
+                    {processingDemo.processing.map((step, index) => (
+                      <div class="flex items-center gap-3 text-sm">
+                        <div class="w-6 h-6 bg-orange-500/20 rounded-full flex items-center justify-center">
+                          <span class="text-orange-400 text-xs">
+                            {index + 1}
+                          </span>
                         </div>
-                      ))
-                    }
+                        <div class="text-green-100/90">{step}</div>
+                        <div class="ml-auto">
+                          <div class="w-4 h-4 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -286,9 +264,7 @@ const universityResults = [
                   <div class="text-orange-300 font-medium mb-2">
                     Generated Training Content:
                   </div>
-                  <div
-                    class="bg-slate-700/50 rounded p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm"
-                  >
+                  <div class="bg-slate-700/50 rounded p-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div class="text-center">
                       <div class="text-2xl font-bold text-orange-400">
                         {processingDemo.output.scenarios}
@@ -347,9 +323,9 @@ const universityResults = [
           <div class="text-center mb-12">
             <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
               Transform Any Psychology Content Into
-              <span class="text-orange-400 golden-shimmer"
-                >Interactive Training</span
-              >
+              <span class="text-orange-400 golden-shimmer">
+                Interactive Training
+              </span>
             </h2>
             <p class="text-base text-green-100/90 max-w-3xl mx-auto">
               Our AI processes research papers, case studies, textbooks, and
@@ -358,31 +334,29 @@ const universityResults = [
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {
-              contentTypes.map((type) => (
-                <Card class="border border-orange-600/30 hover:border-orange-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
-                  <CardHeader class="pb-4 relative">
-                    <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-orange-400">
-                      {type.icon}
-                    </div>
-                    <CardTitle class="text-base font-bold text-orange-100 tracking-wide mb-3">
-                      {type.title}
-                    </CardTitle>
-                    <div class="text-sm text-orange-400/90 font-medium bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20 mb-3">
-                      Automatically processed and structured
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription class="text-sm text-orange-200/80 leading-relaxed mb-3">
-                      {type.description}
-                    </CardDescription>
-                    <div class="text-xs text-orange-300/70">
-                      <span class="font-medium">Examples:</span> {type.examples}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            }
+            {contentTypes.map((type) => (
+              <Card class="border border-orange-600/30 hover:border-orange-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                <CardHeader class="pb-4 relative">
+                  <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-orange-400">
+                    {type.icon}
+                  </div>
+                  <CardTitle class="text-base font-bold text-orange-100 tracking-wide mb-3">
+                    {type.title}
+                  </CardTitle>
+                  <div class="text-sm text-orange-400/90 font-medium bg-orange-500/10 px-3 py-1 rounded-full border border-orange-500/20 mb-3">
+                    Automatically processed and structured
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription class="text-sm text-orange-200/80 leading-relaxed mb-3">
+                    {type.description}
+                  </CardDescription>
+                  <div class="text-xs text-orange-300/70">
+                    <span class="font-medium">Examples:</span> {type.examples}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
 
@@ -391,9 +365,9 @@ const universityResults = [
           <div class="text-center mb-12">
             <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
               Universities Report
-              <span class="text-green-400 golden-shimmer"
-                >Unprecedented Content Access</span
-              >
+              <span class="text-green-400 golden-shimmer">
+                Unprecedented Content Access
+              </span>
             </h2>
             <p class="text-base text-green-100/90 max-w-3xl mx-auto">
               Training programs using Pipeline Processor give students access to
@@ -402,52 +376,44 @@ const universityResults = [
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {
-              universityResults.map((result) => (
-                <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
-                  <CardHeader class="pb-4">
-                    <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
-                      🏛️
-                    </div>
-                    <CardTitle class="text-base font-bold text-green-100 tracking-wide mb-3">
-                      {result.university}
-                    </CardTitle>
-                    <div class="text-lg text-green-400 font-bold mb-2">
-                      {result.result}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription class="text-sm text-green-200/80 leading-relaxed">
-                      {result.detail}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              ))
-            }
+            {universityResults.map((result) => (
+              <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+                <CardHeader class="pb-4">
+                  <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
+                    🏛️
+                  </div>
+                  <CardTitle class="text-base font-bold text-green-100 tracking-wide mb-3">
+                    {result.university}
+                  </CardTitle>
+                  <div class="text-lg text-green-400 font-bold mb-2">
+                    {result.result}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription class="text-sm text-green-200/80 leading-relaxed">
+                    {result.detail}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
 
         <!-- Academic Integrity Section -->
         <div class="mb-16">
-          <Card
-            class="border border-purple-600/30 bg-purple-900/20 rounded-3xl overflow-hidden"
-          >
+          <Card class="border border-purple-600/30 bg-purple-900/20 rounded-3xl overflow-hidden">
             <CardContent class="p-8 lg:p-12 text-center">
               <div class="text-6xl mb-6 text-purple-400">📖</div>
               <h3 class="text-lg lg:text-xl font-bold text-purple-100 mb-4">
                 Academic Integrity Guaranteed
               </h3>
-              <p
-                class="text-base text-purple-200/90 mb-6 leading-relaxed max-w-3xl mx-auto"
-              >
+              <p class="text-base text-purple-200/90 mb-6 leading-relaxed max-w-3xl mx-auto">
                 Our processing maintains full academic integrity with proper
                 citations, attribution, and respect for intellectual property.
                 All processed content includes original source references and
                 follows fair use guidelines.
               </p>
-              <div
-                class="flex items-center justify-center gap-6 text-purple-300/80 text-sm"
-              >
+              <div class="flex items-center justify-center gap-6 text-purple-300/80 text-sm">
                 <span class="flex items-center gap-2">
                   <span class="text-purple-400">✓</span>
                   Full Citation Tracking
@@ -469,20 +435,15 @@ const universityResults = [
 
         <!-- Final CTA -->
         <div class="text-center">
-          <Card
-            class="border border-orange-500/40 bg-slate-900/50 rounded-3xl overflow-hidden"
-          >
+          <Card class="border border-orange-500/40 bg-slate-900/50 rounded-3xl overflow-hidden">
             <CardContent class="p-8 lg:p-12">
               <div class="text-6xl text-orange-400 mb-6">
                 <Target className="w-24 h-24" />
               </div>
 
               <div class="mb-6">
-                <Badge
-                  class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-orange-500/20 border border-orange-400/40 text-orange-200 rounded-full"
-                >
-                  <span class="animate-pulse w-2 h-2 bg-orange-400 rounded-full"
-                  ></span>
+                <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-orange-500/20 border border-orange-400/40 text-orange-200 rounded-full">
+                  <span class="animate-pulse w-2 h-2 bg-orange-400 rounded-full"></span>
                   Process Unlimited Content
                 </Badge>
               </div>
@@ -490,22 +451,18 @@ const universityResults = [
               <h2 class="text-2xl lg:text-4xl font-bold text-orange-100 mb-8">
                 Ready to Transform Your
                 <br />
-                <span class="text-orange-400 golden-shimmer"
-                  >Entire Psychology Library?</span
-                >
+                <span class="text-orange-400 golden-shimmer">
+                  Entire Psychology Library?
+                </span>
               </h2>
 
-              <p
-                class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto"
-              >
+              <p class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto">
                 Stop limiting your students to a few textbooks. Give them access
                 to the entire field of psychology in interactive, engaging
                 training formats.
               </p>
 
-              <div
-                class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6"
-              >
+              <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6">
                 <Button
                   size="lg"
                   class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"

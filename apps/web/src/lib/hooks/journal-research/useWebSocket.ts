@@ -151,89 +151,92 @@ export const useJournalResearchWebSocket = ({
     [onMessage, onError],
   )
 
-  const connect = useCallback(function connect() {
-    if (typeof window === 'undefined') {
-      return
-    }
-    if (!sessionId || !enabled) {
-      return
-    }
-
-    const baseUrl = journalResearchApiClient.getBaseUrl()
-    const path = endpoint ?? `/sessions/${sessionId}/progress/stream`
-    const authToken = getAuthToken()
-    const wsUrl = buildWebSocketUrl(baseUrl, path, authToken)
-
-    if (socketRef.current?.readyState === WebSocket.OPEN) {
-      return
-    }
-
-    setConnectionState(
-      reconnectAttemptsRef.current > 0 ? 'reconnecting' : 'connecting',
-    )
-
-    try {
-      const websocketProtocols =
-        protocols && protocols.length > 0 ? protocols : undefined
-      socketRef.current = new WebSocket(wsUrl, websocketProtocols)
-
-      socketRef.current.onopen = () => {
-        setConnectionState('connected')
-        setReconnectAttempts(0)
-        reconnectAttemptsRef.current = 0
-        onOpen?.()
+  const connect = useCallback(
+    function connect() {
+      if (typeof window === 'undefined') {
+        return
+      }
+      if (!sessionId || !enabled) {
+        return
       }
 
-      socketRef.current.onmessage = handleMessage
+      const baseUrl = journalResearchApiClient.getBaseUrl()
+      const path = endpoint ?? `/sessions/${sessionId}/progress/stream`
+      const authToken = getAuthToken()
+      const wsUrl = buildWebSocketUrl(baseUrl, path, authToken)
 
-      socketRef.current.onerror = () => {
-        setConnectionState('error')
-        const error = new Error('WebSocket connection error')
-        onError?.(error)
+      if (socketRef.current?.readyState === WebSocket.OPEN) {
+        return
       }
 
-      socketRef.current.onclose = () => {
-        setConnectionState('disconnected')
-        onClose?.()
+      setConnectionState(
+        reconnectAttemptsRef.current > 0 ? 'reconnecting' : 'connecting',
+      )
 
-        if (
-          shouldReconnectRef.current &&
-          reconnectIntervalMs > 0 &&
-          reconnectAttemptsRef.current < maxReconnectAttempts
-        ) {
-          reconnectAttemptsRef.current += 1
-          setReconnectAttempts(reconnectAttemptsRef.current)
-          reconnectTimerRef.current = window.setTimeout(
-            connect,
-            reconnectIntervalMs,
-          )
-        } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
-          const error = new Error(
-            `WebSocket reconnection failed after ${maxReconnectAttempts} attempts`,
-          )
+      try {
+        const websocketProtocols =
+          protocols && protocols.length > 0 ? protocols : undefined
+        socketRef.current = new WebSocket(wsUrl, websocketProtocols)
+
+        socketRef.current.onopen = () => {
+          setConnectionState('connected')
+          setReconnectAttempts(0)
+          reconnectAttemptsRef.current = 0
+          onOpen?.()
+        }
+
+        socketRef.current.onmessage = handleMessage
+
+        socketRef.current.onerror = () => {
+          setConnectionState('error')
+          const error = new Error('WebSocket connection error')
           onError?.(error)
         }
+
+        socketRef.current.onclose = () => {
+          setConnectionState('disconnected')
+          onClose?.()
+
+          if (
+            shouldReconnectRef.current &&
+            reconnectIntervalMs > 0 &&
+            reconnectAttemptsRef.current < maxReconnectAttempts
+          ) {
+            reconnectAttemptsRef.current += 1
+            setReconnectAttempts(reconnectAttemptsRef.current)
+            reconnectTimerRef.current = window.setTimeout(
+              connect,
+              reconnectIntervalMs,
+            )
+          } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
+            const error = new Error(
+              `WebSocket reconnection failed after ${maxReconnectAttempts} attempts`,
+            )
+            onError?.(error)
+          }
+        }
+      } catch (error: unknown) {
+        setConnectionState('error')
+        const normalizedError =
+          error instanceof Error
+            ? error
+            : new Error('WebSocket connection failed')
+        onError?.(normalizedError)
       }
-    } catch (error: unknown) {
-      setConnectionState('error')
-      const normalizedError =
-        error instanceof Error
-          ? error
-          : new Error('WebSocket connection failed')
-      onError?.(normalizedError)
-    }
-  }, [
-    sessionId,
-    endpoint,
-    protocols,
-    enabled,
-    reconnectIntervalMs,
-    maxReconnectAttempts,
-    handleMessage,
-    onOpen,
-    onError,
-    onClose,
-  ])
+    },
+    [
+      sessionId,
+      endpoint,
+      protocols,
+      enabled,
+      reconnectIntervalMs,
+      maxReconnectAttempts,
+      handleMessage,
+      onOpen,
+      onError,
+      onClose,
+    ],
+  )
 
   useEffect(() => {
     if (!enabled || !sessionId) {

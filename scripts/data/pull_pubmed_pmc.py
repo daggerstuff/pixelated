@@ -22,6 +22,7 @@ import os
 import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from typing import Any
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -70,8 +71,9 @@ def _esearch(query: str, retmax: int = 10000, retstart: int = 0, db: str = "pubm
     url = f"{NCBI_BASE}esearch.fcgi?{urlencode(params)}"
     try:
         with urlopen(url, timeout=30) as resp:
-            data = json.loads(resp.read().decode())
-            return data.get("esearchresult", {}).get("idlist", [])
+            data: dict[str, Any] = json.loads(resp.read().decode())
+            idlist: list[str] = data.get("esearchresult", {}).get("idlist", [])
+            return idlist
     except (HTTPError, Exception) as e:
         logger.warning("esearch failed: %s", e)
         return []
@@ -92,13 +94,14 @@ def _efetch_pmids(pmids: list[str], retmode: str = "text", db: str = "pubmed") -
     url = f"{NCBI_BASE}efetch.fcgi?{urlencode(params)}"
     try:
         with urlopen(url, timeout=60) as resp:
-            return resp.read().decode("utf-8", errors="replace")
+            content: str = resp.read().decode("utf-8", errors="replace")
+            return content
     except (HTTPError, Exception) as e:
         logger.warning("efetch failed: %s", e)
         return ""
 
 
-def _extract_common_metadata(root: ET.Element, article: ET.Element | None) -> dict:
+def _extract_common_metadata(root: ET.Element, article: ET.Element | None) -> dict[str, Any]:
     """Extract shared metadata fields from NCBI XML."""
     if article is None:
         return {
@@ -139,7 +142,7 @@ def _extract_common_metadata(root: ET.Element, article: ET.Element | None) -> di
     }
 
 
-def _parse_fulltext_xml(xml_text: str, pmid: str) -> dict | None:
+def _parse_fulltext_xml(xml_text: str, pmid: str) -> dict[str, Any] | None:
     """Parse PMC JATS full-text XML, extracting body paragraphs."""
     try:
         root = ET.fromstring(xml_text)
@@ -199,7 +202,7 @@ def _parse_fulltext_xml(xml_text: str, pmid: str) -> dict | None:
     }
 
 
-def _parse_abstract_xml(xml_text: str, pmid: str) -> dict | None:
+def _parse_abstract_xml(xml_text: str, pmid: str) -> dict[str, Any] | None:
     """Parse a single PubMed XML abstract into a JSONL record."""
     try:
         root = ET.fromstring(xml_text)
@@ -354,7 +357,7 @@ def pull_fulltexts(output_dir: Path, target: int) -> int:
     return count
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(description="PIX-30: PubMed/PMC Bulk Download")
     parser.add_argument("--abstracts", type=int, default=10000, help="Target abstract count")
     parser.add_argument("--fulltext", type=int, default=5000, help="Target full-text count")

@@ -27,32 +27,34 @@ const links = [
 
         <div class="marketing-nav__title">
           <span class="marketing-nav__name">Pixelated Empathy</span>
-          <span class="marketing-nav__tag"
-            >Clinical supervision, kept specific</span
-          >
+          <span class="marketing-nav__tag">
+            Clinical supervision, kept specific
+          </span>
         </div>
       </a>
 
       <nav class="marketing-nav__links" aria-label="Main navigation">
-        {
-          links.map((link) => (
-            <a
-              href={link.href}
-              class:list={[
-                'marketing-nav__link',
-                currentPath === link.href && 'marketing-nav__link--active',
-              ]}
-              aria-current={currentPath === link.href ? 'page' : undefined}
-            >
-              {link.text}
-            </a>
-          ))
-        }
+        {links.map((link) => (
+          <a
+            href={link.href}
+            class:list={[
+              'marketing-nav__link',
+              currentPath === link.href && 'marketing-nav__link--active',
+            ]}
+            aria-current={currentPath === link.href ? 'page' : undefined}
+          >
+            {link.text}
+          </a>
+        ))}
       </nav>
 
       <div class="marketing-nav__actions">
-        <a href="/contact" class="marketing-nav__pilot">Book a pilot</a>
-        <a href="/demo-hub" class="marketing-nav__demo">Watch demo</a>
+        <a href="/contact" class="marketing-nav__pilot">
+          Book a pilot
+        </a>
+        <a href="/demo-hub" class="marketing-nav__demo">
+          Watch demo
+        </a>
       </div>
 
       <button
@@ -71,7 +73,8 @@ const links = [
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h16"></path>
+            d="M4 6h16M4 12h16M4 18h16"
+          ></path>
         </svg>
       </button>
     </div>
@@ -81,27 +84,27 @@ const links = [
         class="marketing-mobile-menu__content"
         aria-label="Mobile navigation"
       >
-        {
-          links.map((link) => (
-            <a href={link.href} class="marketing-mobile-menu__link">
-              {link.text}
-            </a>
-          ))
-        }
+        {links.map((link) => (
+          <a href={link.href} class="marketing-mobile-menu__link">
+            {link.text}
+          </a>
+        ))}
         <div class="marketing-mobile-menu__actions">
-          <a href="/contact" class="marketing-button marketing-button--primary"
-            >Book a pilot</a
-          >
+          <a href="/contact" class="marketing-button marketing-button--primary">
+            Book a pilot
+          </a>
           <a
             href="/demo-hub"
             class="marketing-button marketing-button--secondary"
-            >Watch the demo</a
           >
+            Watch the demo
+          </a>
           <a
             href="/login"
             class="marketing-mobile-menu__link marketing-mobile-menu__link--muted"
-            >Log in</a
           >
+            Log in
+          </a>
         </div>
       </nav>
     </div>

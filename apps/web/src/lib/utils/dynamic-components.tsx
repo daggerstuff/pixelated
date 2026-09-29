@@ -50,7 +50,7 @@ const ParticleVisualizationFallback = ({
 // Loading components with different visual styles
 const DefaultLoading = () => (
   <div className="flex min-h-[200px] items-center justify-center p-4">
-    <div className="text-muted-foreground animate-pulse">Loading...</div>
+    <div className="animate-pulse text-muted-foreground">Loading...</div>
   </div>
 )
 

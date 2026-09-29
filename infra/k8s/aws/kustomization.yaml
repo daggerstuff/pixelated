@@ -8,6 +8,7 @@ resources:
   - configmap.yaml
   - deployment-blue.yaml
   - deployment-green.yaml
+  - hpa.yaml
   - service.yaml
   - ingress.yaml
   - middleware-security-headers.yaml

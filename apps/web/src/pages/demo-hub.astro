@@ -119,9 +119,7 @@ const liveDemo = {
   description="Try our AI-powered therapy training simulations. Practice crisis interventions, bias detection, and complex client scenarios safely."
 >
   <!-- Hero Section -->
-  <section
-    class="relative overflow-hidden min-h-screen flex items-center py-24 px-4"
-  >
+  <section class="relative overflow-hidden min-h-screen flex items-center py-24 px-4">
     <div class="max-w-5xl mx-auto relative z-10 w-full text-center">
       <!-- Status Bar -->
       <div
@@ -131,30 +129,29 @@ const liveDemo = {
         <span
           class="inline-block w-2 h-2 np-mid"
           style="background: var(--np-mid);"
-          aria-hidden="true"></span>
-        <span class="font-bold np-text tracking-wide"
-          >DEMO LIBRARY AVAILABLE</span
-        >
+          aria-hidden="true"
+        ></span>
+        <span class="font-bold np-text tracking-wide">
+          DEMO LIBRARY AVAILABLE
+        </span>
       </div>
 
       <!-- Headline -->
       <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight np-text">
-        EXPLORE THE<br />PRODUCT SURFACES
+        EXPLORE THE
+        <br />
+        PRODUCT SURFACES
       </h1>
 
       <!-- Description -->
-      <p
-        class="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed np-muted mb-12"
-      >
+      <p class="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed np-muted mb-12">
         Explore the product through focused demos covering simulation,
         analytics, privacy, and supporting workflow components. This page is
         meant to show what exists, not make inflated claims about what does not.
       </p>
 
       <!-- CTA -->
-      <div
-        class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
-      >
+      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
         <button
           id="live-demo-btn"
           class="px-8 py-4 font-bold np-cta np-ring"
@@ -202,7 +199,6 @@ const liveDemo = {
       }
     })
   </script>
-
   <!-- Live Demo Section -->
   <section class="py-24 px-4" style="background: var(--np-surface);">
     <div class="max-w-5xl mx-auto">
@@ -237,55 +233,53 @@ const liveDemo = {
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {
-          demos.map((demo) => (
-            <div
-              class="p-6 flex flex-col"
-              style="background: var(--np-surface); border: 1px solid var(--np-line);"
-            >
-              <div class="flex items-center justify-between mb-4">
-                <div class="text-3xl">{demo.icon}</div>
-                <div class="flex gap-2">
-                  <div
-                    class="text-xs px-2 py-1 font-bold uppercase tracking-wide"
-                    style="background: var(--np-elevated); color: var(--np-text); border: 1px solid var(--np-line);"
-                  >
-                    {demo.status}
-                  </div>
-                  <div
-                    class="text-xs px-2 py-1 font-bold uppercase tracking-wide np-muted"
-                    style="border: 1px solid var(--np-line);"
-                  >
-                    {demo.difficulty}
-                  </div>
+        {demos.map((demo) => (
+          <div
+            class="p-6 flex flex-col"
+            style="background: var(--np-surface); border: 1px solid var(--np-line);"
+          >
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-3xl">{demo.icon}</div>
+              <div class="flex gap-2">
+                <div
+                  class="text-xs px-2 py-1 font-bold uppercase tracking-wide"
+                  style="background: var(--np-elevated); color: var(--np-text); border: 1px solid var(--np-line);"
+                >
+                  {demo.status}
+                </div>
+                <div
+                  class="text-xs px-2 py-1 font-bold uppercase tracking-wide np-muted"
+                  style="border: 1px solid var(--np-line);"
+                >
+                  {demo.difficulty}
                 </div>
               </div>
-
-              <h3 class="text-lg font-semibold mb-3 np-text">{demo.title}</h3>
-              <p class="np-muted text-sm mb-6 leading-relaxed flex-1">
-                {demo.description}
-              </p>
-
-              <div class="grid grid-cols-2 gap-4 mb-6">
-                {Object.entries(demo.stats).map(([key, value]) => (
-                  <div class="text-center">
-                    <div class="text-lg font-bold np-text">{value}</div>
-                    <div class="text-xs uppercase tracking-wide np-muted">
-                      {key}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <a
-                href={demo.href}
-                class="block w-full text-center py-3 font-bold np-cta"
-              >
-                LAUNCH DEMO →
-              </a>
             </div>
-          ))
-        }
+
+            <h3 class="text-lg font-semibold mb-3 np-text">{demo.title}</h3>
+            <p class="np-muted text-sm mb-6 leading-relaxed flex-1">
+              {demo.description}
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              {Object.entries(demo.stats).map(([key, value]) => (
+                <div class="text-center">
+                  <div class="text-lg font-bold np-text">{value}</div>
+                  <div class="text-xs uppercase tracking-wide np-muted">
+                    {key}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <a
+              href={demo.href}
+              class="block w-full text-center py-3 font-bold np-cta"
+            >
+              LAUNCH DEMO →
+            </a>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -366,16 +360,21 @@ const liveDemo = {
         <span
           class="px-3 py-1 font-semibold"
           style="background: var(--np-elevated); border: 1px solid var(--np-line);"
-          >✓ Product walkthroughs available</span
         >
+          ✓ Product walkthroughs available
+        </span>
         <span
           class="px-3 py-1 font-semibold np-muted"
-          style="border: 1px solid var(--np-line);">✓ Full support</span
+          style="border: 1px solid var(--np-line);"
         >
+          ✓ Full support
+        </span>
         <span
           class="px-3 py-1 font-semibold np-muted"
-          style="border: 1px solid var(--np-line);">✓ Custom integration</span
+          style="border: 1px solid var(--np-line);"
         >
+          ✓ Custom integration
+        </span>
       </div>
     </div>
   </section>

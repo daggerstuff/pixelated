@@ -1,6 +1,7 @@
 /* @vitest-environment node */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { initializeDatabase } from '../../../lib/db'
 import { GET, POST } from '../../../pages/api/session/progress'
 
 type QueryResultStub = {
@@ -61,11 +62,21 @@ const { mockConnect } = vi.hoisted(() => ({
 
 vi.mock('pg', () => ({
   Pool: class {
+    // initializeDatabase() registers pool error/connect listeners.
+    on() {
+      return this
+    }
+
     async connect() {
       return mockConnect()
     }
   },
 }))
+
+// lib/db requires initializeDatabase() before getPool() will return a pool
+// (gate added 2026-08-26). With 'pg' mocked above this only constructs the
+// mock pool and sets the module flag; no real connection is made.
+initializeDatabase()
 
 const createMockQueryResult = (
   rowCount: number,

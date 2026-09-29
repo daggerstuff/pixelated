@@ -7,47 +7,48 @@
 <div class="w-full">
   <div class="flex gap-2 mb-3">
     <button
-      class="hero-tab px-3 py-1.5 text-sm rounded-full border border-gray-700 text-gray-300 data-[active=true]:text-black data-[active=true]:bg-[color:var(--accent-primary)]"
+      class="hero-tab rounded-none border border-border bg-secondary px-3 py-1.5 text-sm text-muted-foreground transition-colors data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
       data-index="0"
-      data-active="true">Role‑play</button
+      data-active="true"
     >
+      Role‑play
+    </button>
     <button
-      class="hero-tab px-3 py-1.5 text-sm rounded-full border border-gray-700 text-gray-300"
-      data-index="1">Bias</button
+      class="hero-tab rounded-none border border-border bg-secondary px-3 py-1.5 text-sm text-muted-foreground transition-colors"
+      data-index="1"
     >
+      Bias
+    </button>
     <button
-      class="hero-tab px-3 py-1.5 text-sm rounded-full border border-gray-700 text-gray-300"
-      data-index="2">Debrief</button
+      class="hero-tab rounded-none border border-border bg-secondary px-3 py-1.5 text-sm text-muted-foreground transition-colors"
+      data-index="2"
     >
+      Debrief
+    </button>
   </div>
 
-  <div
-    class="relative overflow-hidden rounded-lg border border-gray-800 bg-gray-900/40"
-  >
+  <div class="relative overflow-hidden rounded-none border border-border bg-card">
     <!-- loader -->
     <div
-      class="absolute left-0 top-0 h-0.5 bg-[color:var(--accent-primary)] transition-all duration-[4000ms] ease-linear"
+      class="absolute left-0 top-0 h-0.5 bg-primary transition-all duration-[4000ms] ease-linear"
       id="loader"
       style="width: 0%"
-    >
-    </div>
+    ></div>
 
     <div class="p-5 min-h-[240px] grid" id="panels">
       <!-- Panel 0 -->
       <div class="panel" data-index="0" style="display: grid">
-        <div class="text-xs tracking-widest text-gray-400 uppercase mb-3">
+        <div class="mb-3 text-xs uppercase tracking-widest text-muted-foreground">
           Crisis role‑play
         </div>
         <div class="space-y-3">
-          <div class="rounded-md px-3 py-2 bg-gray-800/70 text-gray-100 w-fit">
+          <div class="w-fit rounded-none bg-secondary px-3 py-2 text-foreground">
             I’m not sleeping and I think my boss is out to get me.
           </div>
-          <div
-            class="rounded-md px-3 py-2 bg-teal-500/10 text-[color:var(--accent-primary)] w-fit"
-          >
+          <div class="w-fit rounded-none border border-ring bg-secondary px-3 py-2 font-medium text-foreground">
             Thanks for sharing. When did this start to feel unmanageable?
           </div>
-          <div class="rounded-md px-3 py-2 bg-gray-800/70 text-gray-100 w-fit">
+          <div class="w-fit rounded-none bg-secondary px-3 py-2 text-foreground">
             Last week. I skipped meds after a fight with my partner.
           </div>
         </div>
@@ -55,45 +56,42 @@
 
       <!-- Panel 1 -->
       <div class="panel" data-index="1" style="display: none">
-        <div class="text-xs tracking-widest text-gray-400 uppercase mb-3">
+        <div class="mb-3 text-xs uppercase tracking-widest text-muted-foreground">
           Bias detection
         </div>
-        <ul class="text-sm text-gray-300 space-y-2">
+        <ul class="space-y-2 text-sm text-foreground">
           <li class="flex items-start gap-2">
-            <span
-              class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent-primary)]"
-            ></span> Interruptions decreased after prompt: maintain 2‑sec pause.
+            <span class="mt-1 inline-block h-1.5 w-1.5 rounded-none bg-primary"></span>{' '}
+            Interruptions decreased after prompt: maintain 2‑sec pause.
           </li>
           <li class="flex items-start gap-2">
-            <span
-              class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent-primary)]"
-            ></span> Consider non‑pathologizing language for cultural context.
+            <span class="mt-1 inline-block h-1.5 w-1.5 rounded-none bg-primary"></span>{' '}
+            Consider non‑pathologizing language for cultural context.
           </li>
           <li class="flex items-start gap-2">
-            <span
-              class="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent-primary)]"
-            ></span> Reflect back affect before exploring solutions.
+            <span class="mt-1 inline-block h-1.5 w-1.5 rounded-none bg-primary"></span>{' '}
+            Reflect back affect before exploring solutions.
           </li>
         </ul>
       </div>
 
       <!-- Panel 2 -->
       <div class="panel" data-index="2" style="display: none">
-        <div class="text-xs tracking-widest text-gray-400 uppercase mb-3">
+        <div class="mb-3 text-xs uppercase tracking-widest text-muted-foreground">
           Debrief metrics
         </div>
         <div class="grid grid-cols-3 gap-3 text-center">
-          <div class="rounded-md border border-gray-800 p-3">
-            <div class="text-2xl font-semibold text-white">+82%</div>
-            <div class="text-xs text-gray-400">diagnostic accuracy</div>
+          <div class="rounded-none border border-border p-3">
+            <div class="text-2xl font-semibold text-foreground">+82%</div>
+            <div class="text-xs text-muted-foreground">diagnostic accuracy</div>
           </div>
-          <div class="rounded-md border border-gray-800 p-3">
-            <div class="text-2xl font-semibold text-white">3.1×</div>
-            <div class="text-xs text-gray-400">faster skill gain</div>
+          <div class="rounded-none border border-border p-3">
+            <div class="text-2xl font-semibold text-foreground">3.1×</div>
+            <div class="text-xs text-muted-foreground">faster skill gain</div>
           </div>
-          <div class="rounded-md border border-gray-800 p-3">
-            <div class="text-2xl font-semibold text-white">0</div>
-            <div class="text-xs text-gray-400">patient harm</div>
+          <div class="rounded-none border border-border p-3">
+            <div class="text-2xl font-semibold text-foreground">0</div>
+            <div class="text-xs text-muted-foreground">patient harm</div>
           </div>
         </div>
       </div>

@@ -259,7 +259,7 @@ UNWINNABLE_TRAGEDY_TYPES = [
 # --------------------------------------------------------------------------- #
 
 
-def generate_edge_case_session(category: str, rng: random.Random) -> dict:
+def generate_edge_case_session(category: str, rng: random.Random) -> dict[str, list[dict[str, str]]]:
     """Generates a multi-turn ChatML session record based on category specifications."""
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
@@ -290,7 +290,7 @@ def generate_edge_case_session(category: str, rng: random.Random) -> dict:
         )
 
     elif category == "stubborn_nightmare":
-        stub_name, user_input, therapist_strategy = rng.choice(STUBBORN_CLIENT_TYPES)
+        _stub_name, user_input, _therapist_strategy = rng.choice(STUBBORN_CLIENT_TYPES)
 
         user_prompt_1 = user_input
         asst_resp_1 = (
@@ -314,7 +314,7 @@ def generate_edge_case_session(category: str, rng: random.Random) -> dict:
         )
 
     elif category == "unwinnable_tragedy":
-        trag_name, user_input, therapist_strategy = rng.choice(UNWINNABLE_TRAGEDY_TYPES)
+        _trag_name, user_input, _therapist_strategy = rng.choice(UNWINNABLE_TRAGEDY_TYPES)
 
         user_prompt_1 = user_input
         asst_resp_1 = (
@@ -340,7 +340,7 @@ def generate_edge_case_session(category: str, rng: random.Random) -> dict:
     return {"messages": messages}
 
 
-def main():
+def main() -> None:
     logger.info("=== Starting Synthetic Edge-Case & Nightmare Session Generation (100,000 Target) ===")
     quality = QualityFilter()
     rng = random.Random(42)

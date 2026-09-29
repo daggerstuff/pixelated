@@ -18,7 +18,7 @@ RETRYABLE_STATUSES = frozenset({429, 500, 502, 503})
 def backoff_delay(attempt: int, retry_after: float | None = None) -> float:
     if retry_after is not None:
         return min(retry_after, MAX_DELAY)
-    return min(BASE_DELAY * 2**attempt, MAX_DELAY)
+    return min(BASE_DELAY * (1 << attempt), MAX_DELAY)
 
 
 def with_retry[T](fn: Callable[..., T]) -> Callable[..., T]:

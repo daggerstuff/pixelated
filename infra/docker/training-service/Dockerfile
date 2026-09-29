@@ -5,16 +5,16 @@ FROM nvidia/cuda:12.6.3-devel-ubuntu22.04 AS base
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/New_York
 
-# Install Python 3.13 and system dependencies
-# Ubuntu 22.04 doesn't ship 3.13 — add deadsnakes PPA first
+# Install Python 3.14 and system dependencies
+# Ubuntu 22.04 doesn't ship 3.14 — add deadsnakes PPA first
 RUN apt-get update && \
     apt-get install --no-install-recommends -y software-properties-common && \
     add-apt-repository ppa:deadsnakes/ppa -y && \
     apt-get update && \
     apt-get install --no-install-recommends -y \
-    python3.13 \
-    python3.13-venv \
-    python3.13-dev \
+    python3.14 \
+    python3.14-venv \
+    python3.14-dev \
     python3-pip \
     curl \
     git \
@@ -23,13 +23,13 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install uv package manager via official installer (avoids py3.13 pip/distutils issues)
+# Install uv package manager via official installer (avoids py3.14 pip/distutils issues)
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 
 WORKDIR /app
 
-# Create virtual environment with Python 3.13
-RUN python3.13 -m venv /opt/venv
+# Create virtual environment with Python 3.14
+RUN python3.14 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONPATH="/app"
 
@@ -38,7 +38,7 @@ COPY ai/config/requirements_training.txt ./requirements.txt
 RUN uv pip install --python /opt/venv/bin/python --no-cache-dir -r requirements.txt
 
 # Note: torch, transformers, peft, accelerate, bitsandbytes, and other training deps
-# are already installed via requirements_training.txt above with Python 3.13-compatible versions.
+# are already installed via requirements_training.txt above with Python 3.14-compatible versions.
 
 FROM base AS production
 

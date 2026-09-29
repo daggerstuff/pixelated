@@ -10,7 +10,7 @@ import * as tf from '@tensorflow/tfjs'
 import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('response-orchestration')
 
 export interface ThreatResponse {

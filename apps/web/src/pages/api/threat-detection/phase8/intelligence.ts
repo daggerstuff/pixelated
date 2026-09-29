@@ -282,7 +282,10 @@ export const PUT: APIRoute = async ({ request }) => {
   try {
     // Authenticate request - require admin privileges
     const authResult = await authenticateRequest(request)
-    if (!authResult.success || !(authResult as { user?: { isAdmin?: boolean } }).user?.isAdmin) {
+    if (
+      !authResult.success ||
+      !(authResult as { user?: { isAdmin?: boolean } }).user?.isAdmin
+    ) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized or insufficient privileges' }),
         {

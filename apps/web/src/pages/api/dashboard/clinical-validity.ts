@@ -38,8 +38,7 @@ async function getQueueStats(): Promise<number> {
       const data = await response.json()
       return data.pending ?? 0
     }
-  } catch (error) {
-  }
+  } catch (error) {}
 
   return mockData.queueDepth
 }
@@ -60,7 +59,6 @@ async function runBenchmark(): Promise<{
       '-m',
       'training.benchmark',
     ]
-
 
     const child = spawn(command, args, {
       cwd: join(process.cwd(), 'ai'),
@@ -189,7 +187,6 @@ export const GET: APIRoute = async ({ url }) => {
         // Try to run benchmark first
         benchmarkData = await runBenchmark()
       } catch (benchmarkError) {
-
         // Try to read from file as fallback
         benchmarkData = await readBenchmarkFile()
       }
@@ -221,7 +218,6 @@ export const GET: APIRoute = async ({ url }) => {
       },
     })
   } catch (error) {
-
     // Return 500 error when scorer fails
     const errorResponse = {
       error: 'Failed to fetch clinical validity data',

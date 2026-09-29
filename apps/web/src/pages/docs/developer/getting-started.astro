@@ -16,20 +16,36 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
 
   <h2>Table of Contents</h2>
   <ol>
-    <li><a href="#prerequisites">Prerequisites</a></li>
-    <li><a href="#create-api-key">Create an API Key</a></li>
-    <li><a href="#first-request">Make Your First Request</a></li>
-    <li><a href="#authentication">Authentication Methods</a></li>
-    <li><a href="#rate-limits">Rate Limits & Quotas</a></li>
-    <li><a href="#error-handling">Error Handling</a></li>
-    <li><a href="#next-steps">Next Steps</a></li>
+    <li>
+      <a href="#prerequisites">Prerequisites</a>
+    </li>
+    <li>
+      <a href="#create-api-key">Create an API Key</a>
+    </li>
+    <li>
+      <a href="#first-request">Make Your First Request</a>
+    </li>
+    <li>
+      <a href="#authentication">Authentication Methods</a>
+    </li>
+    <li>
+      <a href="#rate-limits">Rate Limits & Quotas</a>
+    </li>
+    <li>
+      <a href="#error-handling">Error Handling</a>
+    </li>
+    <li>
+      <a href="#next-steps">Next Steps</a>
+    </li>
   </ol>
 
   <h2 id="prerequisites">Prerequisites</h2>
   <ul>
     <li>A Pixelated Empathy account with developer access</li>
     <li>Node.js 18+ or Python 3.9+ installed (for SDK usage)</li>
-    <li><code>curl</code> or any HTTP client for testing</li>
+    <li>
+      <code>curl</code> or any HTTP client for testing
+    </li>
   </ul>
 
   <h2 id="create-api-key">Create an API Key</h2>
@@ -46,16 +62,25 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     <li>
       Select the scopes your application needs:
       <ul>
-        <li><code>read</code> — Read access to non-PHI endpoints</li>
-        <li><code>write</code> — Create/update resources</li>
+        <li>
+          <code>read</code> — Read access to non-PHI endpoints
+        </li>
+        <li>
+          <code>write</code> — Create/update resources
+        </li>
         <li>
           <code>developer:manage</code> — Manage API keys (rotation, revocation)
         </li>
-        <li><code>analytics:read</code> — Access analytics endpoints</li>
         <li>
-          <code>memory:read</code> / <code>memory:write</code> — Memory API access
+          <code>analytics:read</code> — Access analytics endpoints
         </li>
-        <li><code>admin</code> — Full admin access (use with caution)</li>
+        <li>
+          <code>memory:read</code> / <code>memory:write</code> — Memory API
+          access
+        </li>
+        <li>
+          <code>admin</code> — Full admin access (use with caution)
+        </li>
       </ul>
     </li>
     <li>Set a name and optional expiration date</li>
@@ -63,9 +88,9 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
   </ol>
 
   <div class="callout callout-warning">
-    <strong>Security:</strong> Store your API key securely. Never commit it to version
-    control or expose it in client-side code. Use environment variables or a secrets
-    manager.
+    <strong>Security:</strong> Store your API key securely. Never commit it to
+    version control or expose it in client-side code. Use environment variables
+    or a secrets manager.
   </div>
 
   <h2 id="first-request">Make Your First Request</h2>
@@ -82,16 +107,16 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
 }</code></pre>
 
   <p>
-    The response includes the <code>X-API-Version</code> header indicating the API
-    version that served your request.
+    The response includes the <code>X-API-Version</code> header indicating the
+    API version that served your request.
   </p>
 
   <h2 id="authentication">Authentication Methods</h2>
 
   <h3>API Key (Recommended for Server-Side)</h3>
   <p>
-    Include your API key in the <code>X-API-Key</code> header on every request. This
-    is the simplest method for server-to-server integrations.
+    Include your API key in the <code>X-API-Key</code> header on every request.
+    This is the simplest method for server-to-server integrations.
   </p>
 
   <pre><code class="language-bash" is:raw>curl -X GET https://api.pixelatedempathy.com/api/v1/search?q=anxiety \
@@ -116,7 +141,8 @@ curl -X GET https://api.pixelatedempathy.com/api/v1/profile \
   <p>
     Each API key has assigned scopes. Requests requiring a scope your key
     doesn't have will return <code>403 Forbidden</code>. Check the
-    <a href="/docs/api/swagger">API reference</a> for required scopes per endpoint.
+    <a href="/docs/api/swagger">API reference</a> for required scopes per
+    endpoint.
   </p>
 
   <h2 id="rate-limits">Rate Limits & Quotas</h2>
@@ -126,12 +152,15 @@ curl -X GET https://api.pixelatedempathy.com/api/v1/profile \
       <code>X-RateLimit-Limit</code> — Maximum requests per minute for your tier
     </li>
     <li>
-      <code>X-RateLimit-Remaining</code> — Requests remaining in the current window
+      <code>X-RateLimit-Remaining</code> — Requests remaining in the current
+      window
     </li>
     <li>
       <code>X-RateLimit-Reset</code> — Unix timestamp when the window resets
     </li>
-    <li><code>X-RateLimit-Daily-Remaining</code> — Daily quota remaining</li>
+    <li>
+      <code>X-RateLimit-Daily-Remaining</code> — Daily quota remaining
+    </li>
     <li>
       <code>X-RateLimit-Monthly-Remaining</code> — Monthly quota remaining
     </li>
@@ -152,17 +181,35 @@ Retry-After: 12
   <h2 id="error-handling">Error Handling</h2>
   <p>The API uses standard HTTP status codes:</p>
   <ul>
-    <li><code>200</code> — Success</li>
-    <li><code>201</code> — Created</li>
-    <li><code>400</code> — Bad request (validation error)</li>
-    <li><code>401</code> — Unauthorized (missing or invalid key)</li>
-    <li><code>403</code> — Forbidden (insufficient scopes)</li>
-    <li><code>404</code> — Not found</li>
-    <li><code>429</code> — Rate limit exceeded</li>
-    <li><code>500</code> — Internal server error</li>
+    <li>
+      <code>200</code> — Success
+    </li>
+    <li>
+      <code>201</code> — Created
+    </li>
+    <li>
+      <code>400</code> — Bad request (validation error)
+    </li>
+    <li>
+      <code>401</code> — Unauthorized (missing or invalid key)
+    </li>
+    <li>
+      <code>403</code> — Forbidden (insufficient scopes)
+    </li>
+    <li>
+      <code>404</code> — Not found
+    </li>
+    <li>
+      <code>429</code> — Rate limit exceeded
+    </li>
+    <li>
+      <code>500</code> — Internal server error
+    </li>
   </ul>
 
-  <p>Error responses include a <code>message</code> field with details:</p>
+  <p>
+    Error responses include a <code>message</code> field with details:
+  </p>
   <pre><code class="language-json" is:raw>{
   "error": "validation_error",
   "message": "Query parameter 'q' is required",
@@ -172,9 +219,9 @@ Retry-After: 12
   <h2 id="next-steps">Next Steps</h2>
   <ul>
     <li>
-      <a href="/docs/developer/code-examples"
-        >Code examples in TypeScript and Python</a
-      >
+      <a href="/docs/developer/code-examples">
+        Code examples in TypeScript and Python
+      </a>
     </li>
     <li>
       <a href="/docs/developer/sdk-guide">SDK installation and usage guide</a>
@@ -182,7 +229,9 @@ Retry-After: 12
     <li>
       <a href="/docs/api/swagger">Interactive API reference (Swagger UI)</a>
     </li>
-    <li><a href="/docs/api/api-versioning">API versioning policy</a></li>
+    <li>
+      <a href="/docs/api/api-versioning">API versioning policy</a>
+    </li>
   </ul>
 </DocumentationLayout>
 
@@ -208,7 +257,7 @@ Retry-After: 12
   }
 
   code {
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-family: var(--np-font-mono, 'Spline Sans Mono Variable', monospace);
   }
 
   :not(pre) > code {

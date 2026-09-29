@@ -13,10 +13,12 @@
  */
 
 import { useState, useCallback } from 'react'
-import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
+
 import type { ClinicalRole } from '@/lib/ehr-native/auth/types'
 import type { RiskStratificationReview } from '@/lib/ehr-native/gates/types'
+import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
 import { RiskStratificationService } from '@/lib/ehr-native/services/risk.service'
+
 import { RiskReviewCard } from './RiskReviewCard'
 
 export interface RiskReviewQueueProps {
@@ -65,14 +67,14 @@ export function RiskReviewQueue({
   return (
     <div className="space-y-4" data-testid="risk-review-queue">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">
+        <h2 className="text-lg font-semibold text-foreground">
           Risk Review Queue
         </h2>
         <button
           type="button"
           onClick={loadReviews}
           disabled={loading}
-          className="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="hover:bg-primary/90 rounded-none bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
           data-testid="refresh-btn"
         >
           {loading ? 'Loading...' : 'Refresh'}
@@ -81,7 +83,7 @@ export function RiskReviewQueue({
 
       {error && (
         <div
-          className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+          className="rounded-none border border-ring bg-secondary p-3 text-sm text-foreground"
           data-testid="error-message"
         >
           {error}
@@ -90,7 +92,7 @@ export function RiskReviewQueue({
 
       {!loading && !error && reviews.length === 0 && (
         <div
-          className="rounded-md border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-500"
+          className="rounded-none border border-border bg-secondary p-6 text-center text-sm text-muted-foreground"
           data-testid="empty-state"
         >
           No pending risk reviews.
@@ -109,7 +111,7 @@ export function RiskReviewQueue({
       </div>
 
       {/* Stub notice: full implementation in F3.2 */}
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-muted-foreground">
         Supervisor review queue — stub for F3.2. Full filtering, pagination, and
         clinician notification will be implemented in F3.2.
       </p>

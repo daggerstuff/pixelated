@@ -30,12 +30,21 @@ import subprocess
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, TypedDict
 
 from scripts.services.monthly_llm_driver.orch_db import ConnectionBundle
 
 # ---------------------------------------------------------------------------
 # Data model
 # ---------------------------------------------------------------------------
+
+
+class HeartbeatTriage(TypedDict):
+    """Triage payload returned by ``heartbeat_age_seconds``."""
+
+    heartbeat_age_seconds: float | None
+    bytes_age_ratio: float
+    state: str
 
 
 @dataclass
@@ -53,7 +62,7 @@ class ResumeGateReport:
     def missing_or_partial_count(self) -> int:
         return len(self.missing) + len(self.partial)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "month": self.month,
             "n_chunks_expected": self.n_chunks_expected,
@@ -107,7 +116,7 @@ def _expected_chunk_count(chunks_dir: Path, month: str) -> int:
     return 0
 
 
-def _classify_chunk_doc(status: str, emails: list, chat_bursts: list) -> str:
+def _classify_chunk_doc(status: str, emails: list[Any], chat_bursts: list[Any]) -> str:
     """Classify a chunk document (from Mongo or flat file) into one of
     'ok', 'ok_empty', or 'partial'.
 
@@ -505,7 +514,7 @@ def _ps_find_dispatch_processes(month: str) -> list[tuple[int, str]]:
 # ---------------------------------------------------------------------------
 
 
-def heartbeat_age_seconds(heartbeat_path: Path) -> dict:
+def heartbeat_age_seconds(heartbeat_path: Path) -> HeartbeatTriage:
     """Read the heartbeat JSON and return a triage dict with state detection.
 
     Returns a dict with:
@@ -533,7 +542,7 @@ def heartbeat_age_seconds(heartbeat_path: Path) -> dict:
     expected_chunk_size = 5300  # chars (30*110 + 30*60 + 200 envelope)
 
     # Default result for dead state
-    dead_result = {
+    dead_result: HeartbeatTriage = {
         "heartbeat_age_seconds": None,
         "bytes_age_ratio": 0.0,
         "state": "dead",

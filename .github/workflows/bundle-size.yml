@@ -1,0 +1,48 @@
+# Bundle-size audit. Builds the frontend and ratchets the total shipped
+# client JavaScript against a pinned budget (baseline × 1.25) plus a
+# single-chunk hard cap. Separate from Quality so a full build does not
+# slow the main quality signal; it gates the same staging branch.
+name: Bundle size
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'apps/web/src/**'
+      - 'packages/**'
+      - 'astro.config.*'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'scripts/ci/bundle-size-audit.mjs'
+      - '.github/workflows/bundle-size.yml'
+  pull_request:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bundle-size-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  bundle-size:
+    name: Client bundle budget (ratchet)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: 24.16.0
+      - name: Build client (Node adapter)
+        run: pnpm build
+      - name: Audit client bundle size
+        run: node scripts/ci/bundle-size-audit.mjs

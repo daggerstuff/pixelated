@@ -63,11 +63,11 @@ if (!isLoggedIn || !isAdmin) {
 
     <UmamiAnalytics nonce={cspNonce} />
   </head>
-  <body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
+  <body class="bg-background min-h-screen">
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-md focus:shadow-lg transition-transform"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-none transition-transform"
     >
       Skip to content
     </a>
@@ -81,7 +81,7 @@ if (!isLoggedIn || !isAdmin) {
         <div class="flex items-center gap-4">
           <div class="relative">
             <button
-              class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+              class="text-muted-foreground hover:text-foreground"
               aria-label="Notifications"
             >
               <svg
@@ -102,11 +102,11 @@ if (!isLoggedIn || !isAdmin) {
           </div>
           <div class="relative">
             <button
-              class="flex items-center gap-2 text-gray-700 dark:text-gray-300"
+              class="flex items-center gap-2 text-foreground"
               aria-label="User profile"
             >
               <img
-                class="h-8 w-8 rounded-full object-cover"
+                class="h-8 w-8 rounded-none object-cover"
                 src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
                 alt="Admin"
               />

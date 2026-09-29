@@ -36,57 +36,51 @@ const {
         <h1 class="marketing-title">{title}</h1>
         <p class="marketing-lede">{lede}</p>
 
-        {
-          (primaryCTA || secondaryCTA) && (
-            <div class="marketing-actions">
-              {primaryCTA && (
-                <a
-                  class="marketing-button marketing-button--primary"
-                  href={primaryCTA.href}
-                >
-                  {primaryCTA.text}
-                </a>
-              )}
-              {secondaryCTA && (
-                <a
-                  class="marketing-button marketing-button--secondary"
-                  href={secondaryCTA.href}
-                >
-                  {secondaryCTA.text}
-                </a>
-              )}
-            </div>
-          )
-        }
+        {(primaryCTA || secondaryCTA) && (
+          <div class="marketing-actions">
+            {primaryCTA && (
+              <a
+                class="marketing-button marketing-button--primary"
+                href={primaryCTA.href}
+              >
+                {primaryCTA.text}
+              </a>
+            )}
+            {secondaryCTA && (
+              <a
+                class="marketing-button marketing-button--secondary"
+                href={secondaryCTA.href}
+              >
+                {secondaryCTA.text}
+              </a>
+            )}
+          </div>
+        )}
 
         {note && <p class="marketing-note">{note}</p>}
 
-        {
-          trustLine.length > 0 && (
-            <div class="marketing-hero__trustline">
-              {trustLine.map((item) => (
-                <span>{item}</span>
-              ))}
-            </div>
-          )
-        }
+        {trustLine.length > 0 && (
+          <div class="marketing-hero__trustline">
+            {trustLine.map((item) => (
+              <span>{item}</span>
+            ))}
+          </div>
+        )}
       </div>
 
-      {
-        proof && (
-          <aside class="marketing-hero__proof" aria-label={proof.label}>
-            <header class="marketing-hero__proof-head">
-              <span class="marketing-list-label">{proof.label}</span>
-            </header>
-            <div class="marketing-hero__proof-body" set:html={proof.body} />
-            {proof.caption && (
-              <footer class="marketing-hero__proof-foot">
-                <span>{proof.caption}</span>
-              </footer>
-            )}
-          </aside>
-        )
-      }
+      {proof && (
+        <aside class="marketing-hero__proof" aria-label={proof.label}>
+          <header class="marketing-hero__proof-head">
+            <span class="marketing-list-label">{proof.label}</span>
+          </header>
+          <div class="marketing-hero__proof-body" set:html={proof.body} />
+          {proof.caption && (
+            <footer class="marketing-hero__proof-foot">
+              <span>{proof.caption}</span>
+            </footer>
+          )}
+        </aside>
+      )}
     </div>
   </div>
 </section>

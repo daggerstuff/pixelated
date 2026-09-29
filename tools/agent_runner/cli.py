@@ -14,7 +14,10 @@ from tools.agent_runner.config_loader import load_config
 from tools.agent_runner.coordinator import MultiAgentCoordinator
 from tools.agent_runner.dashboard import ClusterDashboard
 from tools.agent_runner.event_bus import EventBus
+from tools.agent_runner.hitl_proxy import EscalationStore, cli_proxy_listen
 from tools.agent_runner.lineage import LineageTracker
+from tools.agent_runner.monitor import LiveClusterMonitor
+from tools.agent_runner.onboarding import OnboardingWizard
 from tools.agent_runner.project_initializer import SpecProjectInitializer
 from tools.agent_runner.self_evolution import SelfEvolutionEngine
 from tools.agent_runner.skeptic import SkepticReviewer
@@ -23,7 +26,7 @@ from tools.agent_runner.triage import AutoTriageEngine
 
 # Automatically load .env if present
 try:
-    from dotenv import load_dotenv  # type: ignore[import-untyped]
+    from dotenv import load_dotenv
 
     load_dotenv(override=True)
 except ImportError:
@@ -377,17 +380,18 @@ def cmd_evolution(args: argparse.Namespace) -> int:
         )
         print(f"   🔍 Root Cause: {les.root_cause_summary}")
         print(f"   💡 Distilled Rule: {les.actionable_rule}\n")
-def cmd_hitl(args: argparse.Namespace) -> int:
+    return 0
+
+
+def cmd_hitl(_args: argparse.Namespace) -> int:
     """Run interactive Human-in-the-Loop CLI Proxy Listener."""
-    from tools.agent_runner.hitl_proxy import EscalationStore, cli_proxy_listen
     store = EscalationStore()
     cli_proxy_listen(store)
     return 0
 
 
-def cmd_onboard(args: argparse.Namespace) -> int:
+def cmd_onboard(_args: argparse.Namespace) -> int:
     """Run interactive setup and agent discovery wizard."""
-    from tools.agent_runner.onboarding import OnboardingWizard
     wizard = OnboardingWizard()
     wizard.run_interactive_setup()
     return 0
@@ -401,7 +405,6 @@ def cmd_monitor(args: argparse.Namespace) -> int:
     state_mgr = StateManager(args.state)
     event_bus = EventBus()
 
-    from tools.agent_runner.monitor import LiveClusterMonitor
     monitor = LiveClusterMonitor(config=config, state_mgr=state_mgr, event_bus=event_bus)
 
     if getattr(args, "serve_http", False) or getattr(args, "port", None):
@@ -437,7 +440,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     monitor_parser = subparsers.add_parser("monitor", help="Launch live-refreshing modern TUI cluster monitor")
     monitor_parser.add_argument("-i", "--interval", type=int, default=2, help="TUI refresh interval in seconds")
-    monitor_parser.add_argument("-p", "--port", type=int, default=8888, help="Port to serve live JSON telemetry on HTTP")
+    monitor_parser.add_argument(
+        "-p", "--port", type=int, default=8888, help="Port to serve live JSON telemetry on HTTP"
+    )
     monitor_parser.add_argument("--serve-http", action="store_true", help="Start background HTTP telemetry streamer")
 
     subparsers.add_parser("hitl", help="Interactive Human-in-the-Loop CLI Proxy Listener")

@@ -5,9 +5,10 @@ import json
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 
-def categorize_record(record: dict) -> str:
+def categorize_record(record: dict[str, Any]) -> str:
     """Attempt to categorize a record from various metadata sources."""
     category = "uncategorized"
 
@@ -47,11 +48,11 @@ def categorize_record(record: dict) -> str:
     return category
 
 
-def analyze_dataset(file_path: Path) -> dict:
+def analyze_dataset(file_path: Path) -> dict[str, Any]:
     """Analyze and categorize a dataset."""
 
-    categories = Counter()
-    sources = Counter()
+    categories: Counter[str] = Counter()
+    sources: Counter[str] = Counter()
     total = 0
 
     with open(file_path) as f:
@@ -78,7 +79,7 @@ def analyze_dataset(file_path: Path) -> dict:
     return {"total": total, "categories": dict(categories), "sources": dict(sources)}
 
 
-def main():
+def main() -> None:
     datasets = [
         (
             "Tier1 Priority",
@@ -98,7 +99,7 @@ def main():
         ),
     ]
 
-    all_categories = Counter()
+    all_categories: Counter[str] = Counter()
     total_records = 0
 
     for _name, path in datasets:

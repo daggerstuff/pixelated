@@ -49,6 +49,7 @@ interface S3PutParams {
   Key: string
   Body: Buffer
   ContentType: string
+  StorageClass?: string
 }
 
 interface S3GetParams {
@@ -70,10 +71,13 @@ interface S3DeleteParams {
 export class S3StorageProvider implements StorageProvider {
   private s3: S3Client | null = null
   private readonly bucketName: string
+  private readonly defaultStorageClass: string
   private initialized = false
 
   constructor(private readonly config: StorageProviderConfig) {
     this.bucketName = (config['bucket'] as string) || ''
+    this.defaultStorageClass =
+      (config['storageClass'] as string) || 'INTELLIGENT_TIERING'
     if (!this.bucketName) {
       throw new Error('Bucket name is required for S3 storage provider')
     }
@@ -195,6 +199,7 @@ export class S3StorageProvider implements StorageProvider {
         Key: key,
         Body: Buffer.from(data),
         ContentType: 'application/octet-stream',
+        StorageClass: this.defaultStorageClass,
       }
 
       await this.s3!.putObject(params)

@@ -31,7 +31,9 @@ export function parseDatabaseUrl(url: string): {
     : false
 
   const connectTimeoutSec = parsed.searchParams.get('connect_timeout')
-  const parsedTimeout = connectTimeoutSec ? parseInt(connectTimeoutSec, 10) : NaN
+  const parsedTimeout = connectTimeoutSec
+    ? parseInt(connectTimeoutSec, 10)
+    : NaN
   const connectionTimeoutMillis =
     Number.isFinite(parsedTimeout) && parsedTimeout > 0
       ? parsedTimeout * 1000
@@ -44,6 +46,8 @@ export function parseDatabaseUrl(url: string): {
     user: decodeURIComponent(parsed.username),
     password: decodeURIComponent(parsed.password),
     ssl,
-    ...(connectionTimeoutMillis !== undefined ? { connectionTimeoutMillis } : {}),
+    ...(connectionTimeoutMillis !== undefined
+      ? { connectionTimeoutMillis }
+      : {}),
   }
 }

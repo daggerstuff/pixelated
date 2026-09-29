@@ -326,61 +326,55 @@ export default function CrisisDetectionDemo() {
 
   const getRiskLevelColor = (level: string) => {
     switch (level) {
-      case 'none':
-        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
-      case 'low':
-        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
-      case 'moderate':
-        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
       case 'high':
-        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
+        return 'border-ring bg-secondary font-medium text-foreground'
       case 'imminent':
-        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
+        return 'border-transparent bg-primary text-primary-foreground'
       default:
-        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
+        return 'border-border bg-secondary text-foreground'
     }
   }
 
   const getRiskIcon = (level: string) => {
     switch (level) {
       case 'none':
-        return <CheckCircle className="text-neutral-600 h-5 w-5" />
+        return <CheckCircle className="h-5 w-5 text-muted-foreground" />
       case 'low':
-        return <Shield className="text-neutral-600 h-5 w-5" />
+        return <Shield className="h-5 w-5 text-muted-foreground" />
       case 'moderate':
-        return <AlertTriangle className="text-neutral-600 h-5 w-5" />
+        return <AlertTriangle className="h-5 w-5 text-foreground" />
       case 'high':
-        return <AlertTriangle className="text-neutral-600 h-5 w-5" />
+        return <AlertTriangle className="h-5 w-5 text-foreground" />
       case 'imminent':
-        return <AlertTriangle className="text-neutral-600 h-5 w-5" />
+        return <AlertTriangle className="h-5 w-5 text-foreground" />
       default:
-        return <Shield className="text-neutral-600 h-5 w-5" />
+        return <Shield className="h-5 w-5 text-muted-foreground" />
     }
   }
 
   const getIndicatorIcon = (present: boolean, confidence: number) => {
     if (present && confidence > 0.7)
-      return <AlertTriangle className="text-neutral-500 h-4 w-4" />
+      return <AlertTriangle className="h-4 w-4 text-foreground" />
     if (present && confidence > 0.5)
-      return <AlertTriangle className="text-neutral-500 h-4 w-4" />
-    if (present) return <AlertTriangle className="text-neutral-500 h-4 w-4" />
-    return <CheckCircle className="text-neutral-500 h-4 w-4" />
+      return <AlertTriangle className="h-4 w-4 text-foreground" />
+    if (present) return <AlertTriangle className="h-4 w-4 text-foreground" />
+    return <CheckCircle className="h-4 w-4 text-muted-foreground" />
   }
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 p-6">
       {/* Header */}
       <div className="space-y-4 text-center">
-        <h1 className="text-gray-900 flex items-center justify-center gap-3 text-3xl font-bold">
-          <Shield className="text-neutral-700 h-8 w-8" />
+        <h1 className="flex items-center justify-center gap-3 text-3xl font-bold text-foreground">
+          <Shield className="h-8 w-8 text-foreground" />
           Crisis Detection & Assessment
         </h1>
-        <p className="text-gray-600 mx-auto max-w-2xl">
+        <p className="mx-auto max-w-2xl text-muted-foreground">
           Advanced AI-powered crisis detection system for real-time assessment
           of suicide risk, self-harm indicators, and mental health emergencies
           with immediate resource recommendations.
         </p>
-        <div className="bg-neutral-100 border-neutral-200 text-neutral-800 rounded-lg border p-4 text-sm">
+        <div className="rounded-none border border-border bg-secondary p-4 text-sm text-foreground">
           <strong>Important:</strong> This is a demonstration tool. For actual
           crises, immediately contact emergency services (911) or the National
           Suicide Prevention Lifeline (988).
@@ -404,12 +398,12 @@ export default function CrisisDetectionDemo() {
           />
 
           <div className="flex items-center justify-between">
-            <div className="text-gray-500 text-sm">
+            <div className="text-sm text-muted-foreground">
               {inputText.length} characters • Real-time crisis detection
               {realTimeMonitoring && (
                 <Badge
                   variant="outline"
-                  className="bg-neutral-100 text-neutral-700 ml-2"
+                  className="ml-2 bg-secondary text-foreground"
                 >
                   <Activity className="mr-1 h-3 w-3" />
                   Live Monitoring
@@ -421,9 +415,7 @@ export default function CrisisDetectionDemo() {
                 variant="outline"
                 size="sm"
                 onClick={() => setRealTimeMonitoring(!realTimeMonitoring)}
-                className={
-                  realTimeMonitoring ? 'bg-neutral-100 border-neutral-200' : ''
-                }
+                className={realTimeMonitoring ? 'border-ring bg-secondary' : ''}
               >
                 <Activity className="mr-2 h-4 w-4" />
                 {realTimeMonitoring ? 'Disable' : 'Enable'} Real-time
@@ -431,11 +423,11 @@ export default function CrisisDetectionDemo() {
               <Button
                 onClick={async () => performCrisisAssessment(false)}
                 disabled={assessing || inputText.trim().length < 5}
-                className="bg-neutral-700 hover:bg-neutral-800 flex items-center gap-2"
+                className="hover:bg-primary/90 flex items-center gap-2 bg-primary text-primary-foreground"
               >
                 {assessing ? (
                   <>
-                    <div className="border-white border-t-transparent h-4 w-4 animate-spin rounded-full border-2" />
+                    <div className="border-t-transparent h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground" />
                     Assessing...
                   </>
                 ) : (
@@ -450,7 +442,7 @@ export default function CrisisDetectionDemo() {
 
           {/* Assessment History Indicator */}
           {assessmentHistory.length > 0 && (
-            <div className="text-gray-500 flex items-center gap-2 text-xs">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <TrendingUp className="h-3 w-3" />
               <span>
                 {assessmentHistory.length} previous assessment
@@ -463,7 +455,7 @@ export default function CrisisDetectionDemo() {
                 ) && (
                 <Badge
                   variant="outline"
-                  className="text-neutral-700 border-neutral-200"
+                  className="border-ring text-foreground"
                 >
                   <AlertCircle className="mr-1 h-3 w-3" />
                   High-risk history
@@ -484,7 +476,7 @@ export default function CrisisDetectionDemo() {
       {assessment && (
         <div className="space-y-6">
           {/* Risk Level Overview */}
-          <Card className="border-l-neutral-500 border-l-4">
+          <Card className="border-l-4 border-l-ring">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -502,34 +494,36 @@ export default function CrisisDetectionDemo() {
             <CardContent>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div>
-                  <h4 className="text-gray-900 mb-2 font-medium">Risk Score</h4>
+                  <h4 className="mb-2 font-medium text-foreground">
+                    Risk Score
+                  </h4>
                   <Progress
                     value={assessment.riskScore * 100}
                     className="mb-2 w-full"
                   />
-                  <div className="text-gray-600 text-sm">
+                  <div className="text-sm text-muted-foreground">
                     {(assessment.riskScore * 100).toFixed(1)}% risk probability
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-gray-900 mb-2 font-medium">
+                  <h4 className="mb-2 font-medium text-foreground">
                     Confidence Level
                   </h4>
                   <Progress
                     value={assessment.confidenceLevel * 100}
                     className="mb-2 w-full"
                   />
-                  <div className="text-gray-600 text-sm">
+                  <div className="text-sm text-muted-foreground">
                     {(assessment.confidenceLevel * 100).toFixed(1)}% confidence
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-gray-900 mb-2 font-medium">
+                  <h4 className="mb-2 font-medium text-foreground">
                     Assessment Time
                   </h4>
-                  <div className="text-gray-600 flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Clock className="h-4 w-4" />
                     <span className="text-sm">
                       {new Date(assessment.timestamp).toLocaleTimeString()}
@@ -552,7 +546,7 @@ export default function CrisisDetectionDemo() {
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {Object.entries(assessment.crisisIndicators).map(
                   ([key, indicator]) => (
-                    <div key={key} className="rounded-lg border p-4">
+                    <div key={key} className="rounded-none border p-4">
                       <div className="mb-2 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {getIndicatorIcon(
@@ -563,7 +557,7 @@ export default function CrisisDetectionDemo() {
                             {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
                           </span>
                         </div>
-                        <div className="text-gray-600 text-sm">
+                        <div className="text-sm text-muted-foreground">
                           {Math.round(indicator.confidence * 100)}%
                         </div>
                       </div>
@@ -573,7 +567,7 @@ export default function CrisisDetectionDemo() {
                         className="mb-2 w-full"
                       />
 
-                      <div className="text-gray-500 flex justify-between text-xs">
+                      <div className="flex justify-between text-xs text-muted-foreground">
                         <span>
                           {indicator.present ? 'Present' : 'Not detected'}
                         </span>
@@ -593,7 +587,7 @@ export default function CrisisDetectionDemo() {
             {/* Immediate Actions */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-neutral-800 flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <Zap className="h-5 w-5" />
                   Immediate Actions Required
                 </CardTitle>
@@ -602,10 +596,10 @@ export default function CrisisDetectionDemo() {
                 <ul className="space-y-3">
                   {assessment.immediateActions.map((action, index) => (
                     <li key={action} className="flex items-start gap-2">
-                      <div className="bg-neutral-200 text-neutral-700 mt-0.5 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold">
+                      <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-secondary text-xs font-bold text-foreground">
                         {index + 1}
                       </div>
-                      <span className="text-gray-700">{action}</span>
+                      <span className="text-foreground">{action}</span>
                     </li>
                   ))}
                 </ul>
@@ -615,7 +609,7 @@ export default function CrisisDetectionDemo() {
             {/* Emergency Resources */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-neutral-800 flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <Phone className="h-5 w-5" />
                   Emergency Resources
                 </CardTitle>
@@ -625,23 +619,23 @@ export default function CrisisDetectionDemo() {
                   {assessment.emergencyResources.map((resource) => (
                     <div
                       key={resource.type + resource.contact}
-                      className="bg-neutral-100 border-neutral-200 rounded-lg border p-3"
+                      className="rounded-none border border-border bg-secondary p-3"
                     >
                       <div className="mb-1 flex items-center justify-between">
-                        <h4 className="text-neutral-900 font-medium">
+                        <h4 className="font-medium text-foreground">
                           {resource.type}
                         </h4>
                         <Badge
                           variant="outline"
-                          className="bg-neutral-200 text-neutral-700 text-xs"
+                          className="bg-secondary text-xs text-foreground"
                         >
                           {resource.available}
                         </Badge>
                       </div>
-                      <div className="text-neutral-800 mb-1 font-mono text-lg">
+                      <div className="mb-1 font-mono text-lg text-foreground">
                         {resource.contact}
                       </div>
-                      <p className="text-neutral-700 text-sm">
+                      <p className="text-sm text-muted-foreground">
                         {resource.description}
                       </p>
                     </div>
@@ -654,7 +648,7 @@ export default function CrisisDetectionDemo() {
           {/* Protective Factors */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-neutral-700 flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-foreground">
                 <Heart className="h-5 w-5" />
                 Protective Factors Identified
               </CardTitle>
@@ -664,10 +658,10 @@ export default function CrisisDetectionDemo() {
                 {assessment.protectiveFactors.map((factor) => (
                   <div
                     key={factor}
-                    className="bg-neutral-100 border-neutral-200 flex items-start gap-2 rounded-lg border p-3"
+                    className="flex items-start gap-2 rounded-none border border-border bg-secondary p-3"
                   >
-                    <CheckCircle className="text-neutral-600 mt-0.5 h-5 w-5 flex-shrink-0" />
-                    <span className="text-neutral-800">{factor}</span>
+                    <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                    <span className="text-foreground">{factor}</span>
                   </div>
                 ))}
               </div>
@@ -680,7 +674,7 @@ export default function CrisisDetectionDemo() {
               <div className="flex flex-wrap justify-center gap-4">
                 <Button
                   variant="outline"
-                  className="bg-neutral-100 border-neutral-200 text-neutral-700 hover:bg-neutral-200"
+                  className="border-border bg-secondary text-foreground hover:bg-accent"
                   onClick={() => window.open('tel:988')}
                 >
                   <Phone className="mr-2 h-4 w-4" />
@@ -689,7 +683,7 @@ export default function CrisisDetectionDemo() {
 
                 <Button
                   variant="outline"
-                  className="bg-neutral-100 border-neutral-200 text-neutral-700 hover:bg-neutral-200"
+                  className="border-border bg-secondary text-foreground hover:bg-accent"
                   onClick={() => window.open('sms:741741?body=HOME')}
                 >
                   Crisis Text Line

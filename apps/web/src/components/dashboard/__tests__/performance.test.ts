@@ -56,6 +56,25 @@ function assertFast(durationMs: number, boundMs: number): void {
   }
 }
 
+/**
+ * Wall-clock single-shot timings flap on loaded shared runners (observed
+ * 11.0ms vs a 10ms bound with the component unchanged). Median-of-N is the
+ * deterministic measurement: one JIT warm-up render, then N measured
+ * renders, take the median. The bound stays tight.
+ */
+function measureRenderMs(mount: () => () => void, iterations = 7): number {
+  mount()() // warm-up: JIT/module-init cost must not count
+  const samples: number[] = []
+  for (let i = 0; i < iterations; i++) {
+    const start = performance.now()
+    const unmount = mount()
+    samples.push(performance.now() - start)
+    unmount()
+  }
+  samples.sort((a, b) => a - b)
+  return samples[Math.floor(iterations / 2)] ?? 0
+}
+
 describe('Dashboard Performance Tests', () => {
   const createLargeSessionDataset = (count: number): TherapistSession[] => {
     return Array.from({ length: count }, (_, i) => ({
@@ -222,19 +241,23 @@ describe('Dashboard Performance Tests', () => {
   })
 
   it('renders progress tracker efficiently', () => {
-    const startTime = performance.now()
+    const renderTime = measureRenderMs(
+      () =>
+        render(
+          React.createElement(TherapistProgressTracker, {
+            session: mockSessions[0]!,
+          }),
+        ).unmount,
+    )
+
+    // Should render very quickly
+    assertFast(renderTime, 10)
 
     render(
       React.createElement(TherapistProgressTracker, {
         session: mockSessions[0]!,
       }),
     )
-
-    const endTime = performance.now()
-    const renderTime = endTime - startTime
-
-    // Should render very quickly
-    assertFast(renderTime, 10)
     expect(
       screen.getByLabelText('Therapist Progress Tracker'),
     ).toBeInTheDocument()

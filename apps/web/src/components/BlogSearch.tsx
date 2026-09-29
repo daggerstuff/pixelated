@@ -85,7 +85,7 @@ export function BlogSearch() {
         />
 
         <Search
-          className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+          className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
           aria-hidden="true"
         />
 
@@ -125,7 +125,7 @@ export function BlogSearch() {
               <h3 className="mb-2 text-lg font-semibold">
                 <a
                   href={`/blog/${result['slug']}`}
-                  className="hover:text-primary transition-colors"
+                  className="transition-colors hover:text-primary"
                 >
                   {result['title']}
                 </a>

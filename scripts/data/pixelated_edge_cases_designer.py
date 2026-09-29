@@ -23,12 +23,15 @@ Architecture:
   Threads pop instantly from collections.deque() buffer for maximum generation speed.
 """
 
+import itertools
 import json
 import logging
 import random
 import threading
 import time
 from collections import deque
+from collections.abc import Callable
+from typing import Any, cast
 
 import data_designer.config as dd
 from openai import OpenAI
@@ -45,10 +48,10 @@ SYSTEM_PROMPT = (
     "Respond directly, unflinchingly, humanly, and with grounded clinical authority."
 )
 
-_GLOBAL_SESSION_QUEUE = deque()
+_GLOBAL_SESSION_QUEUE: deque[list[dict[str, Any]]] = deque()
 _QUEUE_LOCK = threading.Lock()
 _OLLAMA_LOCK = threading.Lock()
-_KEY_INDEX = 0
+_KEY_INDEX = itertools.count()
 _KEY_LOCK = threading.Lock()
 
 NVIDIA_KEYS = [
@@ -71,11 +74,8 @@ FAST_OLLAMA_MODELS = [
 
 def get_next_nim_client() -> OpenAI:
     """Gets the next NVIDIA NIM client in round-robin order across 3 keys."""
-    global _KEY_INDEX
     with _KEY_LOCK:
-        client = NIM_CLIENTS[_KEY_INDEX % len(NIM_CLIENTS)]
-        _KEY_INDEX += 1
-        return client
+        return NIM_CLIENTS[next(_KEY_INDEX) % len(NIM_CLIENTS)]
 
 
 def execute_ollama_wayfarer(ollama_client: OpenAI, prompt: str) -> str:
@@ -139,11 +139,21 @@ def execute_9router(router_client: OpenAI, model: str, prompt: str) -> str:
         return ""
 
 
-@dd.custom_column_generator(
+ColumnGenFn = Callable[[dict[str, Any]], dict[str, Any]]
+
+# data_designer is an untyped third-party package (genuine Any boundary);
+# cast only fixes the decorator's type for mypy — runtime behavior is identical.
+custom_column_generator = cast(
+    Callable[..., Callable[[ColumnGenFn], ColumnGenFn]],
+    dd.custom_column_generator,
+)
+
+
+@custom_column_generator(
     required_columns=["category", "diagnosis", "persona_niche", "client_name"],
     side_effect_columns=["messages", "turns_count"],
 )
-def generate_curated_session(row: dict) -> dict:
+def generate_curated_session(row: dict[str, Any]) -> dict[str, Any]:
     cat = row.get("category", "edge_case")
     diag = row.get("diagnosis", "Complex PTSD")
     persona = row.get("persona_niche", "Tech Founder")
@@ -210,7 +220,7 @@ def generate_curated_session(row: dict) -> dict:
             if isinstance(data, dict) and "sessions" in data and isinstance(data["sessions"], list):
                 for s in data["sessions"]:
                     if isinstance(s, list) and len(s) > 0:
-                        parsed_sessions.append([{"role": "system", "content": SYSTEM_PROMPT}] + s)
+                        parsed_sessions.append([{"role": "system", "content": SYSTEM_PROMPT}, *s])
         except Exception:
             pass
 

@@ -117,104 +117,107 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
   }, [moodVector])
 
   // Animation function
-  const animate = useCallback(function animate() {
-    const canvas = canvasRef.current
-    if (!canvas) {
-      return
-    }
+  const animate = useCallback(
+    function animate() {
+      const canvas = canvasRef.current
+      if (!canvas) {
+        return
+      }
 
-    const ctx = canvas.getContext('2d')
-    if (!ctx) {
-      return
-    }
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        return
+      }
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // Set up 3D-like perspective
-    const centerX = canvas.width / 2
-    const centerY = canvas.height / 2
-    const scale = 2
+      // Set up 3D-like perspective
+      const centerX = canvas.width / 2
+      const centerY = canvas.height / 2
+      const scale = 2
 
-    timeRef.current += 0.02
+      timeRef.current += 0.02
 
-    // Draw brain outline
-    ctx.strokeStyle = '#E5E7EB'
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    ctx.ellipse(centerX, centerY, 80, 60, 0, 0, 2 * Math.PI)
-    ctx.stroke()
+      // Draw brain outline
+      ctx.strokeStyle = '#E5E7EB'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      ctx.ellipse(centerX, centerY, 80, 60, 0, 0, 2 * Math.PI)
+      ctx.stroke()
 
-    // Draw neural connections
-    brainRegions.forEach((region, i) => {
-      brainRegions.forEach((otherRegion, j) => {
-        if (i >= j) {
-          return
-        }
+      // Draw neural connections
+      brainRegions.forEach((region, i) => {
+        brainRegions.forEach((otherRegion, j) => {
+          if (i >= j) {
+            return
+          }
 
-        const distance = Math.sqrt(
-          Math.pow(region.x - otherRegion.x, 2) +
-            Math.pow(region.y - otherRegion.y, 2) +
-            Math.pow(region.z - otherRegion.z, 2),
-        )
-
-        if (distance < 50) {
-          const connectionStrength =
-            (region.activity + otherRegion.activity) / 2
-
-          ctx.strokeStyle = `rgba(99, 102, 241, ${connectionStrength * 0.3})`
-          ctx.lineWidth = connectionStrength * 2
-          ctx.beginPath()
-          ctx.moveTo(centerX + region.x * scale, centerY + region.y * scale)
-          ctx.lineTo(
-            centerX + otherRegion.x * scale,
-            centerY + otherRegion.y * scale,
+          const distance = Math.sqrt(
+            Math.pow(region.x - otherRegion.x, 2) +
+              Math.pow(region.y - otherRegion.y, 2) +
+              Math.pow(region.z - otherRegion.z, 2),
           )
+
+          if (distance < 50) {
+            const connectionStrength =
+              (region.activity + otherRegion.activity) / 2
+
+            ctx.strokeStyle = `rgba(99, 102, 241, ${connectionStrength * 0.3})`
+            ctx.lineWidth = connectionStrength * 2
+            ctx.beginPath()
+            ctx.moveTo(centerX + region.x * scale, centerY + region.y * scale)
+            ctx.lineTo(
+              centerX + otherRegion.x * scale,
+              centerY + otherRegion.y * scale,
+            )
+            ctx.stroke()
+          }
+        })
+      })
+
+      // Draw brain regions
+      brainRegions.forEach((region) => {
+        const x = centerX + region.x * scale
+        const y = centerY + region.y * scale
+
+        // Pulsing effect based on activity
+        const pulse =
+          1 +
+          Math.sin(timeRef.current * 3 + region.x * 0.1) * 0.2 * region.activity
+        const radius = (region.size * region.activity * pulse) / 2
+
+        // Glow effect
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 2)
+        gradient.addColorStop(0, region.color + 'AA')
+        gradient.addColorStop(0.5, region.color + '44')
+        gradient.addColorStop(1, region.color + '00')
+
+        ctx.fillStyle = gradient
+        ctx.beginPath()
+        ctx.arc(x, y, radius * 2, 0, 2 * Math.PI)
+        ctx.fill()
+
+        // Core region
+        ctx.fillStyle = region.color
+        ctx.beginPath()
+        ctx.arc(x, y, radius, 0, 2 * Math.PI)
+        ctx.fill()
+
+        // Activity indicator
+        if (region.activity > 0.7) {
+          ctx.strokeStyle = '#FFFFFF'
+          ctx.lineWidth = 2
+          ctx.beginPath()
+          ctx.arc(x, y, radius + 3, 0, 2 * Math.PI)
           ctx.stroke()
         }
       })
-    })
 
-    // Draw brain regions
-    brainRegions.forEach((region) => {
-      const x = centerX + region.x * scale
-      const y = centerY + region.y * scale
-
-      // Pulsing effect based on activity
-      const pulse =
-        1 +
-        Math.sin(timeRef.current * 3 + region.x * 0.1) * 0.2 * region.activity
-      const radius = (region.size * region.activity * pulse) / 2
-
-      // Glow effect
-      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius * 2)
-      gradient.addColorStop(0, region.color + 'AA')
-      gradient.addColorStop(0.5, region.color + '44')
-      gradient.addColorStop(1, region.color + '00')
-
-      ctx.fillStyle = gradient
-      ctx.beginPath()
-      ctx.arc(x, y, radius * 2, 0, 2 * Math.PI)
-      ctx.fill()
-
-      // Core region
-      ctx.fillStyle = region.color
-      ctx.beginPath()
-      ctx.arc(x, y, radius, 0, 2 * Math.PI)
-      ctx.fill()
-
-      // Activity indicator
-      if (region.activity > 0.7) {
-        ctx.strokeStyle = '#FFFFFF'
-        ctx.lineWidth = 2
-        ctx.beginPath()
-        ctx.arc(x, y, radius + 3, 0, 2 * Math.PI)
-        ctx.stroke()
-      }
-    })
-
-    animationRef.current = requestAnimationFrame(animate)
-  }, [brainRegions])
+      animationRef.current = requestAnimationFrame(animate)
+    },
+    [brainRegions],
+  )
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -240,25 +243,25 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
     activity: number,
   ): { label: string; color: string } => {
     if (activity > 0.8) {
-      return { label: 'Very High', color: 'bg-red-500' }
+      return { label: 'Very High', color: 'bg-primary' }
     }
     if (activity > 0.6) {
-      return { label: 'High', color: 'bg-orange-500' }
+      return { label: 'High', color: 'bg-foreground' }
     }
     if (activity > 0.4) {
-      return { label: 'Moderate', color: 'bg-yellow-500' }
+      return { label: 'Moderate', color: 'bg-muted-foreground' }
     }
     if (activity > 0.2) {
-      return { label: 'Low', color: 'bg-blue-500' }
+      return { label: 'Low', color: 'border border-muted-foreground' }
     }
-    return { label: 'Very Low', color: 'bg-gray-500' }
+    return { label: 'Very Low', color: 'border border-border' }
   }
 
   return (
-    <Card className={`border-0 shadow-lg ${className}`}>
+    <Card className={`border border-border shadow-none ${className}`}>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Brain className="text-purple-600 h-5 w-5" />
+          <Brain className="h-5 w-5 text-foreground" />
           <span>Neural Activity Map</span>
           {archetype && (
             <Badge variant="outline" className="ml-auto">
@@ -269,14 +272,17 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* 3D Brain Visualization */}
-        <div className="from-slate-900 to-purple-900 relative rounded-lg bg-gradient-to-br p-4">
+        <div className="relative rounded-none border border-border bg-secondary p-4">
           <canvas
             ref={canvasRef}
-            className="h-auto w-full rounded"
+            className="h-auto w-full rounded-none"
             style={{ maxHeight: '200px' }}
           />
           <div className="absolute right-2 top-2">
-            <Badge variant="secondary" className="bg-white/20 text-white">
+            <Badge
+              variant="secondary"
+              className="border border-border bg-secondary text-foreground"
+            >
               <Activity className="mr-1 h-3 w-3" />
               Live
             </Badge>
@@ -291,10 +297,12 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
               return (
                 <div key={region.id} className="flex items-center space-x-2">
                   <div
-                    className={`h-2 w-2 rounded-full ${activityInfo.color}`}
+                    className={`h-2 w-2 rounded-none ${activityInfo.color}`}
                     style={{ backgroundColor: region.color }}
                   />
-                  <span className="text-gray-600 truncate">{region.name}</span>
+                  <span className="truncate text-muted-foreground">
+                    {region.name}
+                  </span>
                   <Badge
                     variant="outline"
                     className="ml-auto px-1 py-0 text-xs"
@@ -311,9 +319,11 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
         {moodVector && (
           <div className="border-t pt-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">Overall Neural Activity</span>
+              <span className="text-muted-foreground">
+                Overall Neural Activity
+              </span>
               <div className="flex items-center space-x-2">
-                <Zap className="text-yellow-500 h-4 w-4" />
+                <Zap className="h-4 w-4 text-foreground" />
                 <span className="font-medium">
                   {Math.round(
                     (Object.values(moodVector as Record<string, number>).reduce(

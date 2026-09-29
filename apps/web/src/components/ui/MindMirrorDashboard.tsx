@@ -22,51 +22,37 @@ const ARCHETYPES = {
   wounded_healer: {
     name: 'Wounded Healer',
     icon: '🩹',
-    color: '#FF6B6B',
     description: 'Transforms pain into healing wisdom',
-    gradient: 'from-red-400 to-pink-500',
   },
   shadow_strategist: {
     name: 'Shadow Strategist',
     icon: 'target',
-    color: '#4ECDC4',
     description: 'Strategic thinker with deep analytical skills',
-    gradient: 'from-teal-400 to-cyan-500',
   },
   visionary: {
     name: 'Visionary',
     icon: '🔮',
-    color: '#45B7D1',
     description: 'Future-focused creative innovator',
-    gradient: 'from-blue-400 to-indigo-500',
   },
   inner_child: {
     name: 'Inner Child',
     icon: '👶',
-    color: '#96CEB4',
     description: 'Innocent wonder and emotional authenticity',
-    gradient: 'from-green-400 to-emerald-500',
   },
   wise_elder: {
     name: 'Wise Elder',
     icon: '🧙',
-    color: '#FECA57',
     description: 'Experience-based guidance and wisdom',
-    gradient: 'from-yellow-400 to-orange-500',
   },
   rebel_spirit: {
     name: 'Rebel Spirit',
     icon: '⚡',
-    color: '#FF9FF3',
     description: 'Change agent with revolutionary energy',
-    gradient: 'from-purple-400 to-pink-500',
   },
   caregiver: {
     name: 'Caregiver',
     icon: '💝',
-    color: '#54A0FF',
     description: "Nurturing protector focused on others' wellbeing",
-    gradient: 'from-blue-400 to-purple-500',
   },
 }
 
@@ -101,29 +87,21 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
         label: 'Emotional Intensity',
         value: mood_vector.emotional_intensity,
         icon: Heart,
-        color: 'text-red-500',
-        bgColor: 'bg-red-50',
       },
       {
         label: 'Cognitive Clarity',
         value: mood_vector.cognitive_clarity,
         icon: Brain,
-        color: 'text-blue-500',
-        bgColor: 'bg-blue-50',
       },
       {
         label: 'Energy Level',
         value: mood_vector.energy_level,
         icon: Zap,
-        color: 'text-yellow-500',
-        bgColor: 'bg-yellow-50',
       },
       {
         label: 'Social Connection',
         value: mood_vector.social_connection,
         icon: User,
-        color: 'text-green-500',
-        bgColor: 'bg-green-50',
       },
     ]
   }, [analysis?.mood_vector])
@@ -131,11 +109,11 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
   if (isAnalyzing) {
     return (
       <div className={`space-y-6 ${className}`}>
-        <Card className="from-purple-50 to-blue-50 border-0 bg-gradient-to-br shadow-lg">
+        <Card className="border border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-center space-x-3">
-              <div className="border-purple-600 h-8 w-8 animate-spin rounded-full border-b-2"></div>
-              <span className="text-gray-700 text-lg font-medium">
+              <div className="h-8 w-8 animate-spin rounded-none border-b-2 border-ring"></div>
+              <span className="text-lg font-medium text-foreground">
                 🧠 Processing through AI...
               </span>
             </div>
@@ -148,13 +126,13 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
   if (!analysis) {
     return (
       <div className={`space-y-6 ${className}`}>
-        <Card className="from-gray-50 to-slate-50 border-0 bg-gradient-to-br shadow-lg">
+        <Card className="border border-border">
           <CardContent className="p-8 text-center">
-            <Brain className="text-gray-400 mx-auto mb-4 h-12 w-12" />
-            <h3 className="text-gray-600 mb-2 text-lg font-medium">
+            <Brain className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+            <h3 className="mb-2 text-lg font-medium text-foreground">
               Ready for Analysis
             </h3>
-            <p className="text-gray-500">
+            <p className="text-muted-foreground">
               Share your thoughts to see real-time psychological insights
             </p>
           </CardContent>
@@ -167,21 +145,19 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
     <div className={`space-y-6 ${className}`}>
       {/* Archetype Card */}
       {archetypeInfo && (
-        <Card className="overflow-hidden border-0 shadow-lg">
-          <div
-            className={`bg-gradient-to-r ${archetypeInfo.gradient} text-white p-6`}
-          >
+        <Card className="overflow-hidden border border-border">
+          <div className="bg-primary p-6 text-primary-foreground">
             <div className="flex items-center space-x-4">
               <div className="text-4xl">{archetypeInfo.icon}</div>
               <div className="flex-1">
                 <h3 className="text-xl font-bold">{archetypeInfo.name}</h3>
-                <p className="text-white/90 text-sm">
+                <p className="text-primary-foreground/90 text-sm">
                   {archetypeInfo.description}
                 </p>
               </div>
               <Badge
                 variant="secondary"
-                className="bg-white/20 text-white border-white/30"
+                className="bg-primary-foreground/10 border-primary-foreground/30 text-primary-foreground"
               >
                 {Math.round(analysis.archetype.confidence * 100)}% confidence
               </Badge>
@@ -195,25 +171,25 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
         {moodMetrics.map((metric) => (
           <Card
             key={metric.label}
-            className="border-0 shadow-md transition-shadow hover:shadow-lg"
+            className="border border-border transition-colors hover:border-ring"
           >
             <CardContent className="p-4">
               <div className="flex items-center space-x-3">
-                <div className={`rounded-lg p-2 ${metric.bgColor}`}>
-                  <metric.icon className={`h-5 w-5 ${metric.color}`} />
+                <div className="rounded-none border border-input bg-secondary p-2">
+                  <metric.icon className="h-5 w-5 text-foreground" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-gray-600 text-sm font-medium">
+                  <p className="text-sm font-medium text-muted-foreground">
                     {metric.label}
                   </p>
                   <div className="flex items-center space-x-2">
-                    <div className="bg-gray-200 h-2 flex-1 rounded-full">
+                    <div className="h-2 flex-1 rounded-none bg-secondary">
                       <div
-                        className={`h-2 rounded-full bg-gradient-to-r ${metric.color.replace('text-', 'from-')} to-opacity-60`}
+                        className="h-2 rounded-none bg-primary"
                         style={{ width: `${metric.value * 100}%` }}
                       />
                     </div>
-                    <span className="text-gray-700 text-sm font-bold">
+                    <span className="text-sm font-bold text-foreground">
                       {Math.round(metric.value * 100)}
                     </span>
                   </div>
@@ -233,7 +209,7 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <Card className="border-0 shadow-md">
+          <Card className="border border-border">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Activity className="h-5 w-5" />
@@ -270,7 +246,7 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
         </TabsContent>
 
         <TabsContent value="insights" className="space-y-4">
-          <Card className="border-0 shadow-md">
+          <Card className="border border-border">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Eye className="h-5 w-5" />
@@ -283,14 +259,14 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
                   analysis.insights.map((insight) => (
                     <div
                       key={insight}
-                      className="bg-blue-50 flex items-start space-x-3 rounded-lg p-3"
+                      className="flex items-start space-x-3 rounded-none border border-input bg-secondary p-3"
                     >
-                      <Sparkles className="text-blue-500 mt-0.5 h-4 w-4 flex-shrink-0" />
-                      <p className="text-gray-700 text-sm">{insight}</p>
+                      <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                      <p className="text-sm text-foreground">{insight}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-sm italic">
+                  <p className="text-sm italic text-muted-foreground">
                     No specific insights available
                   </p>
                 )}
@@ -300,7 +276,7 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
         </TabsContent>
 
         <TabsContent value="recommendations" className="space-y-4">
-          <Card className="border-0 shadow-md">
+          <Card className="border border-border">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <TrendingUp className="h-5 w-5" />
@@ -313,14 +289,14 @@ export const MindMirrorDashboard: React.FC<MindMirrorDashboardProps> = ({
                   analysis.recommendations.map((rec) => (
                     <div
                       key={rec}
-                      className="bg-green-50 flex items-start space-x-3 rounded-lg p-3"
+                      className="flex items-start space-x-3 rounded-none border border-input bg-secondary p-3"
                     >
-                      <Shield className="text-green-500 mt-0.5 h-4 w-4 flex-shrink-0" />
-                      <p className="text-gray-700 text-sm">{rec}</p>
+                      <Shield className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                      <p className="text-sm text-foreground">{rec}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-sm italic">
+                  <p className="text-sm italic text-muted-foreground">
                     No specific recommendations available
                   </p>
                 )}

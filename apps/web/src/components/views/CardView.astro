@@ -26,23 +26,21 @@ const {
 const collectionItems = await getCollection(collectionType)
 ---
 
-{
-  mode === 'masonry' && (
-    <responsive-masonry
-      class="block relative w-full min-h-screen op-0 op-transition-500"
-      data-gap={gap}
-      data-min-card-width={minCardWidth}
-      data-max-card-width={maxCardWidth}
-    >
-      {collectionItems.map((item: unknown) => (
-        <CardItem
-          class="card-masonry absolute top-0 left-0"
-          item={item as unknown as CardItemData}
-        />
-      ))}
-    </responsive-masonry>
-  )
-}
+{mode === 'masonry' && (
+  <responsive-masonry
+    class="block relative w-full min-h-screen op-0 op-transition-500"
+    data-gap={gap}
+    data-min-card-width={minCardWidth}
+    data-max-card-width={maxCardWidth}
+  >
+    {collectionItems.map((item: unknown) => (
+      <CardItem
+        class="card-masonry absolute top-0 left-0"
+        item={item as unknown as CardItemData}
+      />
+    ))}
+  </responsive-masonry>
+)}
 
 <script>
   export class ResponsiveMasonry extends HTMLElement {

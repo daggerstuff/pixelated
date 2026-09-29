@@ -11,12 +11,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
 
-from skillrevise.core.agents import AgentAdapter
+from skillrevise.benchmarks.verifier import CommandVerifier, Verifier
 from skillrevise.core.artifacts import ArtifactStore
 from skillrevise.core.env import env_flag_enabled, get_env, set_env_with_legacy
 from skillrevise.core.models import ExecutionTrace, Skill, TaskSpec, TrajectoryEvent
-from skillrevise.benchmarks.verifier import CommandVerifier, Verifier, VerifierResult
-
 
 _PROXY_ENV_KEYS = {
     "HTTP_PROXY",
@@ -94,7 +92,9 @@ class CommandAgentHarness:
         set_env_with_legacy(env, "SKILL_REVISE_WORKSPACE", str(workspace))
         set_env_with_legacy(env, "SKILL_REVISE_TRACE_PATH", str(trace_path))
         set_env_with_legacy(env, "SKILL_REVISE_INSTRUCTION", task.instruction)
-        set_env_with_legacy(env, "SKILL_REVISE_SKILL_PATH", "" if skill_path is None else str(skill_path))
+        set_env_with_legacy(
+            env, "SKILL_REVISE_SKILL_PATH", "" if skill_path is None else str(skill_path)
+        )
         timeout_seconds = int(task.metadata.get("timeout_seconds", self.timeout_seconds))
         if get_env(env, "SKILL_REVISE_TIMEOUT") is None:
             set_env_with_legacy(env, "SKILL_REVISE_TIMEOUT", str(timeout_seconds))
@@ -117,6 +117,7 @@ class CommandAgentHarness:
                 capture_output=True,
                 text=True,
                 timeout=outer_timeout,
+                check=False,
             )
             stdout = completed.stdout
             stderr = completed.stderr
@@ -175,7 +176,10 @@ class CommandAgentHarness:
 
 
 def _bypass_proxy_enabled(env: dict[str, str]) -> bool:
-    return env_flag_enabled(env, "SKILL_REVISE_BYPASS_PROXY") or env_flag_enabled(env, "SKILL_REVISE_NO_PROXY")
+    return bool(
+        env_flag_enabled(env, "SKILL_REVISE_BYPASS_PROXY")
+        or env_flag_enabled(env, "SKILL_REVISE_NO_PROXY")
+    )
 
 
 def _without_proxy_env(env: dict[str, str]) -> dict[str, str]:
@@ -199,7 +203,7 @@ def _last_nonempty_line(value: str) -> str:
     return ""
 
 
-class SkillsBenchAgentAdapter(AgentAdapter):
+class SkillsBenchAgentAdapter:
     """Real benchmark adapter shell.
 
     This class handles workspace materialization, optional skill injection, external harness
@@ -258,7 +262,9 @@ class SkillsBenchAgentAdapter(AgentAdapter):
             run_id=run_dir.name,
             task_id=task.task_id,
             skill_version=None if skill is None else skill.version,
-            success=execution.status == "success" if verifier_result is None else verifier_result.success,
+            success=execution.status == "success"
+            if verifier_result is None
+            else verifier_result.success,
             status=execution.status,
             started_at=run_dir.name.split("-")[0] if "-" in run_dir.name else run_dir.name,
             ended_at=run_dir.name.split("-")[0] if "-" in run_dir.name else run_dir.name,
@@ -266,7 +272,9 @@ class SkillsBenchAgentAdapter(AgentAdapter):
             tool_calls=execution.tool_calls,
             steps=execution.steps,
             latency_seconds=execution.latency_seconds,
-            outcome_summary=execution.outcome_summary if verifier_result is None else verifier_result.summary,
+            outcome_summary=execution.outcome_summary
+            if verifier_result is None
+            else verifier_result.summary,
             events=events,
             metadata={
                 "workspace": str(workspace),
@@ -300,7 +308,8 @@ class SkillsBenchAgentAdapter(AgentAdapter):
 
     def _create_run_dir(self, task: TaskSpec, label: str) -> Path:
         if self.artifact_store is not None:
-            return self.artifact_store.start_run(task.task_id, label)
+            run_dir: Path = self.artifact_store.start_run(task.task_id, label)
+            return run_dir
         safe_task_id = task.task_id.replace("/", "-").replace("\\", "-")
         return Path(tempfile.mkdtemp(prefix=f"{safe_task_id}-{label}-"))
 

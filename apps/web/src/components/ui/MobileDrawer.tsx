@@ -33,7 +33,7 @@ export function MobileDrawer({ isOpen, onClose, children }: MobileDrawerProps) {
     <>
       {/* Backdrop */}
       <button
-        className="bg-gray-900 fixed inset-0 z-40 border-0 bg-opacity-50 lg:hidden"
+        className="bg-foreground/60 fixed inset-0 z-40 border-0 lg:hidden"
         onClick={onClose}
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
@@ -44,11 +44,11 @@ export function MobileDrawer({ isOpen, onClose, children }: MobileDrawerProps) {
       />
 
       {/* Drawer */}
-      <div className="bg-white dark:bg-gray-800 fixed inset-y-0 left-0 z-40 w-64 transform transition-transform duration-300 ease-in-out lg:hidden">
+      <div className="fixed inset-y-0 left-0 z-40 w-64 transform border-r border-border bg-card transition-transform duration-300 ease-in-out lg:hidden">
         <div className="h-full overflow-y-auto px-3 py-4">
           <button
             onClick={onClose}
-            className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-600 dark:hover:text-white absolute right-2.5 top-2.5 inline-flex items-center rounded-lg p-1.5 text-sm"
+            className="absolute right-2.5 top-2.5 inline-flex items-center rounded-none p-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path

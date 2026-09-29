@@ -28,12 +28,11 @@ const accordionId = `accordion-${Math.random().toString(36).substring(2, 9)}`
         stroke-linecap="round"
         stroke-linejoin="round"
         stroke-width="2"
-        d="M19 9l-7 7-7-7"></path>
+        d="M19 9l-7 7-7-7"
+      ></path>
     </svg>
   </summary>
-  <div
-    class="accordion-content px-4 py-3 bg-white dark:bg-gray-900 rounded-b-lg"
-  >
+  <div class="accordion-content px-4 py-3 bg-white dark:bg-gray-900 rounded-b-lg">
     <slot />
   </div>
 </details>

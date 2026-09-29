@@ -162,21 +162,21 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
   }, [biasIndicators])
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-neutral-600'
-    if (score >= 60) return 'text-neutral-700'
-    return 'text-neutral-800'
+    if (score >= 80) return 'text-muted-foreground'
+    if (score >= 60) return 'text-foreground'
+    return 'text-foreground'
   }
 
   const getScoreBgColor = (score: number) => {
-    if (score >= 80) return 'bg-neutral-100'
-    if (score >= 60) return 'bg-neutral-200'
-    return 'bg-neutral-300'
+    if (score >= 80) return 'bg-secondary'
+    if (score >= 60) return 'bg-accent'
+    return 'bg-primary'
   }
 
   if (!content || content.length < 10) {
     return (
-      <div className="bg-gray-50 rounded-lg p-4">
-        <div className="text-gray-500 text-center">
+      <div className="rounded-none bg-secondary p-4">
+        <div className="text-center text-muted-foreground">
           <div className="text-sm">Real-time Bias Analysis</div>
           <div className="mt-1 text-xs">
             Start typing to see live feedback...
@@ -190,17 +190,17 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white border-gray-200 space-y-4 rounded-lg border p-4"
+      className="bg-white space-y-4 rounded-none border border-border p-4"
     >
       {/* Overall Score */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div
-            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getScoreBgColor(overallScore)} ${getScoreColor(overallScore)}`}
+            className={`inline-flex items-center rounded-none px-3 py-1 text-sm font-medium ${getScoreBgColor(overallScore)} ${getScoreColor(overallScore)}`}
           >
             Bias Score: {Math.round(overallScore)}/100
           </div>
-          <div className="text-gray-600 text-sm">
+          <div className="text-sm text-muted-foreground">
             {overallScore >= 80
               ? '✓ Excellent'
               : overallScore >= 60
@@ -213,22 +213,22 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
         <motion.div
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="text-neutral-600 flex items-center space-x-1"
+          className="flex items-center space-x-1 text-muted-foreground"
         >
-          <div className="bg-neutral-600 h-2 w-2 rounded-full"></div>
+          <div className="h-2 w-2 rounded-none bg-foreground"></div>
           <span className="text-xs">Live</span>
         </motion.div>
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-gray-200 h-2 w-full rounded-full">
+      <div className="h-2 w-full rounded-none bg-secondary">
         <motion.div
-          className={`h-2 rounded-full transition-all duration-500 ${
+          className={`h-2 rounded-none transition-all duration-500 ${
             overallScore >= 80
-              ? 'bg-neutral-500'
+              ? 'bg-muted-foreground'
               : overallScore >= 60
-                ? 'bg-neutral-600'
-                : 'bg-neutral-700'
+                ? 'bg-foreground'
+                : 'bg-primary'
           }`}
           style={{ width: `${overallScore}%` }}
           initial={{ width: 0 }}
@@ -245,7 +245,7 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
             exit={{ opacity: 0, height: 0 }}
             className="space-y-2"
           >
-            <div className="text-gray-700 text-sm font-medium">
+            <div className="text-sm font-medium text-foreground">
               Detected Issues:
             </div>
             {biasIndicators.map((indicator, index) => (
@@ -254,42 +254,42 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className={`rounded-lg border-l-4 p-3 ${
+                className={`rounded-none border-l-4 p-3 ${
                   indicator.severity === 'high'
-                    ? 'bg-neutral-100 border-neutral-500'
+                    ? 'border-foreground bg-secondary'
                     : indicator.severity === 'medium'
-                      ? 'bg-neutral-50 border-neutral-400'
-                      : 'bg-neutral-50 border-neutral-300'
+                      ? 'border-muted-foreground bg-secondary'
+                      : 'border-border bg-secondary'
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
                       <span
-                        className={`bg-neutral-100 text-neutral-700 rounded-full px-2 py-1 text-xs font-medium`}
+                        className={`rounded-none bg-secondary px-2 py-1 text-xs font-medium text-foreground`}
                       >
                         {indicator.type}
                       </span>
                       <span
                         className={`text-xs font-medium ${
                           indicator.severity === 'high'
-                            ? 'text-neutral-800'
+                            ? 'text-foreground'
                             : indicator.severity === 'medium'
-                              ? 'text-neutral-700'
-                              : 'text-neutral-600'
+                              ? 'text-foreground'
+                              : 'text-muted-foreground'
                         }`}
                       >
                         {indicator.severity.toUpperCase()}
                       </span>
                     </div>
-                    <div className="text-gray-700 mt-1 text-sm">
+                    <div className="mt-1 text-sm text-foreground">
                       {indicator.description}
                     </div>
-                    <div className="text-gray-600 mt-1 text-xs">
+                    <div className="mt-1 text-xs text-muted-foreground">
                       <Lightbulb className="h-5 w-5" /> {indicator.suggestion}
                     </div>
                   </div>
-                  <div className="text-gray-500 ml-2 text-xs">
+                  <div className="ml-2 text-xs text-muted-foreground">
                     {Math.round(indicator.confidence * 100)}%
                   </div>
                 </div>
@@ -304,11 +304,11 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="bg-neutral-100 border-neutral-200 rounded-lg border p-3"
+          className="rounded-none border border-border bg-secondary p-3"
         >
           <div className="flex items-center space-x-2">
             <svg
-              className="text-neutral-600 h-5 w-5"
+              className="h-5 w-5 text-muted-foreground"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -318,11 +318,11 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
                 clipRule="evenodd"
               />
             </svg>
-            <span className="text-neutral-800 text-sm font-medium">
+            <span className="text-sm font-medium text-foreground">
               No significant bias patterns detected
             </span>
           </div>
-          <p className="text-neutral-700 mt-1 text-xs">
+          <p className="mt-1 text-xs text-foreground">
             Content appears to use inclusive, unbiased language.
           </p>
         </motion.div>

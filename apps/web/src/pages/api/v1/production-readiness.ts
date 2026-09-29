@@ -1,7 +1,16 @@
 import { existsSync, readFileSync } from 'node:fs'
 import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import { uptimeMonitor } from '../../../lib/services/uptime-monitor'
+
+// Astro's project root is the repo root with srcDir './apps/web/src', so
+// cwd-relative paths resolve differently between dev, build, and test
+// runners. Anchor every filesystem check to this module's real location.
+// This file lives at apps/web/src/pages/api/v1/.
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url))
+const SRC_DIR = path.resolve(MODULE_DIR, '../../..') // apps/web/src
+const REPO_ROOT = path.resolve(SRC_DIR, '../../..')
 
 interface ProductionReadinessCheck {
   id: string
@@ -111,7 +120,9 @@ export const GET = async () => {
 async function checkCrisisDetection(): Promise<ProductionReadinessCheck> {
   try {
     // Check if crisis detection service exists
-    if (!existsSync('./src/lib/ai/services/crisis-detection.ts')) {
+    if (
+      !existsSync(path.join(SRC_DIR, 'lib/ai/services/crisis-detection.ts'))
+    ) {
       return {
         id: 'crisis-detection',
         name: 'Crisis Detection Accuracy',
@@ -151,17 +162,17 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
   try {
     // Read actual coverage from vitest/coverage output
     const coverageJsonPath = path.join(
-      process.cwd(),
+      REPO_ROOT,
       'coverage',
       'coverage-final.json',
     )
     const coberturaPath = path.join(
-      process.cwd(),
+      REPO_ROOT,
       'coverage',
       'cobertura-coverage.xml',
     )
     const coverageAuditPath = path.join(
-      process.cwd(),
+      REPO_ROOT,
       'scripts/ci/coverage-audit-report.json',
     )
 
@@ -245,7 +256,7 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
     }
 
     // If no coverage data exists, return appropriate status
-    if (coverage === 0 && !existsSync(path.join(process.cwd(), 'coverage'))) {
+    if (coverage === 0 && !existsSync(path.join(REPO_ROOT, 'coverage'))) {
       coverageDetails = { message: 'No coverage data found - run tests first' }
     }
 
@@ -286,15 +297,19 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
 
 async function checkPerformanceStandards(): Promise<ProductionReadinessCheck> {
   try {
-    // Check if performance validation script exists
-    if (!existsSync('./scripts/performance-validation.js')) {
+    // Check that the CI performance gates (test + build perf trackers) exist
+    const perfGates = ['test-perf-tracker.mjs', 'build-perf-tracker.mjs'].map(
+      (f) => existsSync(path.join(REPO_ROOT, 'scripts/ci', f)),
+    )
+    if (!perfGates.some(Boolean)) {
       return {
         id: 'performance',
         name: 'Performance Standards',
         status: 'fail',
         score: 0,
         target: 1000,
-        message: 'Performance validation script not found',
+        message:
+          'CI performance gates not found (scripts/ci/*-perf-tracker.mjs)',
       }
     }
 
@@ -364,9 +379,11 @@ async function checkReliabilityStandards(): Promise<ProductionReadinessCheck> {
 async function checkSecurityStandards(): Promise<ProductionReadinessCheck> {
   try {
     const securityChecks = [
-      existsSync('./.github/workflows/security-scanning.yml'),
-      existsSync('./security-baseline.json'),
-      existsSync('./src/lib/security'),
+      existsSync(
+        path.join(REPO_ROOT, '.github/workflows/security-scanning.yml'),
+      ),
+      existsSync(path.join(REPO_ROOT, 'security-baseline.json')),
+      existsSync(path.join(SRC_DIR, 'lib/security')),
     ]
 
     const securityScore =
@@ -405,10 +422,10 @@ async function checkSecurityStandards(): Promise<ProductionReadinessCheck> {
 async function checkDocumentationStandards(): Promise<ProductionReadinessCheck> {
   try {
     const docChecks = [
-      existsSync('./README.md'),
-      existsSync('./src/content/docs'),
-      existsSync('./docs'),
-      existsSync('./src/content/docs/api.md'),
+      existsSync(path.join(REPO_ROOT, 'README.md')),
+      existsSync(path.join(SRC_DIR, 'docs')),
+      existsSync(path.join(REPO_ROOT, 'docs')),
+      existsSync(path.join(SRC_DIR, 'content-store/docs/api.md')),
     ]
 
     const docScore = (docChecks.filter(Boolean).length / docChecks.length) * 100
@@ -437,10 +454,9 @@ async function checkDocumentationStandards(): Promise<ProductionReadinessCheck> 
 async function checkComplianceStandards(): Promise<ProductionReadinessCheck> {
   try {
     const complianceChecks = [
-      existsSync('./security-baseline.json'),
-      existsSync('./src/content/docs/compliance'),
-      existsSync('./PRIVACY.md') ||
-        existsSync('./src/content/docs/privacy-policy.md'),
+      existsSync(path.join(REPO_ROOT, 'security-baseline.json')),
+      existsSync(path.join(SRC_DIR, 'docs/compliance')),
+      existsSync(path.join(SRC_DIR, 'pages/privacy.astro')),
     ]
 
     const complianceScore =
@@ -475,10 +491,10 @@ async function checkComplianceStandards(): Promise<ProductionReadinessCheck> {
 async function checkUsabilityStandards(): Promise<ProductionReadinessCheck> {
   try {
     const usabilityChecks = [
-      existsSync('./src/components'),
-      existsSync('./src/pages'),
-      existsSync('./src/layouts'),
-      existsSync('./uno.config.ts') || existsSync('./uno.config.js'),
+      existsSync(path.join(SRC_DIR, 'components')),
+      existsSync(path.join(SRC_DIR, 'pages')),
+      existsSync(path.join(SRC_DIR, 'layouts')),
+      existsSync(path.join(REPO_ROOT, 'uno.config.ts')),
     ]
 
     const usabilityScore =
@@ -516,46 +532,48 @@ async function checkAdditionalProductionRequirements(): Promise<
   const checks: ProductionReadinessCheck[] = []
 
   // Deployment readiness
+  const deploymentReady =
+    existsSync(path.join(REPO_ROOT, 'scripts')) &&
+    existsSync(path.join(REPO_ROOT, 'package.json'))
   checks.push({
     id: 'deployment',
     name: 'Deployment Readiness',
-    status:
-      existsSync('./scripts') && existsSync('./package.json') ? 'pass' : 'fail',
-    score: existsSync('./scripts') && existsSync('./package.json') ? 100 : 0,
+    status: deploymentReady ? 'pass' : 'fail',
+    score: deploymentReady ? 100 : 0,
     target: 100,
-    message:
-      existsSync('./scripts') && existsSync('./package.json')
-        ? 'Deployment scripts available'
-        : 'Missing deployment configuration',
+    message: deploymentReady
+      ? 'Deployment scripts available'
+      : 'Missing deployment configuration',
   })
 
   // Monitoring systems
+  const healthEndpoint = existsSync(
+    path.join(SRC_DIR, 'pages/api/v1/health.ts'),
+  )
   checks.push({
     id: 'monitoring',
     name: 'Monitoring Systems',
-    status: existsSync('./src/pages/api/v1/health.ts') ? 'pass' : 'fail',
-    score: existsSync('./src/pages/api/v1/health.ts') ? 100 : 0,
+    status: healthEndpoint ? 'pass' : 'fail',
+    score: healthEndpoint ? 100 : 0,
     target: 100,
-    message: existsSync('./src/pages/api/v1/health.ts')
+    message: healthEndpoint
       ? 'Health monitoring operational'
       : 'Health monitoring not found',
   })
 
   // Environment configuration
+  const envConfig =
+    existsSync(path.join(REPO_ROOT, '.env.example')) ||
+    existsSync(path.join(SRC_DIR, 'config'))
   checks.push({
     id: 'environment',
     name: 'Environment Configuration',
-    status:
-      existsSync('./.env.example') || existsSync('./src/config')
-        ? 'pass'
-        : 'warning',
-    score:
-      existsSync('./.env.example') || existsSync('./src/config') ? 100 : 50,
+    status: envConfig ? 'pass' : 'warning',
+    score: envConfig ? 100 : 50,
     target: 100,
-    message:
-      existsSync('./.env.example') || existsSync('./src/config')
-        ? 'Environment configuration available'
-        : 'Environment configuration incomplete',
+    message: envConfig
+      ? 'Environment configuration available'
+      : 'Environment configuration incomplete',
   })
 
   return checks

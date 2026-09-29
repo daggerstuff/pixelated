@@ -275,10 +275,10 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
     return (
       <div className={`flex h-64 items-center justify-center ${className}`}>
         <div className="flex flex-col items-center">
-          <div className="border-blue-500 mb-4 h-8 w-8 animate-spin rounded-full border-b-2"></div>
-          <span className="text-gray-600">Loading chart data...</span>
+          <div className="mb-4 h-8 w-8 animate-spin rounded-none border-b-2 border-t-2 border-ring"></div>
+          <span className="text-muted-foreground">Loading chart data...</span>
           {dataConfig?.autoRefresh && (
-            <span className="text-gray-500 mt-1 text-xs">
+            <span className="mt-1 text-xs text-muted-foreground">
               Auto-refreshing every{' '}
               {(dataConfig.refreshInterval ?? 60000) / 1000}s
             </span>
@@ -316,17 +316,15 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
       <div className="h-64 w-full">{renderChart()}</div>
 
       {/* Status indicators */}
-      <div className="text-gray-500 mt-2 flex items-center justify-between text-xs">
+      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
         <div className="flex items-center space-x-4">
           {/* Data source indicator */}
           <div className="flex items-center space-x-1">
             <div
-              className={`h-2 w-2 rounded-full ${
+              className={`h-2 w-2 rounded-none ${
                 useBackend && !backendError
-                  ? 'bg-green-500'
-                  : error
-                    ? 'bg-red-500'
-                    : 'bg-yellow-500'
+                  ? 'bg-primary'
+                  : 'border border-muted-foreground'
               }`}
             ></div>
             <span>
@@ -342,7 +340,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
           {useBackend && (
             <button
               onClick={refreshBackendData}
-              className="hover:text-blue-600 flex items-center space-x-1 transition-colors"
+              className="flex items-center space-x-1 transition-colors hover:text-foreground"
               title="Refresh data"
             >
               <svg
@@ -376,7 +374,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
 
       {/* Error display */}
       {error && (
-        <div className="bg-yellow-50 border-yellow-200 text-yellow-800 mt-2 rounded border p-2 text-xs">
+        <div className="mt-2 rounded-none border border-ring bg-secondary p-2 text-xs font-medium text-foreground">
           <div className="flex items-center space-x-1">
             <svg
               className="h-4 w-4"

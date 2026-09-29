@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 
-from skillreducer.llm.client import LLMClient
 from skillreducer.llm import prompts
+from skillreducer.llm.client import LLMClient
 from skillreducer.models import ContentItem, ContentType
 
 
@@ -42,17 +42,21 @@ def _heuristic_classify(paragraph: str, index: int) -> ContentItem:
     lower = paragraph.lower()
     heading = paragraph.splitlines()[0].lower() if paragraph else ""
 
-    if re.search(r"```", paragraph) and any(k in lower for k in ("example", "input:", "output:")):
-        content_type = ContentType.EXAMPLE
-    elif any(k in heading for k in ("example", "examples")):
+    if (
+        re.search(r"```", paragraph)
+        and any(k in lower for k in ("example", "input:", "output:"))
+        or any(k in heading for k in ("example", "examples"))
+    ):
         content_type = ContentType.EXAMPLE
     elif any(k in heading for k in ("template", "boilerplate", "format")):
         content_type = ContentType.TEMPLATE
     elif any(k in heading for k in ("background", "rationale", "why", "overview")):
         content_type = ContentType.BACKGROUND
-    elif paragraph.strip() == paragraph.strip().upper() and len(paragraph) < 120:
-        content_type = ContentType.REDUNDANT
-    elif paragraph.count(paragraph[:40]) > 1:
+    elif (
+        paragraph.strip() == paragraph.strip().upper()
+        and len(paragraph) < 120
+        or paragraph.count(paragraph[:40]) > 1
+    ):
         content_type = ContentType.REDUNDANT
     else:
         content_type = ContentType.CORE_RULE

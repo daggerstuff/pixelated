@@ -19,12 +19,10 @@ const config = getMonitoringConfig()
 </script>
 
 {/* Add Grafana Faro Web SDK if RUM is enabled */}
-{
-  config.grafana.enableRUM && (
-    <script
-      src="https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js"
-      async
-      is:inline
-    />
-  )
-}
+{config.grafana.enableRUM && (
+  <script
+    src="https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js"
+    async
+    is:inline
+  ></script>
+)}

@@ -6,7 +6,6 @@ export class EmailService {
     role: string,
   ): Promise<void> {
     // Security: Never log credentials. Redact temporary password.
-
     // In a real implementation, this would use nodemailer or similar
     // to send actual emails
   }

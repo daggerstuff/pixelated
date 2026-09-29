@@ -56,11 +56,9 @@ export interface SelectProps {
       disabled={(Astro.props as any).disabled}
       class:list={['input', (Astro.props as any).error && 'input-error']}
     />
-    {
-      (Astro.props as any).error && (
-        <span class="form-error">{(Astro.props as any).error}</span>
-      )
-    }
+    {(Astro.props as any).error && (
+      <span class="form-error">{(Astro.props as any).error}</span>
+    )}
   </div>
 </fragment>
 

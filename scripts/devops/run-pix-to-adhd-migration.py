@@ -11,14 +11,31 @@ import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+from typing import Any, TypedDict, cast
 
 BATCH_SIZE = 50
 
 
-def adf_description(text: str) -> dict:
-    paragraphs = []
-    for line in text.splitlines() or [text]:
-        line = line.strip()
+class AdfText(TypedDict):
+    type: str
+    text: str
+
+
+class AdfParagraph(TypedDict):
+    type: str
+    content: list[AdfText]
+
+
+class AdfDoc(TypedDict):
+    type: str
+    version: int
+    content: list[AdfParagraph]
+
+
+def adf_description(text: str) -> AdfDoc:
+    paragraphs: list[AdfParagraph] = []
+    for line_text in text.splitlines() or [text]:
+        line = line_text.strip()
         if not line:
             continue
         paragraphs.append(
@@ -42,8 +59,9 @@ def request_json(
     url: str,
     user: str,
     token: str,
-    payload: dict | None = None,
-) -> dict:
+    payload: dict[str, Any] | None = None,
+) -> dict[str, Any] | list[Any]:
+    """Issue endpoints return a JSON object; user search returns a JSON array."""
     data = None
     headers = {"Accept": "application/json"}
     if payload is not None:
@@ -58,13 +76,14 @@ def request_json(
     try:
         with urllib.request.urlopen(req, timeout=120) as resp:
             body = resp.read().decode("utf-8")
-            return json.loads(body) if body else {}
+            result: dict[str, Any] | list[Any] = json.loads(body) if body else {}
+            return result
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"{method} {url} -> HTTP {exc.code}: {detail}") from exc
 
 
-def create_issue(site: str, user: str, token: str, issue: dict) -> str:
+def create_issue(site: str, user: str, token: str, issue: dict[str, Any]) -> str:
     fields = {
         "project": {"key": issue["projectKey"]},
         "summary": issue["summary"],
@@ -86,7 +105,10 @@ def create_issue(site: str, user: str, token: str, issue: dict) -> str:
         token,
         payload,
     )
-    return response["key"]
+    # POST /issue always returns a JSON object with the created issue "key".
+    created = cast(dict[str, Any], response)
+    key: str = created["key"]
+    return key
 
 
 def lookup_account_id(site: str, user: str, token: str, email: str) -> str:
@@ -101,7 +123,10 @@ def lookup_account_id(site: str, user: str, token: str, email: str) -> str:
     )
     if not response:
         raise RuntimeError(f"No Jira user found for {email}")
-    return response[0]["accountId"]
+    # GET /user/search always returns a JSON array of user objects.
+    users = cast(list[dict[str, Any]], response)
+    account_id: str = users[0]["accountId"]
+    return account_id
 
 
 def main() -> None:
@@ -126,7 +151,7 @@ def main() -> None:
 
     mapping: dict[str, str] = {}
     if args.dry_run:
-        for issue in issues[:5]:
+        for _issue in issues[:5]:
             pass
         return
 
@@ -134,9 +159,8 @@ def main() -> None:
     if issues and issues[0].get("assignee"):
         assignee_id = lookup_account_id(site, args.email, args.token, issues[0]["assignee"])
 
-    for index, issue in enumerate(issues, start=1):
-        if assignee_id and issue.get("assignee"):
-            issue = {**issue, "assignee_id": assignee_id}
+    for index, item in enumerate(issues, start=1):
+        issue = {**item, "assignee_id": assignee_id} if (assignee_id and item.get("assignee")) else item
         source_label = next((label for label in issue.get("label", []) if label.startswith("source-pix-")), None)
         source_key = source_label.replace("source-", "").upper() if source_label else f"ROW-{index}"
 
@@ -158,7 +182,9 @@ def main() -> None:
             args.token,
             {"fields": fields},
         )
-        dest_key = response["key"]
+        # POST /issue always returns a JSON object with the created issue "key".
+        created = cast(dict[str, Any], response)
+        dest_key: str = created["key"]
         mapping[source_key] = dest_key
         time.sleep(0.15)
 

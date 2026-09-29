@@ -16,73 +16,71 @@ const {
       <p class="brutalist-caption">{subtitle}</p>
       <h3 class="brutalist-subheading text-xl md:text-2xl">{title}</h3>
     </div>
-    <div
-      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 items-center justify-items-center"
-    >
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 items-center justify-items-center">
       <div
-        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        class="group logo-item h-12 w-20 rounded-none border border-border bg-card transition-colors duration-300 hover:border-ring md:h-16 md:w-24"
         aria-label="Harvard University"
       >
         <img
           src="/images/logos/harvard-university.png"
           alt="Harvard University"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>Harvard</span>';"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-muted-foreground\'>Harvard</span>';"
         />
       </div>
       <div
-        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        class="group logo-item h-12 w-20 rounded-none border border-border bg-card transition-colors duration-300 hover:border-ring md:h-16 md:w-24"
         aria-label="Johns Hopkins"
       >
         <img
           src="/images/logos/johns-hopkins.png"
           alt="Johns Hopkins"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>Johns Hopkins</span>';"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-muted-foreground\'>Johns Hopkins</span>';"
         />
       </div>
       <div
-        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        class="group logo-item h-12 w-20 rounded-none border border-border bg-card transition-colors duration-300 hover:border-ring md:h-16 md:w-24"
         aria-label="Mayo Clinic"
       >
         <img
           src="/images/logos/mayo-clinic.png"
           alt="Mayo Clinic"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>Mayo Clinic</span>';"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-muted-foreground\'>Mayo Clinic</span>';"
         />
       </div>
       <div
-        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        class="group logo-item h-12 w-20 rounded-none border border-border bg-card transition-colors duration-300 hover:border-ring md:h-16 md:w-24"
         aria-label="VA Health"
       >
         <img
           src="/images/logos/va-health.png"
           alt="VA Health"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>VA Health</span>';"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-muted-foreground\'>VA Health</span>';"
         />
       </div>
       <div
-        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        class="group logo-item h-12 w-20 rounded-none border border-border bg-card transition-colors duration-300 hover:border-ring md:h-16 md:w-24"
         aria-label="Kaiser Permanente"
       >
         <img
           src="/images/logos/kaiser-permanente.png"
           alt="Kaiser Permanente"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>Kaiser</span>';"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-muted-foreground\'>Kaiser</span>';"
         />
       </div>
       <div
-        class="group logo-item w-20 h-12 md:w-24 md:h-16 rounded-lg border border-gray-800 bg-gray-900/40 hover:border-gray-600 transition-all duration-300"
+        class="group logo-item h-12 w-20 rounded-none border border-border bg-card transition-colors duration-300 hover:border-ring md:h-16 md:w-24"
         aria-label="NIMH"
       >
         <img
           src="/images/logos/nih.png"
           alt="NIMH"
           class="max-w-full max-h-full object-contain opacity-70 group-hover:opacity-100 transition-opacity"
-          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-gray-500\'>NIMH</span>';"
+          onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-xs text-muted-foreground\'>NIMH</span>';"
         />
       </div>
     </div>
@@ -123,7 +121,7 @@ const {
   /* Fallback text styling when image fails */
   .logo-item span {
     font-size: 0.625rem;
-    color: rgba(156, 163, 175, 0.6);
+    color: var(--np-muted, #8c8c8c);
     text-align: center;
     display: flex;
     align-items: center;

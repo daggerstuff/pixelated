@@ -35,12 +35,12 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
   }
 
   return (
-    <div className="bg-black fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-opacity-50 p-4">
-      <div className="bg-white dark:bg-gray-800 relative w-full max-w-md rounded-lg p-6">
+    <div className="bg-foreground/60 fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
+      <div className="relative w-full max-w-md rounded-none border border-border bg-card p-6">
         <button
           type="button"
           onClick={onClose}
-          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 absolute right-3 top-3"
+          className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
           aria-label={TEXT.closeAriaLabel}
         >
           <svg
@@ -64,14 +64,14 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
           <div>
             <h4 className="text-md mb-2 font-medium">{TEXT.overview}</h4>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                <p className="text-gray-500 dark:text-gray-400 text-xs">
+              <div className="rounded-none bg-secondary p-3">
+                <p className="text-xs text-muted-foreground">
                   {TEXT.totalSessions}
                 </p>
                 <p className="text-2xl font-bold">{metrics.sessionCount}</p>
               </div>
-              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                <p className="text-gray-500 dark:text-gray-400 text-xs">
+              <div className="rounded-none bg-secondary p-3">
+                <p className="text-xs text-muted-foreground">
                   {TEXT.averageScore}
                 </p>
                 <p className="text-2xl font-bold">{metrics.averageScore}%</p>
@@ -87,13 +87,13 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
                   {TEXT.skillsImproving}
                 </p>
                 {metrics.skillsImproving.length > 0 ? (
-                  <ul className="text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm">
+                  <ul className="list-disc pl-5 text-sm text-muted-foreground">
                     {metrics.skillsImproving.map((skill) => (
                       <li key={skill}>{skill}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500 dark:text-gray-400 text-sm italic">
+                  <p className="text-sm italic text-muted-foreground">
                     {TEXT.noProgressYet}
                   </p>
                 )}
@@ -103,13 +103,13 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
                   {TEXT.skillsNeedingFocus}
                 </p>
                 {metrics.skillsNeeding.length > 0 ? (
-                  <ul className="text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm">
+                  <ul className="list-disc pl-5 text-sm text-muted-foreground">
                     {metrics.skillsNeeding.map((skill) => (
                       <li key={skill}>{skill}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500 dark:text-gray-400 text-sm italic">
+                  <p className="text-sm italic text-muted-foreground">
                     {TEXT.keepPracticing}
                   </p>
                 )}
@@ -122,7 +122,7 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
           <button
             type="button"
             onClick={onClose}
-            className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2"
+            className="hover:bg-primary/90 rounded-none bg-primary px-4 py-2 text-primary-foreground"
           >
             {TEXT.closeButton}
           </button>

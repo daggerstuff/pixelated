@@ -60,14 +60,12 @@ const coverageTopics = [
   <section class="marketing-section">
     <div class="marketing-shell">
       <div class="marketing-grid marketing-grid--3">
-        {
-          quickFacts.map((fact) => (
-            <article class="marketing-card">
-              <span class="marketing-card__label">{fact.label}</span>
-              <p>{fact.value}</p>
-            </article>
-          ))
-        }
+        {quickFacts.map((fact) => (
+          <article class="marketing-card">
+            <span class="marketing-card__label">{fact.label}</span>
+            <p>{fact.value}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>
@@ -88,7 +86,9 @@ const coverageTopics = [
         <article class="marketing-card">
           <span class="marketing-card__label">Useful topics</span>
           <ul class="marketing-list">
-            {coverageTopics.map((topic) => <li>{topic}</li>)}
+            {coverageTopics.map((topic) => (
+              <li>{topic}</li>
+            ))}
           </ul>
         </article>
       </div>

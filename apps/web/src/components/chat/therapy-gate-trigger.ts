@@ -1,5 +1,7 @@
 export async function triggerTherapyGateSubmit() {
-  const fn = (window as typeof window & { handleTherapyGateSubmit?: () => void }).handleTherapyGateSubmit
+  const fn = (
+    window as typeof window & { handleTherapyGateSubmit?: () => void }
+  ).handleTherapyGateSubmit
   if (typeof fn === 'function') {
     fn()
     return
@@ -11,7 +13,9 @@ export async function triggerTherapyGateSubmit() {
     '[data-testid="chat-history"]',
   ) as HTMLElement | null
   if (!textarea?.value.trim()) return
-  const gateUrl = (window as typeof window & { gateApiUrl?: string }).gateApiUrl ?? '/api/ingestion/gate'
+  const gateUrl =
+    (window as typeof window & { gateApiUrl?: string }).gateApiUrl ??
+    '/api/ingestion/gate'
   const message = textarea.value
   textarea.value = ''
   try {
@@ -33,7 +37,7 @@ export async function triggerTherapyGateSubmit() {
       blockEl.setAttribute('role', 'alert')
       blockEl.setAttribute('data-testid', 'safety-block')
       blockEl.className =
-        'border-red-300 bg-red-50 text-red-900 rounded-lg border px-4 py-3 shadow-sm'
+        'border-ring bg-secondary text-foreground rounded-none border px-4 py-3'
       const title = document.createElement('p')
       title.className = 'font-semibold'
       title.textContent = 'Message blocked for safety'
@@ -51,7 +55,7 @@ export async function triggerTherapyGateSubmit() {
       const msgEl = document.createElement('div')
       msgEl.setAttribute('data-testid', 'message-user')
       msgEl.className =
-        'max-w-[85%] rounded-2xl px-4 py-3 text-sm bg-blue-600 text-white ml-auto'
+        'max-w-[85%] rounded-none px-4 py-3 text-sm bg-primary text-primary-foreground ml-auto'
       msgEl.textContent = message
       chatHistory?.appendChild(msgEl)
     }

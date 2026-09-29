@@ -9,18 +9,21 @@ You do **not** need to read the research paper first.
 
 **SkillReducer** makes agent **skills** cheaper to run by cutting **tokens**.
 
-A skill is usually a folder with a `SKILL.md` file (instructions for an AI agent).  
+A skill is usually a folder with a `SKILL.md` file (instructions for an AI
+agent).  
 Long skills cost more money and can confuse the model. This tool:
 
-1. **Audits** — shows how many tokens a skill uses  
-2. **Reduces** — shortens the skill while keeping what matters  
-3. **Optional TSCG** — if **you provide an MCP tools JSON**, also compresses tool schemas  
+1. **Audits** — shows how many tokens a skill uses
+2. **Reduces** — shortens the skill while keeping what matters
+3. **Optional TSCG** — if **you provide an MCP tools JSON**, also compresses
+   tool schemas
 
 ---
 
 ## How reduction works (big picture)
 
-Tokens come from **two places**. SkillReducer handles skills; TSCG handles tools **only if you give it JSON**.
+Tokens come from **two places**. SkillReducer handles skills; TSCG handles tools
+**only if you give it JSON**.
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
@@ -46,24 +49,26 @@ Tokens come from **two places**. SkillReducer handles skills; TSCG handles tools
                    optimized/<skill>/
 ```
 
-| What you want | What you must provide | What gets smaller |
-|---------------|----------------------|-------------------|
-| Lean skill only | `SKILL.md` folder | Skill text |
+| What you want               | What you must provide       | What gets smaller               |
+| --------------------------- | --------------------------- | ------------------------------- |
+| Lean skill only             | `SKILL.md` folder           | Skill text                      |
 | Lean skill **+** lean tools | Skill folder **+ MCP JSON** | Skill text **and** tool schemas |
 
-**Important:** SkillReducer does **not** invent your MCP tools. For tool compression you **must provide** the MCP/tools JSON yourself (`--tools tools.json` or `mcp_manifest.json` in the skill folder).
+**Important:** SkillReducer does **not** invent your MCP tools. For tool
+compression you **must provide** the MCP/tools JSON yourself
+(`--tools tools.json` or `mcp_manifest.json` in the skill folder).
 
 ---
 
 ## What you need
 
-| Tool | Required? | Why |
-|------|-----------|-----|
-| **Python 3.11+** | Yes | Runs SkillReducer |
-| **Skill folder** (`SKILL.md`) | Yes | What gets reduced |
-| **API key** (OpenAI-compatible) | Optional | Better compression; without it use `--no-llm` |
-| **MCP tools JSON** | Required for `--tscg` | Your tool schemas to compress |
-| **Node.js 18+** | Only for TSCG | Runs `@tscg/core` |
+| Tool                            | Required?             | Why                                           |
+| ------------------------------- | --------------------- | --------------------------------------------- |
+| **Python 3.11+**                | Yes                   | Runs SkillReducer                             |
+| **Skill folder** (`SKILL.md`)   | Yes                   | What gets reduced                             |
+| **API key** (OpenAI-compatible) | Optional              | Better compression; without it use `--no-llm` |
+| **MCP tools JSON**              | Required for `--tscg` | Your tool schemas to compress                 |
+| **Node.js 18+**                 | Only for TSCG         | Runs `@tscg/core`                             |
 
 ---
 
@@ -124,11 +129,11 @@ This only reduces **skill** tokens. No MCP JSON needed yet.
 
 ## How skill reduction works (detail)
 
-| Stage | What it does | Token effect |
-|-------|--------------|--------------|
-| **Stage 1** | Compresses or generates the YAML `description` (routing text) | Smaller always-on skill menu |
-| **Stage 2** | Keeps core rules in `SKILL.md`; moves examples/background to separate files | Smaller body when skill activates; refs load on demand |
-| **Stage 3** (optional) | Pulls large code blocks into `scripts/` | Less code pasted inside markdown |
+| Stage                  | What it does                                                                | Token effect                                           |
+| ---------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------ |
+| **Stage 1**            | Compresses or generates the YAML `description` (routing text)               | Smaller always-on skill menu                           |
+| **Stage 2**            | Keeps core rules in `SKILL.md`; moves examples/background to separate files | Smaller body when skill activates; refs load on demand |
+| **Stage 3** (optional) | Pulls large code blocks into `scripts/`                                     | Less code pasted inside markdown                       |
 
 **Before → after (idea):**
 
@@ -169,9 +174,9 @@ Minimal example:
 }
 ```
 
-| How you pass it | Command |
-|-----------------|---------|
-| Separate file | `--tools path/to/tools.json` |
+| How you pass it     | Command                                             |
+| ------------------- | --------------------------------------------------- |
+| Separate file       | `--tools path/to/tools.json`                        |
 | Inside skill folder | Put `mcp_manifest.json` in the skill, then `--tscg` |
 
 Without one of these, `--tscg` is skipped with: `TSCG skipped: no tools`.
@@ -265,32 +270,37 @@ extract_pdf(path:str!, pages?:str) -> text
 merge_pdfs(inputs:str[]!, output:str!) -> file
 ```
 
-| Piece | Meaning |
-|-------|---------|
-| `path:str!` | required string (`!` = required) |
-| `pages?:str` | optional string |
-| `inputs:str[]!` | required array of strings |
-| `-> text` | short result hint from the description |
+| Piece           | Meaning                                |
+| --------------- | -------------------------------------- |
+| `path:str!`     | required string (`!` = required)       |
+| `pages?:str`    | optional string                        |
+| `inputs:str[]!` | required array of strings              |
+| `-> text`       | short result hint from the description |
 
-Same tools, far fewer tokens: verbose JSON keys (`type`, `function`, `parameters`, `properties`, `description`, …) are dropped; types and required flags stay.
+Same tools, far fewer tokens: verbose JSON keys (`type`, `function`,
+`parameters`, `properties`, `description`, …) are dropped; types and required
+flags stay.
 
 Typical savings on schemas: about **50–70%** (TSCG paper/benchmarks).  
-Skill savings: about **~48% description / ~39% body** (SkillReducer paper) when LLM mode works well.
+Skill savings: about **~48% description / ~39% body** (SkillReducer paper) when
+LLM mode works well.
 
-Full beginner steps for tools: [`skillreducer/tscg/README.md`](skillreducer/tscg/README.md).
+Full beginner steps for tools:
+[`skillreducer/tscg/README.md`](skillreducer/tscg/README.md).
 
 ---
 
 ## What just happened?
 
-| Command | Meaning |
-|---------|---------|
-| `audit` | Count skill tokens and flag common problems |
-| `reduce` | Write a smaller skill into `optimized/` |
-| `reduce --tscg --tools …` | Same + compress **your** MCP JSON schemas |
-| `revise …` | **Optional** SkillRevise (separate paper) — does **not** change reduce |
+| Command                   | Meaning                                                                |
+| ------------------------- | ---------------------------------------------------------------------- |
+| `audit`                   | Count skill tokens and flag common problems                            |
+| `reduce`                  | Write a smaller skill into `optimized/`                                |
+| `reduce --tscg --tools …` | Same + compress **your** MCP JSON schemas                              |
+| `revise …`                | **Optional** SkillRevise (separate paper) — does **not** change reduce |
 
-**Important:** originals are not overwritten. Output goes to `optimized/` by default.
+**Important:** originals are not overwritten. Output goes to `optimized/` by
+default.
 
 Optional quality pass (vendored under `src/skillrevise/`):
 
@@ -320,7 +330,8 @@ YOU:  skill folder  +  (optional) MCP JSON you provide
      optimized/<skill-name>/
 ```
 
-Full simple flow + one example: [docs/REDUCTION_FLOW.md](docs/REDUCTION_FLOW.md).
+Full simple flow + one example:
+[docs/REDUCTION_FLOW.md](docs/REDUCTION_FLOW.md).
 
 ---
 
@@ -335,7 +346,7 @@ No. You export or copy schemas into JSON and pass that file.
 **Do I need Stage 3?**  
 No. Stages 1–2 are enough for most skills.
 
-**Where do I put my own skill?**  
+**Where do I put my own skill?**
 
 ```text
 my-skill/
@@ -350,16 +361,16 @@ Use `--no-llm`, or set `api_key` in `.env`.
 
 ## Next steps
 
-| Goal | Go here |
-|------|---------|
-| Full docs | [README.md](README.md) |
-| MCP JSON + TSCG for beginners | [skillreducer/tscg/README.md](skillreducer/tscg/README.md) |
-| **Papers (SkillReducer + TSCG)** | [docs/PAPERS.md](docs/PAPERS.md) |
-| **Flow + one example** | [docs/REDUCTION_FLOW.md](docs/REDUCTION_FLOW.md) |
-| SkillReducer paper detail | [PAPER_DETAIL.md](PAPER_DETAIL.md) |
-| TSCG paper detail | [docs/TSCG_PAPER_DETAIL.md](docs/TSCG_PAPER_DETAIL.md) |
-| Sample skills | [data/README.md](data/README.md) |
-| Citations | [CITATION.md](CITATION.md) |
+| Goal                             | Go here                                                    |
+| -------------------------------- | ---------------------------------------------------------- |
+| Full docs                        | [README.md](README.md)                                     |
+| MCP JSON + TSCG for beginners    | [skillreducer/tscg/README.md](skillreducer/tscg/README.md) |
+| **Papers (SkillReducer + TSCG)** | [docs/PAPERS.md](docs/PAPERS.md)                           |
+| **Flow + one example**           | [docs/REDUCTION_FLOW.md](docs/REDUCTION_FLOW.md)           |
+| SkillReducer paper detail        | [PAPER_DETAIL.md](PAPER_DETAIL.md)                         |
+| TSCG paper detail                | [docs/TSCG_PAPER_DETAIL.md](docs/TSCG_PAPER_DETAIL.md)     |
+| Sample skills                    | [data/README.md](data/README.md)                           |
+| Citations                        | [CITATION.md](CITATION.md)                                 |
 
 ---
 

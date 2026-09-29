@@ -6,7 +6,7 @@
  */
 
 import type { RedisClientType } from 'redis'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('metrics-utils')
 
 export interface MetricData {

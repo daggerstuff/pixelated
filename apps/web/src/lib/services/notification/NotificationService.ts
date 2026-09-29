@@ -226,7 +226,9 @@ export class NotificationService {
   private async initializeCrisisTemplate(): Promise<void> {
     if (!this.templates.has(CRISIS_ALERT_TEMPLATE_ID)) {
       // adminEmail may not be present on config.notifications type, but is expected here.
-      const adminEmail = (config.notifications as { adminEmail?: () => string }).adminEmail?.()
+      const adminEmail = (
+        config.notifications as { adminEmail?: () => string }
+      ).adminEmail?.()
       if (!adminEmail) {
         logger.warn(
           'Admin email not configured. Crisis email alerts will not be sent by default template.',

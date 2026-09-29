@@ -43,6 +43,13 @@ interface EmotionTrackingChartProps {
  * This component creates a timeline visualization of emotional dimensions (valence,
  * arousal, dominance) to help therapists identify patterns during sessions.
  */
+// section-2.1 bounded series palette (data marks only — chrome stays neutral)
+const SERIES_STROKES = {
+  valence: '#3b82f6',
+  arousal: '#ef4444',
+  dominance: '#22c55e',
+} as const
+
 export default function EmotionTrackingChart({
   data = [],
   height = 300,
@@ -88,10 +95,10 @@ export default function EmotionTrackingChart({
   // Loading state
   if (isLoading) {
     return (
-      <div className="bg-gray-50 flex items-center justify-center rounded-lg p-6">
+      <div className="flex items-center justify-center rounded-none bg-secondary p-6">
         <div className="flex w-full animate-pulse flex-col">
-          <div className="bg-gray-200 mb-2.5 h-4 w-3/4 rounded"></div>
-          <div className="bg-gray-200 h-40 w-full rounded"></div>
+          <div className="bg-secondary-foreground/10 mb-2.5 h-4 w-3/4 rounded-none"></div>
+          <div className="bg-secondary-foreground/10 h-40 w-full rounded-none"></div>
         </div>
       </div>
     )
@@ -100,11 +107,11 @@ export default function EmotionTrackingChart({
   // Empty state
   if (data.length === 0) {
     return (
-      <div className="bg-gray-50 flex flex-col items-center justify-center rounded-lg p-6">
-        <p className="text-gray-500 mb-2">
+      <div className="flex flex-col items-center justify-center rounded-none bg-secondary p-6">
+        <p className="mb-2 text-foreground">
           No emotion data available for this session
         </p>
-        <p className="text-gray-400 text-sm">
+        <p className="text-sm text-muted-foreground">
           Data will appear as the session progresses
         </p>
       </div>
@@ -112,9 +119,11 @@ export default function EmotionTrackingChart({
   }
 
   return (
-    <div className={cn('p-4 bg-white rounded-lg shadow-sm', className)}>
+    <div
+      className={cn('p-4 bg-card border border-border rounded-none', className)}
+    >
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-gray-900 text-lg font-medium">
+        <h3 className="text-lg font-medium text-foreground">
           Emotional Dimensions
         </h3>
 
@@ -138,10 +147,10 @@ export default function EmotionTrackingChart({
       <div className="mb-4 flex flex-wrap gap-2">
         <button
           onClick={() => toggleDimension('valence')}
-          className={`rounded-full px-3 py-1 text-xs transition-colors ${
+          className={`rounded-none px-3 py-1 text-xs transition-colors ${
             dimensions.includes('valence')
-              ? 'bg-blue-100 text-blue-800 border-blue-300 border'
-              : 'bg-gray-100 text-gray-600 border-gray-200 border'
+              ? 'border border-ring bg-secondary font-medium text-foreground'
+              : 'border border-border bg-secondary text-muted-foreground'
           }`}
           aria-pressed={dimensions.includes('valence')}
         >
@@ -149,10 +158,10 @@ export default function EmotionTrackingChart({
         </button>
         <button
           onClick={() => toggleDimension('arousal')}
-          className={`rounded-full px-3 py-1 text-xs transition-colors ${
+          className={`rounded-none px-3 py-1 text-xs transition-colors ${
             dimensions.includes('arousal')
-              ? 'bg-red-100 text-red-800 border-red-300 border'
-              : 'bg-gray-100 text-gray-600 border-gray-200 border'
+              ? 'border border-ring bg-secondary font-semibold text-foreground'
+              : 'border border-border bg-secondary text-muted-foreground'
           }`}
           aria-pressed={dimensions.includes('arousal')}
         >
@@ -160,10 +169,10 @@ export default function EmotionTrackingChart({
         </button>
         <button
           onClick={() => toggleDimension('dominance')}
-          className={`rounded-full px-3 py-1 text-xs transition-colors ${
+          className={`rounded-none px-3 py-1 text-xs transition-colors ${
             dimensions.includes('dominance')
-              ? 'bg-green-100 text-green-800 border-green-300 border'
-              : 'bg-gray-100 text-gray-600 border-gray-200 border'
+              ? 'border border-input bg-secondary text-muted-foreground'
+              : 'border border-border bg-secondary text-muted-foreground'
           }`}
           aria-pressed={dimensions.includes('dominance')}
         >
@@ -205,7 +214,7 @@ export default function EmotionTrackingChart({
               type="monotone"
               dataKey="valence"
               name="valence"
-              stroke="#3b82f6"
+              stroke={SERIES_STROKES.valence}
               activeDot={{ r: 8 }}
               connectNulls
             />
@@ -216,7 +225,7 @@ export default function EmotionTrackingChart({
               type="monotone"
               dataKey="arousal"
               name="arousal"
-              stroke="#ef4444"
+              stroke={SERIES_STROKES.arousal}
               activeDot={{ r: 8 }}
               connectNulls
             />
@@ -227,7 +236,7 @@ export default function EmotionTrackingChart({
               type="monotone"
               dataKey="dominance"
               name="dominance"
-              stroke="#22c55e"
+              stroke={SERIES_STROKES.dominance}
               activeDot={{ r: 8 }}
               connectNulls
             />
@@ -236,7 +245,7 @@ export default function EmotionTrackingChart({
       </ResponsiveContainer>
 
       {/* Legend explanation */}
-      <div className="border-gray-100 text-gray-500 mt-4 border-t pt-2 text-xs">
+      <div className="mt-4 border-t border-border pt-2 text-xs text-muted-foreground">
         <p>
           <strong>Valence:</strong> How positive or negative the emotional state
           (0-10)

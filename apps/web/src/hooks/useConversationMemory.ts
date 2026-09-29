@@ -224,7 +224,9 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
         (state === 'paused' || state === 'ended')
       ) {
         const now = Date.now()
-        const elapsed = Math.floor((now - (lastActiveTimeRef.current ?? 0)) / 1000)
+        const elapsed = Math.floor(
+          (now - (lastActiveTimeRef.current ?? 0)) / 1000,
+        )
 
         const metricsUpdate: Partial<SessionProgressMetrics> = {
           activeTime: (progressMetrics.activeTime ?? 0) + elapsed,

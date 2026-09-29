@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import tempfile
+from pathlib import Path
 
 import art
 import weave
@@ -53,7 +54,7 @@ SFT_WARMUP_STEPS = 50  # Number of SFT steps to run before RL
 # instead of redefining a local copy here.
 
 
-async def main():
+async def main() -> None:
     weave.init(PROJECT)
     logging.info("Loading dataset...")
     examples = load_dataset(DATASET_PATH)

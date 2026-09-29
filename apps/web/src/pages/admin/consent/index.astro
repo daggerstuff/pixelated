@@ -13,16 +13,16 @@ await requirePageAuth(Astro, 'admin')
   title="Consent Management"
   description="Manage patient consent options, versions, and monitor consent status"
 >
-  <div class="bg-white p-6 shadow rounded-lg mb-6">
+  <div class="bg-card border border-border p-6 rounded-none mb-6">
     <div class="flex items-start mb-6">
-      <div class="mr-4 bg-green-100 p-2 rounded-lg">
-        <Icon name="tabler:clipboard-check" class="h-8 w-8 text-green-600" />
+      <div class="mr-4 bg-secondary border border-input p-2 rounded-none">
+        <Icon name="tabler:clipboard-check" class="h-8 w-8 text-foreground" />
       </div>
       <div>
         <h2 class="text-lg font-semibold">
           HIPAA-Compliant Consent Management
         </h2>
-        <p class="text-gray-600">
+        <p class="text-muted-foreground">
           This dashboard provides tools to create and manage consent types,
           consent document versions, and monitor user consent status in
           compliance with HIPAA regulations.
@@ -33,40 +33,40 @@ await requirePageAuth(Astro, 'admin')
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
       <a
         href="/admin/consent/types"
-        class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+        class="flex items-center p-3 bg-secondary rounded-none hover:bg-accent transition-colors"
       >
-        <div class="mr-3 bg-blue-100 p-2 rounded-full">
-          <Icon name="tabler:category" class="h-5 w-5 text-blue-600" />
+        <div class="mr-3 bg-secondary border border-input p-2 rounded-none">
+          <Icon name="tabler:category" class="h-5 w-5 text-foreground" />
         </div>
         <div>
           <h3 class="font-medium">Consent Types</h3>
-          <p class="text-sm text-gray-500">Manage consent categories</p>
+          <p class="text-sm text-muted-foreground">Manage consent categories</p>
         </div>
       </a>
 
       <a
         href="/admin/consent/versions"
-        class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+        class="flex items-center p-3 bg-secondary rounded-none hover:bg-accent transition-colors"
       >
-        <div class="mr-3 bg-purple-100 p-2 rounded-full">
-          <Icon name="tabler:versions" class="h-5 w-5 text-purple-600" />
+        <div class="mr-3 bg-secondary border border-input p-2 rounded-none">
+          <Icon name="tabler:versions" class="h-5 w-5 text-foreground" />
         </div>
         <div>
           <h3 class="font-medium">Document Versions</h3>
-          <p class="text-sm text-gray-500">Manage consent documents</p>
+          <p class="text-sm text-muted-foreground">Manage consent documents</p>
         </div>
       </a>
 
       <a
         href="/admin/consent/options"
-        class="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+        class="flex items-center p-3 bg-secondary rounded-none hover:bg-accent transition-colors"
       >
-        <div class="mr-3 bg-green-100 p-2 rounded-full">
-          <Icon name="tabler:list-details" class="h-5 w-5 text-green-600" />
+        <div class="mr-3 bg-secondary border border-input p-2 rounded-none">
+          <Icon name="tabler:list-details" class="h-5 w-5 text-foreground" />
         </div>
         <div>
           <h3 class="font-medium">Consent Options</h3>
-          <p class="text-sm text-gray-500">Manage granular options</p>
+          <p class="text-sm text-muted-foreground">Manage granular options</p>
         </div>
       </a>
     </div>

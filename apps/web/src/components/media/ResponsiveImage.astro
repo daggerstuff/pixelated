@@ -44,82 +44,78 @@ const isRemoteImage =
 const aspectRatio = width && height ? width / height : undefined
 ---
 
-{
-  isRemoteImage ? (
-    <div class={`responsive-image-wrapper ${wrapperClass}`}>
-      <picture>
-        {format === 'avif' && (
-          <source
-            type="image/avif"
-            srcset={breakpoints
-              .map(
-                (bp: number) =>
-                  `${src}?w=${bp}&format=avif&q=${quality} ${bp}w`,
-              )
-              .join(', ')}
-            sizes={sizes}
-          />
-        )}
-        {(format === 'webp' || format === 'avif') && (
-          <source
-            type="image/webp"
-            srcset={breakpoints
-              .map(
-                (bp: number) =>
-                  `${src}?w=${bp}&format=webp&q=${quality} ${bp}w`,
-              )
-              .join(', ')}
-            sizes={sizes}
-          />
-        )}
-        <img
-          src={`${src}?w=${width || breakpoints[3]}&format=${format === 'avif' || format === 'webp' ? 'jpg' : format}&q=${quality}`}
+{isRemoteImage ? (
+  <div class={`responsive-image-wrapper ${wrapperClass}`}>
+    <picture>
+      {format === 'avif' && (
+        <source
+          type="image/avif"
           srcset={breakpoints
             .map(
-              (bp: number) =>
-                `${src}?w=${bp}&format=${format === 'avif' || format === 'webp' ? 'jpg' : format}&q=${quality} ${bp}w`,
+              (bp: number) => `${src}?w=${bp}&format=avif&q=${quality} ${bp}w`,
             )
             .join(', ')}
-          alt={alt}
-          width={width}
-          height={height}
-          loading={priority ? 'eager' : loading}
-          decoding={decoding}
-          fetchpriority={priority ? 'high' : undefined}
-          class={`responsive-image ${className} ${blurUp ? 'blur-up' : ''}`}
+          {sizes}
+        />
+      )}
+      {(format === 'webp' || format === 'avif') && (
+        <source
+          type="image/webp"
+          srcset={breakpoints
+            .map(
+              (bp: number) => `${src}?w=${bp}&format=webp&q=${quality} ${bp}w`,
+            )
+            .join(', ')}
+          {sizes}
+        />
+      )}
+      <img
+        src={`${src}?w=${width || breakpoints[3]}&format=${format === 'avif' || format === 'webp' ? 'jpg' : format}&q=${quality}`}
+        srcset={breakpoints
+          .map(
+            (bp: number) =>
+              `${src}?w=${bp}&format=${format === 'avif' || format === 'webp' ? 'jpg' : format}&q=${quality} ${bp}w`,
+          )
+          .join(', ')}
+        {alt}
+        {width}
+        {height}
+        loading={priority ? 'eager' : loading}
+        {decoding}
+        fetchpriority={priority ? 'high' : undefined}
+        class={`responsive-image ${className} ${blurUp ? 'blur-up' : ''}`}
+        style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''}
+      />
+    </picture>
+
+    {blurUp && (
+      <div class="blur-placeholder" aria-hidden="true">
+        <img
+          src={`${src}?w=20&format=webp&q=30`}
+          alt=""
+          width="20"
+          aria-hidden="true"
           style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''}
         />
-      </picture>
-
-      {blurUp && (
-        <div class="blur-placeholder" aria-hidden="true">
-          <img
-            src={`${src}?w=20&format=webp&q=30`}
-            alt=""
-            width="20"
-            aria-hidden="true"
-            style={aspectRatio ? `aspect-ratio: ${aspectRatio};` : ''}
-          />
-        </div>
-      )}
-    </div>
-  ) : (
-    <div class={`responsive-image-wrapper ${wrapperClass}`}>
-      {typeof src !== 'string' && (
-        <Image
-          src={src}
-          alt={alt}
-          width={width}
-          height={height}
-          loading={priority ? 'eager' : loading}
-          decoding={decoding}
-          fetchpriority={priority ? 'high' : undefined}
-          class={`responsive-image ${className} ${blurUp ? 'blur-up' : ''}`}
-        />
-      )}
-    </div>
-  )
-}
+      </div>
+    )}
+  </div>
+) : (
+  <div class={`responsive-image-wrapper ${wrapperClass}`}>
+    {typeof src !== 'string' && (
+      <Image
+        {src}
+        {alt}
+        {width}
+        {height}
+        loading={priority ? 'eager' : loading}
+        {decoding}
+        fetchpriority={priority ? 'high' : undefined}
+        class={`responsive-image ${className} ${blurUp ? 'blur-up' : ''}`}
+      />
+    )}
+  </div>
+)}
 
 <style>
   .responsive-image-wrapper {

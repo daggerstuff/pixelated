@@ -95,7 +95,7 @@ export default function ScenarioGenerationDemo() {
         <div>
           <label
             htmlFor="scenario-type"
-            className="text-slate-200 mb-3 block text-sm font-medium"
+            className="mb-3 block text-sm font-medium text-foreground"
           >
             Select Scenario Type
           </label>
@@ -107,10 +107,10 @@ export default function ScenarioGenerationDemo() {
               <button
                 key={type.id}
                 onClick={() => setSelectedType(type.id)}
-                className={`rounded-lg border p-4 transition-all ${
+                className={`rounded-none border p-4 transition-all ${
                   selectedType === type.id
-                    ? 'bg-blue-600/20 border-blue-400 text-blue-200'
-                    : 'bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-slate-700/50'
+                    ? 'border-ring bg-secondary font-medium text-foreground'
+                    : 'border-border bg-card text-muted-foreground hover:bg-secondary'
                 }`}
               >
                 <div className="mb-2 text-2xl">{type.icon}</div>
@@ -125,7 +125,7 @@ export default function ScenarioGenerationDemo() {
           <button
             onClick={generateScenario}
             disabled={isGenerating}
-            className="bg-orange-600 hover:bg-orange-700 disabled:bg-slate-600 text-white rounded-lg px-8 py-3 font-medium transition-colors disabled:cursor-not-allowed"
+            className="hover:bg-primary/90 rounded-none bg-primary px-8 py-3 font-medium text-primary-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-35"
           >
             {isGenerating
               ? 'Generating Scenario...'
@@ -137,31 +137,33 @@ export default function ScenarioGenerationDemo() {
         {scenario && (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Client Profile */}
-            <div className="bg-slate-800/50 border-slate-600/50 rounded-lg border p-6">
-              <h3 className="text-white mb-4 text-lg font-semibold">
+            <div className="rounded-none border border-border bg-card p-6">
+              <h3 className="mb-4 text-lg font-semibold text-foreground">
                 Client Profile
               </h3>
               <div className="space-y-3">
                 <div>
-                  <div className="text-orange-400 font-medium">
+                  <div className="font-medium text-foreground">
                     Name & Demographics
                   </div>
-                  <div className="text-white">
+                  <div className="text-foreground">
                     {scenario.client.name}, {scenario.client.age}
                   </div>
-                  <div className="text-slate-300 text-sm">
+                  <div className="text-sm text-muted-foreground">
                     {scenario.client.occupation}
                   </div>
                 </div>
                 <div>
-                  <div className="text-orange-400 font-medium">
+                  <div className="font-medium text-foreground">
                     Presenting Concern
                   </div>
-                  <div className="text-white">{scenario.client.presenting}</div>
+                  <div className="text-foreground">
+                    {scenario.client.presenting}
+                  </div>
                 </div>
                 <div>
-                  <div className="text-orange-400 font-medium">Background</div>
-                  <div className="text-slate-300 text-sm">
+                  <div className="font-medium text-foreground">Background</div>
+                  <div className="text-sm text-muted-foreground">
                     {scenario.background}
                   </div>
                 </div>
@@ -169,32 +171,34 @@ export default function ScenarioGenerationDemo() {
             </div>
 
             {/* Clinical Information */}
-            <div className="bg-slate-800/50 border-slate-600/50 rounded-lg border p-6">
-              <h3 className="text-white mb-4 text-lg font-semibold">
+            <div className="rounded-none border border-border bg-card p-6">
+              <h3 className="mb-4 text-lg font-semibold text-foreground">
                 Clinical Presentation
               </h3>
               <div className="space-y-3">
                 <div>
-                  <div className="text-green-400 mb-2 font-medium">
+                  <div className="mb-2 font-medium text-foreground">
                     Key Symptoms
                   </div>
                   <ul className="space-y-1">
                     {scenario.symptoms.map((symptom: string) => (
                       <li
                         key={symptom}
-                        className="text-slate-300 flex items-start gap-2 text-sm"
+                        className="flex items-start gap-2 text-sm text-muted-foreground"
                       >
-                        <span className="text-green-400 mt-1 text-xs">•</span>
+                        <span className="mt-1 text-xs text-muted-foreground">
+                          •
+                        </span>
                         {symptom}
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <div className="text-blue-400 font-medium">
+                  <div className="font-medium text-foreground">
                     Clinical Formulation
                   </div>
-                  <div className="text-slate-300 text-sm">
+                  <div className="text-sm text-muted-foreground">
                     {scenario.formulation}
                   </div>
                 </div>
@@ -202,20 +206,22 @@ export default function ScenarioGenerationDemo() {
             </div>
 
             {/* Treatment Plan */}
-            <div className="bg-slate-800/50 border-slate-600/50 rounded-lg border p-6 lg:col-span-2">
-              <h3 className="text-white mb-4 text-lg font-semibold">
+            <div className="rounded-none border border-border bg-card p-6 lg:col-span-2">
+              <h3 className="mb-4 text-lg font-semibold text-foreground">
                 Suggested Treatment Approach
               </h3>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {scenario.treatment.map((treatment: string, index: number) => (
                   <div
                     key={`treatment-${index}-${treatment.slice(0, 20)}`}
-                    className="bg-slate-700/30 flex items-start gap-3 rounded-lg p-3"
+                    className="flex items-start gap-3 rounded-none bg-secondary p-3"
                   >
-                    <span className="text-cyan-400 text-sm font-bold">
+                    <span className="text-sm font-bold text-foreground">
                       {index + 1}
                     </span>
-                    <span className="text-slate-300 text-sm">{treatment}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {treatment}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -225,8 +231,8 @@ export default function ScenarioGenerationDemo() {
 
         {isGenerating && (
           <div className="py-8 text-center">
-            <div className="text-slate-300 inline-flex items-center gap-3">
-              <div className="border-orange-400 border-t-transparent h-6 w-6 animate-spin rounded-full border-2"></div>
+            <div className="inline-flex items-center gap-3 text-muted-foreground">
+              <div className="border-t-transparent h-6 w-6 animate-spin rounded-full border-2 border-ring"></div>
               Generating comprehensive clinical scenario...
             </div>
           </div>

@@ -1,11 +1,10 @@
 import { memo, useCallback } from 'react'
 import type { FC } from 'react'
 
-import { useTheme } from '@/components/theme/ThemeProvider'
 import { cn } from '@/lib/utils'
 import type { Message } from '@/types/chat'
 
-export interface ChatMessageProps {
+interface ChatMessageProps {
   message: Message
   isTyping?: boolean
 }
@@ -17,7 +16,7 @@ export interface ChatMessageProps {
  * - Encryption and verification badges
  * - Memory-stored and analyzed state indicators
  * - Error detection via `isError` flag or `Error:` content prefix
- * - Dark mode via ThemeProvider
+ * - Tokens handle both light and dark modes
  * - Timestamp display when available
  * - Screen-reader accessible live region for new messages
  */
@@ -25,9 +24,6 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
   message,
   isTyping = false,
 }) {
-  const { resolvedTheme } = useTheme()
-  const isDark = resolvedTheme === 'dark'
-
   // Derive display traits from the message
   const isUser = message.role === 'user'
   const isSystem = message.role === 'system'
@@ -60,14 +56,7 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
         aria-label="Assistant is typing"
         aria-live="polite"
       >
-        <div
-          className={cn(
-            'rounded-2xl border px-4 py-3',
-            isDark
-              ? 'border-gray-700 bg-gray-800 text-gray-200'
-              : 'border-gray-200 bg-gray-100 text-gray-900',
-          )}
-        >
+        <div className="rounded-none border border-border bg-secondary px-4 py-3 text-foreground">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">
               {message.name || 'Assistant'}
@@ -75,10 +64,7 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
             {message.analyzed && (
               <span
                 className={cn(
-                  'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px]',
-                  isDark
-                    ? 'bg-blue-900/60 text-blue-300'
-                    : 'bg-blue-100 text-blue-700',
+                  'inline-flex items-center gap-1 rounded-none border border-input bg-secondary px-2 py-0.5 text-[10px] text-foreground',
                 )}
               >
                 analyzing
@@ -88,22 +74,19 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
           <div className="mt-2 flex items-center gap-1" aria-hidden="true">
             <span
               className={cn(
-                'inline-block h-2 w-2 animate-typing-dot rounded-full',
-                isDark ? 'bg-gray-400' : 'bg-gray-500',
+                'inline-block h-2 w-2 animate-typing-dot rounded-none bg-muted-foreground',
               )}
               style={{ animationDelay: '0ms' }}
             />
             <span
               className={cn(
-                'inline-block h-2 w-2 animate-typing-dot rounded-full',
-                isDark ? 'bg-gray-400' : 'bg-gray-500',
+                'inline-block h-2 w-2 animate-typing-dot rounded-none bg-muted-foreground',
               )}
               style={{ animationDelay: '150ms' }}
             />
             <span
               className={cn(
-                'inline-block h-2 w-2 animate-typing-dot rounded-full',
-                isDark ? 'bg-gray-400' : 'bg-gray-500',
+                'inline-block h-2 w-2 animate-typing-dot rounded-none bg-muted-foreground',
               )}
               style={{ animationDelay: '300ms' }}
             />
@@ -133,21 +116,13 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
             )}
           >
             {showName && (
-              <span
-                className={cn(
-                  'text-xs font-medium',
-                  isDark ? 'text-gray-400' : 'text-gray-500',
-                )}
-              >
+              <span className={cn('text-xs font-medium text-muted-foreground')}>
                 {message.name}
               </span>
             )}
             {hasTimestamp && (
               <time
-                className={cn(
-                  'text-[10px]',
-                  isDark ? 'text-gray-600' : 'text-gray-400',
-                )}
+                className={cn('text-[10px] text-muted-foreground opacity-70')}
                 dateTime={message.timestamp}
               >
                 {formatTimestamp(message.timestamp!)}
@@ -159,31 +134,15 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
         {/* Main message bubble */}
         <div
           className={cn(
-            'rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap break-words',
-            isUser && 'bg-blue-600 text-white',
+            'rounded-none px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap break-words',
+            isUser && 'bg-primary text-primary-foreground',
             isSystem &&
-              cn(
-                'border text-center text-xs italic',
-                isDark
-                  ? 'border-gray-700 bg-gray-800/80 text-gray-400'
-                  : 'border-gray-200 bg-gray-50 text-gray-500',
-              ),
-            isError &&
-              cn(
-                'border',
-                isDark
-                  ? 'border-red-800 bg-red-900/40 text-red-200'
-                  : 'border-red-200 bg-red-50 text-red-800',
-              ),
+              'border border-border bg-secondary text-center text-xs italic text-muted-foreground',
+            isError && 'border border-ring bg-secondary font-medium',
             !isUser &&
               !isSystem &&
               !isError &&
-              cn(
-                'border',
-                isDark
-                  ? 'border-gray-700 bg-gray-800 text-gray-200'
-                  : 'border-gray-200 bg-white text-gray-900',
-              ),
+              'border border-border bg-card text-foreground',
           )}
           aria-label={`${message.role} message${isError ? ' with error' : ''}`}
         >
@@ -200,10 +159,7 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
           {message.encrypted && (
             <span
               className={cn(
-                'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium',
-                isDark
-                  ? 'bg-green-900/40 text-green-400'
-                  : 'bg-green-50 text-green-700',
+                'inline-flex items-center gap-1 rounded-none border border-input bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-foreground',
               )}
               title="End-to-end encrypted"
             >
@@ -227,10 +183,7 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
           {message.verified && (
             <span
               className={cn(
-                'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium',
-                isDark
-                  ? 'bg-blue-900/40 text-blue-400'
-                  : 'bg-blue-50 text-blue-700',
+                'inline-flex items-center gap-1 rounded-none border border-input bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-foreground',
               )}
               title="Sender verified"
             >
@@ -254,10 +207,7 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
           {message.memoryStored && (
             <span
               className={cn(
-                'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium',
-                isDark
-                  ? 'bg-purple-900/40 text-purple-400'
-                  : 'bg-purple-50 text-purple-700',
+                'inline-flex items-center gap-1 rounded-none border border-border bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground',
               )}
               title="Stored in session memory"
             >
@@ -280,10 +230,7 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
           {message.analyzed && !isTyping && (
             <span
               className={cn(
-                'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium',
-                isDark
-                  ? 'bg-amber-900/40 text-amber-400'
-                  : 'bg-amber-50 text-amber-700',
+                'inline-flex items-center gap-1 rounded-none border border-ring bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-foreground',
               )}
               title="Content has been analyzed"
             >

@@ -123,16 +123,16 @@ export function PixelEnhancedChat({
   return (
     <div className="flex h-full gap-4">
       {/* Chat Area */}
-      <div className="bg-white border-gray-200 flex flex-1 flex-col rounded-lg border">
+      <div className="flex flex-1 flex-col rounded-none border border-border bg-card">
         {/* Header */}
-        <div className="border-gray-200 border-b p-4">
+        <div className="border-b border-border p-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-gray-900 text-lg font-semibold">
+            <h2 className="text-lg font-semibold text-foreground">
               Therapeutic Conversation
             </h2>
             <button
               onClick={() => setShowMetrics(!showMetrics)}
-              className="text-blue-600 hover:text-blue-700 text-sm"
+              className="text-sm text-foreground hover:text-muted-foreground"
             >
               {showMetrics ? 'Hide' : 'Show'} Metrics
             </button>
@@ -142,7 +142,7 @@ export function PixelEnhancedChat({
         {/* Messages */}
         <div className="flex-1 space-y-4 overflow-y-auto p-4">
           {messages.length === 0 ? (
-            <div className="text-gray-400 mt-8 text-center">
+            <div className="mt-8 text-center text-muted-foreground">
               <p>Start a conversation to see Pixel analysis</p>
             </div>
           ) : (
@@ -157,7 +157,7 @@ export function PixelEnhancedChat({
           )}
           {isAnalyzing && (
             <div className="flex justify-center py-4">
-              <div className="border-blue-600 h-6 w-6 animate-spin rounded-full border-b-2"></div>
+              <div className="h-6 w-6 animate-spin rounded-none border-b-2 border-ring"></div>
             </div>
           )}
         </div>
@@ -165,7 +165,7 @@ export function PixelEnhancedChat({
         {/* Input */}
         <form
           onSubmit={handleSendMessage}
-          className="border-gray-200 border-t p-4"
+          className="border-t border-border p-4"
         >
           <div className="flex gap-2">
             <input
@@ -174,12 +174,12 @@ export function PixelEnhancedChat({
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Type your message..."
               disabled={isAnalyzing}
-              className="border-gray-300 focus:ring-blue-500 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2"
+              className="flex-1 rounded-none border border-input px-4 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
             />
             <button
               type="submit"
               disabled={isAnalyzing || !inputValue.trim()}
-              className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 rounded-lg px-4 py-2"
+              className="rounded-none bg-primary px-4 py-2 text-primary-foreground hover:bg-accent disabled:opacity-35"
             >
               Send
             </button>
@@ -194,7 +194,7 @@ export function PixelEnhancedChat({
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <span className="text-blue-700 h-4 w-4">🧠</span>
+                  <span className="h-4 w-4 text-foreground">🧠</span>
                   <span>Behavioral Pattern</span>
                 </CardTitle>
               </CardHeader>
@@ -203,7 +203,7 @@ export function PixelEnhancedChat({
                   {lastAnalysis.behavioral_pattern}
                 </p>
                 {lastAnalysis.behavioral_pattern_confidence !== undefined && (
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-sm text-muted-foreground">
                     Confidence:{' '}
                     {(lastAnalysis.behavioral_pattern_confidence * 100).toFixed(
                       0,
@@ -220,7 +220,7 @@ export function PixelEnhancedChat({
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Zap className="text-yellow-600 h-4 w-4" />
+                  <Zap className="h-4 w-4 text-foreground" />
                   EQ Metrics
                 </CardTitle>
               </CardHeader>
@@ -274,21 +274,23 @@ export function PixelEnhancedChat({
             <Card
               className={
                 crisisStatus.isCrisis
-                  ? 'border-red-300 bg-red-50'
-                  : 'border-green-300 bg-green-50'
+                  ? 'border-ring bg-secondary'
+                  : 'border-input bg-card'
               }
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   {crisisStatus.isCrisis ? (
                     <>
-                      <AlertCircle className="text-red-600 h-4 w-4" />
-                      <span className="text-red-900">Crisis Alert</span>
+                      <AlertCircle className="h-4 w-4 text-foreground" />
+                      <span className="text-foreground">Crisis Alert</span>
                     </>
                   ) : (
                     <>
-                      <Zap className="text-green-600 h-4 w-4" />
-                      <span className="text-green-900">No Crisis Detected</span>
+                      <Zap className="h-4 w-4 text-foreground" />
+                      <span className="text-foreground">
+                        No Crisis Detected
+                      </span>
                     </>
                   )}
                 </CardTitle>
@@ -315,7 +317,7 @@ export function PixelEnhancedChat({
                       {crisisStatus.signals.map((signal) => (
                         <div
                           key={`${signal.type}:${signal.severity}`}
-                          className="bg-red-100 text-red-800 rounded px-2 py-1 text-xs"
+                          className="rounded-none bg-secondary px-2 py-1 text-xs text-foreground ring-1 ring-ring"
                         >
                           {signal.type} (severity: {signal.severity.toFixed(2)})
                         </div>
@@ -324,8 +326,8 @@ export function PixelEnhancedChat({
                   </div>
                 )}
                 {crisisStatus.interventionTriggered && (
-                  <div className="bg-red-200 mt-2 rounded p-2">
-                    <p className="text-red-900 text-xs font-semibold">
+                  <div className="mt-2 rounded-none bg-secondary p-2 ring-1 ring-ring">
+                    <p className="text-xs font-semibold text-foreground">
                       Intervention: {crisisStatus.interventionType}
                     </p>
                   </div>
@@ -336,16 +338,16 @@ export function PixelEnhancedChat({
 
           {/* Bias Detection */}
           {biasFlags.length > 0 && (
-            <Card className="border-orange-300 bg-orange-50">
+            <Card className="border-ring bg-secondary">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between gap-2">
                   <span className="flex items-center gap-2">
-                    <AlertTriangle className="text-orange-600 h-4 w-4" />
+                    <AlertTriangle className="h-4 w-4 text-foreground" />
                     Bias Detected
                   </span>
                   <button
                     onClick={clearBiasFlags}
-                    className="text-orange-600 hover:text-orange-700 text-xs"
+                    className="text-xs text-muted-foreground hover:text-foreground"
                   >
                     Clear
                   </button>
@@ -358,7 +360,7 @@ export function PixelEnhancedChat({
                     className="text-sm"
                   >
                     <div className="flex items-center justify-between">
-                      <p className="text-orange-900 font-medium">
+                      <p className="font-medium text-foreground">
                         {flag.detected}
                       </p>
                       <Badge
@@ -370,7 +372,7 @@ export function PixelEnhancedChat({
                       </Badge>
                     </div>
                     {flag.suggestedCorrection && (
-                      <p className="text-orange-800 mt-1 text-xs">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         Suggestion: {flag.suggestedCorrection}
                       </p>
                     )}
@@ -402,10 +404,10 @@ function MessageBubble({
       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
     >
       <div
-        className={`max-w-sm rounded-lg px-4 py-2 ${
+        className={`max-w-sm rounded-none px-4 py-2 ${
           message.role === 'user'
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-900'
+            ? 'bg-primary text-primary-foreground'
+            : 'bg-secondary text-foreground'
         }`}
       >
         <p className="text-sm">{message.content}</p>
@@ -449,7 +451,7 @@ function MessageBubble({
                 <summary className="cursor-pointer font-semibold opacity-75 hover:opacity-100">
                   📚 Context Used ({pixelMetrics.memories.length})
                 </summary>
-                <ul className="bg-black/5 mt-1 max-h-32 list-disc space-y-1 overflow-y-auto rounded p-2 pl-3 opacity-90">
+                <ul className="mt-1 max-h-32 list-disc space-y-1 overflow-y-auto rounded-none bg-secondary p-2 pl-3">
                   {pixelMetrics.memories.map((mem, i) => (
                     <li key={i} className="text-[10px] leading-3">
                       {mem}
@@ -475,14 +477,14 @@ function MetricBar({ label, value }: { label: string; value: number }) {
   return (
     <div>
       <div className="mb-1 flex items-center justify-between">
-        <span className="text-gray-700 text-sm font-medium">{label}</span>
-        <span className="text-gray-600 text-xs font-semibold">
+        <span className="text-sm font-medium text-foreground">{label}</span>
+        <span className="text-xs font-semibold text-muted-foreground">
           {(value * 100).toFixed(0)}%
         </span>
       </div>
-      <div className="bg-gray-200 h-2 w-full rounded-full">
+      <div className="h-2 w-full rounded-none bg-secondary">
         <div
-          className="bg-blue-600 h-2 rounded-full transition-all"
+          className="h-2 rounded-none bg-primary transition-all"
           style={{ width: `${value * 100}%` }}
         ></div>
       </div>

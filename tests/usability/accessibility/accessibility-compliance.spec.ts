@@ -73,10 +73,21 @@ test.describe('Accessibility Compliance', () => {
   })
 
   test('should work with screen readers', async ({ page }) => {
-    // Test landmark roles
+    // Test landmark roles. Native <main>/<nav>/<header>/<footer> elements
+    // expose landmark roles implicitly — requiring explicit role attributes
+    // would penalize the correct markup.
     const landmarks = await page
       .locator(
-        '[role="main"], [role="navigation"], [role="banner"], [role="contentinfo"]',
+        [
+          'main',
+          '[role="main"]',
+          'nav',
+          '[role="navigation"]',
+          'header',
+          '[role="banner"]',
+          'footer',
+          '[role="contentinfo"]',
+        ].join(', '),
       )
       .count()
     expect(landmarks).toBeGreaterThan(0)

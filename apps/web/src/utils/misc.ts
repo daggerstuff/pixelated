@@ -33,7 +33,7 @@ export function toggleFadeEffect(
   const element = document.getElementById(elementId)
   if (!element) return
 
-    if (visible) {
+  if (visible) {
     element.classList.remove(hiddenClass)
     if (elementId === 'backdrop') lockScroll()
     if (window.matchMedia('(prefers-reduced-motion)').matches) return

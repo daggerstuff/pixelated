@@ -56,10 +56,10 @@ export function DashboardWidget({
             {onRefresh && (
               <button
                 onClick={onRefresh}
-                className="hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-1 transition-colors"
+                className="rounded-none p-1 transition-colors hover:bg-accent"
                 aria-label="Refresh data"
               >
-                <RefreshCw className="text-gray-500 h-4 w-4" />
+                <RefreshCw className="h-4 w-4 text-muted-foreground" />
               </button>
             )}
             {actions}

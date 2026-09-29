@@ -14,7 +14,7 @@ import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -43,46 +43,61 @@ def load_jsonl_sample(file_path: str, sample_size: int = 100) -> list[dict[str, 
     return records
 
 
-def analyze_results(results: list[Any]) -> dict[str, Any]:
+class AnalysisStats(TypedDict):
+    total_records: int
+    category_distribution: Counter[str]
+    method_distribution: Counter[str]
+    confidence_by_category: dict[str, dict[str, float | int]]
+    low_confidence_count: int
+    high_confidence_count: int
+
+
+def analyze_results(results: list[Any]) -> AnalysisStats:
     """Analyze classification results and generate statistics."""
-    stats = {
-        "total_records": len(results),
-        "category_distribution": Counter(),
-        "method_distribution": Counter(),
-        "confidence_by_category": {},
-        "low_confidence_count": 0,
-        "high_confidence_count": 0,
-    }
+    category_distribution: Counter[str] = Counter()
+    method_distribution: Counter[str] = Counter()
+    confidence_lists: dict[str, list[float]] = {}
+    low_confidence_count = 0
+    high_confidence_count = 0
 
     for result in results:
         category = result.category.value
-        stats["category_distribution"][category] += 1
-        stats["method_distribution"][result.classification_method] += 1
+        category_distribution[category] += 1
+        method_distribution[result.classification_method] += 1
 
         # Track confidence
-        if category not in stats["confidence_by_category"]:
-            stats["confidence_by_category"][category] = []
-        stats["confidence_by_category"][category].append(result.confidence)
+        if category not in confidence_lists:
+            confidence_lists[category] = []
+        confidence_lists[category].append(result.confidence)
 
         if result.confidence < 0.5:
-            stats["low_confidence_count"] += 1
+            low_confidence_count += 1
         elif result.confidence >= 0.8:
-            stats["high_confidence_count"] += 1
+            high_confidence_count += 1
 
     # Calculate average confidence per category
-    for category in stats["confidence_by_category"]:
-        confidences = stats["confidence_by_category"][category]
-        stats["confidence_by_category"][category] = {
+    confidence_by_category: dict[str, dict[str, float | int]] = {}
+    for category, confidences in confidence_lists.items():
+        confidence_by_category[category] = {
             "avg": sum(confidences) / len(confidences),
             "min": min(confidences),
             "max": max(confidences),
             "count": len(confidences),
         }
 
+    stats: AnalysisStats = {
+        "total_records": len(results),
+        "category_distribution": category_distribution,
+        "method_distribution": method_distribution,
+        "confidence_by_category": confidence_by_category,
+        "low_confidence_count": low_confidence_count,
+        "high_confidence_count": high_confidence_count,
+    }
+
     return stats
 
 
-def print_results(stats: dict[str, Any], processing_stats: dict[str, Any]):
+def print_results(stats: AnalysisStats, processing_stats: dict[str, float]) -> None:
     """Print formatted results."""
 
     for _method, count in stats["method_distribution"].items():
@@ -90,7 +105,7 @@ def print_results(stats: dict[str, Any], processing_stats: dict[str, Any]):
 
     for category, count in stats["category_distribution"].most_common():
         pct = count / stats["total_records"] * 100
-        conf = stats["confidence_by_category"][category]
+        conf = stats["confidence_by_category"][category]["avg"]
         print(f"Category {category}: {pct:.2f}% (conf: {conf:.2f})")
 
     if processing_stats.get("estimated_cost"):
@@ -98,7 +113,7 @@ def print_results(stats: dict[str, Any], processing_stats: dict[str, Any]):
         print(f"Estimated cost: {cost:.2f}")
 
 
-def save_detailed_results(results: list[Any], output_path: str):
+def save_detailed_results(results: list[Any], output_path: str) -> None:
     """Save detailed results to JSON file."""
     detailed = []
 
@@ -120,7 +135,7 @@ def save_detailed_results(results: list[Any], output_path: str):
     logger.info(f"💾 Detailed results saved to: {output_path}")
 
 
-def main():
+def main() -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Process sample batch with hybrid classifier")
     parser.add_argument(

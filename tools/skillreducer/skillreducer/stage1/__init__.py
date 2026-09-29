@@ -1,6 +1,6 @@
 """Stage 1 entry point: routing layer optimization (Algorithm 1)."""
 
-from skillreducer.stage1.agent import Stage1RoutingAgent, Stage1Result, create_stage1_routing_agent
+from skillreducer.stage1.agent import Stage1Result, Stage1RoutingAgent, create_stage1_routing_agent
 from skillreducer.stage1.oracle import (
     CandidateSkill,
     Stage1Oracle,
@@ -11,8 +11,8 @@ from skillreducer.stage1.oracle import (
 __all__ = [
     "CandidateSkill",
     "Stage1Oracle",
-    "Stage1RoutingAgent",
     "Stage1Result",
+    "Stage1RoutingAgent",
     "build_stage1_oracle",
     "create_stage1_routing_agent",
     "simulated_oracle",

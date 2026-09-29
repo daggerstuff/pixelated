@@ -1,7 +1,8 @@
 ---
-// Type system: The Quiet Instrument. Fraunces Variable carries display,
-// Public Sans Variable carries body, JetBrains Mono Variable carries
-// labels and data. Weight, size, and tracking carry hierarchy.
+// Type system: Quiet Instrument, clinical editorial. Instrument Serif
+// carries display. Instrument Sans Variable carries body and tracked
+// uppercase labels. Spline Sans Mono stays for app-internal code/data.
+// Weight, size, and tracking carry hierarchy.
 import '@/lib/fonts'
 /* Astro-palette base tokens (AGPL import-only CSS, no .astro source copied) */
 /* style.css is loaded via <link> in <head> — public assets must not be
@@ -187,12 +188,10 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
       set:html={JSON.stringify(organizationSchema)
         .replaceAll(String.fromCharCode(60), '\\u003c')
         .replaceAll(String.fromCharCode(62), '\\u003e')}
-    />
-    {
-      mixpanelToken && isAnalyticsAllowedRoute && (
-        <script type="text/javascript" set:html={mixpanelScript} />
-      )
-    }
+    ></script>
+    {mixpanelToken && isAnalyticsAllowedRoute && (
+      <script type="text/javascript" set:html={mixpanelScript}></script>
+    )}
     <script
       is:inline
       nonce={cspNonce}
@@ -208,7 +207,9 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     </script>
   </head>
   <body>
-    <a class="np-skip-link" href="#main-content">Skip to main content</a>
+    <a class="np-skip-link" href="#main-content">
+      Skip to main content
+    </a>
 
     <header class="site-header">
       <nav class="nav" aria-label="Primary navigation">
@@ -223,30 +224,26 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
             <span></span>
           </summary>
           <div class="nav-menu-panel">
-            {
-              navItems.map((item) => (
-                <a
-                  href={withBasePath(item.href)}
-                  aria-current={isActive(item.href) ? 'page' : undefined}
-                >
-                  {item.label}
-                </a>
-              ))
-            }
-          </div>
-        </details>
-
-        <div class="nav-links">
-          {
-            navItems.map((item) => (
+            {navItems.map((item) => (
               <a
                 href={withBasePath(item.href)}
                 aria-current={isActive(item.href) ? 'page' : undefined}
               >
                 {item.label}
               </a>
-            ))
-          }
+            ))}
+          </div>
+        </details>
+
+        <div class="nav-links">
+          {navItems.map((item) => (
+            <a
+              href={withBasePath(item.href)}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          ))}
         </div>
 
         <div class="nav-tools">
@@ -286,9 +283,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
               aria-hidden="true"
             >
               <circle cx="8" cy="8" r="3.25"></circle>
-              <path
-                d="M8 0.75v2M8 13.25v2M15.25 8h-2M2.75 8h-2M13.13 2.87l-1.42 1.42M4.29 11.71l-1.42 1.42M13.13 13.13l-1.42-1.42M4.29 4.29L2.87 2.87"
-              ></path>
+              <path d="M8 0.75v2M8 13.25v2M15.25 8h-2M2.75 8h-2M13.13 2.87l-1.42 1.42M4.29 11.71l-1.42 1.42M13.13 13.13l-1.42-1.42M4.29 4.29L2.87 2.87"></path>
             </svg>
             <svg
               class="nav-toggle-moon"
@@ -300,9 +295,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
               stroke-width="1.25"
               aria-hidden="true"
             >
-              <path
-                d="M13.25 9.6A5.75 5.75 0 0 1 6.4 2.75a5.75 5.75 0 1 0 6.85 6.85Z"
-              ></path>
+              <path d="M13.25 9.6A5.75 5.75 0 0 1 6.4 2.75a5.75 5.75 0 1 0 6.85 6.85Z"></path>
             </svg>
           </button>
         </div>
@@ -315,7 +308,9 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
 
     <!-- astro-palette footer -->
     <footer class="footer">
-      <span>&copy; {new Date().getFullYear()} {siteName}</span>
+      <span>
+        &copy; {new Date().getFullYear()} {siteName}
+      </span>
     </footer>
 
     <!-- Search overlay (astro-palette style, Cmd/Ctrl K) -->
@@ -327,7 +322,9 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         aria-modal="true"
       >
         <div class="search-input-row">
-          <span class="search-prompt" aria-hidden="true">$</span>
+          <span class="search-prompt" aria-hidden="true">
+            $
+          </span>
           <input
             id="search-input"
             type="search"
@@ -347,9 +344,9 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         </div>
         <div class="theme-overlay-footer">
           <span class="theme-overlay-actions">
-            <button class="theme-close-btn" type="button" id="search-close-btn"
-              >esc</button
-            >
+            <button class="theme-close-btn" type="button" id="search-close-btn">
+              esc
+            </button>
           </span>
         </div>
       </div>
@@ -373,7 +370,6 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         )
       })
     </script>
-
     <script>
       // Search overlay — astro-palette style, with Pagefind when available
       let searchController: AbortController | undefined
@@ -602,11 +598,14 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     align-items: center;
     gap: 10px;
     text-decoration: none;
+    /* Text-only wordmark renders ~17.6px tall; give the link a hit
+             area that meets the WCAG 2.2 AA 2.5.8 target-size minimum. */
+    min-height: 24px;
   }
   .brand span {
     font-family: var(--np-font-display);
     font-size: 1rem;
-    font-weight: 350;
+    font-weight: var(--np-weight-display);
     letter-spacing: -0.02em;
     line-height: 1.1;
     color: var(--np-text);
@@ -623,7 +622,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     background: var(--np-elevated);
     color: var(--np-text);
     border: 1px solid var(--np-line-strong);
-    font-family: var(--np-font-mono);
+    font-family: var(--np-font-label);
     font-size: 0.75rem;
     text-decoration: none;
   }

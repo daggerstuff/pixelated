@@ -104,7 +104,7 @@ class PIX8LongSessionGenerator:
                 "extracted_count": 0,
             }
 
-    def _run_extraction_process(self, cmd, output_file):
+    def _run_extraction_process(self, cmd: list[str], output_file: Path) -> dict[str, Any]:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True, shell=False)
 
         logger.info("Extraction complete!")
@@ -136,7 +136,7 @@ class PIX8LongSessionGenerator:
         """Internal method to generate patient profiles with retry logic."""
         max_retries = 5
         base_delay = 5
-        patient_profiles = []
+        patient_profiles: list[dict[str, Any]] = []
 
         for attempt in range(max_retries):
             try:
@@ -327,7 +327,7 @@ class PIX8LongSessionGenerator:
         if not messages:
             return messages
 
-        filtered = []
+        filtered: list[dict[str, Any]] = []
         consecutive_goodbyes = 0
 
         for i, msg in enumerate(messages):
@@ -703,7 +703,7 @@ class PIX8LongSessionGenerator:
         return aggregate_stats
 
 
-def main():
+def main() -> int:
     """Run PIX-8 long-running session generation."""
     parser = argparse.ArgumentParser(description="Generate long-running therapy sessions for PIX-8 dataset enhancement")
     parser.add_argument(

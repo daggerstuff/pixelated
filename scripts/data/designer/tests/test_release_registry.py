@@ -7,14 +7,21 @@ from pathlib import Path
 import pytest
 
 from scripts.data.designer.common import CONSTRUCTION_SPEC_VERSION, PROMPT_VERSION
-from scripts.data.designer.release_manifest import ApprovalState, DVCPointer, build_manifest_from_records
+from scripts.data.designer.release_manifest import (
+    ApprovalState,
+    DVCPointer,
+    ReleaseManifest,
+    build_manifest_from_records,
+)
 from scripts.data.designer.release_registry import ReleaseRegistry, ReleaseRegistryEntry
 from scripts.data.designer.schemas import (
     ChatMessage,
     ConstructionRecord,
+    ContributionMode,
     HumanReviewStatus,
     JudgeResult,
     TargetProduct,
+    UsePolicy,
 )
 
 BUILDER_HASH = "sha256:" + "a" * 64
@@ -27,8 +34,8 @@ def _make_record(human_review_status: HumanReviewStatus = HumanReviewStatus.APPR
         source_id="SRC-047",
         analysis_id="src047.mi-reflection",
         source_unit_refs=["annomi:dialogue-001:turn-04"],
-        use_policies=["direct"],
-        contribution_mode="direct_seed",
+        use_policies=[UsePolicy.DIRECT],
+        contribution_mode=ContributionMode.DIRECT_SEED,
         construction_spec_version=CONSTRUCTION_SPEC_VERSION,
         model_alias="nvidia-text",
         prompt_version=PROMPT_VERSION,
@@ -55,7 +62,7 @@ def _make_dvc_pointer() -> DVCPointer:
 def _make_manifest(
     release_id: str = "REL-001",
     release_version: str = "1.0.0",
-) -> object:
+) -> ReleaseManifest:
     return build_manifest_from_records(
         release_id=release_id,
         release_version=release_version,

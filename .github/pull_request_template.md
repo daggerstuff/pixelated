@@ -1,47 +1,34 @@
+<!-- PR checklist for Pixelated Empathy. Delete sections that do not apply. -->
+
 ## Summary
 
-<!-- Brief description of what this PR does and why -->
+<!-- What changed and why. One or two sentences. -->
 
-## Changes
+## Clinical / privacy impact
 
-<!-- List the key changes in this PR -->
+<!-- This is a mental-health platform: state explicitly if the change touches
+     PHI, therapeutic gating, consent, crisis flows, or data retention.
+     "None" is an acceptable answer. -->
 
--
+- [ ] No PHI or sensitive data introduced in code, tests, fixtures, or logs.
 
-## Migration Review (if `db/` changes)
+## Validation
 
-<!-- If this PR includes database migrations, check the following: -->
+<!-- What real checks did you run? Commands + result. Do not claim checks you
+     did not run. -->
 
-- [ ] Migration file follows `NNN_description.sql` naming convention
-- [ ] Rollback file included (`NNN_description.rollback.sql`) if schema is
-      modified
-- [ ] Migration tested locally with `./scripts/devops/validate-migrations.sh`
-- [ ] No destructive operations without explicit `IF EXISTS` / `IF NOT EXISTS`
-      guards
-- [ ] Indexes added for new columns used in queries
-- [ ] Migration is idempotent (safe to run multiple times)
+- [ ] `pnpm lint` (oxlint type-aware)
+- [ ] Relevant tests executed (list the suite and result)
 
-**If this PR does not modify `db/`, delete this section.**
+## Type-safety and suppression policy
 
-## Testing
+- [ ] No `@ts-ignore`, `@ts-nocheck`, `# noqa`, `# type: ignore`, or eslint
+      disables added anywhere.
 
-<!-- How did you verify these changes? -->
+## Quality baselines
 
-- [ ] `pnpm typecheck` passes
-- [ ] `pnpm lint` passes
-- [ ] `pnpm vitest run -c config/vitest.config.ts` passes
-- [ ] Manual testing performed (describe below)
+<!-- If this PR intentionally grows a pinned baseline (complexity, duplication,
+     file size, tech-debt, version drift), say which and why, and that it was
+     re-pinned via the sanctioned `-- --update` path. -->
 
-## Security & Privacy
-
-<!-- For safety-critical or PHI-related changes -->
-
-- [ ] No PHI or secrets committed
-- [ ] No type suppressions added (`@ts-ignore`, `as any`, etc.)
-- [ ] HIPAA compliance verified if clinical workflow affected
-
-## Checklist
-
-- [ ] Branch is up to date with target branch
-- [ ] Commit messages follow conventional commits
-- [ ] Self-review completed
+- [ ] No pinned baseline regresses (CI Quality workflow reports this).

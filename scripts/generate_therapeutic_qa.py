@@ -100,7 +100,7 @@ def detect_theme(text: str) -> str:
     return "general"
 
 
-def generate_question(passage: str, theme: str, channel: str) -> str:
+def generate_question(passage: str, theme: str, _channel: str) -> str:
     """Generate a realistic therapeutic question based on content."""
     import random
 
@@ -118,7 +118,7 @@ def generate_question(passage: str, theme: str, channel: str) -> str:
     return random.choice(questions)
 
 
-def create_qa_pair(passage: str, transcript: dict) -> dict | None:
+def create_qa_pair(passage: str, transcript: dict[str, str]) -> dict[str, str | dict[str, str | int]] | None:
     """Create a high-quality QA pair from a transcript passage."""
     if len(passage) < 150:
         return None
@@ -147,7 +147,7 @@ def create_qa_pair(passage: str, transcript: dict) -> dict | None:
     }
 
 
-def parse_transcript_file(file_path: Path) -> dict | None:
+def parse_transcript_file(file_path: Path) -> dict[str, str] | None:
     """Parse a transcript markdown file."""
     try:
         content = file_path.read_text(encoding="utf-8")
@@ -196,8 +196,8 @@ def create_passages(text: str, min_words: int = 200, max_words: int = 800) -> li
     sentences = re.split(r"(?<=[.!?])\s+", text)
     sentences = [s.strip() for s in sentences if s.strip() and len(s) > 10]
 
-    passages = []
-    current_passage = []
+    passages: list[str] = []
+    current_passage: list[str] = []
     current_word_count = 0
 
     for sentence in sentences:
@@ -224,7 +224,7 @@ def create_passages(text: str, min_words: int = 200, max_words: int = 800) -> li
     return passages
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Generate therapeutic QA pairs")
     parser.add_argument("--transcript-dir", type=Path, default=Path("ai/data/transcripts/ingested"))
     parser.add_argument("--output", type=Path, default=Path("ai/data/therapeutic_qa_pairs.jsonl"))
@@ -258,7 +258,7 @@ def main():
             f.write(json.dumps(pair) + "\n")
 
     if args.sample and all_pairs:
-        for i, pair in enumerate(all_pairs[:3], 1):
+        for _i, _pair in enumerate(all_pairs[:3], 1):
             pass
 
 

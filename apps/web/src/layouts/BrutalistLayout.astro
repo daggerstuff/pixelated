@@ -83,7 +83,9 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
   </head>
   <body>
     <!-- Skip Link -->
-    <a href="#main-content" class="skip-link">Skip to content</a>
+    <a href="#main-content" class="skip-link">
+      Skip to content
+    </a>
 
     <!-- Header -->
     <BrutalistHeader />
@@ -100,14 +102,12 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
     <div class="scroll-progress" aria-hidden="true"></div>
 
     <!-- Vercel Speed Insights and Analytics -->
-    {
-      shouldRenderAnalytics && (
-        <>
-          <SpeedInsights />
-          <Analytics />
-        </>
-      )
-    }
+    {shouldRenderAnalytics && (
+      <>
+        <SpeedInsights />
+        <Analytics />
+      </>
+    )}
   </body>
 </html>
 

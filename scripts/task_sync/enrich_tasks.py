@@ -285,7 +285,7 @@ Hook the automated backlog steering and prioritization pipeline directly into th
 }
 
 
-def main():
+def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
     logging.info("Fetching issues from Linear...")
     try:

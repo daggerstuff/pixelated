@@ -31,12 +31,10 @@ const gridClasses = {
 
 <div class="analytics-dashboard" role="main" aria-labelledby="dashboard-title">
   <header class="mb-6">
-    <h1 id="dashboard-title" class="text-2xl font-bold">{title}</h1>
-    {
-      description && (
-        <p class="text-gray-600 dark:text-gray-400 mt-1">{description}</p>
-      )
-    }
+    <h1 id="dashboard-title" class="text-2xl font-bold">
+      {title}
+    </h1>
+    {description && <p class="mt-1 text-muted-foreground">{description}</p>}
   </header>
 
   <div
@@ -46,7 +44,9 @@ const gridClasses = {
   </div>
 </div>
 
-<a href="#dashboard-title" class="skip-link">Skip to dashboard content</a>
+<a href="#dashboard-title" class="skip-link">
+  Skip to dashboard content
+</a>
 
 <style>
   .analytics-dashboard {

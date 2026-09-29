@@ -4,6 +4,11 @@
  * support for different environments and log levels
  */
 
+// Explicit .ts extension: this file is also loaded through Node's native
+// type stripping (via the standardized-logger.js twin), which requires
+// explicit extensions on relative imports.
+import { scrub } from '../logging/scrub.ts'
+
 type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
 interface LoggerOptions {
@@ -127,10 +132,13 @@ class Logger {
     const prefix = this.options.prefix ? `[${this.options.prefix}]` : ''
     const formattedMessage = `${timestamp} ${level.toUpperCase()} ${prefix} ${message}`
 
-    // Redact sensitive data if needed
-    const redactedArgs = this.options.redact
-      ? args.map((arg) => this.redact(arg, this.options.redact!))
-      : args
+    // Scrub secrets/PII from structured payloads (../logging/scrub.ts), then
+    // apply any explicitly configured key redaction on top.
+    const redactedArgs = args
+      .map((arg) => scrub(arg))
+      .map((arg) =>
+        this.options.redact ? this.redact(arg, this.options.redact) : arg,
+      )
 
     // Browser or server logging
     if (typeof window !== 'undefined') {

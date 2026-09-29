@@ -1,7 +1,6 @@
 import type { ChangeEvent, SyntheticEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
-import { useTheme } from '@/components/theme/ThemeProvider'
 import { cn } from '@/lib/utils'
 import type { Message } from '@/types/chat'
 
@@ -29,7 +28,6 @@ export function ChatContainer({
   inputPlaceholder,
   disabled = false,
 }: ChatContainerProps) {
-  const { resolvedTheme } = useTheme()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [showScrollButton, setShowScrollButton] = useState(false)
@@ -98,47 +96,18 @@ export function ChatContainer({
       {/* Messages container */}
       <div
         ref={containerRef}
-        className={cn(
-          'flex-1 space-y-4 overflow-y-auto rounded-lg border p-6 shadow-sm',
-          resolvedTheme === 'dark'
-            ? 'border-gray-700 bg-black'
-            : 'border-gray-200 bg-white',
-        )}
+        className="flex-1 space-y-4 overflow-y-auto rounded-none border border-border bg-card p-6"
       >
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center space-y-4 text-center">
-            <div
-              className={
-                resolvedTheme === 'dark'
-                  ? 'bg-blue-900 rounded-full p-4'
-                  : 'bg-blue-50 rounded-full p-4'
-              }
-            >
-              <IconBrain
-                className={
-                  resolvedTheme === 'dark'
-                    ? 'text-blue-400 h-8 w-8'
-                    : 'text-blue-600 h-8 w-8'
-                }
-              />
+            <div className="rounded-none bg-secondary p-4">
+              <IconBrain className="h-8 w-8 text-foreground" />
             </div>
             <div className="max-w-sm space-y-2">
-              <h3
-                className={
-                  resolvedTheme === 'dark'
-                    ? 'text-gray-200 text-lg font-semibold'
-                    : 'text-gray-900 text-lg font-semibold'
-                }
-              >
+              <h3 className="text-lg font-semibold text-foreground">
                 Start a Conversation
               </h3>
-              <p
-                className={
-                  resolvedTheme === 'dark'
-                    ? 'text-gray-400 text-sm'
-                    : 'text-gray-600 text-sm'
-                }
-              >
+              <p className="text-sm text-muted-foreground">
                 Begin your therapy session by sending a message. The AI will
                 respond in a supportive and empathetic manner.
               </p>
@@ -192,10 +161,8 @@ export function ChatContainer({
         <button
           onClick={scrollToBottom}
           className={cn(
-            'absolute bottom-20 right-4 rounded-full p-2 shadow-lg transition-colors',
-            resolvedTheme === 'dark'
-              ? 'bg-blue-800 text-white hover:bg-blue-900'
-              : 'bg-blue-600 text-white hover:bg-blue-700',
+            'absolute bottom-20 right-4 rounded-none p-2 transition-colors',
+            'bg-primary text-primary-foreground hover:bg-accent',
           )}
           aria-label="Scroll to bottom"
         >
@@ -207,9 +174,7 @@ export function ChatContainer({
       <div
         className={cn(
           'sticky bottom-0 py-4',
-          resolvedTheme === 'dark'
-            ? 'bg-gradient-to-t from-black to-transparent'
-            : 'bg-gradient-to-t from-white to-transparent',
+          'bg-gradient-to-t from-background to-transparent',
         )}
       >
         <ChatInput

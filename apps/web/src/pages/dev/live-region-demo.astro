@@ -58,37 +58,35 @@ const sections = [
     </p>
 
     <div class="grid gap-10 mb-10">
-      {
-        sections.map((section) => (
-          <section class="border border-border/40 rounded-lg p-6 bg-card/50">
-            <h2 class="text-xl font-semibold mb-3">{section.title}</h2>
-            <p class="mb-5 text-gray-600 dark:text-gray-300">
-              {section.description}
-            </p>
+      {sections.map((section) => (
+        <section class="border border-border/40 rounded-lg p-6 bg-card/50">
+          <h2 class="text-xl font-semibold mb-3">{section.title}</h2>
+          <p class="mb-5 text-gray-600 dark:text-gray-300">
+            {section.description}
+          </p>
 
-            <div class="grid gap-3">
-              {section.examples.map((example) => (
-                <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <button
-                    class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-md"
-                    onclick={`window.LiveRegionSystem.${
-                      section.title.startsWith('Status')
-                        ? 'announceStatus'
-                        : section.title.startsWith('Alert')
-                          ? 'announceAlert'
-                          : 'log'
-                    }
+          <div class="grid gap-3">
+            {section.examples.map((example) => (
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <button
+                  class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-md"
+                  onclick={`window.LiveRegionSystem.${
+                    section.title.startsWith('Status')
+                      ? 'announceStatus'
+                      : section.title.startsWith('Alert')
+                        ? 'announceAlert'
+                        : 'log'
+                  }
                     ('${example.message}'${example.clear ? ', true' : ''})`}
-                  >
-                    {example.label}
-                  </button>
-                  <span class="text-sm opacity-80">"{example.message}"</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))
-      }
+                >
+                  {example.label}
+                </button>
+                <span class="text-sm opacity-80">"{example.message}"</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
 
       <section class="border border-border/40 rounded-lg p-6 bg-card/50">
         <h2 class="text-xl font-semibold mb-3">Progress Announcements</h2>
@@ -104,16 +102,15 @@ const sections = [
             Start Progress Demo
           </button>
 
-          <div
-            class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden"
-          >
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
             <div
               id="progress-bar"
               class="bg-purple-600 h-4 rounded-full w-0 transition-all duration-500"
-            >
-            </div>
+            ></div>
           </div>
-          <div class="mt-2 text-sm text-center" id="progress-text">0%</div>
+          <div class="mt-2 text-sm text-center" id="progress-text">
+            0%
+          </div>
         </div>
       </section>
     </div>
@@ -140,19 +137,23 @@ const sections = [
         <li>
           <strong>Astro Component:</strong> Automatically included in BaseLayout
         </li>
-        <li><strong>React Context:</strong> For React components</li>
         <li>
-          <strong>Utility Functions:</strong> For use in any JavaScript/TypeScript
-          file
+          <strong>React Context:</strong> For React components
+        </li>
+        <li>
+          <strong>Utility Functions:</strong> For use in any
+          JavaScript/TypeScript file
         </li>
       </ul>
 
       <h3>Learn More</h3>
       <p>
-        Check out the <a href="/docs/accessibility/live-regions"
-          >Live Region System documentation</a
-        >
-        for detailed information on implementation, best practices, and examples.
+        Check out the{' '}
+        <a href="/docs/accessibility/live-regions">
+          Live Region System documentation
+        </a>
+        for detailed information on implementation, best practices, and
+        examples.
       </p>
     </div>
   </div>

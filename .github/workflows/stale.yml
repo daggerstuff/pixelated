@@ -1,0 +1,51 @@
+name: Stale backlog sweep
+
+# Backlog hygiene (readiness: backlog_health). ~32% of open issues sat
+# untouched >30 days with no automated sweep. This keeps the backlog
+# triage-accurate: 60 days inactive -> labelled and pinged for triage;
+# another 21 days -> closed as stale with an explanatory comment.
+# Issues marked for triage or tagged as contribution-friendly are exempt,
+# as are security-labeled issues (never auto-close security reports).
+
+on:
+  schedule:
+    # Sundays 04:20 UTC, off the top of the hour to ease runner load.
+    - cron: '20 4 * * 0'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+concurrency:
+  group: stale-sweep
+  cancel-in-progress: false
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11.0.0
+        with:
+          # Issues only; PRs have their own review lifecycle.
+          days-before-stale: 60
+          days-before-close: 21
+          stale-issue-message: >-
+            This issue has had no activity for 60 days. If it still matters,
+            comment or update it to keep it open — otherwise it will be closed
+            as stale in 21 days. Closing is not a verdict: reopen with fresh
+            context any time.
+          close-issue-message: >-
+            Closed as stale after three weeks without activity. This is
+            housekeeping, not a decision — reopen with updated context any time.
+          stale-issue-label: 'status/stale'
+          exempt-issue-labels: >-
+            status/needs-triage,security,help wanted,good first
+            issue,status/accepted,status/in-progress
+          # Never touch pull requests.
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          exempt-all-assignees: true
+          exempt-all-milestones: true

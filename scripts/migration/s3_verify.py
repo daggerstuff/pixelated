@@ -34,7 +34,7 @@ SECRET_KEY = os.getenv("HETZNER_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_
 REGION = os.getenv("HETZNER_S3_REGION", "hel1")
 
 
-def get_s3_client():
+def get_s3_client() -> Any:
     """Create and return an S3 client."""
     config = Config(region_name=REGION)
     return boto3.client(
@@ -47,7 +47,7 @@ def get_s3_client():
     )
 
 
-def check_s3_path(s3, path: str) -> bool:
+def check_s3_path(s3: Any, path: str) -> bool:
     """Check if a path or prefix exists on S3."""
     if not path.startswith("s3://"):
         return False
@@ -65,7 +65,7 @@ def check_s3_path(s3, path: str) -> bool:
             return False
 
 
-def verify_datasets(s3, datasets: dict[str, Any]) -> tuple[int, int]:
+def verify_datasets(s3: Any, datasets: dict[str, Any]) -> tuple[int, int]:
     """Verify standard datasets in the registry."""
     checked = 0
     errors = 0
@@ -83,7 +83,7 @@ def verify_datasets(s3, datasets: dict[str, Any]) -> tuple[int, int]:
     return checked, errors
 
 
-def verify_edge_cases(s3, edge_cases: dict[str, Any]) -> tuple[int, int]:
+def verify_edge_cases(s3: Any, edge_cases: dict[str, Any]) -> tuple[int, int]:
     """Verify edge case sources in the registry."""
     checked = 0
     errors = 0
@@ -113,7 +113,7 @@ def verify_edge_cases(s3, edge_cases: dict[str, Any]) -> tuple[int, int]:
     return checked, errors
 
 
-def verify_structure():
+def verify_structure() -> None:
     """Main verification logic."""
     registry_path = Path(__file__).parents[2] / "ai" / "data" / "dataset_registry.json"
     with open(registry_path, encoding="utf-8") as f:

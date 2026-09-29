@@ -10,7 +10,7 @@ import type {
   ThreatHuntingConfig,
 } from '../types'
 
-vi.mock('../../logging/build-safe-logger', () => ({
+vi.mock('@/lib/logging/build-safe-logger', () => ({
   createBuildSafeLogger: () => ({
     info: vi.fn(),
     warn: vi.fn(),

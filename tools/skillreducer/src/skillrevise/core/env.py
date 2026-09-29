@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping
-
+from typing import overload
 
 NEW_ENV_PREFIX = "SKILL_REVISE_"
 LEGACY_ENV_PREFIX = "SKILL_HARNESS_"
@@ -16,6 +16,14 @@ def legacy_env_name(name: str) -> str:
 def env_names(name: str) -> tuple[str, ...]:
     legacy = legacy_env_name(name)
     return (name,) if legacy == name else (name, legacy)
+
+
+@overload
+def get_env(env: Mapping[str, str], name: str, default: None = ...) -> str | None: ...
+
+
+@overload
+def get_env(env: Mapping[str, str], name: str, default: str) -> str: ...
 
 
 def get_env(env: Mapping[str, str], name: str, default: str | None = None) -> str | None:

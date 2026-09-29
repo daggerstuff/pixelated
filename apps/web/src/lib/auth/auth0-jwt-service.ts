@@ -3,7 +3,7 @@
  * Replaces the previous custom JWT service with Auth0 integration
  */
 
-import * as auth0 from 'auth0'
+import * as auth0 from 'auth0-legacy'
 
 interface JwtPayload {
   iss?: string

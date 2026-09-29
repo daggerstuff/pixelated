@@ -9,8 +9,8 @@ import * as tf from '@tensorflow/tfjs'
 import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { asRedisOps } from '../../redis-ops'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { asRedisOps } from '../../../redis-ops'
 // Removed unused type imports to satisfy lint rules
 
 const logger = createBuildSafeLogger('ai-enhanced-monitoring')

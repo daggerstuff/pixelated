@@ -135,32 +135,32 @@ export function PixelMultimodalChat({
   }, [fusedEmotion])
 
   return (
-    <div className="border-slate-200 bg-white/80 flex flex-col gap-4 rounded-xl border p-4 shadow-sm backdrop-blur">
+    <div className="flex flex-col gap-4 rounded-none border border-border bg-card p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-col">
-          <h2 className="text-slate-900 text-lg font-semibold">{title}</h2>
-          <p className="text-slate-500 text-sm">
+          <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+          <p className="text-sm text-muted-foreground">
             Capture audio, transcribe in real time, and fuse with Pixel text
             analysis.
           </p>
         </div>
         {latencyMs ? (
-          <span className="bg-emerald-50 text-emerald-700 rounded-full px-3 py-1 text-xs font-medium">
+          <span className="rounded-none border border-input bg-secondary px-3 py-1 text-xs font-medium text-foreground">
             {latencyMs.toFixed(0)} ms
           </span>
         ) : null}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="border-slate-100 bg-slate-50/60 flex flex-col gap-3 rounded-lg border p-3">
-          <label className="text-slate-800 text-sm font-medium">Message</label>
+        <div className="flex flex-col gap-3 rounded-none border border-border bg-secondary p-3">
+          <label className="text-sm font-medium text-foreground">Message</label>
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type a short prompt or note to accompany the audio…"
-            className="border-slate-200 bg-white text-slate-900 focus:border-indigo-400 focus:ring-indigo-100 min-h-[110px] w-full rounded-md border px-3 py-2 text-sm shadow-inner outline-none transition focus:ring-2"
+            className="min-h-[110px] w-full rounded-none border border-input bg-card px-3 py-2 text-sm text-foreground outline-none transition focus:border-ring focus:ring-2 focus:ring-ring"
           />
-          <div className="text-slate-500 flex flex-wrap items-center gap-3 text-xs">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
             <span>Session: {sessionId}</span>
             <span className="hidden md:inline">
               Context: {defaultContextType}
@@ -168,24 +168,26 @@ export function PixelMultimodalChat({
           </div>
         </div>
 
-        <div className="border-slate-100 bg-slate-50/60 flex flex-col gap-3 rounded-lg border p-3">
+        <div className="flex flex-col gap-3 rounded-none border border-border bg-secondary p-3">
           <div className="flex items-center justify-between">
-            <div className="text-slate-800 text-sm font-medium">
+            <div className="text-sm font-medium text-foreground">
               Audio capture
             </div>
-            <div className="text-slate-500 text-xs">{durationLabel}</div>
+            <div className="text-xs text-muted-foreground">{durationLabel}</div>
           </div>
 
-          <label className="border-slate-200 bg-white text-slate-700 flex items-center justify-between rounded-md border px-3 py-2 text-sm shadow-inner">
+          <label className="flex items-center justify-between rounded-none border border-input bg-card px-3 py-2 text-sm text-foreground">
             <span className="flex flex-col">
-              <span className="text-slate-800 font-medium">Streaming mode</span>
-              <span className="text-slate-500 text-xs">
+              <span className="font-medium text-foreground">
+                Streaming mode
+              </span>
+              <span className="text-xs text-muted-foreground">
                 Send audio chunks over WebSocket for lower latency.
               </span>
             </span>
             <input
               type="checkbox"
-              className="accent-indigo-600 h-4 w-4"
+              className="h-4 w-4 accent-foreground"
               checked={streamingMode}
               onChange={(e) => setStreamingMode(e.target.checked)}
             />
@@ -196,10 +198,10 @@ export function PixelMultimodalChat({
               type="button"
               onClick={isRecording ? handleStopRecording : handleStartRecording}
               className={
-                'text-white inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold shadow-sm transition ' +
+                'inline-flex items-center gap-2 rounded-none px-3 py-2 text-sm font-semibold text-primary-foreground transition ' +
                 (isRecording
-                  ? 'bg-rose-600 hover:bg-rose-700'
-                  : 'bg-indigo-600 hover:bg-indigo-700')
+                  ? 'bg-primary hover:bg-accent'
+                  : 'bg-primary hover:bg-accent')
               }
             >
               {isRecording ? 'Stop Recording' : 'Start Recording'}
@@ -209,7 +211,7 @@ export function PixelMultimodalChat({
               type="button"
               onClick={isPaused ? resumeRecording : pauseRecording}
               disabled={!isRecording}
-              className="border-slate-200 text-slate-700 hover:bg-slate-100 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-none border border-input px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPaused ? 'Resume' : 'Pause'}
             </button>
@@ -217,7 +219,7 @@ export function PixelMultimodalChat({
             <button
               type="button"
               onClick={reset}
-              className="border-slate-200 text-slate-700 hover:bg-slate-100 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-semibold transition"
+              className="inline-flex items-center gap-2 rounded-none border border-input px-3 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary"
             >
               Reset
             </button>
@@ -226,31 +228,31 @@ export function PixelMultimodalChat({
           {audioUrl ? (
             <audio controls src={audioUrl} className="mt-2 w-full" />
           ) : (
-            <div className="border-slate-200 bg-white text-slate-500 rounded-md border border-dashed px-3 py-2 text-xs">
+            <div className="rounded-none border border-dashed border-input bg-card px-3 py-2 text-xs text-muted-foreground">
               No audio captured yet.
             </div>
           )}
 
           {recordingNote ? (
-            <div className="text-indigo-600 text-xs">{recordingNote}</div>
+            <div className="text-xs text-foreground">{recordingNote}</div>
           ) : null}
 
           {streaming ? (
-            <div className="text-emerald-600 text-xs">
+            <div className="text-xs text-foreground">
               {streamStatus ?? 'Streaming audio…'}
             </div>
           ) : streamStatus ? (
-            <div className="text-slate-500 text-xs">{streamStatus}</div>
+            <div className="text-xs text-muted-foreground">{streamStatus}</div>
           ) : null}
 
           {streamError ? (
-            <div className="bg-rose-50 text-rose-700 rounded-md px-3 py-2 text-xs">
+            <div className="rounded-none border border-ring bg-card px-3 py-2 text-xs text-foreground">
               {streamError}
             </div>
           ) : null}
 
           {audioError ? (
-            <div className="bg-rose-50 text-rose-700 rounded-md px-3 py-2 text-xs">
+            <div className="rounded-none border border-ring bg-card px-3 py-2 text-xs text-foreground">
               {audioError}
             </div>
           ) : null}
@@ -262,7 +264,7 @@ export function PixelMultimodalChat({
           type="button"
           onClick={handleSend}
           disabled={loading || (!message && !audioBlob)}
-          className="bg-emerald-600 text-white hover:bg-emerald-700 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-none bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-35"
         >
           {loading ? 'Sending…' : 'Send to Pixel'}
         </button>
@@ -270,53 +272,53 @@ export function PixelMultimodalChat({
         <button
           type="button"
           onClick={handleReset}
-          className="border-slate-200 text-slate-700 hover:bg-slate-100 inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-semibold transition"
+          className="inline-flex items-center gap-2 rounded-none border border-input px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-secondary"
         >
           Clear
         </button>
 
         {error ? (
-          <span className="bg-rose-50 text-rose-700 rounded-md px-3 py-1 text-xs font-medium">
+          <span className="rounded-none border border-ring bg-card px-3 py-1 text-xs font-semibold text-foreground">
             {error}
           </span>
         ) : null}
 
         {conflictDetected ? (
-          <span className="bg-amber-50 text-amber-700 rounded-md px-3 py-1 text-xs font-medium">
+          <span className="rounded-none border border-ring bg-secondary px-3 py-1 text-xs font-medium text-foreground">
             Modality conflict detected
           </span>
         ) : null}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="border-slate-100 bg-white rounded-lg border p-3">
-          <div className="text-slate-800 flex items-center justify-between text-sm font-medium">
+        <div className="rounded-none border border-border bg-card p-3">
+          <div className="flex items-center justify-between text-sm font-medium text-foreground">
             <span>Transcription</span>
             {lastResponse?.warning ? (
-              <span className="text-amber-600 text-xs font-semibold">
+              <span className="text-xs font-semibold text-foreground">
                 {lastResponse.warning}
               </span>
             ) : null}
           </div>
-          <div className="text-slate-700 mt-2 text-sm">
+          <div className="mt-2 text-sm text-foreground">
             {transcription ?? 'No transcript yet.'}
           </div>
         </div>
 
-        <div className="border-slate-100 bg-white rounded-lg border p-3">
-          <div className="text-slate-800 flex items-center justify-between text-sm font-medium">
+        <div className="rounded-none border border-border bg-card p-3">
+          <div className="flex items-center justify-between text-sm font-medium text-foreground">
             <span>Audio Emotion</span>
             {audioEmotion?.confidence ? (
-              <span className="text-slate-500 text-xs">
+              <span className="text-xs text-muted-foreground">
                 {Math.round((audioEmotion.confidence || 0) * 100)}%
               </span>
             ) : null}
           </div>
-          <div className="text-slate-700 mt-2 text-sm">
+          <div className="mt-2 text-sm text-foreground">
             {audioEmotion?.primary_emotion ?? 'Not available'}
           </div>
           {audioEmotion ? (
-            <div className="text-slate-600 mt-2 grid grid-cols-3 gap-2 text-xs">
+            <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-muted-foreground">
               <Stat label="Valence" value={audioEmotion.valence} />
               <Stat label="Arousal" value={audioEmotion.arousal} />
               {audioEmotion.dominance !== undefined ? (
@@ -326,20 +328,20 @@ export function PixelMultimodalChat({
           ) : null}
         </div>
 
-        <div className="border-slate-100 bg-white rounded-lg border p-3">
-          <div className="text-slate-800 flex items-center justify-between text-sm font-medium">
+        <div className="rounded-none border border-border bg-card p-3">
+          <div className="flex items-center justify-between text-sm font-medium text-foreground">
             <span>Fused Emotion</span>
             {fusedEmotion?.confidence ? (
-              <span className="text-slate-500 text-xs">
+              <span className="text-xs text-muted-foreground">
                 {Math.round((fusedEmotion.confidence || 0) * 100)}%
               </span>
             ) : null}
           </div>
-          <div className="text-slate-700 mt-2 text-sm">
+          <div className="mt-2 text-sm text-foreground">
             {fusedSummary ?? 'Not available'}
           </div>
           {fusedEmotion ? (
-            <div className="text-slate-600 mt-2 grid grid-cols-3 gap-2 text-xs">
+            <div className="mt-2 grid grid-cols-3 gap-2 text-xs text-muted-foreground">
               <Stat label="Valence" value={fusedEmotion.valence} />
               <Stat label="Arousal" value={fusedEmotion.arousal} />
               <Stat label="EQ" value={fusedEmotion.overall_eq} />
@@ -348,18 +350,18 @@ export function PixelMultimodalChat({
         </div>
 
         {behavioralPattern ? (
-          <div className="border-slate-100 bg-white rounded-lg border p-3">
-            <div className="text-slate-800 text-sm font-medium">
+          <div className="rounded-none border border-border bg-card p-3">
+            <div className="text-sm font-medium text-foreground">
               Behavioral Pattern
             </div>
             <div
-              className="text-slate-700 mt-2 text-sm"
+              className="mt-2 text-sm text-foreground"
               data-testid="multimodal-behavioral-pattern"
             >
               {behavioralPattern}
             </div>
             {behavioralPatternConfidence !== null ? (
-              <div className="text-slate-600 mt-1 text-xs">
+              <div className="mt-1 text-xs text-muted-foreground">
                 {(behavioralPatternConfidence * 100).toFixed(0)}% confidence
               </div>
             ) : null}
@@ -373,13 +375,15 @@ export function PixelMultimodalChat({
 function Stat({ label, value }: { label: string; value?: number }) {
   if (value === undefined || Number.isNaN(value)) {
     return (
-      <div className="bg-slate-50 text-slate-500 rounded-md px-2 py-1">—</div>
+      <div className="rounded-none bg-secondary px-2 py-1 text-muted-foreground">
+        —
+      </div>
     )
   }
 
   return (
-    <div className="bg-slate-50 text-slate-700 rounded-md px-2 py-1">
-      <div className="text-slate-500 text-[11px] uppercase tracking-wide">
+    <div className="rounded-none bg-secondary px-2 py-1 text-foreground">
+      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
         {label}
       </div>
       <div className="font-semibold">{value.toFixed(2)}</div>

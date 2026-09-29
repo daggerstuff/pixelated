@@ -73,11 +73,11 @@ const useTherapeuticInterventions = (): TherapeuticInterventions => {
 
 // Loading fallback component
 const LoadingAnalytics = () => (
-  <div className="border-green-700/30 bg-black animate-pulse rounded-xl border bg-opacity-90 p-6">
-    <div className="bg-green-700/20 mb-4 h-6 w-1/3 rounded"></div>
+  <div className="animate-pulse rounded-none border border-border bg-card p-6">
+    <div className="mb-4 h-6 w-1/3 rounded-none bg-secondary"></div>
     <div className="grid grid-cols-2 gap-4">
-      <div className="bg-green-700/10 h-40 rounded"></div>
-      <div className="bg-green-700/10 h-40 rounded"></div>
+      <div className="h-40 rounded-none bg-secondary"></div>
+      <div className="h-40 rounded-none bg-secondary"></div>
     </div>
   </div>
 )
@@ -501,17 +501,17 @@ function ProfessionalTherapistWorkspace() {
     >
       {/* Header toolbar */}
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-green-300 text-xl font-bold">
+        <h1 className="text-xl font-bold text-foreground">
           Therapy Training Environment
         </h1>
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowPatientModelSelector(true)}
             className={cn(
-              'rounded-lg px-3 py-1.5 text-sm',
+              'rounded-none px-3 py-1.5 text-sm',
               usePatientSimulation
-                ? 'bg-green-800/70 text-green-200'
-                : 'bg-green-900/30 text-green-400',
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-muted-foreground',
             )}
           >
             {usePatientSimulation
@@ -521,10 +521,10 @@ function ProfessionalTherapistWorkspace() {
           <button
             onClick={() => setShowAnalytics(!showAnalytics)}
             className={cn(
-              'rounded-lg p-1.5',
+              'rounded-none p-1.5',
               showAnalytics
-                ? 'bg-green-800/70 text-green-200'
-                : 'bg-green-900/30 text-green-400',
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-muted-foreground',
             )}
             aria-label="Toggle analytics dashboard"
           >
@@ -533,10 +533,10 @@ function ProfessionalTherapistWorkspace() {
           <button
             onClick={() => setShowMentalHealthPanel(!showMentalHealthPanel)}
             className={cn(
-              'rounded-lg p-1.5',
+              'rounded-none p-1.5',
               showMentalHealthPanel
-                ? 'bg-green-800/70 text-green-200'
-                : 'bg-green-900/30 text-green-400',
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-muted-foreground',
             )}
             aria-label="Toggle mental health insights"
           >
@@ -545,10 +545,10 @@ function ProfessionalTherapistWorkspace() {
           <button
             onClick={toggleSupervisorFeedback}
             className={cn(
-              'rounded-lg px-3 py-1.5 text-sm',
+              'rounded-none px-3 py-1.5 text-sm',
               showSupervisorFeedback
-                ? 'bg-green-800/70 text-green-200'
-                : 'bg-green-900/30 text-green-400',
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-muted-foreground',
             )}
           >
             Supervisor Feedback
@@ -556,10 +556,10 @@ function ProfessionalTherapistWorkspace() {
           <button
             onClick={() => setShowSessionProgress(!showSessionProgress)}
             className={cn(
-              'rounded-lg px-3 py-1.5 text-sm',
+              'rounded-none px-3 py-1.5 text-sm',
               showSessionProgress
-                ? 'bg-green-800/70 text-green-200'
-                : 'bg-green-900/30 text-green-400',
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-muted-foreground',
             )}
             aria-expanded={showSessionProgress}
           >
@@ -567,7 +567,7 @@ function ProfessionalTherapistWorkspace() {
           </button>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="bg-green-900/30 text-green-400 rounded-lg p-1.5"
+            className="rounded-none bg-secondary p-1.5 text-muted-foreground"
             aria-label={isExpanded ? 'Minimize' : 'Maximize'}
           >
             {isExpanded ? (
@@ -584,7 +584,7 @@ function ProfessionalTherapistWorkspace() {
         {/* Chat container */}
         <div className="flex-1">
           <button
-            className="bg-green-900/30 text-green-300 flex items-center gap-2 rounded-lg px-3 py-2"
+            className="flex items-center gap-2 rounded-none bg-secondary px-3 py-2 text-foreground"
             aria-pressed={showScenarios}
             onClick={() => setShowScenarios(!showScenarios)}
           >
@@ -602,7 +602,10 @@ function ProfessionalTherapistWorkspace() {
                   onCheckedChange={toggleMentalHealthAnalysis}
                 />
 
-                <Label htmlFor="mh-analysis" className="text-green-300 text-sm">
+                <Label
+                  htmlFor="mh-analysis"
+                  className="text-sm text-foreground"
+                >
                   Cognitive Assessment
                 </Label>
               </div>
@@ -615,7 +618,7 @@ function ProfessionalTherapistWorkspace() {
 
                 <Label
                   htmlFor="expert-guidance"
-                  className="text-green-300 text-sm"
+                  className="text-sm text-foreground"
                 >
                   Clinical Guidance
                 </Label>
@@ -625,8 +628,8 @@ function ProfessionalTherapistWorkspace() {
 
           {/* Scenarios popup */}
           {showScenarios && (
-            <div className="border-green-700/30 bg-black absolute z-10 mt-1 w-64 rounded-lg border bg-opacity-95 p-2 shadow-lg">
-              <h3 className="border-green-700/30 text-green-300 mb-2 border-b pb-1 text-sm font-semibold">
+            <div className="absolute z-10 mt-1 w-64 rounded-none border border-border bg-card p-2">
+              <h3 className="mb-2 border-b border-border pb-1 text-sm font-semibold text-foreground">
                 Select Client Case
               </h3>
               <div className="flex flex-col space-y-1">
@@ -636,20 +639,20 @@ function ProfessionalTherapistWorkspace() {
                     className={cn(
                       'rounded px-3 py-2 text-left text-sm transition-colors',
                       selectedScenario.id === scenario.id
-                        ? 'bg-green-700/30 text-green-300'
-                        : 'text-gray-300 hover:bg-green-700/20',
+                        ? 'bg-accent text-foreground'
+                        : 'text-muted-foreground hover:bg-secondary',
                     )}
                     onClick={() => changeScenario(scenario)}
                   >
                     <div className="font-medium">{scenario.name}</div>
-                    <div className="text-gray-400 text-xs">
+                    <div className="text-xs text-muted-foreground">
                       {scenario.description}
                     </div>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {scenario.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="bg-green-900/30 text-green-300 rounded-full px-2 py-0.5 text-xs"
+                          className="rounded-none bg-secondary px-2 py-0.5 text-xs text-foreground"
                         >
                           {tag}
                         </span>
@@ -687,7 +690,7 @@ function ProfessionalTherapistWorkspace() {
                 onClick={() =>
                   setShowPatientModelSelector(!showPatientModelSelector)
                 }
-                className="border-gray-300 bg-white hover:bg-gray-100 inline-flex h-8 items-center justify-center rounded-md border px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
+                className="inline-flex h-8 items-center justify-center rounded-none border border-input bg-card px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50"
               >
                 {showPatientModelSelector ? 'Hide' : 'Select'} Patient Model
               </button>
@@ -704,13 +707,15 @@ function ProfessionalTherapistWorkspace() {
               />
 
               {isPatientModelLoading && (
-                <div className="text-blue-500">Loading patient models...</div>
+                <div className="text-muted-foreground">
+                  Loading patient models...
+                </div>
               )}
               {patientModelError && (
-                <div className="text-red-500">{patientModelError}</div>
+                <div className="text-foreground">{patientModelError}</div>
               )}
               {currentModel && (
-                <div className="text-gray-700 mb-2 text-sm">
+                <div className="mb-2 text-sm text-foreground">
                   Using patient model: <strong>{currentModel.name}</strong> -{' '}
                   {currentModel.diagnosisInfo?.primaryDiagnosis}
                 </div>
@@ -722,14 +727,14 @@ function ProfessionalTherapistWorkspace() {
         {/* Right sidebar panels */}
         {showMentalHealthPanel && (
           <div className="w-full lg:w-80">
-            <div className="border-green-700/30 bg-black rounded-xl border bg-opacity-90 p-4">
+            <div className="bg-black rounded-none border border-border bg-opacity-90 p-4">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-green-300 text-lg font-medium">
+                <h3 className="text-lg font-medium text-foreground">
                   Cognitive Assessment
                 </h3>
                 <button
                   onClick={() => setShowMentalHealthPanel(false)}
-                  className="bg-green-900/30 text-green-300 hover:bg-green-800/30 rounded-lg p-1"
+                  className="rounded-none bg-secondary p-1 text-foreground hover:bg-accent"
                   aria-label="Close cognitive assessment panel"
                 >
                   <IconMinimize className="h-4 w-4" />
@@ -802,7 +807,7 @@ function ProfessionalTherapistWorkspace() {
       )}
 
       {showSessionProgress && (
-        <div className="border-white/10 mt-4 border bg-[#0a0a0a] p-4">
+        <div className="mt-4 border border-border bg-card p-4">
           <SessionTimeline
             sessions={sessionProgressSessions}
             activeSessionId={sessionProgress.id}
@@ -813,8 +818,8 @@ function ProfessionalTherapistWorkspace() {
 
       {/* Patient model selector */}
       {showPatientModelSelector && (
-        <div className="bg-black/50 fixed inset-0 z-50 flex items-center justify-center">
-          <div className="bg-white w-full max-w-md rounded-lg p-6">
+        <div className="bg-foreground/60 fixed inset-0 z-50 flex items-center justify-center">
+          <div className="bg-white w-full max-w-md rounded-none p-6">
             <h3 className="mb-4 text-lg font-medium">Select Patient Model</h3>
             <CognitiveModelSelector
               selectedModelId={currentModelId}
@@ -826,28 +831,28 @@ function ProfessionalTherapistWorkspace() {
             <div className="mt-4 flex justify-end space-x-2">
               <button
                 onClick={() => setShowPatientModelSelector(false)}
-                className="bg-gray-200 text-gray-800 rounded-md px-4 py-2"
+                className="rounded-none bg-secondary px-4 py-2 text-foreground"
               >
                 Close
               </button>
               <button
                 onClick={() => setUsePatientSimulation(!usePatientSimulation)}
-                className={`rounded-md px-4 py-2 ${
+                className={`rounded-none px-4 py-2 ${
                   usePatientSimulation
-                    ? 'bg-red-500 text-white'
-                    : 'bg-green-500 text-white'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-primary text-primary-foreground'
                 }`}
               >
                 {usePatientSimulation ? 'Disable' : 'Enable'} Simulation
               </button>
             </div>
             {isPatientModelLoading && (
-              <div className="text-blue-500 mt-2">
+              <div className="mt-2 text-muted-foreground">
                 Loading patient models...
               </div>
             )}
             {patientModelError && (
-              <div className="text-red-500 mt-2">{patientModelError}</div>
+              <div className="mt-2 text-foreground">{patientModelError}</div>
             )}
           </div>
         </div>

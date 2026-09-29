@@ -66,23 +66,21 @@ const jsonLdHtml =
     <script src="/js/polyfill-detector.js" is:inline></script>
     <script src="/js/module-loader.js" defer is:inline></script>
     <script src="/js/background-loader.js" defer is:inline></script>
-    {
-      (nprogress || mediumZoom) && (
-        <script src="/js/nprogress-and-zoom.js" type="module" />
-      )
-    }
+    {(nprogress || mediumZoom) && (
+      <script src="/js/nprogress-and-zoom.js" type="module"></script>
+    )}
 
     {/* Structured data for blog post */}
-    {
-      jsonLdHtml && (
-        <script is:inline type="application/ld+json" set:html={jsonLdHtml} />
-      )
-    }
+    {jsonLdHtml && (
+      <script
+        is:inline
+        type="application/ld+json"
+        set:html={jsonLdHtml}
+      ></script>
+    )}
   </head>
 
-  <body
-    class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"
-  >
+  <body class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30">
     <Navbar />
 
     <main class="container-refined py-12">
@@ -90,33 +88,29 @@ const jsonLdHtml =
         <!-- Blog post header -->
         <header class="mb-8">
           <h1 class="text-4xl font-bold mb-4">{title}</h1>
-          {
-            formattedDate && (
-              <time
-                datetime={pubDate?.toISOString()}
-                class="text-muted-foreground"
-              >
-                {formattedDate}
-              </time>
-            )
-          }
+          {formattedDate && (
+            <time
+              datetime={pubDate?.toISOString()}
+              class="text-muted-foreground"
+            >
+              {formattedDate}
+            </time>
+          )}
           {author && <p class="text-muted-foreground mt-2">By {author}</p>}
-          {
-            tags.length > 0 && (
-              <div class="flex gap-2 mt-4">
-                {tags.map((tag: unknown) => (
-                  <a
-                    href={`/blog/tags/${tag}`}
-                    class="text-sm px-3 py-1 bg-muted rounded-full hover:bg-muted/80 transition-colors"
-                    transition:animate="slide"
-                    data-astro-prefetch
-                  >
-                    {tag}
-                  </a>
-                ))}
-              </div>
-            )
-          }
+          {tags.length > 0 && (
+            <div class="flex gap-2 mt-4">
+              {tags.map((tag: unknown) => (
+                <a
+                  href={`/blog/tags/${tag}`}
+                  class="text-sm px-3 py-1 bg-muted rounded-full hover:bg-muted/80 transition-colors"
+                  transition:animate="slide"
+                  data-astro-prefetch
+                >
+                  {tag}
+                </a>
+              ))}
+            </div>
+          )}
         </header>
 
         <!-- Blog post content -->

@@ -31,9 +31,12 @@ const baseNodeTestGlobs = [
   'apps/web/src/lib/services/notification/__tests__/NotificationService.test.ts',
   'apps/web/src/lib/__tests__/security-implementation.test.ts',
   'apps/web/src/lib/ai/__tests__/getAIService.test.ts',
+  'apps/web/src/lib/ai/__tests__/providers.test.ts',
   'apps/web/src/lib/ai/services/__tests__/FineTuningAIService.test.ts',
   'apps/web/src/lib/graphql/__tests__/graphql.test.ts',
   'apps/web/src/lib/graphql/__tests__/client.test.ts',
+  'apps/web/src/lib/utils/image-optimizer.test.ts',
+  'apps/web/src/lib/admin/__tests__/**/*.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
@@ -75,7 +78,10 @@ const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
 // React provider tests under src/lib/providers need jsdom (window, localStorage,
 // matchMedia). Per-file @vitest-environment is ignored when a vitest project
 // include glob pins the file to the node project.
-const targetedJsdomLibGlobs = ['/lib/providers/']
+// src/lib/hooks is the same case: journal-research hook tests are renderHook +
+// act() suites that need jsdom; without this pin the /lib/ heuristic routed
+// them to node, where jsdom-dependent singletons are null (79 bucket failures).
+const targetedJsdomLibGlobs = ['/lib/providers/', '/lib/hooks/']
 
 const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
@@ -110,7 +116,10 @@ export default defineConfig({
   resolve: {
     alias: [
       memorySchemaAlias,
-      { find: '@/', replacement: `${path.resolve(process.cwd(), 'apps/web/src')}/` },
+      {
+        find: '@/',
+        replacement: `${path.resolve(process.cwd(), 'apps/web/src')}/`,
+      },
       {
         find: 'react-dom/test-utils',
         replacement: path.resolve(
@@ -255,6 +264,8 @@ export default defineConfig({
             ...nodeTestGlobs,
             'apps/web/src/lib/security/__tests__/**/*.test.ts',
             'apps/web/src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+            'apps/web/src/lib/security/threat-detection/**/*.test.ts',
+            'apps/web/src/lib/ai/crisis/**/*.test.ts',
             'apps/web/src/lib/redis.test.ts',
             'apps/web/src/lib/services/notification/__tests__/NotificationService.test.ts',
             'apps/web/src/lib/__tests__/security-implementation.test.ts',
@@ -304,6 +315,8 @@ export default defineConfig({
                   ...nodeTestGlobs,
                   'apps/web/src/lib/security/__tests__/**/*.test.ts',
                   'apps/web/src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+                  'apps/web/src/lib/security/threat-detection/**/*.test.ts',
+                  'apps/web/src/lib/ai/crisis/**/*.test.ts',
                   'apps/web/src/tests/auth.test.ts',
                   'apps/web/src/tests/integration/dream-consolidation.integration.test.ts',
                 ],
@@ -337,16 +350,21 @@ export default defineConfig({
       enabled: coverageEnabled,
       reporter: ['text', 'json', 'html', 'cobertura', 'lcov'],
       reportsDirectory: './coverage',
-      thresholds: {
-        // PIX-223: thresholds lifted toward the security-baseline.json 70% target
-        // as coverage improves. Measured full-run coverage (green): lines 60.7%,
-        // statements 61.1%, functions 61.6%, branches 51.4%. Kept ~6pts
-        // below actual so the gate stays green while enforcing real progress.
-        lines: 55,
-        functions: 55,
-        branches: 45,
-        statements: 55,
-      },
+      // Bucketed advisory runs execute a subset of the corpus, so global
+      // coverage math can never be meaningful there — thresholds apply only
+      // to full-suite runs. (config/vitest.config.ts re-exports this file.)
+      thresholds: process.env['VITEST_BUCKET']
+        ? undefined
+        : {
+            // PIX-223: thresholds lifted toward the security-baseline.json 70% target
+            // as coverage improves. Measured full-run coverage (green): lines 60.7%,
+            // statements 61.1%, functions 61.6%, branches 51.4%. Kept ~6pts
+            // below actual so the gate stays green while enforcing real progress.
+            lines: 55,
+            functions: 55,
+            branches: 45,
+            statements: 55,
+          },
       exclude: [
         'node_modules/**',
         'dist/**',

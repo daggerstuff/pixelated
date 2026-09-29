@@ -118,12 +118,18 @@
 
 .marketing-title {
   margin: 0;
-  font-family: var(--np-font-display, 'Fraunces Variable', Georgia, serif);
-  font-weight: var(--np-weight-display, 350);
+  font-family: var(
+    --np-font-display,
+    'Space Grotesk Variable',
+    'Space Grotesk',
+    system-ui,
+    sans-serif
+  );
+  font-weight: var(--np-weight-display, 700);
   max-width: 18ch;
   font-size: var(--np-text-display, clamp(2.5rem, 5vw, 4.5rem));
   line-height: var(--np-leading-display, 1.05);
-  letter-spacing: var(--np-tracking-display, -0.02em);
+  letter-spacing: var(--np-tracking-display, -0.035em);
   color: var(--text-primary);
   text-wrap: balance;
   font-feature-settings: 'kern', 'liga', 'calt';
@@ -131,16 +137,28 @@
 
 .marketing-title--medium {
   max-width: 22ch;
-  font-weight: var(--np-weight-headline, 400);
+  font-family: var(
+    --np-font-headline,
+    'Space Grotesk Variable',
+    'Space Grotesk',
+    system-ui,
+    sans-serif
+  );
+  font-weight: var(--np-weight-headline, 600);
   font-size: var(--np-text-headline, clamp(1.75rem, 3.5vw, 2.75rem));
   line-height: var(--np-leading-headline, 1.15);
-  letter-spacing: var(--np-tracking-headline, -0.02em);
+  letter-spacing: var(--np-tracking-headline, -0.025em);
 }
 
 .marketing-lede {
   max-width: 60ch;
   margin: 1.45rem 0 0;
-  font-family: var(--np-font-body, ui-sans-serif, system-ui, sans-serif);
+  font-family: var(
+    --np-font-body,
+    'Instrument Sans Variable',
+    system-ui,
+    sans-serif
+  );
   font-weight: 400;
   font-size: clamp(1rem, 1.05vw, 1.125rem);
   line-height: 1.55; /* short-form bridge: ~1.5 is the spec */
@@ -165,10 +183,10 @@
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
   font-family: var(
-    --np-font-mono,
-    'JetBrains Mono Variable',
-    ui-monospace,
-    monospace
+    --np-font-label,
+    'Instrument Sans Variable',
+    system-ui,
+    sans-serif
   );
   font-size: 0.74rem;
   font-weight: 700;
@@ -280,10 +298,10 @@
 .marketing-list-label,
 .marketing-quote-label {
   font-family: var(
-    --np-font-mono,
-    'JetBrains Mono Variable',
-    ui-monospace,
-    monospace
+    --np-font-label,
+    'Instrument Sans Variable',
+    system-ui,
+    sans-serif
   );
   font-size: 0.7rem;
   font-weight: 600;
@@ -293,12 +311,7 @@
 }
 
 .marketing-eyebrow {
-  font-family: var(
-    --np-font-mono,
-    'JetBrains Mono Variable',
-    ui-monospace,
-    monospace
-  );
+  font-family: var(--np-font-label, system-ui, sans-serif);
   font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -434,7 +447,7 @@
   margin: 0;
   font-family: var(
     --np-font-body,
-    'Public Sans Variable',
+    'Instrument Sans Variable',
     system-ui,
     sans-serif
   );
@@ -448,7 +461,12 @@
 
 .marketing-card p,
 .marketing-card li {
-  font-family: var(--np-font-body, ui-sans-serif, system-ui, sans-serif);
+  font-family: var(
+    --np-font-body,
+    'Instrument Sans Variable',
+    system-ui,
+    sans-serif
+  );
   font-weight: 400;
   font-size: 0.95rem;
   line-height: 1.65;

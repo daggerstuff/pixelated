@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any, TypedDict
 
 import pytest
 
@@ -82,8 +84,23 @@ def test_release_requires_complete_inspection_and_human_approval() -> None:
         assert_release_eligible(incomplete)
 
 
+class _CommonFields(TypedDict):
+    product: TargetProduct
+    source_id: str
+    analysis_id: str
+    source_unit_refs: list[str]
+    use_policies: list[UsePolicy]
+    contribution_mode: ContributionMode
+    construction_spec_version: str
+    model_alias: str
+    prompt_version: str
+    judge_results: dict[str, JudgeResult]
+    human_review_status: HumanReviewStatus
+    lineage_hashes: list[str]
+
+
 def construction_record(product: TargetProduct) -> ConstructionRecord:
-    common = {
+    common: _CommonFields = {
         "product": product,
         "source_id": "SRC-047",
         "analysis_id": "src047.mi-reflection",
@@ -100,10 +117,15 @@ def construction_record(product: TargetProduct) -> ConstructionRecord:
     if product is TargetProduct.DPO_PREFERENCES:
         return ConstructionRecord(**common, prompt="Reflect the concern", chosen="Reflection", rejected="Advice")
     if product is TargetProduct.KNOWLEDGE_TASKS:
-        return ConstructionRecord(**common, query="What is reflection?", answer="A concise definition", citations=["annomi:guide"])
+        return ConstructionRecord(
+            **common, query="What is reflection?", answer="A concise definition", citations=["annomi:guide"]
+        )
     return ConstructionRecord(
         **common,
-        messages=[ChatMessage(role="user", content="I feel stuck"), ChatMessage(role="assistant", content="Part of you wants change")],
+        messages=[
+            ChatMessage(role="user", content="I feel stuck"),
+            ChatMessage(role="assistant", content="Part of you wants change"),
+        ],
     )
 
 
@@ -115,7 +137,11 @@ def construction_record(product: TargetProduct) -> ConstructionRecord:
         (TargetProduct.KNOWLEDGE_TASKS, to_retrieval, "citations"),
     ],
 )
-def test_output_transforms_preserve_lineage(product, transform, payload_key) -> None:
+def test_output_transforms_preserve_lineage(
+    product: TargetProduct,
+    transform: Callable[[ConstructionRecord], dict[str, Any]],
+    payload_key: str,
+) -> None:
     output = transform(construction_record(product))
 
     assert payload_key in output

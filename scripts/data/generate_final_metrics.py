@@ -6,6 +6,7 @@ import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TypedDict
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
@@ -13,10 +14,21 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_PROJECT_ROOT / "ai"))
 
 
-def analyze_dataset(file_path: Path) -> dict:
+class DatasetStats(TypedDict):
+    total_records: int
+    sample_keys: set[str]
+    message_counts: list[int]
+    has_metadata: int
+    has_quality_score: int
+    categories: Counter[str]
+    sources: Counter[str]
+    avg_messages: float
+
+
+def analyze_dataset(file_path: Path) -> DatasetStats:
     """Analyze a single dataset file."""
 
-    stats = {
+    stats: DatasetStats = {
         "total_records": 0,
         "sample_keys": set(),
         "message_counts": [],
@@ -24,6 +36,7 @@ def analyze_dataset(file_path: Path) -> dict:
         "has_quality_score": 0,
         "categories": Counter(),
         "sources": Counter(),
+        "avg_messages": 0.0,
     }
 
     with open(file_path) as f:
@@ -62,7 +75,6 @@ def analyze_dataset(file_path: Path) -> dict:
             except json.JSONDecodeError:
                 continue
 
-    stats["sample_keys"] = list(stats["sample_keys"])
     stats["avg_messages"] = (
         sum(stats["message_counts"]) / len(stats["message_counts"]) if stats["message_counts"] else 0
     )
@@ -70,7 +82,7 @@ def analyze_dataset(file_path: Path) -> dict:
     return stats
 
 
-def main():
+def main() -> None:
     datasets = [
         (
             "Tier1 Priority Curated",
@@ -90,7 +102,7 @@ def main():
         ),
     ]
 
-    all_stats = {}
+    all_stats: dict[str, DatasetStats] = {}
     total_records = 0
 
     for name, path in datasets:
@@ -102,7 +114,7 @@ def main():
             pass
 
     # Category breakdown
-    all_categories = Counter()
+    all_categories: Counter[str] = Counter()
     for _name, stats in all_stats.items():
         all_categories.update(stats["categories"])
 
@@ -110,7 +122,7 @@ def main():
         pass
 
     # Source breakdown
-    all_sources = Counter()
+    all_sources: Counter[str] = Counter()
     for _name, stats in all_stats.items():
         all_sources.update(stats["sources"])
 

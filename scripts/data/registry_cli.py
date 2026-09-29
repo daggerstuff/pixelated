@@ -15,6 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import argparse
+from typing import Any
 
 from ai.data.registry import (
     DatasetGapTracker,
@@ -28,11 +29,11 @@ from ai.data.registry.sources import (
 )
 
 
-def cmd_query(args):
+def cmd_query(args: argparse.Namespace) -> None:
     """Query registry by stage, quality profile, or status."""
     registry = DatasetRegistry("ai/data/dataset_registry.json")
 
-    refs = []
+    refs: list[Any] = []
 
     if args.stage:
         refs = list(registry.by_stage(args.stage))
@@ -51,7 +52,7 @@ def cmd_query(args):
             pass
 
 
-def cmd_gaps(args):
+def cmd_gaps(args: argparse.Namespace) -> None:
     """Show gap report."""
     registry = DatasetRegistry("ai/data/dataset_registry.json")
     tracker = DatasetGapTracker(registry, mtgc_plan_path=args.plan)
@@ -66,7 +67,7 @@ def cmd_gaps(args):
         tracker.print_report()
 
 
-def cmd_source(args):
+def cmd_source(args: argparse.Namespace) -> None:
     """Source datasets to fill gaps."""
     manager = DatasetSourceManager()
     manager.register_source(JournalSource())
@@ -93,7 +94,7 @@ def cmd_source(args):
             pass
 
 
-def cmd_sync(args):
+def cmd_sync(args: argparse.Namespace) -> None:
     """Sync datasets from external sources."""
     DatasetRegistry("ai/data/dataset_registry.json")
 
@@ -106,7 +107,7 @@ def cmd_sync(args):
         pass
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Dataset Registry CLI", prog="pixelated registry")
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 

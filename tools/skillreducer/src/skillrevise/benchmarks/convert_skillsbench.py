@@ -3,10 +3,11 @@ from __future__ import annotations
 import argparse
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
+from skillrevise.benchmarks.skillsbench import SkillsBenchTaskLoader
 from skillrevise.core.io import to_jsonable, write_json
 from skillrevise.core.models import TaskSpec
-from skillrevise.benchmarks.skillsbench import SkillsBenchTaskLoader
 
 try:
     import tomllib
@@ -61,7 +62,9 @@ def _task_dir_to_spec(task_dir: Path) -> TaskSpec:
     tags = metadata_section.get("tags") or []
     if isinstance(tags, str):
         tags = [tags]
-    category = str(metadata_section.get("category") or (tags[0] if tags else "") or task_dir.name.split("-")[0])
+    category = str(
+        metadata_section.get("category") or (tags[0] if tags else "") or task_dir.name.split("-")[0]
+    )
 
     timeout = _coerce_timeout(
         verifier_section.get("timeout_sec"),
@@ -94,9 +97,10 @@ def _task_dir_to_spec(task_dir: Path) -> TaskSpec:
     )
 
 
-def _load_toml(path: Path) -> dict:
+def _load_toml(path: Path) -> dict[str, Any]:
     with path.open("rb") as handle:
-        return tomllib.load(handle)
+        payload: dict[str, Any] = tomllib.load(handle)
+        return payload
 
 
 def _read_text(path: Path) -> str:
@@ -105,7 +109,7 @@ def _read_text(path: Path) -> str:
     return path.read_text().strip()
 
 
-def _coerce_timeout(*values) -> int:
+def _coerce_timeout(*values: float | str | None) -> int:
     numeric = [float(value) for value in values if value is not None]
     if not numeric:
         return 600
@@ -163,14 +167,24 @@ def _validate_tasks(tasks: list[TaskSpec]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Convert a SkillsBench-style manifest into SkillRevise TaskSpec JSON.")
+    parser = argparse.ArgumentParser(
+        description="Convert a SkillsBench-style manifest into SkillRevise TaskSpec JSON."
+    )
     parser.add_argument("input", help="Input SkillsBench-style JSON or JSONL manifest.")
     parser.add_argument("output", help="Output TaskSpec JSON manifest.")
     parser.add_argument("--workspace-root", help="Root used to resolve relative repo_path values.")
-    parser.add_argument("--default-family", help="Family to use when a record has no domain/subdomain/family.")
-    parser.add_argument("--default-verifier-command", help="Verifier command to use when a record has none.")
-    parser.add_argument("--default-timeout-seconds", type=int, help="Timeout to use when a record has none.")
-    parser.add_argument("--strict", action="store_true", help="Fail if required experiment fields are missing.")
+    parser.add_argument(
+        "--default-family", help="Family to use when a record has no domain/subdomain/family."
+    )
+    parser.add_argument(
+        "--default-verifier-command", help="Verifier command to use when a record has none."
+    )
+    parser.add_argument(
+        "--default-timeout-seconds", type=int, help="Timeout to use when a record has none."
+    )
+    parser.add_argument(
+        "--strict", action="store_true", help="Fail if required experiment fields are missing."
+    )
     args = parser.parse_args()
 
     tasks = normalize_tasks(

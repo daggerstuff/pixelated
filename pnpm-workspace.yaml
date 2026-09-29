@@ -78,7 +78,11 @@ allowBuilds:
   '@scarf/scarf': true
   koffi: true
   '@google/genai': true
-minimumReleaseAge: 0
+# One day (minutes). Newly published package versions are only installable
+# after they have been on the registry for 24 hours — most malicious or
+# defective releases are yanked within that window. Packages that genuinely
+# need day-one installs are exempted in minimumReleaseAgeExclude below.
+minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@cloudflare/*'
@@ -231,6 +235,23 @@ peerDependencyRules:
     '@emnapi/core': ^1.10.0
     '@emnapi/runtime': ^1.10.0
 overrides:
+  # Drift consolidation (#6050): pin newest to collapse duplicate resolutions.
+  '@opentelemetry/instrumentation-mongodb': 0.72.0
+  '@oxc-project/types': 0.151.0
+  aria-query: 5.3.2
+  cluster-key-slot: 1.1.2
+  cookie-signature: 1.2.2
+  csp_evaluator: 1.1.8
+  devtools-protocol: 0.0.1687809
+  dom-accessibility-api: 0.6.3
+  fast-glob: 3.3.3
+  fflate: 0.8.3
+  html-entities: 2.6.0
+  lighthouse-stack-packs: 1.12.3
+  mime-db: 1.54.0
+  mongodb: 7.6.0
+  oxc-parser: 0.151.0
+  webdriver-bidi-protocol: 0.4.3
   '@cloudflare/workers-types': 4.20260611.1
   'eslint-plugin-jsx-a11y>minimatch': 3.1.5
   '@astrojs/react>devalue': ^5.6.4
@@ -243,8 +264,8 @@ overrides:
   '@foresight/core>esbuild': 0.25.0
   '@foresight/core>minimatch': 9.0.7
   '@foresight/core>vite': 6.4.2
-  fast-uri: 3.1.6
-  '@foresight/docs>fast-uri': 3.1.6
+  fast-uri: 3.1.8
+  '@foresight/docs>fast-uri': 3.1.8
   '@foresight/docs>serialize-javascript': ^7.0.5
   '@google-cloud/storage>uuid': '>=11.1.1'
   gcp-metadata>uuid: '>=11.1.1'
@@ -273,15 +294,17 @@ overrides:
 
   '@vercel/routing-utils@5.3.3>path-to-regexp': npm:path-to-regexp@6.3.0
   '@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0': npm:path-to-regexp@6.3.0
-  astro>devalue: '>=5.8.1'
+  astro>devalue: ^5.9.4
   axios: '>=1.15.1'
   adm-zip: 0.6.0
   brace-expansion: ^5.0.8
   astro>cookie: ^2.0.0
   cookie: '^0.7.2'
   '@vercel/oidc': '3.7.1'
-  devalue: '>=5.8.1'
+  devalue: ^5.9.4
   devalue@<5.8.1: ^5.8.1
+  micromark-extension-gfm-table: 2.1.2
+  '@colors/colors': 1.6.1
   diff: ^5.2.2
   dompurify: ^3.4.3
   drizzle-orm: ^0.45.2
@@ -295,14 +318,28 @@ overrides:
   follow-redirects: '>=1.16.0'
   glob: ^13.0.0
   h3: '>=1.15.9'
-  'nitro>h3': '2.0.1-rc.22'
+  # Exact pin, not a caret range: prerelease ranges (^x-rc.N) re-resolve to
+  # every newly published RC and drift pnpm-lock.yaml on every commit hook
+  # sync. rc.32 satisfies the security floor (>= rc.31); bump the pin
+  # deliberately when a newer RC is vetted.
+  'nitro>h3': 2.0.1-rc.32
+  # devframe (via @unocss/inspector) imports { H3 } from 'h3' — an h3 2.x-only
+  # export. The floor override above resolves stable h3 1.15.x for it and breaks
+  # the import; pin devframe's h3 to the same vetted RC.
+  'devframe>h3': 2.0.1-rc.32
   hono: ^4.12.14
   ip-address: '>=10.1.1'
   # CVE-2026-84375 (HIGH, fixed in 4.3.2).
   js-yaml: 4.3.2
   markdown-it: 14.2.0
   '@opentelemetry/core': 2.8.0
-  joi: 17.13.4
+  joi: 17.13.8
+  # Version-drift ratchet: consolidate duplicate resolutions introduced by
+  # the Dependabot major-updates merge (#6053) — single-version pins, all
+  # semver-compatible with their requesters.
+  '@sentry/core@^10': 10.75.1
+  dotenv: 18.0.1
+  tsx: 4.23.15
   jsonwebtoken: ^9.0.0
   jws: '>=4.0.1'
   kerberos: ^7.0.0

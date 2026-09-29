@@ -166,7 +166,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
 
           <div className="h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="text-muted-foreground flex h-full items-center justify-center p-4">
+              <div className="flex h-full items-center justify-center p-4 text-muted-foreground">
                 No notifications
               </div>
             ) : (
@@ -182,10 +182,10 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                   >
                     <div className="flex-1">
                       <h3 className="font-medium">{notification.title}</h3>
-                      <p className="text-muted-foreground text-sm">
+                      <p className="text-sm text-muted-foreground">
                         {notification.body}
                       </p>
-                      <div className="text-muted-foreground mt-1 text-xs">
+                      <div className="mt-1 text-xs text-muted-foreground">
                         {new Date(notification.createdAt).toLocaleString()}
                       </div>
                     </div>

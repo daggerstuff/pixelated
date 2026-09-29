@@ -28,6 +28,8 @@ export interface SegmentQualityMetrics {
   outcomeAchievementRate: number
   /** Number of responses sampled */
   sampleSize: number
+  /** Number of expected outcomes evaluated for outcomeAchievementRate */
+  outcomeCount: number
 }
 
 /**
@@ -56,11 +58,19 @@ export interface VarianceResult {
   max: number
   /** Minimum value across segments */
   min: number
-  /** Variance = max - min (percentage points) */
+  /** Spread across segments, in `unit` */
   variance: number
-  /** Threshold percentage (default 2%) */
+  /** Threshold in `unit` */
   threshold: number
-  /** True if variance exceeds threshold */
+  /** Unit the variance is expressed in */
+  unit: 'percentage-points' | 'relative-percent'
+  /**
+   * For proportion metrics (highConfidenceRate, outcomeAchievementRate):
+   * whether the max/min gap clears a two-proportion z-test at p < 0.01.
+   * Non-proportion metrics are always true (threshold is the only gate).
+   */
+  statisticallySignificant: boolean
+  /** True if variance exceeds threshold AND the gap is statistically significant */
   exceeded: boolean
 }
 
@@ -119,6 +129,72 @@ const DEFAULT_MIN_SAMPLE_SIZE = 10
 const MAX_SAMPLE_SIZE = 500
 
 /**
+ * Metrics audited for cross-segment variance (every quality metric except sampleSize).
+ */
+const AUDITED_METRICS = [
+  'averageConfidence',
+  'averageResponseLength',
+  'highConfidenceRate',
+  'outcomeAchievementRate',
+] as const
+
+type AuditedMetric = (typeof AUDITED_METRICS)[number]
+
+/**
+ * Unit per audited metric. Rate/confidence metrics are 0-1 ratios whose spread
+ * is naturally expressed in percentage points. averageResponseLength is in
+ * characters — an absolute spread there is meaningless without a scale, so it
+ * is expressed as relative percent of the max segment mean.
+ */
+const METRIC_UNITS: Record<AuditedMetric, VarianceResult['unit']> = {
+  averageConfidence: 'percentage-points',
+  highConfidenceRate: 'percentage-points',
+  outcomeAchievementRate: 'percentage-points',
+  averageResponseLength: 'relative-percent',
+}
+
+/**
+ * Threshold for relative-percent metrics (averageResponseLength), in relative
+ * percent. A 2pp threshold would misfire on length: real sessions differ by
+ * tens of characters, so a spread below 10% of the max segment mean is not
+ * actionable.
+ */
+const RELATIVE_LENGTH_THRESHOLD = 10
+
+/** Two-proportion z-test critical value for p < 0.01 (two-tailed). */
+const Z_CRITICAL = 2.576
+
+/**
+ * Proportion metrics are gated behind a two-proportion z-test so that small
+ * samples cannot turn sampling noise into a bias alert.
+ */
+const PROPORTION_METRICS: readonly AuditedMetric[] = [
+  'highConfidenceRate',
+  'outcomeAchievementRate',
+]
+
+/**
+ * Two-proportion pooled z statistic. Returns +/-Infinity when the pooled
+ * standard error collapses to 0 (degenerate 0/1 rates with a real gap).
+ */
+function twoProportionZ(
+  successes1: number,
+  n1: number,
+  successes2: number,
+  n2: number,
+): number {
+  const p1 = n1 > 0 ? successes1 / n1 : 0
+  const p2 = n2 > 0 ? successes2 / n2 : 0
+  const pooled = (successes1 + successes2) / (n1 + n2)
+  const se = Math.sqrt(pooled * (1 - pooled) * (1 / n1 + 1 / n2))
+  if (se === 0) {
+    if (p1 === p2) return 0
+    return p1 > p2 ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY
+  }
+  return (p1 - p2) / se
+}
+
+/**
  * Compute quality metrics for a set of AI responses.
  */
 function computeMetrics(
@@ -132,6 +208,7 @@ function computeMetrics(
       highConfidenceRate: 0,
       outcomeAchievementRate: 0,
       sampleSize: 0,
+      outcomeCount: 0,
     }
   }
 
@@ -167,6 +244,7 @@ function computeMetrics(
     highConfidenceRate: highConfRate,
     outcomeAchievementRate: outcomeRate,
     sampleSize: responses.length,
+    outcomeCount: allOutcomes.length,
   }
 }
 
@@ -252,40 +330,98 @@ function groupByDemographic(
 
 /**
  * Compute variance across segments for a given metric.
+ *
+ * The spread is expressed in the metric's unit (percentage points for ratios,
+ * relative percent for length). For proportion metrics a spread is only
+ * actionable when it clears a two-proportion z-test at p < 0.01 between the
+ * highest and lowest segments — a raw max/min gap on small samples is
+ * indistinguishable from sampling noise.
  */
 function computeVariance(
   segments: SegmentResult[],
-  metric: keyof SegmentQualityMetrics,
+  metric: AuditedMetric,
   threshold: number,
 ): VarianceResult {
-  const values = segments
-    .filter((s) => s.sampleSize > 0)
-    .map((s) => s.metrics[metric])
-    .filter((v) => typeof v === 'number' && !Number.isNaN(v))
+  const unit = METRIC_UNITS[metric]
+  const eligible = segments.filter((s) => s.sampleSize > 0)
 
-  if (values.length < 2) {
+  if (eligible.length < 2) {
     return {
-      metric: metric,
+      metric,
       max: 0,
       min: 0,
       variance: 0,
       threshold,
+      unit,
+      statisticallySignificant: false,
       exceeded: false,
     }
   }
 
-  const max = Math.max(...values)
-  const min = Math.min(...values)
-  const variance = (max - min) * 100 // Convert to percentage points
+  let maxSegment = eligible[0]
+  let minSegment = eligible[0]
+  for (const s of eligible) {
+    if (s.metrics[metric] > maxSegment.metrics[metric]) maxSegment = s
+    if (s.metrics[metric] < minSegment.metrics[metric]) minSegment = s
+  }
+  const max = maxSegment.metrics[metric]
+  const min = minSegment.metrics[metric]
+
+  const variance =
+    unit === 'relative-percent'
+      ? max === 0
+        ? 0
+        : ((max - min) / max) * 100
+      : (max - min) * 100
+
+  let statisticallySignificant = true
+  if (variance > 0 && PROPORTION_METRICS.includes(metric)) {
+    if (metric === 'highConfidenceRate') {
+      const n1 = maxSegment.metrics.sampleSize
+      const n2 = minSegment.metrics.sampleSize
+      const k1 = Math.round(maxSegment.metrics.highConfidenceRate * n1)
+      const k2 = Math.round(minSegment.metrics.highConfidenceRate * n2)
+      statisticallySignificant =
+        Math.abs(twoProportionZ(k1, n1, k2, n2)) >= Z_CRITICAL
+    } else {
+      const n1 = maxSegment.metrics.outcomeCount
+      const n2 = minSegment.metrics.outcomeCount
+      statisticallySignificant =
+        n1 > 0 &&
+        n2 > 0 &&
+        Math.abs(
+          twoProportionZ(
+            Math.round(maxSegment.metrics.outcomeAchievementRate * n1),
+            n1,
+            Math.round(minSegment.metrics.outcomeAchievementRate * n2),
+            n2,
+          ),
+        ) >= Z_CRITICAL
+    }
+  }
 
   return {
-    metric: metric,
+    metric,
     max,
     min,
     variance,
     threshold,
-    exceeded: variance > threshold,
+    unit,
+    statisticallySignificant,
+    exceeded: variance > threshold && statisticallySignificant,
   }
+}
+
+function formatVarianceValue(v: VarianceResult): string {
+  return v.unit === 'relative-percent'
+    ? `${v.variance.toFixed(2)}% relative`
+    : `${v.variance.toFixed(2)} pp`
+}
+
+function formatThresholdValue(v: VarianceResult): string {
+  return v.unit === 'relative-percent'
+    ? `${v.threshold}% relative`
+    : `${v.threshold} pp`
 }
 
 /**
@@ -300,7 +436,17 @@ function generateRecommendations(
   const exceeded = varianceResults.filter((v) => v.exceeded)
   for (const v of exceeded) {
     recs.push(
-      `Variance for ${v.metric} exceeds threshold: ${v.variance.toFixed(2)}% > ${v.threshold}%`,
+      `Variance for ${v.metric} exceeds threshold: ${formatVarianceValue(v)} > ${formatThresholdValue(v)}`,
+    )
+  }
+
+  // Above threshold but not statistically significant — sampling noise, not bias
+  const noiseOnly = varianceResults.filter(
+    (v) => !v.exceeded && v.variance > v.threshold,
+  )
+  for (const v of noiseOnly) {
+    recs.push(
+      `Variance for ${v.metric} is ${formatVarianceValue(v)} (threshold ${formatThresholdValue(v)}) but not statistically significant at p<0.01 — likely sampling noise; monitor next cycle`,
     )
   }
 
@@ -375,21 +521,23 @@ export class BiasAuditRunner {
     }
 
     // Compute variance for each quality metric
-    const metricKeys: (keyof SegmentQualityMetrics)[] = [
-      'averageConfidence',
-      'averageResponseLength',
-      'highConfidenceRate',
-      'outcomeAchievementRate',
-    ]
-
-    const varianceResults = metricKeys.map((k) =>
-      computeVariance(segments, k, threshold),
+    const varianceResults = AUDITED_METRICS.map((k) =>
+      computeVariance(
+        segments,
+        k,
+        k === 'averageResponseLength' ? RELATIVE_LENGTH_THRESHOLD : threshold,
+      ),
     )
 
     const thresholdExceeded = varianceResults.some((v) => v.exceeded)
     const alertLevel = determineAlertLevel(varianceResults)
     const recommendations = generateRecommendations(varianceResults, segments)
-    const totalResponses = segments.reduce((sum, s) => sum + s.sampleSize, 0)
+    // Count actual responses — segments overlap across dimensions, so summing
+    // per-segment sample sizes multi-counts sessions by the number of dimensions.
+    const totalResponses = sessions.reduce(
+      (sum, s) => sum + (s.aiResponses?.length ?? 0),
+      0,
+    )
 
     const report: BiasAuditReport = {
       reportId: `bias-audit-${month}-${Date.now()}`,

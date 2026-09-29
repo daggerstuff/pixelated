@@ -121,63 +121,61 @@ const contentClasses = `
 `
 ---
 
-{
-  href ? (
-    <a class={baseClasses} href={href} target={target} rel={rel}>
-      {/* Gradient overlay for depth */}
-      <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+{href ? (
+  <a class={baseClasses} {href} {target} {rel}>
+    {/* Gradient overlay for depth */}
+    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      {/* Background pattern effect */}
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_0%,transparent_50%)] opacity-30" />
+    {/* Background pattern effect */}
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_0%,transparent_50%)] opacity-30" />
 
-      <div class={contentClasses}>
-        {icon && <div class="mb-4 text-3xl">{icon}</div>}
+    <div class={contentClasses}>
+      {icon && <div class="mb-4 text-3xl">{icon}</div>}
 
-        {title && (
-          <h3 class="text-xl font-semibold mb-2 text-balance">{title}</h3>
-        )}
-
-        {description && (
-          <p class="text-sm opacity-90 text-balance">{description}</p>
-        )}
-
-        {children}
-      </div>
-
-      {/* Hover indicator */}
-      {hoverEffect !== 'none' && (
-        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+      {title && (
+        <h3 class="text-xl font-semibold mb-2 text-balance">{title}</h3>
       )}
-    </a>
-  ) : (
-    <div class={baseClasses}>
-      {/* Gradient overlay for depth */}
-      <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      {/* Background pattern effect */}
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_0%,transparent_50%)] opacity-30" />
-
-      <div class={contentClasses}>
-        {icon && <div class="mb-4 text-3xl">{icon}</div>}
-
-        {title && (
-          <h3 class="text-xl font-semibold mb-2 text-balance">{title}</h3>
-        )}
-
-        {description && (
-          <p class="text-sm opacity-90 text-balance">{description}</p>
-        )}
-
-        {children}
-      </div>
-
-      {/* Hover indicator */}
-      {hoverEffect !== 'none' && (
-        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+      {description && (
+        <p class="text-sm opacity-90 text-balance">{description}</p>
       )}
+
+      {children}
     </div>
-  )
-}
+
+    {/* Hover indicator */}
+    {hoverEffect !== 'none' && (
+      <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+    )}
+  </a>
+) : (
+  <div class={baseClasses}>
+    {/* Gradient overlay for depth */}
+    <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+    {/* Background pattern effect */}
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_0%,transparent_50%)] opacity-30" />
+
+    <div class={contentClasses}>
+      {icon && <div class="mb-4 text-3xl">{icon}</div>}
+
+      {title && (
+        <h3 class="text-xl font-semibold mb-2 text-balance">{title}</h3>
+      )}
+
+      {description && (
+        <p class="text-sm opacity-90 text-balance">{description}</p>
+      )}
+
+      {children}
+    </div>
+
+    {/* Hover indicator */}
+    {hoverEffect !== 'none' && (
+      <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/50 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
+    )}
+  </div>
+)}
 
 <style>
   /* Dark mode adjustments */

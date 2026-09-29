@@ -16,6 +16,12 @@ import { test, expect } from '@playwright/test'
 import { login } from './test-utils'
 
 test.describe('Bias Detection Dashboard', () => {
+  // Cold-start dev server hydration (Vite optimize + island chunk + Recharts
+  // dependency graph) can exceed Playwright's 30s default test timeout even
+  // though the explicit waitForSelector below allows 45s. Give the whole
+  // describe enough budget for the slowest cold-start path.
+  test.setTimeout(120_000)
+
   // Setup: login before each test and navigate to bias dashboard
   test.beforeEach(async ({ page }) => {
     await login(page)
@@ -25,10 +31,12 @@ test.describe('Bias Detection Dashboard', () => {
     await page.waitForSelector('[data-testid="bias-dashboard"]', {
       state: 'visible',
     })
-    // Wait for the React dashboard to mount (tabs become available)
+    // Wait for the React dashboard to mount (tabs become available).
+    // Generous timeout: on a cold dev/preview server, the island hydrates and
+    // the dashboard chunk loads after Vite's initial optimize/compile pass.
     await page.waitForSelector('[data-testid="trends-tab"]', {
       state: 'visible',
-      timeout: 15000,
+      timeout: 45000,
     })
   })
 

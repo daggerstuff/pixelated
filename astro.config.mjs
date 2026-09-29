@@ -540,7 +540,14 @@ export default defineConfig({
       // can produce a stale/missing chunk (e.g. settings-XXXXXXXX.js) after a
       // lockfile update, causing "Failed to fetch dynamically imported module"
       // errors on pages that load TherapyGate → memory-schema → zod.
-      include: ['zod'],
+      //
+      // Pre-bundle recharts too: its state/hooks imports the CJS
+      // `use-sync-external-store/shim/with-selector` shim. Serving recharts raw
+      // (via optimizeDeps.exclude) breaks Vite's CJS→ESM named-export interop,
+      // and ResponsiveContainer throws "does not provide an export named
+      // 'useSyncExternalStoreWithSelector'" which unmounts the dashboard island.
+      // Bundling recharts + the shim together fixes the interop.
+      include: ['zod', 'recharts'],
       exclude: [
         // ── Server-only source directories ─────────────────────────────────
         'apps/web/src/lib/security',
@@ -607,7 +614,6 @@ export default defineConfig({
         'axios',
         'bcryptjs',
         'jsonwebtoken',
-        'recharts',
         'lucide-react',
         '@tensorflow/tfjs',
         '@tensorflow/tfjs-layers',
@@ -678,10 +684,11 @@ export default defineConfig({
               org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
               project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
               authToken: process.env.SENTRY_AUTH_TOKEN,
-              // Tag uploaded files with the current release so server
-              // events that carry a matching SENTRY_RELEASE can be
-              // symbolicated against the uploaded maps.
-              release: sentryRelease ? { name: sentryRelease } : undefined,
+              // The deprecated `release` option was removed: runtime
+              // events get their release from sentry.client/server.config.ts
+              // (resolveSentryRelease), and the sourcemap upload is tagged
+              // by the scoped sentryVitePlugin calls above, which pass their
+              // own `release: { name: sentryRelease }`.
               // Sourcemaps are uploaded by the scoped Sentry Vite plugins
               // above. Keep the SDK integration enabled without running a
               // second broad uploader over Astro's virtual module paths.

@@ -3,7 +3,7 @@
 # Cursor Web & Cloud VM Environment Setup Script - Pixelated Empathy
 #
 # This script provisions a clean Ubuntu 22.04 / 24.04 Cloud VM for remote development,
-# installs all required runtimes (Node 24.16.0, pnpm 11.12.0, python 3.13, uv),
+# installs all required runtimes (Node 24.16.0, pnpm 11.12.0, python 3.14, uv),
 # boots up the required database containers (Mongo, Redis, Postgres),
 # installs the Cursor CLI Tunnel daemon, and sets up a systemd service for persistent access.
 #
@@ -174,11 +174,11 @@ install_python_stack() {
     # Install uv
     sudo -u "$REAL_USER" bash -c "curl -LsSf https://astral.sh/uv/install.sh | sh"
     
-    # Install Python 3.13 via uv
-    log_info "Installing Python 3.13..."
+    # Install Python 3.14 via uv
+    log_info "Installing Python 3.14..."
     sudo -u "$REAL_USER" bash -c "
         export PATH=\"\$HOME/.local/bin:\$PATH\"
-        uv python install 3.13
+        uv python install 3.14
     "
     log_success "Python stack installed successfully"
 }

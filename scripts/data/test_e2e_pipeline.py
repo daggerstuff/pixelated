@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("e2e_test")
 
 
-async def run_e2e_test():
+async def run_e2e_test() -> None:
     logger.info("🚀 Starting AUTHENTIC End-to-End Pipeline Test")
 
     # 1. Test Safety Layer (Crisis Detection)

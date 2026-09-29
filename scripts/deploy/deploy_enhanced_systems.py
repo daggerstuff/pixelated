@@ -25,17 +25,18 @@ logger = logging.getLogger(__name__)
 class EnhancedSystemDeployer:
     """Deploys enhanced bias detection system components"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.project_root = Path(__file__).parent.parent
         self.deployment_config = self.load_deployment_config()
-        self.deployment_log = []
+        self.deployment_log: list[dict[str, str]] = []
 
     def load_deployment_config(self) -> dict[str, Any]:
         """Load deployment configuration"""
         config_path = self.project_root / "config" / "deployment.json"
         if config_path.exists():
             with open(config_path) as f:
-                return json.load(f)
+                config: dict[str, Any] = json.load(f)
+            return config
         return {
             "services": {
                 "bias_detection": {"port": 8001, "workers": 4},
@@ -49,7 +50,7 @@ class EnhancedSystemDeployer:
             },
         }
 
-    def log_deployment_step(self, step: str, status: str, details: str = ""):
+    def log_deployment_step(self, step: str, status: str, details: str = "") -> None:
         """Log deployment step"""
         log_entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -523,7 +524,7 @@ echo "  - Memory Service: http://localhost:{self.deployment_config["services"]["
         return True
 
 
-async def main():
+async def main() -> int:
     """Main deployment function"""
     deployer = EnhancedSystemDeployer()
 

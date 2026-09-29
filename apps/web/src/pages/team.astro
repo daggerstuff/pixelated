@@ -3,6 +3,8 @@ import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
 import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
+export const prerender = true
+
 const founder = {
   name: 'Chad',
   role: 'Founder',
@@ -59,7 +61,9 @@ const futureRoles = [
             {founder.name}
           </h2>
           <p>{founder.bio}</p>
-          <p><strong>Focus:</strong> {founder.expertise}</p>
+          <p>
+            <strong>Focus:</strong> {founder.expertise}
+          </p>
         </article>
 
         <article class="marketing-card">
@@ -84,14 +88,12 @@ const futureRoles = [
       </div>
 
       <div class="marketing-grid marketing-grid--3">
-        {
-          futureRoles.map((role) => (
-            <article class="marketing-card">
-              <span class="marketing-card__label">{role.label}</span>
-              <p>{role.body}</p>
-            </article>
-          ))
-        }
+        {futureRoles.map((role) => (
+          <article class="marketing-card">
+            <span class="marketing-card__label">{role.label}</span>
+            <p>{role.body}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>

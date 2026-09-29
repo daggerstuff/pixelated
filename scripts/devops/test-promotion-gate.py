@@ -149,7 +149,7 @@ def test_scenario(scenario: str) -> bool:
     return False
 
 
-def main():
+def main() -> int:
     """Run promotion gate integration tests."""
     import argparse
 
@@ -168,7 +168,7 @@ def main():
     print("=" * 60)
 
     scenarios = ["pass", "fail"] if args.scenario == "all" else [args.scenario]
-    results = {}
+    results: dict[str, bool] = {}
 
     for scenario in scenarios:
         results[scenario] = test_scenario(scenario)
