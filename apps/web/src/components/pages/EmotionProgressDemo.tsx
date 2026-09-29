@@ -14,14 +14,14 @@ const EmotionProgressDemo: FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-6 text-3xl font-bold">Emotion Progress Dashboard</h1>
 
-      <p className="text-gray-600 mb-8">
+      <p className="mb-8 text-muted-foreground">
         This dashboard visualizes emotional health progress over time, showing
         improvements across multiple dimensions, tracking risk factors, and
         measuring progress toward goals.
       </p>
 
       {error && (
-        <div className="bg-neutral-100 border-neutral-500 text-neutral-700 mb-6 border-l-4 p-4">
+        <div className="mb-6 rounded-none border-l-4 border-ring bg-secondary p-4 text-foreground">
           <p className="font-bold">Error</p>
           <p>{String(error)}</p>
         </div>
@@ -30,23 +30,25 @@ const EmotionProgressDemo: FC = () => {
       {data ? (
         <EmotionProgressDashboard timeRange={timeRange} isLoading={isLoading} />
       ) : isLoading ? (
-        <div className="bg-white mb-8 rounded-lg p-6 shadow">
+        <div className="mb-8 rounded-none border border-border bg-card p-6">
           <div className="animate-pulse space-y-4">
-            <div className="bg-gray-200 h-4 w-1/4 rounded"></div>
-            <div className="bg-gray-200 h-10 w-full rounded"></div>
+            <div className="h-4 w-1/4 rounded-none bg-secondary"></div>
+            <div className="h-10 w-full rounded-none bg-secondary"></div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="bg-gray-200 h-40 rounded"></div>
-              <div className="bg-gray-200 h-40 rounded"></div>
+              <div className="h-40 rounded-none bg-secondary"></div>
+              <div className="h-40 rounded-none bg-secondary"></div>
             </div>
           </div>
         </div>
       ) : (
-        <div className="bg-gray-100 mb-8 rounded-lg p-6 text-center">
-          <p className="text-gray-500">No emotion progress data available</p>
+        <div className="mb-8 rounded-none border border-border bg-secondary p-6 text-center">
+          <p className="text-muted-foreground">
+            No emotion progress data available
+          </p>
         </div>
       )}
 
-      <div className="bg-white rounded-lg p-6 shadow-md">
+      <div className="rounded-none border border-border bg-card p-6">
         <h2 className="mb-4 text-xl font-semibold">
           About Emotion Progress Tracking
         </h2>
