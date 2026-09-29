@@ -202,5 +202,3 @@ export function WebSocketMessageLogger(props: {
     </div>
   )
 }
-
-export default WebSocketProgressBar
