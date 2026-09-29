@@ -50,31 +50,31 @@ export default function SentryTest({ className = '' }: SentryTestProps) {
 
   return (
     <div className={`sentry-test-component ${className}`}>
-      <div className="bg-yellow-100 border-yellow-400 rounded-lg border p-4">
-        <h3 className="text-yellow-800 mb-2 text-sm font-semibold">
+      <div className="rounded-none border border-ring bg-secondary p-4">
+        <h3 className="mb-2 text-sm font-semibold text-foreground">
           🧪 Sentry Integration Test (Development Only)
         </h3>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={handleTestError}
-            className="bg-red-500 text-white hover:bg-red-600 rounded px-3 py-1 text-xs"
+            className="rounded-none border border-border bg-secondary px-3 py-1 text-xs text-foreground hover:bg-accent"
           >
             Test Error
           </button>
           <button
             onClick={handleTestMessage}
-            className="bg-blue-500 text-white hover:bg-blue-600 rounded px-3 py-1 text-xs"
+            className="rounded-none border border-border bg-secondary px-3 py-1 text-xs text-foreground hover:bg-accent"
           >
             Test Message
           </button>
           <button
             onClick={handleFullTest}
-            className="bg-green-500 text-white hover:bg-green-600 rounded px-3 py-1 text-xs"
+            className="rounded-none border border-border bg-secondary px-3 py-1 text-xs text-foreground hover:bg-accent"
           >
             Full Test
           </button>
         </div>
-        <p className="text-yellow-700 mt-2 text-xs">
+        <p className="mt-2 text-xs text-muted-foreground">
           Check your Sentry dashboard at{' '}
           <a
             href="https://pixelated-empathy-dq.sentry.io/projects/pixel-astro/"
