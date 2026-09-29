@@ -125,7 +125,9 @@ export const PasswordInputWithStrength = forwardRef<
         <div className="form-group">
           <label htmlFor={name} className="mb-2 block font-medium">
             {label}
-            {required && <span className="text-red-500 ml-1">*</span>}
+            {required && (
+              <span className="ml-1 font-medium text-foreground">*</span>
+            )}
           </label>
 
           <div className="relative">
@@ -134,7 +136,7 @@ export const PasswordInputWithStrength = forwardRef<
               id={name}
               name={name}
               type={showPassword ? 'text' : 'password'}
-              className={`w-full rounded border p-3 ${isShowingError ? 'border-red-500 bg-red-50' : 'border-gray-300'} ${isFocused ? 'ring-blue-300 border-blue-300 ring-2' : ''} ${showToggleButton ? 'pr-12' : ''} ${inputClassName} `}
+              className={`w-full rounded-none border p-3 ${isShowingError ? 'border-ring bg-secondary' : 'border-input'} ${isFocused ? 'ring-2 ring-ring' : ''} ${showToggleButton ? 'pr-12' : ''} ${inputClassName} `}
               value={currentValue}
               onChange={handleChange}
               onFocus={handleFocus}
@@ -148,7 +150,7 @@ export const PasswordInputWithStrength = forwardRef<
             {showToggleButton && (
               <button
                 type="button"
-                className="text-gray-500 hover:text-gray-700 focus-visible:ring-blue-300 absolute right-3 top-1/2 -translate-y-1/2 transform rounded-sm focus:outline-none focus-visible:ring-2"
+                className="absolute right-3 top-1/2 -translate-y-1/2 transform rounded-none text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onClick={togglePasswordVisibility}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 title={showPassword ? 'Hide password' : 'Show password'}
@@ -169,7 +171,7 @@ export const PasswordInputWithStrength = forwardRef<
           {isShowingError && (
             <div
               id={`${name}-error`}
-              className={`${isFocused ? 'hidden md:block' : ''} text-red-500 mt-1 text-sm`}
+              className={`${isFocused ? 'hidden md:block' : ''} mt-1 text-sm font-medium text-foreground`}
               role="alert"
             >
               {error}
@@ -177,7 +179,10 @@ export const PasswordInputWithStrength = forwardRef<
           )}
 
           {helperText && (
-            <div id={`${name}-helper`} className="text-gray-500 mt-1 text-xs">
+            <div
+              id={`${name}-helper`}
+              className="mt-1 text-xs text-muted-foreground"
+            >
               {helperText}
             </div>
           )}

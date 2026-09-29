@@ -23,7 +23,7 @@ interface MenuItem {
 
 // Define the nav classes based on the position setting in UI config
 const position = UI.nav.position as NavPosition
-const navClasses = `${navPositionClasses[position]} ${UI.nav.glassmorphism ? 'backdrop-blur-md bg-white/80 dark:bg-gray-900/80' : 'bg-white dark:bg-gray-900'} ${className}`
+const navClasses = `${navPositionClasses[position]} border-b border-border bg-card ${className}`
 
 const menuItems = Object.entries(SITE.menu).map(([key, value]): MenuItem => ({
   link: `/${key === 'home' ? '' : key}`,
@@ -63,7 +63,7 @@ const currentPath = Astro.url.pathname
               'relative transition-colors',
               isActive
                 ? 'text-primary font-medium'
-                : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary',
+                : 'text-muted-foreground hover:text-foreground',
             ]}
             transition:animate="slide"
             aria-current={isActive ? 'page' : undefined}
@@ -119,7 +119,7 @@ const currentPath = Astro.url.pathname
               'relative block py-2 transition-colors',
               isActive
                 ? 'text-primary font-medium pl-3 border-l-2 border-primary'
-                : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary',
+                : 'text-muted-foreground hover:text-foreground',
             ]}
             transition:animate="slide"
             aria-current={isActive ? 'page' : undefined}

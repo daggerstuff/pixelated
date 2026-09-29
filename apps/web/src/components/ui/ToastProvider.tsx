@@ -22,15 +22,15 @@ export default function ToastProvider() {
         // Custom styling for different toast types
         success: {
           duration: 3000,
-          className: 'border-l-4 border-neutral-500',
+          className: 'border-l-4 border-border',
         },
         error: {
           duration: 5000,
-          className: 'border-l-4 border-neutral-500',
+          className: 'border-l-4 border-border',
         },
         loading: {
           duration: Infinity,
-          className: 'border-l-4 border-neutral-400',
+          className: 'border-l-4 border-border',
         },
       }}
       className="max-w-md"
