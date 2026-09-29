@@ -18,7 +18,7 @@ export function Avatar({
   return (
     <div
       className={cn(
-        'rounded-full overflow-hidden bg-gray-200 flex items-center justify-center text-gray-600',
+        'overflow-hidden rounded-none bg-secondary text-muted-foreground',
         className,
       )}
     >

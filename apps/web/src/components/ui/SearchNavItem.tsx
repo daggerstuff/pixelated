@@ -29,7 +29,7 @@ export default function SearchNavItem({
       <button
         type="button"
         onClick={toggleSearch}
-        className={`text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 rounded-lg p-2 ${buttonClassName}`}
+        className={`rounded-none p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground ${buttonClassName}`}
         aria-expanded={isOpen}
         aria-label="Search"
       >
@@ -46,7 +46,7 @@ export default function SearchNavItem({
         <div
           className={`absolute z-10 mt-2 ${placeDropdownLeft ? 'right-0' : 'left-0'} w-64 sm:w-80`}
         >
-          <div className="bg-white ring-black dark:bg-gray-800 dark:ring-gray-700 rounded-md p-2 shadow-lg ring-1 ring-opacity-5">
+          <div className="rounded-none border border-border bg-card p-2">
             <SearchBox
               placeholder="Search..."
               maxResults={5}

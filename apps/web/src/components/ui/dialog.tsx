@@ -313,7 +313,7 @@ function DialogModal<TData>({
       <FocusTrap active={isOpen}>
         <div
           className={cn(
-            'w-full rounded-lg bg-white shadow-lg dark:bg-gray-800',
+            'w-full rounded-none border border-border bg-card',
             'overflow-hidden flex flex-col',
             maxWidthClasses[maxWidth],
             className,
@@ -328,14 +328,12 @@ function DialogModal<TData>({
         >
           {/* Header */}
           {title && (
-            <div className="border-gray-200 dark:border-gray-700 flex items-center justify-between border-b px-6 py-4">
-              <h3 className="text-gray-900 dark:text-white text-lg font-medium">
-                {title}
-              </h3>
+            <div className="flex items-center justify-between border-b border-border px-6 py-4">
+              <h3 className="text-lg font-medium text-foreground">{title}</h3>
               {showCloseButton && (
                 <button
                   type="button"
-                  className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none"
+                  className="text-muted-foreground transition-colors hover:text-foreground focus:outline-none"
                   onClick={onClose}
                   aria-label="Close dialog"
                 >
@@ -363,9 +361,7 @@ function DialogModal<TData>({
 
           {/* Footer */}
           {footer && (
-            <div className="border-gray-200 dark:border-gray-700 border-t px-6 py-4">
-              {footer}
-            </div>
+            <div className="border-t border-border px-6 py-4">{footer}</div>
           )}
         </div>
       </FocusTrap>
@@ -435,7 +431,7 @@ function ConfirmDialog<TData>({
       <FocusTrap active={isOpen}>
         <div
           className={cn(
-            'w-full rounded-lg bg-white shadow-lg dark:bg-gray-800',
+            'w-full rounded-none border border-border bg-card',
             'overflow-hidden flex flex-col',
             maxWidth === 'sm' ? 'max-w-sm' : 'max-w-md',
             className,
@@ -450,10 +446,8 @@ function ConfirmDialog<TData>({
         >
           {/* Header */}
           {title && (
-            <div className="border-gray-200 dark:border-gray-700 border-b px-6 py-4">
-              <h3 className="text-gray-900 dark:text-white text-lg font-medium">
-                {title}
-              </h3>
+            <div className="border-b border-border px-6 py-4">
+              <h3 className="text-lg font-medium text-foreground">{title}</h3>
             </div>
           )}
 
@@ -461,7 +455,7 @@ function ConfirmDialog<TData>({
           <div className="flex-1 overflow-y-auto p-6">{children}</div>
 
           {/* Footer */}
-          <div className="border-gray-200 dark:border-gray-700 flex justify-end gap-3 border-t px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-border px-6 py-4">
             <Button
               variant="outline"
               onClick={onClose}
@@ -546,18 +540,4 @@ function useConfirmDialog<TData>(): ConfirmDialogHookResult<TData> {
   }
 }
 
-export {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-  DialogModal,
-  ConfirmDialog,
-  useDialog,
-  useConfirmDialog,
-}
+export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogModal }

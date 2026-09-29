@@ -16,9 +16,9 @@ interface MentalHealthCardProps {
 }
 
 const statusColors = {
-  active: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  completed: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  pending: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  active: 'border-ring bg-secondary font-medium text-foreground',
+  completed: 'border-border bg-secondary text-foreground',
+  pending: 'border-border bg-secondary text-muted-foreground',
 }
 
 export const MentalHealthCard: React.FC<MentalHealthCardProps> = ({
@@ -51,12 +51,14 @@ export const MentalHealthCard: React.FC<MentalHealthCardProps> = ({
           <h3 className="text-white text-2xl font-semibold leading-tight tracking-tight">
             {title}
           </h3>
-          <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {description}
+          </p>
         </div>
 
         <div className="border-white/10 mt-6 border-t pt-4">
           <div className="flex items-center justify-between">
-            <span className="text-gray-500 text-xs font-medium uppercase tracking-wider">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               {metric}
             </span>
             <span className="text-white text-2xl font-bold tabular-nums">

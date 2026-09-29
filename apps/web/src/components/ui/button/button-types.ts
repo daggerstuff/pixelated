@@ -44,7 +44,7 @@ interface ButtonVariantProps extends VariantProps<typeof buttonVariants> {
   rightIcon?: React.ReactNode
 }
 
-export interface ButtonButtonProps
+interface ButtonButtonProps
   extends
     ButtonBaseProps,
     Omit<

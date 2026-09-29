@@ -232,7 +232,7 @@ export default function SearchBox({
             placeholder={placeholder}
             aria-label="Search"
             aria-keyshortcuts={shortcutSymbol === '⌘' ? 'Meta+K' : 'Control+K'}
-            className={`border-gray-300 dark:border-gray-700 dark:bg-gray-800 focus:ring-primary-500 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 ${className}`}
+            className={`w-full rounded-none border border-input bg-background px-4 py-2 text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring ${className}`}
             aria-autocomplete="list"
             aria-controls="search-results"
             aria-activedescendant={
@@ -245,7 +245,7 @@ export default function SearchBox({
 
           {query.length === 0 && (
             <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
-              <kbd className="border-gray-200 bg-gray-100 text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 hidden h-5 select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 sm:inline-flex">
+              <kbd className="hidden h-5 select-none items-center gap-1 rounded-none border border-border bg-secondary px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100 sm:inline-flex">
                 <span className="text-xs">{shortcutSymbol}</span>K
               </kbd>
             </div>
@@ -254,7 +254,7 @@ export default function SearchBox({
           {query.length > 0 && (
             <button
               type="button"
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 absolute right-2 top-1/2 -translate-y-1/2"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
               onClick={() => {
                 setQuery('')
                 setIsOpen(false)
@@ -286,11 +286,11 @@ export default function SearchBox({
           <div
             ref={resultsRef}
             id="search-results"
-            className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 absolute z-20 mt-1 w-full overflow-hidden rounded-md border shadow-lg"
+            className="absolute z-20 mt-1 w-full overflow-hidden rounded-none border border-border bg-card"
             role="listbox"
           >
             {hasResults ? (
-              <ul className="divide-gray-200 dark:divide-gray-700 divide-y">
+              <ul className="divide-y divide-border">
                 {results.map((result, index) => (
                   <li key={result.id} role="presentation">
                     <button
@@ -300,23 +300,23 @@ export default function SearchBox({
                       aria-selected={index === activeIndex}
                       className={`w-full px-4 py-3 text-left focus:outline-none ${
                         index === activeIndex
-                          ? 'bg-gray-100 dark:bg-gray-700'
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                          ? 'bg-secondary'
+                          : 'transition-colors hover:bg-secondary'
                       }`}
                       onClick={() => handleResultClick(result)}
                       tabIndex={-1}
                     >
-                      <div className="text-gray-900 dark:text-white font-medium">
+                      <div className="font-medium text-foreground">
                         {result.title}
                       </div>
                       {result.content && (
-                        <div className="text-gray-500 dark:text-gray-400 line-clamp-2 text-sm">
+                        <div className="line-clamp-2 text-sm text-muted-foreground">
                           {result.content.substring(0, 150)}...
                         </div>
                       )}
                       {result.category && (
                         <div className="mt-1">
-                          <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 inline-flex items-center rounded-full px-2 py-1 text-xs font-medium">
+                          <span className="inline-flex items-center rounded-none border border-border bg-secondary px-2 py-1 text-xs font-medium text-foreground">
                             {result.category}
                           </span>
                         </div>
@@ -328,7 +328,7 @@ export default function SearchBox({
             ) : (
               showNoResults &&
               query.length >= minQueryLength && (
-                <div className="text-gray-500 dark:text-gray-400 px-4 py-3 text-sm">
+                <div className="px-4 py-3 text-sm text-muted-foreground">
                   No results found for &quot;{query}&quot;
                 </div>
               )

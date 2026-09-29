@@ -15,16 +15,16 @@ type AlertProps = {
 
 const variantClassMap = {
   info: {
-    container: 'bg-blue-50 border-blue-200 text-blue-800',
+    container: 'border-border bg-secondary text-foreground',
   },
   success: {
-    container: 'bg-green-50 border-green-200 text-green-800',
+    container: 'border-border bg-secondary text-foreground',
   },
   warning: {
-    container: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    container: 'border-ring bg-secondary font-medium text-foreground',
   },
   error: {
-    container: 'bg-red-50 border-red-200 text-red-800',
+    container: 'border-ring bg-primary font-medium text-primary-foreground',
   },
 }
 
@@ -63,7 +63,11 @@ describe('Alert', () => {
     })
 
     const alert = container.querySelector('div')
-    expect(alert).toHaveClass('bg-blue-50', 'border-blue-200', 'text-blue-800')
+    expect(alert).toHaveClass(
+      'border-border',
+      'bg-secondary',
+      'text-foreground',
+    )
     expect(screen.getByText('Test Alert')).toBeInTheDocument()
     expect(screen.getByText('This is a test alert')).toBeInTheDocument()
   })
@@ -77,9 +81,9 @@ describe('Alert', () => {
 
     const alert = container.querySelector('div')
     expect(alert).toHaveClass(
-      'bg-green-50',
-      'border-green-200',
-      'text-green-800',
+      'border-border',
+      'bg-secondary',
+      'text-foreground',
     )
     expect(screen.getByText('Success Alert')).toBeInTheDocument()
     expect(
@@ -95,11 +99,7 @@ describe('Alert', () => {
     })
 
     const alert = container.querySelector('div')
-    expect(alert).toHaveClass(
-      'bg-yellow-50',
-      'border-yellow-200',
-      'text-yellow-800',
-    )
+    expect(alert).toHaveClass('border-ring', 'bg-secondary', 'text-foreground')
     expect(screen.getByText('Warning Alert')).toBeInTheDocument()
     expect(screen.getByText('Please be cautious')).toBeInTheDocument()
   })
@@ -112,7 +112,11 @@ describe('Alert', () => {
     })
 
     const alert = container.querySelector('div')
-    expect(alert).toHaveClass('bg-red-50', 'border-red-200', 'text-red-800')
+    expect(alert).toHaveClass(
+      'border-ring',
+      'bg-primary',
+      'text-primary-foreground',
+    )
     expect(screen.getByText('Error Alert')).toBeInTheDocument()
     expect(screen.getByText('An error occurred')).toBeInTheDocument()
   })

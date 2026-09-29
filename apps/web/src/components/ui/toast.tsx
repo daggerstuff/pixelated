@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import type { ToastOptions, DefaultToastOptions } from 'react-hot-toast'
-import { toast as hotToast, Toaster } from 'react-hot-toast'
+import type { ToastOptions } from 'react-hot-toast'
+import { toast as hotToast } from 'react-hot-toast'
 
 import { cn } from '../../lib/utils'
 import { IconX } from './icons'
@@ -15,50 +15,6 @@ export interface ToastProps extends Omit<ToastOptions, 'icon'> {
 const defaultOptions: Partial<ToastOptions> = {
   duration: 3000,
   position: 'bottom-right',
-}
-
-// Toast component that provides the Toaster container
-export function Toast({
-  position = 'bottom-right',
-  toastOptions,
-  className,
-}: {
-  position?: ToastOptions['position']
-  toastOptions?: DefaultToastOptions
-  className?: string
-}) {
-  return (
-    <Toaster
-      position={position}
-      toastOptions={{
-        className: cn(
-          'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-lg rounded-md',
-          className,
-        ),
-        success: {
-          className: cn(
-            'bg-white dark:bg-gray-800 border-l-4 border-neutral-500',
-            className,
-          ),
-          iconTheme: {
-            primary: '#6B7280',
-            secondary: 'white',
-          },
-        },
-        error: {
-          className: cn(
-            'bg-white dark:bg-gray-800 border-l-4 border-neutral-500',
-            className,
-          ),
-          iconTheme: {
-            primary: '#6B7280',
-            secondary: 'white',
-          },
-        },
-        ...toastOptions,
-      }}
-    />
-  )
 }
 
 // Promise toast message types
@@ -76,7 +32,7 @@ export const toast = {
       (t) => (
         <div
           className={cn(
-            'flex items-center p-4 bg-white dark:bg-gray-800 rounded-md shadow-md',
+            'flex items-center rounded-none border border-border bg-card p-4',
             'max-w-md w-full',
             t.visible ? 'animate-enter' : 'animate-leave',
           )}
@@ -85,10 +41,14 @@ export const toast = {
           <div className="flex-1">{message}</div>
           <button
             onClick={() => hotToast.dismiss(t.id)}
-            className="hover:bg-gray-100 dark:hover:bg-gray-700 ml-4 rounded-full p-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="ml-4 rounded-none p-1 transition-colors hover:bg-secondary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label="Dismiss"
           >
-            <IconX size={16} className="text-gray-500" aria-hidden="true" />
+            <IconX
+              size={16}
+              className="text-muted-foreground"
+              aria-hidden="true"
+            />
           </button>
         </div>
       ),
@@ -123,7 +83,7 @@ export const toast = {
       ...options,
       icon: (
         <svg
-          className="text-blue-500 h-5 w-5"
+          className="h-5 w-5 text-foreground"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
@@ -145,7 +105,7 @@ export const toast = {
       ...options,
       icon: (
         <svg
-          className="text-yellow-500 h-5 w-5"
+          className="h-5 w-5 text-muted-foreground"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
@@ -193,5 +153,3 @@ export const toast = {
     hotToast.dismiss(toastId)
   },
 }
-
-export default Toast
