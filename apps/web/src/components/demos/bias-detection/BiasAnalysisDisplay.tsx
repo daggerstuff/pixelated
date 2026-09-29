@@ -426,5 +426,3 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
     </div>
   )
 }
-
-export default BiasAnalysisDisplay

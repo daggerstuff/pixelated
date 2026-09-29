@@ -399,5 +399,3 @@ export const HistoricalProgressTracker: FC<HistoricalProgressTrackerProps> = ({
     </div>
   )
 }
-
-export default HistoricalProgressTracker

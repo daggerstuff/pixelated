@@ -45,7 +45,7 @@ export interface DateRange {
 }
 
 /** Filter data by time range. Pure — accepts customDateRange as param. */
-export const filterDataByTimeRange = (
+const filterDataByTimeRange = (
   data: FilterableData,
   timeRange: string,
   customDateRange?: DateRange,
@@ -97,7 +97,7 @@ export const filterDataByTimeRange = (
 }
 
 /** Filter data by bias score threshold. Pure. */
-export const filterDataByBiasScore = (
+const filterDataByBiasScore = (
   data: FilterableData,
   filter: string,
 ): FilterableData => {
@@ -127,7 +127,7 @@ export const filterDataByBiasScore = (
 }
 
 /** Filter data by alert level. Pure. */
-export const filterDataByAlertLevel = (
+const filterDataByAlertLevel = (
   data: FilterableData,
   filter: string,
 ): FilterableData => {
