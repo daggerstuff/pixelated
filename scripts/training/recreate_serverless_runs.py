@@ -86,13 +86,24 @@ class _HistoryFrame(Protocol):
     def __len__(self) -> int: ...
 
 
+class _RunHandle(Protocol):
+    def history(self) -> _HistoryFrame: ...
+
+
+class _ApiHandle(Protocol):
+    def run(self, path_or_url: str) -> _RunHandle: ...
+
+
 def fetch_run_history(run_name: str) -> _HistoryFrame:
     """Fetch detailed history for a specific run."""
     import wandb
 
-    api = wandb.Api()
+    api = cast(_ApiHandle, wandb.Api())
+    # wandb's Api.run is untyped in this version; the protocols above give
+    # mypy --strict the shape it needs (run.history() is DataFrame-shaped
+    # per wandb's default pandas=True mode).
     run = api.run(f"{PROJECT}/{run_name}")
-    history = cast(_HistoryFrame, run.history())
+    history = run.history()
 
     output_path = Path(f"/tmp/{run_name}_history.json")
     history.to_json(output_path, orient="records")
