@@ -15,9 +15,6 @@ export const prerender = false
   <!-- Enhanced Hero Section with Modern Visual Elements -->
   <section class="brutalist-section mesh-bg-1 relative overflow-hidden">
     <!-- Floating Background Elements -->
-    <div class="absolute top-20 left-10 w-32 h-32 rounded-full bg-gradient-to-r from-green-500/10 to-teal-500/10 floating-element"></div>
-    <div class="absolute top-40 right-20 w-24 h-24 rounded-full bg-gradient-to-r from-blue-500/10 to-green-500/10 floating-element--delayed"></div>
-    <div class="absolute bottom-20 left-1/3 w-20 h-20 rounded-full bg-gradient-to-r from-teal-500/10 to-blue-500/10 floating-element"></div>
 
     <div class="brutalist-container relative z-10">
       <div class="text-center mb-12">
@@ -28,23 +25,21 @@ export const prerender = false
         </div>
 
         <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
-          <span class="gradient-text-primary">THERAPEUTIC</span>
+          <span>THERAPEUTIC</span>
           <br />
-          <span class="gradient-text-secondary">AI CHAT</span>
+          <span>AI CHAT</span>
         </h1>
 
-        <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+        <p class="text-xl text-foreground max-w-4xl mx-auto mb-8">
           Experience advanced AI chat with{' '}
-          <span class="gradient-text-primary font-bold">
-            therapeutic response generation
-          </span>
-          , real-time sentiment analysis, and crisis detection powered by
+          <span class="font-bold">therapeutic response generation</span>,
+          real-time sentiment analysis, and crisis detection powered by
           enterprise-grade AI.
         </p>
 
         <!-- Enhanced Badge System -->
         <div class="flex flex-wrap justify-center gap-4 mb-12">
-          <div class="nav-pill bg-gradient-to-r from-green-500 to-teal-500 text-white">
+          <div class="nav-pill bg-secondary border border-border text-foreground">
             <svg
               class="w-4 h-4"
               fill="none"
@@ -60,7 +55,7 @@ export const prerender = false
             </svg>
             REAL-TIME CHAT
           </div>
-          <div class="nav-pill bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+          <div class="nav-pill bg-secondary border border-border text-foreground">
             <svg
               class="w-4 h-4"
               fill="none"
@@ -76,7 +71,7 @@ export const prerender = false
             </svg>
             SENTIMENT ANALYSIS
           </div>
-          <div class="nav-pill bg-gradient-to-r from-orange-500 to-red-500 text-white">
+          <div class="nav-pill bg-secondary border border-border text-foreground">
             <svg
               class="w-4 h-4"
               fill="none"
@@ -92,7 +87,7 @@ export const prerender = false
             </svg>
             CRISIS DETECTION
           </div>
-          <div class="nav-pill bg-gradient-to-r from-teal-500 to-green-500 text-white">
+          <div class="nav-pill bg-secondary border border-border text-foreground">
             <svg
               class="w-4 h-4"
               fill="none"
@@ -114,27 +109,27 @@ export const prerender = false
   </section>
 
   <!-- Enhanced Main Chat Demo -->
-  <section class="brutalist-section bg-gray-900/50 mesh-bg-2">
+  <section class="brutalist-section bg-card mesh-bg-2">
     <div class="brutalist-container">
       <div class="max-w-6xl mx-auto">
         <div class="glass-card mb-12">
           <div class="space-y-6">
-            <div class="border-b border-gray-700 pb-4">
+            <div class="border-b border-border pb-4">
               <h3 class="brutalist-subheading text-2xl mb-2">
                 💬 LIVE CHAT INTERFACE
               </h3>
-              <p class="text-gray-400">
+              <p class="text-foreground">
                 Send a message to start a therapeutic conversation with our AI
               </p>
             </div>
 
             <!-- Chat Demo Container -->
-            <div class="chat-container rounded-lg">
+            <div class="chat-container rounded-none">
               <ChatDemo client:load />
             </div>
 
             <!-- Quick Start Actions -->
-            <div class="flex gap-3 pt-4 border-t border-gray-700">
+            <div class="flex gap-3 pt-4 border-t border-border">
               <BrutalistButton
                 variant="primary"
                 class="flex-1"
@@ -171,7 +166,7 @@ export const prerender = false
           ADVANCED
           <span class="confidence-boost">CAPABILITIES</span>
         </h2>
-        <p class="text-lg text-gray-300">
+        <p class="text-lg text-foreground">
           Real-time AI analysis and therapeutic response generation
         </p>
       </div>
@@ -185,22 +180,22 @@ export const prerender = false
             </h3>
             <div class="space-y-3 text-left">
               <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-green-400 rounded-full"></span>
-                <span class="text-gray-300">
+                <span class="w-3 h-3 bg-primary rounded-full"></span>
+                <span class="text-foreground">
                   Sentiment analysis of every message
                 </span>
               </div>
               <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
-                <span class="text-gray-300">Emotional state tracking</span>
+                <span class="w-3 h-3 bg-primary rounded-full"></span>
+                <span class="text-foreground">Emotional state tracking</span>
               </div>
               <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-yellow-400 rounded-full"></span>
-                <span class="text-gray-300">Crisis detection & alerting</span>
+                <span class="w-3 h-3 bg-primary rounded-full"></span>
+                <span class="text-foreground">Crisis detection & alerting</span>
               </div>
               <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-purple-400 rounded-full"></span>
-                <span class="text-gray-300">
+                <span class="w-3 h-3 bg-primary rounded-full"></span>
+                <span class="text-foreground">
                   Therapeutic response generation
                 </span>
               </div>
@@ -216,20 +211,22 @@ export const prerender = false
             </h3>
             <div class="space-y-3 text-left">
               <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-green-400 rounded-full"></span>
-                <span class="text-gray-300">HIPAA-compliant architecture</span>
+                <span class="w-3 h-3 bg-primary rounded-full"></span>
+                <span class="text-foreground">
+                  HIPAA-compliant architecture
+                </span>
               </div>
               <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
-                <span class="text-gray-300">End-to-end encryption</span>
+                <span class="w-3 h-3 bg-primary rounded-full"></span>
+                <span class="text-foreground">End-to-end encryption</span>
               </div>
               <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-yellow-400 rounded-full"></span>
-                <span class="text-gray-300">Comprehensive audit logging</span>
+                <span class="w-3 h-3 bg-primary rounded-full"></span>
+                <span class="text-foreground">Comprehensive audit logging</span>
               </div>
               <div class="flex items-center gap-3">
-                <span class="w-3 h-3 bg-purple-400 rounded-full"></span>
-                <span class="text-gray-300">Zero data retention in demo</span>
+                <span class="w-3 h-3 bg-primary rounded-full"></span>
+                <span class="text-foreground">Zero data retention in demo</span>
               </div>
             </div>
           </div>
@@ -239,14 +236,14 @@ export const prerender = false
   </section>
 
   <!-- Technical Details -->
-  <section class="brutalist-section bg-gray-900/50">
+  <section class="brutalist-section bg-card">
     <div class="brutalist-container">
       <div class="text-center mb-12">
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
           HOW IT
-          <span class="text-blue-400">WORKS</span>
+          <span class="text-foreground">WORKS</span>
         </h2>
-        <p class="text-lg text-gray-300">
+        <p class="text-lg text-foreground">
           Advanced AI integration with therapeutic training
         </p>
       </div>
@@ -258,21 +255,21 @@ export const prerender = false
             <h3 class="brutalist-subheading text-lg mb-3">
               STREAMING RESPONSES
             </h3>
-            <p class="text-gray-400 text-sm mb-4">
+            <p class="text-foreground text-sm mb-4">
               Real-time streaming responses using the LLM API for natural
               conversation flow.
             </p>
             <div class="space-y-2 text-sm">
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Sub-second response times</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Natural conversation flow</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Context-aware responses</span>
               </div>
             </div>
@@ -287,21 +284,21 @@ export const prerender = false
             <h3 class="brutalist-subheading text-lg mb-3">
               SENTIMENT ANALYSIS
             </h3>
-            <p class="text-gray-400 text-sm mb-4">
+            <p class="text-foreground text-sm mb-4">
               Real-time emotional state analysis with configurable sensitivity
               thresholds.
             </p>
             <div class="space-y-2 text-sm">
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Emotion classification</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Intensity scoring</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Trend tracking</span>
               </div>
             </div>
@@ -312,21 +309,21 @@ export const prerender = false
           <div class="text-center">
             <div class="text-4xl mb-4">🚨</div>
             <h3 class="brutalist-subheading text-lg mb-3">CRISIS DETECTION</h3>
-            <p class="text-gray-400 text-sm mb-4">
+            <p class="text-foreground text-sm mb-4">
               Advanced pattern recognition for identifying crisis situations
               with immediate alerts.
             </p>
             <div class="space-y-2 text-sm">
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Suicide risk assessment</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Self-harm detection</span>
               </div>
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Immediate escalation</span>
               </div>
             </div>
@@ -344,7 +341,7 @@ export const prerender = false
           REAL-TIME
           <span class="confidence-boost">METRICS</span>
         </h2>
-        <p class="text-lg text-gray-300">
+        <p class="text-lg text-foreground">
           Live system performance and analysis data
         </p>
       </div>
@@ -379,7 +376,7 @@ export const prerender = false
   </section>
 
   <!-- CTA Section -->
-  <section class="brutalist-section bg-gray-900/50">
+  <section class="brutalist-section bg-card">
     <div class="brutalist-container">
       <div class="mental-health-safe max-w-4xl mx-auto text-center">
         <div class="text-5xl mb-6">
@@ -392,7 +389,7 @@ export const prerender = false
           <span class="confidence-boost">THERAPEUTIC AI?</span>
         </h2>
 
-        <p class="text-xl text-gray-300 mb-8">
+        <p class="text-xl text-foreground mb-8">
           Deploy our AI chat system in your practice. Full API access, custom
           training, and enterprise support.
         </p>
@@ -502,27 +499,25 @@ export const prerender = false
   /* Enhanced chat container styling */
   .chat-container {
     min-height: 600px;
-    background: var(--bg-secondary);
-    border: 2px solid var(--border-primary);
-    border-radius: var(--radius-lg);
+    background: var(--np-surface);
+    border: 1px solid var(--np-line);
+    border-radius: 0;
   }
 
   /* Sample button hover effects */
   #sample-anxiety:hover,
   #sample-depression:hover,
   #sample-crisis:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    border-color: var(--np-mid);
   }
 
   /* Metric card animations */
   .metric-card {
-    transition: all var(--transition-normal);
+    transition: border-color 0.15s ease;
   }
 
   .metric-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--accent-primary);
+    border-color: var(--np-mid);
   }
 
   /* Custom animations */

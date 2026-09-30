@@ -9,29 +9,29 @@ import EnhancedBiasDetectionInterface from '@/components/demos/bias-detection/En
   description="Advanced AI-powered bias detection system for therapeutic conversations with real-time analysis, counterfactual scenarios, and comprehensive reporting."
   keywords="bias detection, AI therapy, mental health, therapeutic training, bias analysis, cultural competency"
 >
-  <main class="min-h-screen bg-gray-50">
+  <main class="min-h-screen bg-secondary">
     <!-- Hero Section -->
-    <section class="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white py-16">
+    <section class="bg-background text-foreground py-16">
       <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto text-center">
           <h1 class="text-4xl md:text-5xl font-bold mb-6">
             Enhanced Bias Detection Demo
           </h1>
-          <p class="text-xl md:text-2xl mb-8 text-blue-100">
+          <p class="text-xl md:text-2xl mb-8 text-foreground">
             Advanced AI-powered analysis of bias patterns in therapeutic
             conversations with modern UI/UX
           </p>
           <div class="flex flex-wrap justify-center gap-3">
-            <span class="px-3 py-1 rounded-full bg-blue-800/50 border border-blue-400/30 text-sm">
+            <span class="px-3 py-1 rounded-none bg-secondary border border-border text-sm">
               Real-time Analysis
             </span>
-            <span class="px-3 py-1 rounded-full bg-purple-800/50 border border-purple-400/30 text-sm">
+            <span class="px-3 py-1 rounded-none bg-secondary border border-border text-sm">
               Counterfactual Scenarios
             </span>
-            <span class="px-3 py-1 rounded-full bg-indigo-800/50 border border-indigo-400/30 text-sm">
+            <span class="px-3 py-1 rounded-none bg-secondary border border-border text-sm">
               Historical Trends
             </span>
-            <span class="px-3 py-1 rounded-full bg-teal-800/50 border border-teal-400/30 text-sm">
+            <span class="px-3 py-1 rounded-none bg-secondary border border-border text-sm">
               Responsive & Accessible
             </span>
           </div>
@@ -49,22 +49,22 @@ import EnhancedBiasDetectionInterface from '@/components/demos/bias-detection/En
     <!-- CTA -->
     <section class="py-12">
       <div class="container mx-auto px-4">
-        <div class="max-w-3xl mx-auto text-center bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+        <div class="max-w-3xl mx-auto text-center bg-card rounded-none p-8 border border-border">
           <h2 class="text-2xl font-bold mb-3">Ready to explore more?</h2>
-          <p class="text-gray-600 mb-6">
+          <p class="text-muted-foreground mb-6">
             Visit the original demo or explore platform dashboards for
             integrated analytics.
           </p>
           <div class="flex flex-wrap justify-center gap-3">
             <a
               href="/demo/bias-detection"
-              class="px-5 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900"
+              class="px-5 py-2 bg-secondary text-foreground rounded-none hover:bg-accent"
             >
               Original Demo
             </a>
             <a
               href="/dashboard/bias-detection"
-              class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              class="px-5 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90"
             >
               Bias Analytics Dashboard
             </a>
@@ -96,7 +96,7 @@ import EnhancedBiasDetectionInterface from '@/components/demos/bias-detection/En
       }
     }
     .demo-container:focus-within {
-      outline: 2px solid #3b82f6;
+      outline: 2px solid var(--np-mid);
       outline-offset: 2px;
     }
     @media print {

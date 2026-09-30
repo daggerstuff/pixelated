@@ -141,25 +141,16 @@ const universityResults = [
   description="AI monitors therapy sessions for unconscious bias and provides gentle, private feedback. Advanced bias detection for safer therapy."
   bgType="plum"
 >
-  <div class="relative min-h-screen text-white">
-    <!-- Floating Particles -->
-    <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
-      <div class="particle particle-1"></div>
-      <div class="particle particle-2"></div>
-      <div class="particle particle-3"></div>
-      <div class="particle particle-4"></div>
-      <div class="particle particle-5"></div>
-    </div>
-
+  <div class="relative min-h-screen text-foreground">
     <div class="relative z-10 py-8">
       <div class="container mx-auto px-4">
         <!-- Header -->
         <div class="text-center mb-12">
-          <div class="mb-8 animate-breathe">
-            <Badge class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-red-500/20 border border-red-400/40 text-red-200 rounded-full">
+          <div class="mb-8">
+            <Badge class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-secondary border border-border text-muted-foreground rounded-none">
               <span class="relative flex h-3 w-3">
-                <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
               </span>
               Bias Detection Active
             </Badge>
@@ -167,12 +158,12 @@ const universityResults = [
 
           <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
             {currentVariant.headline}
-            <span class="text-red-400 golden-shimmer block mt-2">
+            <span class="text-foreground block mt-2">
               Security & Bias Detection Engine
             </span>
           </h1>
 
-          <p class="text-lg text-green-200/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p class="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
             {currentVariant.subheadline}
           </p>
         </div>
@@ -180,17 +171,19 @@ const universityResults = [
         <!-- Detection Specifications -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {detectionSpecs.map((spec) => (
-            <Card class="border border-red-600/30 bg-red-900/20 hover:border-red-400/60 transition-all duration-700 organic-card">
+            <Card class="border border-border bg-card hover:border-ring transition-all duration-700 organic-card">
               <CardHeader class="pb-2">
-                <CardTitle class="text-red-300 text-sm">
+                <CardTitle class="text-foreground text-sm">
                   {spec.metric}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div class="text-2xl font-bold text-red-400 mb-1">
+                <div class="text-2xl font-bold text-foreground mb-1">
                   {spec.value}
                 </div>
-                <div class="text-xs text-red-200/70">{spec.comparison}</div>
+                <div class="text-xs text-muted-foreground">
+                  {spec.comparison}
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -198,75 +191,75 @@ const universityResults = [
 
         <!-- Live Detection Demo -->
         <div class="mb-16">
-          <Card class="border border-red-600/30 bg-slate-900/50 overflow-hidden">
+          <Card class="border border-border bg-card overflow-hidden">
             <CardHeader>
               <div class="flex justify-between items-start">
                 <div>
-                  <CardTitle class="text-red-100 text-xl mb-2">
+                  <CardTitle class="text-foreground text-xl mb-2">
                     Live Bias Detection Demo
                   </CardTitle>
-                  <CardDescription class="text-red-200/80">
+                  <CardDescription class="text-muted-foreground">
                     See how AI identifies and addresses unconscious bias in real
                     therapy scenarios
                   </CardDescription>
                 </div>
-                <Badge class="bg-red-500/20 text-red-300">
-                  <span class="animate-pulse w-2 h-2 bg-red-400 rounded-full mr-2"></span>
+                <Badge class="bg-secondary text-foreground">
+                  <span class="animate-pulse w-2 h-2 bg-primary rounded-full mr-2"></span>
                   Monitoring...
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
-              <div class="bg-slate-800/50 rounded-lg p-6 mb-6">
+              <div class="bg-secondary rounded-none p-6 mb-6">
                 <div class="mb-4">
-                  <div class="text-red-300 font-medium mb-2">Scenario:</div>
-                  <div class="bg-slate-700/50 rounded p-3 text-green-100 text-sm">
+                  <div class="text-foreground font-medium mb-2">Scenario:</div>
+                  <div class="bg-secondary rounded-none p-3 text-foreground text-sm">
                     {detectionDemo.scenario}
                   </div>
                 </div>
 
                 <div class="mb-4">
-                  <div class="text-red-300 font-medium mb-2">
+                  <div class="text-foreground font-medium mb-2">
                     Bias Detected:
                   </div>
-                  <div class="bg-slate-700/50 rounded p-4">
+                  <div class="bg-secondary rounded-none p-4">
                     <div class="flex items-center gap-3 mb-3">
-                      <div class="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center">
-                        <span class="text-red-400">⚠️</span>
+                      <div class="w-8 h-8 bg-secondary rounded-none flex items-center justify-center">
+                        <span class="text-foreground">⚠️</span>
                       </div>
                       <div>
-                        <div class="text-red-300 font-medium">
+                        <div class="text-foreground font-medium">
                           {detectionDemo.biasDetected.type}
                         </div>
-                        <div class="text-red-200/70 text-sm">
+                        <div class="text-muted-foreground text-sm">
                           Severity: {detectionDemo.biasDetected.severity}
                         </div>
                       </div>
                     </div>
 
                     <div class="mb-3">
-                      <div class="text-red-300 font-medium text-sm mb-1">
+                      <div class="text-foreground font-medium text-sm mb-1">
                         What was detected:
                       </div>
-                      <div class="text-green-100/90 text-sm">
+                      <div class="text-foreground text-sm">
                         {detectionDemo.biasDetected.description}
                       </div>
                     </div>
 
                     <div class="mb-3">
-                      <div class="text-red-300 font-medium text-sm mb-1">
+                      <div class="text-foreground font-medium text-sm mb-1">
                         Suggested improvement:
                       </div>
-                      <div class="text-green-100/90 text-sm">
+                      <div class="text-foreground text-sm">
                         {detectionDemo.biasDetected.suggestion}
                       </div>
                     </div>
 
-                    <div class="bg-green-500/10 border border-green-400/30 rounded p-3">
-                      <div class="text-green-300 font-medium text-sm mb-1">
+                    <div class="bg-secondary border border-border rounded-none p-3">
+                      <div class="text-foreground font-medium text-sm mb-1">
                         Feedback delivery:
                       </div>
-                      <div class="text-green-200/80 text-sm">
+                      <div class="text-muted-foreground text-sm">
                         {detectionDemo.feedback}
                       </div>
                     </div>
@@ -276,7 +269,7 @@ const universityResults = [
                 <div class="flex gap-3">
                   <Button
                     size="sm"
-                    class="bg-red-600 hover:bg-red-700 text-white"
+                    class="bg-primary hover:bg-primary/90 text-primary-foreground"
                     data-demo-action="run-bias-detection"
                   >
                     Run Bias Detection
@@ -284,14 +277,14 @@ const universityResults = [
                   <Button
                     size="sm"
                     variant="outline"
-                    class="border-red-500/50 text-red-300 hover:bg-red-500/10"
+                    class="border-border text-foreground hover:bg-accent"
                     data-demo-action="view-feedback"
                   >
                     View Feedback System
                   </Button>
                 </div>
               </div>
-              <div class="text-xs text-red-200/60">
+              <div class="text-xs text-muted-foreground">
                 ⚡ Real-time analysis with zero latency • 🔒 Completely private
                 feedback • 💛 Designed to educate, not shame
               </div>
@@ -302,11 +295,11 @@ const universityResults = [
         <!-- Bias Types Section -->
         <div class="mb-16">
           <div class="text-center mb-12">
-            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+            <h2 class="text-2xl lg:text-4xl font-bold text-foreground mb-4">
               Comprehensive Bias Detection Across
-              <span class="text-red-400 golden-shimmer">All Dimensions</span>
+              <span class="text-foreground">All Dimensions</span>
             </h2>
-            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+            <p class="text-base text-foreground max-w-3xl mx-auto">
               Our AI monitors for unconscious bias across cultural,
               socioeconomic, age, and diagnostic dimensions
             </p>
@@ -314,23 +307,21 @@ const universityResults = [
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             {biasTypes.map((type) => (
-              <Card class="border border-red-600/30 hover:border-red-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+              <Card class="border border-border hover:border-ring rounded-none overflow-hidden group transition-all duration-700 organic-card">
                 <CardHeader class="pb-4 relative">
-                  <div class="text-5xl mb-4 group-hover:scale-110 transition-transform duration-700 text-red-400">
-                    {type.icon}
-                  </div>
-                  <CardTitle class="text-base font-bold text-red-100 tracking-wide mb-3">
+                  <div class="text-5xl mb-4 text-foreground">{type.icon}</div>
+                  <CardTitle class="text-base font-bold text-foreground tracking-wide mb-3">
                     {type.title}
                   </CardTitle>
-                  <div class="text-sm text-red-400/90 font-medium bg-red-500/10 px-3 py-1 rounded-full border border-red-500/20 mb-3">
+                  <div class="text-sm text-foreground font-medium bg-secondary px-3 py-1 rounded-none border border-border mb-3">
                     Real-time monitoring and feedback
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription class="text-sm text-red-200/80 leading-relaxed mb-3">
+                  <CardDescription class="text-sm text-muted-foreground leading-relaxed mb-3">
                     {type.description}
                   </CardDescription>
-                  <div class="text-xs text-red-300/70">
+                  <div class="text-xs text-foreground">
                     <span class="font-medium">Examples:</span> {type.examples}
                   </div>
                 </CardContent>
@@ -342,13 +333,11 @@ const universityResults = [
         <!-- University Results -->
         <div class="mb-16">
           <div class="text-center mb-12">
-            <h2 class="text-2xl lg:text-4xl font-bold text-white mb-4">
+            <h2 class="text-2xl lg:text-4xl font-bold text-foreground mb-4">
               Universities Report
-              <span class="text-green-400 golden-shimmer">
-                Dramatic Bias Reduction
-              </span>
+              <span class="text-foreground">Dramatic Bias Reduction</span>
             </h2>
-            <p class="text-base text-green-100/90 max-w-3xl mx-auto">
+            <p class="text-base text-foreground max-w-3xl mx-auto">
               Training programs using Bias Detection Engine see unprecedented
               improvements in cultural competency
             </p>
@@ -356,20 +345,18 @@ const universityResults = [
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {universityResults.map((result) => (
-              <Card class="border border-green-600/30 hover:border-green-400/60 rounded-2xl overflow-hidden group transition-all duration-700 organic-card">
+              <Card class="border border-border hover:border-ring rounded-none overflow-hidden group transition-all duration-700 organic-card">
                 <CardHeader class="pb-4">
-                  <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-700 text-green-400">
-                    🏛️
-                  </div>
-                  <CardTitle class="text-base font-bold text-green-100 tracking-wide mb-3">
+                  <div class="text-4xl mb-4 text-foreground">🏛️</div>
+                  <CardTitle class="text-base font-bold text-foreground tracking-wide mb-3">
                     {result.university}
                   </CardTitle>
-                  <div class="text-lg text-green-400 font-bold mb-2">
+                  <div class="text-lg text-foreground font-bold mb-2">
                     {result.result}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription class="text-sm text-green-200/80 leading-relaxed">
+                  <CardDescription class="text-sm text-muted-foreground leading-relaxed">
                     {result.detail}
                   </CardDescription>
                 </CardContent>
@@ -380,31 +367,31 @@ const universityResults = [
 
         <!-- Privacy & Security Section -->
         <div class="mb-16">
-          <Card class="border border-blue-600/30 bg-blue-900/20 rounded-3xl overflow-hidden">
+          <Card class="border border-border bg-card rounded-none overflow-hidden">
             <CardContent class="p-8 lg:p-12 text-center">
-              <div class="text-6xl mb-6 text-blue-400">🛡️</div>
-              <h3 class="text-lg lg:text-xl font-bold text-blue-100 mb-4">
+              <div class="text-6xl mb-6 text-foreground">🛡️</div>
+              <h3 class="text-lg lg:text-xl font-bold text-foreground mb-4">
                 Zero-Knowledge Bias Detection
               </h3>
-              <p class="text-base text-blue-200/90 mb-6 leading-relaxed max-w-3xl mx-auto">
+              <p class="text-base text-muted-foreground mb-6 leading-relaxed max-w-3xl mx-auto">
                 Our bias detection uses Fully Homomorphic Encryption (FHE) to
                 analyze conversations while they remain completely encrypted. We
                 detect bias patterns without ever seeing the actual conversation
                 content - ensuring complete privacy.
               </p>
-              <div class="flex items-center justify-center gap-6 text-blue-300/80 text-sm">
+              <div class="flex items-center justify-center gap-6 text-foreground text-sm">
                 <span class="flex items-center gap-2">
-                  <span class="text-blue-400">✓</span>
+                  <span class="text-foreground">✓</span>
                   Encrypted Analysis
                 </span>
                 <span class="hidden sm:inline">•</span>
                 <span class="hidden sm:inline flex items-center gap-2">
-                  <span class="text-blue-400">✓</span>
+                  <span class="text-foreground">✓</span>
                   Private Feedback
                 </span>
                 <span class="hidden sm:inline">•</span>
                 <span class="hidden sm:inline flex items-center gap-2">
-                  <span class="text-blue-400">✓</span>
+                  <span class="text-foreground">✓</span>
                   No Content Storage
                 </span>
               </div>
@@ -414,28 +401,26 @@ const universityResults = [
 
         <!-- Final CTA -->
         <div class="text-center">
-          <Card class="border border-red-500/40 bg-slate-900/50 rounded-3xl overflow-hidden">
+          <Card class="border border-border bg-card rounded-none overflow-hidden">
             <CardContent class="p-8 lg:p-12">
-              <div class="text-6xl text-red-400 mb-6">
+              <div class="text-6xl text-foreground mb-6">
                 <Target className="w-24 h-24" />
               </div>
 
               <div class="mb-6">
-                <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-red-500/20 border border-red-400/40 text-red-200 rounded-full">
-                  <span class="animate-pulse w-2 h-2 bg-red-400 rounded-full"></span>
+                <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-secondary border border-border text-muted-foreground rounded-none">
+                  <span class="animate-pulse w-2 h-2 bg-primary rounded-full"></span>
                   Protect Every Client Interaction
                 </Badge>
               </div>
 
-              <h2 class="text-2xl lg:text-4xl font-bold text-red-100 mb-8">
+              <h2 class="text-2xl lg:text-4xl font-bold text-foreground mb-8">
                 Ready to Make Therapy
                 <br />
-                <span class="text-red-400 golden-shimmer">
-                  Safer for Everyone?
-                </span>
+                <span class="text-foreground">Safer for Everyone?</span>
               </h2>
 
-              <p class="text-base lg:text-lg text-green-200/90 mb-8 leading-relaxed max-w-2xl mx-auto">
+              <p class="text-base lg:text-lg text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
                 Every client deserves culturally competent, unbiased care. Help
                 your students see their blind spots before they impact real
                 people.
@@ -444,7 +429,7 @@ const universityResults = [
               <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6">
                 <Button
                   size="lg"
-                  class="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white px-10 py-5 text-base font-bold rounded-full transform hover:scale-105 transition-all duration-300"
+                  class="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-5 text-base font-bold rounded-none transition-colors duration-300"
                   data-demo-cta="primary"
                   data-variant={variantKey}
                 >
@@ -453,14 +438,14 @@ const universityResults = [
                 <Button
                   size="lg"
                   variant="outline"
-                  class="border-2 border-red-400 text-red-300 hover:bg-red-400/10 px-8 py-4 text-sm font-semibold rounded-full transition-all duration-300"
+                  class="border-2 border-ring text-foreground hover:bg-accent px-8 py-4 text-sm font-semibold rounded-none transition-all duration-300"
                   data-demo-cta="secondary"
                 >
                   See Detection Examples
                 </Button>
               </div>
 
-              <p class="text-xs text-red-300/70">
+              <p class="text-xs text-foreground">
                 🎓 Safer therapy for all • 🔒 Completely private feedback • 💛
                 Designed to educate, not shame
               </p>
@@ -473,96 +458,6 @@ const universityResults = [
 </BaseLayout>
 
 <style>
-  /* Organic Particles */
-  .particles-container {
-    overflow: hidden;
-  }
-
-  .particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #ef4444;
-    border-radius: 50%;
-    animation: float-organic 12s ease-in-out infinite;
-    opacity: 0.6;
-  }
-
-  .particle-1 {
-    top: 20%;
-    left: 10%;
-    animation-delay: 0s;
-    animation-duration: 15s;
-  }
-
-  .particle-2 {
-    top: 40%;
-    right: 20%;
-    animation-delay: 3s;
-    animation-duration: 18s;
-  }
-
-  .particle-3 {
-    bottom: 30%;
-    left: 25%;
-    animation-delay: 6s;
-    animation-duration: 12s;
-  }
-
-  .particle-4 {
-    top: 60%;
-    right: 40%;
-    animation-delay: 9s;
-    animation-duration: 20s;
-  }
-
-  .particle-5 {
-    bottom: 10%;
-    right: 10%;
-    animation-delay: 12s;
-    animation-duration: 16s;
-  }
-
-  @keyframes float-organic {
-    0%,
-    100% {
-      transform: translateY(0px) translateX(0px) scale(1);
-      opacity: 0.6;
-    }
-    25% {
-      transform: translateY(-30px) translateX(20px) scale(1.2);
-      opacity: 0.8;
-    }
-    50% {
-      transform: translateY(-10px) translateX(-15px) scale(0.9);
-      opacity: 0.4;
-    }
-    75% {
-      transform: translateY(20px) translateX(10px) scale(1.1);
-      opacity: 0.7;
-    }
-  }
-
-  /* Text Effects */
-  .golden-shimmer {
-    background: linear-gradient(45deg, #ef4444, #dc2626, #b91c1c);
-    background-size: 200% 200%;
-    animation: shimmer 3s ease-in-out infinite;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  @keyframes shimmer {
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-
   /* Card Effects */
   .organic-card {
     position: relative;
@@ -594,31 +489,6 @@ const universityResults = [
     50% {
       transform: scale(1) rotate(180deg);
       opacity: 1;
-    }
-  }
-
-  /* Breathing Animation */
-  .animate-breathe {
-    animation: breathe 3s ease-in-out infinite;
-  }
-
-  @keyframes breathe {
-    0%,
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.05);
-      opacity: 0.9;
-    }
-  }
-
-  /* Responsive adjustments */
-  @media (max-width: 768px) {
-    .particle {
-      width: 3px;
-      height: 3px;
     }
   }
 </style>
