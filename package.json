@@ -399,7 +399,7 @@
     "twilio": "^6.1.1",
     "uuid": "^14.0.2",
     "workers-ai-provider": "^4.0.0",
-    "ws": "^8.21.3",
+    "ws": "^8.22.0",
     "zod": "^4.6.5",
     "zustand": "^5.0.15"
   },
@@ -474,7 +474,7 @@
     "autoprefixer": "^10.6.1",
     "axe-core": "^4.13.0",
     "browserify-zlib": "^0.2.0",
-    "chalk": "^6.0.0",
+    "chalk": "^6.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "concurrently": "^10.0.5",
