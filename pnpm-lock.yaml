@@ -118,7 +118,6 @@ overrides:
   node-domexception: ^2.0.1
   node-forge: '>=1.4.0'
   node-gyp: ^10.0.0
-  nodemailer: ^9.0.1
   openai: npm:openai@6.37.0
   path-to-regexp: 6.3.0
   picomatch: '>=4.0.4'
@@ -534,8 +533,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
       nodemailer:
-        specifier: ^9.0.1
-        version: 9.1.1
+        specifier: ^10.0.10
+        version: 10.0.12
       otplib:
         specifier: ^13.5.0
         version: 13.5.0
@@ -1530,8 +1529,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(@aws-sdk/client-s3@3.1136.0)
       nodemailer:
-        specifier: ^9.0.1
-        version: 9.1.1
+        specifier: ^10.0.10
+        version: 10.0.12
       pg:
         specifier: ^8.22.0
         version: 8.23.0
@@ -12360,9 +12359,9 @@ packages:
   node-seal@7.0.0:
     resolution: {integrity: sha512-R5q8PQ6z3Hyq7x1uunNf5yZtDuSlffYkWFA5uvzL2fYF/IHL7+KwCsRdLlG3inBU1dMUgakDWiuqf0csMvcang==}
 
-  nodemailer@9.1.1:
-    resolution: {integrity: sha512-izw9mVKFix6YSnC9eLgV6g1opl9DUlRio9ZNcq+Wu9Ujn2UwF+8Nl0B8nz22kEC+CTZCvinkxwJ0DeFbb6NwcQ==}
-    engines: {node: '>=6.0.0'}
+  nodemailer@10.0.12:
+    resolution: {integrity: sha512-PQ46oNbNMuH/Sno7B5IWIU9etytwrO0xdTFvWXpIQFRXhBAXtzD48243AS+BCbQQTPD8y3fqUrgLn0tSo77gvg==}
+    engines: {node: '>=20.0.0'}
 
   nopt@8.1.0:
     resolution: {integrity: sha512-ieGu42u/Qsa4TFktmaKEwM6MQH0pOWnaB3htzh0JRtx84+Mebc0cbZYN5bC+6WTZ4+77xrL9Pn5m7CV6VIkV7A==}
@@ -12853,7 +12852,7 @@ packages:
       jiti: '>=1.21.0'
       postcss: '>=8.0.9'
       tsx: 4.23.15
-      yaml: ^2.8.3
+      yaml: ^2.4.2
     peerDependenciesMeta:
       jiti:
         optional: true
@@ -14763,7 +14762,7 @@ packages:
       sugarss: ^5.0.0
       terser: ^5.16.0
       tsx: 4.23.15
-      yaml: ^2.8.3
+      yaml: ^2.4.2
     peerDependenciesMeta:
       '@types/node':
         optional: true
@@ -15230,11 +15229,6 @@ packages:
 
   yaml@2.8.4:
     resolution: {integrity: sha512-ml/JPOj9fOQK8RNnWojA67GbZ0ApXAUlN2UQclwv2eVgTgn7O9gg9o7paZWKMp4g0H3nTLtS9LVzhkpOFIKzog==}
-    engines: {node: '>= 14.6'}
-    hasBin: true
-
-  yaml@2.9.1:
-    resolution: {integrity: sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw==}
     engines: {node: '>= 14.6'}
     hasBin: true
 
@@ -17163,7 +17157,7 @@ snapshots:
       string-env-interpolation: 1.0.1
       ts-log: 3.0.3
       tslib: 2.8.1
-      yaml: 2.9.1
+      yaml: 2.8.4
       yargs: 18.2.0
     optionalDependencies:
       '@parcel/watcher': 2.6.0
@@ -18573,13 +18567,13 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.1)
-      yaml: 2.9.1
+      yaml: 2.8.4
 
   '@opentelemetry/configuration@0.219.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.1)
-      yaml: 2.9.1
+      yaml: 2.8.4
 
   '@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.1)':
     dependencies:
@@ -27812,7 +27806,7 @@ snapshots:
 
   node-seal@7.0.0: {}
 
-  nodemailer@9.1.1: {}
+  nodemailer@10.0.12: {}
 
   nopt@8.1.0:
     dependencies:
@@ -31181,8 +31175,6 @@ snapshots:
       yaml: 2.8.4
 
   yaml@2.8.4: {}
-
-  yaml@2.9.1: {}
 
   yargs-parser@13.1.2:
     dependencies:
