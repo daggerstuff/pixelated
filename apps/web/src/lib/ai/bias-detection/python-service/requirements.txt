@@ -533,7 +533,7 @@ tzlocal==5.3.1
     # via celery
 ulid-py==1.1.0
     # via bias-detection-service (pyproject.toml)
-urllib3==2.7.0
+urllib3==2.8.0
     # via
     #   bias-detection-service (pyproject.toml)
     #   requests
