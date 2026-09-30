@@ -35,19 +35,19 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       </p>
 
       <!-- Progress Summary -->
-      <div class="inline-flex items-center gap-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 px-8 py-4 rounded-full border border-blue-200 dark:border-blue-800">
+      <div class="inline-flex items-center gap-6 bg-card px-8 py-4 rounded-none border border-border">
         <div class="text-center">
-          <div class="text-2xl font-bold text-blue-600">85%</div>
+          <div class="text-2xl font-bold text-foreground">85%</div>
           <div class="text-sm text-muted-foreground">Overall Progress</div>
         </div>
         <div class="w-px h-8 bg-border"></div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-green-600">12</div>
+          <div class="text-2xl font-bold text-foreground">12</div>
           <div class="text-sm text-muted-foreground">Sessions Complete</div>
         </div>
         <div class="w-px h-8 bg-border"></div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-purple-600">4.8</div>
+          <div class="text-2xl font-bold text-foreground">4.8</div>
           <div class="text-sm text-muted-foreground">Wellness Score</div>
         </div>
       </div>
@@ -71,7 +71,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
           spaceBetween={20}
           centeredSlides={true}
           height="320px"
-          className="rounded-lg"
+          className="rounded-none"
           breakpoints={{
             320: { slidesPerView: 1, spaceBetween: 10 },
             640: { slidesPerView: 2, spaceBetween: 15 },
@@ -83,35 +83,35 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
               title: 'Starting Your Journey',
               description: 'Initial assessment and goal setting',
               content:
-                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🌱</div><h3 class="text-xl font-bold mb-2">First Steps</h3><p class="text-center text-sm opacity-90">Beginning your path to wellness and growth</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Completed</div></div>',
+                '<div class="flex flex-col items-center justify-center h-full bg-card text-foreground p-6 rounded-none"><div class="text-5xl mb-4">🌱</div><h3 class="text-xl font-bold mb-2">First Steps</h3><p class="text-center text-sm opacity-90">Beginning your path to wellness and growth</p><div class="mt-4 px-3 py-1 bg-secondary rounded-none text-xs">Completed</div></div>',
             },
             {
               id: 'journey-2',
               title: 'Building Skills',
               description: 'Learning coping strategies and techniques',
               content:
-                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-green-500 to-emerald-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🛠️</div><h3 class="text-xl font-bold mb-2">Skill Building</h3><p class="text-center text-sm opacity-90">Developing tools for emotional regulation</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">In Progress</div></div>',
+                '<div class="flex flex-col items-center justify-center h-full bg-card text-foreground p-6 rounded-none"><div class="text-5xl mb-4">🛠️</div><h3 class="text-xl font-bold mb-2">Skill Building</h3><p class="text-center text-sm opacity-90">Developing tools for emotional regulation</p><div class="mt-4 px-3 py-1 bg-secondary rounded-none text-xs">In Progress</div></div>',
             },
             {
               id: 'journey-3',
               title: 'Emotional Awareness',
               description: 'Understanding and processing emotions',
               content:
-                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-purple-500 to-pink-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🎭</div><h3 class="text-xl font-bold mb-2">Emotional Growth</h3><p class="text-center text-sm opacity-90">Exploring and understanding your emotions</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Active</div></div>',
+                '<div class="flex flex-col items-center justify-center h-full bg-card text-foreground p-6 rounded-none"><div class="text-5xl mb-4">🎭</div><h3 class="text-xl font-bold mb-2">Emotional Growth</h3><p class="text-center text-sm opacity-90">Exploring and understanding your emotions</p><div class="mt-4 px-3 py-1 bg-secondary rounded-none text-xs">Active</div></div>',
             },
             {
               id: 'journey-4',
               title: 'Relationship Building',
               description: 'Strengthening connections with others',
               content:
-                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3.99-4H18a4 4 0 0 0-4 4v2"></path><path d="M15 3a4 4 0 0 1 4 4"></path><path d="M6 9a4 4 0 0 0-4 4"></path></svg></div><h3 class="text-xl font-bold mb-2">Connections</h3><p class="text-center text-sm opacity-90">Building healthy relationships and support</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Upcoming</div></div>',
+                '<div class="flex flex-col items-center justify-center h-full bg-card text-foreground p-6 rounded-none"><div class="text-5xl mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3.99-4H18a4 4 0 0 0-4 4v2"></path><path d="M15 3a4 4 0 0 1 4 4"></path><path d="M6 9a4 4 0 0 0-4 4"></path></svg></div><h3 class="text-xl font-bold mb-2">Connections</h3><p class="text-center text-sm opacity-90">Building healthy relationships and support</p><div class="mt-4 px-3 py-1 bg-secondary rounded-none text-xs">Upcoming</div></div>',
             },
             {
               id: 'journey-5',
               title: 'Maintaining Wellness',
               description: 'Sustaining progress and continued growth',
               content:
-                '<div class="flex flex-col items-center justify-center h-full bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-6 rounded-lg"><div class="text-5xl mb-4">🌟</div><h3 class="text-xl font-bold mb-2">Wellness</h3><p class="text-center text-sm opacity-90">Maintaining growth and preventing relapse</p><div class="mt-4 px-3 py-1 bg-white/20 rounded-full text-xs">Future</div></div>',
+                '<div class="flex flex-col items-center justify-center h-full bg-card text-foreground p-6 rounded-none"><div class="text-5xl mb-4">🌟</div><h3 class="text-xl font-bold mb-2">Wellness</h3><p class="text-center text-sm opacity-90">Maintaining growth and preventing relapse</p><div class="mt-4 px-3 py-1 bg-secondary rounded-none text-xs">Future</div></div>',
             },
           ]}
         />
@@ -123,7 +123,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       <Card>
         <div class="p-6">
           <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-purple-600">
+            <span class="material-symbols-outlined text-foreground">
               psychology
             </span>
             Emotion Exploration Space
@@ -148,7 +148,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       <Card>
         <div class="p-6">
           <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-blue-600">
+            <span class="material-symbols-outlined text-foreground">
               3d_rotation
             </span>
             Your Emotion Journey
@@ -172,7 +172,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       <Card>
         <div class="p-6">
           <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-green-600">
+            <span class="material-symbols-outlined text-foreground">
               trending_up
             </span>
             Your Progress Over Time
@@ -202,7 +202,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       <Card>
         <div class="p-6">
           <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-            <span class="material-symbols-outlined text-orange-600">mood</span>
+            <span class="material-symbols-outlined text-foreground">mood</span>
             Emotional Patterns
           </h3>
           <p class="text-muted-foreground text-sm mb-4">
@@ -226,10 +226,10 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 
     <!-- Action Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <Card class="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
+      <Card class="bg-card">
         <div class="p-6 text-center">
-          <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="material-symbols-outlined text-white text-2xl">
+          <div class="w-16 h-16 bg-primary rounded-none flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-foreground text-2xl">
               chat
             </span>
           </div>
@@ -239,7 +239,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
           </p>
           <a
             href="/therapy-chat"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
           >
             <span>Start Session</span>
             <span class="material-symbols-outlined">arrow_forward</span>
@@ -247,10 +247,10 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
         </div>
       </Card>
 
-      <Card class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20">
+      <Card class="bg-card">
         <div class="p-6 text-center">
-          <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="material-symbols-outlined text-white text-2xl">
+          <div class="w-16 h-16 bg-primary rounded-none flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-foreground text-2xl">
               assignment
             </span>
           </div>
@@ -260,7 +260,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
           </p>
           <a
             href="/components/treatment-plans"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
           >
             <span>View Goals</span>
             <span class="material-symbols-outlined">arrow_forward</span>
@@ -268,10 +268,10 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
         </div>
       </Card>
 
-      <Card class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+      <Card class="bg-card">
         <div class="p-6 text-center">
-          <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span class="material-symbols-outlined text-white text-2xl">
+          <div class="w-16 h-16 bg-primary rounded-none flex items-center justify-center mx-auto mb-4">
+            <span class="material-symbols-outlined text-foreground text-2xl">
               insights
             </span>
           </div>
@@ -281,7 +281,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
           </p>
           <a
             href="/dashboard/enhanced"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
           >
             <span>Explore</span>
             <span class="material-symbols-outlined">arrow_forward</span>
@@ -291,19 +291,19 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     </div>
 
     <!-- Today's Insights -->
-    <Card class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-950/20 dark:to-blue-950/20">
+    <Card class="bg-card">
       <div class="p-6">
         <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
-          <span class="material-symbols-outlined text-indigo-600">
+          <span class="material-symbols-outlined text-foreground">
             lightbulb
           </span>
           Today's Insights
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+          <div class="bg-card rounded-none p-4">
             <div class="flex items-center gap-3 mb-2">
-              <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                <span class="material-symbols-outlined text-green-600 text-sm">
+              <div class="w-8 h-8 bg-secondary rounded-none flex items-center justify-center">
+                <span class="material-symbols-outlined text-foreground text-sm">
                   trending_up
                 </span>
               </div>
@@ -315,10 +315,10 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
             </p>
           </div>
 
-          <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+          <div class="bg-card rounded-none p-4">
             <div class="flex items-center gap-3 mb-2">
-              <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                <span class="material-symbols-outlined text-blue-600 text-sm">
+              <div class="w-8 h-8 bg-secondary rounded-none flex items-center justify-center">
+                <span class="material-symbols-outlined text-foreground text-sm">
                   schedule
                 </span>
               </div>
@@ -329,10 +329,10 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
             </p>
           </div>
 
-          <div class="bg-white dark:bg-gray-800 rounded-lg p-4">
+          <div class="bg-card rounded-none p-4">
             <div class="flex items-center gap-3 mb-2">
-              <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
-                <span class="material-symbols-outlined text-purple-600 text-sm">
+              <div class="w-8 h-8 bg-secondary rounded-none flex items-center justify-center">
+                <span class="material-symbols-outlined text-foreground text-sm">
                   psychology
                 </span>
               </div>
@@ -353,24 +353,24 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
         <span>Patient Dashboard</span>
         <span>•</span>
         <span>
-          Live Data: <span class="font-medium text-green-600">Connected</span>
+          Live Data: <span class="font-medium text-foreground">Connected</span>
         </span>
         <span>•</span>
         <span>
-          Privacy: <span class="font-medium text-blue-600">Maximum</span>
+          Privacy: <span class="font-medium text-foreground">Maximum</span>
         </span>
       </div>
 
       <div class="flex items-center gap-2">
         <a
           href="/dashboard"
-          class="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+          class="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-none hover:bg-secondary/80 transition-colors"
         >
           Standard Dashboard
         </a>
         <a
           href="/components"
-          class="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          class="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
         >
           Explore Components
         </a>
