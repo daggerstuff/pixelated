@@ -111,7 +111,7 @@ const handlePromote = `
     </div>
 
     {error ? (
-      <div class="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6">
+      <div class="bg-secondary border border-ring text-foreground px-4 py-3 rounded-none mb-6">
         <p class="font-medium">Error</p>
         <p class="text-sm">{error}</p>
       </div>
@@ -133,7 +133,7 @@ const handlePromote = `
             <div class="space-y-4" data-pending-list>
               {pendingItems.map((item) => (
                 <div
-                  class="p-4 border rounded-lg border-border"
+                  class="p-4 border rounded-none border-border"
                   data-queue-card
                 >
                   <div class="flex justify-between items-start mb-3">
@@ -159,7 +159,7 @@ const handlePromote = `
 
                   {item.routing_reason && (
                     <div class="mb-3">
-                      <span class="text-xs font-medium px-2 py-1 rounded bg-yellow-900/30 text-yellow-300">
+                      <span class="text-xs font-medium px-2 py-1 rounded-none border border-border bg-secondary text-foreground">
                         {item.routing_reason}
                       </span>
                     </div>
@@ -200,7 +200,7 @@ const handlePromote = `
               <TrendingUp class="w-5 h-5 text-accent" />
               <h2 class="text-xl font-semibold">Reviewed Items</h2>
             </div>
-            <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-400">
+            <span class="px-3 py-1 text-xs font-medium rounded-none border border-border bg-secondary text-foreground">
               {reviewedItems.length} ready for promotion
             </span>
           </div>
@@ -209,7 +209,7 @@ const handlePromote = `
             <div class="space-y-4" data-reviewed-list>
               {reviewedItems.map((item) => (
                 <div
-                  class="p-4 border rounded-lg border-green-500/30 bg-green-500/5"
+                  class="p-4 border rounded-none border-border bg-secondary"
                   data-queue-card
                 >
                   <div class="flex justify-between items-start mb-3">
@@ -218,7 +218,7 @@ const handlePromote = `
                       <p class="text-xs text-muted-foreground mt-1">
                         Added {new Date(item.created_at).toLocaleDateString()}
                       </p>
-                      <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded bg-green-500/20 text-green-400">
+                      <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-none border border-border bg-secondary text-foreground">
                         Reviewed
                       </span>
                     </div>
@@ -238,7 +238,7 @@ const handlePromote = `
 
                   {item.routing_reason && (
                     <div class="mb-3">
-                      <span class="text-xs font-medium px-2 py-1 rounded bg-yellow-900/30 text-yellow-300">
+                      <span class="text-xs font-medium px-2 py-1 rounded-none border border-border bg-secondary text-foreground">
                         {item.routing_reason}
                       </span>
                     </div>
@@ -263,7 +263,7 @@ const handlePromote = `
                     type="button"
                     data-promote-btn
                     onclick={`handlePromote(${item.id}, 'validated')`}
-                    class="w-full sm:w-auto px-4 py-2 bg-accent hover:bg-accentHover text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full sm:w-auto px-4 py-2 bg-accent hover:bg-accentHover text-foreground text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Promote to Validated
                   </button>
@@ -290,11 +290,11 @@ const handlePromote = `
           <h2 class="text-xl font-semibold mb-6">Queue Statistics</h2>
 
           <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="text-center p-3 rounded-lg bg-surface/50">
+            <div class="text-center p-3 rounded-none bg-surface/50">
               <div class="text-2xl font-bold">{pendingItems.length}</div>
               <div class="text-xs text-muted-foreground">Pending</div>
             </div>
-            <div class="text-center p-3 rounded-lg bg-surface/50">
+            <div class="text-center p-3 rounded-none bg-surface/50">
               <div class="text-2xl font-bold">{reviewedItems.length}</div>
               <div class="text-xs text-muted-foreground">Reviewed</div>
             </div>
@@ -335,25 +335,25 @@ const handlePromote = `
         </Card>
 
         {/* Promotion Workflow Info */}
-        <Card class="p-6 mt-6 border-green-500/20">
-          <h3 class="text-lg font-semibold mb-4 text-green-400">
+        <Card class="p-6 mt-6 border-border">
+          <h3 class="text-lg font-semibold mb-4 text-foreground">
             Promotion Workflow
           </h3>
           <div class="space-y-2 text-sm">
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <span class="w-2 h-2 rounded-full border-2 border-muted-foreground"></span>
               <span class="text-muted-foreground">Pending</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+              <span class="w-2 h-2 rounded-full bg-muted-foreground"></span>
               <span class="text-muted-foreground">Reviewed</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-green-400"></span>
+              <span class="w-2 h-2 rounded-full bg-primary"></span>
               <span class="text-muted-foreground">Validated</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+              <span class="w-2 h-2 rounded-full bg-foreground"></span>
               <span class="text-muted-foreground">Merged</span>
             </div>
           </div>

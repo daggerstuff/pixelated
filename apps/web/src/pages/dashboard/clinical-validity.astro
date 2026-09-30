@@ -98,16 +98,16 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
     {/* Degradation Alert */}
     {showDegradationAlert && (
       <div
-        class="mb-6 p-4 border rounded-lg bg-gradient-to-r from-orange-950/30 to-orange-900/20 border-orange-800 relative"
+        class="mb-6 p-4 border rounded-none bg-secondary border-ring relative"
         role="alert"
         aria-labelledby="degradation-alert-title"
         aria-describedby="degradation-alert-description"
       >
         <div class="flex items-start gap-3">
           {/* Icon */}
-          <div class="flex-shrink-0 p-2 bg-orange-500/20 rounded-lg">
+          <div class="flex-shrink-0 p-2 bg-secondary rounded-none">
             <svg
-              class="w-5 h-5 text-orange-400"
+              class="w-5 h-5 text-foreground"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
@@ -125,13 +125,13 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
           <div class="flex-1">
             <h3
               id="degradation-alert-title"
-              class="text-lg font-semibold text-orange-200 mb-1"
+              class="text-lg font-semibold text-foreground mb-1"
             >
               Performance Degradation Detected
             </h3>
             <p
               id="degradation-alert-description"
-              class="text-orange-300/90 mb-3"
+              class="text-muted-foreground mb-3"
             >
               Clinical validity pass rate has dropped{' '}
               {degradationDetails.degradationPercentage.toFixed(1)} percentage
@@ -142,13 +142,13 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
             </p>
             <div class="flex flex-wrap gap-2">
               <button
-                class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                class="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-none transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
                 onclick="console.log('Investigate degradation')"
               >
                 Investigate
               </button>
               <button
-                class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium rounded-lg transition-colors border border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-gray-900"
+                class="px-4 py-2 bg-secondary hover:bg-accent text-foreground font-medium rounded-none transition-colors border border-border focus:outline-none focus:ring-2 focus:ring-ring"
                 onclick="this.closest('[role=\'alert\']').style.display = 'none'"
               >
                 Dismiss
@@ -168,9 +168,9 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
 
     {/* Error State */}
     {error && (
-      <div class="mb-6 p-4 bg-red-950/20 border border-red-800 rounded-lg">
-        <p class="text-red-300 font-medium">Unable to load dashboard data</p>
-        <p class="text-red-400 text-sm mt-1">{error}</p>
+      <div class="mb-6 p-4 bg-secondary border border-ring rounded-none">
+        <p class="text-foreground font-medium">Unable to load dashboard data</p>
+        <p class="text-foreground text-sm mt-1">{error}</p>
         <p class="text-muted-foreground text-sm mt-2">
           Showing mock data for demonstration. Ensure the clinical validity API
           endpoint is running.
@@ -180,8 +180,8 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
 
     {/* Loading State */}
     {isLoading && (
-      <div class="mb-6 p-4 bg-blue-950/20 border border-blue-800 rounded-lg">
-        <p class="text-blue-300 font-medium">Loading dashboard data...</p>
+      <div class="mb-6 p-4 bg-secondary border border-border rounded-none">
+        <p class="text-foreground font-medium">Loading dashboard data...</p>
       </div>
     )}
 
@@ -190,8 +190,8 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       {/* Current Pass Rate */}
       <Card class="p-6">
         <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 bg-green-500/20 rounded-lg">
-            <TrendingUp class="w-5 h-5 text-green-400" />
+          <div class="p-2 bg-secondary rounded-none">
+            <TrendingUp class="w-5 h-5 text-foreground" />
           </div>
           <h3 class="text-lg font-semibold">Current Pass Rate</h3>
         </div>
@@ -199,7 +199,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
           {(data.passRate * 100).toFixed(1)}%
         </div>
         <p class="text-muted-foreground text-sm mb-2">Samples scoring ≥ 0.6</p>
-        <div class="text-green-400 text-sm font-medium flex items-center gap-1">
+        <div class="text-foreground text-sm font-medium flex items-center gap-1">
           <TrendingUp class="w-4 h-4" /> +2.1%
         </div>
       </Card>
@@ -207,8 +207,8 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       {/* Queue Depth */}
       <Card class="p-6">
         <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 bg-blue-500/20 rounded-lg">
-            <Users class="w-5 h-5 text-blue-400" />
+          <div class="p-2 bg-secondary rounded-none">
+            <Users class="w-5 h-5 text-foreground" />
           </div>
           <h3 class="text-lg font-semibold">Queue Depth</h3>
         </div>
@@ -216,7 +216,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
         <p class="text-muted-foreground text-sm mb-2">
           Samples awaiting review
         </p>
-        <div class="text-blue-400 text-sm font-medium flex items-center gap-1">
+        <div class="text-foreground text-sm font-medium flex items-center gap-1">
           <span>+1</span>
         </div>
       </Card>
@@ -224,8 +224,8 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       {/* 7-Day Avg */}
       <Card class="p-6">
         <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 bg-purple-500/20 rounded-lg">
-            <Activity class="w-5 h-5 text-purple-400" />
+          <div class="p-2 bg-secondary rounded-none">
+            <Activity class="w-5 h-5 text-foreground" />
           </div>
           <h3 class="text-lg font-semibold">7-Day Avg</h3>
         </div>
@@ -240,7 +240,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
         <p class="text-muted-foreground text-sm mb-2">
           Weekly average pass rate
         </p>
-        <div class="text-green-400 text-sm font-medium flex items-center gap-1">
+        <div class="text-foreground text-sm font-medium flex items-center gap-1">
           <TrendingUp class="w-4 h-4" /> +1.5%
         </div>
       </Card>
@@ -248,14 +248,14 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       {/* Total Scored */}
       <Card class="p-6">
         <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 bg-orange-500/20 rounded-lg">
-            <BarChart3 class="w-5 h-5 text-orange-400" />
+          <div class="p-2 bg-secondary rounded-none">
+            <BarChart3 class="w-5 h-5 text-foreground" />
           </div>
           <h3 class="text-lg font-semibold">Total Scored</h3>
         </div>
         <div class="text-3xl font-bold mb-1">1,247</div>
         <p class="text-muted-foreground text-sm mb-2">Samples evaluated</p>
-        <div class="text-green-400 text-sm font-medium flex items-center gap-1">
+        <div class="text-foreground text-sm font-medium flex items-center gap-1">
           <TrendingUp class="w-4 h-4" /> +42
         </div>
       </Card>
@@ -281,9 +281,9 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
               ([dimension, score]) => {
                 const width = `${score * 100}%`
                 const scorePercent = (score * 100).toFixed(1)
-                let colorClass = 'bg-green-500'
-                if (score < 0.6) colorClass = 'bg-yellow-500'
-                if (score < 0.4) colorClass = 'bg-red-500'
+                let colorClass = 'bg-foreground'
+                if (score < 0.6) colorClass = 'bg-primary/70'
+                if (score < 0.4) colorClass = 'bg-muted-foreground/50'
 
                 return (
                   <div>
@@ -291,9 +291,9 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
                       <span class="font-medium capitalize">{dimension}</span>
                       <span class="font-mono">{scorePercent}%</span>
                     </div>
-                    <div class="h-2 bg-surface rounded-full overflow-hidden">
+                    <div class="h-2 bg-surface rounded-none overflow-hidden">
                       <div
-                        class={`h-full ${colorClass} rounded-full transition-all duration-500`}
+                        class={`h-full ${colorClass} rounded-none transition-all duration-500`}
                         style={`width: ${width}`}
                       />
                     </div>
@@ -333,7 +333,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
             </div>
           </div>
 
-          <button class="w-full mt-6 bg-accent hover:bg-accent-hover text-white font-medium py-2.5 px-4 rounded-lg transition-colors">
+          <button class="w-full mt-6 bg-accent hover:bg-accent-hover text-foreground font-medium py-2.5 px-4 rounded-none transition-colors">
             Review Next Sample
           </button>
         </div>
@@ -365,15 +365,15 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
               {data.weeklyTrend.map((day, index) => {
                 const passRatePercent = (day.passRate * 100).toFixed(1)
                 let status = 'Good'
-                let statusColor = 'text-green-500'
+                let statusColor = 'text-muted-foreground'
 
                 if (day.passRate < 0.65) {
                   status = 'Needs attention'
-                  statusColor = 'text-yellow-500'
+                  statusColor = 'text-foreground font-medium'
                 }
                 if (day.passRate < 0.55) {
                   status = 'Critical'
-                  statusColor = 'text-red-500'
+                  statusColor = 'text-foreground font-bold'
                 }
 
                 return (
