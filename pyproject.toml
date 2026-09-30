@@ -122,7 +122,7 @@ dependencies = [
   "virtualenv>=21.2.0",
   "voyageai>=0.3.7",
   "aiosqlite>=0.22.1",
-  "semgrep>=1.79.0",
+  "semgrep>=1.60.0",
   "webdriver-manager>=4.0.2",
   "selenium>=4.43.0",
   "undetected-chromedriver>=3.5.5",
@@ -135,7 +135,7 @@ dependencies = [
   "pinecone-client>=6.0.0",
   "ruff>=0.15.17",
   "beautifulsoup4>=4.15.0",
-  "sqlalchemy>=2.0.51,<2.1",
+  "sqlalchemy>=2.0.51,<2.2",
   "celery>=5.6.3",
 ]
 [project.optional-dependencies]
