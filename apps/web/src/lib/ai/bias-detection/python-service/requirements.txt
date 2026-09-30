@@ -384,7 +384,7 @@ pygments==2.20.0
     # via
     #   bias-detection-service (pyproject.toml)
     #   rich
-pyjwt==2.13.0
+pyjwt==2.14.0
     # via bias-detection-service (pyproject.toml)
 pyparsing==3.3.2
     # via matplotlib
