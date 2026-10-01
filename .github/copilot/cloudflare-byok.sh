@@ -90,13 +90,8 @@ fi
 export COPILOT_PROVIDER_MAX_PROMPT_TOKENS="128000"
 export COPILOT_PROVIDER_MAX_OUTPUT_TOKENS="8192"
 
-# Cloudflare's OpenAI schema validator does not support proprietary grammar tools ('apply_patch').
-# Use an underscore in function name so Zsh never collides with hyphenated alias definitions.
-copilot_cf() {
-  copilot "$@" --excluded-tools apply_patch
-}
-
-alias copilot-cf='copilot_cf'
+# Alias copilot-cf to copilot for backward compatibility
+alias copilot-cf='copilot'
 
 echo "Cloudflare Workers AI BYOK configured (${MODE} mode):"
 echo "  Base URL:            ${COPILOT_PROVIDER_BASE_URL}"
@@ -105,6 +100,5 @@ echo "  Provider Model ID:   ${COPILOT_PROVIDER_MODEL_ID}"
 echo "  Provider Wire Model: ${COPILOT_PROVIDER_WIRE_MODEL}"
 echo "  Tokens:              ${COPILOT_PROVIDER_MAX_PROMPT_TOKENS} prompt / ${COPILOT_PROVIDER_MAX_OUTPUT_TOKENS} output"
 echo ""
-echo "💡 Usage tip: Use 'copilot-cf' or add '--excluded-tools apply_patch' when running prompts:"
-echo "   copilot-cf -p \"Your prompt here\""
-echo "   copilot -p \"Your prompt here\" --excluded-tools apply_patch"
+echo "✅ Ready. You can run copilot directly:"
+echo "   copilot -p \"Your prompt here\""
