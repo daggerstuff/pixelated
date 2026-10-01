@@ -183,6 +183,20 @@ updates:
       - dependency-name: 'joi'
         update-types:
           - 'version-update:semver-major'
+      # @vitest/coverage-v8 5.x requires vitest 5.x; the repo pins vitest ^4.
+      # The pairing must move in lockstep (see the reverted vitest-mismatch
+      # breaker, staging 05ccf70d5). Dependabot bumps it alone and breaks
+      # coverage collection (0% vs budget) — the #6122 hold.
+      - dependency-name: '@vitest/coverage-v8'
+        update-types:
+          - 'version-update:semver-major'
+      # Sentry 11 conflicts with the @sentry/core@^10 → 10.75.1 drift-override
+      # pin (pnpm-workspace.yaml): a single @sentry/* major bump resolves two
+      # full Sentry families and fails the version-drift ratchet (6 @sentry/*
+      # regressions in #6122). Migrate the whole family deliberately.
+      - dependency-name: '@sentry/*'
+        update-types:
+          - 'version-update:semver-major'
 
   # UV - Daily security updates (pyproject.toml + uv.lock)
   - package-ecosystem: 'uv'
