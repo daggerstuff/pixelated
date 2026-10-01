@@ -21,7 +21,7 @@ const MultidimensionalEmotionChartFallback = ({
   className?: string
 }) => (
   <div
-    className={`bg-slate-100 flex h-[360px] items-center justify-center rounded-lg p-4 text-sm ${className ?? ''}`}
+    className={`flex h-[360px] items-center justify-center rounded-none bg-secondary p-4 text-sm ${className ?? ''}`}
   >
     Multidimensional emotion visualization is temporarily unavailable.
   </div>
@@ -29,7 +29,7 @@ const MultidimensionalEmotionChartFallback = ({
 
 const SwiperCarouselFallback = ({ className }: { className?: string }) => (
   <div
-    className={`bg-slate-100 flex h-64 items-center justify-center rounded-lg p-4 text-sm ${className ?? ''}`}
+    className={`flex h-64 items-center justify-center rounded-none bg-secondary p-4 text-sm ${className ?? ''}`}
   >
     Carousel is temporarily unavailable.
   </div>
@@ -41,7 +41,7 @@ const ParticleVisualizationFallback = ({
   className?: string
 }) => (
   <div
-    className={`bg-slate-100 flex h-[360px] items-center justify-center rounded-lg p-4 text-sm ${className ?? ''}`}
+    className={`flex h-[360px] items-center justify-center rounded-none bg-secondary p-4 text-sm ${className ?? ''}`}
   >
     Particle visualization is temporarily unavailable.
   </div>
@@ -55,28 +55,32 @@ const DefaultLoading = () => (
 )
 
 const VisualizationLoading = () => (
-  <div className="bg-slate-50 flex min-h-[400px] items-center justify-center rounded-lg p-8">
+  <div className="flex min-h-[400px] items-center justify-center rounded-none bg-secondary p-8">
     <div className="flex flex-col items-center gap-2">
       <div className="border-t-blue-500 border-r-transparent border-b-blue-500 border-l-transparent h-8 w-8 animate-spin rounded-full border-4"></div>
-      <div className="text-slate-500 text-sm">Loading visualization...</div>
+      <div className="text-sm text-muted-foreground">
+        Loading visualization...
+      </div>
     </div>
   </div>
 )
 
 const ThreeDLoading = () => (
-  <div className="bg-slate-50 flex min-h-[400px] items-center justify-center rounded-lg p-8">
+  <div className="flex min-h-[400px] items-center justify-center rounded-none bg-secondary p-8">
     <div className="flex flex-col items-center gap-2">
       <div className="border-t-indigo-500 border-r-transparent border-b-indigo-500 border-l-transparent h-10 w-10 animate-spin rounded-full border-4"></div>
-      <div className="text-slate-500 text-sm">Loading 3D visualization...</div>
+      <div className="text-sm text-muted-foreground">
+        Loading 3D visualization...
+      </div>
     </div>
   </div>
 )
 
 // Error fallback component
 const ErrorFallback = ({ error }: { error: Error }) => (
-  <div className="border-red-200 bg-red-50 rounded-md border p-4">
-    <p className="text-red-600 font-medium">Failed to load component</p>
-    <p className="text-red-500 text-sm">{String(error)}</p>
+  <div className="rounded-none border border-ring bg-secondary p-4">
+    <p className="font-medium text-foreground">Failed to load component</p>
+    <p className="text-sm text-muted-foreground">{String(error)}</p>
   </div>
 )
 
