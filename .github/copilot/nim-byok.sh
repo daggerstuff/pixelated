@@ -37,10 +37,10 @@ export COPILOT_PROVIDER_BASE_URL="http://127.0.0.1:20128/v1"
 export COPILOT_PROVIDER_API_KEY="$(_9router_api_key)"
 export COPILOT_PROVIDER_TYPE="openai"
 
-# Keep qwen/GPT-4o mini drift from being reused as default for this project.
+# Keep qwen/GPT-4o mini and deprecated models from being reused as default for this project.
 _nim_byok_is_forbidden_model() {
   local candidate="$1"
-  [[ "$candidate" == "gpt-5.4-mini" || "$candidate" == qwen/* || "$candidate" == nvidia/*qwen* || "$candidate" == nscale/*qwen* ]]
+  [[ -z "$candidate" || "$candidate" == "gpt-5.4-mini" || "$candidate" == qwen/* || "$candidate" == nvidia/*qwen* || "$candidate" == nscale/*qwen* || "$candidate" == *glm-5.2* || "$candidate" == *minimax-m3* || "$candidate" == *deepseek-v4-flash ]]
 }
 
 _nim_byok_sanitize_model() {
@@ -96,13 +96,14 @@ is_forbidden_model() {
 
 # Wire model — exact ID sent to 9Router. Environment can override these
 # values if you need to temporarily switch providers/models.
-export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-nvidia/z-ai/glm-5.2}"
-export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-nvidia/z-ai/glm-5.3-flash nvidia/moonshotai/kimi-k3 nvidia/deepseek-ai/deepseek-v4.1-flash nvidia/meta/muse-glimmer-30b nvidia/z-ai/glm-5.3 nvidia/z-ai/glm-5.2 groq/llama-3.3-70b-versatile nvidia/deepseek-ai/deepseek-v4-flash nvidia/moonshotai/kimi-k2.6 nvidia/minimaxai/minimax-m3}")"
+export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-nvidia/z-ai/glm-5.3-flash}"
+export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-nvidia/z-ai/glm-5.3-flash nvidia/meta/muse-glimmer-30b nvidia/z-ai/glm-5.3}")"
 export COPILOT_MODEL="$(_nim_byok_sanitize_model "${COPILOT_MODEL:-${NIM_DEFAULT_MODEL}}")"
 
 # Provider model ID used by Copilot's BYOK wiring.
 # Default to the NIM baseline model so provider/model ids stay on the NIM side.
 export COPILOT_PROVIDER_MODEL_ID="$(_nim_byok_sanitize_model "${COPILOT_PROVIDER_MODEL_ID:-${NIM_DEFAULT_MODEL}}")"
+export COPILOT_PROVIDER_WIRE_MODEL="${COPILOT_PROVIDER_WIRE_MODEL:-$COPILOT_MODEL}"
 
 # Optional fallback sequence for rate-limit recovery (space/comma separated).
 export COPILOT_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${COPILOT_MODEL_SEQUENCE:-${NIM_MODEL_SEQUENCE}}")"
@@ -116,18 +117,12 @@ echo "9Router BYOK configured:"
 echo "  Base URL: ${COPILOT_PROVIDER_BASE_URL}"
 echo "  Model:    ${COPILOT_MODEL}"
 echo "  Provider Model ID: ${COPILOT_PROVIDER_MODEL_ID}"
+echo "  Provider Wire Model: ${COPILOT_PROVIDER_WIRE_MODEL}"
 echo "  Fallback Models: ${COPILOT_MODEL_SEQUENCE}"
 echo "  Fallback Provider IDs: ${COPILOT_PROVIDER_MODEL_SEQUENCE}"
 echo "  Tokens:   ${COPILOT_PROVIDER_MAX_PROMPT_TOKENS} prompt / ${COPILOT_PROVIDER_MAX_OUTPUT_TOKENS} output"
 echo ""
 echo "Switch model: export COPILOT_MODEL=<model-id>"
 echo "  GLM 5.3 Flash:   nvidia/z-ai/glm-5.3-flash"
-echo "  Kimi K3:         nvidia/moonshotai/kimi-k3"
-echo "  DeepSeek V4.1:   nvidia/deepseek-ai/deepseek-v4.1-flash"
 echo "  Muse Glimmer:    nvidia/meta/muse-glimmer-30b"
 echo "  GLM 5.3:         nvidia/z-ai/glm-5.3"
-echo "  GLM 5.2:         nvidia/z-ai/glm-5.2"
-echo "  Llama 3.3 70B:   groq/llama-3.3-70b-versatile"
-echo "  DeepSeek V4:     nvidia/deepseek-ai/deepseek-v4-flash"
-echo "  Kimi K2.6:       nvidia/moonshotai/kimi-k2.6"
-echo "  MiniMax 2.7:     nvidia/minimaxai/minimax-m2.7"
