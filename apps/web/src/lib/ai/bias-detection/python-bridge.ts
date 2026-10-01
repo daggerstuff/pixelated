@@ -84,7 +84,15 @@ export class PythonBiasDetectionBridge {
   }
 
   private startHealthMonitoring(): void {
+    // Guard against reentrancy: checkHealth can take longer than the interval
+    // (10 retry attempts with backoff), and overlapping setInterval callbacks
+    // stack retry cycles indefinitely when the Python service is absent.
+    let checkInFlight = false;
     this.healthCheckTimer = setInterval(async () => {
+      if (checkInFlight) {
+        return;
+      }
+      checkInFlight = true;
       try {
         const healthResponse = await this.checkHealth();
         this.lastHealthCheck = new Date();
@@ -118,6 +126,8 @@ export class PythonBiasDetectionBridge {
           error: describeError(error),
           consecutiveFailures: this.consecutiveFailures,
         });
+      } finally {
+        checkInFlight = false;
       }
     }, this.healthCheckInterval);
   }
