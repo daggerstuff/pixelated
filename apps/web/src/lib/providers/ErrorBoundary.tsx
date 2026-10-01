@@ -122,26 +122,3 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children
   }
 }
-
-// HOC to wrap components with error boundary
-export function withErrorBoundary<T extends object>(
-  Component: React.ComponentType<T>,
-  options: Omit<Props, 'children'> = {},
-): React.FC<T> {
-  return function WithErrorBoundaryWrapper(props: T) {
-    return (
-      <ErrorBoundary {...options}>
-        <Component {...props} />
-      </ErrorBoundary>
-    )
-  }
-}
-
-// Custom hook for programmatic error throwing
-export function useErrorBoundary() {
-  return {
-    throwError: (error: Error) => {
-      throw error
-    },
-  }
-}
