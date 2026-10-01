@@ -543,7 +543,7 @@
     "satori": "^0.33.5",
     "satori-html": "^0.3.2",
     "scheduler": "^0.28.0",
-    "sharp": "^0.35.4",
+    "sharp": "^0.35.5",
     "shiki": "^4.4.3",
     "simple-git": "3.36.0",
     "slug": "^12.0.1",
