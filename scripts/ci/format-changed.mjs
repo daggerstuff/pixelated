@@ -87,7 +87,7 @@ function dedupeAndFilterExisting(files) {
 /** @param {string} command @param {string[]} args */
 function runCommand(command, args) {
   /** @type {SpawnSyncTextResult} */
-  const result = spawnSync("pnpm", ["-s", command, ...args], {
+  const result = spawnSync("pnpm", ["--silent", command, ...args], {
     stdio: "inherit",
   });
   const exitCode = typeof result.status === "number" ? result.status : 0;
