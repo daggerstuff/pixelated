@@ -210,7 +210,7 @@ const openai = new OpenAI({
 
 Neon Ai Gateway's catalog includes:
 
-- **Open-weight models**: Qwen, gpt-oss (via Databricks Foundation Model APIs)
+- **Open-weight models**: gpt-oss (via Databricks Foundation Model APIs)
 - **Frontier models**: GPT (`gpt-5`), Gemini (`gemini-3-flash`) - rolling out
   gradually
 

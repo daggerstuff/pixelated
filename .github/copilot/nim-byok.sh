@@ -40,7 +40,7 @@ export COPILOT_PROVIDER_TYPE="openai"
 # Keep qwen/GPT-4o mini and deprecated models from being reused as default for this project.
 _nim_byok_is_forbidden_model() {
   local candidate="$1"
-  [[ -z "$candidate" || "$candidate" == "gpt-5.4-mini" || "$candidate" == qwen/* || "$candidate" == nvidia/*qwen* || "$candidate" == nscale/*qwen* || "$candidate" == *glm-5.2* || "$candidate" == *minimax-m3* || "$candidate" == *deepseek-v4-flash ]]
+  [[ -z "$candidate" || "$candidate" == "gpt-5.4-mini" || "$candidate" == *qwen* || "$candidate" == *Qwen* || "$candidate" == *glm-5.2* || "$candidate" == *minimax-m3* || "$candidate" == *deepseek-v4-flash ]]
 }
 
 _nim_byok_sanitize_model() {

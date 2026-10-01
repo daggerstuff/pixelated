@@ -43,6 +43,12 @@ PY
 MODE="${1:-direct}"
 MODEL_ARG="${2:-}"
 
+# Filter out qwen models
+if [[ "$MODEL_ARG" =~ [Qq]wen ]]; then
+  echo "⚠️  Qwen models are disabled. Defaulting to DeepSeek V4 Pro."
+  MODEL_ARG=""
+fi
+
 # Parse credentials from environment or 9router DB
 CF_CREDS="$(_cf_db_credentials)"
 CF_KEY="${CLOUDFLARE_API_KEY:-${CF_CREDS%%|*}}"
@@ -53,10 +59,10 @@ if [[ "$MODE" == "9router" ]]; then
   export COPILOT_PROVIDER_BASE_URL="http://127.0.0.1:20128/v1"
   export COPILOT_PROVIDER_API_KEY="$(_9router_api_key)"
   export COPILOT_PROVIDER_TYPE="openai"
-  export COPILOT_MODEL="${MODEL_ARG:-cf/@cf/qwen/qwen3.8-27b}"
+  export COPILOT_MODEL="${MODEL_ARG:-cf/@cf/deepseek-ai/deepseek-v4-pro-0813}"
   export COPILOT_PROVIDER_WIRE_MODEL="${COPILOT_MODEL}"
   export COPILOT_PROVIDER_MODEL_ID="gpt-4o"
-  export COPILOT_MODEL_SEQUENCE="${COPILOT_MODEL} cf/@cf/deepseek-ai/deepseek-v4-pro-0813"
+  export COPILOT_MODEL_SEQUENCE="${COPILOT_MODEL}"
   export COPILOT_PROVIDER_MODEL_SEQUENCE="${COPILOT_MODEL_SEQUENCE}"
 else
   # Option B: Direct Cloudflare Workers AI OpenAI-compatible endpoint
@@ -69,10 +75,10 @@ else
   export COPILOT_PROVIDER_BASE_URL="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/v1"
   export COPILOT_PROVIDER_API_KEY="${CF_KEY}"
   export COPILOT_PROVIDER_TYPE="openai"
-  export COPILOT_MODEL="${MODEL_ARG:-@cf/qwen/qwen3.8-27b}"
+  export COPILOT_MODEL="${MODEL_ARG:-@cf/deepseek-ai/deepseek-v4-pro-0813}"
   export COPILOT_PROVIDER_WIRE_MODEL="${COPILOT_MODEL}"
   export COPILOT_PROVIDER_MODEL_ID="gpt-4o"
-  export COPILOT_MODEL_SEQUENCE="${COPILOT_MODEL} @cf/deepseek-ai/deepseek-v4-pro-0813"
+  export COPILOT_MODEL_SEQUENCE="${COPILOT_MODEL}"
   export COPILOT_PROVIDER_MODEL_SEQUENCE="${COPILOT_MODEL_SEQUENCE}"
 fi
 
@@ -80,8 +86,13 @@ export COPILOT_PROVIDER_MAX_PROMPT_TOKENS="128000"
 export COPILOT_PROVIDER_MAX_OUTPUT_TOKENS="8192"
 
 # Cloudflare's OpenAI schema validator does not support proprietary grammar tools ('apply_patch').
-# Alias copilot to automatically exclude apply_patch for seamless tool execution.
-alias copilot-cf='copilot --excluded-tools apply_patch'
+# Define copilot-cf function to automatically exclude apply_patch for seamless tool execution.
+copilot-cf() {
+  copilot "$@" --excluded-tools apply_patch
+}
+
+# Also alias for interactive convenience
+alias copilot-cf='copilot --excluded-tools apply_patch' 2>/dev/null || true
 
 echo "Cloudflare Workers AI BYOK configured (${MODE} mode):"
 echo "  Base URL:            ${COPILOT_PROVIDER_BASE_URL}"
