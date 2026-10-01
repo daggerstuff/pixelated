@@ -1,0 +1,79 @@
+name: Usability / Accessibility Tests
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main, master, staging]
+    paths:
+      - 'apps/web/src/**'
+      - 'tests/usability/**'
+      - 'config/playwright.config.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/usability-tests.yml'
+  pull_request:
+    branches: [main, master, staging]
+    paths:
+      - 'apps/web/src/**'
+      - 'tests/usability/**'
+      - 'config/playwright.config.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/usability-tests.yml'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+# Cancel superseded runs so feedback on the newest commit is not queued
+# behind stale ones (E2E runs are long).
+concurrency:
+  group: usability-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  usability:
+    name: Run Usability / Accessibility Tests
+    timeout-minutes: 30
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.16.0
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          npm install -g node-gyp
+
+      - name: Install dependencies
+        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Accessibility/usability suite (axe-based WCAG checks, keyboard
+      # navigation, mobile viewports). Lightweight a11y gate that does not
+      # touch auth flows; green locally (~1 min).
+      - name: Run usability suite (a11y gate)
+        run: pnpm e2e:usability --project=chromium
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: ${{ !cancelled() }}
+        with:
+          name: usability-test-results-${{ github.run_id }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 30
+          if-no-files-found: warn
