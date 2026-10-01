@@ -132,17 +132,17 @@ Access session management features:
 ## Next Steps
 
 <CardGroup>
-  <Card title="Core Concepts" icon="book" href="/core/architecture">
+  <Card title="Core Concepts" icon="book" href="/docs/architecture">
     Learn about Pixelated Healths architecture and key concepts
   </Card>
   <Card
     title="API Documentation"
     icon="code"
-    href="/api-reference/introduction"
+    href="/docs/api-reference/introduction"
   >
     Explore the API for custom integrations
   </Card>
-  <Card title="Deployment Guide" icon="server" href="/deployment/requirements">
+  <Card title="Deployment Guide" icon="server" href="/docs/getting-started">
     Learn how to deploy to production
   </Card>
 </CardGroup>
@@ -166,5 +166,5 @@ Access session management features:
    - Verify WebSocket server status
    - Ensure proper SSL configuration
 
-For more help, check our [deployment guide](/deployment/requirements) or
+For more help, check our [getting started guide](/docs/getting-started) or
 [contact support](mailto:support@gemcity.xyz).

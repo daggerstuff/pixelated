@@ -94,7 +94,7 @@ const recentUpdates = [
     date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
     description:
       'Added comprehensive patient rights request management system.',
-    link: '/admin/security/patient-rights',
+    link: '/admin/patient-rights',
   },
 ]
 ---
@@ -272,7 +272,7 @@ const recentUpdates = [
               Security Alerts
             </h2>
             <a
-              href="/admin/security/alerts"
+              href="/admin/audit-logs"
               class="text-sm text-foreground hover:text-foreground"
             >
               View All
@@ -320,7 +320,7 @@ const recentUpdates = [
                       {formatDate(alert.timestamp)}
                     </span>
                     <a
-                      href={`/admin/security/alerts/${alert.id}`}
+                      href="/admin/audit-logs"
                       class="text-xs text-foreground hover:text-foreground"
                     >
                       View Details
@@ -441,7 +441,7 @@ const recentUpdates = [
 
           <div class="mt-6 text-center">
             <a
-              href="/admin/security/compliance"
+              href="/admin/security-dashboard"
               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-none text-primary-foreground bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
             >
               View Full Compliance Report

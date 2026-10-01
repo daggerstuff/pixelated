@@ -133,7 +133,7 @@ Access session management features:
 
     Learn about Pixelated Healths architecture and key concepts
 
-<Card title="API Documentation" icon="code" href="/api-reference/introduction"
+<Card title="API Documentation" icon="code" href="/docs/api-reference/introduction"
 
 >
 
@@ -159,5 +159,5 @@ Access session management features:
    - Verify WebSocket server status
    - Ensure proper SSL configuration
 
-For more help, check our [deployment guide](/deployment/requirements) or
+For more help, check our [getting started guide](/docs/getting-started) or
 [contact support](mailto:support@gemcity.xyz).

@@ -840,9 +840,27 @@ export default defineConfig({
     // Auth de-duplication: one login and one register surface.
     '/signin': { status: 301, destination: '/login' },
     '/signup': { status: 301, destination: '/register' },
+    '/auth/signup': { status: 301, destination: '/register' },
+    '/auth/signin': { status: 301, destination: '/login' },
     // Chat consolidation: retired demo-grade and dead-mock chat pages.
     '/ai-chat': { status: 301, destination: '/chat' },
     '/mental-health-chat': { status: 301, destination: '/chat' },
+    // Route aliases and fallbacks
+    '/cookies': { status: 301, destination: '/cookie-policy' },
+    '/privacy-policy': { status: 301, destination: '/privacy' },
+    '/pricing': { status: 301, destination: '/contact' },
+    '/enterprise': { status: 301, destination: '/contact' },
+    '/support': { status: 301, destination: '/contact' },
+    '/security': { status: 301, destination: '/admin/security' },
+    '/settings': { status: 301, destination: '/admin/security-settings' },
+    '/sessions': { status: 301, destination: '/journal-research/sessions' },
+    '/resources': { status: 301, destination: '/journal-research' },
+    '/admin/settings': { status: 301, destination: '/admin/security-settings' },
+    '/admin/security/baa': { status: 301, destination: '/admin/security/baa/management' },
+    '/admin/security/backup': { status: 301, destination: '/admin/backup-security' },
+    '/admin/security/consent': { status: 301, destination: '/admin/consent' },
+    '/admin/security/dlp': { status: 301, destination: '/admin/dlp' },
+    '/admin/security/patient-rights': { status: 301, destination: '/admin/patient-rights' },
   },
   devToolbar: {
     enabled: isDevelopment,
