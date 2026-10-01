@@ -2,6 +2,11 @@
 # Cloudflare Workers AI BYOK setup for GitHub Copilot CLI
 # Usage: source .github/copilot/cloudflare-byok.sh [mode: direct|9router] [model]
 
+# If this shell has an existing alias from an earlier session, remove it first
+# to avoid Zsh 'defining function based on alias' syntax errors when sourced.
+unalias copilot-cf 2>/dev/null || true
+unset -f copilot-cf copilot_cf 2>/dev/null || true
+
 # Reuse existing GitHub CLI login if no token is exported
 if [[ -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]] && command -v gh >/dev/null 2>&1; then
   if gh_token="$(gh auth token 2>/dev/null)"; then
@@ -86,13 +91,12 @@ export COPILOT_PROVIDER_MAX_PROMPT_TOKENS="128000"
 export COPILOT_PROVIDER_MAX_OUTPUT_TOKENS="8192"
 
 # Cloudflare's OpenAI schema validator does not support proprietary grammar tools ('apply_patch').
-# Define copilot-cf function to automatically exclude apply_patch for seamless tool execution.
-copilot-cf() {
+# Use an underscore in function name so Zsh never collides with hyphenated alias definitions.
+copilot_cf() {
   copilot "$@" --excluded-tools apply_patch
 }
 
-# Also alias for interactive convenience
-alias copilot-cf='copilot --excluded-tools apply_patch' 2>/dev/null || true
+alias copilot-cf='copilot_cf'
 
 echo "Cloudflare Workers AI BYOK configured (${MODE} mode):"
 echo "  Base URL:            ${COPILOT_PROVIDER_BASE_URL}"
