@@ -64,7 +64,7 @@ const trainingPrograms: any[] = []
           )}
           {userRole === 'supervisor' && (
             <Button
-              href="/training/supervisor/dashboard"
+              href="/dashboard"
               size="lg"
               class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
             >
@@ -72,7 +72,7 @@ const trainingPrograms: any[] = []
             </Button>
           )}
           <Button
-            href="/training/progress"
+            href="/analytics"
             variant="outline"
             size="lg"
             class="border-2 border-primary text-primary hover:bg-primary/10"
@@ -196,7 +196,7 @@ const trainingPrograms: any[] = []
             </div>
 
             <Button
-              href={`/training/program/${program.programId}`}
+              href="/simulator"
               class="w-full"
               variant={program.enrolled ? 'default' : 'outline'}
             >

@@ -590,7 +590,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.24.0",
+  "packageManager": "pnpm@12.6.0",
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true,

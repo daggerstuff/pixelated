@@ -180,13 +180,13 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
       </h1>
       <div class="flex space-x-3">
         <a
-          href="/admin/security/risk-assessment/scans"
+          href="#scans"
           class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
         >
           Manage Scans
         </a>
         <a
-          href="/admin/security/risk-assessment/vulnerabilities"
+          href="#findings"
           class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
         >
           View Vulnerabilities
@@ -274,7 +274,7 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
         </div>
       </div>
 
-      <div class="bg-card rounded-none p-4">
+      <div id="scans" class="bg-card rounded-none p-4">
         <h3 class="text-sm font-medium text-muted-foreground">
           Upcoming Scheduled Scans
         </h3>
@@ -294,7 +294,7 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
       </div>
     </div>
 
-    <div class="bg-card rounded-none p-6 mb-6">
+    <div id="findings" class="bg-card rounded-none p-6 mb-6">
       <h2 class="text-lg font-semibold mb-4">Recent Security Findings</h2>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-border">
@@ -376,7 +376,7 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <a
-                    href={`/admin/security/risk-assessment/finding/${finding.id}`}
+                    href="#findings"
                     class="text-foreground hover:text-foreground mr-3"
                   >
                     View Details
@@ -389,7 +389,7 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
       </div>
       <div class="mt-4 text-right">
         <a
-          href="/admin/security/risk-assessment/findings"
+          href="#findings"
           class="text-foreground hover:text-foreground text-sm font-medium"
         >
           View All Findings
@@ -495,7 +495,7 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
       </div>
       <div class="mt-4 text-right">
         <a
-          href="/admin/security/compliance"
+          href="/admin/security-dashboard"
           class="text-foreground hover:text-foreground text-sm font-medium"
         >
           View Detailed Compliance Report

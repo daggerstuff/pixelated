@@ -241,7 +241,7 @@ export function Sidebar() {
         },
         {
           name: 'Resources',
-          href: '/resources',
+          href: '/journal-research',
           icon: (
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
@@ -250,7 +250,7 @@ export function Sidebar() {
         },
         {
           name: 'Session History',
-          href: '/sessions',
+          href: '/journal-research/sessions',
           icon: (
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -449,7 +449,7 @@ export function Sidebar() {
         },
         {
           name: 'Security',
-          href: '/security',
+          href: '/admin/security',
           icon: (
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path
@@ -462,7 +462,7 @@ export function Sidebar() {
         },
         {
           name: 'Settings',
-          href: '/settings',
+          href: '/admin/security-settings',
           icon: (
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
               <path
