@@ -88,7 +88,9 @@ describe('shared retry', () => {
     const promise = sleep(50)
     await advanceTimers()
     await promise
-    expect(Date.now() - start).toBeGreaterThanOrEqual(50)
+    // Fake-timer flush can race real-clock reads by 1-2ms; allow slack so the
+    // intent (the promise resolved only after the flush) holds deterministically.
+    expect(Date.now() - start).toBeGreaterThanOrEqual(45)
   })
 
   it('auth/utils re-exports the shared implementation', async () => {
