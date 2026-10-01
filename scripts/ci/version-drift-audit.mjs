@@ -21,14 +21,26 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-import { parse } from 'yaml'
+import { parseAllDocuments } from 'yaml'
 
 const ROOT = resolve(import.meta.dirname, '../..')
 const LOCKFILE = resolve(ROOT, 'pnpm-lock.yaml')
 const BASELINE_PATH = resolve(import.meta.dirname, 'version-drift-baseline.json')
 
 function countVersions() {
-  const lock = parse(readFileSync(LOCKFILE, 'utf8'))
+  // pnpm >= 12 emits the lockfile as two YAML documents: a
+  // packageManagerDependencies header followed by `---` and the lockfile
+  // body. pnpm itself handles both single- and multi-document files, so the
+  // audit must too — parse everything and use the lockfile body (the document
+  // carrying lockfileVersion).
+  const docs = parseAllDocuments(readFileSync(LOCKFILE, 'utf8')).map((d) =>
+    d.toJS(),
+  )
+  const lock = docs.find((d) => d?.lockfileVersion)
+  if (!lock) {
+    console.error('No lockfile document found in pnpm-lock.yaml.')
+    process.exit(1)
+  }
   /** @type {Map<string, Set<string>>} name -> versions */
   const versions = new Map()
   for (const key of Object.keys(lock.packages ?? {})) {
