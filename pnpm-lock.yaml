@@ -15237,6 +15237,11 @@ packages:
     engines: {node: '>= 14.6'}
     hasBin: true
 
+  yaml@2.9.1:
+    resolution: {integrity: sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
+
   yargs-parser@13.1.2:
     resolution: {integrity: sha512-3lbsNRf/j+A4QuSZfDRA7HRSfWrzO0YjqTJd5kjAq37Zep1CEgaYmrH9Q3GwPiB9cHyd1Y1UwggGhJGoxipbzg==}
 
@@ -17162,7 +17167,7 @@ snapshots:
       string-env-interpolation: 1.0.1
       ts-log: 3.0.3
       tslib: 2.8.1
-      yaml: 2.8.4
+      yaml: 2.9.1
       yargs: 18.2.0
     optionalDependencies:
       '@parcel/watcher': 2.6.0
@@ -18572,13 +18577,13 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.1)
-      yaml: 2.8.4
+      yaml: 2.9.1
 
   '@opentelemetry/configuration@0.219.0(@opentelemetry/api@1.9.1)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.1)
-      yaml: 2.8.4
+      yaml: 2.9.1
 
   '@opentelemetry/context-async-hooks@1.30.1(@opentelemetry/api@1.9.1)':
     dependencies:
@@ -31181,6 +31186,8 @@ snapshots:
       yaml: 2.8.4
 
   yaml@2.8.4: {}
+
+  yaml@2.9.1: {}
 
   yargs-parser@13.1.2:
     dependencies:
