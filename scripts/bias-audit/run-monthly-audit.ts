@@ -54,6 +54,13 @@ const random = mulberry32(xmur3(month)())
  * Response text uses a zero-padded session index so segment text length is
  * uncorrelated with generation order — otherwise averageResponseLength
  * variance measures digit growth, not bias.
+ *
+ * Confidence and outcomes are drawn once into shared pools that every cohort
+ * reuses, so the synthetic model is fair by construction: each demographic
+ * segment observes the identical distribution. Drawing per-response from a
+ * single stream consumed in cohort order made segment means drift with the
+ * seeded RNG (up to 2.72pp averageConfidence spread in 2026-10), producing
+ * spurious bias alerts on data with no real model in the loop (PIX-4725).
  */
 function generateSyntheticSessions(): TherapeuticSession[] {
   const demographics = [
@@ -94,21 +101,33 @@ function generateSyntheticSessions(): TherapeuticSession[] {
     },
   ]
 
+  // Shared, i.i.d. pools reused by every cohort (see doc comment above).
+  const SESSIONS_PER_COHORT = 30
+  const RESPONSES_PER_SESSION = 5
+  const sharedConfidences: number[] = []
+  for (let k = 0; k < SESSIONS_PER_COHORT * RESPONSES_PER_SESSION; k++) {
+    sharedConfidences.push(0.65 + random() * 0.3)
+  }
+  const sharedOutcomes: Array<[boolean, boolean]> = []
+  for (let k = 0; k < SESSIONS_PER_COHORT; k++) {
+    sharedOutcomes.push([random() > 0.2, random() > 0.3])
+  }
+
   const sessions: TherapeuticSession[] = []
   let counter = 0
 
   for (const demo of demographics) {
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < SESSIONS_PER_COHORT; i++) {
       const n = counter++
       const sessionId = `session-${n}`
       const responses = []
-      for (let j = 0; j < 5; j++) {
+      for (let j = 0; j < RESPONSES_PER_SESSION; j++) {
         responses.push({
           responseId: `${sessionId}-resp-${j}`,
           text: `Sample therapeutic response ${j} for session ${String(n).padStart(3, '0')}`,
           timestamp: new Date(),
           type: 'intervention' as const,
-          confidence: 0.65 + random() * 0.3,
+          confidence: sharedConfidences[i * RESPONSES_PER_SESSION + j],
           modelUsed: 'llama-3.1-70b',
         })
       }
@@ -120,12 +139,12 @@ function generateSyntheticSessions(): TherapeuticSession[] {
           {
             outcomeId: `${sessionId}-o1`,
             description: 'Patient engagement',
-            achieved: random() > 0.2,
+            achieved: sharedOutcomes[i][0],
           },
           {
             outcomeId: `${sessionId}-o2`,
             description: 'Skill demonstration',
-            achieved: random() > 0.3,
+            achieved: sharedOutcomes[i][1],
           },
         ],
       })
