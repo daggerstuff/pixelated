@@ -24,26 +24,20 @@ const description =
       <div class="max-w-7xl mx-auto">
         <!-- Breadcrumbs -->
         <nav class="mb-6" aria-label="Breadcrumb">
-          <ol class="flex space-x-2 text-sm text-gray-400">
+          <ol class="flex space-x-2 text-sm text-muted-foreground">
             <li>
-              <a href="/" class="hover:text-gray-700 dark:hover:text-gray-300">
+              <a href="/" class="hover:text-foreground">
                 Home
               </a>
               <span class="mx-2">/</span>
             </li>
             <li>
-              <a
-                href="/analytics"
-                class="hover:text-gray-700 dark:hover:text-gray-300"
-              >
+              <a href="/analytics" class="hover:text-foreground">
                 Analytics
               </a>
               <span class="mx-2">/</span>
             </li>
-            <li
-              class="font-medium text-gray-900 dark:text-gray-100"
-              aria-current="page"
-            >
+            <li class="font-medium text-foreground" aria-current="page">
               Comparative Progress
             </li>
           </ol>
@@ -51,10 +45,10 @@ const description =
 
         <!-- Page header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 class="text-3xl font-bold text-foreground">
             Comparative Progress Analysis
           </h1>
-          <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
+          <p class="mt-2 text-lg text-muted-foreground">
             Compare your progress against anonymized benchmarks and gain
             insights into your therapeutic journey.
           </p>
@@ -71,32 +65,32 @@ const description =
         </Alert>
 
         <!-- Main content -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+        <div class="bg-card border border-border rounded-none p-6">
           <ComparativeProgressDisplay {userId} client:load />
         </div>
 
         <!-- Additional information -->
         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+          <div class="bg-card border border-border rounded-none p-6">
             <h2 class="text-xl font-semibold mb-4">
               Understanding Your Results
             </h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">
+            <p class="text-muted-foreground mb-4">
               Comparative progress analysis helps you understand how your
               therapeutic journey compares to others with similar profiles. This
               can provide context for your progress and help identify areas
               where additional focus might be beneficial.
             </p>
-            <p class="text-gray-600 dark:text-gray-400">
+            <p class="text-muted-foreground">
               Remember that each person's journey is unique, and these
               comparisons are meant to provide context, not judgment. Always
               discuss your results with your healthcare provider.
             </p>
           </div>
 
-          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+          <div class="bg-card border border-border rounded-none p-6">
             <h2 class="text-xl font-semibold mb-4">About the Metrics</h2>
-            <ul class="space-y-3 text-gray-600 dark:text-gray-400">
+            <ul class="space-y-3 text-muted-foreground">
               <li>
                 <strong>PHQ-9 Score:</strong> Measures depression severity
                 (lower scores indicate improvement)
