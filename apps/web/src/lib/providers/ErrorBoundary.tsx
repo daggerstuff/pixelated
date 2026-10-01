@@ -99,11 +99,11 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950 flex min-h-[200px] w-full flex-col items-center justify-center rounded-lg border p-4">
-          <h2 className="text-red-800 dark:text-red-200 mb-2 text-lg font-semibold">
+        <div className="flex min-h-[200px] w-full flex-col items-center justify-center rounded-none border border-ring bg-secondary p-4">
+          <h2 className="mb-2 text-lg font-semibold text-foreground">
             Something went wrong
           </h2>
-          <p className="text-red-600 dark:text-red-300 mb-4 text-sm">
+          <p className="mb-4 text-sm text-muted-foreground">
             {this.state.error?.message ?? 'An unexpected error occurred'}
           </p>
           <button
@@ -111,7 +111,7 @@ export class ErrorBoundary extends Component<Props, State> {
               this.setState({ hasError: false, error: null })
               window.location.reload()
             }}
-            className="bg-red-100 text-red-900 hover:bg-red-200 dark:bg-red-900 dark:text-red-100 dark:hover:bg-red-800 rounded px-4 py-2 text-sm font-medium"
+            className="rounded-none bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-accent"
           >
             Try again
           </button>

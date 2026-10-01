@@ -32,15 +32,15 @@ export class DashboardUpdater {
     const config = {
       maximum: {
         text: 'Maximum (FHE)',
-        className: 'text-green-600 dark:text-green-400',
+        className: 'text-foreground',
       },
       hipaa: {
         text: 'HIPAA Compliant',
-        className: 'text-blue-600 dark:text-blue-400',
+        className: 'text-foreground/80',
       },
       standard: {
         text: 'Standard',
-        className: 'text-yellow-600 dark:text-yellow-400',
+        className: 'text-muted-foreground',
       },
     }
 
