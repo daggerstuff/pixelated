@@ -131,28 +131,28 @@ How are you feeling today? I'm here to listen and help.`,
         </p>
         <div className="space-y-2 py-1">
           <div className="flex items-center gap-2">
-            <Brain className="text-purple-600 h-4 w-4 shrink-0" />
+            <Brain className="h-4 w-4 shrink-0 text-foreground" />
             <p className="text-sm">
               <strong>Clinical-Grade Analysis</strong>: Advanced AI analyzes
               your messages for mental health indicators
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Shield className="text-blue-600 h-4 w-4 shrink-0" />
+            <Shield className="h-4 w-4 shrink-0 text-foreground" />
             <p className="text-sm">
               <strong>Privacy-First</strong>: All analysis uses encrypted
               processing - your data stays secure
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <ChartBar className="text-indigo-600 h-4 w-4 shrink-0" />
+            <ChartBar className="h-4 w-4 shrink-0 text-foreground" />
             <p className="text-sm">
               <strong>Real-Time Insights</strong>: Get immediate feedback on
               emotional patterns and trends
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="text-red-600 h-4 w-4 shrink-0" />
+            <AlertTriangle className="h-4 w-4 shrink-0 text-foreground" />
             <p className="text-sm">
               <strong>Crisis Detection</strong>: Automatic identification of
               urgent situations with immediate resources
@@ -178,7 +178,7 @@ export const createInterventionMessage = (
   content: `**Therapeutic Intervention**\n\n${intervention}`,
   displayContent: (
     <div className="space-y-2">
-      <div className="text-amber-600 flex items-center gap-2">
+      <div className="flex items-center gap-2 text-foreground">
         <Lightbulb className="h-4 w-4" />
         <span className="font-bold">Therapeutic Intervention</span>
       </div>
