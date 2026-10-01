@@ -346,7 +346,7 @@ overrides:
   # Version-drift ratchet: consolidate duplicate resolutions introduced by
   # the Dependabot major-updates merge (#6053) — single-version pins, all
   # semver-compatible with their requesters.
-  '@sentry/core@^10': 10.75.1
+  '@sentry/core@^10': 10.75.3
   dotenv: 18.0.1
   tsx: 4.23.15
   jsonwebtoken: ^9.0.0
