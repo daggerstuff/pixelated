@@ -27,8 +27,10 @@ const setMockUserInfoResponse = (payload: Record<string, unknown>) => {
   mockUserInfoClient.getProfile.mockResolvedValue(response)
 }
 
-// Mock the auth0 module
-vi.mock('auth0', () => {
+// Mock the auth0 module. The service constructs its clients via the
+// 'auth0-legacy' package alias (`import * as auth0 from 'auth0-legacy'`),
+// so that specifier is the one that must be mocked.
+vi.mock('auth0-legacy', () => {
   return {
     AuthenticationClient: vi.fn(function () {
       return mockAuthClient
