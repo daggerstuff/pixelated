@@ -691,8 +691,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
       nodemailer:
-        specifier: ^10.0.10
-        version: 10.0.11
+        specifier: ^10.0.12
+        version: 10.0.12
       otplib:
         specifier: ^13.5.0
         version: 13.5.0
@@ -775,8 +775,8 @@ importers:
         specifier: ^3.7.0
         version: 3.7.0
       twilio:
-        specifier: ^6.1.1
-        version: 6.1.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
+        specifier: ^6.1.2
+        version: 6.1.2(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       uuid:
         specifier: ^14.0.2
         version: 14.0.2
@@ -1687,8 +1687,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(@aws-sdk/client-s3@3.1136.0)
       nodemailer:
-        specifier: ^10.0.10
-        version: 10.0.11
+        specifier: ^10.0.12
+        version: 10.0.12
       pg:
         specifier: ^8.22.0
         version: 8.23.0
@@ -12522,8 +12522,8 @@ packages:
   node-seal@7.0.0:
     resolution: {integrity: sha512-R5q8PQ6z3Hyq7x1uunNf5yZtDuSlffYkWFA5uvzL2fYF/IHL7+KwCsRdLlG3inBU1dMUgakDWiuqf0csMvcang==}
 
-  nodemailer@10.0.11:
-    resolution: {integrity: sha512-/c4P7U7aGpiNu2Rl08q525q2zECkUpSaf2zQPgIStCcAjHAkkQQKwD4sTyi3l91mGcLQrKzL1syXPHymo+Ogtw==}
+  nodemailer@10.0.12:
+    resolution: {integrity: sha512-PQ46oNbNMuH/Sno7B5IWIU9etytwrO0xdTFvWXpIQFRXhBAXtzD48243AS+BCbQQTPD8y3fqUrgLn0tSo77gvg==}
     engines: {node: '>=20.0.0'}
 
   nopt@8.1.0:
@@ -14497,8 +14497,8 @@ packages:
   tweetnacl@1.0.3:
     resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
-  twilio@6.1.1:
-    resolution: {integrity: sha512-d9xFCQaa8DpuDvFiG49TwmppmULHhqzEVncpppazS5oZv5O0E9Wb76STCHt4q+ZjWDL6RAtKey+u8jWcQLKWjw==}
+  twilio@6.1.2:
+    resolution: {integrity: sha512-jlZTCIo0sUhX9qoap2SDtHgVvYtz5VI+G0bzxb/BoqJxE7awxNoDsQJYaAToedZ3F3dD4ZS2+kT8Bj4RKyImvQ==}
     engines: {node: '>=20.0.0'}
 
   type-check@0.4.0:
@@ -27970,7 +27970,7 @@ snapshots:
 
   node-seal@7.0.0: {}
 
-  nodemailer@10.0.11: {}
+  nodemailer@10.0.12: {}
 
   nopt@8.1.0:
     dependencies:
@@ -30270,7 +30270,7 @@ snapshots:
 
   tweetnacl@1.0.3: {}
 
-  twilio@6.1.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
+  twilio@6.1.2(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       axios: 1.20.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       dayjs: 1.11.23
