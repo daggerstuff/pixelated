@@ -31,7 +31,13 @@ function runOnce(label) {
       process.execPath,
       [
         'scripts/testing/local-test-runner.cjs',
-        'run',
+        // One-shot mode must be the --run FLAG, not a bare `run` positional:
+        // local-test-runner.cjs treats any positional as a test-file path,
+        // which silently bypasses VITEST_BUCKET selection. (A bare `run` was
+        // also ambiguous to vitest, so the nightly ran the full default suite
+        // instead of the bucket — surfacing the 25 known-broken auth0 unit
+        // tests as consistent failures on every nightly since 2026-09-25.)
+        '--run',
         '--reporter=json',
         `--outputFile=${outputFile}`,
       ],
