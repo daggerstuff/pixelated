@@ -132,6 +132,15 @@ function buildVitestArgs(suite, passedArgs) {
   if (positionalArgs.length > 0) {
     // When specific paths are passed, don't filter by suite - run those files
     console.log(`Running specific test files: ${positionalArgs.join(", ")}`);
+    if (process.env.VITEST_BUCKET) {
+      // Positional paths override bucket selection entirely. This warning
+      // exists because a bare vitest subcommand (`run`) passed as a
+      // positional once silently turned the nightly flaky-detect runs into
+      // full-suite runs for weeks.
+      console.warn(
+        `⚠ VITEST_BUCKET="${process.env.VITEST_BUCKET}" is set but positional test paths were passed — bucket selection is bypassed.`,
+      );
+    }
     return passedArgs;
   }
 
