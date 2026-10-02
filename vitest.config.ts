@@ -87,7 +87,14 @@ const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
     (entry.includes('/api/') ||
       entry.includes('/lib/') ||
-      entry.startsWith('agents/')) &&
+      entry.startsWith('agents/') ||
+      // tests/unit/auth0 is pinned to the node project by baseNodeTestGlobs
+      // (and excluded from jsdom via that same list). Without this arm, the
+      // core bucket's tests/unit/** glob was dropped by the node project's
+      // targeted filter and then excluded by the jsdom project — so bucketed
+      // runs collected it in NO project and the auth0 tests silently never
+      // ran in CI (PIX-4735: 25 broken tests invisible to every gate).
+      entry.startsWith('tests/unit/')) &&
     !entry.includes('__tests__/AIChat') &&
     !targetedJsdomLibGlobs.some((pattern) => entry.includes(pattern)),
 )
