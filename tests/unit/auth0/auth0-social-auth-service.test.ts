@@ -20,6 +20,10 @@ type MockManagementUsers = {
   link: ReturnType<typeof vi.fn>
   unlink: ReturnType<typeof vi.fn>
   get: ReturnType<typeof vi.fn>
+  identities: {
+    link: ReturnType<typeof vi.fn>
+    delete: ReturnType<typeof vi.fn>
+  }
 }
 
 type MockManagementClient = {
@@ -50,16 +54,27 @@ const mockUserInfoClient: MockUserInfoClient = vi.hoisted(() => ({
   getUserInfo: vi.fn(),
 }))
 
-const mockManagementClient: MockManagementClient = vi.hoisted(() => ({
-  linkUsers: vi.fn(),
-  unlinkUsers: vi.fn(),
-  getUser: vi.fn(),
-  users: {
-    link: vi.fn(),
-    unlink: vi.fn(),
-    get: vi.fn(),
-  },
-}))
+const mockManagementClient: MockManagementClient = vi.hoisted(() => {
+  const identitiesLink = vi.fn()
+  const identitiesDelete = vi.fn()
+  const getUser = vi.fn()
+  return {
+    identitiesLink,
+    identitiesDelete,
+    getUser,
+    linkUsers: identitiesLink,
+    unlinkUsers: identitiesDelete,
+    users: {
+      link: identitiesLink,
+      unlink: identitiesDelete,
+      get: getUser,
+      identities: {
+        link: identitiesLink,
+        delete: identitiesDelete,
+      },
+    },
+  }
+})
 
 // Mock the auth0 module
 vi.mock('auth0', () => {
@@ -80,6 +95,30 @@ vi.mock('auth0', () => {
     ManagementClient: vi.fn(function () {
       return {
         users: mockManagementClient.users,
+      }
+    }),
+    UserInfoClient: vi.fn(function () {
+      return mockUserInfoClient
+    }),
+  }
+})
+
+// The service constructs AuthenticationClient/UserInfoClient from the
+// 'auth0-legacy' package alias — mock that module too so no real SDK
+// client (and no network request) is ever created.
+vi.mock('auth0-legacy', () => {
+  return {
+    AuthenticationClient: vi.fn(function () {
+      return {
+        oauthToken: mockAuthMethods.oauthToken,
+        authorizationCodeGrant: mockAuthMethods.authorizationCodeGrant,
+        getProfile: mockAuthMethods.getProfile,
+        refreshToken: mockAuthMethods.refreshToken,
+        refreshTokenGrant: mockAuthMethods.refreshTokenGrant,
+        oauth: {
+          authorizationCodeGrant: mockAuthMethods.authorizationCodeGrant,
+          refreshTokenGrant: mockAuthMethods.refreshTokenGrant,
+        },
       }
     }),
     UserInfoClient: vi.fn(function () {
@@ -128,12 +167,6 @@ describe('Auth0 Social Auth Service', () => {
     mockAuthClientInstance = mockAuthMethods
     mockManagementClientInstance = mockManagementClient
     mockUserInfoInstance = mockUserInfoClient
-    mockManagementClientInstance.users.link =
-      mockManagementClientInstance.linkUsers
-    mockManagementClientInstance.users.unlink =
-      mockManagementClientInstance.unlinkUsers
-    mockManagementClientInstance.users.get =
-      mockManagementClientInstance.getUser
     mockUserInfoInstance.getUserInfo = vi.fn(async (accessToken: string) => {
       return {
         data: await mockAuthClientInstance.getProfile({
@@ -567,18 +600,17 @@ describe('Auth0 Social Auth Service', () => {
         'access-token-123',
       )
 
-      expect(mockManagementClientInstance.users.link).toHaveBeenCalledWith(
-        { id: 'auth0|user123' },
-        {
-          provider: 'google-oauth2',
-          connection_id: 'google-oauth2',
-          user_id: 'access-token-123',
-        },
-      )
+      expect(
+        mockManagementClientInstance.users.identities.link,
+      ).toHaveBeenCalledWith('auth0|user123', {
+        provider: 'google-oauth2',
+        connection_id: 'google-oauth2',
+        user_id: 'access-token-123',
+      })
     })
 
     it('should throw error when linking fails', async () => {
-      mockManagementClientInstance.users.link.mockRejectedValue(
+      mockManagementClientInstance.users.identities.link.mockRejectedValue(
         new Error('Failed to link account'),
       )
 
@@ -620,17 +652,17 @@ describe('Auth0 Social Auth Service', () => {
         'provider-user-id-123',
       )
 
-      expect(mockManagementClientInstance.users.unlink).toHaveBeenCalledWith(
+      expect(
+        mockManagementClientInstance.users.identities.delete,
+      ).toHaveBeenCalledWith(
         'auth0|user123',
-        {
-          provider: 'google-oauth2',
-          user_id: 'provider-user-id-123',
-        },
+        'google-oauth2',
+        'provider-user-id-123',
       )
     })
 
     it('should throw error when unlinking fails', async () => {
-      mockManagementClientInstance.users.unlink.mockRejectedValue(
+      mockManagementClientInstance.users.identities.delete.mockRejectedValue(
         new Error('Failed to unlink account'),
       )
 

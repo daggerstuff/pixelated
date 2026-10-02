@@ -117,6 +117,20 @@ vi.mock('auth0', () => {
   }
 })
 
+// The service constructs AuthenticationClient/UserInfoClient from the
+// 'auth0-legacy' package alias — mock that module too so no real SDK
+// client (and no network request) is ever created.
+vi.mock('auth0-legacy', () => {
+  return {
+    AuthenticationClient: vi.fn(function () {
+      return mockAuthMethods
+    }),
+    UserInfoClient: vi.fn(function () {
+      return mockUserInfoClient
+    }),
+  }
+})
+
 // Mock the mongodb config
 vi.mock('../../../src/config/mongodb.config', () => {
   return {
