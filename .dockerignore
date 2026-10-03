@@ -57,6 +57,7 @@ Thumbs.db
 
 # Test files and coverage
 tests/
+!tests/integration/package.json
 coverage/
 .nyc_output/
 test-results/
@@ -83,6 +84,8 @@ env/
 pip-log.txt
 pip-delete-this-directory.txt
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
 htmlcov/
 .tox/
@@ -227,6 +230,7 @@ scripts/*
 
 # Tools and utilities
 tools/
+!tools/px/package.json
 # Allow patches used by pnpm patchedDependencies in Docker builds
 patches/
 examples/
