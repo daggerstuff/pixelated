@@ -29,7 +29,7 @@ annotated-types==0.7.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   pydantic
-anyio==4.14.2
+anyio==4.15.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   httpx
@@ -130,7 +130,7 @@ cymem==2.0.13
     #   thinc
 dash==3.4.0
     # via -r src/lib/ai/bias-detection/requirements.txt
-datasets==4.5.0
+datasets==5.0.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   evaluate
@@ -949,7 +949,7 @@ typer-slim==0.21.1
     #   spacy
     #   transformers
     #   weasel
-typing-extensions==4.15.0
+typing-extensions==4.16.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   dash
