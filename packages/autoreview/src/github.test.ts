@@ -26,6 +26,26 @@ function makeFetch(): { impl: HttpFetch; calls: Call[] } {
     if (url === 'https://github.com/o/r/pull/42.diff') {
       return { status: 200, text: async () => 'diff text' }
     }
+    if (url.endsWith('/repos/o/r/pulls/42/comments')) {
+      return {
+        status: 200,
+        text: async () =>
+          JSON.stringify([
+            {
+              id: 101,
+              user: { login: 'human' },
+              author_association: 'MEMBER',
+              body: 'looks good',
+            },
+            {
+              id: 102,
+              user: { login: 'ci[bot]' },
+              author_association: 'NONE',
+              body: 'automated',
+            },
+          ]),
+      }
+    }
     if (url.endsWith('/repos/o/r/pulls/42/reviews')) {
       return { status: 200, text: async () => '{}' }
     }
@@ -80,5 +100,29 @@ describe('createGithubApi', () => {
     await expect(
       api.fetchPullRequest({ owner: 'o', repo: 'r', number: 42 }),
     ).rejects.toThrow(/failed with status 404/)
+  })
+
+  it('maps review comments to the CommentLike shape', async () => {
+    const { impl } = makeFetch()
+    const api = createGithubApi(impl, 'tok')
+    const comments = await api.fetchReviewComments({
+      owner: 'o',
+      repo: 'r',
+      number: 42,
+    })
+    expect(comments).toEqual([
+      {
+        id: '101',
+        authorLogin: 'human',
+        authorAssociation: 'MEMBER',
+        body: 'looks good',
+      },
+      {
+        id: '102',
+        authorLogin: 'ci[bot]',
+        authorAssociation: 'NONE',
+        body: 'automated',
+      },
+    ])
   })
 })

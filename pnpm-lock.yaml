@@ -1805,6 +1805,9 @@ importers:
       ai:
         specifier: ^7.0.58
         version: 7.0.109(zod@4.6.5)
+      yaml:
+        specifier: npm:yaml@2.8.4
+        version: 2.8.4
       zod:
         specifier: ^4.3.2
         version: 4.6.5

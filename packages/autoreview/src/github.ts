@@ -11,6 +11,14 @@ export interface PullRequestInput {
   context: string
 }
 
+/** A PR review comment, compatible with `CommentLike` for bot filtering. */
+export interface GithubReviewComment {
+  id: string
+  authorLogin: string
+  authorAssociation: string
+  body: string
+}
+
 /** Minimal HTTP surface the client needs (satisfied by Node's global fetch). */
 export interface HttpInit {
   method?: string
@@ -28,6 +36,7 @@ export type HttpFetch = (url: string, init?: HttpInit) => Promise<HttpResponse>
 /** GitHub REST surface used by the runner, injectable for tests. */
 export interface GithubApi {
   fetchPullRequest(ref: PullRequestRef): Promise<PullRequestInput>
+  fetchReviewComments(ref: PullRequestRef): Promise<GithubReviewComment[]>
   submitReview(ref: PullRequestRef, review: ReviewResult): Promise<void>
 }
 
@@ -95,6 +104,24 @@ export function createGithubApi(
       const diff = await fetchDiff(pr.diff_url)
       const context = [pr.title, pr.body].filter(Boolean).join('\n\n')
       return { diff, context }
+    },
+    async fetchReviewComments(
+      ref: PullRequestRef,
+    ): Promise<GithubReviewComment[]> {
+      const comments = (await requestJson(
+        `/repos/${ref.owner}/${ref.repo}/pulls/${ref.number}/comments`,
+      )) as Array<{
+        id: number
+        user: { login: string } | null
+        author_association: string
+        body: string
+      }>
+      return comments.map((comment) => ({
+        id: String(comment.id),
+        authorLogin: comment.user?.login ?? 'unknown',
+        authorAssociation: comment.author_association,
+        body: comment.body,
+      }))
     },
     async submitReview(
       ref: PullRequestRef,
