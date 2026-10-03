@@ -85,7 +85,7 @@ confection==1.3.3
     #   weasel
 contourpy==1.3.3
     # via matplotlib
-cryptography==50.0.1
+cryptography==50.0.2
     # via bias-detection-service (pyproject.toml)
 cuda-bindings==13.2.0
     # via torch
@@ -364,7 +364,7 @@ propcache==0.5.2
     #   yarl
 psycopg2-binary==2.9.12
     # via bias-detection-service (pyproject.toml)
-pyarrow==25.0.0
+pyarrow==25.0.1
     # via datasets
 pycparser==3.0
     # via cffi
