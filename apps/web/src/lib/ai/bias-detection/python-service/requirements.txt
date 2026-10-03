@@ -22,7 +22,7 @@ annotated-doc==0.0.4
     #   typer
 annotated-types==0.7.0
     # via pydantic
-anyio==4.14.2
+anyio==4.15.1
     # via
     #   httpx
     #   starlette
@@ -100,7 +100,7 @@ cymem==2.0.13
     #   preshed
     #   spacy
     #   thinc
-datasets==4.8.5
+datasets==5.0.1
     # via evaluate
 defusedxml==0.7.1
     # via nltk
@@ -384,7 +384,7 @@ pygments==2.20.0
     # via
     #   bias-detection-service (pyproject.toml)
     #   rich
-pyjwt==2.15.0
+pyjwt==2.15.1
     # via bias-detection-service (pyproject.toml)
 pyparsing==3.3.2
     # via matplotlib
