@@ -40,3 +40,14 @@ export {
   DEFAULT_PRIMARY_RETRIES,
   DEFAULT_SECONDARY_RETRIES,
 } from './config'
+export { runReview, type RunReviewOptions } from './runner'
+export {
+  createGithubApi,
+  formatReviewBody,
+  type GithubApi,
+  type PullRequestRef,
+  type PullRequestInput,
+  type HttpFetch,
+  type HttpInit,
+  type HttpResponse,
+} from './github'
