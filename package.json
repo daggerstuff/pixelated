@@ -517,7 +517,7 @@
     "micromatch": "^4.0.8",
     "mixpanel-browser": "^2.83.0",
     "mongodb-memory-server": "^11.2.0",
-    "msw": "^2.15.0",
+    "msw": "^3.0.1",
     "node-gyp-build": "^4.8.4",
     "nprogress": "^0.2.0",
     "oxc-parser": "^0.152.0",
