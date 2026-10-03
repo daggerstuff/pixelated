@@ -38,6 +38,7 @@ export interface GithubApi {
   fetchPullRequest(ref: PullRequestRef): Promise<PullRequestInput>
   fetchReviewComments(ref: PullRequestRef): Promise<GithubReviewComment[]>
   submitReview(ref: PullRequestRef, review: ReviewResult): Promise<void>
+  submitComment(ref: PullRequestRef, body: string): Promise<void>
 }
 
 interface PullRequestPayload {
@@ -141,6 +142,21 @@ export function createGithubApi(
       if (response.status >= 400) {
         throw new Error(
           `GitHub review submit failed with status ${response.status}`,
+        )
+      }
+    },
+    async submitComment(ref: PullRequestRef, body: string): Promise<void> {
+      const response = await fetchImpl(
+        `${API_BASE}/repos/${ref.owner}/${ref.repo}/issues/${ref.number}/comments`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ body }),
+        },
+      )
+      if (response.status >= 400) {
+        throw new Error(
+          `GitHub comment submit failed with status ${response.status}`,
         )
       }
     },

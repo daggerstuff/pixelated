@@ -67,3 +67,24 @@ export {
   type ProcessedCommentStore,
   type DedupeResult,
 } from './processed-comments'
+export {
+  ValidationOrchestrator,
+  decideValidation,
+  formatValidationReport,
+  DEFAULT_VALIDATION_TIMEOUT_MS,
+  DEFAULT_VALIDATION_MAX_ATTEMPTS,
+  type SandboxRunner,
+  type SandboxRunResult,
+  type ValidationStatus,
+  type ValidationResult,
+  type ValidationOptions,
+  type ValidationDecision,
+} from './validation'
+export {
+  E2bSandboxRunner,
+  buildE2bCommand,
+  parseE2bResult,
+  type E2bSandboxRunnerOptions,
+  type E2bValidateArgs,
+} from './e2b'
+export { runE2bValidation } from './validation-run'

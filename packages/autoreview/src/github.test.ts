@@ -49,6 +49,9 @@ function makeFetch(): { impl: HttpFetch; calls: Call[] } {
     if (url.endsWith('/repos/o/r/pulls/42/reviews')) {
       return { status: 200, text: async () => '{}' }
     }
+    if (url.endsWith('/repos/o/r/issues/42/comments')) {
+      return { status: 201, text: async () => '{}' }
+    }
     return { status: 404, text: async () => '{}' }
   }
   return { impl, calls }
@@ -124,5 +127,16 @@ describe('createGithubApi', () => {
         body: 'automated',
       },
     ])
+  })
+
+  it('submits an issue comment', async () => {
+    const { impl, calls } = makeFetch()
+    const api = createGithubApi(impl, 'tok')
+    await api.submitComment({ owner: 'o', repo: 'r', number: 42 }, 'hello')
+    const post = calls.find((call) => call.url.endsWith('/issues/42/comments'))
+    expect(post).toBeDefined()
+    expect(post?.init?.method).toBe('POST')
+    const body = JSON.parse(post?.init?.body ?? '{}') as { body: string }
+    expect(body.body).toBe('hello')
   })
 })
