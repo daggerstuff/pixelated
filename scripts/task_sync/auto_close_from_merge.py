@@ -97,7 +97,8 @@ def _search_issue(api_key: str, key: str) -> dict[str, Any] | None:
         }
     """
     data = _gql(api_key, query, {"term": key})
-    nodes = (data.get("data") or {}).get("searchIssues", {}).get("nodes") or []
+    raw_nodes = (data.get("data") or {}).get("searchIssues", {}).get("nodes") or []
+    nodes: list[dict[str, Any]] = [n for n in raw_nodes if isinstance(n, dict)]
     # Guard against fuzzy matches on the term (e.g. PIX-123 matching PIX-1234).
     for node in nodes:
         if node.get("identifier") == key:
