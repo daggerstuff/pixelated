@@ -63,10 +63,7 @@ RUN set -eux; \
 
 # Dependency installation stage (build needs dev tools)
 FROM build-base AS deps
-COPY package.json pnpm-lock.yaml ./
-COPY pnpm-workspace.yaml ./
-COPY patches ./patches
-COPY scripts/devops/install-git-hooks.sh ./scripts/devops/install-git-hooks.sh
+COPY . .
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Build stage
