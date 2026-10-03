@@ -1,0 +1,20 @@
+{
+  "name": "@pixelated/autoreview",
+  "version": "0.1.0",
+  "description": "Repo-owned AutoReview bot core: LLM provider abstraction, failover chain, and rule-based fallback",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.3.0",
+    "typescript": "~5.7.3",
+    "vitest": "^4.1.10"
+  }
+}
