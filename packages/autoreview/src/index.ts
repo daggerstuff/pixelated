@@ -29,6 +29,11 @@ export {
   DEFAULT_OPENAI_MODEL,
 } from './providers/openai'
 export {
+  buildChainFromEnv,
+  defaultProviderFactory,
+  type ProviderFactory,
+} from './chain-factory'
+export {
   providerChainFromEnv,
   type ProviderChainSpec,
   type ChainEnv,
