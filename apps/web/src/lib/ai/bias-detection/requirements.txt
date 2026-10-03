@@ -106,7 +106,7 @@ contourpy==1.3.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   matplotlib
-cryptography==50.0.1
+cryptography==50.0.2
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   great-expectations
@@ -667,7 +667,7 @@ pure-eval==0.2.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   stack-data
-pyarrow==25.0.0
+pyarrow==25.0.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   datasets
