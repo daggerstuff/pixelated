@@ -27887,7 +27887,7 @@ snapshots:
       '@inquirer/confirm': 6.3.2(@types/node@26.6.2)
       '@msw/url': 0.1.2
       '@mswjs/interceptors': 0.45.6(supports-color@10.2.2)
-      cookie: 0.7.2
+      cookie: 2.0.1
       headers-polyfill: 5.0.1
       is-node-process: 1.2.0
       outvariant: 1.4.3
