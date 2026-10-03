@@ -407,6 +407,7 @@ scripts/run-standalone-integrated-pipeline.py
 scripts/hetzner
 scripts/*.ipynb
 tests/scripts/
+tests/e2e/autoreview-smoke-result.json
 package/bundle/
 sliced_output.worktrees/
 latest
