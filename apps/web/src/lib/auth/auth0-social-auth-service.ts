@@ -60,49 +60,6 @@ function getAuth0RuntimeConfig(): Auth0RuntimeConfig {
   }
 }
 
-// Initialize Auth0 clients
-let auth0Authentication: AuthenticationClient | null = null
-let auth0Management: ManagementClient | null = null
-let auth0UserInfo: UserInfoClient | null = null
-
-/**
- * Initialize Auth0 clients
- */
-function initializeAuth0Clients() {
-  const AUTH0_CONFIG = getAuth0RuntimeConfig()
-  if (
-    !AUTH0_CONFIG.domain ||
-    !AUTH0_CONFIG.clientId ||
-    !AUTH0_CONFIG.clientSecret
-  ) {
-    if (shouldWarnAuth0Configuration) {
-      logger.warn('Auth0 configuration incomplete')
-    }
-    return
-  }
-
-  auth0Authentication = new AuthenticationClient({
-    domain: AUTH0_CONFIG.domain,
-    clientId: AUTH0_CONFIG.clientId,
-    clientSecret: AUTH0_CONFIG.clientSecret,
-  })
-
-  auth0UserInfo = new UserInfoClient({
-    domain: AUTH0_CONFIG.domain,
-  })
-
-  if (AUTH0_CONFIG.managementClientId && AUTH0_CONFIG.managementClientSecret) {
-    auth0Management = new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-    })
-  } else {
-    auth0Management = null
-  }
-}
-
 // Types
 export interface SocialUser {
   id: string
@@ -137,6 +94,15 @@ export class Auth0SocialAuthService {
   private readonly domain: string
   private readonly clientId: string
 
+  // Instance-owned clients, built from the config snapshot taken at
+  // construction. They are null when configuration is incomplete, so
+  // "not initialized" checks reflect this instance's own config and
+  // never a stale client left behind by a previous construction
+  // (PIX-4737: module-level clients used to survive re-init).
+  private readonly auth0Authentication: AuthenticationClient | null
+  private readonly auth0Management: ManagementClient | null
+  private readonly auth0UserInfo: UserInfoClient | null
+
   constructor() {
     const config = getAuth0RuntimeConfig()
     this.domain = config.domain
@@ -145,7 +111,37 @@ export class Auth0SocialAuthService {
     if ((!this.domain || !this.clientId) && shouldWarnAuth0Configuration) {
       logger.warn('Auth0 is not properly configured')
     }
-    initializeAuth0Clients()
+
+    if (!config.domain || !config.clientId || !config.clientSecret) {
+      if (shouldWarnAuth0Configuration) {
+        logger.warn('Auth0 configuration incomplete')
+      }
+      this.auth0Authentication = null
+      this.auth0UserInfo = null
+      this.auth0Management = null
+      return
+    }
+
+    this.auth0Authentication = new AuthenticationClient({
+      domain: config.domain,
+      clientId: config.clientId,
+      clientSecret: config.clientSecret,
+    })
+
+    this.auth0UserInfo = new UserInfoClient({
+      domain: config.domain,
+    })
+
+    if (config.managementClientId && config.managementClientSecret) {
+      this.auth0Management = new ManagementClient({
+        domain: config.domain,
+        clientId: config.managementClientId,
+        clientSecret: config.managementClientSecret,
+        audience: `https://${config.domain}/api/v2/`,
+      })
+    } else {
+      this.auth0Management = null
+    }
   }
 
   /**
@@ -200,15 +196,16 @@ export class Auth0SocialAuthService {
     code: string,
     redirectUri: string,
   ): Promise<SocialTokens> {
-    if (!auth0Authentication) {
+    if (!this.auth0Authentication) {
       throw new Error('Auth0 authentication client not initialized')
     }
 
     try {
-      const response = await auth0Authentication.oauth.authorizationCodeGrant({
-        code,
-        redirect_uri: redirectUri,
-      })
+      const response =
+        await this.auth0Authentication.oauth.authorizationCodeGrant({
+          code,
+          redirect_uri: redirectUri,
+        })
       const { data: tokenData } = response
 
       return {
@@ -230,12 +227,12 @@ export class Auth0SocialAuthService {
    * Get user information from Auth0
    */
   async getUserInfo(accessToken: string): Promise<SocialUser> {
-    if (!auth0UserInfo) {
+    if (!this.auth0UserInfo) {
       throw new Error('Auth0 user info client not initialized')
     }
 
     try {
-      const response = await auth0UserInfo.getUserInfo(accessToken)
+      const response = await this.auth0UserInfo.getUserInfo(accessToken)
       const userInfo = response.data
 
       return {
@@ -261,12 +258,12 @@ export class Auth0SocialAuthService {
    * Refresh access token using refresh token
    */
   async refreshAccessToken(refreshToken: string): Promise<SocialTokens> {
-    if (!auth0Authentication) {
+    if (!this.auth0Authentication) {
       throw new Error('Auth0 authentication client not initialized')
     }
 
     try {
-      const response = await auth0Authentication.oauth.refreshTokenGrant({
+      const response = await this.auth0Authentication.oauth.refreshTokenGrant({
         refresh_token: refreshToken,
       })
       const { data: tokenData } = response
@@ -364,13 +361,13 @@ export class Auth0SocialAuthService {
     connection: string,
     accessToken: string,
   ): Promise<void> {
-    if (!auth0Management) {
+    if (!this.auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
 
     try {
       // Link the social account to the user
-      await auth0Management.users.identities.link(userId, {
+      await this.auth0Management.users.identities.link(userId, {
         provider: connection,
         connection_id: connection,
         user_id: accessToken,
@@ -407,13 +404,13 @@ export class Auth0SocialAuthService {
     connection: string,
     providerUserId: string,
   ): Promise<void> {
-    if (!auth0Management) {
+    if (!this.auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
 
     try {
       // Unlink the social account from the user
-      await auth0Management.users.identities.delete(
+      await this.auth0Management.users.identities.delete(
         userId,
         connection as Management.UserIdentityProviderEnum,
         providerUserId,
@@ -446,12 +443,12 @@ export class Auth0SocialAuthService {
    * Get user's social connections
    */
   async getUserSocialConnections(userId: string): Promise<unknown[]> {
-    if (!auth0Management) {
+    if (!this.auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
 
     try {
-      const response = await auth0Management.users.get(userId)
+      const response = await this.auth0Management.users.get(userId)
       const user = response.data
       if (
         typeof user === 'object' &&
