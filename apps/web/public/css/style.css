@@ -680,6 +680,13 @@ samp {
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.16);
 }
 
+/* Closed <details> hides the panel in theory, but the explicit display on the
+   panel defeats it in Chromium (the panel stays laid out with a bogus
+   containing block) — hide it explicitly so its geometry is well-defined. */
+.nav-menu:not([open]) .nav-menu-panel {
+  display: none;
+}
+
 .nav-menu-panel a {
   border-radius: var(--radius-sm);
   padding: 0.62rem 0.7rem;
@@ -1770,6 +1777,19 @@ button.nav-icon-link {
   .sidebar-card {
     position: static;
     margin-top: 3rem;
+  }
+}
+
+/* Very narrow phones: the brand wordmark, menu button, and icon tools cannot
+   all fit at the default gap and padding, pushing .nav-tools past the
+   viewport edge (document scrollWidth overflow at 320px). Tighten the
+   spacing before anything has to be cut. Monocraft widened the wordmark
+   (~201px at 1rem), so this block pairs with the matching .brand span
+   font-size reduction in BaseLayout.astro (PIX-4746). */
+@media (max-width: 380px) {
+  .nav {
+    gap: 0.35rem;
+    padding-inline: 0.75rem;
   }
 }
 
