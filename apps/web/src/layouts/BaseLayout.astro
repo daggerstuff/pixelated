@@ -612,6 +612,15 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     white-space: nowrap;
   }
 
+  /* Monocraft's wide pixel glyphs render the wordmark ~201px at 1rem — with
+     the hamburger and icon row that overflows 320px viewports (usability
+     PIX-4746). Shrink it in the same band style.css tightens the nav. */
+  @media (max-width: 380px) {
+    .brand span {
+      font-size: 0.875rem;
+    }
+  }
+
   /* NP Skip link */
   .np-skip-link {
     position: absolute;
