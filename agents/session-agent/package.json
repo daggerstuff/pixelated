@@ -23,7 +23,7 @@
     "@opentelemetry/sdk-node": "0.219.0",
     "@opentelemetry/sdk-trace-base": "2.8.0",
     "@opentelemetry/semantic-conventions": "^1.29.0",
-    "@vercel/connect": "2.3.4",
+    "@vercel/connect": "2.3.5",
     "ai": "7.0.109",
     "eve": "^0.68.0",
     "mongodb": "^7.7.0",
