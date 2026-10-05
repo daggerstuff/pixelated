@@ -125,10 +125,10 @@ const universityResults = [
         <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
           {currentVariant.headline}
           <br />
-          <span class="text-red-400">CLINICALVAULT</span>
+          <span class="text-foreground">CLINICALVAULT</span>
         </h1>
 
-        <p class="text-xl text-gray-300 max-w-4xl mx-auto mb-8">
+        <p class="text-xl text-foreground max-w-4xl mx-auto mb-8">
           {currentVariant.subheadline}
         </p>
       </div>
@@ -136,14 +136,14 @@ const universityResults = [
   </section>
 
   <!-- Technical Specifications -->
-  <section class="brutalist-section bg-gray-900/50">
+  <section class="brutalist-section bg-card">
     <div class="brutalist-container">
       <div class="dashboard-grid">
         {technicalSpecs.map((spec) => (
           <div class="metric-card hover-lift">
-            <div class="metric-value text-red-400">{spec.value}</div>
+            <div class="metric-value text-foreground">{spec.value}</div>
             <div class="metric-label">{spec.metric}</div>
-            <div class="text-xs text-gray-400 mt-2">{spec.comparison}</div>
+            <div class="text-xs text-foreground mt-2">{spec.comparison}</div>
           </div>
         ))}
       </div>
@@ -155,13 +155,13 @@ const universityResults = [
     <div class="brutalist-container">
       <BrutalistCard variant="elevated" class="max-w-4xl mx-auto">
         <div class="space-y-6">
-          <div class="border-b border-gray-700 pb-4">
+          <div class="border-b border-border pb-4">
             <div class="flex justify-between items-start">
               <div>
                 <h3 class="brutalist-subheading text-2xl mb-2">
                   🚨 LIVE CRISIS INTERVENTION DEMO
                 </h3>
-                <p class="text-gray-400">
+                <p class="text-foreground">
                   Experience a real training scenario with AI patient "Sarah"
                   presenting with suicidal ideation
                 </p>
@@ -176,12 +176,14 @@ const universityResults = [
           <div class="chat-container">
             <div class="chat-header">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                  <span class="text-red-400">👤</span>
+                <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
+                  <span class="text-foreground">👤</span>
                 </div>
                 <div>
-                  <div class="text-red-300 font-medium">AI Patient: Sarah</div>
-                  <div class="text-red-200/70 text-sm">
+                  <div class="text-foreground font-medium">
+                    AI Patient: Sarah
+                  </div>
+                  <div class="text-muted-foreground text-sm">
                     Presenting with acute suicidal ideation
                   </div>
                 </div>
@@ -214,13 +216,13 @@ const universityResults = [
             </div>
           </div>
 
-          <div class="flex flex-wrap gap-4 text-sm text-gray-400">
+          <div class="flex flex-wrap gap-4 text-sm text-foreground">
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+              <span class="w-2 h-2 bg-primary rounded-full"></span>
               <span>Adapts in real-time</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+              <span class="w-2 h-2 bg-primary rounded-full"></span>
               <span>Completely private and safe</span>
             </div>
           </div>
@@ -230,14 +232,14 @@ const universityResults = [
   </section>
 
   <!-- Impossible Before HIPAA Section -->
-  <section class="brutalist-section bg-gray-900/50">
+  <section class="brutalist-section bg-card">
     <div class="brutalist-container">
       <div class="text-center mb-12">
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
           TRAINING THAT WAS
-          <span class="text-red-400">IMPOSSIBLE BEFORE</span>
+          <span class="text-foreground">IMPOSSIBLE BEFORE</span>
         </h2>
-        <p class="text-lg text-gray-300 max-w-4xl mx-auto">
+        <p class="text-lg text-foreground max-w-4xl mx-auto">
           These scenarios were too dangerous, too rare, or too ethically complex
           to practice with real patients
         </p>
@@ -252,7 +254,7 @@ const universityResults = [
                 PREVIOUSLY IMPOSSIBLE TO PRACTICE SAFELY
               </div>
               <h3 class="brutalist-subheading text-lg">{scenario.title}</h3>
-              <p class="text-gray-400 leading-relaxed">
+              <p class="text-foreground leading-relaxed">
                 {scenario.description}
               </p>
             </div>
@@ -271,7 +273,7 @@ const universityResults = [
           <br />
           <span class="confidence-boost">LEADING UNIVERSITIES</span>
         </h2>
-        <p class="text-lg text-gray-300 max-w-4xl mx-auto">
+        <p class="text-lg text-foreground max-w-4xl mx-auto">
           Universities using ClinicalVault report unprecedented improvements in
           training outcomes
         </p>
@@ -283,10 +285,10 @@ const universityResults = [
             <div class="text-center space-y-4">
               <div class="text-5xl">🏛️</div>
               <h3 class="brutalist-subheading text-lg">{result.university}</h3>
-              <div class="text-2xl font-bold text-green-400">
+              <div class="text-2xl font-bold text-foreground">
                 {result.result}
               </div>
-              <p class="text-gray-400 text-sm leading-relaxed">
+              <p class="text-foreground text-sm leading-relaxed">
                 {result.detail}
               </p>
             </div>
@@ -297,7 +299,7 @@ const universityResults = [
   </section>
 
   <!-- Security Guarantee -->
-  <section class="brutalist-section bg-gray-900/50">
+  <section class="brutalist-section bg-card">
     <div class="brutalist-container">
       <BrutalistCard variant="security" class="max-w-4xl mx-auto">
         <div class="text-center space-y-6">
@@ -305,7 +307,7 @@ const universityResults = [
           <h3 class="brutalist-subheading text-2xl">
             BEYOND HIPAA. BEYOND COMPLIANCE.
           </h3>
-          <p class="text-lg text-gray-300 leading-relaxed">
+          <p class="text-lg text-foreground leading-relaxed">
             Your training sessions are protected by military-grade encryption.
             We use Fully Homomorphic Encryption (FHE) - our AI analyzes your
             sessions while they stay completely encrypted. Even we can't see
@@ -313,15 +315,15 @@ const universityResults = [
           </p>
           <div class="flex flex-wrap justify-center gap-6">
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+              <span class="w-3 h-3 bg-primary rounded-full"></span>
               <span class="font-medium">Zero-Knowledge Processing</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+              <span class="w-3 h-3 bg-primary rounded-full"></span>
               <span class="font-medium">Military-Grade Encryption</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 bg-blue-400 rounded-full"></span>
+              <span class="w-3 h-3 bg-primary rounded-full"></span>
               <span class="font-medium">No Data Retention</span>
             </div>
           </div>
@@ -349,7 +351,7 @@ const universityResults = [
           <span class="confidence-boost">TRAINING PROGRAM?</span>
         </h2>
 
-        <p class="text-xl text-gray-300 mb-8 leading-relaxed">
+        <p class="text-xl text-foreground mb-8 leading-relaxed">
           Join the universities already using ClinicalVault to train more
           confident, competent therapists.
         </p>

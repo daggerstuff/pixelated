@@ -103,14 +103,14 @@ const isSupervisor = userRole === 'admin'
   {/* $1 */}
   <script is:inline src="/js/socket.io.min.js"></script>
   <script is:inline src="/js/training-session.js" type="module"></script>
-  <main class="h-screen flex flex-col bg-gray-50">
+  <main class="h-screen flex flex-col bg-background">
     {/* $1 */}
-    <header class="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
+    <header class="bg-card border-b border-border px-6 py-4 flex-shrink-0">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
           <button
             id="back-button"
-            class="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            class="flex items-center text-muted-foreground hover:text-foreground transition-colors"
           >
             <svg
               class="w-5 h-5 mr-2"
@@ -128,13 +128,13 @@ const isSupervisor = userRole === 'admin'
             Back to Training
           </button>
 
-          <div class="h-6 border-l border-gray-300"></div>
+          <div class="h-6 border-l border-input"></div>
 
           <div>
-            <h1 class="text-xl font-semibold text-gray-900">
+            <h1 class="text-xl font-semibold text-foreground">
               Training Session: {sessionData.clientProfile.name}
             </h1>
-            <p class="text-sm text-gray-600">
+            <p class="text-sm text-muted-foreground">
               {sessionData.clientProfile.personalityType} • Level{' '}
               {sessionData.difficultyLevel}
             </p>
@@ -143,7 +143,7 @@ const isSupervisor = userRole === 'admin'
 
         <div class="flex items-center space-x-4">
           {/* $1 */}
-          <div class="flex items-center space-x-2 text-sm text-gray-600">
+          <div class="flex items-center space-x-2 text-sm text-muted-foreground">
             <svg
               class="w-4 h-4"
               fill="none"
@@ -163,7 +163,7 @@ const isSupervisor = userRole === 'admin'
           {/* $1 */}
           <button
             id="emergency-button"
-            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+            class="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-none text-sm font-medium transition-colors"
           >
             🚨 Emergency
           </button>
@@ -172,13 +172,13 @@ const isSupervisor = userRole === 'admin'
           <div class="flex items-center space-x-2">
             <button
               id="pause-session"
-              class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-md text-sm transition-colors"
+              class="bg-secondary hover:bg-accent text-foreground border border-ring px-3 py-2 rounded-none text-sm transition-colors"
             >
               ⏸️ Pause
             </button>
             <button
               id="end-session"
-              class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm transition-colors"
+              class="bg-secondary hover:bg-accent text-foreground px-3 py-2 rounded-none text-sm transition-colors"
             >
               ⏹️ End
             </button>
@@ -192,41 +192,41 @@ const isSupervisor = userRole === 'admin'
       {isTrainee && (
         <div class="flex-1 flex">
           {/* $1 */}
-          <aside class="w-80 bg-white border-r border-gray-200 flex flex-col">
+          <aside class="w-80 bg-card border-r border-border flex flex-col">
             {/* $1 */}
-            <div class="p-6 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <div class="p-6 border-b border-border">
+              <h2 class="text-lg font-semibold text-foreground mb-4">
                 Client Information
               </h2>
 
               <div class="space-y-4">
                 <div>
-                  <label class="text-sm font-medium text-gray-600">
+                  <label class="text-sm font-medium text-muted-foreground">
                     Demographics
                   </label>
-                  <p class="text-sm text-gray-900">
+                  <p class="text-sm text-foreground">
                     {sessionData.clientProfile.age} year old{' '}
                     {sessionData.clientProfile.gender}
                   </p>
                 </div>
 
                 <div>
-                  <label class="text-sm font-medium text-gray-600">
+                  <label class="text-sm font-medium text-muted-foreground">
                     Presenting Problem
                   </label>
-                  <p class="text-sm text-gray-900">
+                  <p class="text-sm text-foreground">
                     {sessionData.clientProfile.presentingProblem}
                   </p>
                 </div>
 
                 <div>
-                  <label class="text-sm font-medium text-gray-600">
+                  <label class="text-sm font-medium text-muted-foreground">
                     Key Triggers
                   </label>
                   <div class="flex flex-wrap gap-1 mt-1">
                     {sessionData.clientProfile.triggers?.map(
                       (trigger: string) => (
-                        <span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                        <span class="px-2 py-1 text-xs bg-foreground text-background rounded-none">
                           {trigger}
                         </span>
                       ),
@@ -235,13 +235,13 @@ const isSupervisor = userRole === 'admin'
                 </div>
 
                 <div>
-                  <label class="text-sm font-medium text-gray-600">
+                  <label class="text-sm font-medium text-muted-foreground">
                     Strengths
                   </label>
                   <div class="flex flex-wrap gap-1 mt-1">
                     {sessionData.clientProfile.strengths?.map(
                       (strength: string) => (
-                        <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                        <span class="px-2 py-1 text-xs bg-secondary text-foreground rounded-none">
                           {strength}
                         </span>
                       ),
@@ -252,15 +252,15 @@ const isSupervisor = userRole === 'admin'
             </div>
 
             {/* $1 */}
-            <div class="p-6 border-b border-gray-200">
-              <h3 class="text-md font-semibold text-gray-900 mb-4">
+            <div class="p-6 border-b border-border">
+              <h3 class="text-md font-semibold text-foreground mb-4">
                 Client State
               </h3>
 
               <div class="text-center mb-4">
                 <div
                   id="client-avatar"
-                  class="w-32 h-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full mx-auto mb-4 flex items-center justify-center border-4 border-blue-300 transition-all duration-1000"
+                  class="w-32 h-32 bg-secondary rounded-none mx-auto mb-4 flex items-center justify-center border-4 border-border transition-all duration-1000"
                 >
                   <span class="text-4xl" id="avatar-emotion">
                     😐
@@ -269,7 +269,7 @@ const isSupervisor = userRole === 'admin'
 
                 <div
                   id="emotional-state"
-                  class="text-sm font-medium text-gray-600 mb-2"
+                  class="text-sm font-medium text-muted-foreground mb-2"
                 >
                   Neutral
                 </div>
@@ -278,42 +278,42 @@ const isSupervisor = userRole === 'admin'
               {/* $1 */}
               <div class="space-y-3">
                 <div>
-                  <div class="flex justify-between text-xs text-gray-600 mb-1">
+                  <div class="flex justify-between text-xs text-muted-foreground mb-1">
                     <span>Trust Level</span>
                     <span id="trust-percentage">0%</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="w-full bg-secondary rounded-none h-2">
                     <div
                       id="trust-meter"
-                      class="bg-green-500 h-2 rounded-full transition-all duration-500"
+                      class="bg-primary h-2 rounded-none transition-all duration-500"
                       style="width: 0%"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <div class="flex justify-between text-xs text-gray-600 mb-1">
+                  <div class="flex justify-between text-xs text-muted-foreground mb-1">
                     <span>Resistance Level</span>
                     <span id="resistance-percentage">0%</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="w-full bg-secondary rounded-none h-2">
                     <div
                       id="resistance-meter"
-                      class="bg-red-500 h-2 rounded-full transition-all duration-500"
+                      class="bg-primary h-2 rounded-none transition-all duration-500"
                       style="width: 0%"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <div class="flex justify-between text-xs text-gray-600 mb-1">
+                  <div class="flex justify-between text-xs text-muted-foreground mb-1">
                     <span>Crisis Risk</span>
                     <span id="crisis-percentage">0%</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="w-full bg-secondary rounded-none h-2">
                     <div
                       id="crisis-meter"
-                      class="bg-yellow-500 h-2 rounded-full transition-all duration-500"
+                      class="bg-primary h-2 rounded-none transition-all duration-500"
                       style="width: 0%"
                     />
                   </div>
@@ -323,26 +323,32 @@ const isSupervisor = userRole === 'admin'
 
             {/* $1 */}
             <div class="p-6 flex-1">
-              <h3 class="text-md font-semibold text-gray-900 mb-4">
+              <h3 class="text-md font-semibold text-foreground mb-4">
                 Nonverbal Cues
               </h3>
 
               <div class="space-y-3 text-sm">
                 <div>
-                  <span class="font-medium text-gray-600">Body Language:</span>
-                  <span id="body-language" class="ml-2 text-gray-900">
+                  <span class="font-medium text-muted-foreground">
+                    Body Language:
+                  </span>
+                  <span id="body-language" class="ml-2 text-foreground">
                     Neutral posture
                   </span>
                 </div>
                 <div>
-                  <span class="font-medium text-gray-600">Voice Tone:</span>
-                  <span id="voice-tone" class="ml-2 text-gray-900">
+                  <span class="font-medium text-muted-foreground">
+                    Voice Tone:
+                  </span>
+                  <span id="voice-tone" class="ml-2 text-foreground">
                     Normal tone
                   </span>
                 </div>
                 <div>
-                  <span class="font-medium text-gray-600">Eye Contact:</span>
-                  <span id="eye-contact" class="ml-2 text-gray-900">
+                  <span class="font-medium text-muted-foreground">
+                    Eye Contact:
+                  </span>
+                  <span id="eye-contact" class="ml-2 text-foreground">
                     Appropriate
                   </span>
                 </div>
@@ -353,14 +359,14 @@ const isSupervisor = userRole === 'admin'
           {/* $1 */}
           <div class="flex-1 flex flex-col">
             {/* $1 */}
-            <div class="flex-1 flex flex-col bg-white">
+            <div class="flex-1 flex flex-col bg-card">
               {/* $1 */}
               <div
                 id="messages-container"
                 class="flex-1 overflow-y-auto p-6 space-y-4"
               >
                 {/* $1 */}
-                <div class="text-center text-gray-500 py-8">
+                <div class="text-center text-muted-foreground py-8">
                   <p>
                     Session starting... The client will begin speaking shortly.
                   </p>
@@ -368,16 +374,16 @@ const isSupervisor = userRole === 'admin'
               </div>
 
               {/* $1 */}
-              <div class="border-t border-gray-200 p-4 bg-gray-50">
+              <div class="border-t border-border p-4 bg-background">
                 <div class="flex flex-col space-y-3">
                   {/* $1 */}
                   <div class="flex items-center space-x-4">
-                    <label class="text-sm font-medium text-gray-700">
+                    <label class="text-sm font-medium text-foreground">
                       Response Type:
                     </label>
                     <select
                       id="intervention-type"
-                      class="text-sm border border-gray-300 rounded-md px-3 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="text-sm border border-input rounded-none px-3 py-1 focus:ring-2 focus:ring-ring focus:border-ring"
                     >
                       <option value="reflection">Reflection</option>
                       <option value="empathy">Empathy</option>
@@ -391,7 +397,7 @@ const isSupervisor = userRole === 'admin'
 
                     <button
                       id="suggestions-button"
-                      class="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200 transition-colors"
+                      class="text-sm bg-secondary text-foreground px-3 py-1 rounded-none hover:bg-accent transition-colors"
                     >
                       <svg
                         class="w-5 h-5"
@@ -408,12 +414,12 @@ const isSupervisor = userRole === 'admin'
                       <textarea
                         id="message-input"
                         placeholder="Type your therapeutic response..."
-                        class="w-full border border-gray-300 rounded-md px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        class="w-full border border-input rounded-none px-4 py-3 focus:ring-2 focus:ring-ring focus:border-ring resize-none"
                         rows="3"
                       ></textarea>
 
                       {/* $1 */}
-                      <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                      <div class="flex justify-between items-center mt-2 text-xs text-muted-foreground">
                         <span>
                           Quality:{' '}
                           <span id="response-quality" class="font-medium">
@@ -426,7 +432,7 @@ const isSupervisor = userRole === 'admin'
 
                     <button
                       id="send-message"
-                      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center"
+                      class="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-none font-medium transition-colors flex items-center justify-center"
                       disabled
                     >
                       <svg
@@ -450,52 +456,52 @@ const isSupervisor = userRole === 'admin'
           </div>
 
           {/* $1 */}
-          <aside class="w-80 bg-white border-l border-gray-200 flex flex-col">
+          <aside class="w-80 bg-card border-l border-border flex flex-col">
             {/* $1 */}
-            <div class="p-6 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <div class="p-6 border-b border-border">
+              <h2 class="text-lg font-semibold text-foreground mb-4">
                 Real-time Guidance
               </h2>
 
               {/* $1 */}
               <div class="space-y-4">
                 <div>
-                  <div class="flex justify-between text-sm text-gray-600 mb-1">
+                  <div class="flex justify-between text-sm text-muted-foreground mb-1">
                     <span>Rapport Building</span>
                     <span id="rapport-score">0/5</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="w-full bg-secondary rounded-none h-2">
                     <div
                       id="rapport-progress"
-                      class="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                      class="bg-primary h-2 rounded-none transition-all duration-500"
                       style="width: 0%"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <div class="flex justify-between text-sm text-gray-600 mb-1">
+                  <div class="flex justify-between text-sm text-muted-foreground mb-1">
                     <span>Active Listening</span>
                     <span id="listening-score">0/5</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="w-full bg-secondary rounded-none h-2">
                     <div
                       id="listening-progress"
-                      class="bg-green-500 h-2 rounded-full transition-all duration-500"
+                      class="bg-primary h-2 rounded-none transition-all duration-500"
                       style="width: 0%"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <div class="flex justify-between text-sm text-gray-600 mb-1">
+                  <div class="flex justify-between text-sm text-muted-foreground mb-1">
                     <span>Empathy</span>
                     <span id="empathy-score">0/5</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="w-full bg-secondary rounded-none h-2">
                     <div
                       id="empathy-progress"
-                      class="bg-purple-500 h-2 rounded-full transition-all duration-500"
+                      class="bg-primary h-2 rounded-none transition-all duration-500"
                       style="width: 0%"
                     />
                   </div>
@@ -504,35 +510,35 @@ const isSupervisor = userRole === 'admin'
             </div>
 
             {/* $1 */}
-            <div class="p-6 border-b border-gray-200">
-              <h3 class="text-md font-semibold text-gray-900 mb-4">
+            <div class="p-6 border-b border-border">
+              <h3 class="text-md font-semibold text-foreground mb-4">
                 Live Feedback
               </h3>
               <div id="feedback-messages" class="space-y-2 text-sm">
-                <p class="text-gray-500">Feedback will appear here.</p>
+                <p class="text-muted-foreground">Feedback will appear here.</p>
               </div>
             </div>
 
             {/* $1 */}
             <div
               id="crisis-alerts"
-              class="hidden p-6 bg-red-50 border-b border-red-200"
+              class="hidden p-6 bg-secondary border-b border-ring"
             >
-              <h3 class="text-md font-semibold text-red-900 mb-2">
+              <h3 class="text-md font-semibold text-foreground mb-2">
                 ⚠️ Crisis Alert
               </h3>
-              <div id="crisis-message" class="text-sm text-red-800" />
+              <div id="crisis-message" class="text-sm text-foreground" />
             </div>
 
             {/* $1 */}
             <div class="flex-1 p-6">
-              <h3 class="text-md font-semibold text-gray-900 mb-4">
+              <h3 class="text-md font-semibold text-foreground mb-4">
                 Session Notes
               </h3>
               <textarea
                 id="session-notes"
                 placeholder="Add your reflections and observations..."
-                class="w-full h-32 border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                class="w-full h-32 border border-input rounded-none px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:border-ring resize-none"
               ></textarea>
             </div>
           </aside>
