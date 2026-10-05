@@ -178,8 +178,11 @@ export class UsabilityUtils {
       // Exceptions per 2.5.8: inline links within sentences, and
       // targets not currently rendered. The previous blanket 44x44
       // best-practice check flagged doctrinally-fine inline text links
-      // and the visually-hidden skip link (0x0 box). Reaching the 44px
-      // mobile best practice is tracked design debt (DESIGN.md §7).
+      // and the visually-hidden skip link (0x0 box). The 44px best
+      // practice is addressed for landing/nav chrome (PIX-4750: real
+      // 44px boxes where layout allows; ::after hit-area overlays on
+      // the compact header row), but this box-based check cannot see
+      // pseudo-element hit areas, so it stays at the 24px AA floor.
       const clickableElements = await page
         .locator('button, a, input[type="button"], input[type="submit"]')
         .all()

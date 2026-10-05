@@ -639,10 +639,21 @@ samp {
   color: var(--ink-soft);
   cursor: pointer;
   list-style: none;
+  position: relative;
   transition:
     color 120ms ease,
     border-color 120ms ease,
     background 120ms ease;
+}
+
+/* 44px mobile touch-target best practice (PIX-4750): the header row
+   cannot fit larger boxes at 320px (PIX-4746), so expand the pointer
+   hit area around the 2.1rem visual box instead. */
+.nav-menu-button::after,
+.nav-icon-link::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
 }
 
 .nav-menu-button::-webkit-details-marker {
@@ -689,6 +700,10 @@ samp {
 
 .nav-menu-panel a {
   border-radius: var(--radius-sm);
+  /* 44px mobile touch-target best practice (PIX-4750). */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
   padding: 0.62rem 0.7rem;
   color: var(--ink-soft);
   font-family: var(--mono);
@@ -717,6 +732,7 @@ samp {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   color: var(--muted);
+  position: relative;
   transition:
     color 120ms ease,
     border-color 120ms ease,
