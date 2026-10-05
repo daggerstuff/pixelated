@@ -25,7 +25,7 @@
     "@opentelemetry/semantic-conventions": "^1.29.0",
     "@vercel/connect": "2.3.6",
     "ai": "7.0.109",
-    "eve": "^0.68.0",
+    "eve": "^0.70.1",
     "mongodb": "^7.7.0",
     "workers-ai-provider": "^4.0.0",
     "zod": "4.6.5"
