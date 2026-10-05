@@ -26,7 +26,7 @@
   "devDependencies": {
     "@types/express": "5.x",
     "@types/node": "24.x",
-    "just-bash": "^3.4.2",
+    "just-bash": "^3.6.0",
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
