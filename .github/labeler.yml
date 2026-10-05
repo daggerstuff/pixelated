@@ -26,3 +26,15 @@ enhancement:
       - any-glob-to-any-file:
           - apps/web/src/pages/**
           - apps/web/src/components/**
+
+ci-cd:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/workflows/*
+          - config/playwright.config.ts
+
+github-actions:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/actions/**
+          - .github/hooks/**

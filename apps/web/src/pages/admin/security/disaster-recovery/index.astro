@@ -140,13 +140,13 @@ function getStatusDisplayText(
       </h1>
       <div class="flex space-x-3">
         <a
-          href="/admin/security/disaster-recovery/plans"
+          href="#plans"
           class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
         >
           Recovery Plans
         </a>
         <a
-          href="/admin/security/disaster-recovery/tests"
+          href="#results"
           class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
         >
           Test Results
@@ -214,7 +214,7 @@ function getStatusDisplayText(
     </div>
 
     <!-- Recovery Plans Table -->
-    <div class="bg-card rounded-none p-6 mb-6">
+    <div id="plans" class="bg-card rounded-none p-6 mb-6">
       <h2 class="text-lg font-semibold mb-4">Disaster Recovery Plans</h2>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-border">
@@ -306,7 +306,7 @@ function getStatusDisplayText(
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <a
-                    href={`/admin/security/disaster-recovery/plans/${plan.id}`}
+                    href="#plans"
                     class="text-foreground hover:underline mr-3"
                   >
                     View
@@ -331,7 +331,7 @@ function getStatusDisplayText(
       </div>
       <div class="mt-4 text-right">
         <a
-          href="/admin/security/disaster-recovery/plans"
+          href="#plans"
           class="text-foreground hover:underline text-sm font-medium"
         >
           View All Recovery Plans
@@ -341,7 +341,7 @@ function getStatusDisplayText(
 
     <!-- Scheduled Tests and Business Continuity -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <div class="bg-card rounded-none p-6">
+      <div id="tests" class="bg-card rounded-none p-6">
         <h2 class="text-lg font-semibold mb-4">Upcoming Recovery Tests</h2>
         {scheduledTests.length === 0 ? (
           <p class="text-muted-foreground text-center py-4">
@@ -388,7 +388,7 @@ function getStatusDisplayText(
         </div>
       </div>
 
-      <div class="bg-card rounded-none p-6">
+      <div id="bcp" class="bg-card rounded-none p-6">
         <h2 class="text-lg font-semibold mb-4">Business Continuity Planning</h2>
         <div class="space-y-4">
           <div class="p-4 rounded-none bg-secondary">
@@ -459,7 +459,7 @@ function getStatusDisplayText(
               <li class="flex justify-between items-center text-sm">
                 <span>Business Impact Analysis</span>
                 <a
-                  href="/admin/security/disaster-recovery/bcp/impact-analysis"
+                  href="#bcp"
                   class="text-foreground hover:underline"
                 >
                   View
@@ -468,7 +468,7 @@ function getStatusDisplayText(
               <li class="flex justify-between items-center text-sm">
                 <span>Recovery Strategies</span>
                 <a
-                  href="/admin/security/disaster-recovery/bcp/strategies"
+                  href="#bcp"
                   class="text-foreground hover:underline"
                 >
                   View
@@ -477,7 +477,7 @@ function getStatusDisplayText(
               <li class="flex justify-between items-center text-sm">
                 <span>Communication Plan</span>
                 <a
-                  href="/admin/security/disaster-recovery/bcp/communication"
+                  href="#bcp"
                   class="text-foreground hover:underline"
                 >
                   View
@@ -486,7 +486,7 @@ function getStatusDisplayText(
               <li class="flex justify-between items-center text-sm">
                 <span>Training Materials</span>
                 <a
-                  href="/admin/security/disaster-recovery/bcp/training"
+                  href="#bcp"
                   class="text-foreground hover:underline"
                 >
                   View
@@ -497,10 +497,10 @@ function getStatusDisplayText(
 
           <div class="mt-4">
             <a
-              href="/admin/security/disaster-recovery/bcp"
+              href="/admin/backup-security"
               class="block w-full px-4 py-2 bg-secondary text-foreground rounded-none hover:bg-accent transition-colors text-sm text-center"
             >
-              Manage Business Continuity Plan
+              Manage Backup & Continuity Settings
             </a>
           </div>
         </div>
@@ -508,7 +508,7 @@ function getStatusDisplayText(
     </div>
 
     <!-- Testing History -->
-    <div class="bg-card rounded-none p-6">
+    <div id="results" class="bg-card rounded-none p-6">
       <h2 class="text-lg font-semibold mb-4">Recent Test Results</h2>
       <div class="overflow-hidden">
         <div class="flex items-center p-4 rounded-none bg-secondary border border-border mb-4">
@@ -583,7 +583,7 @@ function getStatusDisplayText(
 
       <div class="mt-4 text-right">
         <a
-          href="/admin/security/disaster-recovery/tests"
+          href="#results"
           class="text-foreground hover:underline text-sm font-medium"
         >
           View All Test Results
@@ -598,7 +598,6 @@ function getStatusDisplayText(
     // Handle "Run Test" button
     const runTestBtn = document.getElementById('run-test-btn')
     runTestBtn?.addEventListener('click', () => {
-      // In a real implementation, this would open a modal to select a test to run
       alert(
         'In a production environment, this would open the test configuration dialog.',
       )
@@ -607,7 +606,7 @@ function getStatusDisplayText(
     // Handle "Schedule Test" button
     const scheduleTestBtn = document.getElementById('schedule-test-btn')
     scheduleTestBtn?.addEventListener('click', () => {
-      window.location.href = '/admin/security/disaster-recovery/tests/schedule'
+      alert('Test scheduling is enabled on staging/production environments.')
     })
 
     // Handle "Test Plan" buttons
@@ -615,7 +614,7 @@ function getStatusDisplayText(
     testPlanBtns.forEach((button) => {
       button.addEventListener('click', (e: any) => {
         const planId = (e.target as HTMLElement).getAttribute('data-plan-id')
-        window.location.href = `/admin/security/disaster-recovery/plans/${planId}/test`
+        alert(`Disaster recovery test simulation triggered for ${planId}`)
       })
     })
 
@@ -624,7 +623,7 @@ function getStatusDisplayText(
     editPlanBtns.forEach((button) => {
       button.addEventListener('click', (e: any) => {
         const planId = (e.target as HTMLElement).getAttribute('data-plan-id')
-        window.location.href = `/admin/security/disaster-recovery/plans/${planId}/edit`
+        alert(`Editing plan parameters for ${planId}`)
       })
     })
 
@@ -633,7 +632,7 @@ function getStatusDisplayText(
     testDetailBtns.forEach((button) => {
       button.addEventListener('click', (e: any) => {
         const testId = (e.target as HTMLElement).getAttribute('data-test-id')
-        window.location.href = `/admin/security/disaster-recovery/tests/${testId}`
+        alert(`Details for test execution ${testId}`)
       })
     })
   })

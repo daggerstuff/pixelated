@@ -199,8 +199,23 @@ describe('Dashboard Performance Tests', () => {
     vi.clearAllMocks()
   })
 
-  it('renders dashboard with large dataset efficiently', async () => {
-    const startTime = performance.now()
+  it('renders dashboard with large dataset efficiently', () => {
+    // Same flake class as the progress-tracker bound: single-shot wall-clock
+    // timing flapped on a loaded CI runner (157ms vs the 100ms bound, PR 6150),
+    // so the bound is enforced on the median of N measured renders.
+    const renderTime = measureRenderMs(
+      () =>
+        render(
+          React.createElement(
+            TherapistDashboard,
+            { sessions: mockSessions, onSessionControl: mockOnSessionControl },
+            React.createElement('div', null, 'Test content'),
+          ),
+        ).unmount,
+    )
+
+    // Should render within reasonable time (less than 100ms for 100 sessions)
+    assertFast(renderTime, 100)
 
     render(
       React.createElement(
@@ -209,13 +224,6 @@ describe('Dashboard Performance Tests', () => {
         React.createElement('div', null, 'Test content'),
       ),
     )
-
-    // Measure render time
-    const endTime = performance.now()
-    const renderTime = endTime - startTime
-
-    // Should render within reasonable time (less than 100ms for 100 sessions)
-    assertFast(renderTime, 100)
 
     // Check that dashboard renders correctly
     expect(screen.getByLabelText('Therapist Dashboard')).toBeInTheDocument()

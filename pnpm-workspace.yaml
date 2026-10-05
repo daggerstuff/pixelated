@@ -309,6 +309,7 @@ overrides:
   brace-expansion: ^5.0.8
   astro>cookie: ^2.0.0
   cookie: '^0.7.2'
+  msw>cookie: ^2.0.1
   '@vercel/oidc': '3.7.1'
   devalue: ^5.9.4
   devalue@<5.8.1: ^5.8.1
@@ -346,7 +347,7 @@ overrides:
   # Version-drift ratchet: consolidate duplicate resolutions introduced by
   # the Dependabot major-updates merge (#6053) — single-version pins, all
   # semver-compatible with their requesters.
-  '@sentry/core@^10': 10.75.1
+  '@sentry/core@^10': 10.75.3
   dotenv: 18.0.1
   tsx: 4.23.15
   jsonwebtoken: ^9.0.0
@@ -370,7 +371,6 @@ overrides:
   node-domexception: ^2.0.1
   node-forge: '>=1.4.0'
   node-gyp: ^10.0.0
-  nodemailer: ^9.0.1
   openai: npm:openai@6.37.0
   path-to-regexp: 6.3.0
   picomatch: '>=4.0.4'

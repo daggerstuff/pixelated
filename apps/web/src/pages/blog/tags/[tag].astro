@@ -29,24 +29,24 @@ const postCount = hasPosts ? posts.length : 0
   <div class="max-w-4xl mx-auto px-4 py-12">
     <header class="mb-12">
       <nav
-        class="flex items-center gap-2 mb-4 text-sm text-slate-400"
+        class="flex items-center gap-2 mb-4 text-sm text-muted-foreground"
         aria-label="Breadcrumb"
       >
-        <a href="/blog" class="hover:text-green-400 transition-colors">
+        <a href="/blog" class="hover:text-foreground transition-colors">
           Blog
         </a>
         <span aria-hidden="true">/</span>
-        <a href="/blog/tags" class="hover:text-green-400 transition-colors">
+        <a href="/blog/tags" class="hover:text-foreground transition-colors">
           Topics
         </a>
         <span aria-hidden="true">/</span>
-        <span class="text-green-400" aria-current="page">
+        <span class="text-foreground" aria-current="page">
           #{tag}
         </span>
       </nav>
 
       <h1 class="text-3xl font-bold mb-4">#{tag}</h1>
-      <p class="text-slate-400">
+      <p class="text-muted-foreground">
         {postCount} post{postCount !== 1 ? 's' : ''} about {tag}
       </p>
     </header>
@@ -56,10 +56,10 @@ const postCount = hasPosts ? posts.length : 0
         posts.map((post) => <BlogPostCard {post} currentTag={tag} />)
       ) : (
         <div class="text-center py-12">
-          <p class="text-slate-400 mb-4">No posts found for #{tag}</p>
+          <p class="text-muted-foreground mb-4">No posts found for #{tag}</p>
           <a
             href="/blog/tags"
-            class="inline-flex items-center text-green-400 hover:text-green-300 transition-colors"
+            class="inline-flex items-center text-foreground hover:text-foreground transition-colors"
           >
             Browse all topics
           </a>
@@ -67,21 +67,21 @@ const postCount = hasPosts ? posts.length : 0
       )}
     </section>
 
-    <footer class="border-t border-slate-700 pt-8 mt-12">
+    <footer class="border-t border-border pt-8 mt-12">
       <nav
         class="flex flex-col sm:flex-row gap-4 justify-between"
         aria-label="Related pages"
       >
         <a
           href="/blog/tags"
-          class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
+          class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Browse all topics"
         >
           ← All topics
         </a>
         <a
           href="/blog"
-          class="inline-flex items-center text-slate-400 hover:text-green-400 transition-colors"
+          class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
           aria-label="View all blog posts"
         >
           All posts →

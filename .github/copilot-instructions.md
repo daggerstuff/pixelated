@@ -130,6 +130,36 @@ To configure your environment for Neon Ai Gateway:
 source .github/copilot/neon-byok.sh
 ```
 
+## 3c) Cloudflare Workers AI Setup
+
+This project can use Cloudflare Workers AI as a model provider (either directly or via 9Router).
+
+### Quick Start
+
+Configure your environment with:
+
+```bash
+source .github/copilot/cloudflare-byok.sh
+```
+
+Or route through 9Router:
+
+```bash
+source .github/copilot/cloudflare-byok.sh 9router
+```
+
+### Important Usage Note for Cloudflare Workers AI
+
+Cloudflare's OpenAI-compatible schema validator requires standard function tools and does not support Copilot's proprietary lark-grammar `apply_patch` tool (`body.tools[].function.name`).
+
+Always run prompts with:
+
+```bash
+copilot -p "Your prompt" --excluded-tools apply_patch
+# or use the provided alias:
+copilot-cf -p "Your prompt"
+```
+
 This script sets following environment variables:
 
 - `COPILOT_PROVIDER_BASE_URL="${NEON_AI_GATEWAY_BASE_URL}"` (your branch's AI
@@ -180,7 +210,7 @@ const openai = new OpenAI({
 
 Neon Ai Gateway's catalog includes:
 
-- **Open-weight models**: Qwen, gpt-oss (via Databricks Foundation Model APIs)
+- **Open-weight models**: gpt-oss (via Databricks Foundation Model APIs)
 - **Frontier models**: GPT (`gpt-5`), Gemini (`gemini-3-flash`) - rolling out
   gradually
 

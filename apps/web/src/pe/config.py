@@ -104,7 +104,11 @@ class Settings(BaseSettings):
     @property
     def database_url_sync(self) -> str:
         """Return a synchronous DB URL (for Alembic, etc.)."""
-        return self.DATABASE_URL.replace("+asyncpg", "")
+        # Migrations run with psycopg2-binary (see pe-test-db.sh / Quality
+        # workflow). The bare `postgresql://` URL makes SQLAlchemy pick its
+        # default dialect — psycopg3 (sqlalchemy>=2.1) — which is not
+        # installed in the migration venv. Keep the driver explicit.
+        return self.DATABASE_URL.replace("+asyncpg", "+psycopg2")
 
 
 # Singleton

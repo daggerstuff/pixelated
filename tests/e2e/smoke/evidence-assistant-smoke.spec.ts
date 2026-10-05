@@ -128,7 +128,13 @@ test.describe('Evidence Assistant admin page', () => {
     await page.fill('input[type="password"]', password)
     await page.click('button[type="submit"]')
 
-    await page.waitForLoadState('networkidle')
+    // Bounded: the submit may be rate-limited (429) in smoke environments; all we
+    // need is for the login POST to settle before navigating to the admin page.
+    await page
+      .waitForLoadState('networkidle', { timeout: 15_000 })
+      .catch(() => {
+        // networkidle may never settle if background polling continues — proceed.
+      })
 
     await page.goto('/admin/ai/evidence-assistant', {
       waitUntil: 'load',

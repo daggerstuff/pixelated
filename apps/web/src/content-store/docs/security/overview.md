@@ -17,20 +17,20 @@ logging.
   <Card
     title="Zero-Knowledge System"
     icon="shield-halved"
-    href="/security/encryption"
+    href="/docs/architecture/decisions/0004-zero-knowledge-system"
   >
     End-to-end encryption and zero-knowledge proofs
   </Card>
-  <Card title="Authentication" icon="key" href="/security/authentication">
+  <Card title="Authentication" icon="key" href="/docs/auth-types">
     Multi-factor authentication and session management
   </Card>
-  <Card title="Compliance" icon="clipboard-check" href="/security/compliance">
+  <Card title="Compliance" icon="clipboard-check" href="/docs/compliance/hipaa-ai-verification">
     HIPAA compliance and audit trails
   </Card>
   <Card
     title="Data Protection"
     icon="database"
-    href="/security/data-protection"
+    href="/docs/architecture"
   >
     Data encryption and secure storage
   </Card>
@@ -170,17 +170,17 @@ graph TD
   >
     Contact our security team
   </Card>
-  <Card title="Security Docs" icon="book-shield" href="/security/docs">
+  <Card title="Security Docs" icon="book-shield" href="/docs">
     View security documentation
   </Card>
 </CardGroup>
 
 ## Additional Resources
 
-- [Security Whitepaper](/security/whitepaper)
-- [Compliance Certificates](/security/certificates)
-- [Security Advisories](/security/advisories)
-- [Best Practices Guide](/security/best-practices)
+- [Security & Trust Overview](/trust)
+- [Compliance & Controls](/trust)
+- [Security Advisories](/security.txt)
+- [Architecture Overview](/docs/architecture)
 
 ## Support
 

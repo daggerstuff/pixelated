@@ -1,0 +1,25 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
+
+export const prerender = true
+
+const title = 'Offline Mode'
+const description = 'You are currently working in offline mode.'
+---
+
+<BaseLayout {title} {description}>
+  <MarketingPageHero
+    eyebrow="System · Offline"
+    title="You are currently offline."
+    lede="Local data and queued operations remain available. Connect to the internet to sync updates."
+    primaryCTA={{ text: 'Return to Dashboard', href: '/dashboard' }}
+    secondaryCTA={{ text: 'Practice Simulator', href: '/simulator' }}
+    note="Cached resources remain accessible while disconnected."
+    proof={{
+      label: 'Offline status',
+      body: `<p>Your changes and simulation progress will be synchronized automatically once your network connection is restored.</p>`,
+      caption: 'Local storage & queue active.',
+    }}
+  />
+</BaseLayout>

@@ -63,6 +63,12 @@ def _gql(api_key: str, query: str, variables: dict[str, Any] | None = None) -> d
     try:
         with urlopen(req, timeout=30) as resp:
             result: dict[str, Any] = json.loads(resp.read())
+            # GraphQL can return HTTP 200 with "data": null plus an errors
+            # list (e.g. invalid input, deprecated endpoint). Surface that
+            # instead of letting callers crash on None.
+            if result.get("data") is None and result.get("errors"):
+                messages = "; ".join(str(e.get("message")) for e in result["errors"] if isinstance(e, dict))
+                raise RuntimeError(f"Linear GraphQL error: {messages}")
             return result
     except HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
@@ -72,10 +78,14 @@ def _gql(api_key: str, query: str, variables: dict[str, Any] | None = None) -> d
 
 
 def _search_issue(api_key: str, key: str) -> dict[str, Any] | None:
-    """Search Linear for a single issue by its identifier (e.g. PIX-1234)."""
+    """Look up a single issue by its identifier (e.g. PIX-1234).
+
+    Uses ``searchIssues`` — the ``issueSearch`` endpoint was deprecated by
+    Linear (it returns an INPUT_ERROR and empty results).
+    """
     query = """
-        query($query: String!) {
-          issueSearch(query: $query, first: 1) {
+        query($term: String!) {
+          searchIssues(term: $term, first: 1) {
             nodes {
               id
               identifier
@@ -86,8 +96,13 @@ def _search_issue(api_key: str, key: str) -> dict[str, Any] | None:
           }
         }
     """
-    data = _gql(api_key, query, {"query": key})
-    nodes = data.get("data", {}).get("issueSearch", {}).get("nodes") or []
+    data = _gql(api_key, query, {"term": key})
+    raw_nodes = (data.get("data") or {}).get("searchIssues", {}).get("nodes") or []
+    nodes: list[dict[str, Any]] = [n for n in raw_nodes if isinstance(n, dict)]
+    # Guard against fuzzy matches on the term (e.g. PIX-123 matching PIX-1234).
+    for node in nodes:
+        if node.get("identifier") == key:
+            return node
     return nodes[0] if nodes else None
 
 
@@ -112,7 +127,7 @@ def _transition_issue(api_key: str, issue_id: str, state_id: str) -> dict[str, A
         }
     """
     data = _gql(api_key, mutation, {"id": issue_id, "input": {"stateId": state_id}})
-    container = data.get("data", {}).get("issueUpdate") or {}
+    container = (data.get("data") or {}).get("issueUpdate") or {}
     if not container.get("success"):
         raise RuntimeError(f"Linear state transition failed: {data.get('errors', 'unknown')}")
     return container.get("issue") or {}
@@ -150,7 +165,7 @@ def _merge_commit_message(merge_sha: str) -> str:
         )
         if result.returncode == 0:
             return result.stdout.strip()
-    except (subprocess.SubprocessError, FileNotFoundError):
+    except subprocess.SubprocessError, FileNotFoundError:
         pass
     return ""
 

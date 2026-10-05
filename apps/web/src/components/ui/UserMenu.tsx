@@ -100,7 +100,7 @@ export function UserMenu({ className = '' }: UserMenuProps) {
             </li>
             <li>
               <a
-                href="/settings"
+                href="/admin/security-settings"
                 className="block px-4 py-2 text-sm text-foreground transition-colors hover:bg-secondary"
                 role="menuitem"
               >

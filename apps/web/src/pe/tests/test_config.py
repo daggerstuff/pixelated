@@ -41,9 +41,9 @@ class TestSettings:
         assert "http://localhost:3000" in settings.CORS_ORIGINS
 
     def test_database_url_sync(self) -> None:
-        """Sync DB URL should strip +asyncpg."""
+        """Sync DB URL should swap +asyncpg for +psycopg2 (migration driver)."""
         s = Settings(DATABASE_URL="postgresql+asyncpg://user:pass@localhost/db")
-        assert s.database_url_sync == "postgresql://user:pass@localhost/db"
+        assert s.database_url_sync == "postgresql+psycopg2://user:pass@localhost/db"
 
 
 class TestLoggingConfig:

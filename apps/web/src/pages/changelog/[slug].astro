@@ -54,7 +54,7 @@ Please check back later.`
     <header class="not-prose mb-8">
       <h1 class="text-4xl font-bold text-white mb-2">{frontmatter.title}</h1>
       {pubDate && (
-        <p class="text-slate-400 text-sm">
+        <p class="text-muted-foreground text-sm">
           <time datetime={pubDate}>{formatDate(pubDate)}</time>
           {updatedDate && (
             <time datetime={updatedDate}>

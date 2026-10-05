@@ -54,7 +54,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   {
     id: 'settings',
     label: 'Settings',
-    href: '/admin/settings',
+    href: '/admin/security-settings',
     icon: 'settings',
   },
   {
@@ -77,8 +77,8 @@ export const SIMPLE_ADMIN_NAV_ITEMS: AdminNavItem[] = ADMIN_NAV_ITEMS.filter(
 )
 
 SIMPLE_ADMIN_NAV_ITEMS.splice(2, 0, {
-  id: 'content',
-  label: 'Content',
-  href: '/admin/content',
+  id: 'evidence-reports',
+  label: 'Evidence Reports',
+  href: '/admin/evidence-reports',
   icon: 'document',
 })
