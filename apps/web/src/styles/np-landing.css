@@ -311,6 +311,8 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.1rem;
+  /* 44px mobile touch-target best practice (PIX-4750). */
+  min-height: 44px;
   font-family: var(--np-font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
