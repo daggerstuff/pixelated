@@ -566,7 +566,11 @@ describe('Authentication System Integration', () => {
       })
 
       const duration = Date.now() - start
-      expect(duration).toBeGreaterThanOrEqual(50)
+      // The mock delay is 50ms, but Date.now() drift can read 1-2ms low
+      // (observed 49ms in CI, PR 6150). The intent is "the handler awaited
+      // the full mock delay instead of short-circuiting", so allow 5ms of
+      // timer-coalescing slack rather than demanding exact wall-clock 50.
+      expect(duration).toBeGreaterThanOrEqual(45)
     })
   })
 

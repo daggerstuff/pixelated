@@ -404,5 +404,5 @@ All API endpoints require authentication. See the
 ## HIPAA Compliance
 
 All API endpoints are HIPAA compliant and include comprehensive audit logging.
-See the [Security](/security/hipaa) documentation for details on HIPAA
+See the [Trust & Compliance](/trust) documentation for details on HIPAA
 compliance measures.

@@ -14,9 +14,6 @@ export const prerender = false
   <!-- Hero Section -->
   <section class="brutalist-section relative overflow-hidden">
     <!-- Floating Background Elements -->
-    <div class="absolute top-20 left-10 w-32 h-32 rounded-none bg-secondary/10 floating-element"></div>
-    <div class="absolute top-40 right-20 w-24 h-24 rounded-none bg-secondary/10 floating-element--delayed"></div>
-    <div class="absolute bottom-20 left-1/3 w-20 h-20 rounded-none bg-secondary/10 floating-element"></div>
 
     <div class="brutalist-container relative z-10">
       <div class="text-center mb-12">
@@ -167,28 +164,28 @@ export const prerender = false
 
             <div class="space-y-3">
               <BrutalistButton
-                href="/demo/bias-detection"
+                href="/demo-hub"
                 variant="primary"
                 class="w-full"
               >
                 🧪 RUN ANALYSIS TEST
               </BrutalistButton>
               <BrutalistButton
-                href="/dashboard/bias-detection/reports"
+                href="/admin/bias-detection"
                 variant="secondary"
                 class="w-full"
               >
                 📊 VIEW REPORTS
               </BrutalistButton>
               <BrutalistButton
-                href="/dashboard/bias-detection/alerts"
+                href="#active-alerts"
                 variant="secondary"
                 class="w-full"
               >
                 🚨 MANAGE ALERTS
               </BrutalistButton>
               <BrutalistButton
-                href="/dashboard/bias-detection/settings"
+                href="/admin/security-settings"
                 variant="outline"
                 class="w-full"
               >
@@ -305,7 +302,7 @@ export const prerender = false
               and scenarios.
             </p>
             <BrutalistButton
-              href="/dashboard/bias-detection/analytics/bias-distribution"
+              href="/components/analytics-dashboard"
               variant="secondary"
               size="sm"
             >
@@ -326,7 +323,7 @@ export const prerender = false
               accuracy metrics.
             </p>
             <BrutalistButton
-              href="/dashboard/bias-detection/analytics/performance"
+              href="/admin/ai-performance"
               variant="secondary"
               size="sm"
             >
@@ -347,7 +344,7 @@ export const prerender = false
               reporting.
             </p>
             <BrutalistButton
-              href="/dashboard/bias-detection/analytics/compliance"
+              href="/admin/security-dashboard"
               variant="secondary"
               size="sm"
             >
@@ -380,14 +377,14 @@ export const prerender = false
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <BrutalistButton
-            href="/demo/bias-detection"
+            href="/demo-hub"
             variant="primary"
             size="lg"
           >
             🚀 Start Analysis
           </BrutalistButton>
           <BrutalistButton
-            href="/docs/bias-detection"
+            href="/docs"
             variant="secondary"
             size="lg"
           >
@@ -428,29 +425,9 @@ export const prerender = false
     @apply text-muted-foreground;
   }
 
-  /* Floating animations */
-  .floating-element {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .floating-element--delayed {
-    animation: float 6s ease-in-out infinite;
-    animation-delay: 2s;
-  }
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-20px);
-    }
-  }
-
   /* Status dots */
   .status-dot {
-    @apply w-3 h-3 rounded-none;
+    @apply w-3 h-3 rounded-full;
   }
 
   .status-dot--processing {
@@ -517,15 +494,15 @@ export const prerender = false
       container.innerHTML = analyses
         .map(
           (analysis) => `
-        <div class="bg-gray-800/30 rounded-none p-4 border border-gray-600/20">
+        <div class="bg-secondary rounded-none p-4 border border-border">
           <div class="flex items-center justify-between mb-2">
-            <span class="font-medium text-gray-200">${analysis.sessionType}</span>
+            <span class="font-medium text-foreground">${analysis.sessionType}</span>
             <span class="text-sm px-2 py-1 rounded-none ${
               analysis.biasScore > 0.6
-                ? 'bg-red-500/20 text-red-300'
+                ? 'bg-foreground text-background font-medium'
                 : analysis.biasScore > 0.3
-                  ? 'bg-yellow-500/20 text-yellow-300'
-                  : 'bg-green-500/20 text-green-300'
+                  ? 'bg-secondary border border-ring text-foreground font-medium'
+                  : 'bg-secondary border border-border text-muted-foreground'
             }">
               ${(analysis.biasScore * 100).toFixed(1)}%
             </span>
@@ -556,13 +533,13 @@ export const prerender = false
       container.innerHTML = alerts
         .map(
           (alert) => `
-        <div class="bg-red-500/10 border border-red-400/30 rounded-none p-4">
+        <div class="bg-secondary border border-ring rounded-none p-4">
           <div class="flex items-start gap-3">
-            <div class="w-2 h-2 bg-red-400 rounded-none mt-2 flex-shrink-0"></div>
+            <div class="w-2 h-2 rounded-full bg-foreground mt-2 flex-shrink-0"></div>
             <div>
-              <div class="font-medium text-red-200">${alert.title}</div>
-              <div class="text-sm text-red-300/80 mt-1">${alert.description}</div>
-              <div class="text-xs text-red-400/60 mt-2">
+              <div class="font-medium text-foreground">${alert.title}</div>
+              <div class="text-sm text-muted-foreground mt-1">${alert.description}</div>
+              <div class="text-xs text-muted-foreground mt-2">
                 ${new Date(alert.timestamp).toLocaleString()}
               </div>
             </div>

@@ -58,13 +58,13 @@ const topTags = allTags
       <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
         Writing on therapy, technology, and digital empathy.
       </h1>
-      <p class="text-lg text-slate-400 mb-6">
+      <p class="text-lg text-muted-foreground mb-6">
         Welcome to our corner of the internet. We're sharing thoughts on
         creating meaningful therapeutic experiences through technology.
       </p>
       <a
         href="/about"
-        class="text-green-400 hover:text-green-300 transition-colors font-medium"
+        class="text-foreground hover:text-foreground transition-colors font-medium"
       >
         More about us →
       </a>
@@ -76,7 +76,7 @@ const topTags = allTags
         <h2 class="text-2xl font-bold">Recent Posts</h2>
         <a
           href="/blog/page/1"
-          class="text-green-400 hover:text-green-300 transition-colors font-medium"
+          class="text-foreground hover:text-foreground transition-colors font-medium"
         >
           View all posts →
         </a>
@@ -86,7 +86,7 @@ const topTags = allTags
         {posts.map((post: BlogPost) => (
           <article class="group">
             <div class="flex flex-col sm:flex-row gap-4">
-              <div class="flex-shrink-0 text-sm text-slate-400 sm:w-32">
+              <div class="flex-shrink-0 text-sm text-muted-foreground sm:w-32">
                 {formatDate(new Date(post.data.pubDate))}
                 <span class="hidden sm:block mt-1">
                   {getReadingTime(post.body)}
@@ -94,13 +94,13 @@ const topTags = allTags
               </div>
 
               <div class="flex-1">
-                <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">
+                <h3 class="text-xl font-bold mb-2 group-hover:text-foreground transition-colors">
                   <a href={`/blog/${post.slug}`} class="block">
                     {post.data.title}
                   </a>
                 </h3>
 
-                <p class="text-slate-300 mb-3 leading-relaxed">
+                <p class="text-foreground mb-3 leading-relaxed">
                   {post.data.description}
                 </p>
 
@@ -109,7 +109,7 @@ const topTags = allTags
                     {post.data.tags.map((tag: string) => (
                       <a
                         href={`/blog/tags/${tag}`}
-                        class="text-xs text-green-400 hover:text-green-300 transition-colors"
+                        class="text-xs text-foreground hover:text-foreground transition-colors"
                       >
                         #{tag}
                       </a>
@@ -119,7 +119,7 @@ const topTags = allTags
 
                 <a
                   href={`/blog/${post.slug}`}
-                  class="inline-flex items-center mt-3 text-sm text-slate-400 hover:text-green-400 transition-colors group-hover:text-green-400"
+                  class="inline-flex items-center mt-3 text-sm text-muted-foreground hover:text-foreground transition-colors group-hover:text-foreground"
                 >
                   Read article
                   <span class="ml-1 group-hover:translate-x-1 transition-transform">
@@ -139,7 +139,7 @@ const topTags = allTags
         <h2 class="text-2xl font-bold">Explore Topics</h2>
         <a
           href="/blog/tags"
-          class="text-green-400 hover:text-green-300 transition-colors font-medium"
+          class="text-foreground hover:text-foreground transition-colors font-medium"
         >
           View all topics →
         </a>
@@ -153,17 +153,19 @@ const topTags = allTags
           return (
             <a
               href={`/blog/tags/${tag}`}
-              class="group block p-6 rounded-lg border border-slate-700 bg-slate-800/40 hover:border-green-400/50 hover:bg-slate-800/60 transition-all"
+              class="group block p-6 rounded-none border border-border bg-secondary hover:border-ring hover:bg-accent transition-all"
             >
               <div class="flex items-center justify-between mb-2">
-                <h3 class="font-bold text-lg group-hover:text-green-400 transition-colors">
+                <h3 class="font-bold text-lg group-hover:text-foreground transition-colors">
                   #{tag}
                 </h3>
-                <span class="text-sm text-slate-400">
+                <span class="text-sm text-muted-foreground">
                   {tagPosts.length} post{tagPosts.length !== 1 ? 's' : ''}
                 </span>
               </div>
-              <p class="text-sm text-slate-400">Explore articles about {tag}</p>
+              <p class="text-sm text-muted-foreground">
+                Explore articles about {tag}
+              </p>
             </a>
           )
         })}

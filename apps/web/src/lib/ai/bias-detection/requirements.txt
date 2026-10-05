@@ -29,7 +29,7 @@ annotated-types==0.7.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   pydantic
-anyio==4.14.2
+anyio==4.15.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   httpx
@@ -106,7 +106,7 @@ contourpy==1.3.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   matplotlib
-cryptography==50.0.1
+cryptography==50.0.2
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   great-expectations
@@ -130,7 +130,7 @@ cymem==2.0.13
     #   thinc
 dash==3.4.0
     # via -r src/lib/ai/bias-detection/requirements.txt
-datasets==4.5.0
+datasets==5.0.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   evaluate
@@ -667,7 +667,7 @@ pure-eval==0.2.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   stack-data
-pyarrow==25.0.0
+pyarrow==25.0.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   datasets
@@ -912,7 +912,7 @@ toolz==1.1.0
     #   altair
 torch==2.13.0
     # via -r src/lib/ai/bias-detection/requirements.txt
-tornado==6.5.8
+tornado==6.5.9
     # via -r src/lib/ai/bias-detection/requirements.txt
 tqdm==4.67.1
     # via
@@ -949,7 +949,7 @@ typer-slim==0.21.1
     #   spacy
     #   transformers
     #   weasel
-typing-extensions==4.15.0
+typing-extensions==4.16.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   dash
@@ -983,7 +983,7 @@ uritemplate==4.2.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   google-api-python-client
-urllib3==2.7.0
+urllib3==2.8.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   requests

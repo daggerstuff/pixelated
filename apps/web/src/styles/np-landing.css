@@ -4,6 +4,14 @@
    Reference: DESIGN.md & TASTES.md ("The Quiet Instrument")
 */
 
+@font-face {
+  font-family: 'Monocraft';
+  src: url('../assets/fonts/monocraft/Monocraft.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
 :root {
   --np-bg: oklch(0.1 0 0);
   --np-surface: oklch(0.14 0 0);
@@ -17,8 +25,8 @@
   --np-pad: clamp(1.25rem, 4vw, 3rem);
   --np-max-width: 78rem;
   --np-font-display:
-    'Geist Variable', 'Geist', 'Archivo Variable', 'Archivo', system-ui,
-    -apple-system, sans-serif;
+    'Monocraft', 'Geist Variable', 'Geist', 'Archivo Variable', 'Archivo',
+    system-ui, -apple-system, sans-serif;
   --np-font-body:
     'Instrument Sans Variable', system-ui, -apple-system, sans-serif;
   --np-font-mono:
@@ -83,9 +91,9 @@
 .np-display-hero {
   font-family: var(--np-font-display);
   font-size: clamp(2.35rem, 4.2vw, 3.75rem);
-  font-weight: 650;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0;
   color: var(--np-text);
   margin: 0 0 1.25rem 0;
   text-wrap: balance;
@@ -94,9 +102,9 @@
 .np-section-heading {
   font-family: var(--np-font-display);
   font-size: clamp(1.85rem, 3.2vw, 2.75rem);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.025em;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0;
   color: var(--np-text);
   margin: 0 0 1rem 0;
   text-wrap: balance;
@@ -192,15 +200,24 @@
 }
 
 .np-hero-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
   gap: 3rem;
+}
+
+@media (min-width: 1024px) {
+  .np-hero-container {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 2rem;
+  }
 }
 
 /* Hero Header Deck */
 .np-hero-header {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   max-width: 62rem;
 }
 
@@ -249,12 +266,6 @@
   color: var(--np-muted);
 }
 
-@media (min-width: 768px) {
-  .np-hero-ticker {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 .np-ticker-item {
   display: flex;
   align-items: center;
@@ -275,6 +286,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  min-width: 0;
+  max-height: 42rem;
 }
 
 .np-apparatus-top {
@@ -288,6 +301,7 @@
 
 .np-apparatus-tabs {
   display: flex;
+  max-width: 100%;
   overflow-x: auto;
   border-right: 1px solid var(--np-line-strong);
 }
@@ -339,29 +353,19 @@
 /* 2-Column Workstation Body Grid */
 .np-apparatus-grid {
   display: grid;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 1024px) {
-  .np-apparatus-grid {
-    grid-template-columns: 1.14fr 0.86fr;
-  }
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .np-apparatus-pane {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .np-apparatus-pane--left {
   border-bottom: 1px solid var(--np-line-strong);
-}
-
-@media (min-width: 1024px) {
-  .np-apparatus-pane--left {
-    border-bottom: none;
-    border-right: 1px solid var(--np-line-strong);
-  }
 }
 
 .np-pane-head {
@@ -376,6 +380,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .np-pane-tag {

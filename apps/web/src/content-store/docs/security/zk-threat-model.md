@@ -203,12 +203,12 @@ using outputs in studies.
 
 ## Related Documents
 
-- [ADR-0004](/architecture/decisions/0004-zero-knowledge-system) — ZK proof
+- [ADR-0004](/docs/architecture/decisions/0004-zero-knowledge-system) — ZK proof
   system decision and library evaluation
-- [Encryption & ZK System](/security/encryption) — Encryption architecture
+- [Encryption & ZK System](/docs/architecture/decisions/0004-zero-knowledge-system) — Encryption architecture
   and ZK implementation details
-- [HIPAA Compliance](/security/hipaa-compliance) — Compliance framework
-- [Risk Assessment](/security/risk-assessment) — Overall security risk
+- [HIPAA Compliance](/docs/compliance/hipaa-ai-verification) — Compliance framework
+- [Risk Assessment](/admin/security/risk-assessment) — Overall security risk
   assessment
 
 ## Update: SP1 Integration (2026-07-23, PIX-4118)

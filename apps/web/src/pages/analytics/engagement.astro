@@ -69,7 +69,7 @@ const activityTableColumns: Column[] = [
     label: 'Score',
     sortable: true,
     render: (value) =>
-      `<span class="${(value as number) >= 85 ? 'text-green-500' : (value as number) >= 70 ? 'text-yellow-500' : 'text-red-500'}">${value}%</span>`,
+      `<span class="${(value as number) >= 85 ? 'text-foreground' : (value as number) >= 70 ? 'text-foreground/80' : 'text-muted-foreground'}">${value}%</span>`,
   },
 ]
 ---
@@ -132,11 +132,11 @@ const activityTableColumns: Column[] = [
           widgetGap="medium"
         >
           {error ? (
-            <div class="col-span-2 text-center text-red-600 font-semibold py-8">
+            <div class="col-span-2 text-center text-foreground font-semibold py-8">
               Failed to load engagement metrics: {error}
             </div>
           ) : !metrics ? (
-            <div class="col-span-2 text-center text-gray-500 py-8">
+            <div class="col-span-2 text-center text-muted-foreground py-8">
               Loading engagement metrics...
             </div>
           ) : (

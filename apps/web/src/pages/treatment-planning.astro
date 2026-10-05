@@ -9,7 +9,7 @@ const description =
 
 <main class="max-w-4xl mx-auto py-10 px-4">
   <h1 class="text-3xl font-bold mb-2">{title}</h1>
-  <p class="text-lg text-gray-600 mb-8">{description}</p>
+  <p class="text-lg text-muted-foreground mb-8">{description}</p>
 
   <TreatmentPlanner
     client:load
@@ -20,9 +20,9 @@ const description =
 
 <style>
   .filter-btn {
-    @apply px-4 py-2 rounded bg-gray-100 hover:bg-blue-100 text-gray-700 font-medium transition;
+    @apply px-4 py-2 rounded-none bg-secondary hover:bg-accent text-foreground font-medium transition;
   }
   .filter-btn.active {
-    @apply bg-blue-600 text-white;
+    @apply bg-primary text-primary-foreground;
   }
 </style>

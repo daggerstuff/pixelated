@@ -5,10 +5,10 @@ description = "Pixelated Empathy - AI-powered bias detection and mental health p
 authors = [
   { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.14, <3.15"
 dependencies = [
   "flask[async]",
-  "flask-cors>=6.0.2", # Updated to latest secure version
+  "flask-cors>=6.0.5", # Updated to latest secure version
   "pandas",
   "numpy",
   "scikit-learn",
@@ -56,7 +56,7 @@ dependencies = [
   "s3cmd>=2.4.0",
   "authlib>=1.6.11", # Updated to latest secure version
   "motor>=3.7.1",
-  "structlog>=25.4.0",
+  "structlog>=26.1.0",
   "redis>=6.4.0",
   "bcrypt>=4.3.0",
   "email-validator>=2.3.0",
@@ -122,7 +122,7 @@ dependencies = [
   "virtualenv>=21.2.0",
   "voyageai>=0.3.7",
   "aiosqlite>=0.22.1",
-  "semgrep>=1.79.0",
+  "semgrep>=1.60.0",
   "webdriver-manager>=4.0.2",
   "selenium>=4.43.0",
   "undetected-chromedriver>=3.5.5",
@@ -135,7 +135,7 @@ dependencies = [
   "pinecone-client>=6.0.0",
   "ruff>=0.15.17",
   "beautifulsoup4>=4.15.0",
-  "sqlalchemy>=2.0.51,<2.1",
+  "sqlalchemy[asyncio]>=2.0.51,<2.2", # async extra installs greenlet (pe's async engine requires it; bare sqlalchemy pulls it only as an optional platform dep)
   "celery>=5.6.3",
 ]
 [project.optional-dependencies]

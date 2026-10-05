@@ -18,6 +18,12 @@ PY
 
 export COPILOT_PROVIDER_BASE_URL="http://127.0.0.1:20128/v1"
 export COPILOT_PROVIDER_API_KEY="$(_9router_api_key)"
+export COPILOT_PROVIDER_TYPE="openai"
+export COPILOT_MODEL="nvidia/z-ai/glm-5.3-flash"
+export COPILOT_PROVIDER_MODEL_ID="nvidia/z-ai/glm-5.3-flash"
+export COPILOT_PROVIDER_WIRE_MODEL="nvidia/z-ai/glm-5.3-flash"
+export COPILOT_MODEL_SEQUENCE="nvidia/z-ai/glm-5.3-flash nvidia/meta/muse-glimmer-30b nvidia/z-ai/glm-5.3"
+export COPILOT_PROVIDER_MODEL_SEQUENCE="nvidia/z-ai/glm-5.3-flash nvidia/meta/muse-glimmer-30b nvidia/z-ai/glm-5.3"
 
 # Role‑specific models
 export ZYNTHOS_LEAD_MODEL="nvidia/nemotron-3-super"   # large text model (no Llama)

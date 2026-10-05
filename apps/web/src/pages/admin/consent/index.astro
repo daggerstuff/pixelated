@@ -32,7 +32,7 @@ await requirePageAuth(Astro, 'admin')
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-3">
       <a
-        href="/admin/consent/types"
+        href="/admin/consent-management"
         class="flex items-center p-3 bg-secondary rounded-none hover:bg-accent transition-colors"
       >
         <div class="mr-3 bg-secondary border border-input p-2 rounded-none">
@@ -45,28 +45,32 @@ await requirePageAuth(Astro, 'admin')
       </a>
 
       <a
-        href="/admin/consent/versions"
+        href="/admin/state-consent-rules"
         class="flex items-center p-3 bg-secondary rounded-none hover:bg-accent transition-colors"
       >
         <div class="mr-3 bg-secondary border border-input p-2 rounded-none">
           <Icon name="tabler:versions" class="h-5 w-5 text-foreground" />
         </div>
         <div>
-          <h3 class="font-medium">Document Versions</h3>
-          <p class="text-sm text-muted-foreground">Manage consent documents</p>
+          <h3 class="font-medium">State Rules</h3>
+          <p class="text-sm text-muted-foreground">
+            Manage jurisdiction policies
+          </p>
         </div>
       </a>
 
       <a
-        href="/admin/consent/options"
+        href="/admin/patient-rights"
         class="flex items-center p-3 bg-secondary rounded-none hover:bg-accent transition-colors"
       >
         <div class="mr-3 bg-secondary border border-input p-2 rounded-none">
           <Icon name="tabler:list-details" class="h-5 w-5 text-foreground" />
         </div>
         <div>
-          <h3 class="font-medium">Consent Options</h3>
-          <p class="text-sm text-muted-foreground">Manage granular options</p>
+          <h3 class="font-medium">Patient Rights</h3>
+          <p class="text-sm text-muted-foreground">
+            Manage user consent requests
+          </p>
         </div>
       </a>
     </div>
@@ -74,16 +78,14 @@ await requirePageAuth(Astro, 'admin')
 
   <ConsentDashboard />
 
-  <div class="mt-8 bg-neutral-100 border-l-4 border-neutral-400 p-4">
+  <div class="mt-8 bg-secondary border-l-4 border-ring p-4">
     <div class="flex">
       <div class="flex-shrink-0">
-        <Icon name="tabler:info-circle" class="h-5 w-5 text-neutral-400" />
+        <Icon name="tabler:info-circle" class="h-5 w-5 text-muted-foreground" />
       </div>
       <div class="ml-3">
-        <h3 class="text-sm font-medium text-neutral-800">
-          Implementation Note
-        </h3>
-        <div class="mt-2 text-sm text-neutral-700">
+        <h3 class="text-sm font-medium text-foreground">Implementation Note</h3>
+        <div class="mt-2 text-sm text-muted-foreground">
           <p>
             This consent management system implements granular consent with
             version tracking and withdrawal workflows according to HIPAA

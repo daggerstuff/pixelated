@@ -22,7 +22,7 @@ annotated-doc==0.0.4
     #   typer
 annotated-types==0.7.0
     # via pydantic
-anyio==4.14.2
+anyio==4.15.1
     # via
     #   httpx
     #   starlette
@@ -85,7 +85,7 @@ confection==1.3.3
     #   weasel
 contourpy==1.3.3
     # via matplotlib
-cryptography==50.0.1
+cryptography==50.0.2
     # via bias-detection-service (pyproject.toml)
 cuda-bindings==13.2.0
     # via torch
@@ -100,7 +100,7 @@ cymem==2.0.13
     #   preshed
     #   spacy
     #   thinc
-datasets==4.8.5
+datasets==5.0.1
     # via evaluate
 defusedxml==0.7.1
     # via nltk
@@ -364,7 +364,7 @@ propcache==0.5.2
     #   yarl
 psycopg2-binary==2.9.12
     # via bias-detection-service (pyproject.toml)
-pyarrow==25.0.0
+pyarrow==25.0.1
     # via datasets
 pycparser==3.0
     # via cffi
@@ -384,7 +384,7 @@ pygments==2.20.0
     # via
     #   bias-detection-service (pyproject.toml)
     #   rich
-pyjwt==2.13.0
+pyjwt==2.15.1
     # via bias-detection-service (pyproject.toml)
 pyparsing==3.3.2
     # via matplotlib
@@ -510,7 +510,7 @@ typer==0.25.1
     #   spacy
     #   transformers
     #   weasel
-typing-extensions==4.15.0
+typing-extensions==4.16.0
     # via
     #   alembic
     #   fastapi

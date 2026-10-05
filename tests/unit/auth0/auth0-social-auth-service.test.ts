@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
+import { auth0Config } from '../../../apps/web/src/lib/auth/auth0-config'
 import { Auth0SocialAuthService } from '../../../apps/web/src/lib/auth/auth0-social-auth-service'
 import * as securityModule from '../../../apps/web/src/lib/security/index'
 
@@ -20,6 +21,10 @@ type MockManagementUsers = {
   link: ReturnType<typeof vi.fn>
   unlink: ReturnType<typeof vi.fn>
   get: ReturnType<typeof vi.fn>
+  identities: {
+    link: ReturnType<typeof vi.fn>
+    delete: ReturnType<typeof vi.fn>
+  }
 }
 
 type MockManagementClient = {
@@ -50,16 +55,27 @@ const mockUserInfoClient: MockUserInfoClient = vi.hoisted(() => ({
   getUserInfo: vi.fn(),
 }))
 
-const mockManagementClient: MockManagementClient = vi.hoisted(() => ({
-  linkUsers: vi.fn(),
-  unlinkUsers: vi.fn(),
-  getUser: vi.fn(),
-  users: {
-    link: vi.fn(),
-    unlink: vi.fn(),
-    get: vi.fn(),
-  },
-}))
+const mockManagementClient: MockManagementClient = vi.hoisted(() => {
+  const identitiesLink = vi.fn()
+  const identitiesDelete = vi.fn()
+  const getUser = vi.fn()
+  return {
+    identitiesLink,
+    identitiesDelete,
+    getUser,
+    linkUsers: identitiesLink,
+    unlinkUsers: identitiesDelete,
+    users: {
+      link: identitiesLink,
+      unlink: identitiesDelete,
+      get: getUser,
+      identities: {
+        link: identitiesLink,
+        delete: identitiesDelete,
+      },
+    },
+  }
+})
 
 // Mock the auth0 module
 vi.mock('auth0', () => {
@@ -80,6 +96,30 @@ vi.mock('auth0', () => {
     ManagementClient: vi.fn(function () {
       return {
         users: mockManagementClient.users,
+      }
+    }),
+    UserInfoClient: vi.fn(function () {
+      return mockUserInfoClient
+    }),
+  }
+})
+
+// The service constructs AuthenticationClient/UserInfoClient from the
+// 'auth0-legacy' package alias — mock that module too so no real SDK
+// client (and no network request) is ever created.
+vi.mock('auth0-legacy', () => {
+  return {
+    AuthenticationClient: vi.fn(function () {
+      return {
+        oauthToken: mockAuthMethods.oauthToken,
+        authorizationCodeGrant: mockAuthMethods.authorizationCodeGrant,
+        getProfile: mockAuthMethods.getProfile,
+        refreshToken: mockAuthMethods.refreshToken,
+        refreshTokenGrant: mockAuthMethods.refreshTokenGrant,
+        oauth: {
+          authorizationCodeGrant: mockAuthMethods.authorizationCodeGrant,
+          refreshTokenGrant: mockAuthMethods.refreshTokenGrant,
+        },
       }
     }),
     UserInfoClient: vi.fn(function () {
@@ -128,12 +168,6 @@ describe('Auth0 Social Auth Service', () => {
     mockAuthClientInstance = mockAuthMethods
     mockManagementClientInstance = mockManagementClient
     mockUserInfoInstance = mockUserInfoClient
-    mockManagementClientInstance.users.link =
-      mockManagementClientInstance.linkUsers
-    mockManagementClientInstance.users.unlink =
-      mockManagementClientInstance.unlinkUsers
-    mockManagementClientInstance.users.get =
-      mockManagementClientInstance.getUser
     mockUserInfoInstance.getUserInfo = vi.fn(async (accessToken: string) => {
       return {
         data: await mockAuthClientInstance.getProfile({
@@ -295,19 +329,34 @@ describe('Auth0 Social Auth Service', () => {
     })
 
     it('should throw error when auth client is not initialized', async () => {
-      // Clear environment variables to make auth client null
+      // Clear environment variables AND the module-level config snapshot
+      // (it supplies fallback values) so this instance constructs with no
+      // clients at all.
       delete process.env.AUTH0_DOMAIN
       delete process.env.AUTH0_CLIENT_ID
       delete process.env.AUTH0_CLIENT_SECRET
+      const savedConfig = { ...auth0Config }
+      Object.assign(auth0Config, {
+        domain: '',
+        clientId: '',
+        clientSecret: '',
+      })
 
-      const authService = new Auth0SocialAuthService()
+      try {
+        const authService = new Auth0SocialAuthService()
 
-      await expect(
-        authService.exchangeCodeForTokens(
-          'auth-code',
-          'https://example.com/callback',
-        ),
-      ).rejects.toThrow('Token exchange failed')
+        // Instance-owned clients (PIX-4737): this instance was constructed
+        // with incomplete config, so it reports "not initialized" instead of
+        // silently reusing a stale client from a previous construction.
+        await expect(
+          authService.exchangeCodeForTokens(
+            'auth-code',
+            'https://example.com/callback',
+          ),
+        ).rejects.toThrow('Auth0 authentication client not initialized')
+      } finally {
+        Object.assign(auth0Config, savedConfig)
+      }
     })
   })
 
@@ -567,18 +616,17 @@ describe('Auth0 Social Auth Service', () => {
         'access-token-123',
       )
 
-      expect(mockManagementClientInstance.users.link).toHaveBeenCalledWith(
-        { id: 'auth0|user123' },
-        {
-          provider: 'google-oauth2',
-          connection_id: 'google-oauth2',
-          user_id: 'access-token-123',
-        },
-      )
+      expect(
+        mockManagementClientInstance.users.identities.link,
+      ).toHaveBeenCalledWith('auth0|user123', {
+        provider: 'google-oauth2',
+        connection_id: 'google-oauth2',
+        user_id: 'access-token-123',
+      })
     })
 
     it('should throw error when linking fails', async () => {
-      mockManagementClientInstance.users.link.mockRejectedValue(
+      mockManagementClientInstance.users.identities.link.mockRejectedValue(
         new Error('Failed to link account'),
       )
 
@@ -592,21 +640,29 @@ describe('Auth0 Social Auth Service', () => {
     })
 
     it('should throw error when management client is not initialized', async () => {
-      // Clear management client environment variables
+      // Clear management client environment variables and the config
+      // snapshot so this instance constructs without a management client.
       delete process.env.AUTH0_MANAGEMENT_CLIENT_ID
       delete process.env.AUTH0_MANAGEMENT_CLIENT_SECRET
+      const savedConfig = { ...auth0Config }
+      Object.assign(auth0Config, {
+        managementClientId: '',
+        managementClientSecret: '',
+      })
 
-      const authService = new Auth0SocialAuthService()
+      try {
+        const authService = new Auth0SocialAuthService()
 
-      await expect(
-        authService.linkSocialAccount(
-          'auth0|user123',
-          'google-oauth2',
-          'access-token-123',
-        ),
-      ).rejects.toThrow(
-        /Auth0 management client not initialized|Failed to link social account/,
-      )
+        await expect(
+          authService.linkSocialAccount(
+            'auth0|user123',
+            'google-oauth2',
+            'access-token-123',
+          ),
+        ).rejects.toThrow('Auth0 management client not initialized')
+      } finally {
+        Object.assign(auth0Config, savedConfig)
+      }
     })
   })
 
@@ -620,17 +676,17 @@ describe('Auth0 Social Auth Service', () => {
         'provider-user-id-123',
       )
 
-      expect(mockManagementClientInstance.users.unlink).toHaveBeenCalledWith(
+      expect(
+        mockManagementClientInstance.users.identities.delete,
+      ).toHaveBeenCalledWith(
         'auth0|user123',
-        {
-          provider: 'google-oauth2',
-          user_id: 'provider-user-id-123',
-        },
+        'google-oauth2',
+        'provider-user-id-123',
       )
     })
 
     it('should throw error when unlinking fails', async () => {
-      mockManagementClientInstance.users.unlink.mockRejectedValue(
+      mockManagementClientInstance.users.identities.delete.mockRejectedValue(
         new Error('Failed to unlink account'),
       )
 

@@ -52,8 +52,9 @@ if [ -z "${COPILOT_MODEL:-}" ]; then
   export COPILOT_MODEL="openai/gpt-oss-120b"
 fi
 
-# Export provider model ID (alias for COPILOT_MODEL for compatibility)
+# Export provider model ID and wire model (for Copilot BYOK compatibility)
 export COPILOT_PROVIDER_MODEL_ID="${COPILOT_MODEL}"
+export COPILOT_PROVIDER_WIRE_MODEL="${COPILOT_MODEL}"
 
 echo "✅ Neon Ai Gateway environment configured successfully!"
 echo "   Provider URL:  $COPILOT_PROVIDER_BASE_URL"

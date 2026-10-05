@@ -18,14 +18,19 @@ PY
 
 export COPILOT_PROVIDER_BASE_URL="http://127.0.0.1:20128/v1"
 export COPILOT_PROVIDER_API_KEY="$(_9router_api_key)"
+export COPILOT_PROVIDER_TYPE="openai"
 # Default model for planning/coordination (large text model)
-export COPILOT_MODEL="groq/openai/gpt-oss-120b"
+export COPILOT_MODEL="nvidia/z-ai/glm-5.3-flash"
+export COPILOT_PROVIDER_MODEL_ID="nvidia/z-ai/glm-5.3-flash"
+export COPILOT_PROVIDER_WIRE_MODEL="nvidia/z-ai/glm-5.3-flash"
+export COPILOT_MODEL_SEQUENCE="nvidia/z-ai/glm-5.3-flash nvidia/meta/muse-glimmer-30b nvidia/z-ai/glm-5.3"
+export COPILOT_PROVIDER_MODEL_SEQUENCE="nvidia/z-ai/glm-5.3-flash nvidia/meta/muse-glimmer-30b nvidia/z-ai/glm-5.3"
 # Model IDs for specific roles (override as needed)
-export ZYNTHOS_LEAD_MODEL="nvidia/llama-3.2-90b-instruct"
-export ZYNTHOS_HUNTER_MODEL="nvidia/nemotron-3-nano-omni"
-export ZYNTHOS_BUILDER_MODEL="nvidia/nemotron-3-nano-omni"
-export ZYNTHOS_OUTREACH_MODEL="nvidia/nemotron-3-super"
-export ZYNTHOS_NEGOTIATOR_MODEL="nvidia/nemotron-3-super"
-export ZYNTHOS_PAYMENT_MODEL="nvidia/nemotron-3-super"
+export ZYNTHOS_LEAD_MODEL="nvidia/z-ai/glm-5.3"
+export ZYNTHOS_HUNTER_MODEL="nvidia/meta/muse-glimmer-30b"
+export ZYNTHOS_BUILDER_MODEL="nvidia/z-ai/glm-5.3-flash"
+export ZYNTHOS_OUTREACH_MODEL="nvidia/meta/muse-glimmer-30b"
+export ZYNTHOS_NEGOTIATOR_MODEL="nvidia/z-ai/glm-5.3"
+export ZYNTHOS_PAYMENT_MODEL="nvidia/z-ai/glm-5.3-flash"
 # Load into current shell if sourced
 echo "NVIDIA NIM environment variables set."

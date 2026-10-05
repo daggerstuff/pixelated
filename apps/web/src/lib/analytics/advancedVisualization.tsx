@@ -5,14 +5,14 @@
 
 import React from 'react'
 
-export interface DataDimension {
+interface DataDimension {
   field: string
   label: string
   type: 'numeric' | 'categorical' | 'temporal' | 'boolean'
   aggregation?: 'sum' | 'avg' | 'count' | 'min' | 'max' | 'median'
 }
 
-export interface VisualizationConfig {
+interface VisualizationConfig {
   type:
     | 'scatter'
     | 'line'
@@ -32,7 +32,7 @@ export interface VisualizationConfig {
   realTime: boolean
 }
 
-export interface AnalyticsInsight {
+interface AnalyticsInsight {
   id: string
   type: 'trend' | 'anomaly' | 'correlation' | 'pattern' | 'prediction'
   title: string
@@ -43,7 +43,7 @@ export interface AnalyticsInsight {
   impact: 'low' | 'medium' | 'high'
 }
 
-export interface DataPoint {
+interface DataPoint {
   [key: string]: unknown
 }
 
@@ -98,7 +98,7 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
   return (
     <div className={`advanced-visualization ${className}`}>
       {/* Visualization Controls */}
-      <div className="bg-white dark:bg-gray-800 mb-6 flex items-center justify-between rounded-lg border p-4">
+      <div className="mb-6 flex items-center justify-between rounded-none border border-border bg-card p-4">
         <div className="flex items-center gap-4">
           <select
             value={viewMode}
@@ -107,7 +107,7 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
                 e.target.value as 'overview' | 'detailed' | 'comparative',
               )
             }
-            className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2"
+            className="rounded-none border border-input bg-card px-3 py-2"
           >
             <option value="overview">Overview</option>
             <option value="detailed">Detailed</option>
@@ -117,14 +117,12 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium">Interactive:</span>
             <button
-              className={`h-5 w-10 rounded-full transition-colors ${
-                config.interactive
-                  ? 'bg-blue-500'
-                  : 'bg-gray-300 dark:bg-gray-600'
+              className={`h-5 w-10 rounded-none transition-colors ${
+                config.interactive ? 'bg-primary' : 'bg-secondary'
               }`}
             >
               <div
-                className={`bg-white h-4 w-4 rounded-full transition-transform ${
+                className={`h-4 w-4 rounded-none bg-background transition-transform ${
                   config.interactive ? 'translate-x-5' : 'translate-x-1'
                 }`}
               />
@@ -132,7 +130,7 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
           </div>
         </div>
 
-        <div className="text-gray-600 dark:text-gray-400 text-sm">
+        <div className="text-sm text-muted-foreground">
           {data.length} data points • {insights.length} insights
         </div>
       </div>
@@ -141,7 +139,7 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Chart Area */}
         <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-lg border p-6">
+          <div className="rounded-none border border-border bg-card p-6">
             <VisualizationChart
               data={data}
               config={config}
@@ -165,21 +163,17 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
 
       {/* Detailed Analysis Panel */}
       {selectedDataPoints.length > 0 && (
-        <div className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 mt-6 rounded-lg border p-4">
+        <div className="mt-6 rounded-none border border-border bg-secondary p-4">
           <h4 className="mb-3 font-medium">Selected Data Analysis</h4>
           <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
             <div>
-              <div className="text-gray-600 dark:text-gray-400 font-medium">
-                Points
-              </div>
+              <div className="font-medium text-muted-foreground">Points</div>
               <div className="text-lg font-bold">
                 {selectedDataPoints.length}
               </div>
             </div>
             <div>
-              <div className="text-gray-600 dark:text-gray-400 font-medium">
-                Avg Value
-              </div>
+              <div className="font-medium text-muted-foreground">Avg Value</div>
               <div className="text-lg font-bold">
                 {(
                   selectedDataPoints.reduce(
@@ -191,9 +185,7 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
               </div>
             </div>
             <div>
-              <div className="text-gray-600 dark:text-gray-400 font-medium">
-                Range
-              </div>
+              <div className="font-medium text-muted-foreground">Range</div>
               <div className="text-lg font-bold">
                 {Math.min(
                   ...selectedDataPoints.map(
@@ -209,17 +201,15 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
               </div>
             </div>
             <div>
-              <div className="text-gray-600 dark:text-gray-400 font-medium">
-                Trend
-              </div>
+              <div className="font-medium text-muted-foreground">Trend</div>
               <div
                 className={`text-lg font-bold ${
                   calculateTrend(
                     selectedDataPoints,
                     config.dimensions.x.field,
                   ) > 0
-                    ? 'text-green-600'
-                    : 'text-red-600'
+                    ? 'text-foreground'
+                    : 'text-muted-foreground'
                 }`}
               >
                 {calculateTrend(selectedDataPoints, config.dimensions.x.field) >
@@ -289,7 +279,7 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
       <svg
         width={chartWidth}
         height={chartHeight}
-        className="border-gray-200 dark:border-gray-700 border"
+        className="border border-border"
       >
         {/* Grid lines */}
         {[0.25, 0.5, 0.75].map((ratio) => (
@@ -301,7 +291,7 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
               y2={20 + ratio * (chartHeight - 40)}
               stroke="currentColor"
               strokeWidth="0.5"
-              className="text-gray-300 dark:text-gray-600"
+              className="text-muted-foreground/30"
             />
             <line
               x1={20 + ratio * (chartWidth - 40)}
@@ -310,7 +300,7 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
               y2={chartHeight - 20}
               stroke="currentColor"
               strokeWidth="0.5"
-              className="text-gray-300 dark:text-gray-600"
+              className="text-muted-foreground/30"
             />
           </g>
         ))}
@@ -326,8 +316,10 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
               cx={position.x}
               cy={position.y}
               r={isSelected ? 6 : 4}
-              fill={isSelected ? '#3b82f6' : '#10b981'}
-              stroke={hoveredPoint === point ? '#ef4444' : 'white'}
+              fill={isSelected ? 'var(--np-text)' : 'var(--np-mid)'}
+              stroke={
+                hoveredPoint === point ? 'var(--np-text)' : 'var(--np-bg)'
+              }
               strokeWidth="2"
               className="hover:r-8 cursor-pointer transition-all"
               onMouseEnter={() => setHoveredPoint(point)}
@@ -345,7 +337,7 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
       {/* Tooltip */}
       {hoveredPoint && (
         <div
-          className="bg-gray-900 text-white pointer-events-none absolute z-10 rounded-lg px-2 py-1 text-xs"
+          className="pointer-events-none absolute z-10 rounded-none bg-foreground px-2 py-1 text-xs text-background"
           style={{
             left: getPointPosition(hoveredPoint).x + 10,
             top: getPointPosition(hoveredPoint).y - 10,
@@ -368,10 +360,10 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
 const InsightCard: React.FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
   const [isExpanded, setIsExpanded] = React.useState(false)
 
-  const impactColors = {
-    low: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-    medium: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200',
-    high: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200',
+  const impactStyles = {
+    low: 'bg-secondary text-muted-foreground',
+    medium: 'bg-secondary text-foreground border border-ring',
+    high: 'bg-foreground text-background',
   }
 
   const typeIcons: Record<string, string> = {
@@ -383,7 +375,7 @@ const InsightCard: React.FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border">
+    <div className="overflow-hidden rounded-none border border-border bg-card">
       <div className="p-3">
         <div className="mb-2 flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -391,38 +383,38 @@ const InsightCard: React.FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
             <h4 className="text-sm font-medium">{insight.title}</h4>
           </div>
           <span
-            className={`rounded-full px-2 py-1 text-xs font-medium ${
-              impactColors[insight.impact]
+            className={`rounded-none px-2 py-1 text-xs font-medium ${
+              impactStyles[insight.impact]
             }`}
           >
             {insight.impact}
           </span>
         </div>
 
-        <p className="text-gray-600 dark:text-gray-400 mb-3 text-sm">
+        <p className="mb-3 text-sm text-muted-foreground">
           {insight.description}
         </p>
 
         <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-500">
+          <span className="text-muted-foreground">
             Confidence: {(insight.confidence * 100).toFixed(0)}%
           </span>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-foreground hover:underline"
           >
             {isExpanded ? 'Less' : 'More'}
           </button>
         </div>
 
         {isExpanded && (
-          <div className="border-gray-200 dark:border-gray-700 mt-3 border-t pt-3">
+          <div className="mt-3 border-t border-border pt-3">
             <div className="space-y-2">
               <div>
-                <h5 className="text-gray-700 dark:text-gray-300 mb-1 text-xs font-medium">
+                <h5 className="mb-1 text-xs font-medium text-foreground">
                   Recommendations:
                 </h5>
-                <ul className="text-gray-600 dark:text-gray-400 space-y-1 text-xs">
+                <ul className="space-y-1 text-xs text-muted-foreground">
                   {insight.recommendations.map((rec, index) => (
                     <li key={index}>• {rec}</li>
                   ))}
@@ -591,5 +583,3 @@ function calculateCorrelation(
 
   return numerator / (denom1 * denom2)
 }
-
-export default AdvancedVisualization
