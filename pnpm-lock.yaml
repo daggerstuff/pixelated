@@ -599,8 +599,8 @@ importers:
         specifier: ^0.8.212
         version: 0.8.212
       framer-motion:
-        specifier: ^13.4.6
-        version: 13.5.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^14.0.0
+        version: 14.0.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       geoip-lite:
         specifier: ^2.0.3
         version: 2.0.3
@@ -10366,8 +10366,8 @@ packages:
   fraction.js@5.3.4:
     resolution: {integrity: sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==}
 
-  framer-motion@13.5.1:
-    resolution: {integrity: sha512-HeWOaeHD3kyTSIEMT6+nw7fBn4saIfxxabZyAITbycAl4xr1kzGJKIvGt/OWghSlvIA9qTnZ1zTGelHAe6S8DA==}
+  framer-motion@14.0.0:
+    resolution: {integrity: sha512-QAtHmybrDFSliyW1sexMtSQTQd+1jw2ajibEmzpuI4XdPVzQkn+dAzJMm2sW3pl9MJuSS4xN51djQ7huhlP/VA==}
     peerDependencies:
       react: ^19.2.4
       react-dom: ^19.2.4
@@ -12369,11 +12369,11 @@ packages:
     resolution: {integrity: sha512-tljKC0ex20AjO58Ob/eZ53JloycbVswbVNCHx6V6VLGzqt/w8dIynVGL0G8qVjNKwiA7sYSogCrN6QtJ82IV+g==}
     engines: {node: '>= 0.8.0'}
 
-  motion-dom@13.5.1:
-    resolution: {integrity: sha512-/7CVCD20Mz1KobktorpdgvowV0V41J7UxqE+qWS3GkSJqrRr5ft+2RloOYtEKv+wvBp3JaSFBclhxt4ja8ovHg==}
+  motion-dom@14.0.0:
+    resolution: {integrity: sha512-aU3ApXo1yTpeUi3JU+jbDk2TELjxPE3MbBMUP7nZHlARb6RweJK+ojmLjpuB0YsY6zhbBl1YWGo8LMsI1/Llqw==}
 
-  motion-utils@13.5.0:
-    resolution: {integrity: sha512-Hqe/sqjIKliPZg8sVjWAkdySDPJNIeKH+euVkDOG8ri3DUUU7ZjndmHsGqEPz2iHpiyVaV5I22iguCMHU2he+Q==}
+  motion-utils@14.0.0:
+    resolution: {integrity: sha512-jBsyjVxTTRZNeuvd/v+btVXr90LQkYl4HhRu9T2ARc+PMnvkmjsjRVeAg4Qm10b6TlTw+kykWI8gu/6LuvpLSQ==}
 
   mpath@0.9.0:
     resolution: {integrity: sha512-ikJRQTk8hw5DEoFVxHG1Gn9T/xcjtdnOKIU1JTmGjZZlg9LST2mBLmcX3/ICIbgJydT2GOc15RnNy5mHmzfSew==}
@@ -25224,10 +25224,10 @@ snapshots:
 
   fraction.js@5.3.4: {}
 
-  framer-motion@13.5.1(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  framer-motion@14.0.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
-      motion-dom: 13.5.1
-      motion-utils: 13.5.0
+      motion-dom: 14.0.0
+      motion-utils: 14.0.0
       tslib: 2.8.1
     optionalDependencies:
       react: 19.3.0
@@ -27822,11 +27822,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  motion-dom@13.5.1:
+  motion-dom@14.0.0:
     dependencies:
-      motion-utils: 13.5.0
+      motion-utils: 14.0.0
 
-  motion-utils@13.5.0: {}
+  motion-utils@14.0.0: {}
 
   mpath@0.9.0: {}
 
