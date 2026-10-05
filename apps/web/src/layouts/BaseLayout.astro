@@ -601,6 +601,16 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     /* Text-only wordmark renders ~17.6px tall; give the link a hit
              area that meets the WCAG 2.2 AA 2.5.8 target-size minimum. */
     min-height: 24px;
+    position: relative;
+  }
+  /* 44px mobile touch-target best practice (PIX-4750): the header row
+     has no room for taller boxes at 320px (PIX-4746), so expand the
+     pointer hit area instead of the visual box. The overlay is
+     pointer-transparent to layout — it only widens the tap region. */
+  .brand::after {
+    content: '';
+    position: absolute;
+    inset: -0.625rem -0.375rem;
   }
   .brand span {
     font-family: var(--np-font-display);
@@ -627,6 +637,10 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     top: -100%;
     left: 16px;
     z-index: 100;
+    /* 44px target when revealed (PIX-4750). */
+    min-height: 44px;
+    display: flex;
+    align-items: center;
     padding: 8px 16px;
     background: var(--np-elevated);
     color: var(--np-text);
