@@ -35,10 +35,10 @@ const trainingPrograms: any[] = []
     <section class="relative px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="text-center">
         <div class="flex items-center justify-center mb-6">
-          <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mr-4">
+          <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-none flex items-center justify-center mr-4">
             <span class="text-2xl">🎭</span>
           </div>
-          <h1 class="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl">
+          <h1 class="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl">
             Pixelated{' '}
             <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
               Empathy
@@ -46,7 +46,7 @@ const trainingPrograms: any[] = []
           </h1>
         </div>
 
-        <p class="max-w-3xl mx-auto text-xl text-gray-600 sm:text-2xl">
+        <p class="max-w-3xl mx-auto text-xl text-muted-foreground sm:text-2xl">
           Revolutionary therapeutic training platform where AI role-plays as
           difficult clients for comprehensive therapist education and supervisor
           evaluation.
@@ -75,7 +75,7 @@ const trainingPrograms: any[] = []
             href="/training/progress"
             variant="outline"
             size="lg"
-            class="border-2 border-purple-600 text-purple-600 hover:bg-purple-50"
+            class="border-2 border-primary text-primary hover:bg-primary/10"
           >
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"></svg>{' '}
             View Progress
@@ -87,26 +87,26 @@ const trainingPrograms: any[] = []
     <!-- Active Sessions Section -->
     {activeTrainingSessions.length > 0 && (
       <section class="px-4 py-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+        <h2 class="text-3xl font-bold text-foreground mb-8 text-center">
           Active Training Sessions
         </h2>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {activeTrainingSessions.map((session: any) => (
-            <Card class="p-6 hover:shadow-lg transition-shadow border-l-4 border-l-neutral-500">
+            <Card class="p-6 border-l-4 border-l-ring">
               <div class="flex items-start justify-between mb-4">
                 <div>
-                  <h3 class="text-lg font-semibold text-gray-900">
+                  <h3 class="text-lg font-semibold text-foreground">
                     {session.clientProfile.name}
                   </h3>
-                  <p class="text-sm text-gray-600">
+                  <p class="text-sm text-muted-foreground">
                     {session.clientProfile.personalityType}
                   </p>
                 </div>
                 <span
-                  class={`px-2 py-1 text-xs font-medium rounded-full ${
+                  class={`px-2 py-1 text-xs font-medium rounded-none ${
                     session.status === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-secondary text-foreground'
+                      : 'bg-secondary text-foreground border border-ring'
                   }`}
                 >
                   {session.status}
@@ -115,17 +115,17 @@ const trainingPrograms: any[] = []
 
               <div class="space-y-2 mb-4">
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600">Duration:</span>
+                  <span class="text-muted-foreground">Duration:</span>
                   <span class="font-medium">{session.duration}</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600">Difficulty:</span>
+                  <span class="text-muted-foreground">Difficulty:</span>
                   <span class="font-medium">
                     Level {session.difficultyLevel}
                   </span>
                 </div>
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-600">Progress:</span>
+                  <span class="text-muted-foreground">Progress:</span>
                   <span class="font-medium">
                     {session.therapeuticProgress}%
                   </span>
@@ -149,46 +149,46 @@ const trainingPrograms: any[] = []
 
     <!-- Training Programs Section -->
     <section class="px-4 py-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">
+      <h2 class="text-3xl font-bold text-foreground mb-8 text-center">
         Training Programs
       </h2>
       <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {trainingPrograms.map((program: any) => (
-          <Card class="p-8 hover:shadow-xl transition-all duration-300 border-2 hover:border-purple-200">
+          <Card class="p-8 transition-all duration-300 border-2 hover:border-ring">
             <div class="text-center mb-6">
-              <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-none flex items-center justify-center mx-auto mb-4">
                 <span class="text-2xl">{program.icon || '🎓'}</span>
               </div>
-              <h3 class="text-xl font-bold text-gray-900 mb-2">
+              <h3 class="text-xl font-bold text-foreground mb-2">
                 {program.name}
               </h3>
-              <p class="text-gray-600">{program.description}</p>
+              <p class="text-muted-foreground">{program.description}</p>
             </div>
 
             <div class="space-y-3 mb-6">
               <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Target Level:</span>
+                <span class="text-muted-foreground">Target Level:</span>
                 <span class="font-medium capitalize">
                   {program.targetLevel}
                 </span>
               </div>
               <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Sessions Required:</span>
+                <span class="text-muted-foreground">Sessions Required:</span>
                 <span class="font-medium">{program.requiredSessions}</span>
               </div>
               <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Completion Rate:</span>
+                <span class="text-muted-foreground">Completion Rate:</span>
                 <span class="font-medium">{program.completionRate}%</span>
               </div>
             </div>
 
             <div class="mb-6">
-              <h4 class="text-sm font-semibold text-gray-900 mb-2">
+              <h4 class="text-sm font-semibold text-foreground mb-2">
                 Key Skills:
               </h4>
               <div class="flex flex-wrap gap-2">
                 {program.keySkills?.slice(0, 3).map((skill: string) => (
-                  <span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                  <span class="px-2 py-1 text-xs bg-secondary text-foreground rounded-none">
                     {skill}
                   </span>
                 ))}
@@ -210,10 +210,10 @@ const trainingPrograms: any[] = []
     <!-- Readiness Enhancements Section -->
     <section class="px-4 py-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="text-center mb-10">
-        <h2 class="text-3xl font-bold text-gray-900">
+        <h2 class="text-3xl font-bold text-foreground">
           Readiness &amp; Governance Enhancements
         </h2>
-        <p class="mt-3 text-lg text-gray-600 max-w-3xl mx-auto">
+        <p class="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
           Extend training into audit evidence, clinical safety stress testing,
           and executive-ready reporting without losing the learning loop.
         </p>
@@ -222,21 +222,21 @@ const trainingPrograms: any[] = []
         {readinessEnhancements.map((enhancement) => (
           <Card class="p-6 border-l-4 border-l-neutral-500 flex flex-col">
             <div class="mb-4">
-              <h3 class="text-lg font-semibold text-gray-900">
+              <h3 class="text-lg font-semibold text-foreground">
                 {enhancement.title}
               </h3>
-              <p class="text-sm text-gray-600">{enhancement.summary}</p>
+              <p class="text-sm text-muted-foreground">{enhancement.summary}</p>
             </div>
-            <div class="text-xs font-semibold text-neutral-600 uppercase tracking-wide mb-2">
+            <div class="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
               Primary audience
             </div>
-            <div class="text-sm font-medium text-gray-900 mb-4">
+            <div class="text-sm font-medium text-foreground mb-4">
               {enhancement.audience}
             </div>
-            <ul class="space-y-2 text-sm text-gray-600 flex-1">
+            <ul class="space-y-2 text-sm text-muted-foreground flex-1">
               {enhancement.outcomes.map((outcome) => (
                 <li class="flex items-start gap-2">
-                  <span class="text-purple-500 mt-1">•</span>
+                  <span class="text-primary mt-1">•</span>
                   <span>{outcome}</span>
                 </li>
               ))}
@@ -255,23 +255,23 @@ const trainingPrograms: any[] = []
     </section>
 
     <!-- Quick Stats Section -->
-    <section class="px-4 py-12 bg-gray-50 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <section class="px-4 py-12 bg-secondary mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="grid gap-8 md:grid-cols-4">
         <div class="text-center">
-          <div class="text-3xl font-bold text-blue-600 mb-2">8,000+</div>
-          <div class="text-gray-600">Training Conversations</div>
+          <div class="text-3xl font-bold text-primary mb-2">8,000+</div>
+          <div class="text-muted-foreground">Training Conversations</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-purple-600 mb-2">6</div>
-          <div class="text-gray-600">Difficult Client Types</div>
+          <div class="text-3xl font-bold text-primary mb-2">6</div>
+          <div class="text-muted-foreground">Difficult Client Types</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-green-600 mb-2">5</div>
-          <div class="text-gray-600">Competency Levels</div>
+          <div class="text-3xl font-bold text-foreground mb-2">5</div>
+          <div class="text-muted-foreground">Competency Levels</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-orange-600 mb-2">98%</div>
-          <div class="text-gray-600">Training Effectiveness</div>
+          <div class="text-3xl font-bold text-foreground mb-2">98%</div>
+          <div class="text-muted-foreground">Training Effectiveness</div>
         </div>
       </div>
     </section>

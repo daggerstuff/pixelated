@@ -17,26 +17,26 @@ import Badge from '@/components/ui/Badge.astro'
   description="Advanced AI-powered psychology pipeline demonstration featuring clinical knowledge parsing, therapeutic scenario generation, and comprehensive mental health analysis tools."
   bgType="plum"
 >
-  <div class="min-h-screen text-white py-8">
+  <div class="min-h-screen text-foreground py-8">
     <div class="container mx-auto px-4">
       <!-- Header -->
       <div class="text-center mb-12">
         <div class="mb-6">
-          <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-cyan-500/20 border border-cyan-400/40 text-cyan-200 rounded-full">
+          <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-secondary border border-border text-muted-foreground rounded-none">
             <span class="relative flex h-3 w-3">
-              <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+              <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
             </span>
             Live Demo Active
           </Badge>
         </div>
         <h1 class="text-4xl lg:text-5xl font-bold mb-6">
           Psychology Pipeline
-          <span class="text-cyan-400 block mt-2">
+          <span class="text-foreground block mt-2">
             AI-Powered Clinical Analysis
           </span>
         </h1>
-        <p class="text-lg text-slate-300 max-w-3xl mx-auto">
+        <p class="text-lg text-foreground max-w-3xl mx-auto">
           Experience cutting-edge artificial intelligence in clinical psychology
           with real-time knowledge parsing, therapeutic scenario generation, and
           comprehensive mental health analysis tools.
@@ -45,83 +45,83 @@ import Badge from '@/components/ui/Badge.astro'
 
       <!-- Features Overview -->
       <div class="grid md:grid-cols-3 gap-8 mb-12">
-        <Card class="border border-blue-600/30 bg-slate-800/50 backdrop-blur">
+        <Card class="border border-border bg-secondary">
           <CardHeader>
             <div class="text-4xl mb-3">🧠</div>
-            <CardTitle class="text-blue-100">Knowledge Parsing</CardTitle>
+            <CardTitle class="text-foreground">Knowledge Parsing</CardTitle>
           </CardHeader>
           <CardContent>
-            <CardDescription class="text-blue-200/80">
+            <CardDescription class="text-muted-foreground">
               Advanced entity extraction and concept analysis for psychological
               and therapeutic content with real-time confidence scoring.
             </CardDescription>
             <div class="mt-4 space-y-2">
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Mental health condition detection</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Therapeutic technique identification</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Risk assessment & analysis</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card class="border border-orange-600/30 bg-slate-800/50 backdrop-blur">
+        <Card class="border border-border bg-secondary">
           <CardHeader>
             <div class="text-4xl mb-3">📋</div>
-            <CardTitle class="text-orange-100">Scenario Generation</CardTitle>
+            <CardTitle class="text-foreground">Scenario Generation</CardTitle>
           </CardHeader>
           <CardContent>
-            <CardDescription class="text-orange-200/80">
+            <CardDescription class="text-muted-foreground">
               Create comprehensive therapeutic scenarios with detailed client
               profiles, clinical formulations, and treatment plans.
             </CardDescription>
             <div class="mt-4 space-y-2">
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Dynamic client profile creation</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Clinical formulation generation</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-orange-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Treatment plan development</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card class="border border-green-600/30 bg-slate-800/50 backdrop-blur">
+        <Card class="border border-border bg-secondary">
           <CardHeader>
             <div class="text-4xl mb-3">
               <ChartBar className="w-10 h-10" />
             </div>
-            <CardTitle class="text-green-100">Analytics & Insights</CardTitle>
+            <CardTitle class="text-foreground">Analytics & Insights</CardTitle>
           </CardHeader>
           <CardContent>
-            <CardDescription class="text-green-200/80">
+            <CardDescription class="text-muted-foreground">
               Comprehensive analysis with detailed metadata, confidence scoring,
               and clinical relevance metrics for informed decision-making.
             </CardDescription>
             <div class="mt-4 space-y-2">
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Real-time confidence scoring</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Performance metrics tracking</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                <span class="w-2 h-2 bg-primary rounded-full"></span>
                 <span>Clinical relevance assessment</span>
               </div>
             </div>
@@ -130,12 +130,12 @@ import Badge from '@/components/ui/Badge.astro'
       </div>
 
       <!-- Pipeline Overview Section -->
-      <Card class="border border-slate-600/30 bg-slate-800/50 backdrop-blur mb-12">
+      <Card class="border border-border bg-secondary mb-12">
         <CardHeader>
-          <CardTitle class="text-slate-100 text-2xl">
+          <CardTitle class="text-foreground text-2xl">
             Pipeline Architecture Overview
           </CardTitle>
-          <CardDescription class="text-slate-300">
+          <CardDescription class="text-foreground">
             Understand the sophisticated workflow that powers our AI-driven
             clinical analysis system.
           </CardDescription>
@@ -146,12 +146,12 @@ import Badge from '@/components/ui/Badge.astro'
       </Card>
 
       <!-- Knowledge Parsing Demo Section -->
-      <Card class="border border-slate-600/30 bg-slate-800/50 backdrop-blur mb-12">
+      <Card class="border border-border bg-secondary mb-12">
         <CardHeader>
-          <CardTitle class="text-slate-100 text-2xl">
+          <CardTitle class="text-foreground text-2xl">
             Clinical Knowledge Parsing Demo
           </CardTitle>
-          <CardDescription class="text-slate-300">
+          <CardDescription class="text-foreground">
             Experience real-time entity extraction and concept analysis for
             psychological and therapeutic content.
           </CardDescription>
@@ -162,12 +162,12 @@ import Badge from '@/components/ui/Badge.astro'
       </Card>
 
       <!-- Scenario Generation Demo Section -->
-      <Card class="border border-slate-600/30 bg-slate-800/50 backdrop-blur mb-12">
+      <Card class="border border-border bg-secondary mb-12">
         <CardHeader>
-          <CardTitle class="text-slate-100 text-2xl">
+          <CardTitle class="text-foreground text-2xl">
             Therapeutic Scenario Generation Demo
           </CardTitle>
-          <CardDescription class="text-slate-300">
+          <CardDescription class="text-foreground">
             Create comprehensive clinical cases with detailed formulations and
             evidence-based treatment plans.
           </CardDescription>
@@ -178,43 +178,43 @@ import Badge from '@/components/ui/Badge.astro'
       </Card>
 
       <!-- Technical Specifications -->
-      <Card class="border border-slate-600/30 bg-slate-800/50 backdrop-blur">
+      <Card class="border border-border bg-secondary">
         <CardHeader>
-          <CardTitle class="text-slate-100 text-xl">
+          <CardTitle class="text-foreground text-xl">
             Technical Specifications
           </CardTitle>
-          <CardDescription class="text-slate-300">
+          <CardDescription class="text-foreground">
             Performance metrics and system capabilities of the psychology
             pipeline.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="text-center p-4 bg-slate-700/50 rounded-lg">
-              <div class="text-2xl font-bold text-blue-400">{'< 500ms'}</div>
-              <div class="text-sm text-slate-400">Average Response Time</div>
+            <div class="text-center p-4 bg-secondary rounded-none">
+              <div class="text-2xl font-bold text-foreground">{'< 500ms'}</div>
+              <div class="text-sm text-foreground">Average Response Time</div>
             </div>
-            <div class="text-center p-4 bg-slate-700/50 rounded-lg">
-              <div class="text-2xl font-bold text-green-400">94.7%</div>
-              <div class="text-sm text-slate-400">
+            <div class="text-center p-4 bg-secondary rounded-none">
+              <div class="text-2xl font-bold text-foreground">94.7%</div>
+              <div class="text-sm text-foreground">
                 Clinical Entity Recognition
               </div>
             </div>
-            <div class="text-center p-4 bg-slate-700/50 rounded-lg">
-              <div class="text-2xl font-bold text-orange-400">50k+</div>
-              <div class="text-sm text-slate-400">Training Case Studies</div>
+            <div class="text-center p-4 bg-secondary rounded-none">
+              <div class="text-2xl font-bold text-foreground">50k+</div>
+              <div class="text-sm text-foreground">Training Case Studies</div>
             </div>
-            <div class="text-center p-4 bg-slate-700/50 rounded-lg">
-              <div class="text-2xl font-bold text-yellow-400">HIPAA</div>
-              <div class="text-sm text-slate-400">Compliant Encryption</div>
+            <div class="text-center p-4 bg-secondary rounded-none">
+              <div class="text-2xl font-bold text-foreground">HIPAA</div>
+              <div class="text-sm text-foreground">Compliant Encryption</div>
             </div>
-            <div class="text-center p-4 bg-slate-700/50 rounded-lg">
-              <div class="text-2xl font-bold text-red-400">10k+</div>
-              <div class="text-sm text-slate-400">Concurrent Analyses</div>
+            <div class="text-center p-4 bg-secondary rounded-none">
+              <div class="text-2xl font-bold text-foreground">10k+</div>
+              <div class="text-sm text-foreground">Concurrent Analyses</div>
             </div>
-            <div class="text-center p-4 bg-slate-700/50 rounded-lg">
-              <div class="text-2xl font-bold text-cyan-400">REST</div>
-              <div class="text-sm text-slate-400">API with Webhooks</div>
+            <div class="text-center p-4 bg-secondary rounded-none">
+              <div class="text-2xl font-bold text-foreground">REST</div>
+              <div class="text-sm text-foreground">API with Webhooks</div>
             </div>
           </div>
         </CardContent>
