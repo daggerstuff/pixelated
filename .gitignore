@@ -479,7 +479,8 @@ ai/PAL_MEDDIES_IMPLEMENTATION_PLAN.md
 .github/plugins
 .github/prompts
 .github/scripts
-.github/hooks
+.github/hooks/*
+!.github/hooks/secrets-scanner/
 AGENT_HANDOFF.md
 
 .nanocodex
