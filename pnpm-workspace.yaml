@@ -394,6 +394,12 @@ overrides:
   zod: ^4.3.2
   solid-js: 1.9.12
   ws: '>=8.21.0'
+  # CVE-2026-104852 (HIGH, fixed in 12.0.1): @graphql-codegen/cli 7.4.x pins
+  # ^11.2.0 via its @graphql-tools v8-10 deps (no newer cli exists; the v8-10
+  # tool lines ended). Force the patched 12.x line, matching the direct dep.
+  '@graphql-tools/utils': ^12.0.3
+  # CVE-2026-93749 (HIGH, fixed in 1.2.2): pulled by @eslint/css-tree.
+  source-map-js: ^1.2.2
 patchedDependencies:
   # Patched for URL-unsafe characters in file paths; versionless so it survives
   # transitive version bumps (e.g. @astrojs/vercel major updates).
