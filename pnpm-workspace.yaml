@@ -235,6 +235,7 @@ peerDependencyRules:
     '@emnapi/core': ^1.10.0
     '@emnapi/runtime': ^1.10.0
 overrides:
+  '@graphql-tools/utils': ^12.0.3
   # Drift consolidation (#6050): pin newest to collapse duplicate resolutions.
   '@opentelemetry/instrumentation-mongodb': 0.72.0
   '@oxc-project/types': 0.151.0
