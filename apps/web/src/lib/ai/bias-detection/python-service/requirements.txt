@@ -100,7 +100,7 @@ cymem==2.0.13
     #   preshed
     #   spacy
     #   thinc
-datasets==5.0.1
+datasets==5.1.0
     # via evaluate
 defusedxml==0.7.1
     # via nltk
