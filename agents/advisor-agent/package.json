@@ -17,7 +17,7 @@
     "@modelcontextprotocol/sdk": "^1.32.0",
     "@vercel/connect": "2.3.6",
     "ai": "7.0.109",
-    "eve": "^0.70.1",
+    "eve": "^0.70.2",
     "workers-ai-provider": "^4.0.0",
     "zod": "4.6.5"
   },
