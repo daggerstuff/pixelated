@@ -560,7 +560,7 @@ weasel==1.0.0
     # via spacy
 websockets==16.0
     # via uvicorn
-werkzeug==3.1.8
+werkzeug==3.1.9
     # via
     #   bias-detection-service (pyproject.toml)
     #   flask
