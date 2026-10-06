@@ -203,7 +203,7 @@ llvmlite==0.47.0
     # via
     #   numba
     #   shap
-mako==1.4.2
+mako==1.4.3
     # via alembic
 markdown-it-py==4.2.0
     # via rich
