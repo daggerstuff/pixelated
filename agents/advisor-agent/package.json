@@ -14,7 +14,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.32.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
     "@vercel/connect": "2.4.0",
     "ai": "7.0.109",
     "eve": "^0.71.2",
