@@ -3,9 +3,6 @@
 
 Sitemap: https://pixelatedempathy.com/sitemap.xml
 
-User-agent: *
-Allow: /
-
 # Content Signals (https://content-signals.com/, draft-romm-aipref-contentsignal)
 # As a condition of accessing this website, you agree to abide by the following content signals:
 # (a)  If a content-signal = yes, you may collect content for the corresponding use.
@@ -20,6 +17,8 @@ Allow: /
 # OF THE EUROPEAN UNION DIRECTIVE 2019/790 ON COPYRIGHT AND RELATED RIGHTS IN THE DIGITAL SINGLE MARKET.
 Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
+User-agent: *
+Allow: /
 # Authenticated app areas (never crawlable)
 Disallow: /admin
 Disallow: /admin-test
@@ -31,7 +30,6 @@ Disallow: /profile/
 Disallow: /settings/
 Disallow: /unauthorized
 Disallow: /offline
-
 # Internal/test/dev-only pages (also gated by middleware to 404)
 Disallow: /test-sentry
 Disallow: /nightmare-fuel-demo
@@ -40,7 +38,6 @@ Disallow: /style-guide
 Disallow: /search-demo
 Disallow: /dev/
 Disallow: /browser-compatibility/
-
 # Error pages
 Disallow: /404
 Disallow: /500
