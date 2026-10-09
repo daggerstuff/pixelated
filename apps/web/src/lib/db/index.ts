@@ -10,6 +10,7 @@ import path from 'node:path'
 import { Pool, PoolClient } from 'pg'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { parseDatabaseUrl } from './parse-database-url'
 import { recordQuery } from './query-counting'
 const logger = createBuildSafeLogger('index')
 
@@ -30,12 +31,6 @@ interface PoolWithConnectEvent {
   on(event: 'connect', listener: (client: PoolClient) => void): this
 }
 
-interface PoolStats {
-  totalCount: number
-  idleCount: number
-  waitingCount: number
-}
-
 // Database configuration
 export interface DatabaseConfig {
   host: string
@@ -49,19 +44,51 @@ export interface DatabaseConfig {
   ssl?: boolean | object
 }
 
-// Default configuration
-const DEFAULT_CONFIG: DatabaseConfig = {
-  host: process.env['DB_HOST'] ?? 'localhost',
-  port: parseInt(process.env['DB_PORT'] ?? '5432'),
-  database: process.env['DB_NAME'] ?? 'pixelated',
-  user: process.env['DB_USER'] ?? 'postgres',
-  password: process.env['DB_PASSWORD'] ?? '',
-  max: parseInt(process.env['DB_MAX_CONNECTIONS'] ?? '20'),
-  idleTimeoutMillis: parseInt(process.env['DB_IDLE_TIMEOUT'] ?? '30000'),
-  connectionTimeoutMillis: parseInt(
-    process.env['DB_CONNECTION_TIMEOUT'] ?? '15000',
-  ),
-  ssl: process.env['NODE_ENV'] === 'production',
+/**
+ * Resolve the database configuration from the environment.
+ *
+ * Precedence (lowest to highest):
+ *   1. Local development defaults
+ *   2. DATABASE_URL (parsed)
+ *   3. Explicit DB_* environment variables
+ *
+ * The production completeness check is performed in initializeDatabase()
+ * after caller-supplied config has been merged.
+ */
+function resolveDefaultConfig(): DatabaseConfig {
+  const env = process.env
+  const databaseUrl = env['DATABASE_URL']
+
+  const fromUrl: Partial<DatabaseConfig> = databaseUrl
+    ? parseDatabaseUrl(databaseUrl)
+    : {}
+
+  const fromEnv: Partial<DatabaseConfig> = {}
+  if (env['DB_HOST']) fromEnv.host = env['DB_HOST']
+  if (env['DB_PORT']) fromEnv.port = parseInt(env['DB_PORT'], 10)
+  if (env['DB_NAME']) fromEnv.database = env['DB_NAME']
+  if (env['DB_USER']) fromEnv.user = env['DB_USER']
+  if (env['DB_PASSWORD'] !== undefined) fromEnv.password = env['DB_PASSWORD']
+  if (env['DB_CONNECTION_TIMEOUT']) {
+    fromEnv.connectionTimeoutMillis = parseInt(env['DB_CONNECTION_TIMEOUT'], 10)
+  }
+
+  return {
+    host: 'localhost',
+    port: 5432,
+    database: 'pixelated',
+    user: 'postgres',
+    password: '',
+    max: parseInt(env['DB_MAX_CONNECTIONS'] ?? '20', 10),
+    idleTimeoutMillis: parseInt(env['DB_IDLE_TIMEOUT'] ?? '30000', 10),
+    connectionTimeoutMillis: 15000,
+    // Verify server certificates in production by default. Opt out only via
+    // an explicit sslmode=no-verify in DATABASE_URL or caller-supplied config.
+    ssl:
+      env['NODE_ENV'] === 'production' ? { rejectUnauthorized: true } : false,
+    ...fromUrl,
+    ...fromEnv,
+  }
 }
 
 // Connection pool
@@ -75,7 +102,20 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
     return pool
   }
 
-  const finalConfig = { ...DEFAULT_CONFIG, ...config }
+  // In production, refuse to silently fall back to localhost defaults when no
+  // host was configured via DATABASE_URL, DB_HOST, or the caller's config.
+  if (
+    process.env['NODE_ENV'] === 'production' &&
+    !process.env['DATABASE_URL'] &&
+    !process.env['DB_HOST'] &&
+    !config.host
+  ) {
+    throw new Error(
+      'Database is not configured: set DATABASE_URL (or DB_HOST and related DB_* variables) in production.',
+    )
+  }
+
+  const finalConfig = { ...resolveDefaultConfig(), ...config }
   pool = new Pool(finalConfig)
 
   // Handle pool errors
@@ -93,7 +133,7 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   )
 
   logger.info(
-    `Database pool initialized with ${finalConfig.max} max connections`,
+    `Database pool initialized for ${finalConfig.host}:${finalConfig.port}/${finalConfig.database} with ${finalConfig.max} max connections`,
   )
   return pool
 }
@@ -152,46 +192,6 @@ export async function transaction<T>(
 
 /**
  * Health check for database connection
- */
-export async function healthCheck(): Promise<{
-  status: 'healthy' | 'unhealthy'
-  latency: number
-  connections: {
-    total: number
-    idle: number
-    waiting: number
-  }
-}> {
-  const startTime = Date.now()
-  try {
-    await query('SELECT 1')
-    const latency = Date.now() - startTime
-
-    const poolState = getPool()
-    return {
-      status: 'healthy',
-      latency,
-      connections: {
-        total: (poolState as unknown as PoolStats).totalCount,
-        idle: (poolState as unknown as PoolStats).idleCount,
-        waiting: (poolState as unknown as PoolStats).waitingCount,
-      },
-    }
-  } catch {
-    return {
-      status: 'unhealthy',
-      latency: Date.now() - startTime,
-      connections: {
-        total: 0,
-        idle: 0,
-        waiting: 0,
-      },
-    }
-  }
-}
-
-/**
- * Close database connection pool
  */
 export async function closeDatabase(): Promise<void> {
   if (pool) {
@@ -473,7 +473,7 @@ export const migrations = new DatabaseMigration()
 /**
  * User management utilities
  */
-export class UserManager {
+class UserManager {
   /**
    * Create a new user
    */
@@ -590,7 +590,7 @@ export class UserManager {
 /**
  * Session management utilities
  */
-export class SessionManager {
+class SessionManager {
   /**
    * Create a new therapy session
    */
@@ -676,7 +676,7 @@ export class SessionManager {
 /**
  * Bias analysis management utilities
  */
-export class BiasAnalysisManager {
+class BiasAnalysisManager {
   /**
    * Save bias analysis result
    */
