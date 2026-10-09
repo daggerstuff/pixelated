@@ -1,6 +1,9 @@
 import type { APIRoute } from 'astro'
 
 import { initializeDatabase, query } from '@/lib/db'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('bias-detection-summary-api')
 
 export const GET: APIRoute = async () => {
   try {
@@ -99,6 +102,7 @@ export const GET: APIRoute = async () => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
+    logger.error('Failed to fetch bias detection dashboard summary', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to fetch dashboard data',
