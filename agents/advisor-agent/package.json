@@ -14,10 +14,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.32.0",
-    "@vercel/connect": "2.3.6",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@vercel/connect": "2.4.0",
     "ai": "7.0.109",
-    "eve": "^0.70.2",
+    "eve": "^0.71.2",
     "workers-ai-provider": "^4.0.0",
     "zod": "4.6.5"
   },
