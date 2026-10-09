@@ -1,4 +1,7 @@
-import { isSyntheticSentryTestEvent } from './sentry-event-filter.mjs'
+import {
+  isSyntheticSentryTestEvent,
+  isLocalDevelopmentRun,
+} from './sentry-event-filter.mjs'
 
 // instrument.mjs — Comprehensive Sentry Node.js instrumentation for production builds
 try {
@@ -247,7 +250,20 @@ Sentry.init({
 
   // Before send hook for filtering sensitive data and dropping local dev errors
   beforeSend: (/** @type {SentryEvent | null} */ event) => {
+    // Drop synthetic test events fired from SDK smoke tests.
     if (isSyntheticSentryTestEvent(event)) {
+      return null
+    }
+
+    // Drop events from a local development machine. Production runs inside
+    // Docker/Kubernetes, so this never fires in a real deploy — but a local
+    // `pnpm build && node start-server.mjs` run uses NODE_ENV=production,
+    // which previously bypassed the localhost-URL filter below and leaked
+    // dev-machine crashes (EADDRINUSE, stale-build import failures, SSR
+    // errors) into the production project. Boot-time crashes have no
+    // request URL, so the container-signal check is the only reliable gate.
+    // Opt out with SENTRY_ALLOW_LOCAL_EVENTS=1 to verify local telemetry.
+    if (isLocalDevelopmentRun()) {
       return null
     }
 

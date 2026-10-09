@@ -93,7 +93,21 @@ function resolveSentryDsn() {
 }
 
 /** @type {unknown} */
-const ssrModuleCandidate = await import(await resolveSsrEntryModuleUrl());
+let ssrModuleCandidate;
+try {
+  ssrModuleCandidate = await import(await resolveSsrEntryModuleUrl());
+} catch (error) {
+  const detail = toError(error);
+  console.error(
+    `❌ Failed to load the SSR entry module: ${detail.message}`,
+  );
+  // A non-zero exit here is expected to surface via Docker/Kubernetes
+  // healthchecks (which restart the container). We intentionally do NOT call
+  // Sentry.captureException here: the failure mode is "the build artifact
+  // could not be loaded", which the console message already captures, and
+  // container restarts provide the recovery signal.
+  process.exit(1);
+}
 if (!isSSRModule(ssrModuleCandidate)) {
   throw new Error("Failed to import SSR module with expected handler export.");
 }
