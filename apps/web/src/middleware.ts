@@ -7,6 +7,7 @@ import {
   extractTokenFromRequest,
   type AuthOptions,
 } from './lib/auth/auth0-middleware'
+import { agentDiscoveryMiddleware } from './lib/middleware/agent-discovery'
 import { apiVersioningMiddleware } from './lib/middleware/api-versioning'
 import { corsMiddleware } from './lib/middleware/cors'
 import { generateCspNonce } from './lib/middleware/csp'
@@ -291,4 +292,5 @@ export const onRequest = sequence(
   projectAuthMiddleware,
   rateLimitMiddleware,
   apiVersioningMiddleware,
+  agentDiscoveryMiddleware,
 )
