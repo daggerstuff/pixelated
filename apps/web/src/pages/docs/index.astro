@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import { getContentSlug } from '@/utils/blog'
 
 // Define types for use in the template
 type DocPage = {
@@ -87,9 +88,9 @@ const bgType = 'dot'
             {docsByCategory[category].map((doc: DocPage) => (
               <li class="flex justify-between items-baseline mb-2 leading-relaxed">
                 <a
-                  href={`/docs/${doc.slug}`}
+                  href={`/docs/${getContentSlug(doc)}`}
                   class="flex-1 text-primary hover:underline text-lg"
-                  transition:name={`doc-title-${doc.slug}`}
+                  transition:name={`doc-title-${getContentSlug(doc)}`}
                 >
                   {doc.data.title}
                 </a>

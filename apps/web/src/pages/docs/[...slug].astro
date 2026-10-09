@@ -1,6 +1,7 @@
 ---
 import BlogPostLayout from '@/layouts/BlogPostLayout.astro'
 import { getCollection, render } from 'astro:content'
+import { getContentSlug } from '@/utils/blog'
 
 // export const prerender = true;
 
@@ -23,7 +24,7 @@ interface Props {
 const { slug } = Astro.params
 const docs = await getCollection('docs')
 const entry = docs.find(
-  (doc) => !doc.data.draft && (doc.data.slug || doc.slug) === slug,
+  (doc) => !doc.data.draft && getContentSlug(doc) === slug,
 )
 
 if (!entry) {

@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content'
+import { getContentSlug } from '@/utils/blog'
 import type { ShareConfig } from '@/types'
 import BaseLayout from './BaseLayout.astro'
 import ShareLink from '@/components/widgets/ShareLink.astro'
@@ -43,8 +44,8 @@ const shareConfig: ShareConfig = {
 }
 
 // Build URL for sharing (works with prerendered pages)
-const shareUrl = `https://pixelated.empathy.dev/${basePath}/${entry.data.slug || entry.slug}`
-const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
+const shareUrl = `https://pixelated.empathy.dev/${basePath}/${getContentSlug(entry)}`
+const pathname = `/${basePath}/${getContentSlug(entry)}`
 ---
 
 <BaseLayout
@@ -75,7 +76,7 @@ const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
 
         <h1
           class="display-heading mb-6"
-          transition:name={`post-title-${entry.data.slug}`}
+          transition:name={`post-title-${getContentSlug(entry)}`}
         >
           {postTitle}
         </h1>
@@ -106,7 +107,7 @@ const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
           src={image.url}
           alt={image.alt || postTitle}
           class="w-full rounded-lg shadow-md mb-8"
-          transition:name={`image-${entry.data.slug}`}
+          transition:name={`image-${getContentSlug(entry)}`}
         />
       )}
     </header>

@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content'
+import { getContentSlug } from '@/utils/blog'
 
 interface Props {
   post: CollectionEntry<'blog'>
@@ -53,7 +54,11 @@ const formattedDate = formatDate(post.data.pubDate)
           class="text-xl font-bold mb-2 transition-colors group-hover:text-foreground"
           itemprop="headline"
         >
-          <a href={`/blog/${post.slug}`} class="block" itemprop="url">
+          <a
+            href={`/blog/${getContentSlug(post)}`}
+            class="block"
+            itemprop="url"
+          >
             {post.data.title}
           </a>
         </h3>
@@ -84,7 +89,7 @@ const formattedDate = formatDate(post.data.pubDate)
         )}
 
         <a
-          href={`/blog/${post.slug}`}
+          href={`/blog/${getContentSlug(post)}`}
           class="inline-flex items-center text-sm text-muted-foreground transition-colors hover:text-foreground group-hover:text-foreground"
           aria-label={`Read more about ${post.data.title}`}
         >
@@ -104,7 +109,7 @@ const formattedDate = formatDate(post.data.pubDate)
 {!hasValidData && (
   <article class="rounded-none border border-ring bg-secondary p-4">
     <p class="text-sm font-medium text-foreground">
-      Error: Invalid post data for "{post.slug}"
+      Error: Invalid post data for "{post.id ?? 'unknown'}"
     </p>
   </article>
 )}

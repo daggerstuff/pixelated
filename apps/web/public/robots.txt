@@ -1,0 +1,32 @@
+# Pixelated Empathy — https://www.rfc-editor.org/rfc/rfc9309
+# AI-specific crawler rules are managed via Cloudflare AI Crawl Control.
+
+Sitemap: https://pixelatedempathy.com/sitemap.xml
+
+User-agent: *
+Allow: /
+
+# Authenticated app areas (never crawlable)
+Disallow: /admin
+Disallow: /admin-test
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /journal-research
+Disallow: /portal
+Disallow: /profile/
+Disallow: /settings/
+Disallow: /unauthorized
+Disallow: /offline
+
+# Internal/test/dev-only pages (also gated by middleware to 404)
+Disallow: /test-sentry
+Disallow: /nightmare-fuel-demo
+Disallow: /therapy-chat-plan
+Disallow: /style-guide
+Disallow: /search-demo
+Disallow: /dev/
+Disallow: /browser-compatibility/
+
+# Error pages
+Disallow: /404
+Disallow: /500

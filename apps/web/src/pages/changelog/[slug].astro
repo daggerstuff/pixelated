@@ -6,6 +6,7 @@ import { FEATURES } from '@/config'
 import type { PostSchema } from '@/lib/schema'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { formatDate } from '@/utils/datetime'
+import { getContentSlug } from '@/utils/blog'
 import { getCollection, render } from 'astro:content'
 
 // export const prerender = true;
@@ -22,7 +23,7 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params
 const posts = await getCollection('changelog')
-const post = posts.find((p: any) => p.slug === slug)
+const post = posts.find((p: any) => getContentSlug(p) === slug)
 
 if (!post) {
   return Astro.redirect('/404')
@@ -32,7 +33,7 @@ const { Content, headings } = await render(post)
 const { share, toc } = FEATURES
 
 // Build URL for sharing (works with prerendered pages)
-const shareUrl = `https://pixelated.empathy.dev/changelog/${post.slug}`
+const shareUrl = `https://pixelated.empathy.dev/changelog/${getContentSlug(post)}`
 
 // Format dates
 const pubDate =
