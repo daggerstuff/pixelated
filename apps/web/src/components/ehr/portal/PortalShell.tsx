@@ -9,9 +9,37 @@ import React from 'react'
 
 import { authClient } from '@/lib/auth-client'
 
+import { HomeworkWidget } from './HomeworkWidget'
+import { MessagingWidget } from './MessagingWidget'
+import { PortalDashboard } from './PortalDashboard'
+import { SchedulingWidget } from './SchedulingWidget'
+import { StatementWidget } from './StatementWidget'
+import { TelehealthWidget } from './TelehealthWidget'
+
 export interface PortalShellProps {
-  children: React.ReactNode
+  children?: React.ReactNode
   activeFeature?: string
+}
+
+function renderPortalFeatureContent(activeFeature?: string): React.ReactNode {
+  switch (activeFeature) {
+    case undefined:
+      return null
+    case 'dashboard':
+      return <PortalDashboard />
+    case 'scheduling':
+      return <SchedulingWidget />
+    case 'messaging':
+      return <MessagingWidget />
+    case 'homework':
+      return <HomeworkWidget />
+    case 'telehealth':
+      return <TelehealthWidget />
+    case 'statements':
+      return <StatementWidget />
+    default:
+      return null
+  }
 }
 
 interface NavItem {
@@ -60,6 +88,7 @@ export function PortalShell({ children, activeFeature }: PortalShellProps) {
 
   const userName = session?.user?.fullName ?? session?.user?.email ?? 'Patient'
   const userInitial = userName.charAt(0).toUpperCase()
+  const pageContent = children ?? renderPortalFeatureContent(activeFeature)
 
   return (
     <div
@@ -186,7 +215,7 @@ export function PortalShell({ children, activeFeature }: PortalShellProps) {
 
         {/* Page content */}
         <main className="flex-1 px-4 py-6 sm:px-6">
-          <div className="mx-auto w-full max-w-5xl">{children}</div>
+          <div className="mx-auto w-full max-w-5xl">{pageContent}</div>
         </main>
       </div>
     </div>

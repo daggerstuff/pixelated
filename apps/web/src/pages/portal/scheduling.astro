@@ -1,6 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro'
-import { PortalShell, SchedulingWidget } from '@/components/ehr/portal'
+import { PortalShell } from '@/components/ehr/portal'
 
 export const prerender = false
 ---
@@ -9,7 +9,5 @@ export const prerender = false
   title="Scheduling — Client Portal"
   description="Schedule and manage appointments"
 >
-  <PortalShell activeFeature="scheduling" client:load>
-    <SchedulingWidget client:load />
-  </PortalShell>
+  <PortalShell activeFeature="scheduling" client:load />
 </Layout>
