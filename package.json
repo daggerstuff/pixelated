@@ -335,7 +335,7 @@
     "eve": "^0.71.2",
     "express": "^5.2.1",
     "express-openid-connect": "^3.4.0",
-    "express-rate-limit": "^8.7.0",
+    "express-rate-limit": "^8.7.1",
     "express-session": "^1.19.0",
     "flexsearch": "^0.8.212",
     "framer-motion": "^14.0.0",
