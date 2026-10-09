@@ -400,6 +400,10 @@ overrides:
   '@graphql-tools/utils': ^12.0.3
   # CVE-2026-93749 (HIGH, fixed in 1.2.2): pulled by @eslint/css-tree.
   source-map-js: ^1.2.2
+  # CVE-2026-104850 (HIGH, fixed in 2.2.0): agents 0.26.x pins @modelcontextprotocol/client
+  # as an exact 2.0.0 peer (no released agents version allows 2.2.0), so force the
+  # patched 2.x line. Drop when agents ships an updated peer range.
+  '@modelcontextprotocol/client': ^2.2.0
 patchedDependencies:
   # Patched for URL-unsafe characters in file paths; versionless so it survives
   # transitive version bumps (e.g. @astrojs/vercel major updates).
