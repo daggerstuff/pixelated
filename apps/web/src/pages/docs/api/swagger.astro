@@ -34,8 +34,8 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     <p>
       To make API calls from this page, you'll need a valid API key. You can
       obtain one from the
-      <a href="/admin/api-keys">developer dashboard</a>. Add your API key
-      to the "Authorize" dialog to authenticate your requests.
+      <a href="/admin/api-keys">developer dashboard</a>. Add your API key to the
+      "Authorize" dialog to authenticate your requests.
     </p>
   </div>
 
@@ -86,7 +86,7 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     script.onload = function () {
       // Initialize Swagger UI
       const ui = window.SwaggerUIBundle({
-        url: '/docs/api/_openapi.yaml',
+        url: '/openapi.yaml',
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [

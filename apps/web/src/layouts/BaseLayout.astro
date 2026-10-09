@@ -567,6 +567,10 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
 
       document.addEventListener('astro:page-load', initSearch)
     </script>
+    <script>
+      // Register WebMCP tools (no-op where the browser API is absent)
+      import '../scripts/webmcp'
+    </script>
     {isVercelDeploy && <SpeedInsights />}
   </body>
 </html>
