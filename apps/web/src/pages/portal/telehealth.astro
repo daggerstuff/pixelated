@@ -1,15 +1,13 @@
 ---
 import Layout from '@/layouts/Layout.astro'
-import { PortalShell, TelehealthWidget } from '@/components/ehr/portal'
+import { PortalShell } from '@/components/ehr/portal'
 
 export const prerender = false
 ---
 
 <Layout
   title="Telehealth — Client Portal"
-  description="Join telehealth appointments"
+  description="Join telehealth sessions"
 >
-  <PortalShell activeFeature="telehealth" client:load>
-    <TelehealthWidget client:load />
-  </PortalShell>
+  <PortalShell activeFeature="telehealth" client:load />
 </Layout>

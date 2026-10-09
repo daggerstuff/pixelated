@@ -6,6 +6,7 @@
  */
 
 export { PortalShell } from './PortalShell'
+export { PortalDashboard } from './PortalDashboard'
 export { SchedulingWidget } from './SchedulingWidget'
 export { MessagingWidget } from './MessagingWidget'
 export { HomeworkWidget } from './HomeworkWidget'
