@@ -53,7 +53,8 @@ export interface ISearchClient {
 
 // Define post structure for content collections
 export interface BlogPost {
-  slug: string
+  id: string
+  slug?: string
   data: {
     title: string
     tags?: string[]
@@ -63,7 +64,8 @@ export interface BlogPost {
 
 // Define blogSearch interface for content collections
 export interface PostInput {
-  slug: string
+  id: string
+  slug?: string
   data: {
     title: string
     tags?: string[]
@@ -105,10 +107,10 @@ export const blogSearch: BlogSearchInterface = {
 
     // Create a search document
     const doc: SearchDocument = {
-      id: post.slug,
+      id: post.slug || post.id,
       title: post.data.title,
       content: summary,
-      url: `/blog/${post.slug}`,
+      url: `/blog/${post.slug || post.id}`,
       tags: post.data.tags ?? [],
     }
 

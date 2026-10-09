@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getCollection } from 'astro:content'
+import { getContentSlug } from '@/utils/blog'
 
 // export const prerender = true
 
@@ -162,7 +163,7 @@ const description =
 
             <div class="flex-1">
               <h3 class="text-xl font-bold mb-2 group-hover:text-foreground transition-colors">
-                <a href={`/blog/${post.slug}`} class="block">
+                <a href={`/blog/${getContentSlug(post)}`} class="block">
                   {post.data.title}
                 </a>
               </h3>
@@ -185,7 +186,7 @@ const description =
               )}
 
               <a
-                href={`/blog/${post.slug}`}
+                href={`/blog/${getContentSlug(post)}`}
                 class="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors group-hover:text-foreground"
               >
                 Read article

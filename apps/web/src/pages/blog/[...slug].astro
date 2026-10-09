@@ -8,6 +8,7 @@ import CardContent from '@/components/ui/CardContent.astro'
 import CardDescription from '@/components/ui/CardDescription.astro'
 import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
+import { getContentSlug } from '@/utils/blog'
 
 // export const prerender = true;
 
@@ -27,7 +28,7 @@ const { slug } = Astro.params
 const posts = await getCollection('blog')
 const entry = posts.find(
   (post: CollectionEntry<'blog'>) =>
-    !post.data.draft && (post.data.slug || post.slug) === slug,
+    !post.data.draft && getContentSlug(post) === slug,
 )
 
 if (!entry) {
@@ -214,7 +215,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
                     <CardTitle class="text-base font-bold text-foreground tracking-wide mb-3">
                       <a
-                        href={`/blog/${post.data.slug || post.slug}`}
+                        href={`/blog/${getContentSlug(post)}`}
                         class="hover:underline"
                       >
                         {post.data.title}

@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content'
+import { getContentSlug } from '@/utils/blog'
 
 export interface Props {
   post: CollectionEntry<'blog'>
@@ -34,7 +35,7 @@ function getReadingTime(content: string) {
       </div>
       <div class="flex-1">
         <h3 class="text-xl font-bold mb-2 transition-colors group-hover:text-foreground">
-          <a href={`/blog/${post.slug}`} class="block">
+          <a href={`/blog/${getContentSlug(post)}`} class="block">
             {post.data.title}
           </a>
         </h3>
@@ -54,7 +55,7 @@ function getReadingTime(content: string) {
           </div>
         )}
         <a
-          href={`/blog/${post.slug}`}
+          href={`/blog/${getContentSlug(post)}`}
           class="inline-flex items-center text-sm text-muted-foreground transition-colors hover:text-foreground group-hover:text-foreground"
         >
           Read article
@@ -69,7 +70,7 @@ function getReadingTime(content: string) {
   // Default card variant
   <li class="transition-all duration-300">
     <a
-      href={`/blog/${post.slug}`}
+      href={`/blog/${getContentSlug(post)}`}
       class="group block overflow-hidden rounded-none border border-border bg-card transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-ring hover:border-ring"
     >
       {post.data.image?.url && (

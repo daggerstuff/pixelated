@@ -2,6 +2,7 @@ import rss from '@astrojs/rss'
 import { getCollection } from 'astro:content'
 
 import { SITE } from '../config'
+import { getContentSlug } from '../utils/blog'
 import { getUrl } from '../utils/common'
 
 export async function GET() {
@@ -27,7 +28,7 @@ export async function GET() {
 
     items: sortedBlogItems.map((item) => ({
       title: `${item.data.title}`,
-      link: getUrl(`/blog/${item.slug}`),
+      link: getUrl(`/blog/${getContentSlug(item)}`),
       pubDate: item.data.updatedDate ?? item.data.pubDate,
       description: item.data.description,
     })),

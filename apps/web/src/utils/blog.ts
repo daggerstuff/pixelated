@@ -155,3 +155,20 @@ export function slugify(text: string): string {
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
+
+/**
+ * Resolves the URL slug for a content collection entry.
+ *
+ * In Astro's content layer (Astro 5.15+/7), `entry.slug` is deprecated and
+ * no longer populated; the slug value lives on `entry.id` instead. A
+ * frontmatter `slug` field, if present, still overrides.
+ * @param entry - Any content collection entry (blog, docs, changelog, …)
+ * @returns URL slug matching the detail routes
+ */
+export function getContentSlug(entry: {
+  id: string
+  slug?: string | undefined
+  data: { slug?: string | undefined }
+}): string {
+  return entry.data.slug || entry.slug || entry.id
+}

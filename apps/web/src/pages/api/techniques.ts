@@ -56,13 +56,8 @@ export const GET = async ({ request }: { request: Request }) => {
 
     // Transform for API response
     const responseData = filteredTechniques.map(
-      (technique: {
-        id: string
-        slug: string
-        data: Record<string, unknown>
-      }) => ({
+      (technique: { id: string; data: Record<string, unknown> }) => ({
         id: technique.id,
-        slug: technique.slug,
         title: technique.data['title'],
         description: technique.data['description'],
         category: technique.data['category'],

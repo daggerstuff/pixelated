@@ -158,6 +158,13 @@ function resolveStaticFile(urlPath) {
     return withHtml;
   }
 
+  // Try directory index (Astro's build.format: "directory" emits
+  // /about/index.html for prerendered /about)
+  const dirIndex = path.join(filePath, "index.html");
+  if (existsSync(dirIndex) && filePath.startsWith(clientDistRoot)) {
+    return dirIndex;
+  }
+
   return null;
 }
 
