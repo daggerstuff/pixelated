@@ -90,12 +90,12 @@
 /* Typography Hierarchy */
 .np-display-hero {
   font-family: var(--np-font-display);
-  font-size: clamp(2.35rem, 4.2vw, 3.75rem);
+  font-size: clamp(1.5rem, 2.1vw, 2.1rem);
   font-weight: 400;
   line-height: 1.2;
   letter-spacing: 0;
   color: var(--np-text);
-  margin: 0 0 1.25rem 0;
+  margin: 0 0 1rem 0;
   text-wrap: balance;
 }
 
@@ -140,6 +140,7 @@
   flex-wrap: wrap;
   gap: 1rem;
   align-items: center;
+  justify-content: center;
   margin-bottom: 2rem;
 }
 
@@ -287,7 +288,6 @@
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  max-height: 42rem;
 }
 
 .np-apparatus-top {
@@ -302,7 +302,6 @@
 .np-apparatus-tabs {
   display: flex;
   max-width: 100%;
-  overflow-x: auto;
   border-right: 1px solid var(--np-line-strong);
 }
 
@@ -357,7 +356,16 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   min-height: 0;
-  overflow-y: auto;
+}
+
+@media (min-width: 900px) {
+  .np-apparatus-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
+  .np-apparatus-pane--left {
+    border-bottom: none;
+    border-right: 1px solid var(--np-line-strong);
+  }
 }
 
 .np-apparatus-pane {
