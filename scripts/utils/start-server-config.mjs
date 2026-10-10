@@ -55,7 +55,22 @@ async function findHandlerEntryPath(serverDir) {
       continue;
     }
     const moduleUrl = pathToFileURL(resolved).href;
-    const exports = await import(moduleUrl);
+    // Probe each candidate in isolation. dist/server contains both the Astro
+    // entry and large internal bundles; importing one can throw at module
+    // scope (or reject during top-level evaluation). A single broken/stale
+    // file must never take the whole server down, so swallow per-file
+    // failures and keep probing the remaining candidates.
+    let exports;
+    try {
+      exports = await import(moduleUrl);
+    } catch (error) {
+      console.warn(
+        `⚠️ [start-server] Skipping handler candidate ${file}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      continue;
+    }
     if (typeof exports.handler === "function") {
       return resolved;
     }

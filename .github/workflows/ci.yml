@@ -8,6 +8,7 @@ on:
     branches: [staging]
     paths:
       - 'apps/web/src/**'
+      - 'apps/web/public/**'
       - 'ai/**'
       - 'infra/docker/**'
       - 'infra/k8s/**'
