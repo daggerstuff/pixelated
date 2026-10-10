@@ -7,9 +7,6 @@ resolution-markers = [
     "platform_machine != 'x86_64' and sys_platform == 'darwin'",
 ]
 
-[options]
-prerelease-mode = "allow"
-
 [manifest]
 members = [
     "gdrive-dataset-manager",
