@@ -33,6 +33,8 @@ const baseNodeTestGlobs = [
   'apps/web/src/lib/ai/__tests__/getAIService.test.ts',
   'apps/web/src/lib/ai/__tests__/providers.test.ts',
   'apps/web/src/lib/ai/services/__tests__/FineTuningAIService.test.ts',
+  // MongoDB-backed AI repository tests need the node project (no window).
+  'apps/web/src/lib/db/ai/__tests__/**/*.test.ts',
   'apps/web/src/lib/graphql/__tests__/graphql.test.ts',
   'apps/web/src/lib/graphql/__tests__/client.test.ts',
   'apps/web/src/lib/utils/image-optimizer.test.ts',
