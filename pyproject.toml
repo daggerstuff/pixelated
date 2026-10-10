@@ -137,6 +137,7 @@ dependencies = [
   "beautifulsoup4>=4.15.0",
   "sqlalchemy[asyncio]>=2.0.51,<2.2", # async extra installs greenlet (pe's async engine requires it; bare sqlalchemy pulls it only as an optional platform dep)
   "celery>=5.6.3",
+  "fireworks-ai>=1.2.22",
 ]
 [project.optional-dependencies]
 test = [

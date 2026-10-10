@@ -7,6 +7,9 @@ resolution-markers = [
     "platform_machine != 'x86_64' and sys_platform == 'darwin'",
 ]
 
+[options]
+prerelease-mode = "allow"
+
 [manifest]
 members = [
     "gdrive-dataset-manager",
@@ -1803,6 +1806,25 @@ wheels = [
 ]
 
 [[package]]
+name = "fireworks-ai"
+version = "1.2.22"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "anyio" },
+    { name = "distro" },
+    { name = "httpx" },
+    { name = "httpx-aiohttp" },
+    { name = "pydantic" },
+    { name = "sniffio" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/55/e8/11c4e6983597ebb4c45fa5929ebd563e171dbaf1206b241a24e2d51c894f/fireworks_ai-1.2.22.tar.gz", hash = "sha256:3c361d47826576aa43368b1ab46bc14ec02c46d8f8425f2a200c98636e8a0590", size = 633043, upload-time = "2026-10-10T03:47:12.474Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5f/37/288914a8f32bb4714c1542124e125604a83e8a384046297acc53cbd79b61/fireworks_ai-1.2.22-py3-none-any.whl", hash = "sha256:4bb4f756599dee1670e668bf27d02a04e06ff1bf8c169d3bf58bf677c91b9320", size = 576802, upload-time = "2026-10-10T03:47:10.862Z" },
+]
+
+[[package]]
 name = "flake8"
 version = "7.4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2457,6 +2479,19 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b1/df/48c586a5fe32a0f01324ee087459e112ebb7224f646c0b5023f5e79e9956/httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc", size = 141406, upload-time = "2024-12-06T15:37:23.222Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad", size = 73517, upload-time = "2024-12-06T15:37:21.509Z" },
+]
+
+[[package]]
+name = "httpx-aiohttp"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "httpx" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4c/87/3b2df9732a497403e5f4bbf2ec9f25427d53cec797e83070c503649863ef/httpx_aiohttp-0.2.0.tar.gz", hash = "sha256:d4796b981f04734f1d1db9b4d9326ea16bc994f126460b93b69036262cd4a9d8", size = 195714, upload-time = "2026-07-25T07:34:12.17Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e8/e2/74b6bad3a6d342aee12d8b8d825456c02d21d72319c924326d17444c5ff7/httpx_aiohttp-0.2.0-py3-none-any.whl", hash = "sha256:ccd6eb19ba18805476096e8ef0b369a6beda3955db145a538979eface2fce7ff", size = 9732, upload-time = "2026-07-25T07:34:10.939Z" },
 ]
 
 [[package]]
@@ -4959,6 +4994,7 @@ dependencies = [
     { name = "faster-whisper" },
     { name = "fastmcp" },
     { name = "ffmpeg" },
+    { name = "fireworks-ai" },
     { name = "flask", extra = ["async"] },
     { name = "flask-cors" },
     { name = "flask-socketio" },
@@ -5144,6 +5180,7 @@ requires-dist = [
     { name = "faster-whisper", specifier = ">=1.2.0" },
     { name = "fastmcp", specifier = ">=2.14.0" },
     { name = "ffmpeg", specifier = ">=1.4" },
+    { name = "fireworks-ai", specifier = ">=1.2.22" },
     { name = "flake8", marker = "extra == 'dev'" },
     { name = "flask", extras = ["async"] },
     { name = "flask-cors", specifier = ">=6.0.5" },
