@@ -228,7 +228,9 @@ export function getAIServiceByProvider(
       case 'local':
         service = withRateLimit(providerType, createLocalServiceAdapter(config))
         break
-      case "azure-openai": { throw new Error('Not implemented yet: "azure-openai" case') }
+      case 'azure-openai':
+        service = withRateLimit(providerType, createAzureOpenAIServiceAdapter(config))
+        break
       default:
         appLogger.warn(`Unsupported provider type: ${providerType}`)
         return null
@@ -655,6 +657,181 @@ function createOpenAIServiceAdapter(config: AIProviderConfig): AIService {
       id: model,
       name: model,
       provider: 'openai',
+      capabilities: config.capabilities,
+      contextWindow: 8192,
+      maxTokens: 4096,
+    }),
+    dispose: () => {},
+  }
+}
+
+/**
+ * Azure OpenAI adapter.
+ *
+ * Azure's chat-completions API is wire-compatible with OpenAI's (same request
+ * and response shapes), but differs in URL and auth:
+ * - endpoint: {AZURE_OPENAI_ENDPOINT}/openai/deployments/{deployment}/chat/completions?api-version=...
+ * - auth: `api-key` header (not Bearer).
+ *
+ * The deployment name doubles as the model: it comes from options.model when
+ * supplied, otherwise from the configured defaultModel.
+ */
+function createAzureOpenAIServiceAdapter(config: AIProviderConfig): AIService {
+  const rawEndpoint = (config.baseUrl ?? 'https://api.openai.com').replace(/\/+$/, '')
+  const apiVersion =
+    getEnvVar('AZURE_OPENAI_API_VERSION') ?? '2024-02-01'
+
+  const buildUrl = (model: string): string =>
+    `${rawEndpoint}/openai/deployments/${model}/chat/completions?api-version=${apiVersion}`
+
+  const headers = (extra?: Record<string, string>): Record<string, string> => ({
+    'Content-Type': 'application/json',
+    'api-key': config.apiKey,
+    ...extra,
+  })
+
+  const createChatCompletion = async (
+    messages: AIMessage[],
+    options?: AIServiceOptions,
+  ): Promise<AICompletion> => {
+    const model = options?.model ?? config.defaultModel
+    const response = await fetch(buildUrl(model), {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({
+        model,
+        messages: messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: options?.maxTokens ?? 4096,
+        temperature: options?.temperature,
+        stop: options?.stop,
+      }),
+    })
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => response.statusText)
+      throw new Error(`Azure OpenAI API error (${response.status}): ${errText}`)
+    }
+
+    const data = (await response.json()) as {
+      id?: string
+      created?: number
+      model?: string
+      choices: Array<{
+        message: { role: string; content: string }
+        finish_reason?: string
+      }>
+      usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number }
+    }
+
+    const choice = data.choices?.[0]
+    const content = choice?.message?.content ?? ''
+    const usage: AIUsage = {
+      promptTokens: data.usage?.prompt_tokens ?? 0,
+      completionTokens: data.usage?.completion_tokens ?? 0,
+      totalTokens: data.usage?.total_tokens ?? 0,
+    }
+
+    return {
+      id: data.id,
+      created: data.created,
+      model: data.model,
+      choices: [
+        {
+          message: { role: 'assistant', content },
+          finishReason: choice?.finish_reason === 'length' ? 'length' : 'stop',
+        },
+      ],
+      usage,
+      provider: 'azure-openai',
+      content,
+    }
+  }
+
+  return {
+    createChatCompletion,
+    createStreamingChatCompletion: async (messages, options) => {
+      const model = options?.model ?? config.defaultModel
+      const response = await fetch(buildUrl(model), {
+        method: 'POST',
+        headers: headers({ Accept: 'text/event-stream' }),
+        body: JSON.stringify({
+          model,
+          messages: messages.map((m) => ({ role: m.role, content: m.content })),
+          max_tokens: options?.maxTokens ?? 4096,
+          temperature: options?.temperature,
+          stop: options?.stop,
+          stream: true,
+        }),
+      })
+
+      if (!response.ok || !response.body) {
+        const errText = await response.text().catch(() => response.statusText)
+        throw new Error(`Azure OpenAI stream error (${response.status}): ${errText}`)
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      const msgId = `azure-${Date.now()}`
+
+      const stream = async function* (): AsyncGenerator<AIStreamChunk, void, void> {
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() ?? ''
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue
+              const jsonStr = line.slice(6).trim()
+              if (!jsonStr || jsonStr === '[DONE]') continue
+              try {
+                const event = JSON.parse(jsonStr) as {
+                  id?: string
+                  model?: string
+                  created?: number
+                  choices: Array<{
+                    delta?: { content?: string; role?: string }
+                    finish_reason?: string
+                  }>
+                }
+                const delta = event.choices?.[0]?.delta
+                if (delta?.content) {
+                  yield {
+                    id: event.id ?? msgId,
+                    model: event.model ?? model,
+                    created: event.created ?? Date.now(),
+                    content: delta.content,
+                    done: false,
+                  }
+                }
+                const finishReason = event.choices?.[0]?.finish_reason
+                if (finishReason) {
+                  yield {
+                    id: msgId,
+                    model: event.model ?? model,
+                    created: event.created ?? Date.now(),
+                    content: '',
+                    done: true,
+                    finishReason: finishReason === 'length' ? 'length' : 'stop',
+                  }
+                }
+              } catch {
+                // skip malformed SSE line
+              }
+            }
+          }
+        } finally {
+          reader.releaseLock()
+        }
+      }
+      return stream()
+    },
+    getModelInfo: (model: string) => ({
+      id: model,
+      name: model,
+      provider: 'azure-openai',
       capabilities: config.capabilities,
       contextWindow: 8192,
       maxTokens: 4096,

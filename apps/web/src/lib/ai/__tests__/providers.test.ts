@@ -571,6 +571,74 @@ describe('Provider adapters with mocked fetch', () => {
       /empty or malformed/,
     )
   })
+
+  it('Azure OpenAI adapter: successful completion via deployment URL + api-key header', async () => {
+    const fetchMock = vi.mocked(fetch)
+    fetchMock.mockResolvedValue(
+      mockFetchResponse({
+        id: 'az-123',
+        created: 1700000000,
+        model: 'gpt-4',
+        choices: [{ message: { role: 'assistant', content: 'Azure says hi' }, finish_reason: 'stop' }],
+        usage: { prompt_tokens: 4, completion_tokens: 3, total_tokens: 7 },
+      }),
+    )
+    setProviderForTesting(
+      'azure-openai',
+      makeConfig('azure-openai', 'azure-key', 'https://my-res.openai.azure.com'),
+    )
+    const svc = getAIServiceByProvider('azure-openai')
+    expect(svc).not.toBeNull()
+    const result = await svc!.createChatCompletion(
+      [{ role: 'user', content: 'hi' }],
+      { model: 'gpt-4' },
+    )
+    expect(result.provider).toBe('azure-openai')
+    expect(result.content).toBe('Azure says hi')
+    expect(result.usage.totalTokens).toBe(7)
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toBe(
+      'https://my-res.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-02-01',
+    )
+    const headers = init.headers as Record<string, string>
+    expect(headers['api-key']).toBe('azure-key')
+    expect(headers['Authorization']).toBeUndefined()
+  })
+
+  it('Azure OpenAI adapter: uses defaultModel when no model option given', async () => {
+    const fetchMock = vi.mocked(fetch)
+    fetchMock.mockResolvedValue(
+      mockFetchResponse({
+        id: 'az-456',
+        created: 1700000000,
+        model: 'test-model',
+        choices: [{ message: { role: 'assistant', content: 'ok' }, finish_reason: 'stop' }],
+        usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+      }),
+    )
+    setProviderForTesting(
+      'azure-openai',
+      makeConfig('azure-openai', 'azure-key', 'https://my-res.openai.azure.com/'),
+    )
+    const svc = getAIServiceByProvider('azure-openai')
+    await svc!.createChatCompletion([{ role: 'user', content: 'hi' }])
+    const [url] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toContain('/openai/deployments/test-model/chat/completions')
+  })
+
+  it('Azure OpenAI adapter: throws on error status', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      mockFetchResponse({ error: 'Unauthorized' }, 401, false),
+    )
+    setProviderForTesting(
+      'azure-openai',
+      makeConfig('azure-openai', 'bad', 'https://my-res.openai.azure.com'),
+    )
+    const svc = getAIServiceByProvider('azure-openai')
+    await expect(svc!.createChatCompletion([{ role: 'user', content: 'hi' }])).rejects.toThrow(
+      /Azure OpenAI API error \(401\)/,
+    )
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -642,6 +710,30 @@ describe('Streaming adapters', () => {
     expect(chunks).toContain('HF')
     expect(chunks).toContain(' streaming')
   })
+
+  it('Azure OpenAI adapter: streams content chunks', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      mockStreamResponse([
+        { id: 'az-s1', model: 'gpt-4', created: 1, choices: [{ delta: { content: 'Azure' } }] },
+        { id: 'az-s1', model: 'gpt-4', created: 1, choices: [{ delta: { content: ' stream' } }] },
+        { id: 'az-s1', model: 'gpt-4', created: 1, choices: [{ finish_reason: 'stop' }] },
+      ]),
+    )
+    setProviderForTesting(
+      'azure-openai',
+      makeConfig('azure-openai', 'azure-key', 'https://my-res.openai.azure.com'),
+    )
+    const svc = getAIServiceByProvider('azure-openai')
+    const stream = await svc!.createStreamingChatCompletion(
+      [{ role: 'user', content: 'hi' }],
+      { model: 'gpt-4' },
+    )
+    const chunks: string[] = []
+    for await (const chunk of stream) {
+      chunks.push(chunk.content)
+    }
+    expect(chunks).toEqual(['Azure', ' stream', ''])
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -697,6 +789,21 @@ describe('Provider registry', () => {
     expect(isProviderAvailable('anthropic')).toBe(true)
     expect(isProviderAvailable('openai')).toBe(true)
     expect(getProviderConfig('anthropic')?.apiKey).toBe('env-key')
+  })
+
+  it('initializeProviders registers azure-openai when key and endpoint set', () => {
+    vi.stubEnv('AZURE_OPENAI_API_KEY', 'azure-env-key')
+    vi.stubEnv('AZURE_OPENAI_ENDPOINT', 'https://res.openai.azure.com')
+    initializeProviders()
+    expect(isProviderAvailable('azure-openai')).toBe(true)
+    expect(getProviderConfig('azure-openai')?.apiKey).toBe('azure-env-key')
+    expect(getProviderConfig('azure-openai')?.baseUrl).toBe('https://res.openai.azure.com')
+  })
+
+  it('azure-openai not registered without both key and endpoint', () => {
+    vi.stubEnv('AZURE_OPENAI_API_KEY', 'azure-env-key')
+    initializeProviders()
+    expect(isProviderAvailable('azure-openai')).toBe(false)
   })
 
   it('local provider always initialized with default URL', () => {
