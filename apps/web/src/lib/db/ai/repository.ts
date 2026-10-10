@@ -507,9 +507,65 @@ export class AIRepository {
 
     return this.mapStoredDocumentIdArray<ResponseGenerationResult>(results);
   }
+  /**
+   * Aggregate AI usage statistics from stored response generation results.
+   *
+   * Each row in `ai_response_generation` is one AI request (one success or
+   * one failure recorded by the response routes), so summing its
+   * `success`/`latencyMs` fields over a time window yields request counts and
+   * mean latency. An optional `userId` narrows the window to a single user;
+   * omit it for an all-users aggregate.
+   */
+  async getUsageStats(options: { userId?: string; since?: Date; until?: Date }): Promise<{
+    totalRequests: number;
+    successfulRequests: number;
+    failedRequests: number;
+    averageResponseTime: number;
+  }> {
+    const empty = {
+      totalRequests: 0,
+      successfulRequests: 0,
+      failedRequests: 0,
+      averageResponseTime: 0,
+    };
+    const match: Record<string, unknown> = {};
+    if (options.userId) {
+      match["userId"] = options.userId;
+    }
+    const createdAt: Record<string, unknown> = {};
+    if (options.since) {
+      createdAt["$gte"] = options.since;
+    }
+    if (options.until) {
+      createdAt["$lte"] = options.until;
+    }
+    if (Object.keys(createdAt).length > 0) {
+      match["createdAt"] = createdAt;
+    }
+    const collection = await this.getCollection<Record<string, unknown>>("ai_response_generation");
+    const [result] = await collection
+      .aggregate([
+        { $match: match },
+        { $group: { _id: null, total: { $sum: 1 }, successful: { $sum: { $cond: ["$success", 1, 0] } }, latencySum: { $sum: "$latencyMs" } } },
+      ])
+      .toArray();
+    if (!result) {
+      return empty;
+    }
+    const total = Number(result["total"]);
+    const successful = Number(result["successful"]);
+    const latencySum = Number(result["latencySum"] ?? 0);
+    return {
+      totalRequests: total,
+      successfulRequests: successful,
+      failedRequests: Math.max(total - successful, 0),
+      averageResponseTime: total > 0 ? latencySum / total : 0,
+    };
+  }
+
 
   /**
-   * Get intervention analysis results for a user
+   * Get intervention
    */
   async getInterventionAnalysisByUser(
     userId: string,
