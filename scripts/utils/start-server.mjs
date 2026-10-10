@@ -6,6 +6,9 @@ import { createServer as createHttpsServer } from "https";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
 
 // Try to import Sentry from either the local development path or the production path
 /** @typedef {import('../../config/instrument.mjs').SentryInstance} SentryInstance */
@@ -90,7 +93,21 @@ function resolveSentryDsn() {
 }
 
 /** @type {unknown} */
-const ssrModuleCandidate = await import(await resolveSsrEntryModuleUrl());
+let ssrModuleCandidate;
+try {
+  ssrModuleCandidate = await import(await resolveSsrEntryModuleUrl());
+} catch (error) {
+  const detail = toError(error);
+  console.error(
+    `❌ Failed to load the SSR entry module: ${detail.message}`,
+  );
+  // A non-zero exit here is expected to surface via Docker/Kubernetes
+  // healthchecks (which restart the container). We intentionally do NOT call
+  // Sentry.captureException here: the failure mode is "the build artifact
+  // could not be loaded", which the console message already captures, and
+  // container restarts provide the recovery signal.
+  process.exit(1);
+}
 if (!isSSRModule(ssrModuleCandidate)) {
   throw new Error("Failed to import SSR module with expected handler export.");
 }
@@ -135,6 +152,101 @@ const MIME_TYPES = {
 function getMimeType(filePath) {
   const ext = path.extname(filePath).toLowerCase();
   return MIME_TYPES[ext] || "application/octet-stream";
+}
+
+// ── Agent discovery helpers (prerendered pages) ─────────────────────────
+// Handles serving static HTML pages with agent discovery headers and
+// markdown negotiation, matching what the SSR middleware does.
+
+const AGENT_LINK_HEADERS = [
+  '<https://pixelatedempathy.com/.well-known/api-catalog>; rel="api-catalog"',
+  '<https://pixelatedempathy.com/.well-known/oauth-protected-resource>; rel="describedby"',
+  '<https://pixelatedempathy.com/docs/api>; rel="service-doc"',
+  '<https://pixelatedempathy.com/openapi.yaml>; rel="service-desc"; type="application/yaml"',
+  '<https://pixelatedempathy.com/auth.md>; rel="help"; type="text/markdown"',
+  '<https://pixelatedempathy.com/sitemap.xml>; rel="sitemap"',
+];
+
+const DISCOVERY_EXCLUDED_PREFIXES = [
+  "/admin",
+  "/admin-test",
+  "/api/",
+  "/dashboard",
+  "/journal-research",
+  "/portal",
+  "/profile/",
+  "/settings/",
+  "/unauthorized",
+  "/offline",
+  "/test-sentry",
+  "/nightmare-fuel-demo",
+  "/therapy-chat-plan",
+  "/style-guide",
+  "/search-demo",
+  "/dev/",
+  "/browser-compatibility/",
+  "/404",
+  "/500",
+];
+
+/** @param {string | undefined} acceptHeader @returns {boolean} */
+function wantsMarkdown(acceptHeader) {
+  if (!acceptHeader) return false;
+  return acceptHeader.split(",").some((part) => {
+    const media = part.split(";")[0].trim().toLowerCase();
+    return media === "text/markdown" || media === "text/x-markdown";
+  });
+}
+
+/** @param {string} pathname @returns {boolean} */
+function isDiscoveryExcluded(pathname) {
+  return DISCOVERY_EXCLUDED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+let turndownService = null;
+
+/**
+ * Convert an HTML page to markdown for agents (turndown, matching the
+ * middleware's conversion). Returns null when there's nothing worth serving.
+ * @param {string} html @param {string} requestUrl @returns {string | null}
+ */
+function convertHtmlToMarkdown(html, requestUrl) {
+  try {
+    if (!turndownService) {
+      const TurndownService = require("turndown");
+      turndownService = new TurndownService({
+        headingStyle: "atx",
+        codeBlockStyle: "fenced",
+        bulletListMarker: "-",
+        emDelimiter: "*",
+      });
+      turndownService.remove(["script", "style", "noscript", "iframe", "svg"]);
+    }
+    const body = turndownService.turndown(html).trim();
+    if (body.length < 40) return null;
+
+    const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    const title = titleMatch ? titleMatch[1].trim() : "";
+    const descMatch = html.match(
+      /<meta[^>]*name="description"[^>]*content="([^"]*)"/i,
+    );
+    const description = descMatch ? descMatch[1] : "";
+
+    const frontmatter = [
+      "---",
+      title ? `title: ${JSON.stringify(title)}` : null,
+      description ? `description: ${JSON.stringify(description)}` : null,
+      `url: ${JSON.stringify(requestUrl)}`,
+      "---",
+      "",
+    ]
+      .filter((line) => line !== null)
+      .join("\n");
+
+    return `${frontmatter}\n${body}\n`;
+  } catch {
+    return null;
+  }
 }
 
 /** @param {string} urlPath @returns {string | null} */
@@ -257,13 +369,43 @@ function staticAwareHandler(req, res) {
   const staticPath = resolveStaticFile(req.url ?? "/");
   if (staticPath) {
     try {
-      const content = readFileSync(staticPath);
+      let content = readFileSync(staticPath);
       const contentType = getMimeType(staticPath);
       // Immutable cache for hashed assets (everything under /assets/),
       // no-cache for everything else (HTML, etc.)
       const cacheControl = staticPath.includes("/assets/")
         ? "public, max-age=31536000, immutable"
         : "no-cache";
+
+      // Agent discovery for prerendered pages: these bypass the app's
+      // middleware (served straight from disk), so Link headers and
+      // `Accept: text/markdown` conversion happen here.
+      if (contentType.startsWith("text/html")) {
+        if (wantsMarkdown(req.headers.accept)) {
+          const markdown = convertHtmlToMarkdown(content.toString("utf8"), req.url ?? "/");
+          if (markdown) {
+            res.writeHead(200, {
+              "Content-Type": "text/markdown; charset=utf-8",
+              Vary: "Accept",
+              "Cache-Control": "public, max-age=600",
+            });
+            res.end(markdown);
+            return;
+          }
+        }
+        const pageUrl = new URL(req.url ?? "/", "http://localhost").pathname.replace(/\/$/, "");
+        if (!isDiscoveryExcluded(pageUrl)) {
+          res.writeHead(200, {
+            "Content-Type": contentType,
+            "Content-Length": content.length,
+            "Cache-Control": cacheControl,
+            Link: AGENT_LINK_HEADERS.join(", "),
+          });
+          res.end(content);
+          return;
+        }
+      }
+
       res.writeHead(200, {
         "Content-Type": contentType,
         "Content-Length": content.length,
