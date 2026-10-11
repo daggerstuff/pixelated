@@ -1,52 +1,33 @@
-import { useState, type FC } from 'react'
+import type { FC } from 'react'
 
 import EmotionProgressDashboard from '../../components/analytics/EmotionProgressDashboard'
-import useEmotionProgress from '../../hooks/useEmotionProgress'
 
 const EmotionProgressDemo: FC = () => {
-  const [timeRange, _setTimeRange] = useState<
-    'week' | 'month' | 'quarter' | 'year'
-  >('month')
-
-  const { data, isLoading, error } = useEmotionProgress({ timeRange })
+  const timeRange: 'week' | 'month' | 'quarter' | 'year' = 'month'
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-6 text-3xl font-bold">Emotion Progress Dashboard</h1>
 
-      <p className="mb-8 text-muted-foreground">
+      <p className="mb-4 text-muted-foreground">
         This dashboard visualizes emotional health progress over time, showing
         improvements across multiple dimensions, tracking risk factors, and
         measuring progress toward goals.
       </p>
 
-      {error && (
-        <div className="mb-6 rounded-none border-l-4 border-ring bg-secondary p-4 text-foreground">
-          <p className="font-bold">Error</p>
-          <p>{String(error)}</p>
-        </div>
-      )}
+      <div
+        className="mb-6 rounded-none border border-dashed border-ring bg-secondary p-4 text-sm text-foreground"
+        role="note"
+      >
+        <p className="font-bold">Sample data for demonstration only</p>
+        <p className="text-muted-foreground">
+          The figures below are illustrative and are not real patient data.
+          Emotion progress tracking in production reads from a user's own
+          authenticated session records.
+        </p>
+      </div>
 
-      {data ? (
-        <EmotionProgressDashboard timeRange={timeRange} isLoading={isLoading} />
-      ) : isLoading ? (
-        <div className="mb-8 rounded-none border border-border bg-card p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="h-4 w-1/4 rounded-none bg-secondary"></div>
-            <div className="h-10 w-full rounded-none bg-secondary"></div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="h-40 rounded-none bg-secondary"></div>
-              <div className="h-40 rounded-none bg-secondary"></div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="mb-8 rounded-none border border-border bg-secondary p-6 text-center">
-          <p className="text-muted-foreground">
-            No emotion progress data available
-          </p>
-        </div>
-      )}
+      <EmotionProgressDashboard timeRange={timeRange} />
 
       <div className="rounded-none border border-border bg-card p-6">
         <h2 className="mb-4 text-xl font-semibold">
