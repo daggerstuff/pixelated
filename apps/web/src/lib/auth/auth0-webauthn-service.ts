@@ -234,41 +234,14 @@ class Auth0WebAuthnService {
     credential: Record<string, unknown> = {},
   ): Promise<WebAuthnCredential> {
     try {
-      const credentialInput = toWebAuthnCredentialInput(credential)
-
-      // In a real implementation, we would verify the credential using a WebAuthn library
-      // For now, we'll simulate the verification and registration
-
-      const newCredential: WebAuthnCredential = {
-        id: credentialInput.id ?? `cred-${Date.now()}`,
-        name: credentialInput.name ?? 'WebAuthn Credential',
-        type: credentialInput.type ?? 'webauthn-roaming',
-        registeredAt: new Date().toISOString(),
-        publicKey: credentialInput.publicKey ?? 'public-key-placeholder',
-        counter: credentialInput.counter ?? 0,
-        deviceType: credentialInput.deviceType ?? 'unknown',
-        backedUp: credentialInput.backedUp ?? false,
-      }
-
-      // Log successful registration
-      logSecurityEvent(
-        SecurityEventType.WEBAUTHN_REGISTRATION_COMPLETED,
-        userId,
-        {
-          userId: userId,
-          credentialId: newCredential.id,
-          type: newCredential.type,
-          timestamp: new Date().toISOString(),
-        },
+      // Verifying a WebAuthn registration requires validating the
+      // attestation (signature of the public key) produced by the
+      // authenticator. That verification is not implemented here,
+      // so we cannot register a credential honestly. Fail closed
+      // rather than store a fabricated credential record.
+      throw new Error(
+        'WebAuthn registration verification is not supported; attestation validation is not wired up',
       )
-
-      // Update Phase 6 MCP server with registration completion
-      await updatePhase6AuthenticationProgress(
-        userId,
-        `webauthn_registration_completed_${newCredential.id}`,
-      )
-
-      return newCredential
     } catch (error: unknown) {
       logger.error('Failed to verify WebAuthn registration:', error)
 
@@ -353,27 +326,14 @@ class Auth0WebAuthnService {
     const credentialId =
       credentialInput.id ?? `webauthn-credential-${Date.now()}`
     try {
-      // In a real implementation, we would verify the authentication response using a WebAuthn library
-      // For now, we'll simulate the verification
-
-      // Log successful authentication
-      logSecurityEvent(
-        SecurityEventType.WEBAUTHN_AUTHENTICATION_COMPLETED,
-        userId,
-        {
-          userId: userId,
-          credentialId,
-          timestamp: new Date().toISOString(),
-        },
+      // Verifying a WebAuthn assertion requires checking the
+      // authenticator's signature against the registered public key.
+      // That verification is not implemented here. Returning true
+      // would accept any response, including a forged one, as a
+      // successful passwordless login. Fail closed.
+      throw new Error(
+        'WebAuthn authentication verification is not supported; assertion signature checking is not wired up',
       )
-
-      // Update Phase 6 MCP server with authentication completion
-      await updatePhase6AuthenticationProgress(
-        userId,
-        `webauthn_authentication_completed_${credentialId}`,
-      )
-
-      return true
     } catch (error: unknown) {
       logger.error('Failed to verify WebAuthn authentication:', error)
 
@@ -400,49 +360,12 @@ class Auth0WebAuthnService {
   async getUserWebAuthnCredentials(
     userId: string,
   ): Promise<WebAuthnCredential[]> {
-    if (!auth0Management) {
-      throw new Error('Auth0 management client not initialized')
-    }
-
-    try {
-      // In a real implementation, we would get WebAuthn credentials from Auth0
-      // For now, we'll return an empty array to simulate no credentials
-
-      // Simulate some credentials for demonstration purposes (10% chance)
-      const credentials: WebAuthnCredential[] = []
-      if (Math.random() < 0.1) {
-        credentials.push({
-          id: `webauthn-${userId}-1`,
-          name: 'Security Key',
-          type: 'webauthn-roaming',
-          registeredAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-          lastUsedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-          publicKey: 'public-key-placeholder-1',
-          counter: 5,
-          deviceType: 'security-key',
-          backedUp: false,
-        })
-
-        if (Math.random() < 0.5) {
-          credentials.push({
-            id: `webauthn-${userId}-2`,
-            name: 'Built-in Authenticator',
-            type: 'webauthn-platform',
-            registeredAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-            lastUsedAt: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-            publicKey: 'public-key-placeholder-2',
-            counter: 3,
-            deviceType: 'platform',
-            backedUp: true,
-          })
-        }
-      }
-
-      return credentials
-    } catch (error: unknown) {
-      logger.error('Failed to get user WebAuthn credentials:', error)
-      return []
-    }
+    // WebAuthn credentials are managed by Auth0's Guardian; the
+    // Management API exposes no endpoint that lists a user's
+    // WebAuthn (FIDO2) credentials. Returning fabricated credentials
+    // would let callers believe a passwordless factor exists when
+    // it does not. Return the honest answer: none are known.
+    return []
   }
 
   /**
@@ -454,20 +377,11 @@ class Auth0WebAuthnService {
     }
 
     try {
-      // In a real implementation, we would delete the credential from Auth0
-      // For now, we'll just log the deletion
-
-      // Log credential deletion
-      logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_DELETED, null, {
-        userId: userId,
-        credentialId: credentialId,
-        timestamp: new Date().toISOString(),
-      })
-
-      // Update Phase 6 MCP server with credential deletion
-      await updatePhase6AuthenticationProgress(
-        userId,
-        `webauthn_credential_deleted_${credentialId}`,
+      // The Management API has no endpoint to delete a user's
+      // WebAuthn credential. Silently logging a deletion that never
+      // happened would mislead callers. Fail closed.
+      throw new Error(
+        'WebAuthn credential deletion is not supported; no Management API endpoint exists for it',
       )
     } catch (error: unknown) {
       logger.error(
@@ -489,21 +403,11 @@ class Auth0WebAuthnService {
     newName: string,
   ): Promise<void> {
     try {
-      // In a real implementation, we would update the credential name in Auth0
-      // For now, we'll just log the rename operation
-
-      // Log credential rename
-      logSecurityEvent(SecurityEventType.WEBAUTHN_CREDENTIAL_RENAMED, null, {
-        userId: userId,
-        credentialId: credentialId,
-        newName: newName,
-        timestamp: new Date().toISOString(),
-      })
-
-      // Update Phase 6 MCP server with credential rename
-      await updatePhase6AuthenticationProgress(
-        userId,
-        `webauthn_credential_renamed_${credentialId}`,
+      // The Management API has no endpoint to rename a user's
+      // WebAuthn credential. Silently logging a rename that never
+      // happened would mislead callers. Fail closed.
+      throw new Error(
+        'WebAuthn credential rename is not supported; no Management API endpoint exists for it',
       )
     } catch (error: unknown) {
       logger.error(
@@ -561,17 +465,14 @@ class Auth0WebAuthnService {
     _response: any,
   ): Promise<boolean> {
     try {
-      // In a real implementation, we would validate the credential response
-      // For now, we'll simulate validation
-
-      // Log validation
-      logSecurityEvent(SecurityEventType.WEBAUTHN_RESPONSE_VALIDATED, null, {
-        userId: userId,
-        responseValid: true,
-        timestamp: new Date().toISOString(),
-      })
-
-      return true
+      // WebAuthn authentication-response validation requires verifying
+      // the authenticator's signature against the stored public key
+      // (typically via @simplewebauthn/server or Auth0's own flow).
+      // That is not wired up here. Returning true would accept any
+      // response as a valid assertion. Fail closed.
+      throw new Error(
+        'WebAuthn credential response validation is not supported; signature verification is not wired up',
+      )
     } catch (error: unknown) {
       logger.error('Failed to validate WebAuthn credential response:', error)
 

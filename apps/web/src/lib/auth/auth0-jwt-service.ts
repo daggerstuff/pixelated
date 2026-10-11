@@ -18,7 +18,7 @@ interface JwtPayload {
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-import { setInCache } from '../redis'
+import { redisClient, setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 import { retry } from './utils'
@@ -714,15 +714,20 @@ export async function cleanupExpiredTokens(): Promise<{
   timestamp: number
   nextCleanup: number
 }> {
-  // For Auth0 tokens, we don't manage the tokens directly
-  // This is mainly for cleaning up our local cache entries
-
   const currentTime = currentTimestamp()
-  let cleanedCount = 0
 
-  // Get all revoked token keys (simplified implementation)
-  // Note: This would need to be adapted to work with the actual Redis implementation
-  // For now, we'll just return dummy values
+  // Revoked tokens are tracked as cache entries under the `revoked:*`
+  // prefix (see revokeToken above). Each entry carries a 24-hour TTL,
+  // so Redis expires most of them on its own; this sweep removes any
+  // that are still present so the count below reflects actual work.
+  // keys() returns [] when the cache is unreachable, which makes this
+  // a no-op rather than an error in that case.
+  let cleanedCount = 0
+  const revokedKeys = await redisClient.keys('revoked:*')
+  for (const key of revokedKeys) {
+    const deleted = await redisClient.del(key)
+    cleanedCount += deleted
+  }
 
   return {
     cleanedTokens: cleanedCount,
