@@ -242,19 +242,18 @@ export class BiasAuditService {
       currentStep: 'Initializing audit',
     })
 
-    // Simulate sampling from dataset
+    // Load the dataset's actual records from its source file
     this.emitProgress({
       auditId,
       datasetId: dataset.datasetId,
       status: 'sampling',
       progress: 10,
-      currentStep: `Sampling ${config.sampleSize} records from dataset`,
+      currentStep: `Loading records from dataset ${dataset.filePath}`,
     })
 
-    // Generate sample sessions for analysis
-    const sampleSessions = this.generateSampleSessions(
+    const sampleSessions = await this.loadDatasetSessions(
       dataset,
-      Math.min(config.sampleSize, dataset.recordCount),
+      config.sampleSize,
     )
 
     // Emit progress update: analyzing
@@ -348,99 +347,88 @@ export class BiasAuditService {
   }
 
   /**
-   * Generate sample sessions for bias analysis
+   * Load the dataset's actual records from its source file and map them to
+   * sessions for bias analysis.
+   *
+   * Audits drive real quarantine/approval decisions, so the sessions must come
+   * from the dataset's own records. If the file cannot be read or parsed, we
+   * throw — the caller reverts the dataset to `pending_review` rather than
+   * auditing fabricated data.
    */
-  private generateSampleSessions(
+  private async loadDatasetSessions(
     dataset: DatasetForAudit,
     count: number,
-  ): TherapeuticSession[] {
-    // In production, this would read actual data from the dataset file
-    // For now, generate synthetic samples for demonstration
-    const sessions: TherapeuticSession[] = []
-    const ageGroups = ['18-24', '25-34', '35-44', '45-54', '55-64', '65+']
-    const genders = ['male', 'female', 'non-binary', 'prefer_not_to_say']
-    const ethnicities = [
-      'caucasian',
-      'african_american',
-      'hispanic',
-      'asian',
-      'other',
-    ]
-    for (let i = 0; i < count; i++) {
-      const demographic = {
-        age: ageGroups[Math.floor(Math.random() * ageGroups.length)],
-        gender: genders[Math.floor(Math.random() * genders.length)],
-        ethnicity: ethnicities[Math.floor(Math.random() * ethnicities.length)],
-        primaryLanguage: 'en',
-      }
-      const startedAt = new Date()
-      sessions.push({
-        sessionId: `${dataset.datasetId}_sample_${i}`,
-        sessionDate: startedAt.toISOString(),
-        sessionDuration: 120,
-        sessionType: 'general-wellness',
-        sessionNotes: `Sample session ${i} from dataset ${dataset.name}`,
-        participantDemographics: demographic,
-        scenario: {
-          scenarioId: `${dataset.datasetId}_scenario_${i}`,
-          type: 'general-wellness',
-          description: `Bias audit sample session ${i} from ${dataset.name}`,
-          complexity: 'low',
-          tags: ['bias-audit', 'sample'],
-        },
-        content: {
-          transcript: `Sample message ${i} from dataset ${dataset.name}. Sample response ${i}.`,
-          aiResponses: [
-            `Sample model reflection ${i}: reinforce empathy and safety checks`,
-          ],
-          userInputs: [`Sample user input ${i}`],
-          patientPresentation: dataset.name,
-          metadata: {
-            sampleIndex: i,
-            datasetId: dataset.datasetId,
-          },
-        },
-        aiResponses: [
-          {
-            responseId: `${dataset.datasetId}_sample_response_${i}`,
-            text: `Sample model response ${i} for dataset ${dataset.name}`,
-            timestamp: startedAt,
-            type: 'recommendation',
-            metadata: { sampleIndex: i, source: 'bias-audit' },
-          },
-        ],
-        expectedOutcomes: [
-          {
-            outcomeId: `${dataset.datasetId}_outcome_${i}`,
-            description:
-              'Model maintains safety and rapport throughout the simulated session',
-            achieved: true,
-          },
-        ],
-        transcripts: [
-          {
-            speaker: 'user',
-            text: `Sample message ${i} from dataset ${dataset.name}`,
-            timestamp: startedAt,
-          },
-          {
-            speaker: 'therapist',
-            text: `Sample response to user message ${i}`,
-            timestamp: new Date(startedAt.getTime() + 45_000),
-          },
-        ],
-        userInputs: [`Sample user input ${i}`, `Sample follow-up input ${i}`],
-        metadata: {
-          sessionStartTime: startedAt,
-          sessionEndTime: new Date(startedAt.getTime() + 120_000),
-          sessionDuration: 120,
-          completionStatus: 'simulated',
-          tags: ['bias-audit'],
-          traineeId: 'system',
-        },
-      })
+  ): Promise<TherapeuticSession[]> {
+    const raw = await fs.readFile(dataset.filePath, 'utf8')
+    const records = this.parseDatasetRecords(raw, dataset.format)
+    const sampled = records.slice(0, count)
+    if (sampled.length === 0) {
+      throw new Error(
+        `No auditable records found in dataset file ${dataset.filePath}`,
+      )
     }
-    return sessions
+    return sampled.map((record, index) =>
+      this.recordToSession(record, dataset, index),
+    )
+  }
+
+  /**
+   * Parse a raw dataset file into plain record objects. Supports the JSON and
+   * JSON Lines formats; other formats (CSV, Parquet) require a dedicated
+   * parser and are not supported here, so we fail loudly rather than guess.
+   */
+  private parseDatasetRecords(
+    raw: string,
+    format: DatasetForAudit['format'],
+  ): unknown[] {
+    if (format === 'jsonl') {
+      return raw
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .map((line) => JSON.parse(line) as unknown)
+    }
+    if (format === 'json') {
+      const parsed: unknown = JSON.parse(raw)
+      return Array.isArray(parsed) ? parsed : [parsed]
+    }
+    throw new Error(
+      `Unsupported dataset format for bias audit: "${format}". ` +
+        'Only "json" and "jsonl" datasets can be read for auditing.',
+    )
+  }
+
+  /**
+   * Map one raw dataset record to the session shape the bias engine consumes,
+   * passing through any demographic/content fields the record already carries.
+   */
+  private recordToSession(
+    record: unknown,
+    dataset: DatasetForAudit,
+    index: number,
+  ): TherapeuticSession {
+    const data = (
+      typeof record === 'object' && record !== null ? record : {}
+    ) as Record<string, unknown>
+    return {
+      sessionId:
+        typeof data['sessionId'] === 'string'
+          ? data['sessionId']
+          : `${dataset.datasetId}_${index}`,
+      participantDemographics: data['participantDemographics'] as
+        | TherapeuticSession['participantDemographics']
+        | undefined,
+      content: data['content'] as TherapeuticSession['content'] | undefined,
+      scenario: data['scenario'] as TherapeuticSession['scenario'] | undefined,
+      aiResponses: data['aiResponses'] as TherapeuticSession['aiResponses'],
+      transcripts: data['transcripts'] as TherapeuticSession['transcripts'],
+      userInputs: data['userInputs'] as TherapeuticSession['userInputs'],
+      metadata: {
+        ...((data['metadata'] as TherapeuticSession['metadata']) ?? {}),
+        datasetId: dataset.datasetId,
+        sourceRecordIndex: index,
+      },
+    }
   }
 
   /**
