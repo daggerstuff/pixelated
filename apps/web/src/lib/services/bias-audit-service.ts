@@ -6,6 +6,8 @@
  * and provides quarantine workflow management.
  */
 
+import { promises as fs } from 'node:fs'
+
 import { BiasDetectionEngine } from '@/lib/ai/bias-detection/BiasDetectionEngine'
 import type {
   AnalysisResult,
