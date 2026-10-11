@@ -1,3 +1,4 @@
+import { promises as fsPromises } from 'fs'
 import os from 'os'
 import { performance } from 'perf_hooks'
 
@@ -199,18 +200,22 @@ export class HealthMonitor {
 
   private async checkDisk(): Promise<HealthCheck> {
     try {
-      // Basic disk check - in production this would check actual disk usage
-      // For now, simulate a basic check
-      const processMemory = process.memoryUsage()
-      const heapUsagePercent =
-        (processMemory.heapUsed / processMemory.heapTotal) * 100
+      // Real filesystem usage via statfs against the current working volume.
+      const stats = await fsPromises.statfs(process.cwd())
+      const totalBytes = stats.blocks * stats.bsize
+      const freeBytes = stats.bfree * stats.bsize
+      const usedBytes = totalBytes - freeBytes
+      const usagePercent = totalBytes > 0 ? (usedBytes / totalBytes) * 100 : 0
 
       let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy'
       let message = 'Disk usage normal'
 
-      if (heapUsagePercent > 90) {
+      if (usagePercent > 95) {
+        status = 'unhealthy'
+        message = 'Critical disk usage'
+      } else if (usagePercent > 85) {
         status = 'degraded'
-        message = 'High heap usage detected'
+        message = 'High disk usage'
       }
 
       return {
@@ -218,9 +223,10 @@ export class HealthMonitor {
         status,
         message,
         details: {
-          heapUsed: processMemory.heapUsed,
-          heapTotal: processMemory.heapTotal,
-          heapUsagePercent: Math.round(heapUsagePercent * 100) / 100,
+          totalBytes,
+          freeBytes,
+          usedBytes,
+          usagePercent: Math.round(usagePercent * 100) / 100,
         },
       }
     } catch (error: unknown) {

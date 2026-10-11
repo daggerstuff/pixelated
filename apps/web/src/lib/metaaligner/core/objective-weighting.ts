@@ -183,23 +183,16 @@ export class ObjectiveWeightingEngine {
       context.detectedContext,
     )
 
-    // The baseWeights and contextSensitivity might still be used to further adjust
-    // these contextualWeights if needed, or this part can be simplified if
-    // getContextualObjectiveWeights is considered authoritative.
-    // For now, let's assume getContextualObjectiveWeights provides the final weights for the context.
-    // If further adjustments based on baseWeights or sensitivity are needed, this logic would change.
-    // This simplification means adjustmentFactors might not be relevant anymore.
-
-    // Mixin with baseWeights according to sensitivity?
-    // Example: weights[objId] = baseWeights[objId] * (1-sensitivity) + contextualWeights[objId] * sensitivity
-    // For now, directly using contextualWeights:
+    // getContextualObjectiveWeights is authoritative for the detected context:
+    // it already encodes the context-specific weighting. We take its value for
+    // every objective and fall back to baseWeights only for objectives the
+    // contextual mapping does not cover, so every objective stays represented.
     const finalWeights: Record<string, number> = {}
     for (const objectiveId in baseWeights) {
-      // Iterate to ensure all objectives are covered
       finalWeights[objectiveId] =
         contextualWeights[objectiveId] !== undefined
           ? contextualWeights[objectiveId]!
-          : baseWeights[objectiveId] // Fallback to base if not in contextual
+          : baseWeights[objectiveId]
     }
 
     return { weights: finalWeights, contextFactors }
@@ -229,16 +222,13 @@ export class ObjectiveWeightingEngine {
       }
     }
 
-    // Handling preferredObjectives with preferenceStrength - this might involve more complex logic.
-    // For now, we can interpret preferenceStrength as a direct multiplier or a factor in a blend.
-    // Example: a simple multiplier approach (could be refined)
+    // preferredObjectives boost: preferenceStrength (0..1) scales the weight by
+    // (1 + preferenceStrength), so a strength of 0.5 lifts the objective's
+    // weight by 50%. Relative ordering is preserved, so downstream
+    // normalization in computeFinalWeights keeps the weights summing to 1.
     if (userProfile?.preferences?.preferredObjectives) {
       for (const pref of userProfile.preferences.preferredObjectives) {
         if (weights[pref.objectiveId] !== undefined) {
-          // Ensure preferenceStrength is a positive multiplier; adjust as needed for your logic
-          // For example, map 0-1 strength to a 1.0-2.0 multiplier range, or use it to blend.
-          // Simple example: treat strength as a direct boost factor (1 + strength).
-          // This interpretation may need refinement based on desired behavior.
           weights[pref.objectiveId] *= 1 + pref.preferenceStrength
         }
       }
