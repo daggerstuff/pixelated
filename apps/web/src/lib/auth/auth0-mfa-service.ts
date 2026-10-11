@@ -263,27 +263,24 @@ class Auth0MFAService {
           break
 
         case 'sms':
-          if (!factor.phoneNumber) {
-            throw new Error('Phone number is required for SMS MFA')
-          }
-
-          // For SMS, we send a code to the phone number
-          challenge = {
-            challengeType: 'sms',
-            bindingMethod: 'sms',
-            oobCode: `sms-${userId}`, // Placeholder - actual implementation would get this from Auth0
-          }
-          break
+          // SMS codes are delivered by Auth0 Guardian during the
+          // /authorize MFA flow. The Management API has no endpoint to
+          // push a code to an existing enrollment, so a fabricated
+          // oobCode here would let a client 'verify' it against nothing.
+          // Fail closed.
+          throw new Error(
+            'SMS MFA enrollment is not supported server-side; the user must complete it via the Guardian flow',
+          )
 
         case 'webauthn-roaming':
         case 'webauthn-platform':
-          // For WebAuthn, we generate a challenge for the browser
-          challenge = {
-            challengeType: factor.factorType,
-            bindingMethod: 'prompt',
-            oobCode: `webauthn-${userId}`, // Placeholder - actual implementation would get this from Auth0
-          }
-          break
+          // WebAuthn enrollment is completed by the browser using the
+          // WebAuthn API + Guardian SDK. The Management API cannot
+          // initiate a WebAuthn challenge server-side, so a fabricated
+          // oobCode here would verify against nothing. Fail closed.
+          throw new Error(
+            'WebAuthn MFA enrollment is not supported server-side; the browser must complete it via the WebAuthn API',
+          )
       }
 
       // Log enrollment start event
@@ -320,31 +317,15 @@ class Auth0MFAService {
     }
 
     try {
-      // In a real implementation, we would verify the code with Auth0
-      // For now, we'll simulate the completion
-
-      const enrolledFactor: MFAFactor = {
-        id: `factor-${Date.now()}`,
-        factorType: this.resolveFactorType(verification.challengeType),
-        enrolledAt: new Date().toISOString(),
-        status: 'enabled',
-      }
-
-      // Log enrollment completion event
-      logSecurityEvent(SecurityEventType.MFA_ENROLLMENT_COMPLETED, null, {
-        userId: userId,
-        factorType: verification.challengeType,
-        factorId: enrolledFactor.id,
-        timestamp: new Date().toISOString(),
-      })
-
-      // Update Phase 6 MCP server with enrollment completion
-      await updatePhase6AuthenticationProgress(
-        userId,
-        `mfa_enrollment_completed_${verification.challengeType}`,
+      // Completing enrollment requires verifying a code that Auth0
+      // Guardian delivered during the /authorize MFA flow. The
+      // Management API has no 'mark this enrollment verified' endpoint;
+      // enrollment status is updated by Auth0 itself when the user
+      // completes the flow. Fabricating an enrolledFactor would let a
+      // caller 'enroll' without any verification. Fail closed.
+      throw new Error(
+        'MFA enrollment completion is not supported server-side; the user must complete the Guardian enrollment flow in the browser',
       )
-
-      return enrolledFactor
     } catch (error: unknown) {
       logger.error('Failed to complete MFA enrollment:', error)
       throw new Error(
@@ -432,30 +413,14 @@ class Auth0MFAService {
     }
 
     try {
-      // In a real implementation, this would trigger an MFA challenge via Auth0
-      // For now, we'll simulate the challenge
-
-      const challenge: MFAChallenge = {
-        challengeType: factorType,
-        bindingMethod: factorType === 'sms' ? 'sms' : 'prompt',
-        oobCode: `challenge-${userId}-${Date.now()}`,
-      }
-
-      // Log challenge event
-      logSecurityEvent(SecurityEventType.MFA_CHALLENGE_SENT, null, {
-        userId: userId,
-        factorType: factorType,
-        challengeId: challenge.oobCode,
-        timestamp: new Date().toISOString(),
-      })
-
-      // Update Phase 6 MCP server with challenge sent
-      await updatePhase6AuthenticationProgress(
-        userId,
-        `mfa_challenge_sent_${factorType}`,
+      // Guardian challenge delivery happens client-side: the browser
+      // uses the Guardian SDK to request a code from Auth0 via
+      // /authorize. The Management API has no 'send a new code now'
+      // endpoint for an existing enrollment, so a fabricated oobCode
+      // would let the client 'verify' it against nothing. Fail closed.
+      throw new Error(
+        'MFA challenge initiation is not supported server-side; Guardian challenge delivery is client-side via the Guardian SDK',
       )
-
-      return challenge
     } catch (error: unknown) {
       logger.error('Failed to challenge user for MFA:', error)
       throw new Error(
@@ -476,24 +441,16 @@ class Auth0MFAService {
     }
 
     try {
-      // In a real implementation, this would verify the MFA response with Auth0
-      // For now, we'll simulate successful verification
-
-      // Log verification event
-      logSecurityEvent(SecurityEventType.MFA_VERIFICATION_COMPLETED, null, {
-        userId: userId,
-        challengeType: verification.challengeType,
-        success: true,
-        timestamp: new Date().toISOString(),
-      })
-
-      // Update Phase 6 MCP server with verification completion
-      await updatePhase6AuthenticationProgress(
-        userId,
-        `mfa_verification_completed_${verification.challengeType}`,
+      // Guardian MFA verification happens client-side: the browser
+      // uses the Guardian SDK to submit the one-time code to
+      // Auth0's /authorize endpoint. The Management API exposes no
+      // server-side 'verify this code' endpoint, so this method
+      // cannot honestly confirm a code. Returning true here would
+      // let any presented code (or no code at all) satisfy MFA.
+      // Fail closed.
+      throw new Error(
+        'MFA challenge verification is not supported server-side; Guardian verification is client-side via the Guardian SDK',
       )
-
-      return true
     } catch (error: unknown) {
       logger.error('Failed to verify MFA challenge:', error)
 

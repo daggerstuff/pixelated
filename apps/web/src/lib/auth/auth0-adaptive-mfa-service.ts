@@ -312,16 +312,10 @@ export class Auth0AdaptiveMFAService {
           }
         }
 
-        // Check if this is a new IP for the user
-        const user = await retry(
-          async () => await auth0UserService.getUserById(userId),
-          2,
-          500,
-        )
-        if (user?.lastLogin && Math.random() < 0.1) {
-          triggered = true
-          description = `New or unusual IP address for user`
-        }
+        // Probabilistic "new or unusual IP" guesses are removed: a
+        // random trigger would MFA-challenge legitimate users (e.g.
+        // behind NAT/campus ranges) without evidence. The failed-login
+        // log check above is the only IP signal we can honestly report.
       }
     } catch (error: unknown) {
       logger.warn('Failed to analyze IP address:', error)
@@ -364,17 +358,10 @@ export class Auth0AdaptiveMFAService {
         }
       }
 
-      // Check for unusual location change (simulated)
-      const user = await retry(
-        async () => await auth0UserService.getUserById(userId),
-        2,
-        500,
-      )
-      if (user && Math.random() < 0.05 && location.country) {
-        triggered = true
-        description = `Unusual location change detected`
-        value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
-      }
+      // Probabilistic "unusual location" guesses are removed: a random
+      // trigger would flag legitimate travelers without evidence. The
+      // geofencing allowlist check above is the only location signal
+      // we can honestly report.
     } catch (error: unknown) {
       logger.warn('Failed to analyze geolocation:', error)
     }
@@ -479,7 +466,8 @@ export class Auth0AdaptiveMFAService {
           }
         }
 
-        // Check for unusual login patterns (simulated)
+        // Check login recency: a long gap since the last login is a
+        // genuine, verifiable signal from the user record.
         const user = await retry(
           async () => await auth0UserService.getUserById(userId),
           2,
@@ -489,13 +477,15 @@ export class Auth0AdaptiveMFAService {
           const lastLoginTime = new Date(user.lastLogin)
           const timeDiff = timestamp.getTime() - lastLoginTime.getTime()
 
-          // If last login was more than 30 days ago, consider it unusual
+          // If the last login was more than 30 days ago, that is unusual
           if (timeDiff > 30 * 24 * 60 * 60 * 1000) {
             triggered = true
             description = `Unusual login pattern - last login was over 30 days ago`
             value['daysSinceLastLogin'] = Math.round(
               timeDiff / (24 * 60 * 60 * 1000),
             )
+          } else if (!triggered) {
+            description = `Normal login recency (last login within 30 days)`
           }
         }
       }
@@ -550,12 +540,10 @@ export class Auth0AdaptiveMFAService {
           description = `Standard user agent detected`
         }
 
-        // Check for automated tools (simulated)
-        if (Math.random() < 0.02) {
-          // 2% chance for demonstration
-          triggered = true
-          description = `Potential automated tool detected`
-        }
+        // Probabilistic "automated tool" guesses are removed: a random
+        // trigger would challenge legitimate users without evidence. The
+        // suspicious-user-agent pattern check above is the only device
+        // signal we can honestly report.
       }
     } catch (error: unknown) {
       logger.warn('Failed to analyze device:', error)
