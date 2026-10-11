@@ -418,7 +418,11 @@ export class CDNEdgeOptimizer {
   }
 
   /**
-   * Get CDN performance metrics
+   * Get CDN performance metrics.
+   *
+   * The CDN analytics provider has not been wired up yet, so there is no real
+   * telemetry to report. We return zeroed values rather than fabricated
+   * figures, so a caller can distinguish "no data" from a genuine reading.
    */
   async getCDNMetrics(): Promise<{
     cacheHitRate: number
@@ -426,29 +430,22 @@ export class CDNEdgeOptimizer {
     requestsServed: number
     avgResponseTime: number
   }> {
-    try {
-      // This would integrate with CDN analytics APIs
-      // For now, return placeholder data
-
-      return {
-        cacheHitRate: 0.95, // 95% cache hit rate
-        bandwidthSaved: 0, // Bytes saved through caching
-        requestsServed: 0, // Total requests served by CDN
-        avgResponseTime: 50, // Average response time in ms
-      }
-    } catch (error: unknown) {
-      logger.error('Failed to get CDN metrics', { error })
-      return {
-        cacheHitRate: 0,
-        bandwidthSaved: 0,
-        requestsServed: 0,
-        avgResponseTime: 0,
-      }
+    logger.warn('CDN analytics not configured; returning no metrics', {
+      provider: this.config.provider,
+    })
+    return {
+      cacheHitRate: 0,
+      bandwidthSaved: 0,
+      requestsServed: 0,
+      avgResponseTime: 0,
     }
   }
 
   /**
-   * Optimize static assets for global delivery
+   * Optimize static assets for global delivery.
+   *
+   * The static-asset scan is not implemented yet, so nothing has been
+   * optimized. Returns zeroed counts rather than fabricated savings.
    */
   async optimizeStaticAssets(): Promise<{
     optimized: number
@@ -456,9 +453,6 @@ export class CDNEdgeOptimizer {
     savings: number
   }> {
     logger.info('Starting static asset optimization for CDN')
-
-    // This would scan public directory and optimize all static assets
-    // For now, return placeholder results
 
     const result = {
       optimized: 0,
