@@ -6,6 +6,10 @@ const mockRedis = vi.hoisted(() => ({
   getFromCache: vi.fn(),
   setInCache: vi.fn(),
   removeFromCache: vi.fn(),
+  redisClient: {
+    keys: vi.fn(() => []),
+    del: vi.fn(() => 0),
+  },
 }))
 
 const mockAuthClient = vi.hoisted(() => ({
