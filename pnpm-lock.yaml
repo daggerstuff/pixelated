@@ -359,8 +359,8 @@ importers:
         specifier: ^0.4.3
         version: 0.4.3(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(zod@4.6.5)
       '@cloudflare/think':
-        specifier: ^0.20.0
-        version: 0.20.0(@ai-sdk/provider@4.0.17)(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(agents@0.26.0(@ai-sdk/provider@4.0.17)(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.5)(@cloudflare/codemode@0.5.2(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(zod@4.6.5))(@modelcontextprotocol/client@2.2.0)(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(@modelcontextprotocol/server@2.0.0)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.0)(rolldown@1.2.9)(vite@7.3.6(@types/node@26.6.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(react@19.3.0)(supports-color@10.2.2)(zod@4.6.5)
+        specifier: ^0.20.2
+        version: 0.20.2(@ai-sdk/provider@4.0.17)(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(agents@0.26.0(@ai-sdk/provider@4.0.17)(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.5)(@cloudflare/codemode@0.5.2(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(zod@4.6.5))(@modelcontextprotocol/client@2.2.0)(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(@modelcontextprotocol/server@2.0.0)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.0)(rolldown@1.2.9)(vite@7.3.6(@types/node@26.6.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(react@19.3.0)(supports-color@10.2.2)(zod@4.6.5)
       '@google-cloud/storage':
         specifier: ^8.2.0
         version: 8.2.0(supports-color@10.2.2)
@@ -371,8 +371,8 @@ importers:
         specifier: ^5.9.1
         version: 5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-errors@3.0.0(ajv@8.20.0))(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(class-transformer@0.5.1)(class-validator@0.15.1)(effect@3.22.2)(joi@17.13.8)(react-hook-form@7.89.0(@types/react@19.3.0)(react@19.3.0))(zod@4.6.5)
       '@iconify-json/lucide':
-        specifier: ^1.2.140
-        version: 1.2.140
+        specifier: ^1.2.142
+        version: 1.2.142
       '@microsoft/clarity':
         specifier: ^1.0.2
         version: 1.0.2
@@ -446,20 +446,20 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@sentry/astro':
-        specifier: ^10.76.0
-        version: 10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@7.3.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.2)(@upstash/redis@1.39.0)(@vercel/functions@3.9.8(@aws-sdk/credential-provider-web-identity@3.972.77)(ws@8.22.0(utf-8-validate@6.0.6)))(db0@0.4.1)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(rollup@4.64.0)(supports-color@10.2.2)
+        specifier: ^10.76.2
+        version: 10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@7.3.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.2)(@upstash/redis@1.39.0)(@vercel/functions@3.9.8(@aws-sdk/credential-provider-web-identity@3.972.77)(ws@8.22.0(utf-8-validate@6.0.6)))(db0@0.4.1)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(rollup@4.64.0)(supports-color@10.2.2)
       '@sentry/node':
-        specifier: ^10.76.0
-        version: 10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
+        specifier: ^10.76.2
+        version: 10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
       '@sentry/profiling-node':
-        specifier: ^10.76.0
-        version: 10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
+        specifier: ^10.76.2
+        version: 10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
       '@sentry/react':
-        specifier: ^10.76.0
-        version: 10.76.0(react@19.3.0)
+        specifier: ^10.76.2
+        version: 10.76.2(react@19.3.0)
       '@sentry/vite-plugin':
-        specifier: ^5.4.0
-        version: 5.4.0(rollup@4.64.0)(supports-color@10.2.2)
+        specifier: ^5.4.1
+        version: 5.4.1(rollup@4.64.0)(supports-color@10.2.2)
       '@tanstack/react-query':
         specifier: ^5.104.1
         version: 5.104.1(react@19.3.0)
@@ -546,7 +546,7 @@ importers:
         version: 3.4.16
       drizzle-orm:
         specifier: ^0.45.2
-        version: 0.45.3(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.2.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.39.0)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2)
+        version: 0.45.4(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.2.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.39.0)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2)
       eve:
         specifier: ^0.71.2
         version: 0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2))
@@ -587,8 +587,8 @@ importers:
         specifier: ^6.3.0
         version: 6.3.0(crossws@0.4.12(srvx@1.0.5))(graphql@17.0.2)(ws@8.22.0(utf-8-validate@6.0.6))
       graphql-yoga:
-        specifier: ^5.24.2
-        version: 5.24.2(graphql@17.0.2)
+        specifier: ^5.24.4
+        version: 5.24.4(graphql@17.0.2)
       helmet:
         specifier: ^8.3.0
         version: 8.3.0
@@ -602,8 +602,8 @@ importers:
         specifier: ^26.4.0
         version: 26.4.2(typescript@5.8.3)
       idb:
-        specifier: ^8.0.3
-        version: 8.0.3
+        specifier: ^8.0.4
+        version: 8.0.4
       ioredis:
         specifier: ^5.11.1
         version: 5.11.1(supports-color@10.2.2)
@@ -621,7 +621,7 @@ importers:
         version: 9.0.3
       langsmith:
         specifier: '>=0.4.6'
-        version: 0.10.8(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.219.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(ws@8.22.0(utf-8-validate@6.0.6))(zod@4.6.5)
+        version: 0.10.11(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.219.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(ws@8.22.0(utf-8-validate@6.0.6))(zod@4.6.5)
       lucide-react:
         specifier: ^1.52.0
         version: 1.52.0(@types/react@19.3.0)(react@19.3.0)
@@ -641,8 +641,8 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       mongoose:
-        specifier: ^9.11.0
-        version: 9.11.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
+        specifier: ^9.11.1
+        version: 9.11.1(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
       morgan:
         specifier: ^1.12.1
         version: 1.12.1(supports-color@10.2.2)
@@ -659,8 +659,8 @@ importers:
         specifier: ^7.0.0
         version: 7.0.0
       nodemailer:
-        specifier: ^10.0.15
-        version: 10.0.15
+        specifier: ^10.0.16
+        version: 10.0.16
       otplib:
         specifier: ^13.5.0
         version: 13.5.0
@@ -701,8 +701,8 @@ importers:
         specifier: ^2.6.1
         version: 2.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react-i18next:
-        specifier: ^17.0.15
-        version: 17.0.15(i18next@26.4.2(typescript@5.8.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.8.3)
+        specifier: ^17.0.16
+        version: 17.0.16(i18next@26.4.2(typescript@5.8.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.8.3)
       recharts:
         specifier: ^3.10.1
         version: 3.10.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react-is@19.3.0)(react@19.3.0)(redux@5.0.1)
@@ -725,8 +725,8 @@ importers:
         specifier: ^11.1.2
         version: 11.1.2
       resend:
-        specifier: ^6.32.0
-        version: 6.32.0
+        specifier: ^6.32.1
+        version: 6.32.1
       socket.io:
         specifier: ^4.8.4
         version: 4.8.4(supports-color@10.2.2)(utf-8-validate@6.0.6)
@@ -862,7 +862,7 @@ importers:
         version: 12.0.3(graphql@17.0.2)
       '@graphql-yoga/plugin-persisted-operations':
         specifier: ^3.24.2
-        version: 3.24.2(graphql-yoga@5.24.2(graphql@17.0.2))(graphql@17.0.2)
+        version: 3.24.2(graphql-yoga@5.24.4(graphql@17.0.2))(graphql@17.0.2)
       '@iconify-json/ri':
         specifier: ^1.2.10
         version: 1.2.10
@@ -877,7 +877,7 @@ importers:
         version: 1.63.0
       '@spotlightjs/astro':
         specifier: ^3.2.6
-        version: 3.2.6(eef76c2e6fdc00bf9693ce800ce927ae)
+        version: 3.2.6(e71cb7bffec616fb9f5b7cc7d12c063a)
       '@stoplight/spectral-cli':
         specifier: ^6.17.0
         version: 6.17.0
@@ -1293,8 +1293,8 @@ importers:
         specifier: ^1.29.0
         version: 1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
-        specifier: 2.4.0
-        version: 2.4.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
+        specifier: 2.4.1
+        version: 2.4.1(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
       ai:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
@@ -1327,8 +1327,8 @@ importers:
         specifier: ^1.29.0
         version: 1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
-        specifier: 2.4.0
-        version: 2.4.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
+        specifier: 2.4.1
+        version: 2.4.1(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
       ai:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
@@ -1364,8 +1364,8 @@ importers:
         specifier: ^1.29.0
         version: 1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
-        specifier: 2.4.0
-        version: 2.4.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
+        specifier: 2.4.1
+        version: 2.4.1(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
       ai:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
@@ -1401,8 +1401,8 @@ importers:
         specifier: ^1.29.0
         version: 1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
-        specifier: 2.4.0
-        version: 2.4.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
+        specifier: 2.4.1
+        version: 2.4.1(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
       ai:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
@@ -1456,8 +1456,8 @@ importers:
         specifier: ^1.29.0
         version: 1.43.0
       '@vercel/connect':
-        specifier: 2.4.0
-        version: 2.4.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
+        specifier: 2.4.1
+        version: 2.4.1(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
       ai:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
@@ -1511,8 +1511,8 @@ importers:
         specifier: ^1.29.0
         version: 1.43.0
       '@vercel/connect':
-        specifier: 2.4.0
-        version: 2.4.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
+        specifier: 2.4.1
+        version: 2.4.1(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
       ai:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
@@ -1566,8 +1566,8 @@ importers:
         specifier: ^1.29.0
         version: 1.43.0
       '@vercel/connect':
-        specifier: 2.4.0
-        version: 2.4.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
+        specifier: 2.4.1
+        version: 2.4.1(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
       ai:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
@@ -1612,8 +1612,8 @@ importers:
         specifier: ^1.29.0
         version: 1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5)
       '@vercel/connect':
-        specifier: 2.4.0
-        version: 2.4.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
+        specifier: 2.4.1
+        version: 2.4.1(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))
       ai:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
@@ -1685,8 +1685,8 @@ importers:
         specifier: ^9.0.0
         version: 9.0.3
       mongoose:
-        specifier: ^9.11.0
-        version: 9.11.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
+        specifier: ^9.11.1
+        version: 9.11.1(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
       multer:
         specifier: ^2.1.1
         version: 2.4.0
@@ -1694,8 +1694,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(@aws-sdk/client-s3@3.1136.0)
       nodemailer:
-        specifier: ^10.0.15
-        version: 10.0.15
+        specifier: ^10.0.16
+        version: 10.0.16
       pg:
         specifier: ^8.22.0
         version: 8.23.0
@@ -2839,12 +2839,12 @@ packages:
   '@cloudflare/shell@0.4.3':
     resolution: {integrity: sha512-6ZMKQZqdZeommh8LGFK5C2rep4byJfCuyjR4NBdMqn2wW9tbeDJORfDhP/No75MLx8nJeWdgeXvq3D2Ijpa0XA==}
 
-  '@cloudflare/think@0.20.0':
-    resolution: {integrity: sha512-1+BMb0XhALPDmCbzbPhITITANrIqBBYCT0sEIHFSbGOwGhWKLmblzdw8YP/FySdXuYko+y5PIcCXoxjNz0Ji1g==}
+  '@cloudflare/think@0.20.2':
+    resolution: {integrity: sha512-6hkdWYlS3n00tbPwQ6eT6pcHJ9W1POlNgVrZWbwL7biO77/tX80tBwORoujMtTMdc3OaLjb7L5MokAy6bjFO/Q==}
     peerDependencies:
       '@ai-sdk/react': ^4.0.0
       '@chat-adapter/telegram': ^4.29.0
-      agents: '>=0.25.0 <1.0.0'
+      agents: '>=0.28.0 <1.0.0'
       ai: ^7.0.0
       react: ^19.2.4
       zod: ^4.3.2
@@ -3542,6 +3542,12 @@ packages:
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
+  '@graphql-tools/executor@2.0.3':
+    resolution: {integrity: sha512-0qUCtalTDdanDuvW4EiHnNMct8QHYKTuGjI2lXU388LrpoV+5tlqp/xPqdYbrDtl3OBpZHToOEBcQunWz1UDig==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+
   '@graphql-tools/git-loader@8.0.42':
     resolution: {integrity: sha512-1goUoV8vSrnKez93lseg9da1zQ8b7L16Z6p/i7vYM5JHjEpl1pfFH9qJmg6D6uZmB/X56P8o+evb5vPW2Ak1AQ==}
     engines: {node: '>=16.0.0'}
@@ -3778,8 +3784,8 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@iconify-json/lucide@1.2.140':
-    resolution: {integrity: sha512-/br6j8K8IFcZscs7gJ20PWaaonQeA4jcGK0Bdt+4EDra2Zbtpb36RGaGOJr5opz6zJtXaZdMCYCXa0dN/y4c0g==}
+  '@iconify-json/lucide@1.2.142':
+    resolution: {integrity: sha512-vEGX5X52/l77jRMcmxXk3PiEebldDUs8WFdM8X3Evq1S9p5F+o0VZhx8sqaQsmFEB9Ukp5ND5Q/0g2kQ/LF+rQ==}
 
   '@iconify-json/ri@1.2.10':
     resolution: {integrity: sha512-WWMhoncVVM+Xmu9T5fgu2lhYRrKTEWhKk3Com0KiM111EeEsRLiASjpsFKnC/SrB6covhUp95r2mH8tGxhgd5Q==}
@@ -6644,22 +6650,22 @@ packages:
     resolution: {integrity: sha512-Fz5+4XCg3akeoFK+K7g+d7HqGMjmnLoY2eJlpONJmaeT9pXY7yfUyXKZMmMajdE2LxxKJgQ2YKvSCaGVamTjHw==}
     engines: {node: '>=8'}
 
-  '@sentry/astro@10.76.0':
-    resolution: {integrity: sha512-RUtStSNQ5BBgqgZbUWltN/SMekNWXFggSMCLhLVAypeXGosOnldK6mNaXB48+bS80tWoykABHIeq2tI+8n1oBQ==}
+  '@sentry/astro@10.76.2':
+    resolution: {integrity: sha512-+do+7gA/aezLwdxTmmG0BpO1te+EMN/3fUCfeVsr7MYabWSLMPWmGkLQlDgIJhYTZYTdc8yeEOaivq34jzdA9Q==}
     engines: {node: '>=18.19.1'}
     peerDependencies:
       astro: '>=3.x || >=4.0.0-beta || >=7.0.0-beta'
 
-  '@sentry/browser-utils@10.76.0':
-    resolution: {integrity: sha512-PiNBEDSCW74NlBQynazauyIfqAYW4r7WgOpw1Fl36C/5CWAZMWLZVGIXjt8gnzx3yAm13O6qkhJU5KPdeVkHQQ==}
+  '@sentry/browser-utils@10.76.2':
+    resolution: {integrity: sha512-onALxAdvLWyK+0erbrv7LVzh1zX9sErOM21eCz1dpNUIQadrR9tmd5J1kL9a2Wagq1RyIWRmy/YtpwOK4myZaQ==}
     engines: {node: '>=18'}
 
-  '@sentry/browser@10.76.0':
-    resolution: {integrity: sha512-x81duXkPe9bYHJI1H42O6OjPakcYXrEBAqV+G806oKTYzcIUzSbRwwDwQRec3QiMtvogvuR1vBI+4m1acpwx1Q==}
+  '@sentry/browser@10.76.2':
+    resolution: {integrity: sha512-dFyuWYjDs0/LetQZqK5IHj0/wIC8sBYADyMjU5Fo0nt2vzT11CPPG2AKeITIQcoRRs9IZ8ahtDMqWMvBPfDs1w==}
     engines: {node: '>=18'}
 
-  '@sentry/bundler-plugins@10.75.1':
-    resolution: {integrity: sha512-kRv2Yriz44i2B0PKktN8yDH2NhMnI3WUD0XqiBkNrg0nSaiJuTkzAn0iAMR603hQ3SQQgdyaNFeg0ZBM9CWL7A==}
+  '@sentry/bundler-plugins@10.76.2':
+    resolution: {integrity: sha512-5ovSYkHaTTDwe6p9vq0AzE+W9likkINBpzCv7VychGqYUfBGNzr+0YVkAt9//saJI9BKs+lWud5qX5iASf6wkw==}
     engines: {node: '>= 18'}
     peerDependencies:
       rollup: '>=3.2.0'
@@ -6742,16 +6748,16 @@ packages:
     resolution: {integrity: sha512-ixvtKmPF42Y6ckGUbFlB54OWI75H2gO5UYHojO6eXFpS7xO3ZGgV/QH6wb40mWK+0w5XZ0233FuU9VpsuE6mKA==}
     engines: {node: '>=18'}
 
-  '@sentry/feedback@10.76.0':
-    resolution: {integrity: sha512-2kqcAsqAdHxlqN/uKKvIYloWOhltK9Vxt8z43Jb87iPdqm+rxpyxAJZJMFIzOPCqCLod9HrULo/bPd/aHwRpew==}
+  '@sentry/feedback@10.76.2':
+    resolution: {integrity: sha512-w8T7+LfAXjPPg/CpIcXHzPfeMHXR+61WhfYCwKNFK4mUQknYK4m0Kbt28dte9fSsijo4hKvHZ+tJc591SaD4ig==}
     engines: {node: '>=18'}
 
   '@sentry/integrations@7.120.4':
     resolution: {integrity: sha512-kkBTLk053XlhDCg7OkBQTIMF4puqFibeRO3E3YiVc4PGLnocXMaVpOSCkMqAc1k1kZ09UgGi8DxfQhnFEjUkpA==}
     engines: {node: '>=8'}
 
-  '@sentry/node-core@10.76.0':
-    resolution: {integrity: sha512-JCLrnn9otQV0xbj7xkgosj732LrVY2LXjYLhfE0WH6DZHRU1nLGcoxyPxWH9l0NkrQYA2KLNiAMn3FmcA98lNw==}
+  '@sentry/node-core@10.76.2':
+    resolution: {integrity: sha512-TrgAc/SvU5kQfjw8pz6I8LLIUiblOSf9BPPNkTbS0Dzcqa4yQLVbmsbS3rvGT7ot64m9Vjzn327ZRy63MlI6/w==}
     engines: {node: '>=18'}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
@@ -6775,8 +6781,8 @@ packages:
     resolution: {integrity: sha512-FaYbFWxEyTTVqXLJccokJCkwx2cTuvTiRaM9kA+O4HbZVT49xYXqSV9cNLI5UqJhgdHiZDhelBd5LB4wj7IIRA==}
     engines: {node: '>=18'}
 
-  '@sentry/node@10.76.0':
-    resolution: {integrity: sha512-qWt0301wRws9HtbGsOmXapS69cIL5Ald8ZurKsGrqbQ65Ls7QqwS8ZeSS47PRLeJzpQT0xfr4+uNNm6R4hqyjQ==}
+  '@sentry/node@10.76.2':
+    resolution: {integrity: sha512-LSwGGE/GceTbkDHRoQQr3lq/dpxxA6RdooBbuGTJ/S6BdqKX2kw2FdV7Se9eJzZJJJ5AxCZum37+ejYS7N2pJg==}
     engines: {node: '>=18'}
 
   '@sentry/node@7.120.4':
@@ -6787,8 +6793,8 @@ packages:
     resolution: {integrity: sha512-x3Whryb4TytiIhH9ABLVuASfBvwA50v6PpJYvq0Y9dUMi9Eb0cfuqvRCB3e+oVntZHQpnXor2U/gRBIdG2jp4w==}
     engines: {node: '>=14.18'}
 
-  '@sentry/opentelemetry@10.76.0':
-    resolution: {integrity: sha512-elMhLZQ56fBUbES7nnZ53tJMuchLPdx8ibQqtEIUGrhSkl4PD0yC1xKP/btQjmIi16GrzZUJlKDbcOc+0o8ZIw==}
+  '@sentry/opentelemetry@10.76.2':
+    resolution: {integrity: sha512-deqWrKJGaku3nhiZchg34z8W9v6kUwtzoQ4cmEq6CeT8/4X93X4YfeJgoh1dhbswFRpwor4pQ6kj0KttagKtfA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
@@ -6806,27 +6812,27 @@ packages:
       '@opentelemetry/sdk-trace-base': ^1.30.1
       '@opentelemetry/semantic-conventions': ^1.28.0
 
-  '@sentry/profiling-node@10.76.0':
-    resolution: {integrity: sha512-HLkZRByySajaHI1i7ueY2OaYS2OZ8w+BtBMZkIL5X/iyJlZYdO/YtgLBB4UesNSOdclcyKmlDcDTuM6AYuB20Q==}
+  '@sentry/profiling-node@10.76.2':
+    resolution: {integrity: sha512-M8PEFoaCbu+JiESkShJ7aYG4BG3qbAgtmDV8RC+Lf3NvB3pUEAue3LIhDwAMlOKuxlaAAl6gfyDPjnXLdJBiEw==}
     engines: {node: '>=18'}
     hasBin: true
 
-  '@sentry/react@10.76.0':
-    resolution: {integrity: sha512-SqWr3PukUWEfa8szj5JSVrJUE8blIheUDjhASCEg4EyP/x1LJieV+6mD7CAW8TNHVOuc8zJlnxFRDzvVbpOIXA==}
+  '@sentry/react@10.76.2':
+    resolution: {integrity: sha512-ylW0pGg6LA8iPEPjoLXi/6IxzPSTo92pqwVMPAGRhS04he904jsIV4oMt97irDfyGEUUdZFdm/tpWO40Xuu4RQ==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^19.2.4
 
-  '@sentry/replay-canvas@10.76.0':
-    resolution: {integrity: sha512-Bq4x5YHEE28ulu8rZGepTPYjjC4koScxBI2E+rQj0iHVCB5ISHqO9S8GhDA2DTn08GrZyTQzzyvL+aQaw4tDEA==}
+  '@sentry/replay-canvas@10.76.2':
+    resolution: {integrity: sha512-mx7/pXIS7CpuduN5TFI36pBoe62CeTQ4IMQJ+MEJXAhxMmYFZQunc24dNltcs6hjzrhtZqGBYSAV1J+iCKFwdg==}
     engines: {node: '>=18'}
 
-  '@sentry/replay@10.76.0':
-    resolution: {integrity: sha512-ldO+F4koH+x5WaFcAuFIMU0WMDorhHJQM1mFUoR97JtnuC48/U3+AiH3FgC39JeRwDArusjiT+xmpjt1Q/buHQ==}
+  '@sentry/replay@10.76.2':
+    resolution: {integrity: sha512-xMNFEZ7KuEvfj9j1cKmcH+p6u5t3NZs1vcrj+sBW5+S9C327ASOAvcR23ZoM0UhTXr9j7j+Dozs/NYHW2EYjpw==}
     engines: {node: '>=18'}
 
-  '@sentry/server-utils@10.76.0':
-    resolution: {integrity: sha512-PJT8i3xsaSEAwVjgVrVClpFVB9+caxn4AVlUbgjt3/NwkoggKmSaoSUq5vpvzFPO11H1V+50qz9xxCw9gc9EzQ==}
+  '@sentry/server-utils@10.76.2':
+    resolution: {integrity: sha512-wogj6Trj8fAu+aD7HbpvHEBlyANMOvvO9MP5NFJaiQbprLKugtCdE6rFTxDhofXvRo4nswL9m4Cvysg3k5KcvQ==}
     engines: {node: '>=18'}
 
   '@sentry/types@7.120.4':
@@ -6837,8 +6843,8 @@ packages:
     resolution: {integrity: sha512-zCKpyDIWKHwtervNK2ZlaK8mMV7gVUijAgFeJStH+CU/imcdquizV3pFLlSQYRswG+Lbyd6CT/LGRh3IbtkCFw==}
     engines: {node: '>=8'}
 
-  '@sentry/vite-plugin@5.4.0':
-    resolution: {integrity: sha512-fFJgCxs5hDyAm9BbZJ+LbA+LK2tjX5OoD0v0ARU4StR6KQmGUduoPs69yJ9AfqZ0om3Rlp5JDliiwFcNkasORA==}
+  '@sentry/vite-plugin@5.4.1':
+    resolution: {integrity: sha512-poFfn3sQbSFaZpXH8CG27D0eNtDD64wFEniQCb853e7huko9vOl4UP3BjT3vsrnmVuRqagnbxItza10MOC7ysA==}
     engines: {node: '>= 18'}
 
   '@shikijs/core@4.5.0':
@@ -7908,11 +7914,11 @@ packages:
     resolution: {integrity: sha512-kQF8LGie/Hbdq9/psJxLE7owRTcqMQMhgybU04gCeR7cbQAr5t8OrjefDNColJv1QSSucFt4pLwRiARVmlOnug==}
     engines: {node: '>= 18'}
 
-  '@vercel/connect@2.4.0':
-    resolution: {integrity: sha512-DLgITa6iPZRhmPA5L76c1riEiCnsTUmBvfkcbgaOM/0PtSHjOnb8AQ9ywyiyDidlUvLnBot9cteaorjIx0aoWA==}
+  '@vercel/connect@2.4.1':
+    resolution: {integrity: sha512-KsVbpJ9NDl16VyWcG/XUhfwvViNu9UzrpIXgi5pTCrMOy2zhIU5h4bh2hST81rYdoTezFoX+HncDZeFztei2KQ==}
     peerDependencies:
       '@ai-sdk/mcp': ^1 || ^2
-      '@auth/core': '>=0.37.0'
+      '@auth/core': '>=0.41.3'
       '@chat-adapter/slack': ^4.0.0
       '@modelcontextprotocol/sdk': ^1.29.0
       ai: ^6 || ^7.0.0-beta.0
@@ -8138,6 +8144,10 @@ packages:
   '@whatwg-node/disposablestack@0.0.6':
     resolution: {integrity: sha512-LOtTn+JgJvX8WfBVJtF08TGrdjuFzGJc4mkP8EdDI8ADbvO7kiexYep1o8dwnt0okb0jYclCDXF13xU7Ge4zSw==}
     engines: {node: '>=18.0.0'}
+
+  '@whatwg-node/disposablestack@0.1.0':
+    resolution: {integrity: sha512-ok0A9+D+mdeb3w1GNCpVr+2gVVLRWKo9Ywm/whNsoWSNfNg3jNxS0/wUF6NSUYbfOtFGu2wZgJnLjasbaQEfvA==}
+    engines: {node: '>=22.15.0'}
 
   '@whatwg-node/events@0.1.2':
     resolution: {integrity: sha512-ApcWxkrs1WmEMS2CaLLFUEem/49erT3sxIVjpzU5f6zmVcnijtDSrhoK2zVobOIikZJdH63jdAXOrvjf6eOUNQ==}
@@ -9636,8 +9646,8 @@ packages:
   dpop@2.1.2:
     resolution: {integrity: sha512-hN3XjjCcgYWmNL8DFAV1Z3alXIvLolvjis189NI/U4k4Iu/m4rBeUYObbIjnRzQYDQv4zMaXXskjVDqSkmyh7Q==}
 
-  drizzle-orm@0.45.3:
-    resolution: {integrity: sha512-CAloER21cDdcgZ1OmjrZX82EeRNsdP+y0onX/eyoYDaYzki/adrAa91lzM5jWh7zZPK4qUbw/6LGv9J+A+uizA==}
+  drizzle-orm@0.45.4:
+    resolution: {integrity: sha512-NiM1YZpJ2UxyeE67DpDDZ+Tsw4YLX3trSlkNT7Tm9eKoUNb1LvaAaQzXgYQsWs+AQ9TUmmwMmBOCXuqqxUWKKQ==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': 4.20260611.1
@@ -10627,8 +10637,8 @@ packages:
       ws:
         optional: true
 
-  graphql-yoga@5.24.2:
-    resolution: {integrity: sha512-pQoCb4BjDF3ZccHugxm84EQcG4d0qK+r11hFylB4AncvIp1r6PZ450mLRwCv+5c7884/ppPJQPWdnIAIXSCQUA==}
+  graphql-yoga@5.24.4:
+    resolution: {integrity: sha512-jnpLm2g9BfnP18VKL+Yao8YRQYgDjXdAkFgZso/tnKFcRcAtOeUKLDVc1XnYiE3uooXzfIQzsvpKR+fC3we4QA==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       graphql: ^15.2.0 || ^16.0.0 || ^17.0.0
@@ -10879,8 +10889,8 @@ packages:
     resolution: {integrity: sha512-IKXpvIzjnC9XTAUbVBcMfGS0EPaIXtW6v+zr+RRp+hqULEpo0owZax6wyRwPOJbWbzjYspQwusTsfVr0ifh4uQ==}
     engines: {node: '>=0.10.0'}
 
-  idb@8.0.3:
-    resolution: {integrity: sha512-LtwtVyVYO5BqRvcsKuB2iUMnHwPVByPCXFXOpuU96IZPPoPN6xjOGxZQ74pgSVVLQWtUOYgyeL4GE98BY5D3wg==}
+  idb@8.0.4:
+    resolution: {integrity: sha512-jd0ITCrN+Zah4J7R/Z2jnR3W7A4BXDAjmo62MwWuSjxCiueUAf7X5rbodEdidWzeknwXHmLpdZkoiiCppNi30Q==}
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
@@ -11690,8 +11700,8 @@ packages:
   kuler@2.0.0:
     resolution: {integrity: sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A==}
 
-  langsmith@0.10.8:
-    resolution: {integrity: sha512-svLrSnytr4cwZvx5XAel93fXRB1/OmC/u7tfXhnmyMpxIazPLDKKaMQYxGIjCvCRGhprmp9P4RiKM8ecZU46Mg==}
+  langsmith@0.10.11:
+    resolution: {integrity: sha512-99ySd5piFC/y0kyKxlUODamdxYuHs0Sbnz47mop0SypvOaRT8REuB1vd8QpESBag8sHW0QPSXvUbhXpn2+v9yQ==}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
       '@opentelemetry/exporter-trace-otlp-proto': '*'
@@ -12399,8 +12409,8 @@ packages:
       socks:
         optional: true
 
-  mongoose@9.11.0:
-    resolution: {integrity: sha512-dclC0gx/AfasCMX0VChpv4FQ69ylEf3Crve0zKhmYM3VVBK8b0FU8VODx50Th7evM60JxVal8V/1XZQiwLHjwA==}
+  mongoose@9.11.1:
+    resolution: {integrity: sha512-fVtjTVACOtAb0PjDDF+O5NebcEJy5JpAH+AXk16/5i36w38YkW6MZ+KWV54bdIOJFymDz1VjjA5Xg6L2QfjQjQ==}
     engines: {node: '>=20.19.0'}
 
   morgan@1.12.1:
@@ -12623,8 +12633,8 @@ packages:
   node-seal@7.0.0:
     resolution: {integrity: sha512-R5q8PQ6z3Hyq7x1uunNf5yZtDuSlffYkWFA5uvzL2fYF/IHL7+KwCsRdLlG3inBU1dMUgakDWiuqf0csMvcang==}
 
-  nodemailer@10.0.15:
-    resolution: {integrity: sha512-EUqp5PhtcsYXs9Fq/lS7s/8zlTrnBqmzZWzFFROrNikMiz+om/YRKMwqN907t+0A1KKyT8jd39CBUbFZmaZmcA==}
+  nodemailer@10.0.16:
+    resolution: {integrity: sha512-VL9xKErxN+el77o8eBOuYKUPMyEx7F9hfnDCuiUKJRp9v3wnWMOudYgP/SWbwSHy8rUL4cylobuXtki1LpQS7A==}
     engines: {node: '>=20.0.0'}
 
   nopt@8.1.0:
@@ -13358,8 +13368,8 @@ packages:
       '@types/react-dom':
         optional: true
 
-  react-i18next@17.0.15:
-    resolution: {integrity: sha512-7uYpx/oBkesLto7cOzOmfITlUBaXHCAcFahmgETMfWr8nbbWRRnVGvz8wsH/xpbNcyoH+NpCcnOQEqWPMO6/hw==}
+  react-i18next@17.0.16:
+    resolution: {integrity: sha512-7uImVD9hG5yUOaP5KHVied1x0A004Di/KU031ULR35Ma+9e9H5GdnNZHgQEIByyAz+IAXBkRDTedNVzjPUH8ZA==}
     peerDependencies:
       i18next: '>= 26.2.0'
       react: ^19.2.4
@@ -13581,8 +13591,8 @@ packages:
   reselect@5.2.0:
     resolution: {integrity: sha512-AgZ3UOZm3YndfrJ4OYjgrT7bmCm/1iqkjvEfH/oYjzh6PD2qw4QuT3jjnXIrpdt4MTpMXclMT3lXbmRY+XRakw==}
 
-  resend@6.32.0:
-    resolution: {integrity: sha512-bZZUeKlpKINFT+zGG2iIzfDewkyEHRaE7Xk1haseVz3Gfw6ekkizN6KdKgZSMjt5ywE8vMwr3wTdenlF8P475Q==}
+  resend@6.32.1:
+    resolution: {integrity: sha512-Z9DxkIZt5uvVNkjxjc+r4rCPI0MdDIJ7H+GvU50o9GkhrD0tVTwP6caE8KYEco90sos312l6R72jAEMCBFBiFQ==}
     engines: {node: '>=20'}
     peerDependencies:
       '@react-email/render': '*'
@@ -16908,7 +16918,7 @@ snapshots:
       - ai
       - zod
 
-  '@cloudflare/think@0.20.0(@ai-sdk/provider@4.0.17)(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(agents@0.26.0(@ai-sdk/provider@4.0.17)(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.5)(@cloudflare/codemode@0.5.2(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(zod@4.6.5))(@modelcontextprotocol/client@2.2.0)(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(@modelcontextprotocol/server@2.0.0)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.0)(rolldown@1.2.9)(vite@7.3.6(@types/node@26.6.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(react@19.3.0)(supports-color@10.2.2)(zod@4.6.5)':
+  '@cloudflare/think@0.20.2(@ai-sdk/provider@4.0.17)(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(agents@0.26.0(@ai-sdk/provider@4.0.17)(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.5)(@cloudflare/codemode@0.5.2(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(zod@4.6.5))(@modelcontextprotocol/client@2.2.0)(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(@modelcontextprotocol/server@2.0.0)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.0)(rolldown@1.2.9)(vite@7.3.6(@types/node@26.6.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(react@19.3.0)(supports-color@10.2.2)(zod@4.6.5)':
     dependencies:
       '@ai-sdk/anthropic': 4.0.59(zod@4.6.5)
       '@ai-sdk/openai': 4.0.72(zod@4.6.5)
@@ -17676,6 +17686,16 @@ snapshots:
       graphql: 17.0.2
       tslib: 2.8.1
 
+  '@graphql-tools/executor@2.0.3(graphql@17.0.2)':
+    dependencies:
+      '@graphql-tools/utils': 12.0.3(graphql@17.0.2)
+      '@graphql-typed-document-node/core': 3.2.0(graphql@17.0.2)
+      '@repeaterjs/repeater': 3.1.0
+      '@whatwg-node/disposablestack': 0.1.0
+      '@whatwg-node/promise-helpers': 2.0.0
+      graphql: 17.0.2
+      tslib: 2.8.1
+
   '@graphql-tools/git-loader@8.0.42(graphql@17.0.2)(supports-color@10.2.2)':
     dependencies:
       '@graphql-tools/graphql-tag-pluck': 8.3.37(graphql@17.0.2)(supports-color@10.2.2)
@@ -17818,11 +17838,11 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@graphql-yoga/plugin-persisted-operations@3.24.2(graphql-yoga@5.24.2(graphql@17.0.2))(graphql@17.0.2)':
+  '@graphql-yoga/plugin-persisted-operations@3.24.2(graphql-yoga@5.24.4(graphql@17.0.2))(graphql@17.0.2)':
     dependencies:
       '@whatwg-node/promise-helpers': 1.3.2
       graphql: 17.0.2
-      graphql-yoga: 5.24.2(graphql@17.0.2)
+      graphql-yoga: 5.24.4(graphql@17.0.2)
 
   '@graphql-yoga/subscription@5.1.1':
     dependencies:
@@ -17896,7 +17916,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@iconify-json/lucide@1.2.140':
+  '@iconify-json/lucide@1.2.142':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -20868,13 +20888,13 @@ snapshots:
       '@sentry/types': 7.120.4
       '@sentry/utils': 7.120.4
 
-  '@sentry/astro@10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@7.3.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.2)(@upstash/redis@1.39.0)(@vercel/functions@3.9.8(@aws-sdk/credential-provider-web-identity@3.972.77)(ws@8.22.0(utf-8-validate@6.0.6)))(db0@0.4.1)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(rollup@4.64.0)(supports-color@10.2.2)':
+  '@sentry/astro@10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@7.3.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.2)(@upstash/redis@1.39.0)(@vercel/functions@3.9.8(@aws-sdk/credential-provider-web-identity@3.972.77)(ws@8.22.0(utf-8-validate@6.0.6)))(db0@0.4.1)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(rollup@4.64.0)(supports-color@10.2.2)':
     dependencies:
-      '@sentry/browser': 10.76.0
+      '@sentry/browser': 10.76.2
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.75.3
-      '@sentry/node': 10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
-      '@sentry/vite-plugin': 5.4.0(rollup@4.64.0)(supports-color@10.2.2)
+      '@sentry/node': 10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
+      '@sentry/vite-plugin': 5.4.1(rollup@4.64.0)(supports-color@10.2.2)
       astro: 7.3.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.2)(@upstash/redis@1.39.0)(@vercel/functions@3.9.8(@aws-sdk/credential-provider-web-identity@3.972.77)(ws@8.22.0(utf-8-validate@6.0.6)))(db0@0.4.1)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
     transitivePeerDependencies:
       - '@opentelemetry/core'
@@ -20884,21 +20904,21 @@ snapshots:
       - supports-color
       - webpack
 
-  '@sentry/browser-utils@10.76.0':
+  '@sentry/browser-utils@10.76.2':
     dependencies:
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.75.3
 
-  '@sentry/browser@10.76.0':
+  '@sentry/browser@10.76.2':
     dependencies:
-      '@sentry/browser-utils': 10.76.0
+      '@sentry/browser-utils': 10.76.2
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.75.3
-      '@sentry/feedback': 10.76.0
-      '@sentry/replay': 10.76.0
-      '@sentry/replay-canvas': 10.76.0
+      '@sentry/feedback': 10.76.2
+      '@sentry/replay': 10.76.2
+      '@sentry/replay-canvas': 10.76.2
 
-  '@sentry/bundler-plugins@10.75.1(rollup@4.64.0)(supports-color@10.2.2)':
+  '@sentry/bundler-plugins@10.76.2(rollup@4.64.0)(supports-color@10.2.2)':
     dependencies:
       '@babel/core': 7.29.7(supports-color@10.2.2)
       '@sentry/cli': 2.58.6(supports-color@10.2.2)
@@ -20972,7 +20992,7 @@ snapshots:
 
   '@sentry/core@9.22.0': {}
 
-  '@sentry/feedback@10.76.0':
+  '@sentry/feedback@10.76.2':
     dependencies:
       '@sentry/core': 10.75.3
 
@@ -20983,11 +21003,11 @@ snapshots:
       '@sentry/utils': 7.120.4
       localforage: 1.10.0
 
-  '@sentry/node-core@10.76.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))':
+  '@sentry/node-core@10.76.2(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))':
     dependencies:
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.75.3
-      '@sentry/opentelemetry': 10.76.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))
+      '@sentry/opentelemetry': 10.76.2(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))
       import-in-the-middle: 3.5.1
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
@@ -21001,16 +21021,16 @@ snapshots:
       detect-libc: 2.1.2
       node-abi: 3.96.0
 
-  '@sentry/node@10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)':
+  '@sentry/node@10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/instrumentation': 0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
       '@opentelemetry/sdk-trace-base': 2.11.0(@opentelemetry/api@1.9.1)
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.75.3
-      '@sentry/node-core': 10.76.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))
-      '@sentry/opentelemetry': 10.76.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))
-      '@sentry/server-utils': 10.76.0
+      '@sentry/node-core': 10.76.2(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.220.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))
+      '@sentry/opentelemetry': 10.76.2(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))
+      '@sentry/server-utils': 10.76.2
       import-in-the-middle: 3.5.1
     transitivePeerDependencies:
       - '@opentelemetry/core'
@@ -21065,7 +21085,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@sentry/opentelemetry@10.76.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))':
+  '@sentry/opentelemetry@10.76.2(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.11.0(@opentelemetry/api@1.9.1))':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.1)
@@ -21083,34 +21103,34 @@ snapshots:
       '@opentelemetry/semantic-conventions': 1.43.0
       '@sentry/core': 8.55.2
 
-  '@sentry/profiling-node@10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)':
+  '@sentry/profiling-node@10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)':
     dependencies:
       '@sentry/core': 10.75.3
-      '@sentry/node': 10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
+      '@sentry/node': 10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
       '@sentry/node-cpu-profiler': 2.4.4
     transitivePeerDependencies:
       - '@opentelemetry/core'
       - '@opentelemetry/exporter-trace-otlp-http'
       - supports-color
 
-  '@sentry/react@10.76.0(react@19.3.0)':
+  '@sentry/react@10.76.2(react@19.3.0)':
     dependencies:
-      '@sentry/browser': 10.76.0
+      '@sentry/browser': 10.76.2
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.75.3
       react: 19.3.0
 
-  '@sentry/replay-canvas@10.76.0':
+  '@sentry/replay-canvas@10.76.2':
     dependencies:
       '@sentry/core': 10.75.3
-      '@sentry/replay': 10.76.0
+      '@sentry/replay': 10.76.2
 
-  '@sentry/replay@10.76.0':
+  '@sentry/replay@10.76.2':
     dependencies:
-      '@sentry/browser-utils': 10.76.0
+      '@sentry/browser-utils': 10.76.2
       '@sentry/core': 10.75.3
 
-  '@sentry/server-utils@10.76.0':
+  '@sentry/server-utils@10.76.2':
     dependencies:
       '@sentry/conventions': 0.16.0
       '@sentry/core': 10.75.3
@@ -21121,9 +21141,9 @@ snapshots:
     dependencies:
       '@sentry/types': 7.120.4
 
-  '@sentry/vite-plugin@5.4.0(rollup@4.64.0)(supports-color@10.2.2)':
+  '@sentry/vite-plugin@5.4.1(rollup@4.64.0)(supports-color@10.2.2)':
     dependencies:
-      '@sentry/bundler-plugins': 10.75.1(rollup@4.64.0)(supports-color@10.2.2)
+      '@sentry/bundler-plugins': 10.76.2(rollup@4.64.0)(supports-color@10.2.2)
     transitivePeerDependencies:
       - encoding
       - rollup
@@ -21247,9 +21267,9 @@ snapshots:
 
   '@speed-highlight/core@1.2.24': {}
 
-  '@spotlightjs/astro@3.2.6(eef76c2e6fdc00bf9693ce800ce927ae)':
+  '@spotlightjs/astro@3.2.6(e71cb7bffec616fb9f5b7cc7d12c063a)':
     dependencies:
-      '@sentry/astro': 10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@7.3.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.2)(@upstash/redis@1.39.0)(@vercel/functions@3.9.8(@aws-sdk/credential-provider-web-identity@3.972.77)(ws@8.22.0(utf-8-validate@6.0.6)))(db0@0.4.1)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(rollup@4.64.0)(supports-color@10.2.2)
+      '@sentry/astro': 10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@7.3.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.2)(@upstash/redis@1.39.0)(@vercel/functions@3.9.8(@aws-sdk/credential-provider-web-identity@3.972.77)(ws@8.22.0(utf-8-validate@6.0.6)))(db0@0.4.1)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(rollup@4.64.0)(supports-color@10.2.2)
       '@spotlightjs/spotlight': 3.0.2(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)
       astro: 7.3.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.2)(@upstash/redis@1.39.0)(@vercel/functions@3.9.8(@aws-sdk/credential-provider-web-identity@3.972.77)(ws@8.22.0(utf-8-validate@6.0.6)))(db0@0.4.1)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
     transitivePeerDependencies:
@@ -22554,7 +22574,7 @@ snapshots:
     dependencies:
       execa: 5.1.1
 
-  '@vercel/connect@2.4.0(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))':
+  '@vercel/connect@2.4.1(@ai-sdk/mcp@2.0.55(zod@4.6.5))(@modelcontextprotocol/sdk@1.32.1(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.5))(ai@7.0.109(zod@4.6.5))(eve@0.71.2(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(chat@4.41.0(ai@7.0.109(zod@4.6.5))(supports-color@10.2.2)(zod@4.6.5))(just-bash@3.6.0(supports-color@10.2.2)))':
     dependencies:
       '@vercel/oidc': 3.7.1
     optionalDependencies:
@@ -22865,6 +22885,11 @@ snapshots:
   '@whatwg-node/disposablestack@0.0.6':
     dependencies:
       '@whatwg-node/promise-helpers': 1.3.2
+      tslib: 2.8.1
+
+  '@whatwg-node/disposablestack@0.1.0':
+    dependencies:
+      '@whatwg-node/promise-helpers': 2.0.0
       tslib: 2.8.1
 
   '@whatwg-node/events@0.1.2':
@@ -24411,7 +24436,7 @@ snapshots:
 
   dpop@2.1.2: {}
 
-  drizzle-orm@0.45.3(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.2.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.39.0)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2):
+  drizzle-orm@0.45.4(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.2.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.39.0)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20260611.1
       '@neondatabase/serverless': 1.2.0
@@ -25548,11 +25573,11 @@ snapshots:
       crossws: 0.4.12(srvx@1.0.5)
       ws: 8.22.0(utf-8-validate@6.0.6)
 
-  graphql-yoga@5.24.2(graphql@17.0.2):
+  graphql-yoga@5.24.4(graphql@17.0.2):
     dependencies:
       '@envelop/core': 5.6.1
       '@envelop/instrumentation': 1.0.1
-      '@graphql-tools/executor': 2.0.1(graphql@17.0.2)
+      '@graphql-tools/executor': 2.0.3(graphql@17.0.2)
       '@graphql-tools/schema': 10.1.3(graphql@17.0.2)
       '@graphql-tools/utils': 12.0.3(graphql@17.0.2)
       '@graphql-yoga/logger': 2.0.2
@@ -25843,7 +25868,7 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
 
-  idb@8.0.3: {}
+  idb@8.0.4: {}
 
   ieee754@1.2.1: {}
 
@@ -26848,7 +26873,7 @@ snapshots:
 
   kuler@2.0.0: {}
 
-  langsmith@0.10.8(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.219.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(ws@8.22.0(utf-8-validate@6.0.6))(zod@4.6.5):
+  langsmith@0.10.11(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.219.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(ws@8.22.0(utf-8-validate@6.0.6))(zod@4.6.5):
     dependencies:
       openai: 6.37.0(ws@8.22.0(utf-8-validate@6.0.6))(zod@4.6.5)
       p-queue: 6.6.2
@@ -26951,7 +26976,7 @@ snapshots:
   lighthouse@13.5.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)(utf-8-validate@6.0.6)(yauzl@3.4.0):
     dependencies:
       '@paulirish/trace_engine': 0.0.65
-      '@sentry/node': 10.76.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
+      '@sentry/node': 10.76.2(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(supports-color@10.2.2)
       ajv: 8.20.0
       ajv-formats: 3.0.1
       axe-core: 4.14.0
@@ -27846,7 +27871,7 @@ snapshots:
       '@mongodb-js/zstd': 7.0.0
       socks: 2.8.10
 
-  mongoose@9.11.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10):
+  mongoose@9.11.1(@mongodb-js/zstd@7.0.0)(socks@2.8.10):
     dependencies:
       '@standard-schema/spec': 1.1.0
       kareem: 3.4.0
@@ -28132,7 +28157,7 @@ snapshots:
 
   node-seal@7.0.0: {}
 
-  nodemailer@10.0.15: {}
+  nodemailer@10.0.16: {}
 
   nopt@8.1.0:
     dependencies:
@@ -28957,7 +28982,7 @@ snapshots:
       '@types/react': 19.3.0
       '@types/react-dom': 19.3.0(@types/react@19.3.0)
 
-  react-i18next@17.0.15(i18next@26.4.2(typescript@5.8.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.8.3):
+  react-i18next@17.0.16(i18next@26.4.2(typescript@5.8.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.8.3):
     dependencies:
       '@babel/runtime': 7.29.7
       html-parse-stringify: 4.0.1
@@ -29233,7 +29258,7 @@ snapshots:
 
   reselect@5.2.0: {}
 
-  resend@6.32.0:
+  resend@6.32.1:
     dependencies:
       postal-mime: 2.7.6
       standardwebhooks: 1.1.1
