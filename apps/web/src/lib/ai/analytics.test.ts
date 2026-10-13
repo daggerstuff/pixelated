@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({
   getUsageStats: vi.fn(),
 }))
 
-vi.mock('../db/ai/repository', () => ({
+vi.mock('../db/ai', () => ({
   aiRepository: {
     getUsageStats: mocks.getUsageStats,
   },
