@@ -2,7 +2,7 @@
  * AI Usage Analytics
  */
 
-import { aiRepository } from '../db/ai/repository'
+import { aiRepository } from '../db/ai'
 
 export interface AIUsageStatsOptions {
   period?: string
