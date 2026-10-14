@@ -1,28 +1,14 @@
-# Pixelated Empathy — https://www.rfc-editor.org/rfc/rfc9309
-# AI-specific crawler rules are managed via Cloudflare AI Crawl Control.
-
-Sitemap: https://pixelatedempathy.com/sitemap.xml
-
-# Content Signals (https://content-signals.com/, draft-romm-aipref-contentsignal)
-# As a condition of accessing this website, you agree to abide by the following content signals:
-# (a)  If a content-signal = yes, you may collect content for the corresponding use.
-# (b)  If a content-signal = no, you may not collect content for the corresponding use.
-# (c)  If the signal is omitted, no claim is made with respect to the corresponding use.
+# Pixelated Empathy — https://pixelatedempathy.com
 #
-# search: building a search index and providing search results (e.g., returning hyperlinks and short excerpts for search results).
-# ai-input: inputting content into one or more AI models (e.g., retrieval augmented generation, grounding, or other inference).
-# ai-train: training or fine-tuning AI models.
-#
-# ANY RESTRICTIONS EXPRESSED VIA CONTENT SIGNALS ARE EXPRESS RESERVATIONS OF RIGHTS UNDER ARTICLE 4
-# OF THE EUROPEAN UNION DIRECTIVE 2019/790 ON COPYRIGHT AND RELATED RIGHTS IN THE DIGITAL SINGLE MARKET.
-Content-Signal: search=yes, ai-input=yes, ai-train=yes
+# Public marketing, documentation, and blog surfaces are crawlable.
+# Authenticated app areas, internal test pages, and API routes are
+# excluded. This list mirrors the agent-discovery middleware's
+# EXCLUDED_PREFIXES contract (apps/web/src/lib/middleware/agent-discovery.ts);
+# keep the two in sync. RFC 9309 syntax.
 
 User-agent: *
-Allow: /
-# Authenticated app areas (never crawlable)
 Disallow: /admin
 Disallow: /admin-test
-Disallow: /api/
 Disallow: /dashboard
 Disallow: /journal-research
 Disallow: /portal
@@ -30,7 +16,6 @@ Disallow: /profile/
 Disallow: /settings/
 Disallow: /unauthorized
 Disallow: /offline
-# Internal/test/dev-only pages (also gated by middleware to 404)
 Disallow: /test-sentry
 Disallow: /nightmare-fuel-demo
 Disallow: /therapy-chat-plan
@@ -38,6 +23,8 @@ Disallow: /style-guide
 Disallow: /search-demo
 Disallow: /dev/
 Disallow: /browser-compatibility/
-# Error pages
 Disallow: /404
 Disallow: /500
+Disallow: /api/
+
+Sitemap: https://pixelatedempathy.com/sitemap.xml
