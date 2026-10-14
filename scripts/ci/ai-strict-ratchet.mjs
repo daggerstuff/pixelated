@@ -37,7 +37,7 @@ import { join, relative, resolve, sep } from 'node:path'
 const ROOT = resolve(import.meta.dirname, '../..')
 const AI_DIR = join(ROOT, 'ai')
 const BASELINE_PATH = join(ROOT, 'scripts/ci/ai-strict-baseline.json')
-const IGNORE_DIRS = new Set(['__pycache__', '.venv', 'venv', 'node_modules', '.git', 'data', 'wandb'])
+const IGNORE_DIRS = new Set(['__pycache__', '.venv', 'venv', 'node_modules', '.git', 'data', 'wandb', 'output'])
 
 /** The live trees the parent imports (research/quadit, pipelines, training). */
 const TREES = ['research', 'pipelines', 'training']
@@ -46,8 +46,10 @@ const MYPY_CONFIG = `[mypy]
 python_version = 3.13
 strict = True
 ignore_missing_imports = True
-# __main__ scripts collide on module names.
-exclude = __main__\\.py$
+# __main__ scripts collide on module names. training/output (and any other
+# output/ dir under the pinned trees) holds gitignored run artifacts a clean
+# CI checkout never has — same divergence class as the wandb rule below.
+exclude = (__main__\\.py$|/output/)
 
 # Dev machines carry a gitignored wandb/ run-artifacts directory that
 # namespace-package resolution turns into a phantom wandb module
@@ -62,7 +64,8 @@ if (!existsSync(AI_DIR)) {
   process.exit(1)
 }
 
-/** Recursively collect .py files, skipping build/venv/data directories. */
+/** Recursively collect .py files, skipping build/venv and gitignored artifact
+ * directories (data/, output/, wandb/) that a clean CI checkout never has. */
 function collectPythonFiles(dir, acc = []) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (entry.isDirectory()) {
