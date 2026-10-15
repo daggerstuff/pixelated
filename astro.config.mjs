@@ -643,7 +643,16 @@ export default defineConfig({
     const MIN_DEV = process.env.MIN_DEV === '1'
     const base = [
       react({
-        include: ['**/react/*', '**/components/**/*'],
+        // Vite 8 (rolldown/oxc): limit include to JS/TS files. A broad glob
+        // like `**/components/**/*` also matches `.module.css`, which under
+        // Vite 8's OXC builtin transform leaks scoped CSS into the JS
+        // pipeline (esbuild in Vite 7 sniffed the loader and silently
+        // ignored it). `@astrojs/react` only transforms JSX/TSX, so the
+        // narrowed set is sufficient.
+        include: [
+          '**/react/*.{js,jsx,ts,tsx}',
+          '**/components/**/*.{js,jsx,ts,tsx}',
+        ],
         experimentalReactChildren: true,
       }),
     ]
