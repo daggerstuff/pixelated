@@ -19,7 +19,7 @@
     "ai": "7.0.109",
     "eve": "^0.76.3",
     "workers-ai-provider": "^4.0.0",
-    "zod": "4.6.5"
+    "zod": "4.6.6"
   },
   "devDependencies": {
     "@types/node": "24.x",
