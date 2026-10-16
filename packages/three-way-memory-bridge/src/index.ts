@@ -20,6 +20,14 @@ export interface ForesightMemory {
   score?: number
 }
 
+/** Raw item shape returned by `POST /search` before key normalization. */
+interface ForesightSearchItem {
+  memory_id?: string
+  content?: string
+  category?: string
+  combined_score?: number
+}
+
 export interface ThreeWayMemoryContext {
   mastraThreadMessages: MastraMessage[]
   foresightMemories: ForesightMemory[]
@@ -102,21 +110,29 @@ export class MemoryBridge {
       try {
         // Retried so a transient Foresight API blip does not drop the recall.
         const res = await withRetry(async () => {
-          const response = await fetch(
-            `${this.env.FORESIGHT_API_URL}/api/memories/search`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ query, limit: 5 }),
-            },
-          )
+          const response = await fetch(`${this.env.FORESIGHT_API_URL}/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query_type: 'semantic',
+              query,
+              limit: 5,
+            }),
+          })
           if (!response.ok) {
             throw new Error(`Foresight API returned ${response.status}`)
           }
           return response
         })
-        const data = (await res.json()) as { memories?: ForesightMemory[] }
-        foresightMemories = data.memories ?? []
+        const data = (await res.json()) as {
+          memories?: ForesightSearchItem[]
+        }
+        foresightMemories = (data.memories ?? []).map((m) => ({
+          id: m.memory_id ?? '',
+          content: m.content ?? '',
+          category: m.category,
+          score: m.combined_score,
+        }))
       } catch (err) {
         console.error(
           '[MemoryBridge] Foresight search failed after retries:',
@@ -166,14 +182,11 @@ ${threadContextStr || 'No previous messages.'}
       try {
         await withRetry(async () => {
           const response = await fetch(
-            `${this.env.FORESIGHT_API_URL}/api/memories`,
+            `${this.env.FORESIGHT_API_URL}/memories`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                content,
-                store_options: { category },
-              }),
+              body: JSON.stringify({ content, category }),
             },
           )
           if (!response.ok) {

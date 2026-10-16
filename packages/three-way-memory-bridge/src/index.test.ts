@@ -34,16 +34,32 @@ describe('MemoryBridge', () => {
 
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
+      status: 200,
       json: async () => ({
         memories: [
-          { id: '1', content: 'Always prefer pnpm', category: 'preference' },
+          {
+            memory_id: '1',
+            content: 'Always prefer pnpm',
+            category: 'preference',
+            combined_score: 0.9,
+          },
         ],
       }),
     } as any)
 
     const context = await bridge.getContext('package manager preferences')
     expect(context.foresightMemories).toHaveLength(1)
+    expect(context.foresightMemories[0]).toEqual({
+      id: '1',
+      content: 'Always prefer pnpm',
+      category: 'preference',
+      score: 0.9,
+    })
     expect(context.combinedPromptContext).toContain('Always prefer pnpm')
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      'http://localhost:8764/search',
+      expect.objectContaining({ method: 'POST' }),
+    )
   })
 
   describe('Foresight retry behavior', () => {
@@ -68,6 +84,13 @@ describe('MemoryBridge', () => {
       expect(success).toBe(true)
       // Initial attempt + 2 retries
       expect(fetchMock).toHaveBeenCalledTimes(3)
+      expect(fetchMock).toHaveBeenLastCalledWith(
+        'http://localhost:8764/memories',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ content: 'durable memory', category: 'fact' }),
+        }),
+      )
     })
 
     it('returns false after exhausting Foresight retries', async () => {
