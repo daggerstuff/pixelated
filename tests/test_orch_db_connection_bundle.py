@@ -94,7 +94,11 @@ def test_from_env_uses_override_uri() -> None:
     try:
         # Set the env vars to the same defaults (so the test passes
         # even if the services are not running on the default URIs).
-        os.environ["REDIS_URL"] = "redis://:dev_redis_password@127.0.0.1:6379/0"
+        # Build the URIs from the same environment the services run with, so
+        # the test exercises the override path without committing credentials.
+        redis_password = os.environ.get("REDIS_PASSWORD", "")
+        redis_auth = f":{redis_password}@" if redis_password else ""
+        os.environ["REDIS_URL"] = f"redis://{redis_auth}127.0.0.1:6379/0"
         os.environ["MONGO_URL"] = "mongodb://127.0.0.1:27017"
         os.environ["POSTGRES_URL"] = (
             "postgresql://pixelated:dev_password_change_in_prod@127.0.0.1:5432/pixelated_empathy"
