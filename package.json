@@ -321,7 +321,7 @@
     "devalue": "^6.0.2",
     "dompurify": "^3.4.16",
     "drizzle-orm": "^0.45.4",
-    "eve": "^0.77.0",
+    "eve": "^0.78.0",
     "express": "^5.3.0",
     "express-openid-connect": "^3.4.0",
     "express-rate-limit": "^8.7.1",
