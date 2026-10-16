@@ -117,6 +117,37 @@ export class FineTuningOrchestrator {
     }
   }
 
+  private validateOptimizerConfig(config: FineTuningConfig): void {
+    if (config.optimizer?.name === "dimuon" && config.optimizer.lr === undefined) {
+      throw new Error(
+        "Dimuon optimizer requires an explicit lr (no default). Provide optimizer.lr, e.g. ~1.5e-3 for SFT (~15x AdamW) per Tinker guidance.",
+      );
+    }
+  }
+
+  private validateLoraConfig(config: FineTuningConfig): void {
+    if (config.loraRank !== undefined && (!Number.isFinite(config.loraRank) || config.loraRank <= 0)) {
+      throw new Error(`loraRank must be a positive integer, got ${String(config.loraRank)}`);
+    }
+    if (config.loraTarget === "attention-only") {
+      logger.warn(
+        "loraTarget 'attention-only' underperforms even rank-compensated per Tinker LoRA Primer; prefer 'all'.",
+      );
+    }
+  }
+
+  private logBatchScalingHint(config: FineTuningConfig): void {
+    const baseBatch = config.baselineBatchSize;
+    const newBatch = config.batchSize;
+    const baseLr = config.learningRateMultiplier;
+    if (baseLr === undefined || baseBatch === undefined || newBatch === undefined) return;
+    if (baseBatch === newBatch || baseBatch <= 0 || newBatch <= 0) return;
+    const suggested = baseLr * Math.sqrt(newBatch / baseBatch);
+    logger.info(
+      `Batch size changed ${baseBatch} → ${newBatch}: Tinker sqrt-scaling suggests LR ${baseLr} → ${suggested} (hint only; not auto-applied).`,
+    );
+  }
+
   /**
    * Start a fine-tune job on the requested backend. Persists via the active
    * JobStore and records usage on the active CostTracker.
@@ -125,13 +156,17 @@ export class FineTuningOrchestrator {
     paths: TrainingDatasetReference,
     config: FineTuningConfig,
   ): Promise<FineTuningJob> {
+    this.validateOptimizerConfig(config);
+    this.validateLoraConfig(config);
+    this.logBatchScalingHint(config);
+
     const filePath = this.resolveDatasetPath(paths, config.backend, config.jobType);
     if (config.backend !== "openai") {
       this.validateDataset(filePath);
     }
 
     logger.info(
-      `Starting fine-tuning job on ${config.backend} (model: ${config.model})`,
+      `Starting fine-tuning job on ${config.backend} (model: ${config.model}, optimizer: ${config.optimizer?.name ?? "adamw"}, schedule: ${config.lrSchedule?.kind ?? "constant"}, loraRank: ${config.loraRank ?? "default"})`,
     );
 
     const backend = this.factory.getProvider(config.backend);
@@ -245,6 +280,7 @@ export class FineTuningOrchestrator {
    */
   private guessBackendFromJob(job: FineTuningJob): FineTuningBackend {
     if (!job.id) return "openai";
+    if (job.id.startsWith("tinker-")) return "tinker";
     if (job.id.startsWith("hf-")) return "huggingface";
     if (job.id.startsWith("local-")) return "local";
     if (job.id.startsWith("ft-")) return "openai";

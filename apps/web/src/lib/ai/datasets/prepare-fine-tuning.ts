@@ -252,6 +252,16 @@ export async function prepareForHuggingFace(
   }
 }
 
+export function estimateCompletionTokens(records: Array<{ messages: Array<{ content: string }> }>): number {
+  let tokens = 0;
+  for (const rec of records) {
+    for (const msg of rec.messages) {
+      tokens += Math.ceil(msg.content.length / 4);
+    }
+  }
+  return tokens;
+}
+
 export async function prepareAllFormats(
   sourceDir?: string,
   outputDir?: string,
