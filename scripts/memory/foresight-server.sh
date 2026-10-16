@@ -89,7 +89,10 @@ cd "${FORESIGHT_ROOT}"
 # server restarts safe without requiring the client to re-initialize.
 if [[ -n "${FORESIGHT_PORT:-}" ]]; then
   export FASTMCP_STATELESS_HTTP=1
-  set -- "--host" "${FORESIGHT_HOST:-0.0.0.0}" "--port" "${FORESIGHT_PORT}" "$@"
+  # Loopback by default: this server runs unauthenticated (see above) and holds
+  # clinical memories, so 0.0.0.0 would put them on the LAN. Set
+  # FORESIGHT_HOST=0.0.0.0 explicitly, with an API key, if it must be remote.
+  set -- "--host" "${FORESIGHT_HOST:-127.0.0.1}" "--port" "${FORESIGHT_PORT}" "$@"
 fi
 
 exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --no-active -m foresight "$@"
