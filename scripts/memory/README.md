@@ -54,7 +54,9 @@ After installing foresight package:
 - `process_session_transcript` - Extract memories from a transcript
 - `manage_curation_runs` - Manage reviewable curation runs
 - `inject_context` - Inject relevant context
-- `query_memories_temporal` - Query memory trends by time window
+- `query_memories_temporal` - Query memory trends by time window, or reconstruct
+  the state of memory at an instant with `as_of`
+- `reprocess_raw_events` - Rebuild derived memories from the retained raw layer
 - `get_system_status` - System status
 
 Use the nested `foresight-server` CLI or Python API for expert and maintenance

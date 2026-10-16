@@ -166,6 +166,8 @@ phase:
 | `inject_context`             | Single-roundtrip context retrieval      | `conversation_text`, `max_memories=5`          |
 | `manage_memories`            | Store, update, delete, archive memories | `action="store"`, `category`, `content`        |
 | `search_memories`            | Keyword, semantic, hybrid search        | `query`, `use_hybrid=True`, `limit`            |
+| `query_memories_temporal`    | Time-window, trend, point-in-time state | `window`, `trend`, `as_of`                     |
+| `reprocess_raw_events`       | Replay the retained raw layer           | `window_start`, `window_end`                   |
 | `manage_context_blocks`      | Standing guidance & user preferences    | `action="get"\|"update"`, `label`, `content`   |
 | `manage_encryption`          | AES-256-GCM security controls           | `action="status"\|"rotate_key"\|"encrypt_all"` |
 | `process_session_transcript` | End-of-session auto-distillation        | `session_id`, `messages`                       |
