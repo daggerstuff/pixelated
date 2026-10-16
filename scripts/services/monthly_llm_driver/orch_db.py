@@ -42,7 +42,9 @@ import redis
 # Defaults (dev credentials on 127.0.0.1)
 # ---------------------------------------------------------------------------
 
-_DEFAULT_REDIS_URL = "redis://:dev_redis_password@127.0.0.1:6379/0"
+# Unauthenticated on purpose: the local Redis requires a password, so callers
+# must supply REDIS_URL (env or mission .env — _resolve_uri prefers both).
+_DEFAULT_REDIS_URL = "redis://localhost:6379/0"
 _DEFAULT_MONGO_URL = "mongodb://127.0.0.1:27017"
 _DEFAULT_POSTGRES_URL = "postgresql://pixelated:dev_password_change_in_prod@127.0.0.1:5432/pixelated_empathy"
 
