@@ -30,6 +30,10 @@ export interface DatasetMergeStats {
   processingTimeMs: number;
   /** Provenance record for this merge operation (only when mergedByUserId is provided). */
   provenance?: DatasetProvenance;
+  /** Non-blocking advisory warnings (e.g., LoRA capacity). */
+  warnings?: string[];
+  /** Estimated completion tokens across merged samples (char-based heuristic). */
+  estimatedCompletionTokens?: number;
 }
 
 export interface MergeDatasetOptions {
@@ -40,6 +44,11 @@ export interface MergeDatasetOptions {
   categories?: string[];
   /** When set, provenance metadata is created and persisted for this merge run. */
   mergedByUserId?: string;
+  /** When set, emits a non-blocking LoRA capacity warning if completion tokens exceed trainable params. */
+  loraRank?: number;
+  loraTarget?: import("../training/types").LoraTarget;
+  /** Override for capacity estimate model size (default ~7B). */
+  estimatedModelParams?: number;
 }
 
 interface ConversationRecord {
@@ -240,6 +249,7 @@ export async function mergeAllDatasets(
   let qualitySum = 0;
   let qualityCount = 0;
   let memoryWarned = false;
+  let estimatedCompletionTokens = 0;
 
   // Collect source dataset identifiers for provenance
   const sourcePaths: string[] = mergedByUserId ? collectSourceDatasetIds(normalizedDir) : [];
@@ -289,6 +299,9 @@ export async function mergeAllDatasets(
 
         qualitySum += qualityScore;
         qualityCount++;
+        for (const msg of record.messages) {
+          estimatedCompletionTokens += Math.ceil(msg.content.length / 4);
+        }
 
         writer.writeRecord(record, mergedSamples);
         mergedSamples++;
@@ -303,6 +316,23 @@ export async function mergeAllDatasets(
 
   await awaitStreamFinish(writeStream);
 
+  const warnings: string[] = [];
+  if (options.loraRank !== undefined) {
+    const { estimateLoraParams, getLoraCapacityWarning } = await import("../training/lora");
+    const modelParams =
+      options.estimatedModelParams ?? 7_000_000_000;
+    const loraParams = estimateLoraParams(
+      modelParams,
+      options.loraRank,
+      options.loraTarget ?? "all",
+    );
+    const w = getLoraCapacityWarning(estimatedCompletionTokens, loraParams);
+    if (w) {
+      warnings.push(w);
+      logger.warn(w, { estimatedCompletionTokens, loraParams });
+    }
+  }
+
   const stats: DatasetMergeStats = {
     totalDatasets: datasetCount,
     totalSamples,
@@ -311,6 +341,8 @@ export async function mergeAllDatasets(
     categoriesCount: categories.size,
     qualityScoreAverage: qualityCount > 0 ? qualitySum / qualityCount : 0,
     processingTimeMs: Date.now() - startTime,
+    warnings: warnings.length > 0 ? warnings : undefined,
+    estimatedCompletionTokens,
   };
 
   logger.info("Dataset merge completed", { stats });

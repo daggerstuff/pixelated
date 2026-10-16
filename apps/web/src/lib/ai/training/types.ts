@@ -10,7 +10,8 @@ export type TrainingBackendName =
   | "openai"
   | "huggingface"
   | "local"
-  | "dry-run";
+  | "dry-run"
+  | "tinker";
 
 export type FineTuningBackend = TrainingBackendName;
 
@@ -20,6 +21,37 @@ export type FineTuningStatus =
   | "succeeded"
   | "failed"
   | "cancelled";
+
+export type OptimizerName = "adamw" | "dimuon";
+
+export type LrScheduleKind = "constant" | "linear-decay-to-zero" | "cosine";
+
+export interface OptimizerConfig {
+  name: OptimizerName;
+  /** Learning rate. Required for dimuon (no sensible default); optional for adamw (defaults to 1e-4 per Tinker docs). */
+  lr?: number;
+  /** Beta1 momentum. Default 0.9 for both optimizers. */
+  beta1?: number;
+  /** Beta2 for AdamW only. Default 0.95. Ignored for dimuon. */
+  beta2?: number;
+  /** Epsilon for AdamW only. Default 1e-12. Ignored for dimuon. */
+  eps?: number;
+  /** Weight decay. Default 0 (off) for both. */
+  weightDecay?: number;
+  /** Global gradient clipping threshold. Default 0 (off). */
+  gradClip?: number;
+}
+
+export interface LrSchedule {
+  /** Schedule kind. Default "constant" for back-compat. Tinker recommends "linear-decay-to-zero" (~1.3x more step-efficient than constant in SFT). */
+  kind: LrScheduleKind;
+  /** Linear warmup steps before schedule takes over. Default 0. */
+  warmupSteps?: number;
+  /** Total decay steps; defaults to nEpochs-derived total if omitted. */
+  decaySteps?: number;
+}
+
+export type LoraTarget = "all" | "attention-only";
 
 export interface FineTuningConfig {
   model: string;
@@ -34,6 +66,16 @@ export interface FineTuningConfig {
    * Used for PAL (Persona-Aware Alignment).
    */
   jobType?: "sft" | "dpo" | "standard";
+  /** Optimizer selection. Defaults to { name: "adamw" } when omitted. */
+  optimizer?: OptimizerConfig;
+  /** LR schedule. Defaults to { kind: "constant" } for back-compat. */
+  lrSchedule?: LrSchedule;
+  /** LoRA rank. Defaults to backend default (32 per Tinker) when omitted. */
+  loraRank?: number;
+  /** Which matrices LoRA targets. Defaults to "all" (Tinker primer: attention-only underperforms even rank-compensated). */
+  loraTarget?: LoraTarget;
+  /** Baseline batch size for sqrt-scaling hint. When set and batchSize differs, orchestrator logs suggested LR adjustment. */
+  baselineBatchSize?: number;
 }
 
 export interface FineTuningJob {

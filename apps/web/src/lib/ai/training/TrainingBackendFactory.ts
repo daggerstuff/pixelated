@@ -2,6 +2,7 @@ import { DryRunTrainingBackend } from "./backends/DryRunBackend";
 import { HuggingFaceTrainingBackend } from "./backends/HuggingFaceTrainingBackend";
 import { LocalTrainingBackend } from "./backends/LocalBackend";
 import { OpenAITrainingBackend } from "./backends/OpenAITrainingBackend";
+import { TinkerBackend } from "./backends/TinkerBackend";
 import type { TrainingBackend } from "./backends/Base";
 import { JobStore, MemoryJobStore } from "./job-store";
 import type {
@@ -50,6 +51,7 @@ export class MemoryCostTracker implements CostTracker {
       huggingface: this.totals.get("huggingface") ?? 0,
       local: this.totals.get("local") ?? 0,
       "dry-run": this.totals.get("dry-run") ?? 0,
+      tinker: this.totals.get("tinker") ?? 0,
     };
   }
 }
@@ -146,6 +148,8 @@ export class TrainingBackendFactory {
         return new LocalTrainingBackend();
       case "dry-run":
         return new DryRunTrainingBackend();
+      case "tinker":
+        return new TinkerBackend();
       default: {
         // Exhaustive check — TypeScript will warn if a new FineTuningBackend
         // variant is added without a handler. The runtime guard below is
@@ -172,6 +176,7 @@ const TEST_MODEL_SETS: Record<FineTuningBackend, TrainingModelInfo[]> = {
   "dry-run": [
     { id: TEST_DEFAULT_MODEL, ownedBy: "dry-run", fineTunable: true },
   ],
+  tinker: [],
 };
 
 /** Convenience: model list for a single named backend (used by tests). */
