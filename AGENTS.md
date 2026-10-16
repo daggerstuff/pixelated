@@ -165,13 +165,17 @@ phase:
 | ---------------------------- | --------------------------------------- | ---------------------------------------------- |
 | `inject_context`             | Single-roundtrip context retrieval      | `conversation_text`, `max_memories=5`          |
 | `manage_memories`            | Store, update, delete, archive memories | `action="store"`, `category`, `content`        |
+| `capture_in_flight_memory`   | Mid-session immediate memory capture    | `content`, `category`, `importance`            |
 | `search_memories`            | Keyword, semantic, hybrid search        | `query`, `use_hybrid=True`, `limit`            |
 | `query_memories_temporal`    | Time-window, trend, point-in-time state | `window`, `trend`, `as_of`                     |
 | `reprocess_raw_events`       | Replay the retained raw layer           | `window_start`, `window_end`                   |
+| `manage_curation_runs`       | Async curation runs (memory banks)      | `action="create"\|"get"\|"list"\|"cancel"`     |
 | `manage_context_blocks`      | Standing guidance & user preferences    | `action="get"\|"update"`, `label`, `content`   |
-| `manage_encryption`          | AES-256-GCM security controls           | `action="status"\|"rotate_key"\|"encrypt_all"` |
 | `process_session_transcript` | End-of-session auto-distillation        | `session_id`, `messages`                       |
 | `get_system_status`          | Health, cache, and encryption telemetry | `include_trends=True`                          |
+
+AES-256-GCM encryption controls are **CLI-only** (`foresight security
+status\|encrypt-all\|rotate-key`) — there is no `manage_encryption` MCP tool.
 
 ---
 
