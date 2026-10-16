@@ -3,6 +3,11 @@
 # ============================================================================
 # Database (PostgreSQL 17 + pgvector) and Cache (Redis) run in Docker, while
 # the Foresight Python service runs on host via uv/systemd for instant hot-reloading.
+# ---------------------------------------------------------------------------
+# Credentials come from infra/.env (gitignored); compose loads it automatically
+# when you run from this directory:
+#   cd infra && docker compose -f docker-compose.foresight.yml up -d
+# Both are `:?` guards, so a missing .env aborts instead of deploying a default.
 # ============================================================================
 
 services:
@@ -12,10 +17,12 @@ services:
     restart: always
     environment:
       POSTGRES_USER: foresight_user
-      POSTGRES_PASSWORD: foresight_secure_pass_2026
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run from infra/ so compose loads infra/.env}
       POSTGRES_DB: foresight
     ports:
-      - "0.0.0.0:5432:5432"
+      # Loopback only: this port has no non-local consumers, and a published
+      # 5432 on a machine with no inbound firewall is reachable from the WAN.
+      - "127.0.0.1:5432:5432"
     volumes:
       - foresight_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -27,14 +34,14 @@ services:
   pixelated-redis:
     image: redis:latest
     container_name: pixelated-redis
-    command: redis-server --requirepass dev_redis_password
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?run from infra/ so compose loads infra/.env}"]
     restart: always
     ports:
       - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "dev_redis_password", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:?run from infra/ so compose loads infra/.env}", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
