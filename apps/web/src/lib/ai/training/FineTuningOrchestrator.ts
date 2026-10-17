@@ -173,6 +173,7 @@ export class FineTuningOrchestrator {
     const job: FineTuningJob = {
       ...(await backend.submitJob(filePath, config)),
       backend: config.backend,
+      ...(config.sourceProvenanceId ? { sourceProvenanceId: config.sourceProvenanceId } : {}),
     };
 
     const stored = await this.store.put(job);
@@ -188,11 +189,6 @@ export class FineTuningOrchestrator {
       } catch (e) {
         logger.warn("Failed to link training job to provenance", { error: String(e) });
       }
-      // Also keep childRunIds semantics via addChildRunId if that exists
-      try {
-        const { getDefaultProvenanceStore: getProv2 } = await import("../datasets/provenance");
-        await getProv2().addChildRunId(config.sourceProvenanceId, stored.id).catch(() => {});
-      } catch {}
     }
 
     const estimate = backend.estimateUsage(config);

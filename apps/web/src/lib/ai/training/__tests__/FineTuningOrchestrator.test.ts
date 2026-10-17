@@ -135,6 +135,47 @@ describe("FineTuningOrchestrator refactor", () => {
     ).rejects.toThrow(/OPENAI_API_KEY/);
   });
 
+  test("sourceProvenanceId links job to provenance + getJobProvenance round-trip", async () => {
+    const store = new MemoryJobStore();
+    const orch = new FineTuningOrchestrator({ store });
+    const { MemoryProvenanceStore, setProvenanceStore, getDefaultProvenanceStore } =
+      await import("../../../ai/datasets/provenance");
+    const provStore = new MemoryProvenanceStore();
+    setProvenanceStore(provStore);
+    try {
+      const rec = {
+        mergeRunId: `mr-${Date.now()}`,
+        sourceDatasetIds: ["test.jsonl:100:0"],
+        mergedAt: new Date().toISOString(),
+        mergedByUserId: "tester",
+        qualityThresholdUsed: 0.7,
+        dedupStrategy: "hybrid-bloom",
+        inputHash: "abc",
+        childRunIds: [],
+      };
+      await provStore.create(rec);
+      const job = await orch.startFromPrepared(
+        { openai: dryRunPath, huggingface: null },
+        { model: "gpt-4o-mini", nEpochs: 1, backend: "dry-run", sourceProvenanceId: rec.mergeRunId },
+      );
+      expect(job.sourceProvenanceId).toBe(rec.mergeRunId);
+      const prov = await orch.getJobProvenance(job.id);
+      expect(prov?.mergeRunId).toBe(rec.mergeRunId);
+    } finally {
+      setProvenanceStore(null);
+    }
+  });
+
+  test("getJobProvenance returns null when job has no provenance link", async () => {
+    const store = new MemoryJobStore();
+    const orch = new FineTuningOrchestrator({ store });
+    const job = await orch.startFromPrepared(
+      { openai: dryRunPath, huggingface: null },
+      { model: "gpt-4o-mini", nEpochs: 1, backend: "dry-run" },
+    );
+    expect(await orch.getJobProvenance(job.id)).toBeNull();
+  });
+
   test("custom registered backend is re-used across calls", async () => {
     let submitCalls = 0;
     class TestBackend extends TrainingBackend {
