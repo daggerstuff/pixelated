@@ -53,6 +53,13 @@ export interface LrSchedule {
 
 export type LoraTarget = "all" | "attention-only";
 
+export interface RlRewardConfig {
+  empathyWeight: number;
+  crisisWeight: number;
+  clinicalValidityWeight: number;
+  rewardFnName?: string;
+}
+
 export interface FineTuningConfig {
   model: string;
   suffix?: string;
@@ -65,7 +72,7 @@ export interface FineTuningConfig {
    * e.g., 'sft' (Supervised Fine-Tuning) or 'dpo' (Direct Preference Optimization).
    * Used for PAL (Persona-Aware Alignment).
    */
-  jobType?: "sft" | "dpo" | "standard";
+  jobType?: "sft" | "dpo" | "rl" | "grpo" | "standard";
   /** Optimizer selection. Defaults to { name: "adamw" } when omitted. */
   optimizer?: OptimizerConfig;
   /** LR schedule. Defaults to { kind: "constant" } for back-compat. */
@@ -76,6 +83,8 @@ export interface FineTuningConfig {
   loraTarget?: LoraTarget;
   /** Baseline batch size for sqrt-scaling hint. When set and batchSize differs, orchestrator logs suggested LR adjustment. */
   baselineBatchSize?: number;
+  /** RL reward config. Required when jobType is rl|grpo; ignored otherwise. */
+  rlConfig?: RlRewardConfig;
 }
 
 export interface FineTuningJob {
@@ -94,6 +103,21 @@ export interface FineTuningJob {
   backend?: FineTuningBackend;
   /** Optional owner id for per-user job listings. */
   ownerId?: string;
+  /** Dataset provenance this job derives from (DatasetProvenance.mergeRunId). */
+  sourceProvenanceId?: string;
+  /** Latest checkpoint produced by this job, if any. */
+  checkpointId?: string;
+}
+
+export type CheckpointKind = "adapter" | "full";
+
+export interface TrainingCheckpoint {
+  id: string;
+  jobId: string;
+  kind: CheckpointKind;
+  path: string;
+  createdAt: string;
+  metrics?: Record<string, number>;
 }
 
 export interface TrainingModelInfo {

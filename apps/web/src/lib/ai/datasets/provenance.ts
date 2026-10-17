@@ -62,6 +62,8 @@ const INDEXES: IndexDescription[] = [
 // ---------------------------------------------------------------------------
 
 export interface IProvenanceStore {
+  /** Associate a training job with a provenance record (default: addChildRunId). */
+  linkTrainingJob?(mergeRunId: string, jobId: string): Promise<void>;
   create(provenance: DatasetProvenance): Promise<void>;
   getByRunId(runId: string): Promise<DatasetProvenance | null>;
   exists(runId: string): Promise<boolean>;
@@ -114,6 +116,10 @@ export class MemoryProvenanceStore implements IProvenanceStore {
     }
 
     return { current: { ...current }, parent: parent ? { ...parent } : null, children };
+  }
+
+  async linkTrainingJob(mergeRunId: string, jobId: string): Promise<void> {
+    return this.addChildRunId(mergeRunId, jobId);
   }
 
   async addChildRunId(parentRunId: string, childRunId: string): Promise<void> {
@@ -190,6 +196,10 @@ export class MongoProvenanceStore implements IProvenanceStore {
         childRunIds: [...c.childRunIds],
       })),
     };
+  }
+
+  async linkTrainingJob(mergeRunId: string, jobId: string): Promise<void> {
+    return this.addChildRunId(mergeRunId, jobId);
   }
 
   async addChildRunId(parentRunId: string, childRunId: string): Promise<void> {
