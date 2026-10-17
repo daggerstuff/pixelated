@@ -58,6 +58,12 @@ export abstract class TrainingBackend {
     return false;
   }
 
+  /** Optional checkpoint save (pointer-based). Default no-op. */
+  async saveCheckpoint?(_jobId: string, _kind?: string): Promise<{ checkpointId: string; path: string } | null>;
+
+  /** Optional checkpoint resume. Default no-op. */
+  async resumeFromCheckpoint?(_checkpointId: string): Promise<FineTuningJob | null>;
+
   /** Hook for tests — subclasses can override to swap fetch / subprocess. */
   protected log(message: string, meta?: Record<string, unknown>): void {
     logger.info(`[${this.name}] ${message}`, meta);
