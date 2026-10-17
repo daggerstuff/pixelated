@@ -28,6 +28,8 @@ export interface JobStore {
   list(): Promise<FineTuningJob[]>;
   /** List all stored jobs owned by a particular user (id-key). */
   listByOwner(ownerId: string): Promise<FineTuningJob[]>;
+  /** List jobs linked to a provenance mergeRunId. */
+  getByProvenanceId?(mergeRunId: string): Promise<FineTuningJob[]>;
 }
 
 /**
@@ -108,6 +110,13 @@ export class MemoryJobStore implements JobStore {
   async listByOwner(ownerId: string): Promise<FineTuningJob[]> {
     return Array.from(this.jobs.values())
       .filter((j) => (j as FineTuningJob & { ownerId?: string }).ownerId === ownerId)
+      .map((j) => ({ ...j }))
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getByProvenanceId(mergeRunId: string): Promise<FineTuningJob[]> {
+    return Array.from(this.jobs.values())
+      .filter((j) => (j as FineTuningJob & { sourceProvenanceId?: string }).sourceProvenanceId === mergeRunId)
       .map((j) => ({ ...j }))
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
