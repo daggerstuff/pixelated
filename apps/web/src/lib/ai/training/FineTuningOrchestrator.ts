@@ -273,6 +273,13 @@ export class FineTuningOrchestrator {
     return this.store.list();
   }
 
+  async getJobProvenance(jobId: string): Promise<import("../datasets/provenance").DatasetProvenance | null> {
+    const job = await this.store.get(jobId);
+    if (!job?.sourceProvenanceId) return null;
+    const { getDefaultProvenanceStore } = await import("../datasets/provenance");
+    return getDefaultProvenanceStore().getByRunId(job.sourceProvenanceId);
+  }
+
   /** Whether a given job id has reached a terminal state. */
   isTerminalStatus(status: FineTuningStatus): boolean {
     return status === "succeeded" || status === "failed" || status === "cancelled";
