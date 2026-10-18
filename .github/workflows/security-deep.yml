@@ -402,13 +402,10 @@ jobs:
           path: sbom.cyclonedx.json
           retention-days: 30
 
-      - name: Post SBOM summary to PR
+      - name: Summarize SBOM
         if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v3
-        continue-on-error: true
-        with:
-          header: 📋 SBOM
-          path: sbom-summary.md
+        run: |
+          cat sbom-summary.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo "No SBOM summary available" >> "$GITHUB_STEP_SUMMARY"
 
   # -----------------------------------------------------------------------
   # Container base image vulnerability scan
