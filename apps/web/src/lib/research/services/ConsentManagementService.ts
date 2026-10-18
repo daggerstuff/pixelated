@@ -43,6 +43,14 @@ export interface ConsentAuditLog {
   userAgent?: string
 }
 
+export interface ConsentStatistics {
+  totalClients: number
+  activeConsents: number
+  consentLevels: Record<ConsentLevel, number>
+  withdrawalRequests: number
+  expiredConsents: number
+}
+
 const REDIS_CONSENT_KEY = 'consent:level:'
 const REDIS_CONSENT_TTL = 3600 // 1 hour cache TTL
 
@@ -370,13 +378,7 @@ export class ConsentManagementService {
   /**
    * Get consent statistics
    */
-  async getConsentStatistics(): Promise<{
-    totalClients: number
-    activeConsents: number
-    consentLevels: Record<ConsentLevel, number>
-    withdrawalRequests: number
-    expiredConsents: number
-  }> {
+  async getConsentStatistics(): Promise<ConsentStatistics> {
     const totalResult = await query(
       'SELECT COUNT(*) as count FROM consent_records',
     )
@@ -517,13 +519,7 @@ export class ConsentManagementService {
   async exportConsentData(): Promise<{
     consentRecords: ConsentRecord[]
     auditLog: ConsentAuditLog[]
-    statistics: {
-      totalClients: number
-      activeConsents: number
-      consentLevels: Record<ConsentLevel, number>
-      withdrawalRequests: number
-      expiredConsents: number
-    }
+    statistics: ConsentStatistics
   }> {
     const recordsResult = await query(
       `SELECT client_id, current_level, consent_history, last_updated,

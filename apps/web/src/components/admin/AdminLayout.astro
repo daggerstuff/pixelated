@@ -27,112 +27,131 @@ const {
 const { cspNonce } = Astro.locals
 
 // Verify authentication and admin role
+// Note: Unauthenticated /admin requests are already redirected in middleware
+// (projectAuthMiddleware) to avoid ResponseSentError. This is a defense-in-depth
+// check for authenticated non-admin users or edge cases where middleware was bypassed.
 const isLoggedIn = await isAuthenticated()
 const user = isLoggedIn ? await getUser(Astro.request) : null
 const isAdmin = isLoggedIn && user && (await hasAdminRole(user))
+const isAuthorized = Boolean(isAdmin)
 
-// If not authenticated or not an admin, redirect to login page
-if (!isLoggedIn || !isAdmin) {
-  return Astro.redirect('/login?redirect=/admin')
+if (!isAuthorized) {
+  // Layouts cannot safely `return Astro.redirect()` — it causes
+  // "Response has already been sent" (PIXEL-ASTRO-S) because the parent page
+  // has already started streaming. Set redirect headers and render no admin
+  // content: the template below outputs only a minimal redirect shell.
+  Astro.response.status = 302
+  Astro.response.headers.set('Location', '/login?redirect=/admin')
 }
 ---
 
-<html lang={SITE.lang} transition:animate="fade">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
-    <title>{title} | Admin Dashboard</title>
-    <meta name="description" content={description} />
+{isAuthorized ? (
+  <html lang={SITE.lang} transition:animate="fade">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <meta name="generator" content={Astro.generator} />
+      <title>{title} | Admin Dashboard</title>
+      <meta name="description" content={description} />
 
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={image} />
+      <!-- Open Graph / Facebook -->
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={image} />
 
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={image} />
+      <!-- Twitter -->
+      <meta property="twitter:card" content="summary_large_image" />
+      <meta property="twitter:title" content={title} />
+      <meta property="twitter:description" content={description} />
+      <meta property="twitter:image" content={image} />
 
-    <ClientRouter />
-    {cspNonce && <meta name="csp-nonce" content={cspNonce} />}
+      <ClientRouter />
+      {cspNonce && <meta name="csp-nonce" content={cspNonce} />}
 
-    <UmamiAnalytics nonce={cspNonce} />
-  </head>
-  <body class="bg-background min-h-screen">
-    <!-- Skip to content link for accessibility -->
-    <a
-      href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-none transition-transform"
-    >
-      Skip to content
-    </a>
+      <UmamiAnalytics nonce={cspNonce} />
+    </head>
+    <body class="bg-background min-h-screen">
+      <!-- Skip to content link for accessibility -->
+      <a
+        href="#main-content"
+        class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-none transition-transform"
+      >
+        Skip to content
+      </a>
 
-    <AdminPortalShell {title}>
-      <Fragment slot="sidebar">
-        <AdminSidebarNav items={ADMIN_NAV_ITEMS} {activeItem} />
-      </Fragment>
-      <Fragment slot="toolbar">
-        <span class="font-semibold">{title}</span>
-        <div class="flex items-center gap-4">
-          <div class="relative">
-            <button
-              class="text-muted-foreground hover:text-foreground"
-              aria-label="Notifications"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+      <AdminPortalShell {title}>
+        <Fragment slot="sidebar">
+          <AdminSidebarNav items={ADMIN_NAV_ITEMS} {activeItem} />
+        </Fragment>
+        <Fragment slot="toolbar">
+          <span class="font-semibold">{title}</span>
+          <div class="flex items-center gap-4">
+            <div class="relative">
+              <button
+                class="text-muted-foreground hover:text-foreground"
+                aria-label="Notifications"
               >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                ></path>
-              </svg>
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+            <div class="relative">
+              <button
+                class="flex items-center gap-2 text-foreground"
+                aria-label="User profile"
+              >
+                <img
+                  class="h-8 w-8 rounded-none object-cover"
+                  src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
+                  alt="Admin"
+                />
+                <span class="hidden md:inline">Admin</span>
+              </button>
+            </div>
           </div>
-          <div class="relative">
-            <button
-              class="flex items-center gap-2 text-foreground"
-              aria-label="User profile"
-            >
-              <img
-                class="h-8 w-8 rounded-none object-cover"
-                src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
-                alt="Admin"
-              />
-              <span class="hidden md:inline">Admin</span>
-            </button>
-          </div>
-        </div>
-      </Fragment>
-      <slot />
-    </AdminPortalShell>
+        </Fragment>
+        <slot />
+      </AdminPortalShell>
 
-    <style>
-      .slide-enter-content {
-        animation: slide-enter 0.3s ease-out;
-      }
+      <style>
+        .slide-enter-content {
+          animation: slide-enter 0.3s ease-out;
+        }
 
-      @keyframes slide-enter {
-        from {
-          opacity: 0;
-          transform: translateX(-10px);
+        @keyframes slide-enter {
+          from {
+            opacity: 0;
+            transform: translateX(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
-      }
-    </style>
-  </body>
-</html>
+      </style>
+    </body>
+  </html>
+) : (
+  <html lang={SITE.lang}>
+    <head>
+      <meta charset="utf-8" />
+      <meta http-equiv="refresh" content="0; url=/login?redirect=/admin" />
+      <title>Redirecting</title>
+    </head>
+    <body></body>
+  </html>
+)}

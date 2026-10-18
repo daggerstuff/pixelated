@@ -1,27 +1,57 @@
 ---
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
-import { consentManagementService } from '@/lib/research/services/ConsentManagementService'
+import { initializeDatabase } from '@/lib/db'
 import { getConsentExpiryService } from '@/lib/consent'
+import type { ExpiryCheckResult } from '@/lib/consent'
+import { consentManagementService } from '@/lib/research/services/ConsentManagementService'
+import type {
+  ConsentAuditLog,
+  ConsentStatistics,
+} from '@/lib/research/services/ConsentManagementService'
+import type { ConsentRecord } from '@/lib/research/types/research-types'
 
-type ConsentRecord = NonNullable<
-  Awaited<ReturnType<typeof consentManagementService.getConsentRecord>>
->
+// Ensure DB pool exists even if app.astro startup was skipped (e.g. SSR guard failed)
+try {
+  initializeDatabase()
+} catch {
+  // In environments without DB config (e.g. preview), continue with empty state
+}
 
-// Fetch data server-side
-const statistics = await consentManagementService.getConsentStatistics()
-const auditTrail = await consentManagementService.getAuditTrail()
+// Fetch data server-side — degrade gracefully if DB is unavailable
+let statistics: ConsentStatistics
+let auditTrail: ConsentAuditLog[]
+let expiryResult: ExpiryCheckResult
+try {
+  statistics = await consentManagementService.getConsentStatistics()
+  auditTrail = await consentManagementService.getAuditTrail()
+  const expiryService = getConsentExpiryService()
+  expiryResult = await expiryService.checkExpiries()
+} catch {
+  statistics = {
+    totalClients: 0,
+    activeConsents: 0,
+    consentLevels: { none: 0, minimal: 0, limited: 0, full: 0 },
+    withdrawalRequests: 0,
+    expiredConsents: 0,
+  }
+  auditTrail = []
+  expiryResult = {
+    checkedAt: new Date().toISOString(),
+    totalChecked: 0,
+    reminders: [],
+    summary: { expiringSoon: 0, expiringCritical: 0, expired: 0 },
+  }
+}
 
-// Run expiry check
-const expiryService = getConsentExpiryService()
-const expiryResult = await expiryService.checkExpiries()
-
-// Get all consent records
+// Get all consent records — resilient to per-record DB failures
 const clientIds = new Set(auditTrail.map((entry) => entry.clientId))
 const records: ConsentRecord[] = []
 for (const id of clientIds) {
-  const record = await consentManagementService.getConsentRecord(id)
-  if (record) {
-    records.push(record)
+  try {
+    const record = await consentManagementService.getConsentRecord(id)
+    if (record) records.push(record)
+  } catch {
+    // Skip records that fail to load; page still renders
   }
 }
 ---

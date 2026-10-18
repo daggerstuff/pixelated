@@ -73,6 +73,10 @@ function resolveDefaultConfig(): DatabaseConfig {
     fromEnv.connectionTimeoutMillis = parseInt(env['DB_CONNECTION_TIMEOUT'], 10)
   }
 
+  const isLocalHost = (host?: string) =>
+    !host || host === 'localhost' || host === '127.0.0.1' || host === '::1'
+  const effectiveHost: string | undefined = fromEnv.host ?? fromUrl.host
+
   return {
     host: 'localhost',
     port: 5432,
@@ -82,10 +86,14 @@ function resolveDefaultConfig(): DatabaseConfig {
     max: parseInt(env['DB_MAX_CONNECTIONS'] ?? '20', 10),
     idleTimeoutMillis: parseInt(env['DB_IDLE_TIMEOUT'] ?? '30000', 10),
     connectionTimeoutMillis: 15000,
-    // Verify server certificates in production by default. Opt out only via
-    // an explicit sslmode=no-verify in DATABASE_URL or caller-supplied config.
+    // Verify server certificates in production by default for remote hosts.
+    // Localhost never uses SSL, even in production — the local Postgres does
+    // not support TLS and would throw "The server does not support SSL connections".
+    // Opt out only via an explicit sslmode=no-verify or disable in DATABASE_URL.
     ssl:
-      env['NODE_ENV'] === 'production' ? { rejectUnauthorized: true } : false,
+      env['NODE_ENV'] === 'production' && !isLocalHost(effectiveHost)
+        ? { rejectUnauthorized: true }
+        : false,
     ...fromUrl,
     ...fromEnv,
   }
@@ -158,6 +166,12 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
   params?: unknown[],
 ): Promise<DbQueryResult<T>> {
   recordQuery(text)
+  // Auto-initialize pool if caller forgot (mirrors transaction() behavior).
+  // Prevents "Database not initialized" crashes on SSR pages like consent-management
+  // when app.astro startup failed or was bypassed.
+  if (!pool) {
+    initializeDatabase()
+  }
   const client = await getPool().connect()
   try {
     return (await client.query<T>(text, params)) as unknown as DbQueryResult<T>
