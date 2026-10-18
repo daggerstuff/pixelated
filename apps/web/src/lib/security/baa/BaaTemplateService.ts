@@ -1,11 +1,11 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { generateId } from '../../utils/ids'
 import {
+  BusinessAssociateType,
   ServiceCategory,
   type BaaTemplate,
   type BaaTemplateSection,
   type BaaPlaceholder,
-  type BusinessAssociateType,
 } from './types'
 
 // Initialize logger for PHI audit logging

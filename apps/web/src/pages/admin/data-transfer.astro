@@ -7,6 +7,18 @@ import DataPortabilitySystem from '../../components/admin/DataPortabilitySystem.
 import TransferAuditLog from '../../components/admin/TransferAuditLog.astro'
 import { Icon } from 'astro-icon/components'
 
+// Guard: page-level auth prevents AdminLayout ResponseSentError (PIXEL-ASTRO-S).
+// Layouts cannot safely `return Astro.redirect()` — it would render into the
+// streaming response and trigger "Response has already been sent". Page-level
+// redirects run before layout rendering and are the correct Astro pattern.
+const session = Astro.locals.session
+const user = Astro.locals.user
+if (!session || !user || user.role !== 'admin') {
+  return Astro.redirect(
+    `/login?redirect=${encodeURIComponent('/admin/data-transfer')}`,
+  )
+}
+
 // Page configuration
 const title = 'Data Transfer Management'
 const description =

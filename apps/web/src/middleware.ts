@@ -230,6 +230,24 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
     // component itself, which reads Astro.locals.session/user.
     if (!routeConfig) {
       await resolveCookieSession(context)
+      // Guard /admin pages at middleware layer to prevent ResponseSentError
+      // from AdminLayout (which cannot safely return Astro.redirect from a layout).
+      // Middleware runs before any component rendering, so a redirect here avoids
+      // the "Response has already been sent" crash seen in PIXEL-ASTRO-S.
+      try {
+        const pathname = new URL(request.url).pathname
+        if (pathname.startsWith('/admin')) {
+          const sessionUser = context.locals.user
+          const sessionData = context.locals.session
+          if (!sessionUser || !sessionData) {
+            const loginUrl = new URL('/login', request.url)
+            loginUrl.searchParams.set('redirect', pathname)
+            return Response.redirect(loginUrl.toString(), 302)
+          }
+        }
+      } catch {
+        // URL parsing failure — fall through to page render
+      }
       return next()
     }
 

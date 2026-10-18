@@ -22,8 +22,13 @@ export function parseDatabaseUrl(url: string): {
   //   no-verify                       -> TLS, certificate not verified
   //   prefer | allow | require        -> TLS, certificate verified
   //   verify-ca | verify-full         -> TLS, certificate verified
-  //   (unset)                         -> TLS + verification for production
-  //                                      or remote hosts, otherwise no TLS
+  //   (unset)                         -> TLS + verification for remote hosts,
+  //                                      no TLS for localhost. Production
+  //                                      does NOT force TLS on localhost:
+  //                                      local Postgres typically has no
+  //                                      TLS support and the connection
+  //                                      fails with "The server does not
+  //                                      support SSL connections".
   const verifyingModes = [
     'prefer',
     'allow',
@@ -39,10 +44,7 @@ export function parseDatabaseUrl(url: string): {
   } else if (sslMode !== null && verifyingModes.includes(sslMode)) {
     ssl = { rejectUnauthorized: true }
   } else {
-    ssl =
-      process.env['NODE_ENV'] === 'production' || isRemoteHost
-        ? { rejectUnauthorized: true }
-        : false
+    ssl = isRemoteHost ? { rejectUnauthorized: true } : false
   }
 
   const connectTimeoutSec = parsed.searchParams.get('connect_timeout')
