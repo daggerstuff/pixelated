@@ -76,6 +76,7 @@ openhands/
 .sonarlint/
 .squad/
 .squad-workstream
+.deploystaging/
 .superpowers/
 .swarm/
 .tokensave/
