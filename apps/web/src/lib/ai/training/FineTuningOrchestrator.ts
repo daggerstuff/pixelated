@@ -286,7 +286,48 @@ export class FineTuningOrchestrator {
     return this.factory.listModels();
   }
 
-  private get store(): JobStore {
+  private readonly checkpoints = new Map<string, import("./types").TrainingCheckpoint>();
+
+  async saveCheckpoint(jobId: string, kind: import("./types").CheckpointKind = "adapter"): Promise<import("./types").TrainingCheckpoint | null> {
+    const job = await this.store.get(jobId);
+    if (!job?.remoteId) return null;
+    const backend = this.factory.getProvider(job.backend ?? this.guessBackendFromJob(job));
+    const result = await backend.saveCheckpoint?.(job.remoteId, kind);
+    if (!result) return null;
+    const cp: import("./types").TrainingCheckpoint = {
+      id: result.checkpointId,
+      jobId,
+      kind,
+      path: result.path,
+      createdAt: new Date().toISOString(),
+    };
+    this.checkpoints.set(cp.id, cp);
+    await this.store.updateStatus(jobId, job.status, { checkpointId: cp.id });
+    return cp;
+  }
+
+  getCheckpoint(checkpointId: string): import("./types").TrainingCheckpoint | null {
+    return this.checkpoints.get(checkpointId) ?? null;
+  }
+
+  async resumeFromCheckpoint(checkpointId: string, overrides?: Partial<import("./types").FineTuningConfig>): Promise<import("./types").FineTuningJob | null> {
+    const cp = this.checkpoints.get(checkpointId);
+    if (!cp) return null;
+    const origJob = await this.store.get(cp.jobId);
+    if (!origJob) return null;
+    const backend = this.factory.getProvider(origJob.backend ?? this.guessBackendFromJob(origJob));
+    const resumed = await backend.resumeFromCheckpoint?.(checkpointId);
+    if (!resumed) return null;
+    const job: import("./types").FineTuningJob = {
+      ...resumed,
+      ...(overrides ?? {}),
+      backend: origJob.backend,
+      ...(origJob.sourceProvenanceId ? { sourceProvenanceId: origJob.sourceProvenanceId } : {}),
+    };
+    return this.store.put(job);
+  }
+
+    private get store(): JobStore {
     return this.factory.getJobStore();
   }
 
