@@ -1,7 +1,6 @@
 name: OpenAPI Validation
 
 permissions:
-  pull-requests: write
   contents: read
 
 on:
@@ -77,18 +76,6 @@ jobs:
           path: |
             spectral-results.json
           retention-days: 30
-
-      - name: Comment on PR with results
-        if: github.event_name == 'pull_request' && always()
-        uses: marocchino/sticky-pull-request-comment@v3
-        with:
-          header: openapi-validation
-          message: |
-            ## OpenAPI Validation Results
-
-            ${{ steps.validate-all.outcome == 'success' && '✅' || '❌' }} All OpenAPI specs validated.
-
-            See [spectral results artifact](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
 
   export-fastapi-schema:
     name: Export FastAPI OpenAPI Schema

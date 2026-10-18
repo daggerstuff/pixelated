@@ -19,7 +19,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   validate-docs:
@@ -71,23 +70,6 @@ jobs:
           name: docs-build
           path: dist/
           retention-days: 7
-
-      - name: Comment on PR
-        if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v3
-        with:
-          message: |
-            ## Documentation Build
-
-            Job status: `${{ job.status }}`
-
-            - Typecheck: `${{ steps.typecheck.outcome }}`
-            - Build: `${{ steps.build.outcome }}`
-            - OpenAPI spec validated with Spectral
-            - Broken link check: `${{ steps.linkcheck.outcome }}`
-
-            Preview the build artifact in the workflow artifacts.
-            See [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
 
   deploy-preview:
     name: Deploy Preview (Vercel)

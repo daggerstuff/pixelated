@@ -91,19 +91,11 @@ jobs:
           name: security-audit-results
           path: audit-results.json
 
-      - name: Generate vulnerability PR comment
+      - name: Summarize dependency vulnerabilities
         if: github.event_name == 'pull_request'
-        id: vuln_comment
         run: |
           node scripts/ci/generate-vuln-comment.js audit-results.json > pr-comment.md || true
-
-      - name: Post vulnerability summary to PR
-        if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v3
-        continue-on-error: true
-        with:
-          header: 🔒 Dependency Vulnerability Scan
-          path: pr-comment.md
+          cat pr-comment.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || echo "No vulnerability summary available" >> "$GITHUB_STEP_SUMMARY"
 
   # -----------------------------------------------------------------------
   # Python dependency vulnerability scan

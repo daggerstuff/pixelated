@@ -126,8 +126,8 @@ jobs:
             packages/sdk-typescript/dist/
           retention-days: 30
 
-  pr-comment:
-    name: PR SDK Comment
+  sdk-summary:
+    name: SDK Generation Summary
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     needs: generate
@@ -137,27 +137,16 @@ jobs:
           name: generated-sdks
           path: generated-sdks
 
-      - name: Count generated files
-        id: count
+      - name: Summarize generated SDKs
         run: |
           TS_FILES=$(find generated-sdks/packages/sdk-typescript -name '*.ts' 2>/dev/null | wc -l)
           PY_FILES=$(find generated-sdks/packages/sdk-python -name '*.py' 2>/dev/null | wc -l)
-          echo "ts_files=$TS_FILES" >> $GITHUB_OUTPUT
-          echo "py_files=$PY_FILES" >> $GITHUB_OUTPUT
-
-      - uses: marocchino/sticky-pull-request-comment@v3
-        with:
-          header: sdk-generation
-          message: |
-            ## SDK Generation Report
-
-            SDKs generated from the OpenAPI spec in this PR:
-
-            | Language | Files Generated |
-            |----------|----------------|
-            | TypeScript | ${{ steps.count.outputs.ts_files }} |
-            | Python | ${{ steps.count.outputs.py_files }} |
-
-            Generated SDKs are available as artifacts for download.
-
-            **Note**: SDKs are auto-published to npm and PyPI on merge to `main`.
+          {
+            echo "## SDK Generation Report"
+            echo "| Language | Files Generated |"
+            echo "|----------|----------------|"
+            echo "| TypeScript | $TS_FILES |"
+            echo "| Python | $PY_FILES |"
+            echo ""
+            echo "Generated SDKs are available as artifacts for download."
+          } >> "$GITHUB_STEP_SUMMARY"
