@@ -78,6 +78,20 @@ function collectPythonFiles(dir, acc = []) {
   return acc
 }
 
+/** Files tracked by git in the submodule (index paths, repo-relative).
+ * Untracked and gitignored files exist only on dev machines — CI's clean
+ * checkout never has them, so counting them makes dev runs diverge from CI.
+ * Index paths (not ls-tree HEAD) so staged-but-uncommitted files are still
+ * checked locally before they land. */
+function trackedFiles() {
+  const res = spawnSync('git', ['ls-files', '-z'], { cwd: AI_DIR })
+  if (res.status !== 0) {
+    console.error('❌ git ls-files failed in the ai submodule.')
+    process.exit(1)
+  }
+  return new Set(res.stdout.toString().split('\0').filter(Boolean))
+}
+
 function readBaseline() {
   if (!existsSync(BASELINE_PATH)) return { files: [], errors: {} }
   const raw = JSON.parse(readFileSync(BASELINE_PATH, 'utf8'))
@@ -153,8 +167,11 @@ function runStrictMypy() {
   )
 }
 
-/** Parse `path:line: error: msg [code]` lines into `file :: code` counts. */
-function parseErrorCounts(output, treePrefixes) {
+/** Parse `path:line: error: msg [code]` lines into `file :: code` counts.
+ * When `tracked` is provided, errors in files outside it are dropped — mypy
+ * walks the trees itself, so on dev machines it also analyzes untracked and
+ * gitignored files that CI's clean checkout never has. */
+function parseErrorCounts(output, treePrefixes, tracked) {
   const counts = new Map()
   const perFile = new Map()
   const lineRe = new RegExp(
@@ -164,6 +181,7 @@ function parseErrorCounts(output, treePrefixes) {
     const m = line.match(lineRe)
     if (!m) continue
     const file = line.slice(0, line.indexOf(':'))
+    if (tracked && !tracked.has(file)) continue
     const code = m[2]
     const key = `${file} :: ${code}`
     counts.set(key, (counts.get(key) ?? 0) + 1)
@@ -177,9 +195,12 @@ function main() {
   const update = args.includes('--update')
   const prune = args.includes('--prune')
 
+  const tracked = trackedFiles()
   const allFiles = TREES.flatMap((tree) =>
     existsSync(join(AI_DIR, tree)) ? collectPythonFiles(join(AI_DIR, tree)) : [],
-  ).map((f) => relative(AI_DIR, f).split(sep).join('/'))
+  )
+    .map((f) => relative(AI_DIR, f).split(sep).join('/'))
+    .filter((f) => tracked.has(f))
 
   const baseline = readBaseline()
   const legacy = new Set(baseline.files)
@@ -214,7 +235,7 @@ function main() {
   console.log('\n  Running dependency-light mypy --strict on the pinned trees…')
   const result = runStrictMypy()
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`
-  const { counts, perFile } = parseErrorCounts(output, TREES)
+  const { counts, perFile } = parseErrorCounts(output, TREES, tracked)
 
   if (result.status !== 0 && counts.size === 0 && !/^\S+:\d+.*error:/m.test(output)) {
     // mypy itself broke (bad config, syntax crash) — surface raw output.
