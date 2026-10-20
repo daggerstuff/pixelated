@@ -606,3 +606,4 @@ scripts/deploy/rollout-civo.sh
 scripts/devops/run-outlier-ai.sh
 tools_local/
 apps/web/src/pages/docs/api/_openapi.yaml
+apps/web/src/simulator/utils/__tests__/scenarios.test.ts
