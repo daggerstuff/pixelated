@@ -596,3 +596,4 @@ scripts/corpus/pyproject.toml
 scripts/deploy/rollout-civo.sh
 scripts/devops/run-outlier-ai.sh
 tools_local/
+apps/web/src/pages/docs/api/_openapi.yaml
