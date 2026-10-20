@@ -118,6 +118,7 @@ __mocks__
 .envrc
 .venv
 .venv-churner
+.venv-tinker
 **/.venv/
 **/.git_disabled/**
 **/.git_ignore/**
