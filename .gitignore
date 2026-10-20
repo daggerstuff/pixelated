@@ -540,3 +540,6 @@ config/astro.config.mjs
 churnmeon/
 scripts/ci/python-strict-baseline.json
 scripts/ci/python-strict-ratchet.mjs
+scripts/create_ai_vm.sh
+scripts/systemd/linear-agent-runner.service
+tools/agent_runner/git_isolation.py
