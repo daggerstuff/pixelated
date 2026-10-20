@@ -500,3 +500,43 @@ thread-5302e593-transcript.md
 HANDOFF-dashboard-theme.md
 MISSION-stub-tech-debt.md
 /*.tgz
+
+# === Working-tree junk (2026-10-20 cleanup) ===
+# CUDA binaries copied in for local builds; *.so rule doesn't match versioned names
+/libcublas.so.12
+/libcublasLt.so.12
+/libcudart.so.12
+# models symlink points at /mnt/sally (never a repo artifact)
+/models
+# pre-relocation zombie trees restored from backup (src/ was moved to apps/web/src/)
+/src/
+/public/
+/docker/
+/monitoring/
+/templates/
+/cli/
+/k8s/
+/metoro-exporter/
+/tokens/
+/types/
+/deep-agent/
+/frontend/
+/astro/
+/apps/web/src/components/others/
+/apps/web/src/components/tailus/
+/apps/web/src/components/examples/
+# deployment staging runtime + agent session dumps
+.deploystaging/
+.shai/
+# downloads and throwaway artifacts
+google-workspace-cli-x86_64-unknown-linux-gnu.tar.gz.sha256
+omp-session-*.html
+dash-repro.mjs
+judgments.json
+docker-compose.webui.yml
+docker-compose.gpu.override.yml
+neon.ts
+config/astro.config.mjs
+churnmeon/
+scripts/ci/python-strict-baseline.json
+scripts/ci/python-strict-ratchet.mjs
