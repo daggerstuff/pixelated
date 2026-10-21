@@ -277,10 +277,15 @@ export class RealFHEService implements FHEService {
     details?: Record<string, unknown>,
   ): void {
     void (async () => {
+      // Only import the server-side governance bridge in a Node environment;
+      // the computed specifier keeps the bundler from pulling the governance
+      // dependency chain (mongodb, etc.) into client bundles.
+      if (typeof process === 'undefined' || typeof window !== 'undefined') {
+        return
+      }
       try {
-        // Dynamic import: avoid a module-load dependency between FHE and governance.
-        const { GovernanceBridge } =
-          await import('../governance/governance-bridge')
+        const modulePath = ['..', 'governance', 'governance-bridge'].join('/')
+        const { GovernanceBridge } = await import(/* @vite-ignore */ modulePath)
         const bridge = GovernanceBridge.getInstance()
         if (event === 'decryption_complete') {
           await bridge.recordFHEDecryption(details)
