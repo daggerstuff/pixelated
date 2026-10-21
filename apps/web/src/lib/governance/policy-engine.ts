@@ -88,7 +88,14 @@ export class PolicyEngine {
           return {
             field: cond.field,
             test: (value: unknown) => {
-              const strValue = String(value ?? '')
+              const strValue =
+                value == null
+                  ? ''
+                  : typeof value === 'string'
+                    ? value
+                    : typeof value === 'number' || typeof value === 'boolean'
+                      ? String(value)
+                      : JSON.stringify(value)
               switch (cond.operator) {
                 case 'equals':
                   return value === cond.value
