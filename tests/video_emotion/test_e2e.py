@@ -4,7 +4,10 @@ import json
 import os
 import tempfile
 
-import cv2
+import pytest
+
+pytest.importorskip("cv2", reason="opencv-python not installed (optional video processing dependency)")
+
 import numpy as np
 
 from scripts.run_video_emotion_prototype import run_pipeline

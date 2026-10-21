@@ -3,6 +3,8 @@ import os
 
 import pytest
 
+pytest.importorskip("art", reason="openpipe art not installed (optional RL training dependency)")
+
 from experiments.experiment_runner import launch_parallel_start, launch_remaining_batch, run_experiment_pair
 
 

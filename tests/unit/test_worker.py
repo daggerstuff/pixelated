@@ -15,6 +15,8 @@ def worker_module(request):
     Dynamically loads workflow/worker.py to handle non-package import.
     """
     file_path = Path(request.config.rootpath) / "workflow" / "worker.py"
+    if not file_path.exists():
+        pytest.skip(f"workflow/worker.py not present in this checkout: {file_path}")
     module_name = "worker_under_test"
 
     spec = importlib.util.spec_from_file_location(module_name, file_path)

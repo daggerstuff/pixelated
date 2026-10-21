@@ -10,6 +10,11 @@ Test cases:
     idempotent_recreate        -- calling setup_collections twice is safe
 """
 
+import pytest
+
+pytest.importorskip("pymongo", reason="pymongo not installed (optional integration dependency)")
+pytest.importorskip("psycopg2", reason="psycopg2 not installed (optional integration dependency)")
+
 import contextlib
 
 import pymongo
