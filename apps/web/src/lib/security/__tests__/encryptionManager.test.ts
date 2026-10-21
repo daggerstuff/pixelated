@@ -280,6 +280,35 @@ describe('EncryptionManager', () => {
     })
   })
 
+  describe('key destruction (crypto-shred)', () => {
+    beforeEach(async () => {
+      await manager.initialize()
+    })
+
+    it('should destroy a key so data encrypted with it is unrecoverable', async () => {
+      const keyId = manager.getCurrentKeyInfo()!.id
+      const encrypted = await manager.encrypt('sensitive PHI payload', keyId)
+
+      const result = manager.destroyKey(keyId)
+      expect(result).toBe(true)
+      expect(manager.keyExists(keyId)).toBe(false)
+
+      await expect(manager.decrypt(encrypted)).rejects.toThrow()
+    })
+
+    it('should return false for non-existent key', () => {
+      const result = manager.destroyKey('nonexistent')
+      expect(result).toBe(false)
+    })
+
+    it('should be idempotent in effect: destroying twice reports false', async () => {
+      const keyId = manager.getCurrentKeyInfo()!.id
+
+      expect(manager.destroyKey(keyId)).toBe(true)
+      expect(manager.destroyKey(keyId)).toBe(false)
+    })
+  })
+
   describe('ECDH key exchange', () => {
     beforeEach(async () => {
       await manager.initialize()
