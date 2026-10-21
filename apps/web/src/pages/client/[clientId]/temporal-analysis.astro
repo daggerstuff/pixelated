@@ -30,7 +30,9 @@ if (authResult) {
 const user = astro.locals?.user
 
 if (!user) {
-  return astro.redirect('/auth/login')
+  return astro.redirect(
+    `/login?redirect=${encodeURIComponent(`/client/${safeClientId}/temporal-analysis`)}`,
+  )
 }
 
 // Fetch client info

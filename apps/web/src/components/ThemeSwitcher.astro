@@ -248,5 +248,10 @@ const lightPalettes = [
 
   // <html> survives view transitions, so listeners follow palette switches
   // for the life of the session. Re-init on every page load.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeSwitcher)
+  } else {
+    initThemeSwitcher()
+  }
   document.addEventListener('astro:page-load', initThemeSwitcher)
 </script>

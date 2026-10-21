@@ -85,27 +85,41 @@ export const securityHeaders: MiddlewareHandler = async (
     )
   }
 
-  response.headers.set('Content-Security-Policy', csp.join('; '))
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  response.headers.set('X-Content-Type-Options', 'nosniff')
-  response.headers.set('X-Frame-Options', 'DENY')
+  const applyHeaders = (headers: Headers) => {
+    headers.set('Content-Security-Policy', csp.join('; '))
+    headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+    headers.set('X-Content-Type-Options', 'nosniff')
+    headers.set('X-Frame-Options', 'DENY')
 
-  // Only set HSTS header in production and if not explicitly disabled
-  // disabling HSTS is necessary to avoid loops during development or when using proxies like Cloudflare Flexible SSL
-  if (
-    process.env['NODE_ENV'] === 'production' &&
-    process.env['DISABLE_HSTS'] !== 'true'
-  ) {
-    response.headers.set(
-      'Strict-Transport-Security',
-      'max-age=31536000; includeSubDomains; preload',
+    // Only set HSTS header in production and if not explicitly disabled
+    // disabling HSTS is necessary to avoid loops during development or when using proxies like Cloudflare Flexible SSL
+    if (
+      process.env['NODE_ENV'] === 'production' &&
+      process.env['DISABLE_HSTS'] !== 'true'
+    ) {
+      headers.set(
+        'Strict-Transport-Security',
+        'max-age=31536000; includeSubDomains; preload',
+      )
+    }
+
+    headers.set(
+      'Permissions-Policy',
+      'camera=(), microphone=(), geolocation=(), payment=()',
     )
   }
 
-  response.headers.set(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), payment=()',
-  )
-
-  return response
+  try {
+    applyHeaders(response.headers)
+    return response
+  } catch {
+    // If response.headers is immutable (e.g. from Response.redirect), clone headers into a new Response
+    const newHeaders = new Headers(response.headers)
+    applyHeaders(newHeaders)
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: newHeaders,
+    })
+  }
 }

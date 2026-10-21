@@ -22,6 +22,7 @@ const {
 } = Astro.props
 
 const { cspNonce } = Astro.locals
+const isVercelDeploy = !!process.env['VERCEL']
 ---
 
 <style>
@@ -228,8 +229,8 @@ const { cspNonce } = Astro.locals
       </main>
     </div>
     <script>
-      // Mobile sidebar toggle — astro:page-load for client-side nav compatibility
-      document.addEventListener('astro:page-load', () => {
+      // Mobile sidebar toggle — works on initial load and client-side nav
+      const initSidebar = () => {
         const button = document.getElementById('mobile-menu-button')
         const sidebar = document.getElementById('admin-sidebar')
         if (!button || !sidebar) return
@@ -255,8 +256,15 @@ const { cspNonce } = Astro.locals
             button.focus()
           }
         })
-      })
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebar)
+      } else {
+        initSidebar()
+      }
+      document.addEventListener('astro:page-load', initSidebar)
     </script>
-    <SpeedInsights />
+    {isVercelDeploy && <SpeedInsights />}
   </body>
 </html>
