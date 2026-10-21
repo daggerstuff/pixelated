@@ -1,11 +1,9 @@
-"""Linear Multi-Agent Coordination Runner package."""
+"""Linear Multi-Agent Coordination Runner package.
 
-import contextlib
-
-with contextlib.suppress(ImportError):
-    from dotenv import load_dotenv
-
-    load_dotenv(override=True)
+Note: .env is loaded by the CLI entrypoint (cli.py), not here — importing
+this package must not mutate os.environ for unrelated code in the same
+process (it polluted test sessions and other importers).
+"""
 
 from tools.agent_runner.action_parser import ActionParser
 from tools.agent_runner.adapters import AgentAdapter, get_agent_adapter

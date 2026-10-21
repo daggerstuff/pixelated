@@ -11,12 +11,8 @@ from typing import Any
 
 logger = logging.getLogger("agent_runner.trace_analyzer")
 
-try:
-    from dotenv import load_dotenv
-
-    load_dotenv(override=True)
-except ImportError:
-    pass
+# .env is loaded by the CLI entrypoint (cli.py); importing this module must
+# not mutate os.environ for unrelated code in the same process.
 
 LangSmithClient: Any = None
 try:
