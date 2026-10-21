@@ -176,8 +176,8 @@ def test_build_sync_plan_collapses_duplicate_provider_records() -> None:
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
-        1,
-        "tri-sync-rollout",
+        minutes_ago=1,
+        sync_key="tri-sync-rollout",
     )
     jira_older = make_record(
         "jira",
@@ -185,8 +185,8 @@ def test_build_sync_plan_collapses_duplicate_provider_records() -> None:
         "Tri-sync rollout",
         "Old body",
         "open",
-        30,
-        "tri-sync-rollout",
+        minutes_ago=30,
+        sync_key="tri-sync-rollout",
     )
     asana = make_record(
         "asana",
@@ -194,8 +194,8 @@ def test_build_sync_plan_collapses_duplicate_provider_records() -> None:
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
-        5,
-        "tri-sync-rollout",
+        minutes_ago=5,
+        sync_key="tri-sync-rollout",
     )
 
     plan = build_sync_plan(
@@ -504,8 +504,8 @@ def test_build_sync_plan_prefers_open_jira_record_over_newer_closed_duplicate() 
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
-        20,
-        "tri-sync-rollout",
+        minutes_ago=20,
+        sync_key="tri-sync-rollout",
     )
     jira_closed = make_record(
         "jira",
@@ -513,8 +513,8 @@ def test_build_sync_plan_prefers_open_jira_record_over_newer_closed_duplicate() 
         "Tri-sync rollout",
         "Ship the sync bridge",
         "closed",
-        1,
-        "tri-sync-rollout",
+        minutes_ago=1,
+        sync_key="tri-sync-rollout",
     )
     asana = make_record(
         "asana",
@@ -522,8 +522,8 @@ def test_build_sync_plan_prefers_open_jira_record_over_newer_closed_duplicate() 
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
-        5,
-        "tri-sync-rollout",
+        minutes_ago=5,
+        sync_key="tri-sync-rollout",
     )
 
     plan = build_sync_plan(
@@ -547,8 +547,8 @@ def test_build_sync_plan_prefers_open_non_jira_record_over_closed_jira_record() 
         "Tri-sync rollout",
         "Ship the sync bridge",
         "closed",
-        1,
-        "tri-sync-rollout",
+        minutes_ago=1,
+        sync_key="tri-sync-rollout",
     )
     asana_open = make_record(
         "asana",
@@ -556,8 +556,8 @@ def test_build_sync_plan_prefers_open_non_jira_record_over_closed_jira_record() 
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
-        5,
-        "tri-sync-rollout",
+        minutes_ago=5,
+        sync_key="tri-sync-rollout",
     )
 
     plan = build_sync_plan(

@@ -25,6 +25,9 @@ import pytest
 # ``from orchestration.…`` (expecting ``ai/`` on ``sys.path``).  Add both.
 # ---------------------------------------------------------------------------
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # pixelated/
+# Append, don't insert: prepending these made ``ai/scripts`` shadow the
+# root ``scripts`` package (no devops submodule there) for every test
+# collected afterwards.
 for _p in (
     _PROJECT_ROOT / "apps" / "web",
     _PROJECT_ROOT / "apps" / "web" / "src",
@@ -32,7 +35,7 @@ for _p in (
     _PROJECT_ROOT / "ai",
 ):
     if str(_p) not in sys.path:
-        sys.path.insert(0, str(_p))
+        sys.path.append(str(_p))
 
 if "orchestration" not in sys.modules:
     import ai.pipelines.model_training as _mt
