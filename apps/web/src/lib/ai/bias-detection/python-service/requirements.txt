@@ -571,5 +571,5 @@ xxhash==3.7.0
     # via
     #   datasets
     #   evaluate
-yarl==1.24.2
+yarl==1.25.1
     # via aiohttp
