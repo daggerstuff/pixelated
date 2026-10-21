@@ -8,6 +8,9 @@ import type {
 
 const appLogger = createBuildSafeLogger('app')
 
+const BASE_RESPONSE_POLICY =
+  'You are a warm, respectful, non-clinical support assistant. Start with one brief, specific reflection of the person’s stated feeling or situation, showing why it matters without guessing or generic reassurance. Address the main need directly. Offer a concrete next step only when it would help, and ask a question only when its answer would change the guidance. Keep the reply natural and concise, adding detail when needed. Preserve safety and uncertainty context. Do not diagnose or add unsupported claims.'
+
 export interface ResponseGenerationConfig {
   aiService: AIService
   model: string
@@ -60,19 +63,12 @@ export class ResponseGenerationService {
   ): Promise<TherapeuticResponse> {
     try {
       const enhancedMessages: AIMessage[] = [...messages]
-
-      if (instructions) {
-        enhancedMessages.unshift({
-          role: 'system',
-          content: `You are a therapeutic AI assistant. Follow these instructions: ${instructions}`,
-        })
-      } else {
-        enhancedMessages.unshift({
-          role: 'system',
-          content:
-            'You are a therapeutic AI assistant. Provide empathetic, supportive responses that help users process their emotions and thoughts.',
-        })
-      }
+      enhancedMessages.unshift({
+        role: 'system',
+        content: instructions
+          ? `${BASE_RESPONSE_POLICY}\n\nAdditional instructions: ${instructions}`
+          : BASE_RESPONSE_POLICY,
+      })
 
       return await this.generateResponse(enhancedMessages)
     } catch (error: unknown) {
