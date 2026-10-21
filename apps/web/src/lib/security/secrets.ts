@@ -59,14 +59,19 @@ export function getSecret(name: string, defaultValue?: string): string {
 /**
  * Fire-and-forget route into the governance event stream. Governance
  * aggregation must never break secret access, so failures are swallowed and
- * the module is loaded lazily. Synchronous fire to keep getSecret() cheap.
+ * the module is loaded lazily.
  */
 function routeToGovernance(name: string): void {
   void (async () => {
+    // Only import the server-side governance bridge in a Node environment;
+    // the computed specifier keeps the bundler from pulling the governance
+    // dependency chain (mongodb, etc.) into client bundles.
+    if (typeof process === 'undefined' || typeof window !== 'undefined') {
+      return
+    }
     try {
-      // Dynamic import: avoid a module-load dependency between security and governance.
-      const { GovernanceBridge } =
-        await import('../governance/governance-bridge')
+      const modulePath = ['..', 'governance', 'governance-bridge'].join('/')
+      const { GovernanceBridge } = await import(/* @vite-ignore */ modulePath)
       await GovernanceBridge.getInstance().recordSecretAccess(name)
     } catch {
       // Governance module unavailable in this environment; access still works.
