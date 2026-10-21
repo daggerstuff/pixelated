@@ -1,3 +1,21 @@
+/**
+ * INTERNAL MEMORY SERVICE CLIENT — server-side only.
+ *
+ * This is the single sanctioned entry point for talking to the internal
+ * memory service (the shared actor-auth'd service, formerly reached on
+ * port 5003). Browser code must never import this module or know about
+ * the service's host, routes, or auth scheme — browser memory flows go
+ * through backend-owned routes (/api/v1/memory/*) instead.
+ *
+ * Modules allowed to call this client directly (exhaustive):
+ *   - lib/services/product-memory-gateway.ts   (gateway for API routes)
+ *   - lib/server/memory-transport-factory.ts   (transport selection)
+ *   - lib/server/mcp-memory-transport.ts       (MCP transport adapter)
+ *   - lib/server/internal-memory-scope.ts      (scope payload building)
+ *
+ * Anything else that needs memory data must go through the gateway or a
+ * backend route. Enforced by src/lib/memory/__tests__/browser-memory-boundary.test.ts.
+ */
 import { buildScopePayload, buildScopeQuery } from './internal-memory-scope'
 import {
   MemoryServiceRequestSigner,

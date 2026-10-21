@@ -565,6 +565,11 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         )
       }
 
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSearch)
+      } else {
+        initSearch()
+      }
       document.addEventListener('astro:page-load', initSearch)
     </script>
     <script>
