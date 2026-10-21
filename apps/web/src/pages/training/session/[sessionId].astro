@@ -40,7 +40,9 @@ const { sessionId } = Astro.params
 const session = await getSession(Astro.request)
 
 if (!session) {
-  return Astro.redirect('/auth/login')
+  return Astro.redirect(
+    `/login?redirect=${encodeURIComponent(`/training/session/${sessionId}`)}`,
+  )
 }
 
 // Extract token for API call

@@ -11,12 +11,12 @@ import { getCurrentUser, isAuthenticated } from '@/lib/auth'
 // Check if user is authenticated using the available auth functions
 const isUserAuthenticated = await isAuthenticated(Astro.request)
 if (!isUserAuthenticated) {
-  return Astro.redirect('/auth/login')
+  return Astro.redirect('/login?redirect=/training')
 }
 
 const userSession = await getCurrentUser(Astro.request)
 if (!userSession) {
-  return Astro.redirect('/auth/login')
+  return Astro.redirect('/login?redirect=/training')
 }
 
 const userRole = userSession.role // 'trainee', 'supervisor', 'admin'

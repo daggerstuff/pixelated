@@ -13,12 +13,12 @@ export const prerender = false
 // Check if user is authenticated using the same pattern as training/index.astro
 const isUserAuthenticated = await isAuthenticated(Astro.request)
 if (!isUserAuthenticated) {
-  return Astro.redirect('/auth/login')
+  return Astro.redirect('/login?redirect=/training/annotation')
 }
 
 const userSession = await getCurrentUser(Astro.request)
 if (!userSession) {
-  return Astro.redirect('/auth/login')
+  return Astro.redirect('/login?redirect=/training/annotation')
 }
 
 const reviewerId =

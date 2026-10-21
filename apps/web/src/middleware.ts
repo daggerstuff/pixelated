@@ -235,14 +235,19 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
       // Middleware runs before any component rendering, so a redirect here avoids
       // the "Response has already been sent" crash seen in PIXEL-ASTRO-S.
       try {
-        const pathname = new URL(request.url).pathname
+        const pathname = context.url.pathname
         if (pathname.startsWith('/admin')) {
           const sessionUser = context.locals.user
           const sessionData = context.locals.session
           if (!sessionUser || !sessionData) {
-            const loginUrl = new URL('/login', request.url)
-            loginUrl.searchParams.set('redirect', pathname)
-            return Response.redirect(loginUrl.toString(), 302)
+            const redirectPath = `/login?redirect=${encodeURIComponent(pathname)}`
+            if (typeof context.redirect === 'function') {
+              return context.redirect(redirectPath, 302)
+            }
+            return new Response(null, {
+              status: 302,
+              headers: { Location: redirectPath },
+            })
           }
         }
       } catch {
