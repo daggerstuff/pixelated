@@ -357,11 +357,15 @@ export class AuditLogger {
    */
   private routeToGovernance(auditEvent: AuditEvent): void {
     void (async () => {
+      // Only import the server-side governance bridge in a Node environment;
+      // the computed specifier keeps the bundler from pulling the governance
+      // dependency chain (mongodb, etc.) into client bundles.
+      if (typeof process === 'undefined' || typeof window !== 'undefined') {
+        return
+      }
       try {
-        // Dynamic import: avoid a module-load dependency between audit and
-        // governance that would create import cycles in test setups.
-        const { GovernanceBridge } =
-          await import('../governance/governance-bridge')
+        const modulePath = ['..', 'governance', 'governance-bridge'].join('/')
+        const { GovernanceBridge } = await import(/* @vite-ignore */ modulePath)
         await GovernanceBridge.getInstance().recordAuditEvent({
           eventId: auditEvent.id,
           userId: auditEvent.userId,
