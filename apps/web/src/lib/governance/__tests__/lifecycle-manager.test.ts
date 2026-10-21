@@ -113,16 +113,46 @@ describe('LifecycleManager', () => {
   })
 
   describe('secureDelete', () => {
-    it('securely deletes a record using crypto-shred', async () => {
+    it('crypto-shreds the record key when an encryption key is registered', async () => {
       const recordId = 'phi-record-007'
       const createdDate = new Date('2026-01-01')
 
-      lifecycleManager.applyRetention(recordId, '30-day', createdDate)
+      lifecycleManager.applyRetention(
+        recordId,
+        '30-day',
+        createdDate,
+        'key-phi-007',
+      )
+
+      const destroyedKeys: string[] = []
+      const encryption = {
+        destroyKey(keyId: string) {
+          destroyedKeys.push(keyId)
+          return true
+        },
+      }
+
+      const result = await lifecycleManager.secureDelete(recordId, encryption)
+
+      expect(result.deleted).toBe(true)
+      expect(result.method).toBe('crypto-shred')
+      expect(result.keyDestroyed).toBe(true)
+      expect(destroyedKeys).toEqual(['key-phi-007'])
+      expect(lifecycleManager.getRetention(recordId)).toBeUndefined()
+    })
+
+    it('removes an unencrypted record without claiming a shred', async () => {
+      const recordId = 'phi-record-008'
+      lifecycleManager.applyRetention(
+        recordId,
+        '30-day',
+        new Date('2026-01-01'),
+      )
 
       const result = await lifecycleManager.secureDelete(recordId)
 
       expect(result.deleted).toBe(true)
-      expect(result.method).toBe('crypto-shred')
+      expect(result.method).toBe('none')
       expect(lifecycleManager.getRetention(recordId)).toBeUndefined()
     })
 
