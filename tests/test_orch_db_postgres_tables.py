@@ -12,6 +12,8 @@ Test cases:
 
 import pytest
 
+pytest.importorskip("psycopg2", reason="psycopg2 not installed (optional integration dependency)")
+
 from scripts.services.monthly_llm_driver.orch_db_postgres_tables import (
     setup_postgres_tables,
     verify_postgres_tables,

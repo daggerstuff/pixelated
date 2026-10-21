@@ -12,6 +12,11 @@ Test cases:
     close_order_is_pg_first      -- close() closes pg cursors, pg_conn, then mongo
 """
 
+import pytest
+
+pytest.importorskip("pymongo", reason="pymongo not installed (optional integration dependency)")
+pytest.importorskip("psycopg2", reason="psycopg2 not installed (optional integration dependency)")
+
 import os
 from unittest.mock import MagicMock
 

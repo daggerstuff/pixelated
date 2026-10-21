@@ -11,6 +11,11 @@ Test cases:
     aggregate_shape_matches_on_disk -- status aggregate matches on-disk classification
 """
 
+import pytest
+
+pytest.importorskip("pymongo", reason="pymongo not installed (optional integration dependency)")
+pytest.importorskip("psycopg2", reason="psycopg2 not installed (optional integration dependency)")
+
 import sys
 from pathlib import Path
 

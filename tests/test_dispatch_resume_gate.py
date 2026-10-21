@@ -12,6 +12,11 @@ Test cases:
 
 from __future__ import annotations
 
+import pytest
+
+pytest.importorskip("pymongo", reason="pymongo not installed (optional integration dependency)")
+pytest.importorskip("psycopg2", reason="psycopg2 not installed (optional integration dependency)")
+
 import json
 import os
 import re

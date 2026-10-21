@@ -14,6 +14,12 @@ SCRIPT_PATH = (
 )
 
 
+if not SCRIPT_PATH.exists():
+    import pytest
+
+    pytest.skip(f"local-only tooling script not present in this checkout: {SCRIPT_PATH.name}", allow_module_level=True)
+
+
 def _load_module():
     spec = importlib.util.spec_from_file_location(
         "dual_storage_copy_executor",
