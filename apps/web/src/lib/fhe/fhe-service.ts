@@ -118,6 +118,11 @@ export class RealFHEService implements FHEService {
       // 3. Serialize
       const serialized = ciphertext.save()
 
+      this.routeToGovernance('encryption_complete', {
+        id: 'enc-' + Date.now(),
+        dataType: toDataType(value),
+      })
+
       return {
         id: 'enc-' + Date.now(),
         data: serialized,
@@ -167,6 +172,12 @@ export class RealFHEService implements FHEService {
         decryptedNumbers,
         encryptedData.dataType,
       ) as T
+
+      this.routeToGovernance('decryption_complete', {
+        id: encryptedData.id,
+        dataType: encryptedData.dataType,
+      })
+
       return result
     } catch (error: unknown) {
       logger.error('Decryption failed in RealFHEService', { error })
@@ -254,6 +265,32 @@ export class RealFHEService implements FHEService {
     this.initialized = false
     this.initPromise = null
     // Future: homomorphicOps.dispose() if implemented
+  }
+
+  /**
+   * Fire-and-forget route into the governance event stream. Governance
+   * aggregation must never break FHE operations, so failures are swallowed
+   * and the module is loaded lazily.
+   */
+  private routeToGovernance(
+    event: string,
+    details?: Record<string, unknown>,
+  ): void {
+    void (async () => {
+      try {
+        // Dynamic import: avoid a module-load dependency between FHE and governance.
+        const { GovernanceBridge } =
+          await import('../governance/governance-bridge')
+        const bridge = GovernanceBridge.getInstance()
+        if (event === 'decryption_complete') {
+          await bridge.recordFHEDecryption(details)
+        } else {
+          await bridge.recordFHEEncryption(details)
+        }
+      } catch {
+        // Governance module unavailable in this environment.
+      }
+    })()
   }
 
   /**

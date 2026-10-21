@@ -33,6 +33,8 @@ const MANDATORY_SECRETS = [
 export function getSecret(name: string, defaultValue?: string): string {
   const value = process.env[name] ?? defaultValue
 
+  routeToGovernance(name)
+
   if (!value) {
     const isProduction = process.env['NODE_ENV'] === 'production'
     const isMandatory = MANDATORY_SECRETS.includes(name)
@@ -52,6 +54,24 @@ export function getSecret(name: string, defaultValue?: string): string {
   }
 
   return value ?? ''
+}
+
+/**
+ * Fire-and-forget route into the governance event stream. Governance
+ * aggregation must never break secret access, so failures are swallowed and
+ * the module is loaded lazily. Synchronous fire to keep getSecret() cheap.
+ */
+function routeToGovernance(name: string): void {
+  void (async () => {
+    try {
+      // Dynamic import: avoid a module-load dependency between security and governance.
+      const { GovernanceBridge } =
+        await import('../governance/governance-bridge')
+      await GovernanceBridge.getInstance().recordSecretAccess(name)
+    } catch {
+      // Governance module unavailable in this environment; access still works.
+    }
+  })()
 }
 
 /**

@@ -344,7 +344,35 @@ export class AuditLogger {
       this.persistEventWithRetry(auditEvent),
     )
 
+    this.routeToGovernance(auditEvent)
+
     return auditEvent.id
+  }
+
+  /**
+   * Fire-and-forget route into the governance event stream. Failures are
+   * swallowed: governance aggregation must never break the audit path, and
+   * the import is lazy so test environments without the governance module
+   * (or module-load cycles) cannot affect audit logging.
+   */
+  private routeToGovernance(auditEvent: AuditEvent): void {
+    void (async () => {
+      try {
+        // Dynamic import: avoid a module-load dependency between audit and
+        // governance that would create import cycles in test setups.
+        const { GovernanceBridge } =
+          await import('../governance/governance-bridge')
+        await GovernanceBridge.getInstance().recordAuditEvent({
+          eventId: auditEvent.id,
+          userId: auditEvent.userId,
+          type: auditEvent.type,
+          severity: auditEvent.severity,
+          action: auditEvent.action,
+        })
+      } catch {
+        // Governance module unavailable in this environment — audit still logs.
+      }
+    })()
   }
 
   public async getUserEvents(
