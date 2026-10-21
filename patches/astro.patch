@@ -1,8 +1,6 @@
 diff --git a/dist/core/build/plugins/plugin-manifest.js b/dist/core/build/plugins/plugin-manifest.js
 --- a/dist/core/build/plugins/plugin-manifest.js
 +++ b/dist/core/build/plugins/plugin-manifest.js
---- a/dist/core/build/plugins/plugin-manifest.js
-+++ b/dist/core/build/plugins/plugin-manifest.js
 @@ -150,7 +150,8 @@
  	const appendAssetQuery = (pth) => assetQueryString ? `${pth}?${assetQueryString}` : pth;
  	const entryModules = Object.fromEntries(Object.entries(rawEntryModules).map(([key, value]) => [key, value ? appendAssetQuery(value) : value]));
