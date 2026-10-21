@@ -428,6 +428,39 @@ class EncryptionManager {
   }
 
   /**
+   * Check whether a key exists in the store.
+   */
+  keyExists(keyId: string): boolean {
+    return this.keyStore.has(keyId) || this.keyMetadata.has(keyId)
+  }
+
+  /**
+   * Destroy a key outright (crypto-shred).
+   *
+   * Unlike revokeKey (which keeps data decryptable for audit and only marks
+   * the key unusable), destroy removes the key material from the store so
+   * every ciphertext encrypted with it becomes permanently unrecoverable.
+   * Use only for right-to-erasure / secure-deletion flows where no copy of
+   * the data may remain readable.
+   */
+  destroyKey(keyId: string): boolean {
+    // Delete from both maps independently — `||` would short-circuit and
+    // leave metadata behind whenever the store entry was removed.
+    const deletedFromStore = this.keyStore.delete(keyId)
+    const deletedFromMetadata = this.keyMetadata.delete(keyId)
+    const existed = deletedFromStore || deletedFromMetadata
+    if (existed) {
+      logger.info(
+        `Key ${keyId} destroyed (crypto-shred) — ciphertexts encrypted with it are unrecoverable`,
+      )
+      if (keyId === this.currentKeyId) {
+        this.currentKeyId = null
+      }
+    }
+    return existed
+  }
+
+  /**
    * Enable perfect forward secrecy for a key
    */
   async enablePerfectForwardSecrecy(keyId: string): Promise<boolean> {

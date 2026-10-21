@@ -15,6 +15,8 @@ export interface RetentionRecord {
   createdAt: Date
   expiresAt: Date | null
   archivalScheduledAt?: Date
+  /** Key id of the encryption protecting this record's data, if encrypted. */
+  encryptionKeyId?: string
 }
 
 export class LifecycleManager {
@@ -29,6 +31,7 @@ export class LifecycleManager {
     recordId: string,
     period: RetentionPeriod,
     createdAt: Date,
+    encryptionKeyId?: string,
   ): void {
     const expiresAt = this.calculateExpiryDate(createdAt, period)
 
@@ -37,6 +40,7 @@ export class LifecycleManager {
       period,
       createdAt,
       expiresAt,
+      encryptionKeyId,
     }
 
     this.retentionRecords.set(recordId, record)
@@ -101,18 +105,39 @@ export class LifecycleManager {
   }
 
   /**
-   * Securely delete a record using crypto-shred
-   * Deletes the encryption key, making data unrecoverable
+   * Securely delete a record using crypto-shred.
+   *
+   * When an encryption manager is provided and the record carries the key id
+   * of the encryption that protects its data, that key is destroyed so the
+   * stored ciphertext becomes permanently unrecoverable — that is the actual
+   * shred. Without a key reference there is nothing to shred, so the method
+   * reports the honest fallback: the record is removed from the registry but
+   * the underlying data is not crypto-shredded.
    */
   async secureDelete(
     resourceId: string,
-  ): Promise<{ deleted: boolean; method: string }> {
+    encryptionManager?: { destroyKey(keyId: string): boolean },
+  ): Promise<{ deleted: boolean; method: string; keyDestroyed?: boolean }> {
     const record = this.records.get(resourceId)
     if (record) {
-      // Delete encryption key (crypto-shred)
       this.records.delete(resourceId)
-      logger.info(`Crypto-shred deleted ${resourceId}`)
-      return { deleted: true, method: 'crypto-shred' }
+
+      const keyId = record.encryptionKeyId
+      if (encryptionManager && keyId) {
+        const keyDestroyed = encryptionManager.destroyKey(keyId)
+        logger.info(
+          `Crypto-shred deleted ${resourceId} (key ${keyId} destroyed: ${keyDestroyed})`,
+        )
+        return { deleted: true, method: 'crypto-shred', keyDestroyed }
+      }
+
+      logger.warn(
+        `Record ${resourceId} deleted from registry without crypto-shred: ` +
+          (encryptionManager
+            ? 'no encryption key reference on record'
+            : 'no encryption manager provided'),
+      )
+      return { deleted: true, method: 'none' }
     }
     return { deleted: false, method: 'none' }
   }
