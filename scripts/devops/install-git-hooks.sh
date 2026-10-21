@@ -49,6 +49,17 @@ fi
 # dispatcher shims in .husky/_. Nothing to install here in that case.
 if [[ "$HOOKS_PATH" == *".husky"* ]]; then
   echo "Husky manages git hooks (core.hooksPath=$HOOKS_PATH); skipping legacy hook installation."
+  # Remove installer-era copies from the legacy hooks dir. Inert while husky is
+  # active, but they'd reactivate outdated frozen logic if core.hooksPath were
+  # ever unset (the old .git/hooks/pre-rebase blanket-blocker did exactly that).
+  if [ -d "$GIT_DIR/hooks" ]; then
+    for legacy in pre-commit commit-msg post-checkout post-merge pre-rebase; do
+      if [ -e "$GIT_DIR/hooks/$legacy" ] || [ -L "$GIT_DIR/hooks/$legacy" ]; then
+        rm -f "$GIT_DIR/hooks/$legacy"
+        echo "  Removed stale legacy hook $legacy (superseded by version-controlled .husky hooks)"
+      fi
+    done
+  fi
   exit 0
 fi
 if [ -n "$HOOKS_PATH" ]; then
