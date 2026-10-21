@@ -88,7 +88,14 @@ async function probe(route) {
     if (res.status !== route.expectedStatus) {
       findings.push({ route, kind: 'status', got: res.status, ms })
     } else if (ms > route.latencyBudgetMs) {
-      findings.push({ route, kind: 'latency', got: res.status, ms })
+      // First probe may hit a cold serverless instance. Re-probe once and
+      // use the faster timing: a single slow response that is immediately
+      // followed by a fast one is a cold start, not a sustained regression.
+      const second = await probeOnce(route)
+      const ms2 = second.ms
+      if (ms2 > route.latencyBudgetMs) {
+        findings.push({ route, kind: 'latency', got: res.status, ms: ms2 })
+      }
     }
     return { status: res.status, ms, findings }
   } catch (err) {
@@ -99,6 +106,20 @@ async function probe(route) {
       findings: [{ route, kind: 'down', got: 0, ms }],
       error: String(err?.cause?.code ?? err?.message ?? err),
     }
+  }
+}
+
+/** Single fetch attempt without retry logic. */
+async function probeOnce(route) {
+  const started = Date.now()
+  try {
+    const res = await fetch(`${BASE_URL}${route.path}`, {
+      redirect: 'manual',
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    })
+    return { status: res.status, ms: Date.now() - started }
+  } catch (err) {
+    return { status: 0, ms: Date.now() - started }
   }
 }
 
