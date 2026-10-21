@@ -405,8 +405,10 @@ overrides:
   # patched 2.x line. Drop when agents ships an updated peer range.
   '@modelcontextprotocol/client': ^2.2.0
 patchedDependencies:
-  # Patched for URL-unsafe characters in file paths; versionless so it survives
-  # transitive version bumps (e.g. @astrojs/vercel major updates).
+  # Patched for URL-unsafe characters in file paths. Versionless key covers
+  # 0.10-0.12 (space-formatted upstream); 0.13.0 reformatted to tabs and needs
+  # its own patch file pinned by version.
   '@astrojs/internal-helpers': patches/@astrojs__internal-helpers@0.10.0.patch
+  '@astrojs/internal-helpers@0.13.0': patches/@astrojs__internal-helpers@0.13.0.patch
   '@astrojs/vercel': patches/@astrojs__vercel.patch
   astro: patches/astro.patch

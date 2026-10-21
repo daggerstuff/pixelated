@@ -1,0 +1,26 @@
+diff --git a/dist/fs.js b/dist/fs.js
+--- a/dist/fs.js
++++ b/dist/fs.js
+@@ -49,11 +49,11 @@ export async function copyFilesToFolder(files, outDir, exclude = []) {
+ 		while (!file.startsWith(commonAncestor)) {
+ 			commonAncestor = nodePath.dirname(commonAncestor);
+ 		}
+ 	}
+ 	for (const origin of fileList) {
+-		const dest = new URL(nodePath.relative(commonAncestor, origin), outDir);
++		const dest = new URL(nodePath.relative(commonAncestor, origin).replace(/%/g, '%25').replace(/#/g, '%23'), outDir);
+ 		const realpath = await fs.realpath(origin);
+ 		const isSymlink = realpath !== origin;
+ 		const isDir = (await fs.stat(origin)).isDirectory();
+ 		// Create directories recursively
+ 		if (isDir && !isSymlink) {
+ 			await fs.mkdir(new URL("..", dest), { recursive: true });
+ 		} else {
+ 			await fs.mkdir(new URL(".", dest), { recursive: true });
+ 		}
+ 		if (isSymlink) {
+-			const realdest = fileURLToPath(new URL(nodePath.relative(commonAncestor, realpath), outDir));
++			const realdest = fileURLToPath(new URL(nodePath.relative(commonAncestor, realpath).replace(/%/g, '%25').replace(/#/g, '%23'), outDir));
+ 			const target = nodePath.relative(fileURLToPath(new URL(".", dest)), realdest);
+ 			// NOTE: when building function per route, dependencies are linked at the first run, then there's no need anymore to do that once more.
+ 			// So we check if the destination already exists. If it does, move on.
