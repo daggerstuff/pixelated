@@ -12,6 +12,13 @@ const logger = {
 
 // Validate regex pattern for safety (prevents catastrophic backtracking)
 function isValidRegexPattern(pattern: string): boolean {
+  // Reject overly long patterns to avoid excessive compilation and matching cost
+  if (pattern.length > 500) {
+    logger.info(
+      `Rejected regex pattern exceeding length limit: ${pattern.slice(0, 40)}...`,
+    )
+    return false
+  }
   // Reject nested quantifiers which cause catastrophic backtracking
   // Examples of dangerous patterns: (a+)+, (a*)+, (a|b+)+, a{2,3}+
   if (/[+*][+*]|\{[0-9,]+\}[+*]|\([^)]*[+*][^)]*\)[+*]/.test(pattern)) {
@@ -67,7 +74,14 @@ export class PolicyEngine {
           let compiledRegex: RegExp | null = null
           if (cond.operator === 'regex') {
             if (isValidRegexPattern(cond.value)) {
-              compiledRegex = new RegExp(cond.value)
+              try {
+                compiledRegex = new RegExp(cond.value)
+              } catch (error) {
+                logger.info(
+                  `Rejected invalid regex pattern: ${cond.value} (${String(error)})`,
+                )
+                compiledRegex = null
+              }
             }
           }
 
