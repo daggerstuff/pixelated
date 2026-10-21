@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ai.training_corpus import (
+from ai.data.synthetic import (
     DEFAULT_WAVE2_SEED_PACK_PATH,
     build_seed_corpus,
     build_seed_output_paths,

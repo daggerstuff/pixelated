@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ai.training_corpus.expansion_authoring import (
+from ai.data.synthetic.wrapper.expansion_authoring import (
     apply_authored_batch,
     build_authoring_ledger,
     build_authoring_target,

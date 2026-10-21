@@ -1,4 +1,4 @@
-from ai.training_corpus.pal_framework.meddies_to_pal import format_persona
+from ai.data.synthetic.wrapper.pal_framework.meddies_to_pal import format_persona
 
 
 def test_format_persona_basic():

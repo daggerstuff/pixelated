@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ai.training_corpus.expansion_queue import (
+from ai.data.synthetic.expansion_queue import (
     SeedPackQueueConfig,
     build_authoring_batches,
     build_draft_queue_from_packets,

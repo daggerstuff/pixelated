@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from ai.training_corpus.compose import (
+from ai.data.synthetic.compose import (
     load_package_entry_snapshot,
     verify_package_composition,
     write_package_composition_report,

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from ai.training_corpus import (
+from ai.data.synthetic import (
     DEFAULT_WAVE1_MANIFEST_PATH,
     DEFAULT_WAVE1_REGISTRY_PATH,
     DEFAULT_WAVE1_SEED_PACK_PATH,
@@ -43,18 +43,18 @@ from ai.training_corpus import (
     load_synthesis_seed_pack,
     materialize_seed_pack_records,
 )
-from ai.training_corpus.experiments import (
+from ai.data.synthetic.experiments import (
     _wave1_seed_sources,
     _wave2_seed_sources,
     _wave3_seed_sources,
     _wave4_seed_sources,
 )
-from ai.training_corpus.model import CorpusSource
-from ai.training_corpus.normalize import assign_split, make_entry
-from ai.training_corpus.wave1_package import build_wave1_seed_corpus
-from ai.training_corpus.wave2_package import build_wave2_seed_corpus
-from ai.training_corpus.wave3_package import build_wave3_seed_corpus
-from ai.training_corpus.wave4_package import build_wave4_seed_corpus
+from ai.data.synthetic.model import CorpusSource
+from ai.data.synthetic.normalize import assign_split, make_entry
+from ai.data.synthetic.wave1_package import build_wave1_seed_corpus
+from ai.data.synthetic.wave2_package import build_wave2_seed_corpus
+from ai.data.synthetic.wave3_package import build_wave3_seed_corpus
+from ai.data.synthetic.wave4_package import build_wave4_seed_corpus
 
 
 def test_assign_split_is_deterministic() -> None:
