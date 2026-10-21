@@ -345,7 +345,7 @@ pandas==3.0.3
     #   evaluate
     #   fairlearn
     #   shap
-pillow==12.3.0
+pillow==13.0.0
     # via
     #   imageio
     #   matplotlib
