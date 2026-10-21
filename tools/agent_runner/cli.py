@@ -24,7 +24,8 @@ from tools.agent_runner.skeptic import SkepticReviewer
 from tools.agent_runner.state_manager import StateManager
 from tools.agent_runner.triage import AutoTriageEngine
 
-# Automatically load .env if present
+# Automatically load .env if present (CLI entrypoint only — module imports
+# must not mutate os.environ for unrelated code in the same process)
 try:
     from dotenv import load_dotenv
 
