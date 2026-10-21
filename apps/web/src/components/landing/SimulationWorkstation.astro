@@ -326,7 +326,7 @@
 </div>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
+  function initSimulationWorkstation() {
     const scenarios = [
       {
         sessionId: 'SESSION #0412 · ADVERSARIAL RUPTURE',
@@ -576,5 +576,12 @@
         setScenario(idx)
       })
     })
-  })
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSimulationWorkstation)
+  } else {
+    initSimulationWorkstation()
+  }
+  document.addEventListener('astro:page-load', initSimulationWorkstation)
 </script>

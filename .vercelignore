@@ -15,3 +15,57 @@ ai/.venv/
 scratch/
 tmp/
 tests/results/
+
+# Worktrees, archives, and local heavy folders
+/worktrees/
+/wandb/
+/llama*/
+*.tar.gz
+*.tgz
+*.zip
+
+# Build, test, and coverage artifacts
+/coverage/
+/dist/
+/test-results/
+/playwright-report/
+/html-report/
+/artifacts/
+/scan-out/
+/moe_ep_trial_output/
+/logs/
+/experiments/
+/notebooks/
+/data/
+/dataset/
+
+# Non-frontend services (handled on EKS, per vercel-policy.md)
+/ai/
+/hackathon/
+/infra/
+/terraform/
+/docs/
+/agents/
+/business-strategy/
+/business-strategy-cms/
+/metoro-exporter/
+/marketplace/
+/skills/
+
+# Hidden agent caches and temporary dot-directories
+.*
+!.vercel/
+!.vercelignore
+
+# Tests and stray session files
+/tests/
+/foresight/
+/false/
+*.jsonl
+*.pdf
+thread-*.md
+command-code-session-*.html
+
+
+
+
