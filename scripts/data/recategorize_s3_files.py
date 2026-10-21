@@ -110,7 +110,7 @@ class S3Recategorizer:
         Returns:
             List of S3 keys
         """
-        logger.info(f"Listing files in s3://pixel-data/{prefix}")
+        logger.info(f"Listing files in s3://pixel-archive/pixel-data/{prefix}")
 
         try:
             all_keys = self.s3_loader.list_objects(prefix=prefix)

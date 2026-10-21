@@ -6,7 +6,7 @@ Generates 200K long-running therapy sessions with minimum 20+ turns using:
 1. Extraction from existing multi-turn datasets
 2. NeMo Data Designer for synthetic session generation
 
-Output: s3://pixel-data/long_sessions/pix8/
+Output: s3://pixel-archive/pixel-data/long_sessions/pix8/
 """
 
 import argparse
@@ -85,7 +85,7 @@ class PIX8LongSessionGenerator:
             str(self.extractor_script),
             f"--min-turns={self.min_turns}",
             f"--output={output_file}",
-            "--input-dir=s3://pixel-data/processed_ready/",
+            "--input-dir=s3://pixel-archive/pixel-data/processed_ready/",
         ]
 
         logger.info(f"Running: {' '.join(cmd)}")
