@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from ai.training_corpus.merge_package import (
+from ai.data.synthetic.merge_package import (
     MergePackageConfig,
     build_merged_corpus_package,
 )

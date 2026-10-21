@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ai.training_corpus.builder import CorpusBuildResult
-from ai.training_corpus.experiments import (
+from ai.data.synthetic.builder import CorpusBuildResult
+from ai.data.synthetic.experiments import (
     ExperimentVariant,
     VariantOutcome,
     _experiment_variants,
@@ -15,7 +15,7 @@ from ai.training_corpus.experiments import (
     _tagged_messages,
     _variant_metrics,
 )
-from ai.training_corpus.model import CorpusEntry, CorpusManifest
+from ai.data.synthetic.model import CorpusEntry, CorpusManifest
 
 
 def test_extract_human_assistant_pair_parses_tagged_text() -> None:

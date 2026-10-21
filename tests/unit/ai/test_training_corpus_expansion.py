@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from ai.training_corpus import (
+from ai.data.synthetic import (
     DEFAULT_WAVE5_EXPANSION_DRAFT_LEDGER_PATH,
     DEFAULT_WAVE5_EXPANSION_QUEUE_PATH,
     ExpansionCandidateArtifacts,

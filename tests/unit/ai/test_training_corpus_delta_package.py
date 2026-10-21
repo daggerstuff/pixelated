@@ -4,11 +4,11 @@ import json
 from pathlib import Path
 from typing import Any
 
-from ai.training_corpus.delta_package import (
+from ai.data.synthetic.delta_package import (
     ReleaseCandidateDeltaPackageConfig,
     build_release_candidate_delta_corpus,
 )
-from ai.training_corpus.experiments import (
+from ai.data.synthetic.experiments import (
     PreparedSource,
     release_candidate_delta_source_limits_from_report,
 )

@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from ai.training_corpus import (
+import pytest
+
+from ai.data.synthetic import (
     build_expansion_draft_pack,
     ensure_default_expansion_draft_pack_materialized,
     load_expansion_dossiers,
@@ -13,6 +15,10 @@ from ai.training_corpus import (
 
 
 def test_load_expansion_dossiers_reads_wave_five_artifact() -> None:
+    _dossier = Path(".agent/internal/research/training_corpus_source_dossiers_wave5_2026-04-09.json")
+    if not _dossier.exists():
+        pytest.skip("wave5 source dossier research artifact not present in this checkout")
+
     payload = load_expansion_dossiers(
         Path(".agent/internal/research/training_corpus_source_dossiers_wave5_2026-04-09.json")
     )
@@ -62,6 +68,10 @@ def test_build_expansion_draft_pack_creates_authoring_cards() -> None:
 
 
 def test_materialize_and_ensure_default_expansion_draft_pack(tmp_path: Path) -> None:
+    _dossier = Path(".agent/internal/research/training_corpus_source_dossiers_wave5_2026-04-09.json")
+    if not _dossier.exists():
+        pytest.skip("wave5 source dossier research artifact not present in this checkout")
+
     queue = load_expansion_ticket_queue()
     dossiers = load_expansion_dossiers(
         Path(".agent/internal/research/training_corpus_source_dossiers_wave5_2026-04-09.json")

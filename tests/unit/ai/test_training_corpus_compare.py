@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from ai.training_corpus.compare import (
+from ai.data.synthetic.compare import (
     compare_package_snapshots,
     load_package_snapshot,
     write_package_comparison,
