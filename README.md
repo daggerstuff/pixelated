@@ -198,6 +198,9 @@ areas below:
 - **[Architecture](docs/architecture/)** — System design and ADRs
 - **[API Reference](docs/api-reference/)** — API documentation
 - **[Compliance](docs/compliance/)** — HIPAA, security, threat models
+- **[Google Cloud & Gemini Usage Policy](/docs/compliance/google-cloud-gemini-usage)** — in-app docs collection (`apps/web/src/content-store/docs/`):
+  product Gemini usage routes through Vertex AI only, a Google Cloud HIPAA BAA is signed before PHI touches GCP, and
+  no PHI passes through the Gemini API/AI Studio or logs/metadata
 - **[Clinical Validity](docs/clinical-validity/)** — Clinical evaluation
   protocols
 - **[Database](docs/database/)** — Schema and migration docs
