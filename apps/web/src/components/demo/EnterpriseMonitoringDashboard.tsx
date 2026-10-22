@@ -92,7 +92,7 @@ export default function EnterpriseMonitoringDashboard() {
     null,
   )
   const [isLoading, setIsLoading] = useState(true)
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
+  const [lastUpdate, setLastUpdate] = useState<Date>(() => new Date())
 
   // Initialize demo data
   useEffect(() => {

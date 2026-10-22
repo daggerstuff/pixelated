@@ -29,6 +29,8 @@ interface UseAnalyticsDashboardResult {
   error: AnalyticsError | null
   refetch: () => Promise<void>
   clearError: () => void
+  /** Timestamp of the last successful data load (optional so legacy mocks keep compiling). */
+  lastUpdated?: Date | null
 }
 
 const DEFAULT_OPTIONS: Required<UseAnalyticsDashboardOptions> = {
@@ -50,6 +52,7 @@ export function useAnalyticsDashboard(
   const [data, setData] = useState<AnalyticsChartData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<AnalyticsError | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
 
   // Refs for cleanup and retry logic
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -154,6 +157,7 @@ export function useAnalyticsDashboard(
 
         const analyticsData = await fetchAnalyticsData(filters)
         setData(analyticsData)
+        setLastUpdated(new Date())
       } catch (loadError) {
         // Don't set error if request was aborted (component unmounted)
         if (loadError instanceof Error && loadError.name === 'AbortError') {
@@ -272,5 +276,6 @@ export function useAnalyticsDashboard(
     error,
     refetch,
     clearError,
+    lastUpdated,
   }
 }

@@ -171,7 +171,7 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
   showBrainViz = true,
   showAnalysisPanel = true,
 }) => {
-  const [messages, setMessages] = useState<Message[]>([
+  const [messages, setMessages] = useState<Message[]>(() => [
     {
       id: '1',
       content:

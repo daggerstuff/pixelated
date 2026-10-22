@@ -5,7 +5,12 @@ import {
   UserGroupIcon,
   CalendarIcon,
 } from '@heroicons/react/24/outline'
-import type { FC, ComponentProps, ReactElement } from 'react'
+import {
+  useState,
+  type FC,
+  type ComponentProps,
+  type ReactElement,
+} from 'react'
 import React from 'react'
 
 import { FadeIn, SlideUp } from '@/components/layout/AdvancedAnimations'
@@ -677,7 +682,8 @@ const AnalyticsTab: FC<{
 const ScheduleTab: FC<{
   patients: PatientSummary[]
 }> = ({ patients }) => {
-  const today = new Date()
+  // Capture "today" once at mount; Date calls during render are impure.
+  const [today] = useState(() => new Date())
   const upcomingAppointments = patients
     .filter((p) => p.nextAppointment && p.nextAppointment >= today)
     .sort(

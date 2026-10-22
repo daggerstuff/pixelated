@@ -318,10 +318,11 @@ export const AnalyticsCharts: FC = () => {
   })
 
   // Use production-grade analytics hook
-  const { data, isLoading, error, refetch } = useAnalyticsDashboard(filters, {
-    refreshInterval: 300000, // 5 minutes
-    enableAutoRefresh: true,
-  })
+  const { data, isLoading, error, refetch, lastUpdated } =
+    useAnalyticsDashboard(filters, {
+      refreshInterval: 300000, // 5 minutes
+      enableAutoRefresh: true,
+    })
 
   // Handle retry
   const handleRetry = useCallback(() => {
@@ -372,7 +373,7 @@ export const AnalyticsCharts: FC = () => {
           {/* Data freshness indicator */}
           {data && !isLoading && (
             <div className="text-center text-xs text-muted-foreground">
-              Data updated {new Date().toLocaleTimeString()}
+              Data updated {lastUpdated ? lastUpdated.toLocaleTimeString() : ''}
             </div>
           )}
         </>

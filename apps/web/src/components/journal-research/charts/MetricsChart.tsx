@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import ChartComponent from '@/components/analytics/ChartComponent'
 import {
@@ -21,9 +21,10 @@ export function MetricsChart({
   timeRange = 'all',
   className,
 }: MetricsChartProps) {
+  // Capture "now" once at mount; Date calls during render are impure.
+  const [now] = useState(() => new Date())
   const chartData = useMemo(() => {
     // Filter metrics based on time range
-    const now = new Date()
     let filteredMetrics = metrics
 
     if (timeRange === 'week') {
@@ -92,7 +93,7 @@ export function MetricsChart({
         },
       ],
     }
-  }, [metrics, timeRange])
+  }, [metrics, timeRange, now])
 
   return (
     <Card className={cn('w-full', className)}>

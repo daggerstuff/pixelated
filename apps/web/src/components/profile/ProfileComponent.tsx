@@ -10,6 +10,9 @@ interface ProfileComponentProps {
 export function ProfileComponent({ user }: ProfileComponentProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  // Capture "now" once at mount for the account info placeholders; Date
+  // calls during render are impure.
+  const [now] = useState(() => new Date())
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -305,14 +308,14 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
             <h4 className="text-sm font-medium text-muted-foreground">
               Member Since
             </h4>
-            <p>{new Date().toLocaleDateString()}</p>
+            <p>{now.toLocaleDateString()}</p>
           </div>
 
           <div className="space-y-1">
             <h4 className="text-sm font-medium text-muted-foreground">
               Last Login
             </h4>
-            <p>{new Date().toLocaleString()}</p>
+            <p>{now.toLocaleString()}</p>
           </div>
 
           <div className="space-y-1">

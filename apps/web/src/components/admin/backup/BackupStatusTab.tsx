@@ -1,4 +1,4 @@
-import type { FC } from 'react'
+import { useState, type FC } from 'react'
 
 import { Badge } from '@/components/ui/badge/index'
 import { Button } from '@/components/ui/button/index'
@@ -159,6 +159,30 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
   onCreateBackup,
   onVerifyBackup,
 }) => {
+  // Compute the next scheduled run dates once at mount. These are static
+  // schedule descriptions; deriving them during render would make the
+  // component impure (React Compiler disallows Date calls in render).
+  const [scheduleDates] = useState(() => {
+    const now = new Date()
+    // Next Sunday at midnight
+    const daysUntilSunday = 7 - now.getDay()
+    const nextSunday = new Date(now)
+    nextSunday.setDate(now.getDate() + daysUntilSunday)
+    nextSunday.setHours(0, 0, 0, 0)
+    // Next day at midnight
+    const tomorrow = new Date(now)
+    tomorrow.setDate(now.getDate() + 1)
+    tomorrow.setHours(0, 0, 0, 0)
+    // Next hour
+    const nextHour = new Date(now)
+    nextHour.setHours(now.getHours() + 1, 0, 0, 0)
+    return {
+      nextSunday: nextSunday.toLocaleDateString(),
+      tomorrow: tomorrow.toLocaleDateString(),
+      nextHour: nextHour.toLocaleTimeString(),
+    }
+  })
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -291,46 +315,19 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                 <tr className="border-b">
                   <td className="py-2">Full Backup</td>
                   <td className="py-2">Weekly (Sunday at midnight)</td>
-                  <td className="py-2">
-                    {(() => {
-                      // Calculate next Sunday
-                      const now = new Date()
-                      const daysUntilSunday = 7 - now.getDay()
-                      const nextSunday = new Date(now)
-                      nextSunday.setDate(now.getDate() + daysUntilSunday)
-                      nextSunday.setHours(0, 0, 0, 0)
-                      return nextSunday.toLocaleDateString()
-                    })()}
-                  </td>
+                  <td className="py-2">{scheduleDates.nextSunday}</td>
                   <td className="py-2">365 days</td>
                 </tr>
                 <tr className="border-b">
                   <td className="py-2">Differential Backup</td>
                   <td className="py-2">Daily at midnight (except Sunday)</td>
-                  <td className="py-2">
-                    {(() => {
-                      // Calculate next day at midnight
-                      const now = new Date()
-                      const tomorrow = new Date(now)
-                      tomorrow.setDate(now.getDate() + 1)
-                      tomorrow.setHours(0, 0, 0, 0)
-                      return tomorrow.toLocaleDateString()
-                    })()}
-                  </td>
+                  <td className="py-2">{scheduleDates.tomorrow}</td>
                   <td className="py-2">30 days</td>
                 </tr>
                 <tr>
                   <td className="py-2">Transaction Backup</td>
                   <td className="py-2">Hourly</td>
-                  <td className="py-2">
-                    {(() => {
-                      // Calculate next hour
-                      const now = new Date()
-                      const nextHour = new Date(now)
-                      nextHour.setHours(now.getHours() + 1, 0, 0, 0)
-                      return nextHour.toLocaleTimeString()
-                    })()}
-                  </td>
+                  <td className="py-2">{scheduleDates.nextHour}</td>
                   <td className="py-2">7 days</td>
                 </tr>
               </tbody>

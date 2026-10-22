@@ -44,6 +44,9 @@ export function TelehealthWidget() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [joinedId, setJoinedId] = useState<string | null>(null)
+  // Capture "now" once at mount and refresh it alongside the appointment
+  // data; Date calls during render are impure.
+  const [now, setNow] = useState(() => new Date())
 
   useEffect(() => {
     async function fetchAppointments() {
@@ -55,9 +58,10 @@ export function TelehealthWidget() {
         }
         const result = (await res.json()) as PaginatedResponse<Appointment>
         // Filter to upcoming/active telehealth-eligible appointments
-        const now = new Date()
-        const upcoming = result.data.filter((a) => new Date(a.end) >= now)
+        const fetchedAt = new Date()
+        const upcoming = result.data.filter((a) => new Date(a.end) >= fetchedAt)
         setAppointments(upcoming)
+        setNow(fetchedAt)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load')
       } finally {
@@ -129,7 +133,7 @@ export function TelehealthWidget() {
         <div className="space-y-3">
           {appointments.map((apt) => {
             const canJoin = isWithinRange(apt.start, apt.end)
-            const isLive = canJoin && new Date() >= new Date(apt.start)
+            const isLive = canJoin && now >= new Date(apt.start)
             return (
               <div
                 key={apt.id}

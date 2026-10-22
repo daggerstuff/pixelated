@@ -61,7 +61,7 @@ export function MobileScheduleView({
     () => offlineSyncService.getQueuedAppointmentActions(),
   )
   const [selectedDate, setSelectedDate] = useState<string>(
-    new Date().toISOString().split('T')[0],
+    () => new Date().toISOString().split('T')[0],
   )
   const [filterView, setFilterView] = useState<'day' | 'upcoming' | 'all'>(
     'day',
@@ -78,6 +78,9 @@ export function MobileScheduleView({
   const [bookingPractitioner, setBookingPractitioner] = useState(
     currentPractitionerId,
   )
+  // Capture "now" once at mount for the upcoming filter; Date calls during
+  // render are impure.
+  const [now] = useState(() => new Date())
 
   const fetchAppointments = useCallback(async () => {
     try {
@@ -200,7 +203,7 @@ export function MobileScheduleView({
       return appt.start.startsWith(selectedDate)
     }
     if (filterView === 'upcoming') {
-      return new Date(appt.start) >= new Date()
+      return new Date(appt.start) >= now
     }
     return true
   })

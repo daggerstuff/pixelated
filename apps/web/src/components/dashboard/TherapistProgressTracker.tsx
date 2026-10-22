@@ -24,9 +24,11 @@ export function TherapistProgressTracker({
   session,
   className,
 }: TherapistProgressTrackerProps) {
-  // Calculate session duration
+  // Calculate session duration. Capture "now" once at mount for sessions
+  // without an end time; Date calls during render are impure.
+  const [mountedAt] = useState(() => new Date())
   const startTime = new Date(session.startTime)
-  const endTime = session.endTime ? new Date(session.endTime) : new Date()
+  const endTime = session.endTime ? new Date(session.endTime) : mountedAt
   const durationMs = endTime.getTime() - startTime.getTime()
   const durationMinutes = Math.floor(durationMs / 60000)
   const durationHours = Math.floor(durationMinutes / 60)
