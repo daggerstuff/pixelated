@@ -26,7 +26,7 @@ const BrutalistChatDemo: FC = () => {
   // Use PersonaService for persona context
   const personaConfig: PersonaServiceConfig = { mode: 'deterministic' } // Future: set based on UI or API
   getPersonaContext(personaConfig)
-  const [messages, setMessages] = useState<ChatMessage[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [
     createPersonaMessage({
       baseId: '1',
       role: 'system',

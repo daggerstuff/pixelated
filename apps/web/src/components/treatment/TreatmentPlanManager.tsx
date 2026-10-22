@@ -72,6 +72,9 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   const [_editingGoal, _setEditingGoal] = useState<string | null>(null)
   const [newGoal, setNewGoal] = useState<Partial<TreatmentGoal>>({})
   const [showAddGoal, setShowAddGoal] = useState(false)
+  // Capture "now" once at mount for the days-remaining calculation; Date
+  // calls during render are impure.
+  const [now] = useState(() => new Date())
 
   // Default sample plan
   const defaultPlan: TreatmentPlan = {
@@ -522,8 +525,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                     </p>
                     <div className="text-sm text-muted-foreground">
                       Target: {format(goal.targetDate, 'MMM dd, yyyy')}(
-                      {differenceInDays(goal.targetDate, new Date())} days
-                      remaining)
+                      {differenceInDays(goal.targetDate, now)} days remaining)
                     </div>
                   </div>
                   <div className="ml-4 text-right">

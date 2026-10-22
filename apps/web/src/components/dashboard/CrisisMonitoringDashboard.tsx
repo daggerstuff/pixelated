@@ -108,7 +108,7 @@ export const CrisisMonitoringDashboard: React.FC<
   })
   const [activeTab, setActiveTab] = useState('overview')
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const [lastUpdated, setLastUpdated] = useState<Date>(() => new Date())
   const [loading, setLoading] = useState(false)
 
   // Fetch dashboard data

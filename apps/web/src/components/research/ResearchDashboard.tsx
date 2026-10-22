@@ -533,7 +533,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
     const [showForm, setShowForm] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [deletingId, setDeletingId] = useState<string | null>(null)
-    const [formData, setFormData] = useState<PublicationFormData>({
+    const [formData, setFormData] = useState<PublicationFormData>(() => ({
       title: '',
       authors: '',
       journal: '',
@@ -542,7 +542,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
       abstract: '',
       keywords: '',
       publicationDate: new Date().toISOString().split('T')[0],
-    })
+    }))
 
     const filteredPublications = useMemo(() => {
       return publications.filter((pub) => {

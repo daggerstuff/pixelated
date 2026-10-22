@@ -196,15 +196,16 @@ export function ConversionDashboard() {
   const timeChartData = useMemo(() => {
     let labels: string[] = []
 
-    // Generate labels based on selected period
-    const now = new Date()
+    // Generate labels based on selected period (reuse the mount-time
+    // timestamp captured via useState; Date calls during render are impure)
+    const nowDate = new Date(now)
     if (period === 'daily') {
       // Last 7 days
       labels = Array(7)
         .fill(0)
         .map((_, i) => {
-          const date = new Date()
-          date.setDate(now.getDate() - (6 - i))
+          const date = new Date(now)
+          date.setDate(nowDate.getDate() - (6 - i))
           return date.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
@@ -215,8 +216,8 @@ export function ConversionDashboard() {
       labels = Array(6)
         .fill(0)
         .map((_, i) => {
-          const date = new Date()
-          date.setDate(now.getDate() - (5 - i) * 7)
+          const date = new Date(now)
+          date.setDate(nowDate.getDate() - (5 - i) * 7)
           return `Week ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
         })
     } else {
@@ -224,8 +225,8 @@ export function ConversionDashboard() {
       labels = Array(6)
         .fill(0)
         .map((_, i) => {
-          const date = new Date()
-          date.setMonth(now.getMonth() - (5 - i))
+          const date = new Date(now)
+          date.setMonth(nowDate.getMonth() - (5 - i))
           return date.toLocaleDateString('en-US', { month: 'short' })
         })
     }

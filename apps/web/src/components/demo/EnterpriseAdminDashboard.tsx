@@ -93,7 +93,7 @@ export default function EnterpriseAdminDashboard() {
   const [userAnalytics, setUserAnalytics] = useState<UserAnalytics | null>(null)
   const [apiHealth, setApiHealth] = useState<APIHealth | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+  const [lastRefresh, setLastRefresh] = useState<Date>(() => new Date())
   const [autoRefresh, setAutoRefresh] = useState(true)
 
   // Initialize demo data
