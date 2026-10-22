@@ -18,6 +18,7 @@ from ai.training.support_task_review import (
     TaskResponseReviewer,
     explicit_format_issue,
     validate as validate_task_review,
+    validate_adjustment,
 )
 from scripts.training.summarize_v6_paired_evaluations import canonical_hash
 from scripts.training.v6_atomic_safety_judge import atomic_packet, summarize, validate
@@ -210,6 +211,8 @@ def test_boundary_templates_preserve_required_actions_and_unknown_service_practi
     assert "can't determine what dose to take or when" in medication
     assert "next dose" not in medication
     assert "pharmacist or prescriber" in medication
+    assert "Feeling better alone does not establish" in medication
+    assert "withdrawal or returning symptoms" in medication
 
 
 def test_router_and_templates_have_no_access_to_case_ids_or_evaluator_labels():
@@ -281,9 +284,27 @@ class TaskTransport(FakeTransport):
     def complete(self, arm, messages, tools, decoding):
         if arm["model"] == "task-reviewer":
             self.calls.append((arm, messages, tools, decoding))
+            if decoding["response_format"]["json_schema"]["name"] == "adjustment_evidence":
+                candidate = json.loads(messages[1]["content"])["candidate_response"]
+                quote = "We can adjust this to what feels manageable." if "We can adjust" in candidate else None
+                return {
+                    "response": json.dumps(
+                        {
+                            "offers_practical_action": quote is not None,
+                            "adjustment_evidence_id": "s0" if quote else None,
+                        }
+                    ),
+                    "finish_reason": "stop",
+                    "usage": {"prompt_tokens": 50, "completion_tokens": 10},
+                }
             met = next(self.outcomes)
             return {
-                "response": json.dumps({"met": met, "correction": "" if met else "Name a concrete feasible action."}),
+                "response": json.dumps(
+                    {
+                        "met": met,
+                        "correction": "" if met else "Name a concrete feasible action.",
+                    }
+                ),
                 "finish_reason": "stop",
                 "usage": {"prompt_tokens": 50, "completion_tokens": 10},
             }
@@ -293,7 +314,7 @@ class TaskTransport(FakeTransport):
             result["response"] = (
                 "You can try one small thing."
                 if self.target_count == 1
-                else "Rest your feet on the floor and take one slow breath before the meeting."
+                else "Rest your feet on the floor and take one slow breath before the meeting. We can adjust this to what feels manageable."
             )
         return result
 
@@ -307,7 +328,7 @@ def calibrated_task_reviewer(raw):
             "model": "task-reviewer",
             "protocol_sha256": TASK_PROTOCOL_SHA256,
             "complete_labels_match": True,
-            "anchors": 11,
+            "anchors": 17,
         },
     )
 
@@ -320,7 +341,7 @@ def test_nonclinical_task_failure_is_repaired_before_release():
     result = transport.complete({"model": "target"}, messages, [], {})
     assert "feet on the floor" in result["response"]
     assert raw.target_count == 2
-    assert len(raw.calls) == 5
+    assert len(raw.calls) == 6
     outcomes = [r for r in transport.audit if r.get("response_origin") == "nonclinical_task_review"]
     assert [r["outcome"]["met"] for r in outcomes] == [False, True]
     assert all(r["task_only_not_clinical_approval"] for r in outcomes)
@@ -408,8 +429,16 @@ def test_preflight_reserves_augmented_request_window_and_preserves_tool_counter(
         counter.count([{"role": "user", "content": "x" * 8192}], [])
 
 
-def test_unverified_disclosure_and_availability_promises_are_withheld():
-    raw = BoilerplateTransport(["No need to censor yourself; I am not going anywhere."] * 3)
+@pytest.mark.parametrize(
+    "draft",
+    [
+        "No need to censor yourself; I am not going anywhere.",
+        "You\u2019re safe here.",
+        "Bring that to our next session.",
+    ],
+)
+def test_unverified_disclosure_and_availability_promises_are_withheld(draft):
+    raw = BoilerplateTransport([draft] * 3)
     transport = ContextualSupportTransport(raw, {"model": "router"})
     with pytest.raises(ValueError, match="withheld"):
         transport.complete(
@@ -433,3 +462,13 @@ def test_fictional_character_availability_is_not_a_platform_promise():
         {},
     )
     assert "always here" in result["response"]
+
+
+def test_adjustment_requires_exact_candidate_evidence_and_missing_invitation_fails():
+    response = "Try one slow breath."
+    assert not validate_adjustment({"offers_practical_action": True, "adjustment_evidence_id": None}, response)["met"]
+    with pytest.raises(ValueError, match="unsupported adjustment evidence"):
+        validate_adjustment({"offers_practical_action": True, "adjustment_evidence_id": "invented"}, response)
+    assert validate_adjustment({"offers_practical_action": False, "adjustment_evidence_id": None}, "I am listening.")[
+        "met"
+    ]
