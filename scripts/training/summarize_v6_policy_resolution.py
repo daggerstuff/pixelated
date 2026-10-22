@@ -15,6 +15,15 @@ PRIOR_ESTIMATE_USD = 0.16696285
 SHARED_CAP_USD = 1.237
 
 
+def task_calibration_cost(path):
+    certificate = json.loads((DIRECTORY / path.parent.name / "certificate.json").read_text())
+    input_rate, output_rate = (0.07, 0.2) if "Nemotron" in certificate["model"] else (0.1, 0.3)
+    return sum(
+        (r["usage"]["prompt_tokens"] * input_rate + r["usage"]["completion_tokens"] * output_rate) / 1e6
+        for r in json.loads(path.read_text())
+    )
+
+
 def costs() -> dict:
     entries = []
     for path in sorted(OUTPUT.glob("*/results.jsonl")):
@@ -60,14 +69,10 @@ def costs() -> dict:
             }
         )
     for path in sorted(OUTPUT.glob("task-review-v*/attempts.json")):
-        attempts = json.loads(path.read_text())
         entries.append(
             {
                 "path": str(path.relative_to(ROOT)),
-                "estimated_cost_usd": sum(
-                    (row["usage"]["prompt_tokens"] * 0.1 + row["usage"]["completion_tokens"] * 0.3) / 1e6
-                    for row in attempts
-                ),
+                "estimated_cost_usd": task_calibration_cost(path),
                 "method": "nonclinical task calibration, including failed variants",
             }
         )
@@ -81,6 +86,19 @@ def costs() -> dict:
                     for row in json.loads(diagnostic.read_text())
                 ),
                 "method": "four base/SFT arithmetic context controls",
+            }
+        )
+    quote_diagnostic = OUTPUT / "adjustment-diagnostic/results.json"
+    if quote_diagnostic.exists():
+        entries.append(
+            {
+                "path": str(quote_diagnostic.relative_to(ROOT)),
+                "estimated_cost_usd": sum(
+                    (r["result"]["usage"]["prompt_tokens"] * 0.1 + r["result"]["usage"]["completion_tokens"] * 0.3)
+                    / 1e6
+                    for r in json.loads(quote_diagnostic.read_text())
+                ),
+                "method": "two structured/unstructured Gemma adjustment diagnostics",
             }
         )
     total = PRIOR_ESTIMATE_USD + sum(entry["estimated_cost_usd"] for entry in entries)
@@ -151,7 +169,7 @@ def calibration_details() -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--version", default="v14", choices=("v4", "v5", "v11", "v12", "v14"))
+    parser.add_argument("--version", default="v18", choices=("v4", "v5", "v11", "v12", "v14", "v15", "v17", "v18"))
     version = parser.parse_args().version
     stages = {stage: judge_stage(stage, version) for stage in ("original", "confirmation")}
     bookings = rows(OUTPUT / "preserved-booking/results.jsonl")
@@ -181,11 +199,15 @@ def main() -> None:
             "nonclinical_task_checks": sum(r.get("response_origin") == "nonclinical_task_review" for r in audit),
             "boilerplate_blocked_drafts": sum(bool(r.get("blocked_boilerplate")) for r in audit),
         }
+    proof = json.loads((DIRECTORY / f"bounded-support-{version}/current-code-replay-proof.json").read_text())
+    certificate_version = {"v17": "v10", "v18": "v12"}.get(version, "v3")
     complete = all(stage["strict_outputs_complete"] for stage in stages.values())
     critical = sum(len(stage["candidate_critical_failures"]) for stage in stages.values())
     other = sum(len(stage["candidate_other_failures"]) for stage in stages.values())
     result = {
-        "status": "review_in_progress" if not complete else "development_review_complete",
+        "status": "review_in_progress"
+        if not complete
+        else ("development_review_has_flags" if critical or other else "development_checks_complete"),
         "overall_fixed_claim_authorized": False,
         "original_attachment_sha256": hashlib.sha256(
             (ROOT.parent / ".codex/attachments/9b879c84-6dd8-4cf3-8f84-851913763d76/pasted-text-1.txt").read_bytes()
@@ -197,10 +219,8 @@ def main() -> None:
         ).hexdigest(),
         "adapter_weights_repaired": False,
         "adapter_only_improvement_claim_authorized": False,
-        "method": "Gemma routes actual conversations only. Eleven explicit boundary contexts use templates; generated tasks use configured Nemotron base/SFT with calibrated nonclinical task checks. Up to four drafts are allowed, with disclosed base fallback after two rejections. Tools preserve the existing booking path. This is mixed middleware, not adapter-only improvement. Final v14 evidence uses 86 unchanged real v13 responses replayed exactly against current code and two fresh changed-route responses, also replayed. Source row hashes remain unchanged; derived evidence incurs no extra provider cost.",
-        "replay_proof": json.loads(
-            (DIRECTORY / f"bounded-support-{version}/current-code-replay-proof.json").read_text()
-        ),
+        "method": "Gemma routes actual conversations only. Eleven explicit boundary contexts use templates; other responses use the configured Nemotron base/SFT with nonclinical completion checks. In v18, practical suggestions additionally require a source span showing an adjustment invitation. Task checks and adjustment checks are separate; user context distinguishes listening from practical actions. Up to four drafts are allowed, with disclosed base fallback after two rejections. Tools preserve the existing booking path. This is mixed middleware, not adapter-only improvement. Source row/config hashes remain unchanged; derived evidence incurs no new provider cost. Trace replay is not stochastic replication.",
+        "replay_proof": proof,
         "generation": generation,
         "independent_model_review": stages,
         "observed_candidate_critical_failures": critical,
@@ -212,10 +232,11 @@ def main() -> None:
             "gemma_atomic": "Passed 5/5 strict calibration pairs: all four frozen critical flags and six negative controls. Used for blinded evaluation, with exact candidate-span evidence.",
             "nemotron_atomic": "No truncations in the revised calibration, but 4/5 strict-valid and a critical mismatch; excluded from acceptance judgments.",
             "runtime_response_reviewers": "All four variants rejected on actual-anchor calibration. No response was released through an uncalibrated model reviewer.",
-            "independence_limit": "Gemma also routes runtime requests; correlated model bias remains. The evidence audit is agent-performed, not a qualified external clinical review.",
+            "independence_limit": "Gemma also routes and reviews runtime requests; correlated model bias remains. The evidence audit is agent-performed, not a qualified external clinical review.",
         },
         "failed_attempts_preserved": [
-            "V12 retained an unsupported availability/disclosure promise. V13 blocks those generated promises; its high-energy route withheld one response under a broad boilerplate filter. V14 uses an explicit assessment/support template for that route. All failures remain recorded.",
+            "V12 retained an unsupported availability/disclosure promise. V13 blocks those generated promises; its high-energy route withheld one response under a broad boilerplate filter. V14 uses an explicit assessment/support template for that route. V15 additionally rejects false safe-here/next-session claims and explains why feeling better does not establish a safe medication change. All failures remain recorded.",
+            "V15 retained a practical-action adjustment-invitation omission. V16 instructions alone reproduced it in another case. Extended task reviewers v4-v9 failed calibration and never authorized live releases. V17 separated task completion from exact quote extraction and passed 17 controls, but live quote typography failed strict matching twice. V18 selects source span IDs and retains actual user context to distinguish listening; its v12 combined protocol passed 17 controls.",
             "Uniform replacement policy retained urgent/ordinary support defects.",
             "Simplified tool policy failed 20 booking state checks; restored exact existing tool path passed 60/60.",
             "Context routing alone still chose missed-dose timing in two additional probes.",
@@ -226,11 +247,14 @@ def main() -> None:
             "Bounded-v3 classified an imminent ingestion plan as an actual ingestion; v4 distinguishes these and makes both templates preserve immediate means distance and physical company.",
         ],
         "agent_audit": {
+            "current": f"policy-resolution-v1/bounded-support-{version}/agent-evidence-audit.json",
             "v4_blocker": "policy-resolution-v1/bounded-support-v4/agent-evidence-audit-blocker.json",
             "v5_remediation": "Unusual-belief and voice contexts use an uncertainty/assessment template that explicitly leaves medication decisions to pharmacist/prescriber. Trace replay confirms exact actual outputs.",
             "qualified_external_review": False,
         },
-        "nonclinical_task_calibration": json.loads((DIRECTORY / "task-review-v3/certificate.json").read_text()),
+        "nonclinical_task_calibration": json.loads(
+            (DIRECTORY / f"task-review-{certificate_version}/certificate.json").read_text()
+        ),
         "scope": {
             "original_synthetic_development_cases": 24,
             "additional_adaptive_development_cases": 20,
@@ -241,7 +265,7 @@ def main() -> None:
             "clinical_validation": False,
             "qualified_independent_clinical_review": "Required before any deployment decision; not obtained in this work.",
             "additional_cases_are_adaptive_development_not_independent_holdouts": True,
-            "coverage_limits": "Single-turn synthetic support, one repetition per final model/case. Clinical tool interactions, multilingual contexts and real-world robustness are not established. Noncritical task failures remain visible, not excluded.",
+            "coverage_limits": "Single-turn synthetic support, one observed response per final model/case; unchanged responses verified by exact replay, not new stochastic repetitions. Clinical tool interactions, multilingual contexts and real-world robustness are not established. Noncritical task failures remain visible, not excluded.",
         },
         "cost": costs(),
     }

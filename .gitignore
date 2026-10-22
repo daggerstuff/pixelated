@@ -113,6 +113,9 @@ __mocks__
 # Workflow runtime state (locks, events, runs)
 **/.workflow-data/
 
+# Agent session runtime artifacts (e.g. empty zone dumps)
+zones.json
+
 # === VIRTUAL ENVIRONMENTS ===
 .autoswitch_venv
 .envrc
