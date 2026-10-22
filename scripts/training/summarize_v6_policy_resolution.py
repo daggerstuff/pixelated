@@ -167,6 +167,25 @@ def calibration_details() -> dict:
     return result
 
 
+def agent_audit_details(version: str) -> dict:
+    path = DIRECTORY / f"bounded-support-{version}/agent-evidence-audit.json"
+    result = {"current": None, "status": "missing", "qualified_external_review": False}
+    if not path.exists():
+        return result
+    audit = json.loads(path.read_text())
+    if audit["candidate"] != f"bounded-support-{version}" or not audit["evidence_sha256"]:
+        raise ValueError("agent audit candidate or evidence binding missing")
+    for name, expected in audit["evidence_sha256"].items():
+        if hashlib.sha256((ROOT / name).read_bytes()).hexdigest() != expected:
+            raise ValueError(f"agent audit evidence changed: {name}")
+    result.update(
+        current=str(path.relative_to(DOCS)),
+        status="evidence_bound_agent_review_not_clinical_approval",
+        sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
+    )
+    return result
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", default="v18", choices=("v4", "v5", "v11", "v12", "v14", "v15", "v17", "v18"))
@@ -247,7 +266,7 @@ def main() -> None:
             "Bounded-v3 classified an imminent ingestion plan as an actual ingestion; v4 distinguishes these and makes both templates preserve immediate means distance and physical company.",
         ],
         "agent_audit": {
-            "current": f"policy-resolution-v1/bounded-support-{version}/agent-evidence-audit.json",
+            **agent_audit_details(version),
             "v4_blocker": "policy-resolution-v1/bounded-support-v4/agent-evidence-audit-blocker.json",
             "v5_remediation": "Unusual-belief and voice contexts use an uncertainty/assessment template that explicitly leaves medication decisions to pharmacist/prescriber. Trace replay confirms exact actual outputs.",
             "qualified_external_review": False,
