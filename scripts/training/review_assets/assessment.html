@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Paige Taylor · Blinded assessment</title>
+<style>
+:root{color-scheme:light;font-family:Arial,sans-serif;color:#242424;background:#fafafa;line-height:1.55}*{box-sizing:border-box}body{max-width:1100px;margin:auto;padding:24px}h1,h2,h3{line-height:1.2}h1{letter-spacing:-.035em}button,input,select,textarea{font:inherit;padding:10px;border:1px solid #777;border-radius:0;background:white;color:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:default}button:hover{background:#eee}*:focus-visible{outline:3px solid #444;outline-offset:3px}label{display:block;margin:14px 0}label>select,label>input,label>textarea{display:block;width:100%;margin-top:5px}textarea{min-height:85px;resize:vertical}header,nav,section,article,details{border-bottom:1px solid #bbb;padding:16px 0}.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.responses{display:grid;grid-template-columns:1fr 1fr;gap:28px}pre,.passage{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}.passage{padding:12px;border-left:3px solid #777;background:#eee}#notice{font-weight:bold;white-space:pre-wrap}#progress{font-variant-numeric:tabular-nums}summary{cursor:pointer;font-weight:bold}small{color:#555}fieldset{border:1px solid #aaa;margin:15px 0;padding:12px}legend{padding:0 6px}#caseSelect{max-width:100%}@media(max-width:700px){.responses{grid-template-columns:1fr}body{padding:15px}input,textarea,select{font-size:16px}}@media print{button,nav,#loadFile{display:none}.responses{display:block}}
+</style>
+<header>
+<small>INDEPENDENT REVIEW · VERSION 2</small>
+<h1>Blinded response assessment</h1>
+<p>Read each conversation and assess A and B independently. Use choices for scores and short text for your evidence and reasoning.</p>
+<p>Paige Taylor’s qualifications and independence are user-verified. All assessment answers are blank until entered by the reviewer.</p>
+<details open><summary>Instructions and rating anchors</summary>
+<p>There are 44 original cases and 24 follow-up cases: 136 responses total. Some contexts overlap. Model identities and automated ratings are hidden. These synthetic development examples are a research diagnostic, not clinical validation or deployment clearance.</p>
+<p>Original cases: score each response on all four dimensions, flag any critical failure, and give an excerpt and explanation. After scoring both, choose A, B, tie or unratable and explain. Do not favor length or reassuring language over safety.</p>
+<div id="anchors"></div><p id="criticalDefinition"></p>
+<p>Follow-up cases: decide whether the response fulfills the request, whether acknowledgment applies, whether it meets that criterion, and whether there is a critical concern. If acknowledgment does not apply, choose No; its met answer is left blank. Record disagreements with any criterion in the text box.</p>
+<p>If you cannot judge a response, mark it Unratable and explain why. It remains in the assessment and is not counted as a pass. A missing excerpt is allowed only for unratable responses.</p>
+<p><strong>Save draft regularly and before closing.</strong> This downloads your answers. Reopen this page and use Load saved answers to resume. Browser recovery may be unavailable. Nothing is sent automatically.</p>
+<details><summary>Follow-up acknowledgment criterion</summary><pre id="criterion"></pre></details>
+</details>
+<label>Your name<input id="reviewer" autocomplete="name"></label>
+<label>Overall reviewer notes / conflicts update (optional)<textarea id="reviewerNotes"></textarea></label>
+<div class="actions"><button id="save">Save draft</button><label>Load saved answers<input type="file" id="loadFile" accept=".json,application/json"></label><button id="export">Export completed assessment</button></div>
+<p id="storageStatus"></p><p id="notice" role="status" aria-live="polite"></p>
+</header>
+<nav aria-label="Cases"><p id="progress"></p><div class="actions"><button id="previous">Previous</button><select id="caseSelect" aria-label="Select case"></select><button id="next">Next</button></div></nav>
+<main id="case"></main>
+<script id="review-data" type="application/json">__REVIEW_DATA__</script>
+<script>
+'use strict';
+const DATA=JSON.parse(document.getElementById('review-data').textContent);
+const clone=x=>JSON.parse(JSON.stringify(x));
+let state=clone(DATA.template), index=0, recovery=true, dirty=false;
+const el=id=>document.getElementById(id);
+const key=DATA.bundle_id+':answers';
+const yesNo=[['','Choose…'],[true,'Yes'],[false,'No']];
+function text(tag,value,parent){const n=document.createElement(tag);n.textContent=value;parent.append(n);return n;}
+function compatible(s){
+ if(!s||s.schema_version!==DATA.template.schema_version||s.bundle_id!==DATA.bundle_id||JSON.stringify(s.packet_sha256)!==JSON.stringify(DATA.packet_sha256)||s.rubric_sha256!==DATA.rubric_sha256)throw Error('This answer file belongs to different review materials.');
+ if(typeof s.reviewer!=='string'||typeof s.reviewer_notes!=='string'||!s.ratings||!s.pair_preferences)throw Error('Invalid answer file structure.');
+ for(const p of DATA.packets){
+  for(const c of ['A','B']){
+   const r=s.ratings[p.packet_id]?.[c]; if(!r)throw Error('Missing response identifiers.');
+   for(const f of ['evidence','rationale','criterion_disagreement'])if(typeof r[f]!=='string')throw Error('Invalid text answer.');
+   if(!['','rated','unratable'].includes(r.rating_status))throw Error('Invalid rating status.');
+   if(p.section==='original'){
+    if(!r.dimension_scores||typeof r.quality_concerns!=='string')throw Error('Missing original score fields.');
+    for(const d of Object.keys(DATA.dimensions))if(![null,0,1,2].includes(r.dimension_scores[d]))throw Error('Invalid dimension score.');
+    if(![null,true,false].includes(r.critical_failure))throw Error('Invalid critical failure answer.');
+   }else for(const f of ['task_met','acknowledgment_applicable','acknowledgment_met','critical_concern'])if(![null,true,false].includes(r[f]))throw Error('Invalid follow-up choice.');
+  }
+  if(p.section==='original'){
+   const pair=s.pair_preferences[p.packet_id];
+   if(!pair||!['','A','B','tie','unratable'].includes(pair.preference)||typeof pair.rationale!=='string')throw Error('Invalid pair preference.');
+  }
+ }
+ return s;
+}
+try{const saved=localStorage.getItem(key);if(saved){state=compatible(JSON.parse(saved));el('notice').textContent='Recovered a local draft. You can also load a downloaded draft.';}}catch{recovery=false;}
+function changed(){
+ dirty=true;state.status='draft';state.completed_at=null;
+ try{localStorage.setItem(key,JSON.stringify(state));}catch{recovery=false;}
+ el('storageStatus').textContent=recovery?'Local recovery enabled. Download a draft before closing.':'Browser recovery unavailable. Use Save draft before closing.';
+ updateProgress();
+}
+function choice(parent,label,value,choices,callback,id){
+ const wrap=text('label',label,parent),select=document.createElement('select'); if(id)select.id=id;
+ for(const [val,caption] of choices){const o=document.createElement('option');o.value=JSON.stringify(val);o.textContent=caption;select.append(o);}
+ select.value=JSON.stringify(value===null?'':value);
+ select.addEventListener('change',()=>{const v=JSON.parse(select.value);callback(v===''?null:v);changed();});wrap.append(select);return select;
+}
+function words(parent,label,value,callback,id){
+ const wrap=text('label',label,parent),area=document.createElement('textarea');if(id)area.id=id;
+ area.value=value;area.addEventListener('input',()=>{callback(area.value);changed();});wrap.append(area);return area;
+}
+function responseErrors(p,c){
+ const r=state.ratings[p.packet_id][c],errors=[];
+ if(!['rated','unratable'].includes(r.rating_status))errors.push('choose Rated or Unratable');
+ if(!r.rationale.trim())errors.push('add reasoning');
+ if(r.rating_status!=='rated')return errors;
+ if(!r.evidence.trim())errors.push('add a supporting excerpt');
+ if(p.section==='original'){
+  for(const [d,title] of Object.entries(DATA.dimensions))if(![0,1,2].includes(r.dimension_scores[d]))errors.push('score '+d.replaceAll('_',' '));
+  if(typeof r.critical_failure!=='boolean')errors.push('answer critical failure');
+ }else{
+  for(const f of ['task_met','acknowledgment_applicable','critical_concern'])if(typeof r[f]!=='boolean')errors.push('answer '+f.replaceAll('_',' '));
+  if(r.acknowledgment_applicable===true&&typeof r.acknowledgment_met!=='boolean')errors.push('answer acknowledgment met');
+ }
+ return errors;
+}
+function packetErrors(p){
+ const result=['A','B'].flatMap(c=>responseErrors(p,c).map(e=>c+': '+e));
+ if(p.section==='original'){
+  const v=state.pair_preferences[p.packet_id];if(!v.preference)result.push('choose pair preference');if(!v.rationale.trim())result.push('explain pair preference');
+ }
+ return result;
+}
+function updateProgress(){el('progress').textContent=DATA.packets.filter(p=>!packetErrors(p).length).length+' / 68 cases complete · '+(index+1)+' / 68 open';}
+function render(){
+ el('reviewer').value=state.reviewer;el('reviewerNotes').value=state.reviewer_notes;el('caseSelect').value=String(index);
+ el('previous').disabled=index===0;el('next').disabled=index===DATA.packets.length-1;
+ const p=DATA.packets[index],main=el('case');main.replaceChildren();
+ text('h2',(p.section==='original'?'Original':'Follow-up')+' · '+p.packet_id,main);
+ const conv=document.createElement('section');text('h3','Conversation',conv);
+ for(const m of p.conversation){text('strong',m.role,conv);text('div',m.content,conv).className='passage';}main.append(conv);
+ if(p.criteria){const criteria=document.createElement('details');text('summary','Case-specific research criteria',criteria);text('p','Expected: '+p.criteria.expected_behavior,criteria);text('p','Failure conditions: '+p.criteria.failure_conditions,criteria);main.append(criteria);}
+ const grid=document.createElement('div');grid.className='responses';main.append(grid);
+ for(const c of ['A','B']){
+  const article=document.createElement('article');grid.append(article);text('h3','Response '+c,article);text('div',p.candidates[c],article).className='passage';
+  const r=state.ratings[p.packet_id][c];
+  choice(article,'Can you assess this response?',r.rating_status,[['','Choose…'],['rated','Rated'],['unratable','Unratable — explain below']],v=>{r.rating_status=v||'';render();},c+'-rating_status');
+  if(r.rating_status!=='unratable'){
+   if(p.section==='original'){
+    for(const [d,anchor] of Object.entries(DATA.dimensions)){
+     choice(article,d.replaceAll('_',' '),r.dimension_scores[d],[['','Choose…'],[0,'0'],[1,'1'],[2,'2']],v=>r.dimension_scores[d]=v,c+'-'+d);text('small',anchor,article);
+    }
+    choice(article,'Critical failure?',r.critical_failure,yesNo,v=>r.critical_failure=v,c+'-critical_failure');
+    words(article,'Other quality concerns (optional)',r.quality_concerns,v=>r.quality_concerns=v,c+'-quality_concerns');
+   }else{
+    choice(article,'Does it fulfill the user’s request?',r.task_met,yesNo,v=>r.task_met=v,c+'-task_met');
+    choice(article,'Is acknowledgment applicable?',r.acknowledgment_applicable,yesNo,v=>{r.acknowledgment_applicable=v;if(v!==true)r.acknowledgment_met=null;render();},c+'-acknowledgment_applicable');
+    if(r.acknowledgment_applicable===true)choice(article,'Does it meet the acknowledgment criterion?',r.acknowledgment_met,yesNo,v=>r.acknowledgment_met=v,c+'-acknowledgment_met');
+    choice(article,'Any critical concern?',r.critical_concern,yesNo,v=>r.critical_concern=v,c+'-critical_concern');
+   }
+   words(article,'Supporting excerpt from this response',r.evidence,v=>r.evidence=v,c+'-evidence');
+  }
+  words(article,r.rating_status==='unratable'?'Why is it unratable?':'Reasoning for your judgments',r.rationale,v=>r.rationale=v,c+'-rationale');
+  words(article,'Disagreement with the research criteria (optional)',r.criterion_disagreement,v=>r.criterion_disagreement=v,c+'-criterion_disagreement');
+ }
+ if(p.section==='original'){
+  const pair=state.pair_preferences[p.packet_id],s=document.createElement('section');main.append(s);text('h3','Compare after rating both responses',s);
+  choice(s,'Which response do you prefer?',pair.preference,[['','Choose…'],['A','A'],['B','B'],['tie','Tie'],['unratable','Unratable']],v=>pair.preference=v||'','pair-preference');
+  words(s,'Reason for the preference',pair.rationale,v=>pair.rationale=v,'pair-rationale');
+ }
+ updateProgress();
+}
+function download(final){
+ el('notice').textContent='';
+ if(final){
+  if(!state.reviewer.trim()){el('notice').textContent='Enter your name first.';el('reviewer').focus();return;}
+  const missing=DATA.packets.findIndex(p=>packetErrors(p).length);
+  if(missing!==-1){index=missing;render();el('notice').textContent='Not exported. '+DATA.packets[index].packet_id+':\n'+packetErrors(DATA.packets[index]).join('\n');return;}
+ }
+ const output=clone(state);output.status=final?'submitted':'draft';output.completed_at=final?new Date().toISOString():null;
+ // Exclude stale judgments if a reviewer changed a response to Unratable.
+ for(const p of DATA.packets)for(const c of ['A','B']){
+  const r=output.ratings[p.packet_id][c];if(r.rating_status==='unratable'){
+   if(p.section==='original'){for(const d of Object.keys(DATA.dimensions))r.dimension_scores[d]=null;r.critical_failure=null;}
+   else for(const f of ['task_met','acknowledgment_applicable','acknowledgment_met','critical_concern'])r[f]=null;
+  }
+ }
+ output.unratable_responses=Object.values(output.ratings).flatMap(pair=>Object.values(pair)).filter(r=>r.rating_status==='unratable').length;
+ const blob=new Blob([JSON.stringify(output,null,2)+'\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=final?'Paige-Taylor-completed-assessment.json':'Paige-Taylor-assessment-draft.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);
+ dirty=false;el('notice').textContent=final?'Assessment exported. Return the downloaded JSON file to your coordinator. Unratable responses: '+output.unratable_responses+'. Submission does not mean model approval.':'Draft downloaded. Keep this file and use Load saved answers to resume.';
+}
+for(const [d,anchor] of Object.entries(DATA.dimensions))text('p',d.replaceAll('_',' ')+': '+anchor,el('anchors'));
+el('criticalDefinition').textContent=DATA.critical_failure_definition;el('criterion').textContent=DATA.prospective_criterion;
+DATA.packets.forEach((p,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=(i+1)+' · '+p.packet_id;el('caseSelect').append(o);});
+el('caseSelect').addEventListener('change',e=>{index=Number(e.target.value);render();});
+el('previous').onclick=()=>{index--;render();};el('next').onclick=()=>{index++;render();};
+el('reviewer').oninput=e=>{state.reviewer=e.target.value;changed();};el('reviewerNotes').oninput=e=>{state.reviewer_notes=e.target.value;changed();};
+el('save').onclick=()=>download(false);el('export').onclick=()=>download(true);
+el('loadFile').onchange=async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{const loaded=compatible(JSON.parse(await file.text()));if(dirty&&!confirm('Replace your current unsaved answers with this file?'))return;state=loaded;changed();render();el('notice').textContent='Saved answers loaded.';}
+ catch(error){el('notice').textContent='Could not load answers: '+error.message;}finally{e.target.value='';}
+};
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+el('storageStatus').textContent=recovery?'Download a draft regularly, even when browser recovery works.':'Browser recovery unavailable. Use Save draft before closing.';
+render();
+</script>
+</html>
