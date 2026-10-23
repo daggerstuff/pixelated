@@ -335,7 +335,7 @@ export function LoginForm({
               onFocus={() => setFocusedInput('email')}
               onBlur={handleEmailBlur}
               disabled={isLoading}
-              placeholder="your@email.com"
+              placeholder="info@pixelatedempathy.com"
               className={`form-input input-responsive ${errors.email ? 'border-destructive' : ''}`}
               aria-invalid={errors.email ? 'true' : 'false'}
               aria-describedby="email-error"
