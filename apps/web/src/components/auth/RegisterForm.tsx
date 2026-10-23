@@ -209,7 +209,7 @@ export function RegisterForm({
               }
               required
               disabled={isLoading}
-              placeholder="your@email.com"
+              placeholder="info@pixelatedempathy.com"
               aria-required="true"
               aria-invalid={fieldErrors['email'] ? 'true' : 'false'}
               className="mobile-input"
