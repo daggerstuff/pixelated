@@ -115,7 +115,7 @@ fairlearn==0.13.0
     # via bias-detection-service (pyproject.toml)
 fastapi==0.136.1
     # via bias-detection-service (pyproject.toml)
-filelock==3.29.0
+filelock==4.2.4
     # via
     #   bias-detection-service (pyproject.toml)
     #   datasets
@@ -440,7 +440,7 @@ scipy==1.15.3
     #   shap
 sentry-sdk==2.60.0
     # via bias-detection-service (pyproject.toml)
-setuptools==84.0.0
+setuptools==84.1.0
     # via
     #   spacy
     #   thinc

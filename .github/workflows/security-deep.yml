@@ -133,7 +133,7 @@ jobs:
       # --- Python dependencies ---
       - name: Setup Python
         if: matrix.language == 'python'
-        uses: actions/setup-python@v7.0.0
+        uses: actions/setup-python@v7.1.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -228,7 +228,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Set up Python
-        uses: actions/setup-python@v7.0.0
+        uses: actions/setup-python@v7.1.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -276,7 +276,7 @@ jobs:
       - name: Run Checkov infrastructure scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_infra
-        uses: bridgecrewio/checkov-action@v12.3134.0
+        uses: bridgecrewio/checkov-action@v12.3135.0
         with:
           directory: .
           framework: terraform,terraform_plan,bicep
@@ -290,7 +290,7 @@ jobs:
       - name: Run Checkov Helm scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_helm
-        uses: bridgecrewio/checkov-action@v12.3134.0
+        uses: bridgecrewio/checkov-action@v12.3135.0
         with:
           directory: ai/inference/deployment/pixel-voice
           framework: kubernetes,helm
