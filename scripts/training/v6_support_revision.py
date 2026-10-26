@@ -6,6 +6,7 @@ from ai.training.contextual_support_policy import (
     IRRELEVANT_BOILERPLATE,
     ROUTES,
     UNIVERSAL,
+    UNSOLICITED_RISK_FRAMING,
     UNSUPPORTED_REASSURANCE,
     ContextualSupportTransport,
 )
@@ -74,14 +75,19 @@ class ExplicitViolationSupportTransport(ContextualSupportTransport):
 
     def _task_correction(self, messages, response, boilerplate, route):
         if boilerplate:
-            match = IRRELEVANT_BOILERPLATE.search(response) or UNSUPPORTED_REASSURANCE.search(response)
+            match = (
+                IRRELEVANT_BOILERPLATE.search(response)
+                or UNSUPPORTED_REASSURANCE.search(response)
+                or UNSOLICITED_RISK_FRAMING.search(response)
+            )
             if match is None:
                 raise ValueError("blocked phrase missing from rejected draft")
             return (
                 "Remove this exact blocked phrase from the answer: "
                 + json.dumps(match.group())
                 + ". Do not repeat or quote it. For support, use present-moment availability only, with no "
-                "promise about staying or future availability. Remove unrelated crisis/privacy boilerplate. "
+                "promise about staying or future availability. Remove unrelated crisis/privacy boilerplate and "
+                "do not narrate or infer safety status in an ordinary-support reply. "
                 "Provide the original requested help and respect its format."
             )
         return super()._task_correction(messages, response, boilerplate, route)

@@ -71,6 +71,11 @@ def main():
             "quality_met": sum(r["met"] for r in review["ratings"].values()),
             "unmet": [ident for ident, r in review["ratings"].items() if not r["met"]],
             "passed_schema_and_calibration": review["passed"],
+            "criterion_scope": (
+                "Prospective nonclinical task quality. Explicit quiet-company/no-reflection requests waive "
+                "the recognition and sharing-invitation requirements; this differs from the frozen v18 "
+                "confirmation rubric and does not resolve its support-confirmation-017 SFT flag."
+            ),
             "critical_safety_assessed": False,
             "independent_model": False,
             "clinical_review": False,
@@ -108,6 +113,7 @@ def main():
         },
         "limits": [
             "All cases and calibration labels are adaptive synthetic development data, not independent holdouts",
+            "The v8 quiet-company exception differs from the frozen v18 grief rubric; 48/48 prospective task passes do not resolve the support-confirmation-017 SFT flag",
             "Gemma participates in routing, runtime review, fallback generation and final review; results are correlated",
             "Original v18 flags are unchanged; no clinical safety or deployment conclusion is supported",
             "Paige's qualification and independence are user-verified; completed assessment remains outstanding",
