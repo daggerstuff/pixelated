@@ -8,6 +8,7 @@ import pytest
 
 pytest.importorskip("cv2", reason="opencv-python not installed (optional video processing dependency)")
 
+import cv2
 import numpy as np
 
 from scripts.run_video_emotion_prototype import run_pipeline
