@@ -53,7 +53,7 @@ attrs==25.4.0
     #   jsonlines
     #   jsonschema
     #   referencing
-black==26.3.1
+black==26.10.1
     # via -r requirements.txt
 blinker==1.9.0
     # via
@@ -876,7 +876,7 @@ scipy==1.17.1
     #   shap
 seaborn==0.13.2
     # via -r requirements.txt
-setuptools==84.0.0
+setuptools==84.1.0
     # via
     #   -r requirements.txt
     #   dash
