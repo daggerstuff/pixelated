@@ -25,8 +25,8 @@
     "security:scan": "snyk test"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1101.0",
-    "@aws-sdk/s3-request-presigner": "^3.1101.0",
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
     "axios": "^1.20.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
