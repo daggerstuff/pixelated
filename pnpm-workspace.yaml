@@ -217,23 +217,28 @@ peerDependencyRules:
   allowedVersions:
     '@ai-sdk/anthropic': '4'
     '@ai-sdk/provider': '4'
+    '@aws-sdk/client-s3': '*'
     '@babel/core': '>=7.29.1'
+    '@emnapi/core': ^1.10.0
+    '@emnapi/runtime': ^1.10.0
     '@opentelemetry/api': '*'
     '@radix-ui/react-popover': '*'
     '@types/pg': 8.16.0
+    '@vitest/coverage-v8': '*'
     ai: '7'
     astro: '7'
     drizzle-orm: ^0.45.2
     eslint: ^10.4.1
+    graphql: '*'
     mongodb: ^6.14.0
+    msw: '*'
     pg: 8.18.0
     react: '19'
     react-dom: '19'
     redis: 5.10.0
-    typescript: ^6.0.3
+    typescript: '*'
+    vitest: '*'
     zod: '*'
-    '@emnapi/core': ^1.10.0
-    '@emnapi/runtime': ^1.10.0
 overrides:
   # Drift consolidation (#6050): pin newest to collapse duplicate resolutions.
   '@opentelemetry/instrumentation-mongodb': 0.72.0
