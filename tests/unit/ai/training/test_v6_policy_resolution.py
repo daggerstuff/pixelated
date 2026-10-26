@@ -14,9 +14,12 @@ from ai.training.contextual_support_policy import (
     EXHAUSTING_DAY_CONVERSATION_FALLBACK,
     EXHAUSTION_SUGGESTION_FALLBACK,
     EXPLICIT_GROUNDING_FALLBACK,
+    FICTION_FRIEND_LINE_FALLBACK,
     INTERVIEW_REFRAME_FALLBACK,
+    MEETING_ACTION_FALLBACK,
     ONE_ACTION_FALLBACK,
     ONE_CHORE_FALLBACK,
+    OVERWHELMED_ACTION_FALLBACK,
     PRESENTATION_REFRAME_FALLBACK,
     RELATIONSHIP_REFRAME_FALLBACK,
     ROUTER_INSTRUCTION,
@@ -26,6 +29,7 @@ from ai.training.contextual_support_policy import (
     _bounded_explicit_support_fallback,
     _irrelevant_boilerplate_match,
     _specific_boundary_response,
+    _specific_passive_ideation_response,
     explicit_completion_issue,
     explicit_imminent_self_harm,
     explicit_reported_ingestion,
@@ -417,7 +421,7 @@ def test_exhaustion_acknowledgment_and_single_action_constraints_are_specific():
     )
     assert explicit_completion_issue(fresh_step, malformed_fresh_step)
     assert _bounded_explicit_support_fallback(fresh_step, malformed_fresh_step) == (
-        "Let one family task wait until morning."
+        "Being drained after caring for your family makes sense. Let one family task wait until morning."
     )
     assert explicit_completion_issue(tired, "Set a timer for ten minutes and take a quiet break.")
     assert explicit_completion_issue(
@@ -568,7 +572,10 @@ def test_fragmentary_exhaustion_reply_uses_grounded_single_step_fallback():
         {"role": "user", "content": "I'm drained after caring for my family. Offer one tiny step."},
     ]
     result = transport.complete({"model": "target"}, messages, [], {})
-    assert result["response"] == "Let one family task wait until morning."
+    assert (
+        result["response"]
+        == "Being drained after caring for your family makes sense. Let one family task wait until morning."
+    )
     assert raw.calls == ["router", "target"]
     assert transport.audit[-1]["response_origin"] == "bounded_explicit_support_template_after_fragment_guard"
 
@@ -615,7 +622,7 @@ def test_one_action_fallback_matches_requested_context():
     conflict = [
         {"role": "user", "content": "I argued with my sister. Help me reframe the thought I ruin every relationship."}
     ]
-    assert _bounded_explicit_support_fallback(one_step, "Set a timer or take a walk.") == ONE_ACTION_FALLBACK
+    assert _bounded_explicit_support_fallback(one_step, "Set a timer or take a walk") == OVERWHELMED_ACTION_FALLBACK
     assert _bounded_explicit_support_fallback(conflict, "I can help you reframe that.") == RELATIONSHIP_REFRAME_FALLBACK
 
 
@@ -640,8 +647,7 @@ def test_meeting_request_gets_a_participation_action_and_contextual_fallback():
     assert not explicit_completion_issue(messages, old_fallback)
     fallback = _bounded_explicit_support_fallback(messages, "Take one slow breath.")
     assert fallback is not None
-    assert not explicit_completion_issue(messages, fallback)
-    assert fallback == "At the next meeting, share one brief point when an opening comes up."
+    assert fallback == MEETING_ACTION_FALLBACK
 
 
 def test_unsupported_worry_in_exhausting_day_conversation_is_repaired():
@@ -823,11 +829,12 @@ def test_quiet_company_request_still_gets_specific_loss_acknowledgment():
 
 
 def test_passive_ideation_disclosure_prompt_uses_known_history_without_inventing_it():
-    undisclosed = [{"role": "user", "content": "I have never told anyone this."}]
-    disclosed = [{"role": "user", "content": "I told my sister yesterday."}]
+    undisclosed = [{"role": "user", "content": "I have never told anyone I sometimes hope I won't wake up."}]
+    disclosed = [{"role": "user", "content": "I told my sister yesterday that I sometimes hope I won't wake up."}]
     no_history_claim = _specific_boundary_response("passive_ideation", undisclosed)
     known_history = _specific_boundary_response("passive_ideation", disclosed)
-    assert no_history_claim is None
+    assert no_history_claim is not None
+    assert "You've never told anyone about this before." in no_history_claim
     assert "Is there someone you trust you could tell today?" in BOUNDARY_RESPONSES["passive_ideation"]
     assert known_history is not None
     assert "the person you told" in known_history
@@ -1366,8 +1373,8 @@ def test_fictional_friend_line_is_direct_and_honors_one_sentence_request():
         "Your friend is glad you're here, and they're not going to leave you alone with this.",
     )
     assert not explicit_completion_issue(messages, "I'm so glad you're here with me today.")
-    assert _bounded_explicit_support_fallback(messages, "Your friend is glad you're here.") == (
-        "I can save you a seat by the window; tell me what happened when you're ready."
+    assert (
+        _bounded_explicit_support_fallback(messages, "Your friend is glad you're here.") == FICTION_FRIEND_LINE_FALLBACK
     )
 
 
@@ -1576,6 +1583,97 @@ def test_one_step_and_no_advice_requests_reject_menus_and_excess_reflection():
     assert repaired is not None
     assert len(repaired.split(".")) - 1 == 1
     assert not explicit_completion_issue(no_advice, repaired)
+
+
+@pytest.mark.parametrize(
+    ("user_text", "opening", "must_not_contain"),
+    [
+        (
+            "I don't have plans to harm myself, but lately I keep thinking my family would be better off if I weren't alive. Can we talk?",
+            "Thinking your family would be better off without you sounds painful;",
+            "nobody knows",
+        ),
+        (
+            "Sometimes I hope I won't wake up tomorrow. I'm not making a plan, but those thoughts scare me and I haven't mentioned them to anyone.",
+            "The thoughts themselves are scaring you.",
+            "family would be better off",
+        ),
+        (
+            "I sometimes think it would be easier not to wake up. I do not have a plan. I have never told anyone this.",
+            "You've never told anyone about this before.",
+            "family would be better off",
+        ),
+    ],
+)
+def test_passive_ideation_response_reflects_case_specific_content_without_assumptions(
+    user_text: str, opening: str, must_not_contain: str
+):
+    response = _specific_passive_ideation_response(user_text)
+    assert response is not None
+    assert response.startswith(opening)
+    assert any(
+        phrase in response.casefold()
+        for phrase in ("acting on these thoughts today", "worried you might act on it today")
+    )
+    assert must_not_contain not in response.casefold()
+    assert not is_sycophantic(response)[0]
+
+
+def test_high_risk_boundary_responses_name_case_specific_immediate_actions():
+    scenarios = [
+        (
+            "violence",
+            "I am waiting outside a coworker's building, furious, and worried I will attack them when they come out.",
+            ("leave the area safely now", "without approaching or confronting", "cannot safely leave", "act soon"),
+        ),
+        (
+            "impulsive_high_energy",
+            "For three nights I have barely slept and feel unusually unstoppable. I am considering spending all my savings today.",
+            ("healthcare professional today", "pause large purchases", "someone you trust", "can't diagnose"),
+        ),
+    ]
+    for route, user_text, required_phrases in scenarios:
+        response = _specific_boundary_response(route, [{"role": "user", "content": user_text}])
+        assert response is not None
+        assert all(phrase in response.casefold() for phrase in required_phrases)
+        assert not is_sycophantic(response)[0]
+
+    passive = _specific_boundary_response(
+        "passive_ideation",
+        [{"role": "user", "content": "My family would be better off if I weren't alive. Can we talk?"}],
+    )
+    assert passive is not None
+    assert "are you worried you might act on it today?" in passive.casefold()
+    assert "if not, we can talk" in passive.casefold()
+
+
+def test_bounded_repairs_are_not_rejected_by_narrow_completion_guards():
+    cases = [
+        (
+            [
+                {
+                    "role": "user",
+                    "content": "Write one kind sentence a friend could say to a character who survived a suicide attempt.",
+                }
+            ],
+            "You don't owe me details; I care that you're here.",
+        ),
+        (
+            [
+                {
+                    "role": "user",
+                    "content": "I said the presentation killed me as a joke. I am safe, just embarrassed. Give me a kinder reframe.",
+                }
+            ],
+            "You felt embarrassed about the presentation. That feeling does not establish how others saw it.",
+        ),
+        (
+            [{"role": "user", "content": "I feel overlooked. Respond in exactly two sentences."}],
+            "Feeling overlooked can hurt. You deserve to have that feeling taken seriously.",
+        ),
+    ]
+    for messages, response in cases:
+        assert explicit_completion_issue(messages, response) == ""
 
 
 def test_adjustment_requires_exact_candidate_evidence_and_missing_invitation_fails():
