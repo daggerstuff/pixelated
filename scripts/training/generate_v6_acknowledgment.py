@@ -21,15 +21,16 @@ CAP = 0.27
 
 
 class LedgerTransport:
-    def __init__(self, results=RESULTS, cap=CAP, max_calls=312):
+    def __init__(self, results=RESULTS, cap=CAP, max_calls=312, input_token_cap=8192):
         self.raw = WandbAsyncTransport()
         self.results, self.cap, self.max_calls = results, cap, max_calls
+        self.input_token_cap = input_token_cap
         self.spent = 0.0
         self.calls = 0
 
     def complete(self, arm, messages, tools, decoding):
         input_rate, output_rate = (0.1, 0.3) if "gemma-4" in arm["model"] else (0.07, 0.2)
-        reserve = (8192 * input_rate + decoding["max_tokens"] * output_rate) / 1e6
+        reserve = (self.input_token_cap * input_rate + decoding["max_tokens"] * output_rate) / 1e6
         if self.calls >= self.max_calls or self.spent + reserve > self.cap:
             raise ValueError("all-provider-call budget exhausted; no new call made")
         self.calls += 1
@@ -56,25 +57,27 @@ class LedgerTransport:
         record.update(result, estimated_cost_usd=cost)
         with (self.results / "all-provider-calls.jsonl").open("a") as stream:
             stream.write(json.dumps(record) + "\n")
-        if usage["prompt_tokens"] > 8192 or usage["completion_tokens"] > decoding["max_tokens"]:
+        if usage["prompt_tokens"] > self.input_token_cap or usage["completion_tokens"] > decoding["max_tokens"]:
             raise ValueError("provider usage exceeds reservation")
         return result
 
 
 def build_transport(raw, router, certificate, results, version=None):
     candidate = version is not None
-    drafts = (
-        AcknowledgmentDraftTransport(raw, GUIDANCE_V2)
-        if candidate and version in {"v2", "v3", "v4", "v5", "v6", "v7", "v8"}
-        else (AcknowledgmentDraftTransport(raw) if candidate else raw)
-    )
-    if candidate and version in {"v4", "v5", "v6", "v7", "v8"}:
+    version_number = int(version.removeprefix("v")) if candidate else 0
+    if candidate:
+        drafts = (
+            AcknowledgmentDraftTransport(raw, GUIDANCE_V2) if version_number >= 2 else AcknowledgmentDraftTransport(raw)
+        )
+    else:
+        drafts = raw
+    if candidate and version_number >= 4:
         from scripts.training.v6_support_revision import ConversationalRevisionTransport
 
         drafts = ConversationalRevisionTransport(
             drafts,
-            remove_generic_example=version in {"v5", "v6", "v7", "v8"},
-            sample_revisions=version in {"v6", "v7", "v8"},
+            remove_generic_example=version_number >= 5,
+            sample_revisions=version_number >= 6,
         )
     transport = ContextualSupportTransport(
         drafts, router, audit_path=results / "routing-audit.jsonl" if results else None
@@ -85,31 +88,28 @@ def build_transport(raw, router, certificate, results, version=None):
         transport = RevisionSupportTransport(
             drafts, router, audit_path=results / "routing-audit.jsonl" if results else None
         )
-    if version == "v8":
+    if candidate and version_number >= 8:
         from scripts.training.v6_support_revision import ExplicitViolationSupportTransport
 
         transport = ExplicitViolationSupportTransport(
             drafts, router, audit_path=results / "routing-audit.jsonl" if results else None
         )
     transport.task_reviewer = TaskResponseReviewer(drafts, router, certificate)
-    if candidate and version in {"v2", "v3", "v4", "v5", "v6", "v7", "v8"}:
+    if candidate and version_number >= 2:
         from scripts.training.v6_adjustment_repair import RepairedTaskReviewer
 
         adjustment_certificate = json.loads(
-            (
-                DIRECTORY
-                / f"adjustment-repair-{'v3' if version in {'v5', 'v6', 'v7', 'v8'} else 'v2'}/certificate.json"
-            ).read_text()
+            (DIRECTORY / f"adjustment-repair-{'v3' if version_number >= 5 else 'v2'}/certificate.json").read_text()
         )
         transport.task_reviewer = RepairedTaskReviewer(
             drafts,
             router,
             certificate,
             adjustment_certificate,
-            version="v3" if version in {"v5", "v6", "v7", "v8"} else "v2",
+            version="v3" if version_number >= 5 else "v2",
         )
         transport.task_reviewer.require_calibration()
-    if version in {"v7", "v8"}:
+    if candidate and version_number >= 7:
         from scripts.training.v6_acknowledgment_review import AcknowledgmentReviewer, calibrated_acknowledgment
 
         transport.task_reviewer = AcknowledgmentReviewer(
@@ -127,15 +127,64 @@ def build_transport(raw, router, certificate, results, version=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate", action="store_true")
-    parser.add_argument("--candidate-version", choices=("v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8"), default="v1")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--candidate-version",
+        choices=(
+            "v1",
+            "v2",
+            "v3",
+            "v4",
+            "v5",
+            "v6",
+            "v7",
+            "v8",
+            "v9",
+            "v10",
+            "v11",
+            "v12",
+            "v13",
+            "v14",
+            "v15",
+            "v16",
+            "v17",
+            "v18",
+            "v19",
+            "v20",
+            "v21",
+            "v22",
+            "v23",
+            "v24",
+            "v25",
+            "v26",
+            "v27",
+            "v28",
+            "v29",
+            "v30",
+            "v31",
+        ),
+        default="v1",
+    )
     args = parser.parse_args()
     candidate = args.candidate
     version = args.candidate_version
     target = DIRECTORY / f"acknowledgment-candidate-{version}" if candidate else TARGET
     results = OUTPUT / f"acknowledgment-candidate-{version}" if candidate else RESULTS
     cap, max_calls = (0.54, 624) if candidate else (CAP, 312)
-    if target.exists() or results.exists():
-        raise ValueError("fresh probes already exist; refusing automatic repeat or overwrite")
+    if results.exists():
+        raise ValueError("provider results already exist; refusing automatic repeat or resume")
+    if target.exists():
+        existing_plan = target / "plan.json"
+        existing_cases = target / "cases.jsonl"
+        if not existing_plan.is_file() or not existing_cases.is_file():
+            raise ValueError("existing candidate is incomplete; refusing overwrite")
+        prepared = json.loads(existing_plan.read_text())
+        if (
+            prepared.get("run_status") != "prepared_not_run"
+            or prepared.get("candidate") != version
+            or hashlib.sha256(existing_cases.read_bytes()).hexdigest() != prepared.get("input_sha256")
+        ):
+            raise ValueError("existing candidate is stale or already used; refusing overwrite")
     template = DIRECTORY / "bounded-support-v18/confirmation"
     config = json.loads((template / "config.json").read_text())
     config["run_id"] = f"v6-acknowledgment-candidate-{version}" if candidate else "v6-acknowledgment-fresh-v1"
@@ -182,6 +231,8 @@ def main():
     write(
         target / "plan.json",
         {
+            "candidate": version if candidate else "acknowledgment-fresh-v1",
+            "run_status": "prepared_not_run",
             "cases": len(cases),
             "responses": 2 * len(cases),
             "all_provider_cost_cap_usd": cap,
@@ -190,19 +241,22 @@ def main():
             "runtime_changed": candidate,
             "candidate_opt_in_only": candidate,
             "revision_decoding_override": {"temperature": 1.0, "scope": "ordinary generated revisions only"}
-            if candidate and version in {"v6", "v7", "v8"}
+            if candidate and int(version.removeprefix("v")) >= 6
             else None,
             "scope": "Adaptive synthetic development; agent-authored requests; no clinical validation",
             "input_sha256": hashlib.sha256((target / "cases.jsonl").read_bytes()).hexdigest(),
         },
     )
+    if args.dry_run:
+        print(json.dumps({"status": "prepared_not_run", **json.loads((target / "dry-run.json").read_text())}))
+        return
     from ai.training.launch.wandb_sft_v6_execute import _ensure_api_key
 
     os.environ["WANDB_API_KEY"] = _ensure_api_key()
     results.mkdir(parents=True)
     raw = LedgerTransport(results, cap, max_calls)
     transport = build_transport(raw, router, certificate, results, version if candidate else None)
-    transport.task_fallback_arm = router if candidate and version in {"v7", "v8"} else config["arms"][0]
+    transport.task_fallback_arm = router if candidate and int(version.removeprefix("v")) >= 7 else config["arms"][0]
     result = paired_eval.run_paired(request, transport=transport, token_counter=counter)
     write(
         target / "run-result.json",
