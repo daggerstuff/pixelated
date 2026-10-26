@@ -440,7 +440,7 @@ scipy==1.15.3
     #   shap
 sentry-sdk==2.60.0
     # via bias-detection-service (pyproject.toml)
-setuptools==84.1.0
+setuptools==84.2.1
     # via
     #   spacy
     #   thinc
