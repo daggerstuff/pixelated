@@ -237,6 +237,11 @@ commit_repo() {
   success "Committed: ${repo_name} → \"$msg\""
 }
 
+is_gitlink() {
+  local path="$1"
+  git ls-files -s -- "$path" 2>/dev/null | awk '{print $1}' | grep -qx '160000'
+}
+
 # ── Sync with origin (fetch + merge, no rebase) ───────────────────────────────
 sync_with_origin() {
   local repo_path="$1"
@@ -281,6 +286,11 @@ sync_with_origin() {
     return 0
   fi
 
+  if [[ "$DRY_RUN" == "true" ]]; then
+    info "[DRY-RUN] Would merge origin/${branch} (ahead ${ahead}, behind ${behind}) — no merge performed"
+    return 0
+  fi
+
   if [[ "$ahead" -gt 0 ]]; then
     info "${repo_name}: ${ahead} ahead + ${behind} behind — will create merge commit"
     info "Branch is protected / diverged — using merge (no rebase)"
@@ -309,7 +319,7 @@ sync_with_origin() {
   local all_resolved=true
   while IFS= read -r f; do
     [[ -z "$f" ]] && continue
-    if [[ " ${SUBMODULES[*]} " == *" ${f} "* ]] || git submodule status "$f" &>/dev/null; then
+    if is_gitlink "$f"; then
       if ! resolve_submodule_conflict "$repo_path" "$f"; then
         all_resolved=false
       fi
@@ -469,21 +479,25 @@ sync_with_origin "$ROOT" "$REPO_NAME"
 
 # After sync, if submodule pointers drifted from what the merge resolved, update
 if [[ ${#SUBMODULES[@]} -gt 0 ]]; then
-  cd "$ROOT"
-  sub_dirty=$(git diff --name-only HEAD -- "${SUBMODULES[@]}" 2>/dev/null || true)
-  if [[ -n "$sub_dirty" ]]; then
-    info "Submodule pointers changed during merge — updating..."
-    git add "${SUBMODULES[@]}" 2>/dev/null || true
-    if ! git diff --cached --quiet; then
-      git commit -m "chore: update submodule pointers after merge" 2>/dev/null && \
-        success "Committed updated submodule pointers" || true
+  if [[ "$DRY_RUN" == "true" ]]; then
+    info "[DRY-RUN] Would reconcile submodule pointers and checkouts after merge — skipped"
+  else
+    cd "$ROOT"
+    sub_dirty=$(git diff --name-only HEAD -- "${SUBMODULES[@]}" 2>/dev/null || true)
+    if [[ -n "$sub_dirty" ]]; then
+      info "Submodule pointers changed during merge — updating..."
+      git add "${SUBMODULES[@]}" 2>/dev/null || true
+      if ! git diff --cached --quiet; then
+        git commit -m "chore: update submodule pointers after merge" 2>/dev/null && \
+          success "Committed updated submodule pointers" || true
+      fi
     fi
-  fi
 
-  # Sync submodule checkouts with what the main repo now references
-  info "Syncing submodule checkouts with committed pointers..."
-  git submodule update --recursive 2>/dev/null || true
-  success "Submodule checkouts synced"
+    # Sync submodule checkouts with what the main repo now references
+    info "Syncing submodule checkouts with committed pointers..."
+    git submodule update --recursive 2>/dev/null || true
+    success "Submodule checkouts synced"
+  fi
 fi
 
 # ── Step 3 — Push all repos (submodules first, then main) ─────────────────────
@@ -495,7 +509,11 @@ push_repo "$ROOT" "$REPO_NAME"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 section "Done"
-success "All repos committed, synced, and pushed."
+if [[ "$DRY_RUN" == "true" ]]; then
+  success "[DRY-RUN] No commits, merges, or pushes were made."
+else
+  success "All repos committed, synced, and pushed."
+fi
 echo ""
 echo "  Repos processed:"
 for sub in "${SUBMODULES[@]}"; do echo "    • ${sub}"; done
