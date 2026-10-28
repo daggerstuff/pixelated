@@ -74,7 +74,7 @@ classify_file() {
     .github/*|.gitlab*|.ci/*|Dockerfile*|*.dockerfile|docker-compose*|Jenkinsfile*)
       echo "ci" ;;
     # Tests
-    *test*|*spec*|__tests__/*|pytest.ini|jest.config*|vitest.config*|coverage*|.nyc_output/*)
+    *spec*|pytest.ini|jest.config*|vitest.config*|coverage*|.nyc_output/*|*test*)
       echo "tests" ;;
     # Source code
     src/*|lib/*|app/*|packages/*|core/*|components/*)
