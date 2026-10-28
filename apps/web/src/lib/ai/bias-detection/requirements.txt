@@ -69,7 +69,7 @@ catalogue==2.0.10
     #   spacy
     #   srsly
     #   thinc
-certifi==2026.10.19
+certifi==2026.10.23
     # via
     #   -r requirements.txt
     #   httpcore
@@ -169,7 +169,7 @@ executing==2.2.1
     #   stack-data
 fairlearn==0.14.0
     # via -r requirements.txt
-filelock==3.20.3
+filelock==4.2.4
     # via
     #   -r requirements.txt
     #   datasets
@@ -464,7 +464,7 @@ networkx==3.6.1
     #   -r requirements.txt
     #   scikit-image
     #   torch
-nltk==3.10.3
+nltk==3.10.4
     # via
     #   -r requirements.txt
     #   textblob
@@ -876,7 +876,7 @@ scipy==1.17.1
     #   shap
 seaborn==0.13.2
     # via -r requirements.txt
-setuptools==84.1.0
+setuptools==84.2.1
     # via
     #   -r requirements.txt
     #   dash
