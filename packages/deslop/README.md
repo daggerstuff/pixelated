@@ -25,10 +25,12 @@ quality gate before training, evals, or delivery.
 
 ## Features
 
-- Field-aware JSON/JSONL scanning with record IDs, field paths, snippets, and
-  pattern counts
-- Deterministic cleaning with weighted replacement pools and detect-only marker
-  removal
+- Real-time anti-sycophancy gate (`deslop gate` / `deslop.gate`) for agent generation loops
+- Automated agent retry coordinator (`AgentGuard`) with actionable prompt repair
+- Single text cleaning (`deslop text`) and pattern scanning
+- Built-in Model Context Protocol (MCP) stdio server (`deslop mcp`)
+- Field-aware JSON/JSONL scanning with record IDs, field paths, snippets, and pattern counts
+- Deterministic cleaning with weighted replacement pools and detect-only marker removal
 - Preview and diff commands before writing files
 - HTML, Markdown, and JSON quality reports
 - CI density gate via `--fail-on-density`
@@ -37,6 +39,7 @@ quality gate before training, evals, or delivery.
 - Custom `rules.yaml` without mutating global defaults
 - Ollama regeneration that defaults to flagged records only and validates
   top-level schema
+- Zero-dependency standalone drop-in script (`standalone/anti_sycophancy_filter.py`)
 
 ## Install
 
@@ -45,6 +48,55 @@ pip install deslop-cli
 ```
 
 ## Quick start
+
+### Real-Time Anti-Sycophancy Gate (CLI & Python)
+
+Check text for sycophancy, caving phrases, or canned clichés (exits 0 if clean, 1 if rejected):
+
+```bash
+deslop gate "I hear how difficult this has been for you."
+```
+
+In Python agent loops:
+
+```python
+from deslop.gate import AntiSycophancyGate
+
+gate = AntiSycophancyGate.default()
+result = gate.check(assistant_response)
+
+if not result.passed:
+    print(f"Rejected: {result.reason}")
+    print(f"Correction for prompt: {result.correction}")
+```
+
+### Auto-Retrying Agent Interceptor (`AgentGuard`)
+
+Wrap any LLM callable with automatic anti-sycophancy check and prompt retry:
+
+```python
+from deslop.agent import AgentGuard
+
+guard = AgentGuard(auto_clean_residual=True)
+safe_text = guard.run(llm_callable, user_messages, max_retries=3)
+```
+
+### Clean a Single Text String
+
+```bash
+deslop text "Happy to help you deep dive into this moving forward."
+# Output: "Glad to pitch in you look into this next."
+```
+
+### Model Context Protocol (MCP) Server for Agents
+
+Expose tools (`deslop_gate`, `deslop_clean`, `deslop_scan`) to Claude Desktop, Cursor, or OpenCode:
+
+```bash
+deslop mcp
+```
+
+### Dataset Scanning & Cleaning
 
 Scan a dataset:
 
