@@ -970,7 +970,7 @@ toolz==1.1.0
     #   altair
 torch==2.13.0
     # via -r requirements.txt
-tornado==6.5.9
+tornado==6.6
     # via -r requirements.txt
 tqdm==4.67.1
     # via
