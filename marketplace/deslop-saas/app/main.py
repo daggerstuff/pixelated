@@ -7,13 +7,15 @@ import tempfile
 from pathlib import Path
 from typing import Annotated
 
-from deslop.engine import CleanOptions, apply_deslop_to_file, preview_file
+from deslop.engine import CleanOptions, apply_deslop_to_file, clean_text, preview_file
+from deslop.gate import AntiSycophancyGate
 from deslop.models import CleanReport, PreviewReport, RegenReport, ScanReport
 from deslop.regen import OllamaClient, OpenAICompatibleClient, regen_file
 from deslop.rules.core import DEFAULT_RULE_PACKS, RuleSet, load_rule_set
 from deslop.scanner import ScanOptions, scan_file
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import JSONResponse, Response
+from pydantic import BaseModel, Field
 
 app = FastAPI(
     title="Deslop SaaS — Dataset Hygiene API",
@@ -238,6 +240,33 @@ async def regen_endpoint(
             out_path.unlink()
         except OSError:
             pass
+
+
+class GateRequest(BaseModel):
+    text: str = Field(..., description="Assistant text to validate against anti-sycophancy rules.")
+    general_only: bool = Field(False, description="Skip clinical somatic and crisis checks.")
+
+
+class CleanTextRequest(BaseModel):
+    text: str = Field(..., description="Text string to clean.")
+    packs: list[str] | None = Field(None, description="Optional rule packs to apply.")
+
+
+@app.post("/gate", summary="Validate an assistant turn against anti-sycophancy rules")
+async def gate_endpoint(payload: GateRequest) -> dict[str, object]:
+    active_gate = AntiSycophancyGate.general_assistant() if payload.general_only else AntiSycophancyGate.default()
+    result = active_gate.check(payload.text)
+    return result.to_dict()
+
+
+@app.post("/clean-text", summary="Clean AI slop from a text string")
+async def clean_text_endpoint(payload: CleanTextRequest) -> dict[str, object]:
+    cleaned = clean_text(payload.text, packs=payload.packs)
+    return {
+        "original": payload.text,
+        "cleaned": cleaned,
+        "changed": cleaned != payload.text,
+    }
 
 
 if __name__ == "__main__":

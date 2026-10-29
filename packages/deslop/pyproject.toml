@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "deslop-cli"
-version = "0.2.0"
-description = "Clean AI slop from JSON/JSONL datasets. Remove filler phrases, detect low-density text, optionally rewrite with local LLMs."
+version = "0.3.0"
+description = "Clean AI slop and intercept sycophancy in LLM datasets and agent generation loops."
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Pixelated Empathy" }]

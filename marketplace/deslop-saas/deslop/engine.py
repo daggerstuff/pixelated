@@ -53,6 +53,32 @@ def remove_slop(text: str, item_id: str = "generic_id", rules: RuleSet | None = 
     return normalize_spacing(regex.sub(replace_match, text))
 
 
+def clean_text(
+    text: str,
+    rules: RuleSet | None = None,
+    packs: list[str] | tuple[str, ...] | None = None,
+    item_id: str = "text",
+) -> str:
+    """Clean slop from a single text string using default or specified rules and packs."""
+    active_rules = rules or RuleSet.default()
+    if packs:
+        active_rules = active_rules.with_packs(list(packs))
+    return remove_slop(text, item_id, active_rules)
+
+
+def scan_text(
+    text: str,
+    rules: RuleSet | None = None,
+    packs: list[str] | tuple[str, ...] | None = None,
+) -> list[str]:
+    """Scan text and return matched slop/cliche patterns."""
+    active_rules = rules or RuleSet.default()
+    if packs:
+        active_rules = active_rules.with_packs(list(packs))
+    regex = get_pattern_regex(active_rules.all_patterns())
+    return [match.group(0).lower() for match in regex.finditer(text)]
+
+
 def clean_record(record: JsonObject, record_id: str, options: CleanOptions) -> tuple[JsonObject, int]:
     cleaned = clone_json(record)
     rewritten_fields = 0
