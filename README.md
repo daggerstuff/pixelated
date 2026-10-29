@@ -43,8 +43,8 @@ unlock new paradigms for training, healing, and connection.
 | Requirement | Version | Check                 |
 | ----------- | ------- | --------------------- |
 | Node.js     | >= 24   | `node --version`      |
-| pnpm        | 11.24.0 | `pnpm --version`      |
-| Python      | 3.12+   | `python3 --version`   |
+| pnpm        | 12.16.1 | `pnpm --version`      |
+| Python      | 3.14    | `python3 --version`   |
 | uv          | latest  | `uv --version`        |
 | PostgreSQL  | 17+     | `psql --version`      |
 | Redis       | 7+      | `redis-cli --version` |
@@ -72,7 +72,7 @@ The app runs at **http://localhost:5173**.
 > **Submodule Note:** This repo uses three git submodules (`ai/`, `foresight/`,
 > `docs/`). After any clone or pull, run
 > `git submodule update --init --recursive` to sync them. Without this step,
-> those directories will be empty — including all 1,969 docs files.
+> those directories will be empty.
 
 ### All Services
 
@@ -82,7 +82,7 @@ To run the full stack (web + AI services + bias detection + analytics + worker):
 pnpm dev:all-services
 ```
 
-See [WALKTHROUGH.md](WALKTHROUGH.md) for the complete developer guide.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete developer guide.
 
 ---
 
@@ -149,6 +149,30 @@ uv run ruff check .       # Lint Python
 uv run ruff format .      # Format Python
 ```
 
+### The ai/ Training Submodule
+
+`ai/` is the Python training and research engine (Python 3.14, managed with
+`uv`). It is **not** part of the root uv workspace — it ships its own
+`pyproject.toml` and `uv.lock`:
+
+```bash
+cd ai
+uv sync                 # Create the submodule venv
+uv run pytest           # Full test suite
+make test               # Training test suite (matches CI)
+uv run ruff check .     # Lint
+```
+
+Training datasets are versioned with DVC (remote: Cloudflare R2,
+`pixel-archive/ai-data`); fetch them with `cd ai && dvc pull`.
+
+**CI gate:** the Quality workflow's `ai submodule strict ratchet` job
+(`scripts/ci/ai-strict-ratchet.mjs`) pins the submodule's legacy
+strict-typing debt per file and per error code in
+`scripts/ci/ai-strict-baseline.json`. It fails when that debt grows or a new
+`.py` file fails `mypy --strict` — new code must be strict-clean, and debt
+reductions are re-pinned with `--update` / `--prune`.
+
 ### Submodule Management
 
 ```bash
@@ -163,11 +187,11 @@ pnpm submodules:sync                      # Re-sync after pull
 | Layer           | Technology                                        |
 | --------------- | ------------------------------------------------- |
 | Frontend / SSR  | Astro 6 + React 19 (TypeScript, Tailwind CSS)     |
-| Backend / AI    | FastAPI / Express / Flask (Python 3.12+ via `uv`) |
+| Backend / AI    | FastAPI / Express / Flask (Python 3.14 via `uv`)  |
 | Database        | PostgreSQL 17 + pgvector                          |
 | Caching         | Redis                                             |
 | State           | Zustand                                           |
-| Package Manager | pnpm 11.24.0                                      |
+| Package Manager | pnpm 12.16.1                                      |
 | Runtime         | Node.js >= 24                                     |
 
 ---
@@ -175,8 +199,7 @@ pnpm submodules:sync                      # Re-sync after pull
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming, commit conventions,
-testing, and security rules. See [WALKTHROUGH.md](WALKTHROUGH.md) for the full
-developer walkthrough.
+testing, and security rules.
 
 ### Key Rules
 
@@ -190,7 +213,7 @@ developer walkthrough.
 
 ## Documentation
 
-The `docs/` submodule contains 1,969 files across 27 subdirectories. See
+The `docs/` submodule contains 980 files across 28 subdirectories. See
 [`DOCS.md`](DOCS.md) for a full index of all subdirectories, or browse the key
 areas below:
 
