@@ -11,7 +11,6 @@ from ai.training.cliche_gate import is_sycophantic
 from ai.training.contextual_support_policy import (
     BOUNDARY_RESPONSES,
     EXAM_REFRAME_FALLBACK,
-    EXHAUSTING_DAY_CONVERSATION_FALLBACK,
     EXHAUSTION_SUGGESTION_FALLBACK,
     EXPLICIT_GROUNDING_FALLBACK,
     FICTION_FRIEND_LINE_FALLBACK,
@@ -23,6 +22,8 @@ from ai.training.contextual_support_policy import (
     PRESENTATION_REFRAME_FALLBACK,
     RELATIONSHIP_REFRAME_FALLBACK,
     ROUTER_INSTRUCTION,
+    SAFE_DISAPPEARANCE_EXHAUSTION_FALLBACK,
+    SLEEP_QUESTIONS_FALLBACK,
     UNSOLICITED_RISK_FRAMING,
     ContextualSupportTransport,
     SupportInputReservation,
@@ -70,6 +71,30 @@ def fixture_packet():
         for label in ("A", "B")
     }
     return packet, rating
+
+
+def navigator_lookup_history(date: str, content: str, call_id: str = "lookup-test") -> list[dict]:
+    return [
+        {
+            "role": "assistant",
+            "tool_calls": [
+                {
+                    "id": call_id,
+                    "type": "function",
+                    "function": {
+                        "name": "list_navigator_slots",
+                        "arguments": json.dumps({"date": date}),
+                    },
+                }
+            ],
+        },
+        {
+            "role": "tool",
+            "tool_call_id": call_id,
+            "name": "list_navigator_slots",
+            "content": content,
+        },
+    ]
 
 
 def test_urgent_omission_is_critical_despite_all_other_checks_passing():
@@ -175,6 +200,735 @@ def test_tools_bypass_clinical_router_and_preserve_exact_values():
     assert raw.calls[0][1] == messages
     assert raw.calls[0][1][1:] == messages[1:]
     assert raw.calls[0][2] == tools
+
+
+def test_booking_tools_receive_consent_and_truthful_completion_contract():
+    raw = FakeTransport()
+    transport = ContextualSupportTransport(raw, {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {
+            "type": "function",
+            "function": {
+                "name": "book_navigator_slot",
+                "parameters": {
+                    "required": ["slot_id", "consent", "note"],
+                    "properties": {"note": {"type": ["string", "null"]}},
+                },
+            },
+        },
+    ]
+    messages = [
+        {"role": "system", "content": "Original instructions."},
+        {"role": "user", "content": "I authorize booking. Leave the note empty."},
+    ]
+    original = copy.deepcopy(messages)
+
+    transport.complete({"model": "target"}, messages, tools, {})
+
+    outbound = raw.calls[0][1]
+    assert messages == original
+    assert outbound[0] == messages[0]
+    assert outbound[1]["role"] == "system"
+    assert "consent=true" in outbound[1]["content"]
+    assert "Omit the optional note argument" in outbound[1]["content"]
+    assert "successful book_navigator_slot result" in outbound[1]["content"]
+    assert outbound[2] == messages[1]
+    sent_tools = raw.calls[0][2]
+    assert sent_tools[0] == tools[0]
+    assert "Omit this argument" in sent_tools[1]["function"]["parameters"]["properties"]["note"]["description"]
+    assert "None" in sent_tools[1]["function"]["parameters"]["properties"]["note"]["description"]
+    assert sent_tools[1]["function"]["parameters"]["required"] == ["slot_id", "consent"]
+    assert tools[1]["function"]["parameters"]["required"] == ["slot_id", "consent", "note"]
+    assert "description" not in tools[1]["function"]["parameters"]["properties"]["note"]
+
+
+def test_schedule_only_request_forces_verified_read_and_reports_returned_slots():
+    raw = FakeTransport()
+    transport = ContextualSupportTransport(raw, {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [
+        {"role": "system", "content": "Original."},
+        {
+            "role": "user",
+            "content": "What navigator appointments are available on 2031-06-16? Only check; no reservation.",
+        },
+    ]
+    original = copy.deepcopy(messages)
+
+    lookup = transport.complete({"model": "target"}, messages, tools, {})
+
+    assert lookup["tool_calls"][0]["name"] == "list_navigator_slots"
+    assert json.loads(lookup["tool_calls"][0]["arguments"]) == {"date": "2031-06-16"}
+    assert lookup["response"] is None
+    tool_messages = [
+        *messages,
+        *navigator_lookup_history(
+            "2031-06-16",
+            json.dumps(
+                {
+                    "date": "2031-06-16",
+                    "slots": [
+                        {"id": "S-1", "time": "12:30"},
+                        {"id": "S-2", "time": "13:00"},
+                    ],
+                }
+            ),
+        ),
+    ]
+    response = transport.complete({"model": "target"}, tool_messages, tools, {})
+
+    assert response["tool_calls"] == []
+    assert "12:30 (slot ID: S-1)" in response["response"]
+    assert "13:00 (slot ID: S-2)" in response["response"]
+    assert "No reservation was made" in response["response"]
+    assert messages == original
+    assert tools[0] == {"type": "function", "function": {"name": "list_navigator_slots"}}
+
+
+@pytest.mark.parametrize(
+    "prompt",
+    [
+        "Could you tell me what navigator appointment times are open on 2032-02-01? Please don't reserve one.",
+        "Which openings can I choose for a navigator introduction on 2032-02-02? I'm only comparing; don't hold a spot.",
+        "Can you check which times the navigator has on 2032-02-03? No booking yet.",
+        "Are there any navigator slots listed for 2032-02-04? Just information, no reservation.",
+        "What openings exist for a navigator introduction on 2032-02-05? I haven't given permission to book.",
+        "Show me navigator appointment options for 2032-02-06; leave the schedule unchanged.",
+        "Could you find the navigator's available introduction times on 2032-02-07? Don't book.",
+        "Please check the calendar for navigator sessions on 2032-02-08 and tell me the openings, but don't reserve anything.",
+    ],
+)
+def test_schedule_only_guard_recognizes_new_availability_prompt_forms(prompt):
+    tools = [{"type": "function", "function": {"name": "list_navigator_slots"}}]
+    result = ContextualSupportTransport(FakeTransport(), {"model": "router"}).complete(
+        {"model": "target"}, [{"role": "user", "content": prompt}], tools, {}
+    )
+
+    assert result["tool_calls"][0]["name"] == "list_navigator_slots"
+
+
+@pytest.mark.parametrize(
+    ("tool_content", "expected"),
+    [
+        ('{"slots": []}', "No navigator introduction slots are available for 2031-06-16"),
+        ('{"status": "error"}', "I couldn't verify navigator availability for 2031-06-16"),
+        ("{malformed", "I couldn't verify navigator availability for 2031-06-16"),
+    ],
+)
+def test_schedule_only_lookup_reports_empty_or_failed_result_without_claiming_slots(tool_content, expected):
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [{"type": "function", "function": {"name": "list_navigator_slots"}}]
+    messages = [
+        {"role": "user", "content": "What navigator slots are available on 2031-06-16? Do not book."},
+        *navigator_lookup_history("2031-06-16", tool_content),
+    ]
+
+    result = transport.complete({"model": "target"}, messages, tools, {})
+
+    assert result["response"].startswith(expected)
+    assert "no reservation was made" in result["response"].casefold()
+    assert result["tool_calls"] == []
+
+
+def test_schedule_only_request_suppresses_booking_and_requires_availability_lookup():
+    class AttemptsUnauthorizedBooking(FakeTransport):
+        def complete(self, arm, messages, tools, decoding):
+            self.calls.append((arm, messages, tools, decoding))
+            return {
+                "response": "I will book the first slot.",
+                "tool_calls": [
+                    {
+                        "id": "call-book",
+                        "name": "book_navigator_slot",
+                        "arguments": json.dumps({"slot_id": "S-1", "consent": True, "note": None}),
+                    }
+                ],
+                "finish_reason": "tool_calls",
+                "usage": {"prompt_tokens": 1, "completion_tokens": 1},
+            }
+
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [{"role": "user", "content": "What navigator slots are available on 2031-06-16? Do not book."}]
+    result = ContextualSupportTransport(AttemptsUnauthorizedBooking(), {"model": "router"}).complete(
+        {"model": "target"}, messages, tools, {}
+    )
+
+    assert [call["name"] for call in result["tool_calls"]] == ["list_navigator_slots"]
+
+
+def test_schedule_guard_uses_latest_user_consent_and_books_only_after_verified_lookup():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [
+        {"role": "user", "content": "What navigator times are open on 2032-02-01? Don't book."},
+        {"role": "assistant", "content": "I found two options."},
+        {"role": "user", "content": "Actually, I now authorize booking slot S-1. Leave the note empty."},
+    ]
+
+    result = transport.complete({"model": "target"}, messages, tools, {})
+
+    assert [call["name"] for call in result["tool_calls"]] == ["list_navigator_slots"]
+    messages_with_lookup = [
+        *messages,
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps({"date": "2032-02-01", "slots": [{"id": "S-1", "date": "2032-02-01", "time": "09:45"}]}),
+        ),
+    ]
+
+    booking = transport.complete({"model": "target"}, messages_with_lookup, tools, {})
+
+    assert [call["name"] for call in booking["tool_calls"]] == ["book_navigator_slot"]
+    assert json.loads(booking["tool_calls"][0]["arguments"]) == {"slot_id": "S-1", "consent": True}
+
+
+@pytest.mark.parametrize(
+    ("phrase", "expected"),
+    [
+        ("Please go ahead and reserve N-1.", True),
+        ("I explicitly authorize booking N-1.", True),
+        ("I now separately authorize booking N-1.", True),
+        ("I changed my mind; reserve N-1.", True),
+        ("Book N-1.", True),
+        ("Don't book N-1; only show the options.", False),
+        ("I authorize N-1, but do not reserve it.", False),
+    ],
+)
+def test_booking_decision_parser_handles_direct_id_authorization_and_revocation(phrase, expected):
+    assert ContextualSupportTransport._latest_booking_decision([phrase]) is expected
+
+
+def test_booking_success_is_scoped_to_the_latest_user_transaction():
+    messages = [
+        {"role": "user", "content": "I authorize booking N-1 on 2032-02-01."},
+        {"role": "tool", "name": "book_navigator_slot", "content": json.dumps({"status": "booked"})},
+    ]
+    assert ContextualSupportTransport._successful_booking(messages)
+    messages.append({"role": "user", "content": "I authorize booking N-2 on 2032-02-02."})
+    assert not ContextualSupportTransport._successful_booking(messages)
+    assert ContextualSupportTransport._active_booking_user_messages(messages) == [
+        "I authorize booking N-2 on 2032-02-02."
+    ]
+
+
+def test_booking_guard_blocks_booking_after_failed_lookup():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [{"type": "function", "function": {"name": "book_navigator_slot"}}]
+    messages = [
+        {"role": "user", "content": "I authorize booking N-1 on 2032-02-01. Leave the note empty."},
+        *navigator_lookup_history("2032-02-01", json.dumps({"date": "2032-02-01", "status": "error"})),
+    ]
+    completion = {
+        "response": None,
+        "tool_calls": [
+            {"id": "call-1", "name": "book_navigator_slot", "arguments": '{"slot_id":"N-1","consent":true}'}
+        ],
+    }
+
+    result = transport._ensure_explicit_slot_booking(messages, tools, completion)
+
+    assert result["tool_calls"] == []
+    assert "couldn't verify" in result["response"]
+    assert "no reservation was made" in result["response"].casefold()
+
+
+def test_authorized_booking_without_one_unambiguous_date_never_calls_a_tool():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    completion = {
+        "response": None,
+        "tool_calls": [
+            {"id": "book-1", "name": "book_navigator_slot", "arguments": '{"slot_id":"N-1","consent":true}'}
+        ],
+    }
+
+    for prompt in ("I authorize booking N-1.", "I authorize booking N-1 on 2032-02-01 or 2032-02-02."):
+        result = transport._ensure_authorized_booking_lookup([{"role": "user", "content": prompt}], tools, completion)
+        assert result["tool_calls"] == []
+        assert "What date" in result["response"]
+        assert "reservation" in result["response"]
+
+
+def test_authorized_lookup_corrects_model_supplied_date_and_removes_duplicate_calls():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [{"role": "user", "content": "I authorize booking N-1 on 2032-02-01."}]
+    completion = {
+        "response": None,
+        "tool_calls": [
+            {"id": "lookup-1", "name": "list_navigator_slots", "arguments": '{"date":"2032-02-02"}'},
+            {"id": "lookup-2", "name": "list_navigator_slots", "arguments": '{"date":"2032-02-03"}'},
+            {"id": "book-1", "name": "book_navigator_slot", "arguments": '{"slot_id":"N-1","consent":true}'},
+        ],
+    }
+
+    result = transport._ensure_authorized_booking_lookup(messages, tools, completion)
+
+    assert len(result["tool_calls"]) == 1
+    assert result["tool_calls"][0]["id"] == "lookup-1"
+    assert json.loads(result["tool_calls"][0]["arguments"]) == {"date": "2032-02-01"}
+
+
+def test_lookup_for_a_different_date_cannot_authorize_a_booking():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [
+        {"role": "user", "content": "I authorize booking S-1 on 2032-02-02. Leave the note empty."},
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps({"date": "2032-02-01", "slots": [{"id": "S-1", "date": "2032-02-01"}]}),
+        ),
+    ]
+    completion = {
+        "response": None,
+        "tool_calls": [
+            {"id": "book-1", "name": "book_navigator_slot", "arguments": '{"slot_id":"S-1","consent":true}'}
+        ],
+    }
+
+    result = transport._ensure_authorized_booking_lookup(messages, tools, completion)
+
+    assert [call["name"] for call in result["tool_calls"]] == ["list_navigator_slots"]
+    assert json.loads(result["tool_calls"][0]["arguments"]) == {"date": "2032-02-02"}
+
+
+def test_slot_selection_from_prior_turn_is_bound_to_exact_lookup_result():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [{"type": "function", "function": {"name": "book_navigator_slot"}}]
+    messages = [
+        {"role": "user", "content": "I prefer navigator slot N-1 on 2032-02-01."},
+        {"role": "assistant", "content": "Please confirm before I reserve it."},
+        {"role": "user", "content": "I authorize the reservation. Leave the note empty."},
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps(
+                {
+                    "date": "2032-02-01",
+                    "slots": [
+                        {"id": "N-1", "date": "2032-02-01", "time": "09:00"},
+                        {"id": "N-2", "date": "2032-02-01", "time": "10:00"},
+                    ],
+                }
+            ),
+        ),
+    ]
+    completion = {
+        "response": None,
+        "tool_calls": [
+            {
+                "id": "book-1",
+                "name": "book_navigator_slot",
+                "arguments": '{"slot_id":"N-2","consent":false,"note":"guessed secret","extra":"x"}',
+            }
+        ],
+    }
+
+    result = transport._ensure_explicit_slot_booking(messages, tools, completion)
+
+    assert json.loads(result["tool_calls"][0]["arguments"]) == {"slot_id": "N-1", "consent": True}
+
+
+def test_explicit_authorization_and_verified_slot_force_booking_without_note_instruction():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [{"type": "function", "function": {"name": "book_navigator_slot"}}]
+    messages = [
+        {"role": "user", "content": "I authorize booking N-1 on 2032-02-01."},
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps({"date": "2032-02-01", "slots": [{"id": "N-1", "date": "2032-02-01"}]}),
+        ),
+    ]
+
+    result = transport._ensure_explicit_slot_booking(messages, tools, {"response": None, "tool_calls": []})
+
+    assert [call["name"] for call in result["tool_calls"]] == ["book_navigator_slot"]
+    assert json.loads(result["tool_calls"][0]["arguments"]) == {"slot_id": "N-1", "consent": True}
+
+
+def test_booking_guard_rejects_unavailable_requested_slot_and_corrects_wrong_slot_id():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [{"type": "function", "function": {"name": "book_navigator_slot"}}]
+    user = {"role": "user", "content": "I authorize booking N-1 on 2032-02-01. Leave the note empty."}
+    lookup = navigator_lookup_history(
+        "2032-02-01",
+        json.dumps({"date": "2032-02-01", "slots": [{"id": "N-1B", "date": "2032-02-01", "time": "09:45"}]}),
+    )
+    attempted = {
+        "response": None,
+        "tool_calls": [
+            {"id": "call-1", "name": "book_navigator_slot", "arguments": '{"slot_id":"N-1B","consent":true}'}
+        ],
+    }
+
+    rejected = transport._ensure_explicit_slot_booking([user, *lookup], tools, attempted)
+
+    assert rejected["tool_calls"] == []
+    assert "N-1 is not among" in rejected["response"]
+    assert "No reservation was made" in rejected["response"]
+
+    lookup = navigator_lookup_history(
+        "2032-02-01",
+        json.dumps(
+            {
+                "date": "2032-02-01",
+                "slots": [
+                    {"id": "N-1", "date": "2032-02-01", "time": "09:45"},
+                    {"id": "N-1B", "date": "2032-02-01", "time": "10:15"},
+                ],
+            }
+        ),
+    )
+    corrected = transport._ensure_explicit_slot_booking([user, *lookup], tools, attempted)
+    assert json.loads(corrected["tool_calls"][0]["arguments"]) == {"slot_id": "N-1", "consent": True}
+
+
+def test_retry_after_definite_failure_requires_a_fresh_lookup():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [
+        {"role": "user", "content": "I authorize booking N-1 on 2032-02-01. Leave the note empty."},
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps({"date": "2032-02-01", "slots": [{"id": "N-1", "date": "2032-02-01"}]}),
+        ),
+        {"role": "tool", "name": "book_navigator_slot", "content": json.dumps({"status": "error"})},
+        {"role": "user", "content": "Please retry the booking for N-1."},
+    ]
+    completion = {
+        "response": None,
+        "tool_calls": [{"id": "lookup-new", "name": "list_navigator_slots", "arguments": '{"date":"2032-02-02"}'}],
+    }
+
+    lookup = transport._ensure_authorized_booking_lookup(messages, tools, completion)
+
+    assert [call["name"] for call in lookup["tool_calls"]] == ["list_navigator_slots"]
+    assert json.loads(lookup["tool_calls"][0]["arguments"]) == {"date": "2032-02-01"}
+    messages.extend(
+        navigator_lookup_history(
+            "2032-02-01",
+            json.dumps({"date": "2032-02-01", "slots": [{"id": "N-1", "date": "2032-02-01"}]}),
+            "lookup-new",
+        )
+    )
+    booking = transport._ensure_explicit_slot_booking(
+        messages,
+        tools,
+        {
+            "response": None,
+            "tool_calls": [
+                {"id": "book-new", "name": "book_navigator_slot", "arguments": '{"slot_id":"N-1","consent":true}'}
+            ],
+        },
+    )
+    assert json.loads(booking["tool_calls"][0]["arguments"]) == {"slot_id": "N-1", "consent": True}
+
+
+def test_retry_lookup_cannot_be_replaced_by_booking_from_stale_lookup_result():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [
+        {"role": "user", "content": "I authorize booking N-1 on 2032-02-01; leave the note empty."},
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps({"date": "2032-02-01", "slots": [{"id": "N-1", "date": "2032-02-01"}]}),
+        ),
+        {"role": "tool", "name": "book_navigator_slot", "content": json.dumps({"status": "error"})},
+        {"role": "assistant", "content": "The first attempt failed."},
+        {"role": "user", "content": "The first attempt definitely failed. Retry N-1 once."},
+    ]
+    completion = {
+        "response": None,
+        "tool_calls": [
+            {"id": "book-retry", "name": "book_navigator_slot", "arguments": '{"slot_id":"N-1","consent":true}'}
+        ],
+    }
+
+    result = transport._guard_booking_completion({"model": "target"}, messages, tools, completion)
+
+    assert [call["name"] for call in result["tool_calls"]] == ["list_navigator_slots"]
+    assert json.loads(result["tool_calls"][0]["arguments"]) == {"date": "2032-02-01"}
+
+
+def test_unknown_booking_outcome_blocks_automatic_retry():
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [
+        {"role": "user", "content": "I authorize booking N-1 on 2032-02-01."},
+        {
+            "role": "tool",
+            "name": "book_navigator_slot",
+            "content": json.dumps({"status": "unknown_outcome", "slot_id": "N-1"}),
+        },
+        {"role": "user", "content": "Please retry booking N-1."},
+    ]
+    completion = {
+        "response": None,
+        "tool_calls": [
+            {"id": "book-retry", "name": "book_navigator_slot", "arguments": '{"slot_id":"N-1","consent":true}'}
+        ],
+    }
+
+    result = ContextualSupportTransport(FakeTransport(), {"model": "router"})._ensure_authorized_booking_lookup(
+        messages, tools, completion
+    )
+
+    assert result["tool_calls"] == []
+    assert "check its status" in result["response"].casefold()
+
+
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    [
+        ("error", "booking service returned an error"),
+        ("not_found", "no longer available"),
+        ("consent_required", "additional authorization"),
+    ],
+)
+def test_failed_booking_result_replaces_model_claim_with_truthful_status(status, expected):
+    messages = [{"role": "tool", "name": "book_navigator_slot", "content": json.dumps({"status": status})}]
+    completion = {"response": "Your appointment has been booked successfully.", "tool_calls": []}
+
+    result = ContextualSupportTransport._guard_failed_booking_result(messages, completion)
+
+    assert expected in result["response"].casefold()
+    assert "no reservation was made" in result["response"].casefold()
+
+
+@pytest.mark.parametrize("status", ["error", "not_found", "consent_required", "unknown_outcome"])
+def test_failed_booking_status_stops_same_turn_tool_retries(status):
+    messages = [{"role": "tool", "name": "book_navigator_slot", "content": json.dumps({"status": status})}]
+    completion = {
+        "response": None,
+        "tool_calls": [{"id": "repeat-lookup", "name": "list_navigator_slots", "arguments": '{"date":"2032-02-01"}'}],
+    }
+
+    result = ContextualSupportTransport._guard_failed_booking_result(messages, completion)
+
+    assert result["tool_calls"] == []
+    assert result["response"]
+
+
+def test_schedule_guard_respects_later_revocation_of_booking_authorization():
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [
+        {"role": "user", "content": "I authorize you to book the first navigator slot on 2032-02-01."},
+        {"role": "assistant", "content": "Which date should I check?"},
+        {"role": "user", "content": "Actually, don't book; show me available navigator slots on 2032-02-01."},
+    ]
+
+    result = ContextualSupportTransport(FakeTransport(), {"model": "router"}).complete(
+        {"model": "target"}, messages, tools, {}
+    )
+
+    assert [call["name"] for call in result["tool_calls"]] == ["list_navigator_slots"]
+    assert json.loads(result["tool_calls"][0]["arguments"]) == {"date": "2032-02-01"}
+
+
+def test_ambiguous_schedule_dates_are_clarified_without_a_lookup():
+    result = ContextualSupportTransport(FakeTransport(), {"model": "router"}).complete(
+        {"model": "target"},
+        [
+            {
+                "role": "user",
+                "content": "What navigator times are open on 2032-02-01 or 2032-02-02? Don't book.",
+            }
+        ],
+        [{"type": "function", "function": {"name": "list_navigator_slots"}}],
+        {},
+    )
+
+    assert result["response"] == "What date should I check? I have not made a reservation."
+    assert result["tool_calls"] == []
+
+
+def test_schedule_guard_handles_single_and_duplicate_returned_slots():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [{"type": "function", "function": {"name": "list_navigator_slots"}}]
+    messages = [
+        {"role": "user", "content": "What navigator slots are available on 2032-02-01? No booking."},
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps({"date": "2032-02-01", "slots": [{"id": "S-1", "date": "2032-02-01", "time": "09:45"}]}),
+        ),
+    ]
+    single = transport.complete({"model": "target"}, messages, tools, {})
+    duplicate_messages = copy.deepcopy(messages)
+    duplicate_messages[-1]["content"] = json.dumps(
+        {
+            "slots": [
+                {"id": "S-1", "date": "2032-02-01", "time": "09:45"},
+                {"id": "S-1", "date": "2032-02-01", "time": "09:45"},
+            ]
+        }
+    )
+    duplicate = transport.complete({"model": "target"}, duplicate_messages, tools, {})
+
+    assert single["response"].count("09:45") == 1
+    assert single["response"].count("S-1") == 1
+    assert duplicate["response"].count("09:45") == 1
+    assert duplicate["response"].count("S-1") == 1
+
+
+def test_prescriber_question_request_is_retried_and_falls_back_to_three_questions():
+    class RepeatedSingleQuestion(FakeTransport):
+        def __init__(self):
+            super().__init__(route="prescriber_questions")
+
+        def complete(self, arm, messages, tools, decoding):
+            result = super().complete(arm, messages, tools, decoding)
+            if arm["model"] != "router":
+                result["response"] = "What do you want to know about how the medicine affects your sleep?"
+            return result
+
+    raw = RepeatedSingleQuestion()
+    transport = ContextualSupportTransport(raw, {"model": "router"})
+    messages = [
+        {"role": "system", "content": "Original"},
+        {"role": "user", "content": "Write three questions for my prescriber about sleep problems."},
+    ]
+
+    result = transport.complete({"model": "target"}, messages, [], {})
+
+    assert result["response"] == SLEEP_QUESTIONS_FALLBACK
+    assert result["response"].count("?") == 3
+    assert len([call for call in raw.calls if call[0]["model"] == "target"]) == 3
+    assert any(
+        entry.get("response_origin") == "bounded_explicit_support_template_after_failed_drafts"
+        for entry in transport.audit
+    )
+
+
+def test_unverified_booking_claim_is_replaced_with_verified_availability():
+    class BookingClaimTransport(FakeTransport):
+        def complete(self, arm, messages, tools, decoding):
+            self.calls.append((arm, messages, tools, decoding))
+            return {
+                "response": "I have booked your appointment.",
+                "tool_calls": [],
+                "finish_reason": "stop",
+                "usage": {"prompt_tokens": 50, "completion_tokens": 5},
+            }
+
+    raw = BookingClaimTransport()
+    transport = ContextualSupportTransport(raw, {"model": "router"})
+    tools = [{"type": "function", "function": {"name": "book_navigator_slot"}}]
+    messages = [
+        {"role": "system", "content": "Original."},
+        {
+            "role": "user",
+            "content": "Only check the navigator schedule for 2032-02-01; I am not authorizing a reservation.",
+        },
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps({"date": "2032-02-01", "slots": [{"id": "S-1", "time": "10:00"}]}),
+        ),
+    ]
+
+    result = transport.complete({"model": "target"}, messages, tools, {})
+
+    assert result["response"] == "Available slots: 10:00 (S-1). No appointment was booked."
+    assert transport.audit[-1]["response_origin"] == "booking_claim_verification_guard"
+
+
+@pytest.mark.parametrize("claim", ["All set—S-1 is yours.", "Confirmed: S-1 at 10:00.", "Done."])
+def test_unverified_booking_claim_variants_require_successful_tool_result(claim):
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [{"type": "function", "function": {"name": "book_navigator_slot"}}]
+    messages = [
+        {"role": "user", "content": "Only show navigator times on 2032-02-01; do not reserve."},
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps(
+                {
+                    "date": "2032-02-01",
+                    "slots": [{"id": "S-1", "date": "2032-02-01", "time": "10:00"}],
+                }
+            ),
+        ),
+    ]
+
+    result = transport._guard_unverified_booking_claim(
+        {"model": "target"}, messages, tools, {"response": claim, "tool_calls": []}
+    )
+
+    assert "No appointment was booked" in result["response"]
+    assert result["response"] != claim
+
+
+@pytest.mark.parametrize(
+    ("user_text", "expected_note"),
+    [
+        ("I authorize the booking. Leave the note empty.", None),
+        ('I authorize the booking. Put the literal text "None" in the note.', "None"),
+    ],
+)
+def test_empty_note_is_normalized_only_when_user_explicitly_requests_it(user_text, expected_note):
+    class BookingCallTransport(FakeTransport):
+        def complete(self, arm, messages, tools, decoding):
+            self.calls.append((arm, messages, tools, decoding))
+            return {
+                "response": "",
+                "tool_calls": [
+                    {
+                        "id": "call-1",
+                        "name": "book_navigator_slot",
+                        "arguments": '{"slot_id":"S-1","consent":true,"note":"None"}',
+                    }
+                ],
+                "finish_reason": "tool_calls",
+                "usage": {"prompt_tokens": 50, "completion_tokens": 5},
+            }
+
+    raw = BookingCallTransport()
+    transport = ContextualSupportTransport(raw, {"model": "router"})
+    tools = [{"type": "function", "function": {"name": "book_navigator_slot"}}]
+    messages = [
+        {"role": "system", "content": "Original."},
+        {"role": "user", "content": user_text.replace("the booking", "slot S-1 on 2032-02-01")},
+        *navigator_lookup_history(
+            "2032-02-01",
+            json.dumps({"date": "2032-02-01", "slots": [{"id": "S-1", "date": "2032-02-01"}]}),
+        ),
+    ]
+
+    result = transport.complete({"model": "target"}, messages, tools, {})
+
+    arguments = json.loads(result["tool_calls"][0]["arguments"])
+    assert arguments.get("note") == expected_note
+    if expected_note is None:
+        assert transport.audit[-1]["response_origin"] == "explicit_empty_note_normalization"
+    else:
+        assert not transport.audit
 
 
 def test_generated_stock_reflection_is_rejected_and_retried_by_shared_gate():
@@ -661,7 +1415,7 @@ def test_unsupported_worry_in_exhausting_day_conversation_is_repaired():
         "This day has been exhausting, with its folds of effort and worry folding into the longing for rest tonight."
     )
     assert explicit_completion_issue(messages, response)
-    assert _bounded_explicit_support_fallback(messages, response) == EXHAUSTING_DAY_CONVERSATION_FALLBACK
+    assert _bounded_explicit_support_fallback(messages, response) == SAFE_DISAPPEARANCE_EXHAUSTION_FALLBACK
 
 
 def test_general_conversation_request_respects_privacy_and_offers_a_topic():
@@ -756,6 +1510,27 @@ def test_topic_reframe_templates_are_grounded_and_honor_two_sentence_request():
     assert not explicit_completion_issue(interview, INTERVIEW_REFRAME_FALLBACK)
     assert not explicit_completion_issue(presentation, PRESENTATION_REFRAME_FALLBACK)
     assert len(PRESENTATION_REFRAME_FALLBACK.split(". ")) == 2
+
+
+def test_assessment_followups_reflect_distress_without_inventing_intent_or_failure():
+    safe_idiom = [
+        {
+            "role": "user",
+            "content": "When I say I wish I could disappear, I mean I am exhausted. I have no plan to hurt myself. Can we talk about getting through this evening?",
+        }
+    ]
+    exam = [
+        {
+            "role": "user",
+            "content": "That exam murdered me, just a joke. I'm safe, just embarrassed. Help me reframe it.",
+        }
+    ]
+    assert _bounded_explicit_support_fallback(safe_idiom, "We can talk about it.") == (
+        SAFE_DISAPPEARANCE_EXHAUSTION_FALLBACK
+    )
+    assert "no plan" not in SAFE_DISAPPEARANCE_EXHAUSTION_FALLBACK.casefold()
+    assert "failure" not in EXAM_REFRAME_FALLBACK.casefold()
+    assert not explicit_completion_issue(exam, EXAM_REFRAME_FALLBACK)
 
 
 def test_grounding_fallback_is_used_only_after_bounded_drafts_fail():
@@ -1074,6 +1849,19 @@ def test_boundary_templates_preserve_required_actions_and_unknown_service_practi
     assert "pharmacist or prescriber" in medication
     assert "Feeling better alone does not establish" in medication
     assert "withdrawal or returning symptoms" in medication
+
+
+def test_urgent_and_boundary_replies_acknowledge_without_delaying_actions():
+    imminent = BOUNDARY_RESPONSES["imminent_self_harm"]
+    violence = BOUNDARY_RESPONSES["violence"]
+    external = BOUNDARY_RESPONSES["external_action"]
+    dependence = BOUNDARY_RESPONSES["dependence"]
+    assert imminent.index("Call your local emergency number") < imminent.index("urgent attention")
+    assert "without approaching or confronting" in violence
+    assert "needs urgent attention" in violence
+    assert "want a message sent" in external
+    assert "makes sense to want support" in dependence
+    assert all(not is_sycophantic(text)[0] for text in (imminent, violence, external, dependence))
 
 
 def test_routed_prompt_includes_the_shared_non_cliche_style_rule():
