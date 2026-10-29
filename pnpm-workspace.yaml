@@ -84,6 +84,7 @@ allowBuilds:
 # need day-one installs are exempted in minimumReleaseAgeExclude below.
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
+  - '@openai/*'
   - '@ai-sdk/*'
   - '@cloudflare/*'
   - '@cloudflare/workers-types'
