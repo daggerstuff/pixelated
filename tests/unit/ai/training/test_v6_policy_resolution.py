@@ -931,6 +931,48 @@ def test_empty_note_is_normalized_only_when_user_explicitly_requests_it(user_tex
         assert not transport.audit
 
 
+@pytest.mark.parametrize(
+    ("second_booking_request", "expected"),
+    [
+        ("I authorize a separate booking for S-2.", "Note: none"),
+        ("I authorize a separate booking for S-2. Leave its note blank.", "Note: none (as you specified)"),
+    ],
+)
+def test_note_instruction_and_attribution_are_scoped_to_the_current_booking(second_booking_request, expected):
+    class NoteScopeTransport(FakeTransport):
+        def complete(self, arm, messages, tools, decoding):
+            self.calls.append((arm, messages, tools, decoding))
+            return {
+                "response": "Your second booking is complete.\n- Note: none (as you specified)",
+                "tool_calls": [],
+                "finish_reason": "stop",
+                "usage": {"prompt_tokens": 50, "completion_tokens": 5},
+            }
+
+    messages = [
+        {"role": "user", "content": "I authorize S-1. Leave the note empty."},
+        {"role": "tool", "name": "book_navigator_slot", "content": '{"status":"booked"}'},
+        {"role": "user", "content": second_booking_request},
+        {"role": "assistant", "tool_calls": [{"id": "lookup-2"}]},
+        {"role": "tool", "name": "list_navigator_slots", "tool_call_id": "lookup-2", "content": '{"slots": []}'},
+        {"role": "assistant", "tool_calls": [{"id": "book-2"}]},
+        {"role": "tool", "name": "book_navigator_slot", "tool_call_id": "book-2", "content": '{"status":"booked"}'},
+    ]
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    result = ContextualSupportTransport(NoteScopeTransport(), {"model": "router"}).complete(
+        {"model": "target"}, messages, tools, {}
+    )
+
+    if "blank" in second_booking_request:
+        assert "(as you specified)" in result["response"]
+    else:
+        assert "(as you specified)" not in result["response"]
+    assert expected in result["response"]
+
+
 def test_generated_stock_reflection_is_rejected_and_retried_by_shared_gate():
     class ClicheRetryTransport(FakeTransport):
         def __init__(self):

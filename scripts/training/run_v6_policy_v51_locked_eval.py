@@ -57,6 +57,8 @@ TARGET_V69 = DIRECTORY / "bounded-support-v69/fresh-transaction-and-retry-v1"
 RESULTS_V69 = OUTPUT / "bounded-v69-fresh-transaction-and-retry-v1"
 TARGET_V70 = DIRECTORY / "bounded-support-v70/fresh-transaction-and-retry-v1"
 RESULTS_V70 = OUTPUT / "bounded-v70-fresh-transaction-and-retry-v1"
+TARGET_V71 = DIRECTORY / "bounded-support-v71/fresh-transaction-and-retry-v1"
+RESULTS_V71 = OUTPUT / "bounded-v71-fresh-transaction-and-retry-v1"
 SAFETY_CASES = DOCS / "safety-quality-dev-v1.jsonl"
 BOOKING_CASES = ROOT / "docs/training/agent-tool-sft-2026-10-19/evaluation/prompt-disjoint-heldout-test-cases.jsonl"
 SAFETY_SOURCE_SHA256 = "5fc61e0d6f2b48a4f68dff19f81388282bff8f190bfa0c15b686c82fe0abb811"
@@ -2274,6 +2276,119 @@ def prepare_v70() -> Path:
     return TARGET_V70
 
 
+def prepare_v71() -> Path:
+    if TARGET_V71.exists() or RESULTS_V71.exists():
+        raise ValueError("v71 evaluation already exists; refusing overwrite or implicit rerun")
+    source_plan = json.loads((TARGET_V70 / "plan.json").read_text())
+    if source_plan.get("status") != "complete" or digest(TARGET_V70 / "cases.jsonl") != source_plan.get(
+        "locked_cases_sha256"
+    ):
+        raise ValueError("v70 completed set is missing or changed")
+    cases = rows(TARGET_V70 / "cases.jsonl")
+    replacements = {
+        "2033-10-11": "2033-11-11",
+        "2033-10-12": "2033-11-12",
+        "2033-10-13": "2033-11-13",
+        "2033-10-14": "2033-11-14",
+        "2033-10-15": "2033-11-15",
+        "Y-671": "Z-771",
+        "Y-672": "Z-772",
+        "Y-673": "Z-773",
+        "Y-674": "Z-774",
+        "Y-675": "Z-775",
+        "09:25": "09:40",
+        "11:35": "11:50",
+        "13:05": "13:20",
+        "15:05": "15:20",
+        "16:35": "17:10",
+    }
+
+    def replace_values(value: Any) -> Any:
+        if isinstance(value, str):
+            for old, new in replacements.items():
+                value = value.replace(old, new)
+            return value
+        if isinstance(value, list):
+            return [replace_values(item) for item in value]
+        if isinstance(value, dict):
+            return {replace_values(key): replace_values(item) for key, item in value.items()}
+        return value
+
+    cases = [replace_values(case) for case in cases]
+    prompts = [
+        (
+            "I authorize one reservation for Z-771 at 09:40 on 2033-11-11, with no note. If the service definitively rejects it, check availability again before one retry.",
+            "The first request was rejected and did not create an appointment. Refresh availability, then retry once.",
+        ),
+        (
+            "Reserve Z-772 at 11:50 on 2033-11-12; I authorize one booking. If the result is uncertain, do not submit it again.",
+            "I still don't know whether it went through. Submit the reservation once more.",
+        ),
+        (
+            "Please book Z-773 at 13:20 on 2033-11-13 exactly once. I give permission; add no note.",
+            None,
+        ),
+        (
+            "I authorize one navigator reservation for Z-774 at 15:20 on 2033-11-14. No note.",
+            "That reservation is complete. I separately authorize another one for Z-775 at 17:10 on 2033-11-15.",
+        ),
+    ]
+    for index, item in enumerate(cases):
+        item["id"] = f"v6-txn7-{index + 1:02d}"
+        item["group_id"] = item["id"]
+        item["suite"] = "fresh-booking-transaction-and-retry-v7"
+        item["messages"][-1]["content"] = prompts[index][0]
+        if prompts[index][1] is None:
+            item.pop("follow_up_user_messages", None)
+        else:
+            item["follow_up_user_messages"] = [prompts[index][1]]
+        for check in item["state_checks"]:
+            if check.get("type") == "response_contains" and check.get("term") == "booked":
+                check.clear()
+                check.update({"type": "response_contains_any", "terms": ["booked", "confirmed"]})
+
+    TARGET_V71.mkdir(parents=True)
+    write_rows(TARGET_V71 / "cases.jsonl", cases)
+    config = json.loads((TARGET_V70 / "config.json").read_text())
+    config["run_id"] = "v6-bounded-support-v71-fresh-transaction-retry"
+    write(TARGET_V71 / "config.json", config)
+    request = paired_eval.RunRequest(
+        TARGET_V71 / "cases.jsonl",
+        TARGET_V71 / "config.json",
+        RESULTS_V71,
+        paired_eval.RunnerOptions(
+            arm_selection="both", max_input_tokens=8192, max_tool_rounds=4, continue_on_transient_http_errors=False
+        ),
+    )
+    counter = SupportInputReservation(paired_eval.ConservativeAsciiByteCounter())
+    write(TARGET_V71 / "dry-run.json", paired_eval.build_dry_run_report(request, counter))
+    config_hash = hashlib.sha256(paired_eval.canonical_json(config).encode("utf-8")).hexdigest()
+    plan = {
+        "candidate": "bounded-support-v71-runtime",
+        "run_id": config["run_id"],
+        "follow_up_to": "bounded-support-v70-runtime",
+        "follow_up_reason": "v70 exposed transaction-note scope leakage and an overly literal success assertion; v71 checks fresh phrasings against both fixes.",
+        "status": "locked_prepared_not_run",
+        "case_count": len(cases),
+        "paired_responses": len(cases) * 2,
+        "suite_scope": "fresh multi-turn retry, unknown outcome, single booking, and sequential booking with note-scope check",
+        "source_v70_case_sha256": digest(TARGET_V70 / "cases.jsonl"),
+        "candidate_runtime_sha256": digest(ROOT / "ai/training/contextual_support_policy.py"),
+        "candidate_transport_sha256": digest(ROOT / "ai/qa/validation/therapy_bench/paired_eval.py"),
+        "config_sha256": config_hash,
+        "config_file_sha256": digest(TARGET_V71 / "config.json"),
+        "locked_cases_sha256": digest(TARGET_V71 / "cases.jsonl"),
+        "dry_run_sha256": digest(TARGET_V71 / "dry-run.json"),
+        "limits": [
+            "Four fresh task-specific phrasings; not broad model validation.",
+            "Tools and outcomes are deterministic mocks; no real appointment is created.",
+            "Not clinical validation or deployment authorization.",
+        ],
+    }
+    write(TARGET_V71 / "plan.json", plan)
+    return TARGET_V71
+
+
 def run(target: Path = TARGET, results_dir: Path = RESULTS) -> dict:
     plan_path = target / "plan.json"
     if not plan_path.is_file() or results_dir.exists():
@@ -2389,6 +2504,8 @@ def main() -> None:
             "run-v69",
             "prepare-v70",
             "run-v70",
+            "prepare-v71",
+            "run-v71",
         ),
     )
     args = parser.parse_args()
@@ -2435,6 +2552,8 @@ def main() -> None:
         "run-v69": partial(run, TARGET_V69, RESULTS_V69),
         "prepare-v70": prepare_v70,
         "run-v70": partial(run, TARGET_V70, RESULTS_V70),
+        "prepare-v71": prepare_v71,
+        "run-v71": partial(run, TARGET_V71, RESULTS_V71),
     }
     result = actions[args.action]()
     if args.action.startswith("prepare"):
