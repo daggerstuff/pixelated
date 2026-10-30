@@ -1,0 +1,18 @@
+# Local assistant runner configuration.
+#
+# Validated by tests/test_config_lint.py before runtime loading:
+#   - [assistant] table is required and must carry an integer context_window
+#   - [routing] table is required
+# The schema reference lives at tests/fixtures/mock_configs/config.valid.toml.
+
+[assistant]
+name = "pixelated-local"
+model = "local/default"
+context_window = 32768
+temperature = 0.2
+
+[routing]
+strategy = "keyword"
+fallback_skill = "general-qa"
+skills_dir = "skills"
+timeout_ms = 250
