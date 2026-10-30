@@ -442,16 +442,12 @@ class Auth0WebAuthnService {
    * Generate a random challenge for WebAuthn operations
    */
   private generateChallenge(): string {
-    // Generate a random 32-byte challenge
+    // The WebAuthn challenge is a security boundary (replay protection), so it
+    // must come from a cryptographically secure RNG, never Math.random().
+    // Web Crypto's getRandomValues is available in both the browser and Node 18+
+    // (globalThis.crypto), so one path covers both without an insecure fallback.
     const array = new Uint8Array(32)
-    if (typeof window !== 'undefined') {
-      window.crypto.getRandomValues(array)
-    } else {
-      // Fallback for Node.js environment
-      for (let i = 0; i < array.length; i++) {
-        array[i] = Math.floor(Math.random() * 256)
-      }
-    }
+    globalThis.crypto.getRandomValues(array)
 
     // Convert to base64url encoding
     return Buffer.from(array).toString('base64url')
