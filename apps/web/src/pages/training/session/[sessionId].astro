@@ -4,6 +4,7 @@
 
 import Layout from '@/layouts/Layout.astro'
 import { getSession } from '@/lib/auth'
+import VitalsMonitorIsland from '@/components/simulation/VitalsMonitorIsland.tsx'
 
 type TrainingSessionResponse = {
   clientProfile: {
@@ -355,6 +356,11 @@ const isSupervisor = userRole === 'admin'
                   </span>
                 </div>
               </div>
+            </div>
+
+            {/* $1 */}
+            <div class="p-6 border-t border-border">
+              <VitalsMonitorIsland client:load {sessionId} />
             </div>
           </aside>
 
