@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url'
 
 /* jshint esversion: 6, node: true */
 // IMPORTANT: Import Sentry instrumentation first
-import '../instrument.mjs'
+import '../../config/instrument.mjs'
 
 // Get current directory
 const __filename = fileURLToPath(import.meta.url)

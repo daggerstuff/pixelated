@@ -57,11 +57,11 @@ format: ## Format all code
 format-check: ## Check formatting
 	pnpm format:check
 
-typecheck: ## Run TypeScript type check
-	pnpm typecheck
+typecheck: ## Run oxlint type-aware lint (see AGENTS.md — no tsc/astro check)
+	pnpm lint
 
-check-all: ## Run all checks (typecheck + lint + format)
-	pnpm check:all
+check-all: ## Run lint gates (formerly check:all; typecheck scripts removed)
+	pnpm lint
 
 # ── Docker ──────────────────────────────────────────────
 
