@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-// Minimal tag-manager.cjs for rollback workflow (CommonJS)
+// Minimal tag-manager.js for rollback workflow
 const { execFileSync } = require('child_process')
 const args = process.argv.slice(2)
 
 function usage() {
   console.log(
-    'Usage: node tag-manager.cjs <validate|create> <env> [--message="msg"] [--push]',
+    'Usage: node tag-manager.js <validate|create> <env> [--message="msg"] [--push]',
   )
   process.exit(1)
 }
@@ -24,7 +24,9 @@ function getTags(pattern) {
     const tags = execFileSync(
       'git',
       ['tag', '-l', pattern, '--sort=-committerdate'],
-      { encoding: 'utf8' },
+      {
+        encoding: 'utf8',
+      },
     )
     return tags.split('\n').filter(Boolean)
   } catch {
@@ -58,7 +60,7 @@ if (command === 'create') {
   try {
     execFileSync('git', ['tag', '-a', tagName, '-m', message || 'Rollback tag'])
     if (push) {
-      const remote = process.env.GIT_PUSH_REMOTE ?? 'origin'
+      const remote = process.env.GIT_PUSH_REMOTE || 'origin'
       execFileSync('git', ['push', remote, tagName])
     }
     console.log(`Created tag: ${tagName}`)
