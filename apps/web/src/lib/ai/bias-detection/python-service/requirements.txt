@@ -115,7 +115,7 @@ fairlearn==0.13.0
     # via bias-detection-service (pyproject.toml)
 fastapi==0.136.1
     # via bias-detection-service (pyproject.toml)
-filelock==4.2.4
+filelock==4.2.5
     # via
     #   bias-detection-service (pyproject.toml)
     #   datasets
