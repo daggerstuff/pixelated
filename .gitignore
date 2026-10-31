@@ -582,7 +582,6 @@ apps/web/src/layouts/TailusLayout.astro
 apps/web/src/lib/content/features.ts
 apps/web/src/lib/content/intro.ts
 apps/web/src/lib/content/scenarios.ts
-apps/web/src/lib/metaaligner/explainability/visualization.tsx
 apps/web/src/lib/services/emotionTracking.ts
 apps/web/src/lib/supabase.ts
 apps/web/src/lib/utils/code-splitting.ts
