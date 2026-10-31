@@ -379,9 +379,7 @@ async function checkReliabilityStandards(): Promise<ProductionReadinessCheck> {
 async function checkSecurityStandards(): Promise<ProductionReadinessCheck> {
   try {
     const securityChecks = [
-      existsSync(
-        path.join(REPO_ROOT, '.github/workflows/security-scanning.yml'),
-      ),
+      existsSync(path.join(REPO_ROOT, '.github/workflows/security.yml')),
       existsSync(path.join(REPO_ROOT, 'security-baseline.json')),
       existsSync(path.join(SRC_DIR, 'lib/security')),
     ]

@@ -54,7 +54,7 @@ This script checks for:
 ### 2. CI/CD Pipeline Integration
 
 The security checks are integrated into our GitHub Actions workflow
-(`.github/workflows/security-scanning.yml`) to ensure ongoing compliance:
+(`.github/workflows/security.yml` and `.github/workflows/security-deep.yml`) to ensure ongoing compliance:
 
 - Runs on every pull request and scheduled basis
 - Generates a detailed HIPAA compliance report
