@@ -225,8 +225,8 @@ html body {
 
 /* =============================================
    LEGACY COMPATIBILITY ALIASES (charliecreates PR #4932)
-   Layouts still consumed: BrutalistLayout, BlogLayout, TailusLayout,
-   ChatLayout, DocumentationLayout. Map the historical variable names
+   Layouts still consumed: BrutalistLayout, ChatLayout, DashboardLayout,
+   DocumentationLayout, TabbedLayout. Map the historical variable names
    onto the Neutral Precision ramp so the consumers stay renderable
    without importing additional stylesheets. All values resolve to
    zero-chroma NP tokens at the canonical elevation steps; no
