@@ -75,7 +75,7 @@ A vulnerability may be suppressed if **ALL** of the following are true:
 
 - [Vulnerability Suppression Policy](./vulnerability-suppression.md) —
   npm/Python dependency scanning
-- [Security Scanning Workflow](../../workflows/security-scanning.yml) — CI
+- [Security Deep Scan Workflow](../../workflows/security-deep.yml) — CI
   pipeline
 - [Dependabot Configuration](../../dependabot.yml) — automated dependency
   updates

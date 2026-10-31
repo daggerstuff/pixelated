@@ -45,7 +45,8 @@ verification:
 
 - **Security Scanning Workflow**: GitHub Actions workflow for comprehensive
   security scanning
-  - Located at `.github/workflows/security-scanning.yml`
+  - Located at `.github/workflows/security.yml` (fast lane) and
+    `.github/workflows/security-deep.yml` (deep scan)
   - Runs on all pull requests and schedules
   - Generates detailed compliance reports
 
