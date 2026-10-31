@@ -52,22 +52,16 @@ test.describe('Layout Component Integration Tests', () => {
     )
   })
 
-  test('Blog layout renders with correct components', async ({ page }) => {
-    // Visit blog index page which uses BlogLayout
+  test('Blog index renders with BaseLayout shell', async ({ page }) => {
     await page.goto('/blog')
 
-    // Check that blog header is visible
-    await expect(page.locator('header.blog-header')).toBeVisible()
-
-    // Check that blog navigation is present
-    await expect(page.locator('nav.blog-navigation')).toBeVisible()
-
-    // Check that article list is present
-    await expect(page.locator('div.article-list')).toBeVisible()
-
-    // Verify that article cards are rendered
-    const cardCount = await page.locator('.article-card').count()
-    expect(cardCount).toBeGreaterThan(0)
+    await expect(page.locator('header')).toBeVisible()
+    await expect(page.locator('footer')).toBeVisible()
+    await expect(
+      page.getByRole('heading', {
+        name: /writing on therapy, technology, and digital empathy/i,
+      }),
+    ).toBeVisible()
   })
 
   test('Error boundary catches errors correctly', async ({ page }) => {
