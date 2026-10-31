@@ -169,7 +169,7 @@ executing==2.2.1
     #   stack-data
 fairlearn==0.14.0
     # via -r requirements.txt
-filelock==4.2.4
+filelock==4.2.5
     # via
     #   -r requirements.txt
     #   datasets
@@ -731,7 +731,7 @@ pyarrow==25.0.1
     # via
     #   -r requirements.txt
     #   datasets
-pyasn1==0.6.4
+pyasn1==0.6.5
     # via
     #   -r requirements.txt
     #   oauth2client
