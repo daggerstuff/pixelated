@@ -1,6 +1,2 @@
 [permissions]
-allow = [
-  "Bash=pnpm run typecheck 2>&1 | head -50",
-  "Bash=NODE_OPTIONS='--max-old-space-size=8192' npx astro check 2>&1 | head -50",
-  "Bash=NODE_OPTIONS='--max-old-space-size=8192' npx astro check 2>&1 | tail -30",
-]
+allow = []
