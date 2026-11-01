@@ -1,0 +1,14 @@
+# Valid mock configuration for config-lint fixtures.
+# Mirrors the required shape of the repository root config.toml:
+# an [assistant] table with an integer context_window and a [routing] table.
+
+[assistant]
+name = "fixture-assistant"
+model = "local/mock-model"
+context_window = 8192
+temperature = 0.2
+
+[routing]
+strategy = "keyword"
+default_skill = "general-qa"
+timeout_ms = 250
