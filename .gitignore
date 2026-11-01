@@ -94,7 +94,16 @@ job.md
 KIMI.md
 PRODUCT.md
 scratch
-skills/
+# Agent runtime skill caches are local-only, but the repository's own skill
+# routing definitions (skills/*/SKILL.md) are source-controlled and are
+# validated by tests/test_skill_routing.py — un-ignore those.
+skills/*
+!skills/code-generator/
+!skills/code-review/
+!skills/documentation-drafter/
+!skills/general-qa/
+# Vendored agent skill catalog (installed copies) is a local cache.
+agent/
 skills-lock.json
 struct-agent-key.json
 TASTES.md
