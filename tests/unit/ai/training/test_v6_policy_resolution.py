@@ -300,6 +300,9 @@ def test_schedule_only_request_forces_verified_read_and_reports_returned_slots()
         "Show me navigator appointment options for 2032-02-06; leave the schedule unchanged.",
         "Could you find the navigator's available introduction times on 2032-02-07? Don't book.",
         "Please check the calendar for navigator sessions on 2032-02-08 and tell me the openings, but don't reserve anything.",
+        "For 2032-02-09, list the navigator options only; don't make a reservation.",
+        "I authorize navigator slot S-2 on 2032-02-10. Final decision: do not make a booking; list the options.",
+        "Reserve navigator slot S-3 on 2032-02-11. Actually, don't make a reservation; just show the times.",
     ],
 )
 def test_schedule_only_guard_recognizes_new_availability_prompt_forms(prompt):
@@ -645,6 +648,47 @@ def test_retry_after_definite_failure_requires_a_fresh_lookup():
     assert json.loads(booking["tool_calls"][0]["arguments"]) == {"slot_id": "N-1", "consent": True}
 
 
+def test_failed_authorized_lookup_does_not_loop_without_a_new_user_turn():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [
+        {"role": "user", "content": "I authorize booking N-1 on 2032-02-01."},
+        *navigator_lookup_history("2032-02-01", '{"status":"error"}'),
+    ]
+    completion = {
+        "response": None,
+        "tool_calls": [{"id": "lookup-retry", "name": "list_navigator_slots", "arguments": '{"date":"2032-02-01"}'}],
+    }
+
+    blocked = transport._ensure_authorized_booking_lookup(messages, tools, completion)
+
+    assert blocked["tool_calls"] == []
+    assert "couldn't verify" in blocked["response"]
+    assert "No reservation was made" in blocked["response"]
+
+
+def test_failed_authorized_lookup_can_be_retried_after_new_user_turn():
+    transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    messages = [
+        {"role": "user", "content": "I authorize booking N-1 on 2032-02-01."},
+        *navigator_lookup_history("2032-02-01", '{"status":"error"}'),
+        {"role": "user", "content": "Please check the availability one more time."},
+    ]
+
+    retried = transport._ensure_authorized_booking_lookup(messages, tools, {"response": None, "tool_calls": []})
+
+    assert len(retried["tool_calls"]) == 1
+    assert retried["tool_calls"][0]["name"] == "list_navigator_slots"
+    assert json.loads(retried["tool_calls"][0]["arguments"]) == {"date": "2032-02-01"}
+
+
 def test_retry_lookup_cannot_be_replaced_by_booking_from_stale_lookup_result():
     transport = ContextualSupportTransport(FakeTransport(), {"model": "router"})
     tools = [
@@ -929,6 +973,48 @@ def test_empty_note_is_normalized_only_when_user_explicitly_requests_it(user_tex
         assert transport.audit[-1]["response_origin"] == "explicit_empty_note_normalization"
     else:
         assert not transport.audit
+
+
+@pytest.mark.parametrize(
+    ("second_booking_request", "expected"),
+    [
+        ("I authorize a separate booking for S-2.", "Note: none"),
+        ("I authorize a separate booking for S-2. Leave its note blank.", "Note: none (as you specified)"),
+    ],
+)
+def test_note_instruction_and_attribution_are_scoped_to_the_current_booking(second_booking_request, expected):
+    class NoteScopeTransport(FakeTransport):
+        def complete(self, arm, messages, tools, decoding):
+            self.calls.append((arm, messages, tools, decoding))
+            return {
+                "response": "Your second booking is complete.\n- Note: none (as you specified)",
+                "tool_calls": [],
+                "finish_reason": "stop",
+                "usage": {"prompt_tokens": 50, "completion_tokens": 5},
+            }
+
+    messages = [
+        {"role": "user", "content": "I authorize S-1. Leave the note empty."},
+        {"role": "tool", "name": "book_navigator_slot", "content": '{"status":"booked"}'},
+        {"role": "user", "content": second_booking_request},
+        {"role": "assistant", "tool_calls": [{"id": "lookup-2"}]},
+        {"role": "tool", "name": "list_navigator_slots", "tool_call_id": "lookup-2", "content": '{"slots": []}'},
+        {"role": "assistant", "tool_calls": [{"id": "book-2"}]},
+        {"role": "tool", "name": "book_navigator_slot", "tool_call_id": "book-2", "content": '{"status":"booked"}'},
+    ]
+    tools = [
+        {"type": "function", "function": {"name": "list_navigator_slots"}},
+        {"type": "function", "function": {"name": "book_navigator_slot"}},
+    ]
+    result = ContextualSupportTransport(NoteScopeTransport(), {"model": "router"}).complete(
+        {"model": "target"}, messages, tools, {}
+    )
+
+    if "blank" in second_booking_request:
+        assert "(as you specified)" in result["response"]
+    else:
+        assert "(as you specified)" not in result["response"]
+    assert expected in result["response"]
 
 
 def test_generated_stock_reflection_is_rejected_and_retried_by_shared_gate():
