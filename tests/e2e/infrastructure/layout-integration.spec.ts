@@ -55,8 +55,8 @@ test.describe('Layout Component Integration Tests', () => {
   test('Blog index renders with BaseLayout shell', async ({ page }) => {
     await page.goto('/blog')
 
-    await expect(page.locator('header')).toBeVisible()
-    await expect(page.locator('footer')).toBeVisible()
+    await expect(page.locator('header').first()).toBeVisible()
+    await expect(page.locator('footer').first()).toBeVisible()
     await expect(
       page.getByRole('heading', {
         name: /writing on therapy, technology, and digital empathy/i,
