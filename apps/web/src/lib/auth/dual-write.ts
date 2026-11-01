@@ -3,8 +3,8 @@
  *
  * During the cutover from direct `auth0UserService` calls to the
  * `IdentityProvider` abstraction, this module compares the two paths and
- * reports any discrepancies. When the comparison passes consistently, the
- * `auth-legacy.ts` shim can be removed.
+ * reports any discrepancies. When the comparison passes consistently, legacy
+ * direct Auth0 call sites can be removed.
  *
  * Activation (env flags):
  *   AUTH_DUAL_WRITE=true          → compare every call

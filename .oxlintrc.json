@@ -9,7 +9,6 @@
     "apps/web/public/polyfills/**/*.js",
     ".github/cookbook/**/*.ts",
     ".github/cookbook/**/*.tsx",
-    "apps/web/src/lib/business-strategy/**/*.ts",
     "apps/web/src/lib/collaboration/**/*.ts",
     "apps/web/src/lib/ai/modelOptimizer.ts",
     "apps/web/src/lib/export/index.node.ts",
@@ -421,7 +420,6 @@
         "apps/web/src/**/*.spec.ts",
         "apps/web/src/**/*.spec.tsx",
         "tests/**/*",
-        "apps/web/src/lib/business-strategy/**/*",
         "apps/web/src/lib/collaboration/**/*"
       ],
       "rules": {
