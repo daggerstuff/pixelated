@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url'
 
 /* jshint esversion: 6, node: true */
 // IMPORTANT: Import Sentry instrumentation first
-import '../instrument.mjs'
+import '../../config/instrument.mjs'
 
 // Get current directory
 const __filename = fileURLToPath(import.meta.url)
@@ -439,7 +439,7 @@ const server = http.createServer((req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 3333
-server.listen(PORT, () => {
+server.listen(PORT, '127.0.0.1', () => {
   const url = `http://localhost:${PORT}`
   console.log(`Blog management interface running at ${url}`)
 
