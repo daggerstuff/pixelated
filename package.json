@@ -386,7 +386,6 @@
     "@ai-sdk/mcp": "^2.0.29",
     "@ai-sdk/provider": "^4.0.8",
     "@ai-sdk/sandbox-vercel": "^1.0.87",
-    "@astrojs/check": "^0.9.10",
     "@astrojs/markdoc": "^2.1.1",
     "@astrojs/node": "^11.1.4",
     "@astrojs/react": "^7.1.1",
