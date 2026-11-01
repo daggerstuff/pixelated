@@ -1,0 +1,9 @@
+{
+  "active_profiles": ["default"],
+  "default_profile": "default",
+  "routing": {
+    "strategy": "keyword",
+    "fallback_skill": "general-qa",
+    "skills_dir": "skills"
+  }
+}
