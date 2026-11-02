@@ -5,31 +5,40 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from pathlib import Path
+from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
+from scripts.training.build_v6_safety_judge_packets import ROOT
 from scripts.training.generate_v6_acknowledgment import build_transport
 from scripts.training.replay_v6_support_trace import RecordedTransport
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write
 from scripts.training.verify_v6_policy_final import groups
 
 
-def digest(path):
+def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 class CompleteDecodingReplay(RecordedTransport):
-    def __init__(self, records):
+    def __init__(self, records: list[dict[str, Any]]) -> None:
         super().__init__(records)
         self.decoding_records = iter(records)
 
-    def complete(self, arm, messages, tools, decoding):
+    def complete(
+        self,
+        arm: dict[str, Any],
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        decoding: dict[str, Any],
+    ) -> dict[str, Any]:
         record = next(self.decoding_records)
         if "decoding" in record and decoding != record["decoding"]:
             raise ValueError("actual provider decoding differs from frozen ledger")
         return super().complete(arm, messages, tools, decoding)
 
 
-def verify(version: str) -> dict:
+def verify(version: str) -> dict[str, Any]:
     target = DIRECTORY / f"acknowledgment-candidate-{version}"
     output = OUTPUT / target.name
     cases = rows(target / "cases.jsonl")

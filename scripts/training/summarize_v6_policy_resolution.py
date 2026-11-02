@@ -6,26 +6,30 @@ import argparse
 import hashlib
 import json
 from collections import Counter
+from pathlib import Path
+from typing import Any
 
+from scripts.training.build_v6_safety_judge_packets import DOCS, ROOT
 from scripts.training.summarize_v6_booking_contract_probe import state_passed
 from scripts.training.v6_atomic_safety_judge import summarize
-from scripts.training.v6_policy_resolution import DIRECTORY, DOCS, OUTPUT, ROOT, rows, write
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write
 
 PRIOR_ESTIMATE_USD = 0.16696285
 SHARED_CAP_USD = 1.237
 
 
-def task_calibration_cost(path):
+def task_calibration_cost(path: Path) -> float:
     certificate = json.loads((DIRECTORY / path.parent.name / "certificate.json").read_text())
     input_rate, output_rate = (0.07, 0.2) if "Nemotron" in certificate["model"] else (0.1, 0.3)
-    return sum(
+    total: float = sum(
         (r["usage"]["prompt_tokens"] * input_rate + r["usage"]["completion_tokens"] * output_rate) / 1e6
         for r in json.loads(path.read_text())
     )
+    return total
 
 
-def costs() -> dict:
-    entries = []
+def costs() -> dict[str, Any]:
+    entries: list[dict[str, Any]] = []
     for path in sorted(OUTPUT.glob("*/results.jsonl")):
         if (path.parent / "all-provider-calls.jsonl").exists() or (path.parent / "trace-provenance.json").exists():
             continue
@@ -112,13 +116,14 @@ def costs() -> dict:
     }
 
 
-def judge_stage(stage: str, version: str) -> dict:
+def judge_stage(stage: str, version: str) -> dict[str, Any]:
     source = DIRECTORY / f"bounded-support-{version}" / stage
     path = OUTPUT / f"bounded-{version}-{stage}-judge/results.jsonl"
     config = json.loads((source / "judge-config.json").read_text())
     result = summarize(rows(path) if path.exists() else [], rows(source / "judge-cases.jsonl"), config)
     mapping = {row["case_id"]: row for row in rows(source / "judge-sealed-mapping.jsonl")}
-    critical, other = [], []
+    critical: list[dict[str, Any]] = []
+    other: list[dict[str, Any]] = []
     complete = 0
     for ident, ratings in result["ratings"].items():
         for label, rating in ratings.items():
@@ -148,7 +153,7 @@ def judge_stage(stage: str, version: str) -> dict:
     }
 
 
-def calibration_details() -> dict:
+def calibration_details() -> dict[str, Any]:
     directory = DIRECTORY / "calibration-v2"
     packets = rows(directory / "actual-failure-calibration-cases.jsonl")
     expected = json.loads((directory / "actual-failure-calibration-expected.json").read_text())
@@ -167,7 +172,7 @@ def calibration_details() -> dict:
     return result
 
 
-def agent_audit_details(version: str) -> dict:
+def agent_audit_details(version: str) -> dict[str, Any]:
     path = DIRECTORY / f"bounded-support-{version}/agent-evidence-audit.json"
     result = {"current": None, "status": "missing", "qualified_external_review": False}
     if not path.exists():
@@ -202,7 +207,7 @@ def main() -> None:
         }
         for arm in ("base", "sft")
     }
-    generation = {}
+    generation: dict[str, dict[str, Any]] = {}
     for stage in ("original", "confirmation"):
         path = OUTPUT / f"bounded-{version}-{stage}"
         result_rows = rows(path / "results.jsonl")

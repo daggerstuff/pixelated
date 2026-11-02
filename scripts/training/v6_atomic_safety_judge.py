@@ -10,13 +10,14 @@ import hashlib
 import json
 import random
 from pathlib import Path
+from typing import Any
 
 from scripts.training.build_v6_safety_judge_packets import DOCS, ROOT
 from scripts.training.summarize_v6_paired_evaluations import canonical_hash
 from scripts.training.v6_policy_resolution import DIRECTORY, configured, rows, write, write_rows
 
 
-def checks(case: dict, rubric: dict) -> list[dict]:
+def checks(case: dict[str, Any], rubric: dict[str, Any]) -> list[dict[str, Any]]:
     result = [
         {
             "id": "privacy",
@@ -129,7 +130,9 @@ def spans(text: str) -> dict[str, str]:
     return {f"s{i // 160}": text[i : i + 160] for i in range(0, len(text), 160)}
 
 
-def atomic_packet(case: dict, candidates: dict[str, str], rubric: dict, ident: str) -> dict:
+def atomic_packet(
+    case: dict[str, Any], candidates: dict[str, str], rubric: dict[str, Any], ident: str
+) -> dict[str, Any]:
     evidence = {
         "conversation": case["messages"],
         "checks": checks(case, rubric),
@@ -162,8 +165,8 @@ def atomic_packet(case: dict, candidates: dict[str, str], rubric: dict, ident: s
     }
 
 
-def response_format() -> dict:
-    def obj(properties: dict) -> dict:
+def response_format() -> dict[str, Any]:
+    def obj(properties: dict[str, Any]) -> dict[str, Any]:
         return {"type": "object", "properties": properties, "required": list(properties), "additionalProperties": False}
 
     item = obj(
@@ -199,12 +202,12 @@ def response_format() -> dict:
     }
 
 
-def validate(value: dict, case: dict) -> dict:
+def validate(value: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
     packet = json.loads(case["messages"][1]["content"])
     expected = {c["id"]: c for c in packet["checks"]}
     if not isinstance(value, dict) or set(value) != {"A", "B"}:
         raise ValueError("both candidates must be rated")
-    result = {}
+    result: dict[str, Any] = {}
     for label in ("A", "B"):
         rating = value[label]
         if not isinstance(rating, dict) or set(rating) != {"checks", "rationale"}:
@@ -218,7 +221,8 @@ def validate(value: dict, case: dict) -> dict:
         items = rating["checks"]
         if not isinstance(items, list) or len(items) != len(expected):
             raise ValueError("incomplete checklist")
-        seen, resolved = set(), []
+        seen: set[str] = set()
+        resolved: list[dict[str, Any]] = []
         for item in items:
             if not isinstance(item, dict) or set(item) != {"check_id", "met", "evidence_id"}:
                 raise ValueError("check schema differs")
@@ -247,11 +251,19 @@ def validate(value: dict, case: dict) -> dict:
     return result
 
 
-def summarize(attempts: list[dict], cases: list[dict], config: dict, expected: dict | None = None) -> dict:
+def summarize(
+    attempts: list[dict[str, Any]],
+    cases: list[dict[str, Any]],
+    config: dict[str, Any],
+    expected: dict[str, dict[str, bool]] | None = None,
+) -> dict[str, Any]:
     by_id = {case["id"]: case for case in cases}
     if len(by_id) != len(cases) or not cases:
         raise ValueError("invalid packet identities")
-    seen, valid, invalid, mismatches = set(), {}, [], []
+    seen: set[str] = set()
+    valid: dict[str, dict[str, Any]] = {}
+    invalid: list[dict[str, Any]] = []
+    mismatches: list[str] = []
     for row in attempts:
         ident = row["case_id"]
         if ident not in by_id or ident in seen:
@@ -288,7 +300,7 @@ def summarize(attempts: list[dict], cases: list[dict], config: dict, expected: d
     }
 
 
-def prepare_calibration(destination: Path = DIRECTORY) -> dict:
+def prepare_calibration(destination: Path = DIRECTORY) -> dict[str, Any]:
     directory = ROOT / "ai/training/output/v6-policy-independent-safety-review"
     frozen = json.loads((DOCS / "v6-policy-independent-safety-review.json").read_text())["file_sha256"]
     for name in ("ratings-blinded.jsonl", "blind-packets.jsonl", "sealed-mapping.jsonl"):
@@ -298,7 +310,9 @@ def prepare_calibration(destination: Path = DIRECTORY) -> dict:
     mapping = {r["pair_id"]: r for r in rows(directory / "sealed-mapping.jsonl")}
     source_cases = {r["id"]: r for r in rows(DOCS / "safety-quality-dev-v1.jsonl")}
     rubric = json.loads((DOCS / "safety-quality-dev-v1.rubric.json").read_text())
-    cases, expected, manifest = [], {}, []
+    cases: list[dict[str, Any]] = []
+    expected: dict[str, dict[str, bool]] = {}
+    manifest: list[dict[str, Any]] = []
     rng = random.Random(20261021)
     for packet in rows(directory / "blind-packets.jsonl"):
         pair_id = packet["pair_id"]

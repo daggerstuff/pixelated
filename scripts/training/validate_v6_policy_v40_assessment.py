@@ -8,6 +8,7 @@ import zipfile
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, write
 
@@ -39,11 +40,11 @@ ARMS = ("base", "sft")
 
 @dataclass(frozen=True)
 class _Index:
-    packet_by_id: dict
-    map_by_id: dict
-    refreshed_by_case: dict
-    refreshed_packet_by_id: dict
-    result_by_key: dict
+    packet_by_id: dict[str, dict[str, Any]]
+    map_by_id: dict[str, dict[str, Any]]
+    refreshed_by_case: dict[str, dict[str, Any]]
+    refreshed_packet_by_id: dict[str, dict[str, Any]]
+    result_by_key: dict[tuple[str, str], dict[str, Any]]
 
 
 @dataclass(frozen=True)
@@ -55,25 +56,25 @@ class _ResponseRef:
 
 @dataclass
 class _Tally:
-    results_by_arm: dict
-    task_misses: dict
-    acknowledgment_misses: dict
-    critical_responses: dict
-    task_pair_cross_tab: Counter
-    pair_preference: Counter
+    results_by_arm: dict[str, dict[str, int]]
+    task_misses: dict[str, list[dict[str, Any]]]
+    acknowledgment_misses: dict[str, list[dict[str, Any]]]
+    critical_responses: dict[str, list[dict[str, Any]]]
+    task_pair_cross_tab: Counter[str]
+    pair_preference: Counter[str]
     exact_excerpt_count: int
-    unratable_responses: list
+    unratable_responses: list[dict[str, Any]]
 
 
 def digest_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
-def read_rows(path: Path) -> list[dict]:
+def read_rows(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text().splitlines() if line]
 
 
-def _read_archive(archive: Path) -> dict:
+def _read_archive(archive: Path) -> dict[str, Any]:
     with zipfile.ZipFile(archive) as bundle:
         names = set(bundle.namelist())
         if "sealed-mapping.jsonl" in names:
@@ -88,7 +89,7 @@ def _read_archive(archive: Path) -> dict:
         }
         if names != required:
             raise ValueError("assessment archive has missing or unexpected files")
-        payload = {
+        payload: dict[str, Any] = {
             "raw_assessment": bundle.read("Paige_Taylor_v40_completed_assessment.json"),
             "packet_bytes": bundle.read("blinded-packets.jsonl"),
             "form_bytes": bundle.read("review-form-template.json"),
@@ -100,8 +101,8 @@ def _read_archive(archive: Path) -> dict:
     return payload
 
 
-def _verify_archive_identity(review: Path, payload: dict) -> dict:
-    frozen_manifest = json.loads((review / "manifest.json").read_text())
+def _verify_archive_identity(review: Path, payload: dict[str, Any]) -> dict[str, Any]:
+    frozen_manifest: dict[str, Any] = json.loads((review / "manifest.json").read_text())
     if payload["archived_manifest"] != frozen_manifest:
         raise ValueError("assessment archive manifest differs from the delivered v40 packet")
     for name, contents, key in (
@@ -116,7 +117,7 @@ def _verify_archive_identity(review: Path, payload: dict) -> dict:
     return frozen_manifest
 
 
-def _load_current_inputs(source: Path, review: Path, result_dir: Path, payload: dict) -> dict:
+def _load_current_inputs(source: Path, review: Path, result_dir: Path, payload: dict[str, Any]) -> dict[str, Any]:
     refreshed = source / "qualified-review-v40-v2"
     return {
         "packets": [json.loads(line) for line in payload["packet_bytes"].splitlines() if line],
@@ -137,7 +138,12 @@ def _verify_current_proof(source: Path) -> None:
         raise ValueError("current-code v40 replay proof is absent, incomplete, or authorizes deployment")
 
 
-def _verify_completeness(assessment: dict, packets: list, ratings: list, sealed: list) -> None:
+def _verify_completeness(
+    assessment: dict[str, Any],
+    packets: list[dict[str, Any]],
+    ratings: list[dict[str, Any]],
+    sealed: list[dict[str, Any]],
+) -> None:
     packet_ids = {row["packet_id"] for row in packets}
     rating_ids = {row.get("packet_id") for row in ratings or []}
     sealed_ids = {row["packet_id"] for row in sealed}
@@ -157,7 +163,7 @@ def _verify_completeness(assessment: dict, packets: list, ratings: list, sealed:
         raise ValueError("assessment is incomplete or does not match all frozen v40 packet IDs")
 
 
-def _build_index(inputs: dict) -> _Index:
+def _build_index(inputs: dict[str, Any]) -> _Index:
     index = _Index(
         packet_by_id={row["packet_id"]: row for row in inputs["packets"]},
         map_by_id={row["packet_id"]: row for row in inputs["sealed"]},
@@ -195,7 +201,7 @@ def _new_tally() -> _Tally:
     )
 
 
-def _validate_response(response: object, packet: dict, packet_id: str, label: str) -> dict:
+def _validate_response(response: object, packet: dict[str, Any], packet_id: str, label: str) -> dict[str, Any]:
     if not isinstance(response, dict) or set(response) != set(RESPONSE_FIELDS):
         raise ValueError(f"missing response rating fields in {packet_id}:{label}")
     if any(type(response[field]) is not bool for field in BOOLEAN_FIELDS):
@@ -222,7 +228,7 @@ def _validate_response(response: object, packet: dict, packet_id: str, label: st
     return response
 
 
-def _entry(ref: _ResponseRef, response: dict) -> dict:
+def _entry(ref: _ResponseRef, response: dict[str, Any]) -> dict[str, Any]:
     return {
         "packet_id": ref.packet_id,
         "case_id": ref.case_id,
@@ -231,7 +237,7 @@ def _entry(ref: _ResponseRef, response: dict) -> dict:
     }
 
 
-def _record_response(response: dict, ref: _ResponseRef, tally: _Tally) -> None:
+def _record_response(response: dict[str, Any], ref: _ResponseRef, tally: _Tally) -> None:
     for field in tally.results_by_arm[ref.arm]:
         if field == "acknowledgment_applicable":
             tally.results_by_arm[ref.arm][field] += int(response[field])
@@ -247,7 +253,7 @@ def _record_response(response: dict, ref: _ResponseRef, tally: _Tally) -> None:
         tally.critical_responses[ref.arm].append(_entry(ref, response))
 
 
-def _collect_pair(pair: dict, index: _Index, tally: _Tally) -> dict:
+def _collect_pair(pair: dict[str, Any], index: _Index, tally: _Tally) -> dict[str, Any]:
     packet_id = pair["packet_id"]
     packet = index.packet_by_id[packet_id]
     source_map = index.map_by_id[packet_id]
@@ -270,7 +276,9 @@ def _collect_pair(pair: dict, index: _Index, tally: _Tally) -> dict:
     return packet_task
 
 
-def _record_preference(pair: dict, source_map: dict, tally: _Tally, packet_task: dict) -> None:
+def _record_preference(
+    pair: dict[str, Any], source_map: dict[str, Any], tally: _Tally, packet_task: dict[str, Any]
+) -> None:
     packet_id = pair["packet_id"]
     pref = pair.get("pair_preference")
     if pref not in {"A", "B", "tie", "unratable"}:
@@ -289,7 +297,7 @@ def _record_preference(pair: dict, source_map: dict, tally: _Tally, packet_task:
     ] += 1
 
 
-def _collect_ratings(ratings: list, index: _Index) -> _Tally:
+def _collect_ratings(ratings: list[dict[str, Any]], index: _Index) -> _Tally:
     tally = _new_tally()
     for pair in ratings:
         packet_task = _collect_pair(pair, index, tally)
@@ -297,7 +305,7 @@ def _collect_ratings(ratings: list, index: _Index) -> _Tally:
     return tally
 
 
-def validate(archive: Path) -> dict:
+def validate(archive: Path) -> dict[str, Any]:
     source = DIRECTORY / "bounded-support-v40"
     review = source / "qualified-review-v40"
     result_dir = OUTPUT / "bounded-v40"

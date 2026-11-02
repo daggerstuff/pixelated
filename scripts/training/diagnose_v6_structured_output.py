@@ -5,13 +5,14 @@ from __future__ import annotations
 import copy
 import json
 import os
+from typing import Any
 
 from scripts.training.calibrate_v6_acknowledgment_single import validate
 from scripts.training.generate_v6_acknowledgment import LedgerTransport
 from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write
 
 
-def main():
+def main() -> None:
     target = DIRECTORY / "acknowledgment-decoding-diagnostic-v1"
     results = OUTPUT / target.name
     if target.exists() or results.exists():
@@ -34,7 +35,7 @@ def main():
     os.environ["WANDB_API_KEY"] = _ensure_api_key()
     results.mkdir(parents=True)
     raw = LedgerTransport(results, 0.03, 12)
-    ratings = []
+    ratings: list[dict[str, Any]] = []
     for mode in ("schema_compact", "plain_compact"):
         for case in cases:
             messages = copy.deepcopy(case["messages"])

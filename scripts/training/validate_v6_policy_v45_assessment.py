@@ -9,6 +9,7 @@ import json
 import zipfile
 from collections import Counter
 from pathlib import Path
+from typing import Any
 
 from scripts.training.policy_review_metadata import review_metadata
 from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, write
@@ -45,11 +46,13 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def read_rows(path: Path) -> list[dict]:
+def read_rows(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text().splitlines() if line]
 
 
-def read_packet(archive: Path) -> tuple[bytes, dict, list[dict], dict, Path]:
+def read_packet(
+    archive: Path,
+) -> tuple[bytes, dict[str, Any], list[dict[str, Any]], dict[str, Any], Path, bytes]:
     with zipfile.ZipFile(archive) as bundle:
         required = {
             "Paige_Taylor_v45_completed_assessment.json",
@@ -93,7 +96,12 @@ def read_packet(archive: Path) -> tuple[bytes, dict, list[dict], dict, Path]:
     return raw, assessment, packets, manifest, proof_path, notes_bytes
 
 
-def validate_completion(assessment: dict, packets: list[dict], mapping: list[dict], results: list[dict]) -> None:
+def validate_completion(
+    assessment: dict[str, Any],
+    packets: list[dict[str, Any]],
+    mapping: list[dict[str, Any]],
+    results: list[dict[str, Any]],
+) -> None:
     ratings = assessment.get("ratings")
     packet_ids = {row["packet_id"] for row in packets}
     checklist = assessment.get("completion_checklist", {})
@@ -116,7 +124,13 @@ def validate_completion(assessment: dict, packets: list[dict], mapping: list[dic
         raise ValueError("assessment is incomplete or does not match all frozen v45 packets and results")
 
 
-def validate_rating(rating: dict, packet: dict, label: str, sealed: dict, results_by_key: dict) -> None:
+def validate_rating(
+    rating: dict[str, Any],
+    packet: dict[str, Any],
+    label: str,
+    sealed: dict[str, Any],
+    results_by_key: dict[tuple[str, str], dict[str, Any]],
+) -> None:
     packet_id = sealed["packet_id"]
     if not isinstance(rating, dict) or set(rating) != RESPONSE_FIELDS:
         raise ValueError(f"response rating fields mismatch at {packet_id}:{label}")
@@ -141,17 +155,22 @@ def validate_rating(rating: dict, packet: dict, label: str, sealed: dict, result
         raise ValueError(f"reviewed response differs from frozen v45 output at {packet_id}:{label}")
 
 
-def summarize_ratings(assessment: dict, packets: list[dict], mapping: list[dict], results: list[dict]) -> dict:
+def summarize_ratings(
+    assessment: dict[str, Any],
+    packets: list[dict[str, Any]],
+    mapping: list[dict[str, Any]],
+    results: list[dict[str, Any]],
+) -> dict[str, Any]:
     packet_by_id = {row["packet_id"]: row for row in packets}
     mapping_by_id = {row["packet_id"]: row for row in mapping}
     results_by_key = {(row["case_id"], row["arm_id"]): row for row in results}
-    counts = {arm: Counter() for arm in ("base", "sft")}
-    misses = {arm: [] for arm in counts}
-    critical = {arm: [] for arm in counts}
-    acknowledgment_misses = {arm: [] for arm in counts}
-    unsupported = {arm: [] for arm in counts}
-    preferences = Counter()
-    task_pairs = Counter()
+    counts: dict[str, Counter[str]] = {arm: Counter() for arm in ("base", "sft")}
+    misses: dict[str, list[dict[str, Any]]] = {arm: [] for arm in counts}
+    critical: dict[str, list[dict[str, Any]]] = {arm: [] for arm in counts}
+    acknowledgment_misses: dict[str, list[dict[str, Any]]] = {arm: [] for arm in counts}
+    unsupported: dict[str, list[dict[str, Any]]] = {arm: [] for arm in counts}
+    preferences: Counter[str] = Counter()
+    task_pairs: Counter[str] = Counter()
     exact_excerpts = 0
     for pair in assessment["ratings"]:
         packet_id = pair["packet_id"]
@@ -210,7 +229,7 @@ def summarize_ratings(assessment: dict, packets: list[dict], mapping: list[dict]
     }
 
 
-def persist_assessment(data: dict) -> dict:
+def persist_assessment(data: dict[str, Any]) -> dict[str, Any]:
     submitted_path = REVIEW / "assessment-v45-submitted.json"
     normalized_path = REVIEW / "assessment-v45.json"
     summary_path = REVIEW / "review-results-v45.json"
@@ -277,7 +296,7 @@ def persist_assessment(data: dict) -> dict:
     return summary
 
 
-def validate(archive: Path) -> dict:
+def validate(archive: Path) -> dict[str, Any]:
     output_paths = (
         REVIEW / "assessment-v45-submitted.json",
         REVIEW / "assessment-v45.json",

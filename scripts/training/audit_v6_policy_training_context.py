@@ -7,6 +7,7 @@ import json
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
+from typing import Any
 
 from scripts.training.build_v6_safety_judge_packets import DOCS, ROOT
 from scripts.training.summarize_v6_paired_evaluations import canonical_hash
@@ -20,18 +21,18 @@ def digest(path: Path) -> str:
     return result.hexdigest()
 
 
-def bind_training_candidates(train: Path, membership: Path, candidates: list[dict]) -> list[dict]:
+def bind_training_candidates(train: Path, membership: Path, candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Reject stale, repeated or unmatched train-line references before review."""
     requested = {r["train_line"]: r for r in candidates}
     if len(requested) != len(candidates):
         raise ValueError("duplicate review candidate")
-    by_content = defaultdict(list)
-    with membership.open() as references:
-        for reference in map(json.loads, references):
+    by_content: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
+    with membership.open() as membership_stream:
+        for reference in map(json.loads, membership_stream):
             if reference["split"] == "train":
                 by_content[reference["content_group_sha256"]].append(reference)
-    result = []
-    seen = Counter()
+    result: list[dict[str, Any]] = []
+    seen: Counter[str] = Counter()
     with train.open("rb") as stream:
         for index, raw in enumerate(stream, 1):
             row = json.loads(raw)
@@ -71,7 +72,7 @@ def bind_training_candidates(train: Path, membership: Path, candidates: list[dic
     return result
 
 
-def audit() -> dict:
+def audit() -> dict[str, Any]:
     release = json.loads((DOCS / "wandb-full-corpus-current-master-20261021-v6.json").read_text())
     scan = json.loads((DOCS / "policy-repair-v3/training-signal-audit.json").read_text())
     train = ROOT / scan["train_path"]
@@ -86,7 +87,7 @@ def audit() -> dict:
             raise ValueError(f"frozen source hash mismatch: {path.name}")
     queue = bind_training_candidates(train, membership, scan["candidate_rows"])
     by_source_index = {row["candidate_row"]: row for row in queue}
-    found = set()
+    found: set[int] = set()
     with source.open("rb") as stream:
         for index, raw in enumerate(stream, 1):
             if index not in by_source_index:

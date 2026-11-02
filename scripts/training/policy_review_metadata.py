@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+from typing import Any
 
-def review_metadata(assessment: dict, *, rating_form_complete: bool) -> dict:
+
+def review_metadata(assessment: dict[str, Any], *, rating_form_complete: bool) -> dict[str, Any]:
     reviewer = assessment.get("reviewer")
     attested_by = assessment.get("review_attested_by")
     verified_at = assessment.get("credential_verified_at")

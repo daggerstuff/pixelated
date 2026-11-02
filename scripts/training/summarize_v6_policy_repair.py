@@ -9,6 +9,7 @@ import statistics
 from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 from ai.qa.validation.therapy_bench.paired_eval import _run_mock_tool, score_state_checks
 from scripts.training.build_v6_safety_judge_packets import DOCS, ROOT, validate_rating
@@ -18,16 +19,17 @@ from scripts.training.summarize_v6_policy_experiment import arm_effect, verify_s
 OUTPUT = ROOT / "ai/training/output"
 
 
-def read_rows(path: Path) -> list[dict]:
+def read_rows(path: Path) -> list[dict[str, Any]]:
     return list(map(json.loads, path.read_text().splitlines()))
 
 
-def booking_replay(cases: list[dict], rows: list[dict]) -> dict:
+def booking_replay(cases: list[dict[str, Any]], rows: list[dict[str, Any]]) -> dict[str, Any]:
     """Apply the empty-note storage repair equally to every preserved tool trace."""
     records = {(r["case_id"], r["arm_id"]): r for r in rows}
-    result = {}
+    result: dict[str, Any] = {}
     for arm in ("base", "sft"):
-        notes, checked, exact, booked = Counter(), 0, 0, 0
+        notes: Counter[str] = Counter()
+        checked, exact, booked = 0, 0, 0
         for case in cases:
             if case["scenario"] != "appointment_explicit_consent":
                 continue
@@ -55,8 +57,12 @@ def booking_replay(cases: list[dict], rows: list[dict]) -> dict:
     return result
 
 
-def validated_judgments(rows: list[dict], cases: dict, config: dict, dims: set[str]) -> tuple[dict, list]:
-    valid, invalid, seen = {}, [], set()
+def validated_judgments(
+    rows: list[dict[str, Any]], cases: dict[str, Any], config: dict[str, Any], dims: set[str]
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    valid: dict[str, Any] = {}
+    invalid: list[dict[str, Any]] = []
+    seen: set[str] = set()
     for row in rows:
         ident = row["case_id"]
         if ident in seen or ident not in cases:
@@ -78,7 +84,7 @@ def validated_judgments(rows: list[dict], cases: dict, config: dict, dims: set[s
     return valid, invalid
 
 
-def judge_report() -> dict:
+def judge_report() -> dict[str, Any]:
     directory = OUTPUT / "v6-policy-repair-v3/safety-blinded"
     manifest = json.loads((directory / "gemma4-ratings/manifest.json").read_text())
     if manifest["status"] != "complete":
@@ -88,10 +94,12 @@ def judge_report() -> dict:
     dims = {"safety", "accuracy_and_role", "support_and_relevance", "actionability_and_concision"}
     valid, invalid = validated_judgments(read_rows(directory / "gemma4-ratings/results.jsonl"), cases, config, dims)
     mapping = {r["judge_case_id"]: r for r in read_rows(directory / "mapping.jsonl")}
-    summary, critical = {}, []
+    summary: dict[str, Any] = {}
+    critical: list[dict[str, Any]] = []
     for arm in ("base", "sft"):
-        versions = defaultdict(list)
-        differences, preferences = defaultdict(list), Counter()
+        versions: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
+        differences: defaultdict[str, list[tuple[str, float]]] = defaultdict(list)
+        preferences: Counter[str] = Counter()
         for ident, value in valid.items():
             m = mapping[ident]
             if m["arm"] != arm:
@@ -117,11 +125,12 @@ def judge_report() -> dict:
                     )
                 )
             preferences[m["label_to_version"].get(value["preference"], value["preference"])] += 1
-        deltas = {}
+        deltas: dict[str, dict[str, Any]] = {}
         for d, values in differences.items():
             interval = paired_interval(values)
-            interval["v3_minus_v1"] = interval.pop("sft_minus_base")
-            deltas[d] = interval
+            if interval is not None:
+                interval["v3_minus_v1"] = interval.pop("sft_minus_base")
+                deltas[d] = interval
         summary[arm] = {
             "versions": {
                 v: {
@@ -144,7 +153,7 @@ def judge_report() -> dict:
     }
 
 
-def blocking_evidence() -> list[dict]:
+def blocking_evidence() -> list[dict[str, Any]]:
     """Keep directly reviewed safety regressions separate from judge averages."""
     observations = [
         (
@@ -183,7 +192,7 @@ def blocking_evidence() -> list[dict]:
             "Gives missed-dose timing guidance despite unknown medication/strength.",
         ),
     ]
-    result = []
+    result: list[dict[str, Any]] = []
     for version, arm, suffix, excerpt, explanation in observations:
         path = OUTPUT / f"v6-policy-repair-{version}/safety/results.jsonl"
         row = next(r for r in read_rows(path) if r["arm_id"] == arm and r["case_id"] == f"v6-safety-dev-{suffix}")
@@ -204,7 +213,7 @@ def blocking_evidence() -> list[dict]:
     return result
 
 
-def recovery_report() -> dict:
+def recovery_report() -> dict[str, Any]:
     directory = OUTPUT / "v6-policy-repair-v3/safety-blinded"
     path = directory / "recovery-ratings/results.jsonl"
     if not path.exists():
@@ -217,7 +226,7 @@ def recovery_report() -> dict:
     dims = {"safety", "accuracy_and_role", "support_and_relevance", "actionability_and_concision"}
     valid, invalid = validated_judgments(read_rows(path), cases, config, dims)
     mapping = {r["judge_case_id"]: r for r in read_rows(directory / "mapping.jsonl")}
-    flags = []
+    flags: list[dict[str, Any]] = []
     for ident, value in valid.items():
         m = mapping[ident]
         for label, rating in value["ratings"].items():
@@ -240,7 +249,7 @@ def recovery_report() -> dict:
 
 
 def main() -> None:
-    report = {
+    report: dict[str, Any] = {
         "observed_at_utc": datetime.now(UTC).isoformat(),
         "trials": {},
         "decision": "Keep every candidate unpromoted. Evaluation defects are repaired, but prompt changes did not reliably remove privacy and medication safety failures.",
@@ -250,7 +259,7 @@ def main() -> None:
     original_plan = json.loads((DOCS / "role-risk-policy-experiment-plan.json").read_text())
     for version in ("v2", "v3", "v4"):
         plan = json.loads((DOCS / f"policy-repair-{version}/plan.json").read_text())
-        trial = {"suites": {}}
+        trial: dict[str, Any] = {"suites": {}}
         for spec in plan["suites"]:
             suite = spec["name"]
             result_path = OUTPUT / f"v6-policy-repair-{version}/{suite}/results.jsonl"
@@ -292,7 +301,7 @@ def main() -> None:
     report["blinded_v1_v3_judge"] = judge_report()
     report["blocking_evidence"] = blocking_evidence()
     report["bounded_schema_recovery"] = recovery_report()
-    costs = {}
+    costs: dict[str, float] = {}
     for version in ("v2", "v3", "v4"):
         for path in (OUTPUT / f"v6-policy-repair-{version}").glob("**/results.jsonl"):
             costs[str(path.relative_to(OUTPUT))] = sum(row.get("estimated_cost_usd") or 0 for row in read_rows(path))

@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 from ai.training.contextual_support_policy import (
     BOUNDARY_RESPONSES,
@@ -14,7 +15,8 @@ from ai.training.contextual_support_policy import (
     explicit_completion_issue,
     explicit_imminent_self_harm,
 )
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 SOURCE = DIRECTORY / "bounded-support-v45"
 SOURCE_RESULTS = OUTPUT / "bounded-v45" / "results.jsonl"
@@ -27,7 +29,9 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def transform(cases: list[dict], source_results: list[dict], routing: list[dict]) -> tuple[list[dict], list[dict]]:
+def transform(
+    cases: list[dict[str, Any]], source_results: list[dict[str, Any]], routing: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     case_by_id = {case["id"]: case for case in cases}
     route_by_input = {
         row["input_sha256"]: row["route"] for row in routing if row.get("input_sha256") and row.get("route")
@@ -40,6 +44,7 @@ def transform(cases: list[dict], source_results: list[dict], routing: list[dict]
         response = source["response"]
         route = route_by_input.get(canonical_hash(messages))
         repair_kind = None
+        repaired: str | None
 
         if explicit_imminent_self_harm(messages):
             repaired = BOUNDARY_RESPONSES["imminent_self_harm"]
@@ -81,7 +86,12 @@ def transform(cases: list[dict], source_results: list[dict], routing: list[dict]
     return transformed, repairs
 
 
-def audit(cases: list[dict], results: list[dict], repairs: list[dict], routing: list[dict]) -> None:
+def audit(
+    cases: list[dict[str, Any]],
+    results: list[dict[str, Any]],
+    repairs: list[dict[str, Any]],
+    routing: list[dict[str, Any]],
+) -> None:
     case_by_id = {case["id"]: case for case in cases}
     route_by_input = {
         row["input_sha256"]: row["route"] for row in routing if row.get("input_sha256") and row.get("route")

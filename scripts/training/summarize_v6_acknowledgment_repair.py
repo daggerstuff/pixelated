@@ -2,16 +2,18 @@
 
 import hashlib
 import json
+from typing import Any
 
+from scripts.training.build_v6_safety_judge_packets import DOCS, ROOT
 from scripts.training.summarize_v6_policy_resolution import costs
-from scripts.training.v6_policy_resolution import DIRECTORY, DOCS, OUTPUT, ROOT, rows, write
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write
 
 
-def main():
+def main() -> None:
     target = DIRECTORY / "acknowledgment-candidate-v8"
     replay = json.loads((target / "current-code-replay-proof.json").read_text())
     review = json.loads((DIRECTORY / "acknowledgment-candidate-v8-review/result.json").read_text())
-    runs = []
+    runs: list[dict[str, Any]] = []
     for name in ("acknowledgment-fresh-v1", *(f"acknowledgment-candidate-v{i}" for i in range(1, 9))):
         generated = rows(OUTPUT / name / "results.jsonl")
         raw = rows(OUTPUT / name / "all-provider-calls.jsonl")
@@ -28,16 +30,16 @@ def main():
                 "provider_calls": len(raw),
                 "all_provider_estimated_cost_usd": sum(r["estimated_cost_usd"] for r in raw),
                 "gemma_fallback_releases": sum(
-                    r.get("fallback_used") and "gemma" in r["actual_model"] for r in releases
+                    bool(r.get("fallback_used")) and "gemma" in r["actual_model"] for r in releases
                 ),
             }
         )
-    calibrations = []
+    calibrations: list[dict[str, Any]] = []
     for i in range(1, 12):
         source = DIRECTORY / f"acknowledgment-v{i}"
         path = source / "result.json"
         if path.exists():
-            result = json.loads(path.read_text())
+            result: dict[str, Any] = json.loads(path.read_text())
             calibrations.append(
                 {
                     "version": i,

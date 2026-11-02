@@ -6,6 +6,7 @@ import hashlib
 import json
 import zipfile
 from pathlib import Path
+from typing import Any
 
 from ai.training.cliche_gate import is_sycophantic
 from ai.training.contextual_support_policy import explicit_completion_issue
@@ -99,7 +100,7 @@ def audit_packet() -> str:
     return digest(PACKET)
 
 
-def audit() -> dict:
+def audit() -> dict[str, Any]:
     response_count, result_hash = audit_outputs()
     assessment_path, archive_hash, notes_hash = audit_source_files()
     packet_hash = audit_packet()
