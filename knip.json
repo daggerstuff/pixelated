@@ -17,7 +17,6 @@
     "apps/web/src/client-inject.js",
     "apps/web/src/client-polyfills.js",
     "apps/web/src/toolbar-init.ts",
-    "apps/web/src/consts.ts",
     "apps/web/src/types.ts",
     "apps/web/src/config.ts",
     "apps/web/src/hello.js",
