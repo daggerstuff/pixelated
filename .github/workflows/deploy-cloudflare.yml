@@ -23,12 +23,35 @@ env:
   CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
 jobs:
+  # The pipeline lands before the credentials exist, so it must be a no-op
+  # rather than a red X on every green staging CI run. A job-level `if` cannot
+  # read the secrets context reliably, so gate through a step output instead.
+  preflight:
+    name: Check deploy credentials
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - name: Check for Cloudflare API token
+        id: check
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "${CLOUDFLARE_API_TOKEN}" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::CLOUDFLARE_API_TOKEN is not configured; skipping the Cloudflare deploy."
+          fi
+
   build:
     name: Build Cloudflare bundle
+    needs: preflight
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_branch == 'staging')
+      needs.preflight.outputs.enabled == 'true' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'staging'))
     runs-on: ubuntu-latest
     outputs:
       artifact-name: ${{ steps.pack.outputs.name }}
@@ -84,12 +107,22 @@ jobs:
 
   deploy:
     name: Deploy to Cloudflare
-    # PR-less dispatches always allowed; auto-deploys need the token secret present.
-    needs: build
+    needs: [preflight, build]
+    if: needs.preflight.outputs.enabled == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      # wrangler is a devDependency, so the CLI has to be installed before
+      # `pnpm exec wrangler` can run.
+      - name: Setup Node.js with pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          install-native-deps: 'false'
 
       - name: Download deploy artifact
         uses: actions/download-artifact@v7
@@ -103,16 +136,27 @@ jobs:
           test -f server/wrangler.json || { echo "::error::server/wrangler.json missing from artifact"; exit 1; }
 
       - name: Deploy Worker
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: pnpm exec wrangler deploy --config server/wrangler.json
-
-      - name: Smoke test Worker URL
+        id: deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
-          WORKER_URL="https://pixelated-empathy.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
+          pnpm exec wrangler deploy --config server/wrangler.json 2>&1 | tee "$RUNNER_TEMP/deploy.log"
+          # The workers.dev host is the account's subdomain, not the account ID,
+          # so take the URL wrangler prints instead of constructing one.
+          URL=$(grep -oE 'https://[A-Za-z0-9._-]+\.workers\.dev' "$RUNNER_TEMP/deploy.log" | head -n 1 || true)
+          if [ -z "$URL" ]; then
+            echo "::error::wrangler deploy did not report a workers.dev URL"
+            exit 1
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Deployed: $URL"
+
+      - name: Smoke test Worker URL
+        env:
+          WORKER_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          set -euo pipefail
           for i in 1 2 3 4 5; do
             STATUS=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 30 "$WORKER_URL/" || true)
             if [ "$STATUS" = "200" ]; then
