@@ -338,6 +338,8 @@ values.yaml
 /security-report.md
 /security-reports/
 /test-results/
+tests/test-results/
+tests/security/security-reports/
 config/test-results/
 config/playwright-report/
 *_output.txt
@@ -501,6 +503,8 @@ infra/sinker/run_*.json
 HANDOFF_training_dataset.md
 Modern Multi-Agent Coding Architectures.pdf
 *.bak
+*.log.old
+*.log.v2
 NF_PIPELINE_HANDOFF.md
 thread-5302e593-transcript.md
 .jscpd-report/
@@ -591,7 +595,6 @@ apps/web/src/layouts/TailusLayout.astro
 apps/web/src/lib/content/features.ts
 apps/web/src/lib/content/intro.ts
 apps/web/src/lib/content/scenarios.ts
-apps/web/src/lib/metaaligner/explainability/visualization.tsx
 apps/web/src/lib/services/emotionTracking.ts
 apps/web/src/lib/supabase.ts
 apps/web/src/lib/utils/code-splitting.ts
