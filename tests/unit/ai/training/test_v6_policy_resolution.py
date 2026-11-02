@@ -156,6 +156,29 @@ def test_contextual_policy_preserves_user_context_and_does_not_mutate_source():
     assert "confidential" not in result[0]["content"].lower()
 
 
+@pytest.mark.parametrize(
+    "user_request",
+    [
+        "earliest open navigator introduction slot",
+        "earliest available slot",
+        "first navigator intro appointment",
+    ],
+)
+def test_booking_guard_selects_first_verified_slot_for_earliest_request(user_request):
+    slots = [
+        {"id": "S-1", "date": "2031-05-16", "time": "12:30"},
+        {"id": "S-2", "date": "2031-05-16", "time": "13:00"},
+    ]
+    selected, requested_slot_id = ContextualSupportTransport._requested_slot_selection(
+        [f"Please reserve the {user_request} on 2031-05-16."],
+        slots,
+        "2031-05-16",
+    )
+
+    assert selected == slots[0]
+    assert requested_slot_id is None
+
+
 class FakeTransport:
     def __init__(self, route="ordinary", finish="stop"):
         self.calls = []
