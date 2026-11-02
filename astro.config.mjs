@@ -2,6 +2,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 
+import cloudflare from '@astrojs/cloudflare'
 import node from '@astrojs/node'
 import react from '@astrojs/react'
 import vercel from '@astrojs/vercel'
@@ -19,6 +20,85 @@ import { rewriteSentrySource } from './config/sentry-source-map.mjs'
 // Force the Node adapter regardless of any Vercel-provided env vars
 // (VERCEL, DEPLOY_TARGET) that the Vercel build sandbox injects automatically.
 const isVercelDeploy = !!process.env.VERCEL
+// Explicit Cloudflare Workers deployment (set by scripts/ci/build-cloudflare.sh
+// or `DEPLOY_TARGET=cloudflare astro build`). Takes precedence over the
+// Vercel/Node adapters.
+const isCloudflareDeploy = process.env.DEPLOY_TARGET === 'cloudflare'
+
+// Cloudflare Workers (workerd) cannot load native `.node` binaries, and the
+// MongoDB driver's optional `require()` calls are hoisted to the top of the
+// worker bundle, so those native modules must never be resolved. Substitute an
+// inert stub that keeps the driver's own missing-dependency fallback
+// (`kModuleError`) working. zstd/snappy compression, Kerberos/GSSAPI auth and
+// client-side field level encryption stay unavailable, and none of them are
+// used by this app. Pure-JS optional deps that do resolve (`socks`,
+// `gcp-metadata`) are deliberately left alone: they bundle fine, and other
+// packages re-export named bindings from them.
+const cloudflareNativeOptionalModules = [
+  '@mongodb-js/zstd',
+  'kerberos',
+  'snappy',
+  '@aws-sdk/credential-providers',
+  'mongodb-client-encryption',
+  '@sentry/node-cpu-profiler',
+  '@sentry/profiling-node',
+]
+const CLOUDFLARE_NATIVE_STUB_PREFIX = '\0cloudflare-native-unavailable:'
+
+/**
+ * Source for the substitute module. Native-binary modules get a proxy that
+ * raises the driver's usual missing-dependency error on any use; Sentry
+ * profiling gets a throwing `nodeProfilingIntegration` so
+ * `config/instrument.mjs` disables profiling through its existing try/catch.
+ *
+ * @param {string} moduleId
+ * @returns {string}
+ */
+function cloudflareNativeStubSource(moduleId) {
+  if (moduleId === '@sentry/profiling-node') {
+    return [
+      'export function nodeProfilingIntegration() {',
+      "  throw new Error('@sentry/profiling-node is not available on Cloudflare Workers.')",
+      '}',
+    ].join('\n')
+  }
+  return [
+    `const error = new Error('Optional native module "${moduleId}" is not available on Cloudflare Workers.')`,
+    "error.name = 'MongoMissingDependencyError'",
+    'const stub = new Proxy({ kModuleError: error }, {',
+    '  get(target, key) {',
+    "    if (key === 'kModuleError') return target.kModuleError",
+    '    throw target.kModuleError',
+    '  },',
+    '})',
+    'export { error as kModuleError }',
+    'export default stub',
+  ].join('\n')
+}
+
+const cloudflareNativeStubPlugin = {
+  name: 'cloudflare-native-optional-stubs',
+  enforce: 'pre',
+  /**
+   * @param {string} id
+   * @returns {string | undefined}
+   */
+  resolveId(id) {
+    if (!isCloudflareDeploy) return undefined
+    if (!cloudflareNativeOptionalModules.includes(id)) return undefined
+    return `${CLOUDFLARE_NATIVE_STUB_PREFIX}${id}`
+  },
+  /**
+   * @param {string} id
+   * @returns {string | undefined}
+   */
+  load(id) {
+    if (!id.startsWith(CLOUDFLARE_NATIVE_STUB_PREFIX)) return undefined
+    return cloudflareNativeStubSource(
+      id.slice(CLOUDFLARE_NATIVE_STUB_PREFIX.length),
+    )
+  },
+}
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -121,6 +201,18 @@ const preferredPort = (() => {
 })()
 
 const adapter = (() => {
+  if (isCloudflareDeploy) {
+    console.log('🟣 Using Cloudflare Workers adapter for Cloudflare deployment')
+    return cloudflare({
+      // Store Astro session data in Cloudflare KV (auto-provisioned on deploy).
+      sessionKVBindingName: 'SESSION',
+      // Prerender in the Node environment, not workerd. The SSR graph imports
+      // the MongoDB driver, whose native @mongodb-js/zstd binary cannot be
+      // resolved from inside the workerd build sandbox. Node prerendering keeps
+      // the existing build behavior; runtime rendering still runs on Workers.
+      prerenderEnvironment: 'node',
+    })
+  }
   if (isVercelDeploy) {
     console.log('▲ Using Vercel adapter for Vercel deployment')
     return vercel({
@@ -230,6 +322,7 @@ export default defineConfig({
       },
     },
     plugins: [
+      cloudflareNativeStubPlugin,
       ...(hasSentryDSN
         ? [
             ...createScopedSentryVitePlugins({
@@ -300,6 +393,41 @@ export default defineConfig({
               // explicitly overrides it.
               if (env.build && config.build?.sourcemap != null) {
                 env.build.sourcemap ??= config.build.sourcemap
+              }
+
+              // Cloudflare Workers (workerd) cannot load native .node binaries.
+              // The @astrojs/cloudflare adapter bundles the SSR graph with
+              // ssr.noExternal = true, so it tries to inline the MongoDB
+              // driver's optional native sub-deps (zstd, kerberos, snappy).
+              // The Cloudflare Vite plugin rejects `resolve.external`, but
+              // `build.rolldownOptions.external` is the sanctioned mechanism
+              // (the adapter itself externalizes sharp this way). Keep these
+              // optional native deps external: the driver requires them inside
+              // try/catch and degrades to "feature unavailable", and we never
+              // request zstd/kerberos/snappy (MONGODB_URI sets no
+              // compressionAlgorithms), so those code paths are unreachable.
+              if (
+                isCloudflareDeploy &&
+                (name === 'ssr' || name === 'server' || name === 'prerender')
+              ) {
+                env.build ??= {}
+                env.build.rolldownOptions ??= {}
+                const nativeOptionals = [
+                  '@mongodb-js/zstd',
+                  'kerberos',
+                  'snappy',
+                ]
+                const current = Array.isArray(
+                  env.build.rolldownOptions.external,
+                )
+                  ? env.build.rolldownOptions.external
+                  : typeof env.build.rolldownOptions.external === 'string'
+                    ? [env.build.rolldownOptions.external]
+                    : []
+                env.build.rolldownOptions.external = [
+                  ...current,
+                  ...nativeOptionals.filter((d) => !current.includes(d)),
+                ]
               }
 
               // Propagate rollupOptions.onwarn to each environment build.
@@ -865,11 +993,20 @@ export default defineConfig({
     '/sessions': { status: 301, destination: '/journal-research/sessions' },
     '/resources': { status: 301, destination: '/journal-research' },
     '/admin/settings': { status: 301, destination: '/admin/security-settings' },
-    '/admin/security/baa': { status: 301, destination: '/admin/security/baa/management' },
-    '/admin/security/backup': { status: 301, destination: '/admin/backup-security' },
+    '/admin/security/baa': {
+      status: 301,
+      destination: '/admin/security/baa/management',
+    },
+    '/admin/security/backup': {
+      status: 301,
+      destination: '/admin/backup-security',
+    },
     '/admin/security/consent': { status: 301, destination: '/admin/consent' },
     '/admin/security/dlp': { status: 301, destination: '/admin/dlp' },
-    '/admin/security/patient-rights': { status: 301, destination: '/admin/patient-rights' },
+    '/admin/security/patient-rights': {
+      status: 301,
+      destination: '/admin/patient-rights',
+    },
   },
   devToolbar: {
     enabled: isDevelopment,
