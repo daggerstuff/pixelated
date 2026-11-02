@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 from collections import defaultdict
+from pathlib import Path
+from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
 from ai.training.contextual_support_policy import (
@@ -17,10 +19,11 @@ from ai.training.contextual_support_policy import (
     explicit_completion_issue,
     explicit_imminent_self_harm,
 )
+from scripts.training.build_v6_safety_judge_packets import ROOT
 from scripts.training.generate_v6_acknowledgment import build_transport
 from scripts.training.replay_v6_support_trace import RecordedTransport
 from scripts.training.v6_policy_confirmation import PROBES
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 SOURCE = DIRECTORY / "bounded-support-v43"
 TARGET = DIRECTORY / "bounded-support-v44"
@@ -28,24 +31,26 @@ SOURCE_RESULTS = OUTPUT / "bounded-v43"
 RESULTS = OUTPUT / "bounded-v44"
 
 
-def digest(path) -> str:
+def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_inputs() -> tuple[list[dict], dict, list[dict], dict[str, list[dict]]]:
+def load_inputs() -> tuple[list[dict[str, Any]], dict[str, Any], list[dict[str, Any]], dict[str, list[dict[str, Any]]]]:
     cases = rows(SOURCE / "cases.jsonl")
     config = json.loads((SOURCE / "config.json").read_text())
     source_results = rows(SOURCE_RESULTS / "results.jsonl")
     source_calls = rows(SOURCE_RESULTS / "all-provider-calls.jsonl")
     if len(cases) != 56 or len(source_results) != 112:
         raise ValueError("v43 frozen cases or paired results are incomplete")
-    calls_by_key: dict[str, list[dict]] = defaultdict(list)
+    calls_by_key: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for call in source_calls:
         calls_by_key[call["response_key"]].append(call)
     return cases, config, source_results, calls_by_key
 
 
-def prepare_candidate(cases: list[dict], config: dict, source_results: list[dict]) -> None:
+def prepare_candidate(
+    cases: list[dict[str, Any]], config: dict[str, Any], source_results: list[dict[str, Any]]
+) -> None:
     TARGET.mkdir(parents=True)
     RESULTS.mkdir(parents=True)
     write_rows(TARGET / "cases.jsonl", cases)
@@ -72,14 +77,17 @@ def prepare_candidate(cases: list[dict], config: dict, source_results: list[dict
 
 
 def replay_results(
-    cases: list[dict], config: dict, source_results: list[dict], calls_by_key: dict[str, list[dict]]
-) -> tuple[list[dict], list[dict], int]:
+    cases: list[dict[str, Any]],
+    config: dict[str, Any],
+    source_results: list[dict[str, Any]],
+    calls_by_key: dict[str, list[dict[str, Any]]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int]:
     case_by_id = {case["id"]: case for case in cases}
     arms = {arm["id"]: arm for arm in config["arms"]}
     router = json.loads((DIRECTORY / "calibration-v2/gemma4-calibration-config.json").read_text())["arms"][0]
     certificate = json.loads((DIRECTORY / "task-review-v12/certificate.json").read_text())
-    results = []
-    used_calls = []
+    results: list[dict[str, Any]] = []
+    used_calls: list[dict[str, Any]] = []
     unused_source_calls = 0
     for row in source_results:
         key = f"{row['case_id']}:{row['arm_id']}"
@@ -113,7 +121,9 @@ def replay_results(
     return results, used_calls, unused_source_calls
 
 
-def audit_ordinary_outputs(cases: list[dict], results: list[dict]) -> tuple[set[str], dict]:
+def audit_ordinary_outputs(
+    cases: list[dict[str, Any]], results: list[dict[str, Any]]
+) -> tuple[set[str], dict[str, Any]]:
     route_by_input = {
         entry["input_sha256"]: entry["route"] for entry in rows(RESULTS / "routing-audit.jsonl") if entry.get("route")
     }
@@ -121,10 +131,10 @@ def audit_ordinary_outputs(cases: list[dict], results: list[dict]) -> tuple[set[
         case["id"] for case in cases if route_by_input.get(canonical_hash(case["messages"])) in {"ordinary", "fiction"}
     }
     case_by_id = {case["id"]: case for case in cases}
-    task_failures = []
-    boilerplate = []
-    risk_framing = []
-    unsupported_isolation = []
+    task_failures: list[str] = []
+    boilerplate: list[str] = []
+    risk_framing: list[str] = []
+    unsupported_isolation: list[str] = []
     for result in results:
         case = case_by_id[result["case_id"]]
         if result["case_id"] in ordinary_cases:
@@ -153,7 +163,7 @@ def audit_ordinary_outputs(cases: list[dict], results: list[dict]) -> tuple[set[
     }
 
 
-def audit_urgent_actions(cases: list[dict], results: list[dict]) -> tuple[bool, int]:
+def audit_urgent_actions(cases: list[dict[str, Any]], results: list[dict[str, Any]]) -> tuple[bool, int]:
     case_by_id = {case["id"]: case for case in cases}
     critical_requirements = {
         "acute_risk-01": (
@@ -199,7 +209,7 @@ def audit_urgent_actions(cases: list[dict], results: list[dict]) -> tuple[bool, 
     return True, deterministic_risk_cases
 
 
-def write_run_and_proof(candidate: dict) -> tuple[dict, dict]:
+def write_run_and_proof(candidate: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
     cases = candidate["cases"]
     config = candidate["config"]
     results = candidate["results"]
@@ -269,7 +279,7 @@ def write_run_and_proof(candidate: dict) -> tuple[dict, dict]:
     return run, proof
 
 
-def create_candidate() -> dict:
+def create_candidate() -> dict[str, Any]:
     if TARGET.exists() or RESULTS.exists():
         raise ValueError("v44 candidate already exists; refusing to overwrite")
     cases, config, source_results, calls_by_key = load_inputs()

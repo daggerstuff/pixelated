@@ -1,6 +1,7 @@
 """Carry the rejected draft into an opt-in bounded revision, without changing v18."""
 
 import json
+from typing import Any
 
 from ai.training.contextual_support_policy import (
     IRRELEVANT_BOILERPLATE,
@@ -13,8 +14,10 @@ from ai.training.contextual_support_policy import (
 
 
 class RevisionSupportTransport(ContextualSupportTransport):
-    def _task_correction(self, messages, response, boilerplate, route):
-        correction = super()._task_correction(messages, response, boilerplate, route)
+    def _task_correction(
+        self, messages: list[dict[str, Any]], response: str, boilerplate: bool, route: str, style_issue: str = ""
+    ) -> str:
+        correction = super()._task_correction(messages, response, boilerplate, route, style_issue)
         if not correction:
             return correction
         return (
@@ -29,13 +32,15 @@ class RevisionSupportTransport(ContextualSupportTransport):
 class ConversationalRevisionTransport:
     """Give the generator its failed draft plus an explicit bounded revision turn."""
 
-    def __init__(self, transport, *, remove_generic_example=False, sample_revisions=False):
+    def __init__(self, transport: Any, *, remove_generic_example: bool = False, sample_revisions: bool = False) -> None:
         self.transport = transport
         self.remove_generic_example = remove_generic_example
         self.sample_revisions = sample_revisions
-        self.previous_draft = None
+        self.previous_draft: str | None = None
 
-    def complete(self, arm, messages, tools, decoding):
+    def complete(
+        self, arm: dict[str, Any], messages: list[dict[str, Any]], tools: list[dict[str, Any]], decoding: dict[str, Any]
+    ) -> dict[str, Any]:
         marker = UNIVERSAL + "\n" + ROUTES["ordinary"]
         feedback_marker = "\nAutomated nonclinical completion check, with no new user facts: "
         ordinary = not tools and messages and marker in messages[0].get("content", "")
@@ -64,7 +69,7 @@ class ConversationalRevisionTransport:
             ]
             if len(json.dumps(messages).encode()) + 128 > 8192:
                 raise ValueError("revision context exceeds reserved input bound")
-        result = self.transport.complete(arm, messages, tools, decoding)
+        result: dict[str, Any] = self.transport.complete(arm, messages, tools, decoding)
         if ordinary:
             self.previous_draft = result.get("response")
         return result
@@ -73,7 +78,9 @@ class ConversationalRevisionTransport:
 class ExplicitViolationSupportTransport(ContextualSupportTransport):
     """Identify the actual rejected phrase instead of giving an ambiguous generic warning."""
 
-    def _task_correction(self, messages, response, boilerplate, route):
+    def _task_correction(
+        self, messages: list[dict[str, Any]], response: str, boilerplate: bool, route: str, style_issue: str = ""
+    ) -> str:
         if boilerplate:
             match = (
                 IRRELEVANT_BOILERPLATE.search(response)
@@ -90,4 +97,4 @@ class ExplicitViolationSupportTransport(ContextualSupportTransport):
                 "do not narrate or infer safety status in an ordinary-support reply. "
                 "Provide the original requested help and respect its format."
             )
-        return super()._task_correction(messages, response, boilerplate, route)
+        return super()._task_correction(messages, response, boilerplate, route, style_issue)

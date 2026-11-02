@@ -6,6 +6,8 @@ import argparse
 import hashlib
 import json
 import os
+from pathlib import Path
+from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
 from ai.training.contextual_support_policy import ContextualSupportTransport, SupportInputReservation
@@ -21,14 +23,26 @@ CAP = 0.27
 
 
 class LedgerTransport:
-    def __init__(self, results=RESULTS, cap=CAP, max_calls=312, input_token_cap=8192):
+    def __init__(
+        self,
+        results: Path = RESULTS,
+        cap: float = CAP,
+        max_calls: int = 312,
+        input_token_cap: int = 8192,
+    ) -> None:
         self.raw = WandbAsyncTransport()
         self.results, self.cap, self.max_calls = results, cap, max_calls
         self.input_token_cap = input_token_cap
         self.spent = 0.0
         self.calls = 0
 
-    def complete(self, arm, messages, tools, decoding):
+    def complete(
+        self,
+        arm: dict[str, Any],
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        decoding: dict[str, Any],
+    ) -> dict[str, Any]:
         input_rate, output_rate = (0.1, 0.3) if "gemma-4" in arm["model"] else (0.07, 0.2)
         reserve = (self.input_token_cap * input_rate + decoding["max_tokens"] * output_rate) / 1e6
         if self.calls >= self.max_calls or self.spent + reserve > self.cap:
@@ -62,9 +76,16 @@ class LedgerTransport:
         return result
 
 
-def build_transport(raw, router, certificate, results, version=None):
+def build_transport(
+    raw: Any,
+    router: dict[str, Any],
+    certificate: dict[str, Any],
+    results: Path | None,
+    version: str | None = None,
+) -> ContextualSupportTransport:
     candidate = version is not None
-    version_number = int(version.removeprefix("v")) if candidate else 0
+    version_number = int(version.removeprefix("v")) if version is not None else 0
+    drafts: Any
     if candidate:
         drafts = (
             AcknowledgmentDraftTransport(raw, GUIDANCE_V2) if version_number >= 2 else AcknowledgmentDraftTransport(raw)
@@ -74,7 +95,8 @@ def build_transport(raw, router, certificate, results, version=None):
     if candidate and version_number >= 4:
         from scripts.training.v6_support_revision import ConversationalRevisionTransport
 
-        drafts = ConversationalRevisionTransport(
+        conversational_revision: Any = ConversationalRevisionTransport
+        drafts = conversational_revision(
             drafts,
             remove_generic_example=version_number >= 5,
             sample_revisions=version_number >= 6,
@@ -98,10 +120,11 @@ def build_transport(raw, router, certificate, results, version=None):
     if candidate and version_number >= 2:
         from scripts.training.v6_adjustment_repair import RepairedTaskReviewer
 
+        repaired_task_reviewer: Any = RepairedTaskReviewer
         adjustment_certificate = json.loads(
             (DIRECTORY / f"adjustment-repair-{'v3' if version_number >= 5 else 'v2'}/certificate.json").read_text()
         )
-        transport.task_reviewer = RepairedTaskReviewer(
+        transport.task_reviewer = repaired_task_reviewer(
             drafts,
             router,
             certificate,
@@ -112,19 +135,21 @@ def build_transport(raw, router, certificate, results, version=None):
     if candidate and version_number >= 7:
         from scripts.training.v6_acknowledgment_review import AcknowledgmentReviewer, calibrated_acknowledgment
 
-        transport.task_reviewer = AcknowledgmentReviewer(
+        acknowledgment_reviewer: Any = AcknowledgmentReviewer
+        load_acknowledgment: Any = calibrated_acknowledgment
+        transport.task_reviewer = acknowledgment_reviewer(
             drafts,
             router,
             certificate,
             adjustment_certificate,
             version="v3",
-            acknowledgment_bundle=calibrated_acknowledgment(),
+            acknowledgment_bundle=load_acknowledgment(),
         )
         transport.task_reviewer.require_calibration()
     return transport
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate", action="store_true")
     parser.add_argument("--dry-run", action="store_true")

@@ -5,12 +5,13 @@ from __future__ import annotations
 import json
 import re
 from datetime import UTC, datetime
+from typing import Any
 
 from scripts.training.audit_v6_source_status import digest
 from scripts.training.summarize_v6_paired_evaluations import DOCS, OUTPUT, ROOT, paired_interval, summarize
 
 
-def verify_sole_prompt_change(original: list[dict], variant: list[dict], instruction: str) -> None:
+def verify_sole_prompt_change(original: list[dict[str, Any]], variant: list[dict[str, Any]], instruction: str) -> None:
     if len(original) != len(variant):
         raise ValueError("experiment case count changed")
     for before, after in zip(original, variant, strict=True):
@@ -20,13 +21,15 @@ def verify_sole_prompt_change(original: list[dict], variant: list[dict], instruc
             raise ValueError("experiment changes more than the registered system instruction")
 
 
-def fraction(row: dict | None, check_count: int) -> float:
+def fraction(row: dict[str, Any] | None, check_count: int) -> float:
     if not row or row["status"] != "success" or row.get("finish_reason") == "length":
         return 0.0
     return sum(bool(item["passed"]) for item in row.get("state_metrics", [])) / check_count
 
 
-def arm_effect(cases: list[dict], before: list[dict], after: list[dict], arm: str) -> dict:
+def arm_effect(
+    cases: list[dict[str, Any]], before: list[dict[str, Any]], after: list[dict[str, Any]], arm: str
+) -> dict[str, Any]:
     old = {row["case_id"]: row for row in before if row["arm_id"] == arm}
     new = {row["case_id"]: row for row in after if row["arm_id"] == arm}
     pairs = []

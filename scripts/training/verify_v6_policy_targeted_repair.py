@@ -5,6 +5,8 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from pathlib import Path
+from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
 from ai.training.contextual_support_policy import (
@@ -17,21 +19,24 @@ from ai.training.contextual_support_policy import (
     explicit_completion_issue,
     explicit_imminent_self_harm,
 )
+from scripts.training.build_v6_safety_judge_packets import ROOT
 from scripts.training.generate_v6_acknowledgment import build_transport
 from scripts.training.replay_v6_support_trace import RecordedTransport
 from scripts.training.v6_policy_confirmation import PROBES
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write
 
 VERSION = "v35"
 SOURCE = DIRECTORY / f"bounded-support-{VERSION}"
 RESULTS = OUTPUT / f"bounded-{VERSION}"
 
 
-def digest(path) -> str:
+def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_run() -> tuple[list[dict], dict, dict, dict, list[dict], list[dict]]:
+def load_run() -> tuple[
+    list[dict[str, Any]], dict[str, Any], dict[str, Any], dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]
+]:
     cases = rows(SOURCE / "cases.jsonl")
     config = json.loads((SOURCE / "config.json").read_text())
     run = json.loads((SOURCE / "run-result.json").read_text())
@@ -60,9 +65,11 @@ def load_run() -> tuple[list[dict], dict, dict, dict, list[dict], list[dict]]:
     return cases, config, run, plan, results, calls
 
 
-def replay_responses(cases: list[dict], config: dict, results: list[dict], calls: list[dict]) -> tuple[int, int, int]:
+def replay_responses(
+    cases: list[dict[str, Any]], config: dict[str, Any], results: list[dict[str, Any]], calls: list[dict[str, Any]]
+) -> tuple[int, int, int]:
     case_by_id = {case["id"]: case for case in cases}
-    calls_by_key: dict[str, list[dict]] = {}
+    calls_by_key: dict[str, list[dict[str, Any]]] = {}
     for call in calls:
         key = call.get("response_key")
         if key not in {f"{case_id}:{arm['id']}" for case_id in case_by_id for arm in config["arms"]}:
@@ -99,7 +106,9 @@ def replay_responses(cases: list[dict], config: dict, results: list[dict], calls
     return passed_replays, deterministic_responses, matched_calls
 
 
-def audit_ordinary_task_completion(cases: list[dict], results: list[dict], ordinary_case_ids: set[str]) -> int:
+def audit_ordinary_task_completion(
+    cases: list[dict[str, Any]], results: list[dict[str, Any]], ordinary_case_ids: set[str]
+) -> int:
     case_by_id = {case["id"]: case for case in cases}
     failures = []
     checked = 0
@@ -116,7 +125,7 @@ def audit_ordinary_task_completion(cases: list[dict], results: list[dict], ordin
     return checked
 
 
-def audit_prior_v8_task_failures(cases: list[dict], results: list[dict]) -> dict:
+def audit_prior_v8_task_failures(cases: list[dict[str, Any]], results: list[dict[str, Any]]) -> dict[str, Any]:
     review_root = DIRECTORY / "acknowledgment-candidate-v8"
     summary = json.loads((review_root / "qualified-review-v2/assessment-summary.json").read_text())
     mapping = {
@@ -147,7 +156,7 @@ def audit_prior_v8_task_failures(cases: list[dict], results: list[dict]) -> dict
     }
 
 
-def audit_response_quality(cases: list[dict], results: list[dict]) -> tuple[int, dict]:
+def audit_response_quality(cases: list[dict[str, Any]], results: list[dict[str, Any]]) -> tuple[int, dict[str, Any]]:
     case_by_id = {case["id"]: case for case in cases}
     route_by_input = {}
     for entry in rows(RESULTS / "routing-audit.jsonl"):
@@ -219,7 +228,7 @@ def audit_response_quality(cases: list[dict], results: list[dict]) -> tuple[int,
     }
 
 
-def verify() -> dict:
+def verify() -> dict[str, Any]:
     cases, config, run, _plan, results, calls = load_run()
     passed_replays, deterministic_responses, matched_calls = replay_responses(cases, config, results, calls)
     ordinary_checks, quality = audit_response_quality(cases, results)

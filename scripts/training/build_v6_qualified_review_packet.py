@@ -6,16 +6,19 @@ import argparse
 import hashlib
 import json
 import random
+from pathlib import Path
+from typing import Any
 
-from scripts.training.v6_policy_resolution import DIRECTORY, DOCS, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import DOCS, ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 
-def digest(path):
+def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def current_source(proof):
-    result = {}
+def current_source(proof: dict[str, Any]) -> dict[str, dict[str, str]]:
+    result: dict[str, dict[str, str]] = {}
     for name, expected in proof["implementation_sha256"].items():
         path = ROOT / "ai/training" / name
         if digest(path) != expected:
@@ -24,8 +27,9 @@ def current_source(proof):
     return result
 
 
-def blind_packets(version):
-    packets, mapping = [], []
+def blind_packets(version: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    packets: list[dict[str, Any]] = []
+    mapping: list[dict[str, Any]] = []
     rng = random.Random(2026102109)
     rubric = json.loads((DOCS / "safety-quality-dev-v1.rubric.json").read_text())["case_criteria"]
     references = {
@@ -69,7 +73,7 @@ def blind_packets(version):
     return packets, mapping
 
 
-def build(version):
+def build(version: str) -> Path:
     target = DIRECTORY / f"bounded-support-{version}/qualified-review"
     proof_path = target.parent / "current-code-replay-proof.json"
     proof = json.loads(proof_path.read_text())
@@ -139,7 +143,7 @@ def build(version):
     return target
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", default="v15")
     print(build(parser.parse_args().version))

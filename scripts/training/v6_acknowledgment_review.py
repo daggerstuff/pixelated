@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+from typing import Any
 
 from ai.training.support_task_review import INPUT_CAP, OUTPUT_CAP, validate as validate_task
 from scripts.training.calibrate_v6_acknowledgment_single import packet
@@ -9,7 +10,7 @@ from scripts.training.v6_adjustment_repair import RepairedTaskReviewer
 from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows
 
 
-def calibrated_acknowledgment():
+def calibrated_acknowledgment() -> dict[str, Any]:
     target = DIRECTORY / "acknowledgment-v11"
     result = json.loads((target / "result.json").read_text())
     plan = json.loads((target / "plan.json").read_text())
@@ -38,11 +39,11 @@ def calibrated_acknowledgment():
 
 
 class AcknowledgmentReviewer(RepairedTaskReviewer):
-    def __init__(self, *args, acknowledgment_bundle, **kwargs):
+    def __init__(self, *args: Any, acknowledgment_bundle: dict[str, Any], **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.acknowledgment = acknowledgment_bundle
 
-    def require_calibration(self):
+    def require_calibration(self) -> None:
         super().require_calibration()
         bundle = self.acknowledgment
         if (
@@ -52,7 +53,7 @@ class AcknowledgmentReviewer(RepairedTaskReviewer):
         ):
             raise ValueError("acknowledgment reviewer identity mismatch")
 
-    def _adjustment_check(self, messages, response):
+    def _adjustment_check(self, messages: list[dict[str, Any]], response: str) -> dict[str, Any]:
         adjustment = super()._adjustment_check(messages, response)
         if not adjustment["met"]:
             return adjustment
@@ -79,5 +80,6 @@ class AcknowledgmentReviewer(RepairedTaskReviewer):
             or not 0 <= usage["completion_tokens"] <= OUTPUT_CAP
         ):
             raise ValueError("incomplete acknowledgment check; withheld")
-        entry["result"] = validate_task(json.loads(result["response"]))
-        return entry["result"]
+        resolved = validate_task(json.loads(result["response"]))
+        entry["result"] = resolved
+        return resolved

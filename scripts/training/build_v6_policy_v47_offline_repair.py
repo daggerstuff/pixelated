@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 from ai.training.cliche_gate import is_sycophantic
 from ai.training.contextual_support_policy import (
@@ -16,7 +17,8 @@ from ai.training.contextual_support_policy import (
     explicit_imminent_self_harm,
     explicit_reported_ingestion,
 )
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 SOURCE = DIRECTORY / "bounded-support-v46"
 SOURCE_RESULTS = OUTPUT / "bounded-v46" / "results.jsonl"
@@ -25,7 +27,7 @@ TARGET = DIRECTORY / "bounded-support-v47"
 TARGET_RESULTS = OUTPUT / "bounded-v47" / "results.jsonl"
 
 
-def requested_loss_conversation(messages: list[dict]) -> bool:
+def requested_loss_conversation(messages: list[dict[str, Any]]) -> bool:
     user_text = "\n".join(message.get("content", "") for message in messages if message.get("role") == "user")
     return "friend died" in user_text.casefold() and "want to talk" in user_text.casefold()
 
@@ -34,7 +36,7 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def route_repair(messages: list[dict], response: str, route: str | None) -> tuple[str, str] | None:
+def route_repair(messages: list[dict[str, Any]], response: str, route: str | None) -> tuple[str, str] | None:
     if explicit_reported_ingestion(messages):
         return BOUNDARY_RESPONSES["ingestion"], "reported_ingestion_emergency_response"
     if explicit_imminent_self_harm(messages):
@@ -52,7 +54,7 @@ def route_repair(messages: list[dict], response: str, route: str | None) -> tupl
     return None
 
 
-def review_repair(messages: list[dict], response: str) -> tuple[str, str] | None:
+def review_repair(messages: list[dict[str, Any]], response: str) -> tuple[str, str] | None:
     if explicit_completion_issue(messages, response):
         repaired = _bounded_explicit_support_fallback(messages, response)
         if repaired is None:
@@ -66,7 +68,9 @@ def review_repair(messages: list[dict], response: str) -> tuple[str, str] | None
     return None
 
 
-def transform(cases: list[dict], source_results: list[dict], routing: list[dict]) -> tuple[list[dict], list[dict]]:
+def transform(
+    cases: list[dict[str, Any]], source_results: list[dict[str, Any]], routing: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     case_by_id = {case["id"]: case for case in cases}
     route_by_input = {
         row["input_sha256"]: row["route"] for row in routing if row.get("input_sha256") and row.get("route")
@@ -109,7 +113,7 @@ def transform(cases: list[dict], source_results: list[dict], routing: list[dict]
     return results, repairs
 
 
-def audit_response(row: dict, case: dict, route: str | None) -> None:
+def audit_response(row: dict[str, Any], case: dict[str, Any], route: str | None) -> None:
     response = row["response"]
     case_id = row["case_id"]
     if explicit_completion_issue(case["messages"], response):
@@ -132,7 +136,7 @@ def audit_response(row: dict, case: dict, route: str | None) -> None:
         raise ValueError(f"method detail leaked into fictional recovery response {case_id}")
 
 
-def audit_reviewer_fixes(outputs: dict, repair_keys: set[tuple[str, str]]) -> None:
+def audit_reviewer_fixes(outputs: dict[tuple[str, str], str], repair_keys: set[tuple[str, str]]) -> None:
     expected_pairs = {
         ("v6-safety-dev-acute_risk-02", "base"),
         ("v6-safety-dev-acute_risk-02", "sft"),
@@ -170,7 +174,12 @@ def audit_reviewer_fixes(outputs: dict, repair_keys: set[tuple[str, str]]) -> No
             raise ValueError(f"v47 medication questions are not exact and grounded: {case_id}:{arm_id}")
 
 
-def audit(cases: list[dict], results: list[dict], repairs: list[dict], routing: list[dict]) -> None:
+def audit(
+    cases: list[dict[str, Any]],
+    results: list[dict[str, Any]],
+    repairs: list[dict[str, Any]],
+    routing: list[dict[str, Any]],
+) -> None:
     case_by_id = {case["id"]: case for case in cases}
     route_by_input = {
         row["input_sha256"]: row["route"] for row in routing if row.get("input_sha256") and row.get("route")

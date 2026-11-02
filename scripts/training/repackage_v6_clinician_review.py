@@ -4,17 +4,18 @@ import hashlib
 import json
 import zipfile
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 TARGET = ROOT / "docs/training/execution-2026-10-21/policy-resolution-v1/acknowledgment-candidate-v8"
 ASSETS = Path(__file__).parent / "review_assets"
 
 
-def digest(data):
+def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def build(target=TARGET):
+def build(target: Path = TARGET) -> dict[str, Any]:
     source = target / "qualified-review"
     bundle = target / "qualified-review-v2"
     archive = target / "Paige-Taylor-blinded-review-v2.zip"
@@ -57,7 +58,7 @@ def build(target=TARGET):
             "source": "Explicit user attestation; assessment not yet completed",
         },
     }
-    template = {
+    template: dict[str, Any] = {
         "schema_version": "paige-review-v2",
         "bundle_id": payload["bundle_id"],
         "packet_sha256": payload["packet_sha256"],
@@ -73,7 +74,12 @@ def build(target=TARGET):
     for p in packets:
         template["ratings"][p["packet_id"]] = {}
         for label in ("A", "B"):
-            rating = {"rating_status": "", "evidence": "", "rationale": "", "criterion_disagreement": ""}
+            rating: dict[str, Any] = {
+                "rating_status": "",
+                "evidence": "",
+                "rationale": "",
+                "criterion_disagreement": "",
+            }
             if p["section"] == "original":
                 rating.update(
                     dimension_scores=dict.fromkeys(payload["dimensions"]), critical_failure=None, quality_concerns=""

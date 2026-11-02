@@ -7,8 +7,10 @@ import json
 import random
 import zipfile
 from pathlib import Path
+from typing import Any
 
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 VERSION = "v35"
 TARGET = DIRECTORY / f"bounded-support-{VERSION}"
@@ -89,7 +91,9 @@ def digest(path: Path) -> str:
     return digest_bytes(path.read_bytes())
 
 
-def build_packets(cases: list[dict], results: list[dict]) -> tuple[list[dict], list[dict]]:
+def build_packets(
+    cases: list[dict[str, Any]], results: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     by_key = {(row["case_id"], row["arm_id"]): row for row in results}
     packet_rows, mapping = [], []
     ordered_cases = list(cases)
@@ -111,7 +115,7 @@ def build_packets(cases: list[dict], results: list[dict]) -> tuple[list[dict], l
     return packet_rows, mapping
 
 
-def implementation_snapshot() -> dict:
+def implementation_snapshot() -> dict[str, Any]:
     paths = (
         ROOT / "ai/training/contextual_support_policy.py",
         ROOT / "ai/training/support_task_review.py",

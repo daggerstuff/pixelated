@@ -7,6 +7,7 @@ import hashlib
 import json
 import random
 from pathlib import Path
+from typing import Any
 
 from scripts.training.build_v6_safety_judge_packets import DOCS, ROOT, judge_config, packet, validate_rating
 from scripts.training.summarize_v6_paired_evaluations import canonical_hash
@@ -40,7 +41,7 @@ Final answer checks, for every conversation:
 )
 
 
-def variant_cases(cases: list[dict], instruction: str = POLICY) -> list[dict]:
+def variant_cases(cases: list[dict[str, Any]], instruction: str = POLICY) -> list[dict[str, Any]]:
     result = copy.deepcopy(cases)
     for case in result:
         if case["messages"][0]["role"] != "system":
@@ -50,7 +51,9 @@ def variant_cases(cases: list[dict], instruction: str = POLICY) -> list[dict]:
     return result
 
 
-def calibration(rubric: dict, cases: dict[str, dict]) -> tuple[list[dict], list[dict]]:
+def calibration(
+    rubric: dict[str, Any], cases: dict[str, dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Catch the observed omissions and false acceptance without revealing labels."""
     examples = [
         (
@@ -111,7 +114,8 @@ def calibration(rubric: dict, cases: dict[str, dict]) -> tuple[list[dict], list[
         ),
     ]
     rng = random.Random(20261021)
-    packets, expected = [], []
+    packets: list[dict[str, Any]] = []
+    expected: list[dict[str, Any]] = []
     for index, (suffix, first, second, flag_a, flag_b) in enumerate(examples):
         case = cases[f"v6-safety-dev-{suffix}"]
         values = [(first, flag_a), (second, flag_b)]
@@ -137,13 +141,19 @@ def calibration(rubric: dict, cases: dict[str, dict]) -> tuple[list[dict], list[
     return packets, expected
 
 
-def check_calibration(rows: list[dict], cases: list[dict], expected: list[dict], dimensions: set[str]) -> dict:
+def check_calibration(
+    rows: list[dict[str, Any]],
+    cases: list[dict[str, Any]],
+    expected: list[dict[str, Any]],
+    dimensions: set[str],
+) -> dict[str, Any]:
     """Fail closed on missing, truncated, unratable, or wrongly flagged anchors."""
     by_id = {case["id"]: case for case in cases}
     flags = {item["case_id"]: item["expected_critical_flags"] for item in expected}
     if len(by_id) != len(cases) or len(flags) != len(expected) or set(flags) != set(by_id) or not by_id:
         raise ValueError("calibration anchor identities differ")
-    seen, failed = set(), []
+    seen: set[str] = set()
+    failed: list[dict[str, Any]] = []
     for row in rows:
         ident = row["case_id"]
         if ident in seen or ident not in by_id:
@@ -174,8 +184,12 @@ def check_calibration(rows: list[dict], cases: list[dict], expected: list[dict],
 
 
 def require_calibrated_judge(
-    rows: list[dict], cases: list[dict], expected: list[dict], dimensions: set[str], config: dict
-) -> dict:
+    rows: list[dict[str, Any]],
+    cases: list[dict[str, Any]],
+    expected: list[dict[str, Any]],
+    dimensions: set[str],
+    config: dict[str, Any],
+) -> dict[str, Any]:
     """Verify the exact judge/config, then refuse a scored run on failed anchors."""
     if any(
         row.get("config_sha256") != canonical_hash(config)
@@ -191,6 +205,7 @@ def require_calibrated_judge(
 
 
 def prepare(destination: Path = DOCS / "policy-repair-v2") -> None:
+    cases: list[dict[str, Any]] | dict[str, dict[str, Any]]
     if destination.exists():
         raise ValueError("refusing to overwrite a registered repair experiment")
     plan = json.loads((DOCS / "role-risk-policy-experiment-plan.json").read_text())
@@ -237,7 +252,7 @@ def prepare(destination: Path = DOCS / "policy-repair-v2") -> None:
             )
             (destination / f"{judge}-{stage}-config.json").write_text(json.dumps(cfg, indent=2) + "\n")
             judge_caps += cfg["pricing"]["hard_cap_usd"]
-    manifest = {
+    manifest: dict[str, Any] = {
         "experiment_id": "nemotron35-v6-policy-repair-v2",
         "instruction": POLICY,
         "suites": suites,
