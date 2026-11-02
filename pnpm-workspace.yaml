@@ -331,7 +331,7 @@ overrides:
   eslint>minimatch: ^3.1.4
   express: '>=4.20.0'
   fast-xml-parser: 5.7.0
-  follow-redirects: '>=1.16.0'
+  follow-redirects: '>=1.16.2'
   glob: ^13.0.0
   h3: '>=1.15.9'
   # Exact pin, not a caret range: prerelease ranges (^x-rc.N) re-resolve to
@@ -349,7 +349,7 @@ overrides:
   js-yaml: 4.3.2
   markdown-it: 14.2.0
   '@opentelemetry/core': 2.8.0
-  joi: 17.13.8
+  joi: 17.13.9
   # Version-drift ratchet: consolidate duplicate resolutions introduced by
   # the Dependabot major-updates merge (#6053) — single-version pins, all
   # semver-compatible with their requesters.
@@ -374,7 +374,11 @@ overrides:
   handlebars: '>=4.7.9'
   smol-toml: '>=1.6.1'
   minimatch: ^10.2.3
-  node-domexception: ^2.0.1
+  # 2.x is a side-effect-only polyfill with no module exports, so
+  # `import DOMException from 'node-domexception'` (fetch-blob 3.x/4.x,
+  # formdata-node) fails to bundle. Every consumer here wants the 1.x
+  # default export, so keep the single-version pin on 1.0.0.
+  node-domexception: 1.0.0
   node-forge: '>=1.4.0'
   node-gyp: ^10.0.0
   openai: npm:openai@6.37.0
@@ -387,9 +391,10 @@ overrides:
   scmp: 2.1.0
   sitemap: ^9.0.0
   socket.io-parser: '>=4.2.6'
+  systeminformation: ^5.33.16
   tar: ^7.5.11
   tmp: '>=0.2.4'
-  undici: ^7.25.0
+  undici: ^7.30.1
   unocss: ^66.7.0
   wrangler: ^4.59.1
   yaml: npm:yaml@2.8.4
@@ -398,16 +403,24 @@ overrides:
   zod: ^4.3.2
   solid-js: 1.9.12
   ws: '>=8.21.0'
-  # CVE-2026-104852 (HIGH, fixed in 12.0.1): @graphql-codegen/cli 7.4.x pins
-  # ^11.2.0 via its @graphql-tools v8-10 deps (no newer cli exists; the v8-10
-  # tool lines ended). Force the patched 12.x line, matching the direct dep.
-  '@graphql-tools/utils': ^12.0.3
+  # NOTE: deliberately no global @graphql-tools/utils pin. The tree splits
+  # across two incompatible major lines: the @graphql-codegen /
+  # @graphql-tools v8-12 loader stack needs ^12.x, while graphql-yoga 6.x
+  # (with @graphql-tools schema@11, executor@4, merge@10) needs ^13.x and
+  # re-exports DEFAULT_MULTIPART_CONTENT_TYPE from it, which 12.x does not
+  # provide. Both lines resolve at or above the CVE-2026-104852 fix (12.0.1),
+  # so no pin is needed to stay patched.
   # CVE-2026-93749 (HIGH, fixed in 1.2.2): pulled by @eslint/css-tree.
   source-map-js: ^1.2.2
   # CVE-2026-104850 (HIGH, fixed in 2.2.0): agents 0.26.x pins @modelcontextprotocol/client
   # as an exact 2.0.0 peer (no released agents version allows 2.2.0), so force the
   # patched 2.x line. Drop when agents ships an updated peer range.
   '@modelcontextprotocol/client': ^2.2.0
+  # CVE-2026-111768 / CVE-2026-111770 (HIGH, fixed in 2.3.0) and GHSA-f897-62hf-6gxq
+  # (fixed in 2.1.0): the agents packages still request the older MCP server/node
+  # lines. Force the patched versions; drop when the agents peer ranges move.
+  '@modelcontextprotocol/node': ^2.1.0
+  '@modelcontextprotocol/server': ^2.3.0
 patchedDependencies:
   # Patched for URL-unsafe characters in file paths. Versionless key for 0.10–0.12
   # (space-formatted upstream) survives transitive version bumps. 0.13.0 reformatted
