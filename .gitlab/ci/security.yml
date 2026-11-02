@@ -1,2 +1,0 @@
-# Security configuration - simplified for main pipeline
-# Main security scanning is handled in .gitlab-ci.yml
