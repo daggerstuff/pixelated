@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import json
 from pathlib import Path
+from typing import Any
 
 from scripts.training.build_v6_safety_judge_packets import DOCS
 from scripts.training.summarize_v6_paired_evaluations import canonical_hash
@@ -23,7 +24,9 @@ SLOT_ID_DESCRIPTION = (
 )
 
 
-def describe_booking_note(cases: list[dict], *, optional: bool = False, describe_slot: bool = False) -> list[dict]:
+def describe_booking_note(
+    cases: list[dict[str, Any]], *, optional: bool = False, describe_slot: bool = False
+) -> list[dict[str, Any]]:
     """Clarify optional input; preserve types, consent, prompts and verifiers."""
     result = copy.deepcopy(cases)
     for case in result:
@@ -41,7 +44,7 @@ def describe_booking_note(cases: list[dict], *, optional: bool = False, describe
     return result
 
 
-def prepare(directory: Path, *, optional: bool = False, full_suite: bool = False) -> dict:
+def prepare(directory: Path, *, optional: bool = False, full_suite: bool = False) -> dict[str, Any]:
     source = DOCS / "policy-repair-v3"
     cases = [json.loads(line) for line in (source / "tools-cases.jsonl").read_text().splitlines()]
     if not full_suite:

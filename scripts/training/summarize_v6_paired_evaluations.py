@@ -47,22 +47,22 @@ def paired_interval(values: list[tuple[str, float]], draws: int = 5000) -> dict[
 def summarize(cases: list[dict[str, Any]], rows: list[dict[str, Any]], config: dict[str, Any]) -> dict[str, Any]:
     by_case = {case["id"]: case for case in cases}
     arms = {arm["id"]: arm for arm in config["arms"]}
-    records = {}
-    for row in rows:
-        key = row["arm_id"], row["case_id"]
+    records: dict[tuple[str, str], dict[str, Any]] = {}
+    for record in rows:
+        key = record["arm_id"], record["case_id"]
         if key in records or key[0] not in arms or key[1] not in by_case:
             raise ValueError("duplicate or unknown arm/case record")
         if (
-            row["case_sha256"] != canonical_hash(by_case[key[1]])
-            or row["config_sha256"] != canonical_hash(config)
-            or row["model"] != arms[key[0]]["model"]
+            record["case_sha256"] != canonical_hash(by_case[key[1]])
+            or record["config_sha256"] != canonical_hash(config)
+            or record["model"] != arms[key[0]]["model"]
         ):
             raise ValueError("case/config/model identity mismatch")
-        records[key] = row
-    arm_summaries = {}
-    paired_values = []
-    regression_ids = []
-    case_rows = []
+        records[key] = record
+    arm_summaries: dict[str, dict[str, Any]] = {}
+    paired_values: list[tuple[str, float]] = []
+    regression_ids: list[str] = []
+    case_rows: list[dict[str, Any]] = []
     for arm in arms:
         selected = [records.get((arm, case["id"])) for case in cases]
         successes = [row for row in selected if row and row["status"] == "success"]
@@ -102,17 +102,17 @@ def summarize(cases: list[dict[str, Any]], rows: list[dict[str, Any]], config: d
             ),
         }
     for case in cases:
-        scores = {}
-        statuses = {}
+        scores: dict[str, float | None] = {}
+        statuses: dict[str, str] = {}
         expected = case.get("state_checks", [])
         for arm in arms:
             row = records.get((arm, case["id"]))
             statuses[arm] = row["status"] if row else "missing"
             usable = bool(row and row["status"] == "success" and row.get("finish_reason") != "length")
-            measured = row.get("state_metrics", []) if usable else []
+            measured = row.get("state_metrics", []) if usable and row else []
             scores[arm] = sum(bool(item["passed"]) for item in measured) / len(expected) if expected else None
         if expected:
-            delta = scores["sft"] - scores["base"]
+            delta = (scores["sft"] or 0.0) - (scores["base"] or 0.0)
             paired_values.append((case["scenario"], delta))
             if delta < 0:
                 regression_ids.append(case["id"])
@@ -136,7 +136,7 @@ def summarize(cases: list[dict[str, Any]], rows: list[dict[str, Any]], config: d
 
 def main() -> None:
     budget = json.loads((DOCS / "v6-evaluation-budget.json").read_text())
-    results = {}
+    results: dict[str, dict[str, Any]] = {}
     for label in ("gemma4", "nemotron35"):
         results[label] = {}
         for suite, spec in zip(("tools", "capability", "safety"), budget["suites"], strict=True):

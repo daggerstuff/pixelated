@@ -63,9 +63,10 @@ def candidate_pair(row: dict[str, Any]) -> tuple[str, str]:
     ]
     if len(parts) != 2 or parts[0][0] != "user" or parts[1][0] != "assistant":
         raise ValueError("ambiguous book candidate is not one user/assistant pair")
-    if not all(isinstance(content, str) for _, content in parts):
+    user_content, assistant_content = parts[0][1], parts[1][1]
+    if not isinstance(user_content, str) or not isinstance(assistant_content, str):
         raise ValueError("candidate user/assistant content is not text")
-    return parts[0][1], parts[1][1]
+    return user_content, assistant_content
 
 
 def load_candidate_targets(

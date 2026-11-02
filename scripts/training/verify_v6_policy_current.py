@@ -9,12 +9,15 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from pathlib import Path
+from typing import Any
 
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 from scripts.training.verify_v6_policy_final import groups, verify_response
 
 
-def source_trace(path, key):
+def source_trace(path: Path, key: tuple[str, str]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     actual = rows(path)
     index = next(i for i, r in enumerate(actual) if (r["case_id"], r["arm_id"]) == key)
     trace = groups(rows(path.parent / "all-provider-calls.jsonl"))[index]
@@ -24,7 +27,12 @@ def source_trace(path, key):
     return trace, config
 
 
-def replay_stage(stage, changes, settings, versions):
+def replay_stage(
+    stage: str,
+    changes: dict[tuple[str, str], dict[str, Any]],
+    settings: tuple[dict[str, Any], dict[str, Any]],
+    versions: tuple[str, str],
+) -> dict[str, Any]:
     version, previous = versions
     source = DIRECTORY / f"bounded-support-{previous}" / stage
     cases = {c["id"]: c for c in rows(source / "cases.jsonl")}
@@ -77,7 +85,7 @@ def replay_stage(stage, changes, settings, versions):
     return {"stage": stage, "verified_responses": len(final), "matched_provider_calls": calls, "fresh_responses": fresh}
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", choices=("v15", "v16", "v17", "v18"), default="v18")
     version = parser.parse_args().version
@@ -92,7 +100,7 @@ def main():
     changes = {(r["case_id"], r["arm_id"]): r for r in changed}
     if len(changes) != expected:
         raise ValueError("duplicate changed responses")
-    proof = {
+    proof: dict[str, Any] = {
         "network_calls": 0,
         "clinical_validation": False,
         "stages": [

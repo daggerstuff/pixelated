@@ -57,8 +57,9 @@ Subscription documents are exposed as raw strings for use with a `graphql-ws`
 client:
 
 ```typescript
-import { createGraphqlClient } from '@/lib/graphql/client'
 import { createClient as createWsClient } from 'graphql-ws'
+
+import { createGraphqlClient } from '@/lib/graphql/client'
 
 const client = createGraphqlClient({
   endpoint: 'http://localhost:5173/api/graphql',

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from typing import Any
 
 from ai.training.support_task_review import ADJUSTMENT_INSTRUCTION, INSTRUCTION, TaskResponseReviewer
 
@@ -49,26 +50,36 @@ ADJUSTMENT_V3_SHA256 = hashlib.sha256((TASK_V2 + ADJUSTMENT_V3).encode()).hexdig
 class AdjustmentTransport:
     """Change only the legacy adjustment instruction, never draft or task requests."""
 
-    def __init__(self, transport, version="v2"):
+    def __init__(self, transport: Any, version: str = "v2") -> None:
         self.transport = transport
         self.instruction = ADJUSTMENT_V3 if version == "v3" else ADJUSTMENT_V2
 
-    def complete(self, arm, messages, tools, decoding):
+    def complete(
+        self, arm: dict[str, Any], messages: list[dict[str, Any]], tools: list[dict[str, Any]], decoding: dict[str, Any]
+    ) -> dict[str, Any]:
         if not tools and messages and messages[0] == {"role": "system", "content": ADJUSTMENT_INSTRUCTION}:
             messages = [{"role": "system", "content": self.instruction}, *messages[1:]]
         elif not tools and messages and messages[0] == {"role": "system", "content": INSTRUCTION}:
             messages = [{"role": "system", "content": TASK_V2}, *messages[1:]]
-        return self.transport.complete(arm, messages, tools, decoding)
+        result: dict[str, Any] = self.transport.complete(arm, messages, tools, decoding)
+        return result
 
 
 class RepairedTaskReviewer(TaskResponseReviewer):
-    def __init__(self, transport, arm, certificate, adjustment_certificate, version="v2"):
+    def __init__(
+        self,
+        transport: Any,
+        arm: dict[str, Any],
+        certificate: dict[str, Any],
+        adjustment_certificate: dict[str, Any],
+        version: str = "v2",
+    ) -> None:
         super().__init__(AdjustmentTransport(transport, version), arm, certificate)
         self.repair_hash = ADJUSTMENT_V3_SHA256 if version == "v3" else ADJUSTMENT_V2_SHA256
         self.version = version
         self.adjustment_certificate = adjustment_certificate
 
-    def require_calibration(self):
+    def require_calibration(self) -> None:
         super().require_calibration()
         certificate = self.adjustment_certificate
         if (
@@ -79,7 +90,9 @@ class RepairedTaskReviewer(TaskResponseReviewer):
         ):
             raise ValueError("repaired adjustment calibration absent or mismatched")
 
-    def review(self, messages, response, *, require_adjustment=False):
+    def review(
+        self, messages: list[dict[str, Any]], response: str, *, require_adjustment: bool = False
+    ) -> dict[str, Any]:
         start = len(self.audit)
         try:
             return super().review(messages, response, require_adjustment=require_adjustment)
@@ -87,7 +100,7 @@ class RepairedTaskReviewer(TaskResponseReviewer):
             for entry in self.audit[start:]:
                 entry["repair_protocol_sha256"] = self.repair_hash
 
-    def _adjustment_check(self, messages, response):
+    def _adjustment_check(self, messages: list[dict[str, Any]], response: str) -> dict[str, Any]:
         try:
             return super()._adjustment_check(messages, response)
         finally:

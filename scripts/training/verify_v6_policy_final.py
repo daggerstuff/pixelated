@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+from typing import Any
 
 from ai.training.contextual_support_policy import ContextualSupportTransport, canonical_hash
 from ai.training.support_task_review import TaskResponseReviewer
+from scripts.training.build_v6_safety_judge_packets import ROOT
 from scripts.training.replay_v6_support_trace import RecordedTransport
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 
-def groups(records: list[dict]) -> list[list[dict]]:
-    result: list[list[dict]] = []
+def groups(records: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
+    result: list[list[dict[str, Any]]] = []
     for record in records:
         if record["max_tokens"] == 96 and "gemma-4" in record["model"]:
             result.append([])
@@ -22,7 +24,13 @@ def groups(records: list[dict]) -> list[list[dict]]:
     return result
 
 
-def verify_response(trace, settings, config, messages, selected):
+def verify_response(
+    trace: list[dict[str, Any]],
+    settings: tuple[dict[str, Any], dict[str, Any]],
+    config: dict[str, Any],
+    messages: list[dict[str, Any]],
+    selected: dict[str, Any],
+) -> tuple[ContextualSupportTransport, int]:
     router, certificate = settings
     arm = next(a for a in config["arms"] if a["id"] == selected["arm_id"])
     raw = RecordedTransport(trace)
@@ -38,7 +46,12 @@ def verify_response(trace, settings, config, messages, selected):
     return transport, raw.count
 
 
-def write_stage(stage, cases, config, evidence):
+def write_stage(
+    stage: str,
+    cases: dict[str, dict[str, Any]],
+    config: dict[str, Any],
+    evidence: tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]],
+) -> None:
     final, final_audit, provenance = evidence
     target = DIRECTORY / "bounded-support-v14" / stage
     output = OUTPUT / f"bounded-v14-{stage}"
@@ -61,7 +74,7 @@ def main() -> None:
     certificate = json.loads((DIRECTORY / "task-review-v3/certificate.json").read_text())
     changed = rows(OUTPUT / "bounded-v14-changed/results.jsonl")
     replacements = {(r["case_id"], r["arm_id"]): r for r in changed}
-    proof = {
+    proof: dict[str, Any] = {
         "network_calls": 0,
         "clinical_validation": False,
         "stages": [],

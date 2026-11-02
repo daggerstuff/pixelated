@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from typing import Any, Protocol
 
 from ai.training.contextual_support_policy import ROUTES, UNIVERSAL
 
@@ -32,14 +33,30 @@ GUIDANCE_V2 = (
 )
 
 
+class _Transport(Protocol):
+    def complete(
+        self,
+        arm: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        decoding: dict[str, Any],
+    ) -> dict[str, Any]: ...
+
+
 class AcknowledgmentDraftTransport:
     """Transform only ordinary draft requests, leaving routing/review/tools intact."""
 
-    def __init__(self, transport, guidance=GUIDANCE):
+    def __init__(self, transport: _Transport, guidance: str = GUIDANCE) -> None:
         self.transport = transport
         self.guidance = guidance
 
-    def complete(self, arm, messages, tools, decoding):
+    def complete(
+        self,
+        arm: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        decoding: dict[str, Any],
+    ) -> dict[str, Any]:
         marker = UNIVERSAL + "\n" + ROUTES["ordinary"]
         if not tools and messages and messages[0].get("role") == "system" and marker in messages[0].get("content", ""):
             messages = copy.deepcopy(messages)

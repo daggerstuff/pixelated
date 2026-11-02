@@ -9,7 +9,7 @@
 
 import { Buffer } from 'buffer'
 
-import archiver from 'archiver'
+import { ZipArchive } from 'archiver'
 import PDFDocument from 'pdfkit'
 
 // Augment PDFKit types for methods used in this file
@@ -628,7 +628,7 @@ export class ExportService {
     const chunks: Buffer[] = []
 
     // Create archive
-    const archive = archiver('zip', {
+    const archive = new ZipArchive({
       zlib: { level: 9 }, // Maximum compression
     })
 

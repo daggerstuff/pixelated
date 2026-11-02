@@ -2,20 +2,22 @@
 
 import json
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
 from scripts.training.generate_v6_acknowledgment import LedgerTransport
 from scripts.training.v6_policy_resolution import rows, write, write_rows
 
 
-def run_fourway(target, results, cap, max_input_tokens=8192):
+def run_fourway(target: Path, results: Path, cap: float, max_input_tokens: int = 8192) -> dict[str, Any]:
     if results.exists():
         raise ValueError("judge output exists; automatic retries prohibited")
     packets = rows(target / "judge-cases.jsonl")
     for i in range(4):
         write_rows(target / f"shard-{i}/cases.jsonl", packets[i::4])
 
-    def worker(i):
+    def worker(i: int) -> dict[str, Any]:
         dest = results / f"shard-{i}"
         dest.mkdir(parents=True)
         transport = LedgerTransport(
@@ -49,7 +51,7 @@ def run_fourway(target, results, cap, max_input_tokens=8192):
     }
 
 
-def run_sampled(target, results, cap):
+def run_sampled(target: Path, results: Path, cap: float) -> dict[str, Any]:
     """Standalone judge diagnostic: paired generation harness intentionally requires temperature zero."""
     if results.exists():
         raise ValueError("sampled output exists; retries prohibited")
@@ -60,11 +62,11 @@ def run_sampled(target, results, cap):
         raise ValueError("unexpected sampled judge configuration")
     config_hash = paired_eval.sha256_bytes(paired_eval.canonical_json(config).encode())
 
-    def worker(i):
+    def worker(i: int) -> int:
         dest = results / f"shard-{i}"
         dest.mkdir(parents=True)
         transport = LedgerTransport(dest, cap / 4, len(cases[i::4]))
-        outputs = []
+        outputs: list[dict[str, Any]] = []
         for case in cases[i::4]:
             count = paired_eval.ConservativeAsciiByteCounter().count(case["messages"], [])
             if count > 8192:

@@ -8,7 +8,7 @@ import zipfile
 from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 
-def main():
+def main() -> None:
     target = DIRECTORY / "acknowledgment-candidate-v8"
     bundle = target / "qualified-review"
     archive = target / "Paige-Taylor-blinded-review.zip"

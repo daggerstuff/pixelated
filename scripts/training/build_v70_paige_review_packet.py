@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 RUN = (
@@ -14,7 +15,7 @@ OUTPUT = ROOT / "ai/training/output/v6-policy-resolution-v1/bounded-v70-fresh-tr
 REVIEW = ROOT / "docs/training/execution-2026-10-21/policy-resolution-v1/bounded-support-v70/paige-review"
 
 
-def read_jsonl(path: Path) -> list[dict]:
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
 
@@ -27,7 +28,7 @@ def build() -> None:
         raise ValueError("v70 review packet already exists; refusing overwrite")
     cases = read_jsonl(RUN / "cases.jsonl")
     results = read_jsonl(OUTPUT / "results.jsonl")
-    by_case: dict[str, list[dict]] = {}
+    by_case: dict[str, list[dict[str, Any]]] = {}
     for result in results:
         by_case.setdefault(result["case_id"], []).append(result)
     REVIEW.mkdir(parents=True)

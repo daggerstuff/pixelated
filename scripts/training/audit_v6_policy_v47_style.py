@@ -7,6 +7,7 @@ import hashlib
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "packages/deslop"))
@@ -25,7 +26,7 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def audit(results_path: Path, output_path: Path) -> dict:
+def audit(results_path: Path, output_path: Path) -> dict[str, Any]:
     rows = [json.loads(line) for line in results_path.read_text().splitlines() if line]
     if len(rows) != 112 or len({(row["case_id"], row["arm_id"]) for row in rows}) != 112:
         raise ValueError("style audit requires all 112 unique paired response slots")

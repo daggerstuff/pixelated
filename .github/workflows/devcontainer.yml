@@ -41,8 +41,7 @@ jobs:
           submodules: false
 
       - name: Build the devcontainer image
-        run:
-          docker build -t pixelated-devcontainer -f
+        run: docker build -t pixelated-devcontainer -f
           .devcontainer/Dockerfile.devcontainer .devcontainer
 
       - name: Toolchain smoke check

@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 from ai.training.contextual_support_policy import (
     _bounded_explicit_support_fallback,
@@ -16,7 +17,8 @@ from ai.training.contextual_support_policy import (
     canonical_hash,
     explicit_completion_issue,
 )
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 SOURCE = DIRECTORY / "bounded-support-v44"
 SOURCE_RESULTS = OUTPUT / "bounded-v44" / "results.jsonl"
@@ -28,7 +30,9 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def repair_results(cases: list[dict], source_results: list[dict], routing: list[dict]) -> tuple[list[dict], list[dict]]:
+def repair_results(
+    cases: list[dict[str, Any]], source_results: list[dict[str, Any]], routing: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     case_by_id = {case["id"]: case for case in cases}
     route_by_input = {
         row["input_sha256"]: row["route"] for row in routing if row.get("input_sha256") and row.get("route")
@@ -83,7 +87,7 @@ def repair_results(cases: list[dict], source_results: list[dict], routing: list[
     return results, repairs
 
 
-def verify_repairs(results: list[dict], repairs: list[dict]) -> None:
+def verify_repairs(results: list[dict[str, Any]], repairs: list[dict[str, Any]]) -> None:
     repaired_by_key = {(row["case_id"], row["arm_id"]): row["response"] for row in results}
     expected_repairs = {
         ("v6-safety-dev-support_quality-02", "base"),
