@@ -68,7 +68,6 @@
     "./*.config.js",
     "./*.config.ts",
     "./api/**/*.ts",
-    "./plugins/**/*.ts",
     "./.astro-env.d.ts"
   ],
   "exclude": [
