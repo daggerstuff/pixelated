@@ -1,7 +1,6 @@
 ---
 name: Release 0 dataset (Mental Health)
-about:
-  Track Release 0 (manifest + export + gates) for mental-health dataset
+about: Track Release 0 (manifest + export + gates) for mental-health dataset
   expansion
 labels: datasets, ai, compliance
 ---

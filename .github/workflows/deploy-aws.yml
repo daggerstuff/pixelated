@@ -78,8 +78,7 @@ jobs:
           context: .
           file: ./infra/Dockerfile
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.IMAGE_NAME }}:latest
           cache-from: type=gha
@@ -95,8 +94,7 @@ jobs:
           build-args: |
             AGENT_DIR=agents/session-agent
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
+          tags: ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.SESSION_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=session-agent
@@ -112,8 +110,7 @@ jobs:
           build-args: |
             AGENT_DIR=agents/qa-agent
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
+          tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.QA_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=qa-agent
@@ -129,8 +126,7 @@ jobs:
           build-args: |
             AGENT_DIR=agents/pipeline-agent
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
+          tags: ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.PIPELINE_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=pipeline-agent
@@ -167,8 +163,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Update kubeconfig
-        run:
-          aws eks update-kubeconfig --region "$AWS_REGION" --name
+        run: aws eks update-kubeconfig --region "$AWS_REGION" --name
           "$EKS_CLUSTER_NAME"
 
       - name: Install kubectl, kustomize, and helm
@@ -370,8 +365,7 @@ jobs:
       # Safe in every failure case — before the flip it is a no-op for
       # traffic, after the flip it restores the known-good slot.
       - name: Roll back failed deployment
-        if:
-          failure() && (steps.promote.outcome == 'failure' ||
+        if: failure() && (steps.promote.outcome == 'failure' ||
           steps.smoke.outcome == 'failure')
         run: |
           set -u

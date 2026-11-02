@@ -1,11 +1,11 @@
 ---
 name: general-qa
-description: "Fallback skill for general factual questions that no specialized skill owns."
+description: 'Fallback skill for general factual questions that no specialized skill owns.'
 triggers:
-  - "general question"
-  - "factual question"
-  - "capital of a country"
-  - "quick lookup"
+  - 'general question'
+  - 'factual question'
+  - 'capital of a country'
+  - 'quick lookup'
 ---
 
 # General QA

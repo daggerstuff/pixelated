@@ -1,9 +1,9 @@
 ---
 name: fixture-valid-skill
-description: "Reference fixture for SKILL.md validation: declares every required key."
+description: 'Reference fixture for SKILL.md validation: declares every required key.'
 triggers:
-  - "fixture:valid-skill"
-  - "run the valid fixture"
+  - 'fixture:valid-skill'
+  - 'run the valid fixture'
 ---
 
 # Fixture: Valid Skill
