@@ -219,38 +219,7 @@ async def main_async() -> None:
                     try:
                         record = json.loads(line)
                         msgs = record.get("messages", [])
-                        concat_content = "".join(
-                            [
-                                f"{m.get('role', '')}:{quality._normalize_text(m.get('content', ''))}"
-                                for m in msgs
-                                if isinstance(m, dict)
-                            ]
-                        )
-                        import hashlib
-
-                        content_hash = hashlib.sha256(concat_content.encode("utf-8")).hexdigest()
-                        quality.seen_hashes.add(content_hash)
-
-                        u = next(
-                            (
-                                quality._normalize_text(m.get("content", ""))
-                                for m in msgs
-                                if isinstance(m, dict) and m.get("role") == "user"
-                            ),
-                            "",
-                        )[:120]
-                        a = next(
-                            (
-                                quality._normalize_text(m.get("content", ""))
-                                for m in msgs
-                                if isinstance(m, dict) and m.get("role") == "assistant"
-                            ),
-                            "",
-                        )[:100]
-                        if u and a:
-                            fp = hashlib.md5(f"{u}||{a}".encode()).hexdigest()
-                            quality.seen_fingerprints.add(fp)
-
+                        quality.seen_hashes.add(hash("".join(m["content"] for m in msgs)))
                         existing_count += 1
                     except Exception:
                         pass
