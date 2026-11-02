@@ -1,5 +1,5 @@
 // Devcontainer: the only outright zero on the readiness report.
-// Matches the documented toolchain exactly: Node 24 + pnpm 11.24
+// Matches the documented toolchain exactly: Node 24 + pnpm 12.16.1
 // (packageManager pin), Python 3.14 via uv (ai/ requires-python),
 // and docker-outside-of-docker for the throwaway pe test database
 // (make pe-test-db). Submodules are checked out by the post-create

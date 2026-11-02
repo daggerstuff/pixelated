@@ -798,9 +798,6 @@ importers:
       '@ai-sdk/sandbox-vercel':
         specifier: ^1.0.87
         version: 1.0.153(ws@8.22.0(utf-8-validate@6.0.6))(zod@4.6.7)
-      '@astrojs/check':
-        specifier: ^0.9.10
-        version: 0.9.10(@emnapi/runtime@1.11.3)(prettier-plugin-astro@1.1.1(prettier@3.9.10))(prettier@3.9.10)(typescript@5.8.3)
       '@astrojs/markdoc':
         specifier: ^2.1.1
         version: 2.1.1(@types/react@19.3.0)(astro@7.4.2(patch_hash=74950e75e5c1b6b481917ab76bdc51751e1359ee6e6c5618fa69037bad96d2a5)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.5)(@upstash/redis@1.40.0)(@vercel/functions@3.10.1(@aws-sdk/credential-provider-web-identity@3.972.80)(ws@8.22.0(utf-8-validate@6.0.6)))(crossws@0.4.15(srvx@1.0.5))(db0@0.4.1)(esbuild@0.28.2)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(ocache@0.3.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(react@19.3.1)
@@ -2094,16 +2091,6 @@ packages:
     resolution: {integrity: sha512-A6f1nKy99I6tyoK82U6kBHvQQZmdHmTmPzJYPY/0eaOW0r8/qPmEOwjGHs+hL/vCgOwQTupu4LT1XtXNUuDruA==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
 
-  '@astrojs/astro2tsx@0.1.3':
-    resolution: {integrity: sha512-GMDC7Eo0myBUA/QLBl0u+OcegJ8LiBhccmNZR34KmprQNP8gQUJlWlOOZWUsxNA2rNS6GuPYcGDyLoPnjmn4/Q==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-
-  '@astrojs/check@0.9.10':
-    resolution: {integrity: sha512-zgx/UQMozdjOa3bOxjgeCFdtpE3c9rRX6xHwa+2QXvy8z8Akifu2AtubHyv/zzC2znO8dl8fFWL4K+Ba9kS8HQ==}
-    hasBin: true
-    peerDependencies:
-      typescript: ^5.0.0 || ^6.0.0
-
   '@astrojs/cloudflare@14.4.3':
     resolution: {integrity: sha512-Ki3WMvkuKu6pgRucw8bAQR5nZMu85monmwaCJ5J2jDN1vEmdZi6ClXm1dC41KvxH2KBLzJf4GcLsC7fif0r+ZQ==}
     peerDependencies:
@@ -2189,18 +2176,6 @@ packages:
 
   '@astrojs/internal-helpers@0.13.0':
     resolution: {integrity: sha512-20jxQqnSmpskcGyad7N5l6Xf1gz0UCa6lNde44bEBdaXGpncEYfAZJ142r2ZgzBaG4dUyzGmhqZWv1INU2eiHQ==}
-
-  '@astrojs/language-server@2.17.2':
-    resolution: {integrity: sha512-WzqCBYo0RtKrkPLPMnTz2+UOQPosaFhoG/PvoSyPIgBU0BKeS6qeaYv7Rscq7P1LxJdoN0VosQF2h2TZTsIGHg==}
-    hasBin: true
-    peerDependencies:
-      prettier: ^3.0.0
-      prettier-plugin-astro: '>=0.11.0'
-    peerDependenciesMeta:
-      prettier:
-        optional: true
-      prettier-plugin-astro:
-        optional: true
 
   '@astrojs/markdoc@2.1.1':
     resolution: {integrity: sha512-dVnKKo2DreEsqY4Agxr4f6EwF3+Q+DvwAIzlxW9mMtNtssPa2BWDZzT6NYhW/fgOIzjAkg4b9L7TOuEwo4BrzQ==}
@@ -3144,27 +3119,6 @@ packages:
 
   '@davepagurek/bezier-path@0.0.7':
     resolution: {integrity: sha512-CVlnCOrV1iy4Z12T756i9l4G6kF7r8uhlnb+xqDemAMmWQB+8Q0b+8VEqIiUfywgZDSiDr18Rm7pZlnA69rE8Q==}
-
-  '@emmetio/abbreviation@2.3.3':
-    resolution: {integrity: sha512-mgv58UrU3rh4YgbE/TzgLQwJ3pFsHHhCLqY20aJq+9comytTXUDNGG/SMtSeMJdkpxgXSXunBGLD8Boka3JyVA==}
-
-  '@emmetio/css-abbreviation@2.1.8':
-    resolution: {integrity: sha512-s9yjhJ6saOO/uk1V74eifykk2CBYi01STTK3WlXWGOepyKa23ymJ053+DNQjpFcy1ingpaO7AxCcwLvHFY9tuw==}
-
-  '@emmetio/css-parser@0.4.1':
-    resolution: {integrity: sha512-2bC6m0MV/voF4CTZiAbG5MWKbq5EBmDPKu9Sb7s7nVcEzNQlrZP6mFFFlIaISM8X6514H9shWMme1fCm8cWAfQ==}
-
-  '@emmetio/html-matcher@1.3.0':
-    resolution: {integrity: sha512-NTbsvppE5eVyBMuyGfVu2CRrLvo7J4YHb6t9sBFLyY03WYhXET37qA4zOYUjBWFCRHO7pS1B9khERtY0f5JXPQ==}
-
-  '@emmetio/scanner@1.0.4':
-    resolution: {integrity: sha512-IqRuJtQff7YHHBk4G8YZ45uB9BaAGcwQeVzgj/zj8/UdOhtQpEIupUhSk8dys6spFIWVZVeK20CzGEnqR5SbqA==}
-
-  '@emmetio/stream-reader-utils@0.1.0':
-    resolution: {integrity: sha512-ZsZ2I9Vzso3Ho/pjZFsmmZ++FWeEd/txqybHTm4OgaZzdS8V9V/YYWQwg5TC38Z7uLWUV1vavpLLbjJtKubR1A==}
-
-  '@emmetio/stream-reader@2.2.0':
-    resolution: {integrity: sha512-fXVXEyFA5Yv3M3n8sUGT7+fvecGrZP4k6FnWWMSZVQf69kAq0LLpaBQLGcPR30m3zMmKYhECP4k/ZkzvhEW5kw==}
 
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
@@ -4719,13 +4673,6 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [glibc]
-
-  '@napi-rs/wasm-runtime@1.2.4':
-    resolution: {integrity: sha512-AJxoUD2/15ESHbvpcyjU274nsAPLuOtPHCk0vKJM5pj//Fg/B1FXNWjPnXTT9PymCYYiHo4zPj0ZomXBKhoy7g==}
-    engines: {node: ^20.19.0 || ^22.13.0 || >=23.5.0}
-    peerDependencies:
-      '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
-      '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
 
   '@napi-rs/wasm-runtime@1.2.5':
     resolution: {integrity: sha512-HshSvXzmBxNzqejd3k/KemgQ3hdREUYFRRrgxOZ+gPljDIsO2SDZrVZMd4Z/HsxudQbE62OVyVFE8z9BCurfjA==}
@@ -8619,29 +8566,8 @@ packages:
   '@vitest/utils@4.1.12':
     resolution: {integrity: sha512-Q3awXrwOfEV+qc3WmO5ONyE0yO7Q1gQ9/oyHxGLZ/pl7N3NO/ZztqQwKLuwMkV+CA1JYSIeO3gkHnRDIo4AVaA==}
 
-  '@volar/kit@2.4.28':
-    resolution: {integrity: sha512-cKX4vK9dtZvDRaAzeoUdaAJEew6IdxHNCRrdp5Kvcl6zZOqb6jTOfk3kXkIkG3T7oTFXguEMt5+9ptyqYR84Pg==}
-    peerDependencies:
-      typescript: '*'
-
   '@volar/language-core@2.4.28':
     resolution: {integrity: sha512-w4qhIJ8ZSitgLAkVay6AbcnC7gP3glYM3fYwKV3srj8m494E3xtrCv6E+bWviiK/8hs6e6t1ij1s2Endql7vzQ==}
-
-  '@volar/language-server@2.4.28':
-    resolution: {integrity: sha512-NqcLnE5gERKuS4PUFwlhMxf6vqYo7hXtbMFbViXcbVkbZ905AIVWhnSo0ZNBC2V127H1/2zP7RvVOVnyITFfBw==}
-    peerDependencies:
-      typescript: '*'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
-  '@volar/language-service@2.4.28':
-    resolution: {integrity: sha512-Rh/wYCZJrI5vCwMk9xyw/Z+MsWxlJY1rmMZPsxUoJKfzIRjS/NF1NmnuEcrMbEVGja00aVpCsInJfixQTMdvLw==}
-    peerDependencies:
-      typescript: '*'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
 
   '@volar/source-map@2.4.28':
     resolution: {integrity: sha512-yX2BDBqJkRXfKw8my8VarTyjv48QwxdJtvRgUpNE5erCsgEUdI2DsLbpa+rOQVAJYshY99szEcRDmyHbF10ggQ==}
@@ -8653,12 +8579,6 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
-
-  '@vscode/emmet-helper@2.11.0':
-    resolution: {integrity: sha512-QLxjQR3imPZPQltfbWRnHU6JecWTF1QSWhx3GAKQpslx7y3Dp6sIIXhKjiUJ/BR9FX8PVthjr9PD6pNwOJfAzw==}
-
-  '@vscode/l10n@0.0.18':
-    resolution: {integrity: sha512-KYSIHVmslkaCDyw013pphY+d7x1qV8IZupYfeIfzNA+nsaWHbn5uPuQRvdRFsa9zFzGeudPuoGoZ1Op4jrJXIQ==}
 
   '@vue/compiler-core@3.5.44':
     resolution: {integrity: sha512-k34nCytbK8PQ1gR2mGROYOw6Pnv/mumqIdrZ3x2tbyXZDWm7ViKGLTfdB+DRrWqEQsLgGJvn0WN9jBif5zCTLQ==}
@@ -8895,11 +8815,6 @@ packages:
     peerDependenciesMeta:
       ajv:
         optional: true
-
-  ajv-i18n@4.2.0:
-    resolution: {integrity: sha512-v/ei2UkCEeuKNXh8RToiFsUclmU+G57LO1Oo22OagNMENIw+Yb8eMwvHu7Vn9fmkjJyv6XclhJ8TbuigSglPkg==}
-    peerDependencies:
-      ajv: ^8.18.0
 
   ajv@6.15.0:
     resolution: {integrity: sha512-fgFx7Hfoq60ytK2c7DhnF8jIvzYgOMxfugjLOSMHjLIPgenqa7S7oaagATUq99mV6IYvN2tRmC0wnTYX6iPbMw==}
@@ -10346,9 +10261,6 @@ packages:
   emittery@0.13.1:
     resolution: {integrity: sha512-DeWwawk6r5yR9jFgnDKYt4sLS0LmHJJi3ZOnb5/JdbYwj3nW+FxQnHIjhBKz8YLC7oRNPVM9NQ47I3CVx34eqQ==}
     engines: {node: '>=12'}
-
-  emmet@2.4.11:
-    resolution: {integrity: sha512-23QPJB3moh/U9sT4rQzGgeyyGIrcM+GH5uVYg2C6wZIxAIJq7Ng3QLT79tl8FUwDXhyq9SusfknOrofAKqvgyQ==}
 
   emoji-regex-xs@2.0.1:
     resolution: {integrity: sha512-1QFuh8l7LqUcKe24LsPUNzjrzJQ7pgRwp1QMcZ5MX6mFplk2zQ08NVCM84++1cveaUUYtcCYHmeFEuNg16sU4g==}
@@ -12264,9 +12176,6 @@ packages:
   jsonc-parser@2.2.1:
     resolution: {integrity: sha512-o6/yDBYccGvTz1+QFevz6l6OBZ2+fMVu2JZ9CIhzsYRX4mjaK5IyX9eldUdCmga16zlgQxyrj5pt9kzuj2C02w==}
 
-  jsonc-parser@2.3.1:
-    resolution: {integrity: sha512-H8jvkz1O50L3dMZCsLqiuB2tA7muqbSg1AtGEkN0leAqGjsUzDJir3Zwr02BhqdcITPg3ei3mZ+HjMocAknhhg==}
-
   jsonc-parser@3.3.1:
     resolution: {integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==}
 
@@ -13107,9 +13016,6 @@ packages:
         optional: true
       vite:
         optional: true
-
-  muggle-string@0.4.1:
-    resolution: {integrity: sha512-VNTrAak/KhO2i8dqqnqnAHOa3cYBwXEZe9h+D5h/1ZqFSTEFHdM65lR7RoIqq3tBBYavsOXV84NoHXZ0AkPyqQ==}
 
   multer-s3@3.0.1:
     resolution: {integrity: sha512-BFwSO80a5EW4GJRBdUuSHblz2jhVSAze33ZbnGpcfEicoT0iRolx4kWR+AJV07THFRCQ78g+kelKFdjkCCaXeQ==}
@@ -14238,12 +14144,6 @@ packages:
   remove-trailing-spaces@1.0.9:
     resolution: {integrity: sha512-xzG7w5IRijvIkHIjDk65URsJJ7k4J95wmcArY5PRcmjldIOl7oTvG8+X2Ag690R7SfwiOcHrWZKVc1Pp5WIOzA==}
 
-  request-light@0.5.8:
-    resolution: {integrity: sha512-3Zjgh+8b5fhRJBQZoy+zbVKpAQGLyka0MPgW3zruTF4dFFJ8Fqcfu9YsAvi/rvdcaTeWG3MkbZv4WKxAn/84Lg==}
-
-  request-light@0.7.0:
-    resolution: {integrity: sha512-lMbBMrDoxgsyO+yB3sDcrDuX85yYt7sS8BfQd11jtbW/z5ZWgLZRcEGLsLoYw7I0WSUGQBs8CC8ScIxkTX1+6Q==}
-
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
@@ -15344,12 +15244,6 @@ packages:
   typedarray-to-buffer@3.1.5:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
 
-  typesafe-path@0.2.2:
-    resolution: {integrity: sha512-OJabfkAg1WLZSqJAJ0Z6Sdt3utnbzr/jh+NAHoyWHJe8CMSy79Gm085094M9nvTPy22KzTVn5Zq5mbapCI/hPA==}
-
-  typescript-auto-import-cache@0.3.6:
-    resolution: {integrity: sha512-RpuHXrknHdVdK7wv/8ug3Fr0WNsNi5l5aB8MYYuXhq2UH5lnEB1htJ1smhtD5VeCsGr2p8mUDtd83LCQDFVgjQ==}
-
   typescript-eslint@8.71.2:
     resolution: {integrity: sha512-Rz4effbMy2g9wnvOJZG6SbVavX313Lap1vNEbk1RUochzickvzP8P4HB+bkNg5e50eVz1hQGjh9K1omI1xB4Bw==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
@@ -15827,85 +15721,6 @@ packages:
       jsdom:
         optional: true
 
-  volar-service-css@0.0.71:
-    resolution: {integrity: sha512-wRRFt9BpjMKCazcgOh67MSjUjiWUCAh99DyYSDIOTuxaRjEtDC7PpB0k1Y1wbJIW/pVtMUSVbpPo3UGSm0Byxw==}
-    peerDependencies:
-      '@volar/language-service': ~2.4.0
-    peerDependenciesMeta:
-      '@volar/language-service':
-        optional: true
-
-  volar-service-emmet@0.0.71:
-    resolution: {integrity: sha512-zqjzt6bN95e3CUstBm0PBFAJnrfz0ZAARka87fart46/gNCLLuP3Vujy8V/J8HEziTFLnfkgIASLFYPUhonJcA==}
-    peerDependencies:
-      '@volar/language-service': ~2.4.0
-    peerDependenciesMeta:
-      '@volar/language-service':
-        optional: true
-
-  volar-service-html@0.0.71:
-    resolution: {integrity: sha512-e8tHPhgQ7ooLfudAEIku+kgd9pWkq3SSz8RbnQDI1+Eb8wbenkLGHqoirLqz5ORLV6wIMr2Iv08RWBG5eOcgpw==}
-    peerDependencies:
-      '@volar/language-service': ~2.4.0
-    peerDependenciesMeta:
-      '@volar/language-service':
-        optional: true
-
-  volar-service-prettier@0.0.71:
-    resolution: {integrity: sha512-Rz7JVH3qD108UCdmIEiZvOBNljMt2nLFdbN8AXcDfn7xD9F5I2aCIsDVqBbXw21PsnxG0b7MfwtNF+zPS/NKUg==}
-    peerDependencies:
-      '@volar/language-service': ~2.4.0
-      prettier: ^2.2 || ^3.0
-    peerDependenciesMeta:
-      '@volar/language-service':
-        optional: true
-      prettier:
-        optional: true
-
-  volar-service-typescript-twoslash-queries@0.0.71:
-    resolution: {integrity: sha512-9K2k72s4n7rV9s4bX0MyjbX9iBribvKZbBJKuEmTCZfeWJXs6Yh7bGpY4eoc7UufAjvpheBqwyZCOIPBvxCv0A==}
-    peerDependencies:
-      '@volar/language-service': ~2.4.0
-      typescript: '*'
-    peerDependenciesMeta:
-      '@volar/language-service':
-        optional: true
-      typescript:
-        optional: true
-
-  volar-service-typescript@0.0.71:
-    resolution: {integrity: sha512-yTtM/BVT6hoyEYnDtaCyAtNhdNeS/mhTTABlBOdw3NNiRBUin3IznFJpgfjer4c6RYopiPjjQjc9VFhxVl1mLw==}
-    peerDependencies:
-      '@volar/language-service': ~2.4.0
-      typescript: '*'
-    peerDependenciesMeta:
-      '@volar/language-service':
-        optional: true
-      typescript:
-        optional: true
-
-  volar-service-yaml@0.0.71:
-    resolution: {integrity: sha512-qYGWGuVpUTnZGu5P/CR4KLK4aIR8RrcVnmfZ2eRcj9q/I8VZCoC5yy9FtEvfNvnDp4MU17yhdJcvpQPIqhJS2Q==}
-    peerDependencies:
-      '@volar/language-service': ~2.4.0
-    peerDependenciesMeta:
-      '@volar/language-service':
-        optional: true
-
-  vscode-css-languageservice@6.3.10:
-    resolution: {integrity: sha512-eq5N9Er3fC4vA9zd9EFhyBG90wtCCuXgRSpAndaOgXMh1Wgep5lBgRIeDgjZBW9pa+332yC9+49cZMW8jcL3MA==}
-
-  vscode-html-languageservice@5.6.2:
-    resolution: {integrity: sha512-ulCrSnFnfQ16YzvwnYUgEbUEl/ZG7u2eV27YhvLObSHKkb8fw1Z9cgsnUwjTEeDIdJDoTDTDpxuhQwoenoLNMg==}
-
-  vscode-json-languageservice@4.1.8:
-    resolution: {integrity: sha512-0vSpg6Xd9hfV+eZAaYN63xVVMOTmJ4GgHxXnkLCh+9RsQBkWKIghzLhW2B9ebfG+LQQg8uLtsQ2aUKjTgE+QOg==}
-    engines: {npm: '>=7.0.0'}
-
-  vscode-jsonrpc@8.2.0:
-    resolution: {integrity: sha512-C+r0eKJUIfiDIfwJhria30+TYWPtuHJXHtI7J0YlOmKAo7ogxP20T0zxB7HZQIFhIyvoBPwWskjxrvAtfjyZfA==}
-    engines: {node: '>=14.0.0'}
-
   vscode-jsonrpc@8.2.1:
     resolution: {integrity: sha512-kdjOSJ2lLIn7r1rtrMbbNCHjyMPfRnowdKjBQ+mGq6NAW5QY2bEZC/khaC5OR8svbbjvLEaIXkOq45e2X9BIbQ==}
     engines: {node: '>=14.0.0'}
@@ -15914,17 +15729,11 @@ packages:
     resolution: {integrity: sha512-qETYf9PCl1lVfwR+oBmMfc4vP2nqLNA35ABxorw3j06+xlKRgDVxbLgKm4Y/xPL0YWdeDjLoI4ImICIT3nB0zQ==}
     engines: {node: '>=14.0.0'}
 
-  vscode-languageserver-protocol@3.17.5:
-    resolution: {integrity: sha512-mb1bvRJN8SVznADSGWM9u/b07H7Ecg0I3OgXDuLdn307rl/J3A9YD6/eYOssqhecL27hK1IPZAsaqh00i/Jljg==}
-
   vscode-languageserver-protocol@3.18.4:
     resolution: {integrity: sha512-CCXbyr99dafRJzJH/0Ryk7ly5T8XPmSR0//OuF2w4m+9JiOin7zcAT5iET8GRE7Z9taFBejb3GbM0a0mbjdbrg==}
 
   vscode-languageserver-textdocument@1.0.15:
     resolution: {integrity: sha512-Gsfr9S8LU3S6885cS+NaleasJ0n3V5y/SOTqHCifQiXWFw3G9w9/YItDfwHrlCz+dSZWWZ8ilYVMcJe7Sz7Sxw==}
-
-  vscode-languageserver-types@3.17.5:
-    resolution: {integrity: sha512-Ld1VelNuX9pdF39h2Hgaeb5hEZM2Z3jUrrMgWQAu82jMtZp7p3vJT3BzToKtZI7NgQssZje5o0zryOrhQvzQAg==}
 
   vscode-languageserver-types@3.18.4:
     resolution: {integrity: sha512-nQsacoiijvl0fRf2q28uFDrAVwRhdCa3QveiF7/CX0r18mLR5FU/1WskSsCKOjmEbtteKUnY8x8Yzxop+k0zwg==}
@@ -15932,13 +15741,6 @@ packages:
   vscode-languageserver@10.1.2:
     resolution: {integrity: sha512-pXPWde3RytdeBVEs6PulOOT5OpeXC5GkWRpcT11f5rNn41jviQsAYPyAqJ/0oVGETQLKPJtYbHNiMPlfLb0NTQ==}
     hasBin: true
-
-  vscode-languageserver@9.0.1:
-    resolution: {integrity: sha512-woByF3PDpkHFUreUa7Hos7+pUWdeWMXRd26+ZX2A8cFx6v/JPTtd4/uN0/jB6XQHYaOlHbio03NTHCqrgG5n7g==}
-    hasBin: true
-
-  vscode-nls@5.2.0:
-    resolution: {integrity: sha512-RAaHx7B14ZU04EU31pT+rKz2/zSl7xMsfIZuo8pd+KZO6PXtQmpevpq3vxvWNcrGbdmhM/rr5Uw5Mz+NBfhVng==}
 
   vscode-uri@3.2.0:
     resolution: {integrity: sha512-m2gXo3bn0G1kT9InzMf07fTbqMbGtyckj3bH5ktLO+1Ssv+yiATZ4dhwaQv9UZWxJh6E9IFGnQyjgWVDWVBDrg==}
@@ -16205,10 +16007,6 @@ packages:
   yallist@5.0.0:
     resolution: {integrity: sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==}
     engines: {node: '>=18'}
-
-  yaml-language-server@1.23.0:
-    resolution: {integrity: sha512-3qVyCOexLCWw06PQa5kRPwvMWMZ/eZeCRWUvgD6a0OkqL/4iCnxy2WumbWifa937Uo5xhyWJ0uxlU39ljhNh7A==}
-    hasBin: true
 
   yaml@2.8.4:
     resolution: {integrity: sha512-ml/JPOj9fOQK8RNnWojA67GbZ0ApXAUlN2UQclwv2eVgTgn7O9gg9o7paZWKMp4g0H3nTLtS9LVzhkpOFIKzog==}
@@ -16507,25 +16305,6 @@ snapshots:
       is-potential-custom-element-name: 1.0.1
       lru-cache: 11.5.3
 
-  '@astrojs/astro2tsx@0.1.3(@emnapi/runtime@1.11.3)':
-    dependencies:
-      '@emnapi/core': 1.11.3
-      '@napi-rs/wasm-runtime': 1.2.4(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)
-    transitivePeerDependencies:
-      - '@emnapi/runtime'
-
-  '@astrojs/check@0.9.10(@emnapi/runtime@1.11.3)(prettier-plugin-astro@1.1.1(prettier@3.9.10))(prettier@3.9.10)(typescript@5.8.3)':
-    dependencies:
-      '@astrojs/language-server': 2.17.2(@emnapi/runtime@1.11.3)(prettier-plugin-astro@1.1.1(prettier@3.9.10))(prettier@3.9.10)(typescript@5.8.3)
-      chokidar: 4.0.3
-      kleur: 4.1.5
-      typescript: 5.8.3
-      yargs: 18.2.0
-    transitivePeerDependencies:
-      - '@emnapi/runtime'
-      - prettier
-      - prettier-plugin-astro
-
   '@astrojs/cloudflare@14.4.3(@types/node@26.6.5)(astro@7.4.2(patch_hash=74950e75e5c1b6b481917ab76bdc51751e1359ee6e6c5618fa69037bad96d2a5)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.5)(@upstash/redis@1.40.0)(@vercel/functions@3.10.1(@aws-sdk/credential-provider-web-identity@3.972.80)(ws@8.22.0(utf-8-validate@6.0.6)))(crossws@0.4.15(srvx@1.0.5))(db0@0.4.1)(esbuild@0.28.2)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(ocache@0.3.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(utf-8-validate@6.0.6)(workerd@1.20261023.1)(wrangler@4.156.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.6.5)(utf-8-validate@6.0.6))(yaml@2.8.4)':
     dependencies:
       '@astrojs/internal-helpers': 0.13.0(patch_hash=ebdd1966ecd34c914d725ce2525d1ab4e759c3335374079650f9e3b4ebabc706)
@@ -16627,32 +16406,6 @@ snapshots:
       smol-toml: 1.9.1
       unified: 11.0.5
       yaml: 2.8.4
-
-  '@astrojs/language-server@2.17.2(@emnapi/runtime@1.11.3)(prettier-plugin-astro@1.1.1(prettier@3.9.10))(prettier@3.9.10)(typescript@5.8.3)':
-    dependencies:
-      '@astrojs/astro2tsx': 0.1.3(@emnapi/runtime@1.11.3)
-      '@astrojs/yaml2ts': 0.2.4
-      '@volar/kit': 2.4.28(typescript@5.8.3)
-      '@volar/language-core': 2.4.28
-      '@volar/language-server': 2.4.28(typescript@5.8.3)
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-      muggle-string: 0.4.1
-      tinyglobby: 0.2.17
-      volar-service-css: 0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))
-      volar-service-emmet: 0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))
-      volar-service-html: 0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))
-      volar-service-prettier: 0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))(prettier@3.9.10)
-      volar-service-typescript: 0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))(typescript@5.8.3)
-      volar-service-typescript-twoslash-queries: 0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))(typescript@5.8.3)
-      volar-service-yaml: 0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))
-      vscode-html-languageservice: 5.6.2
-      vscode-uri: 3.2.0
-    optionalDependencies:
-      prettier: 3.9.10
-      prettier-plugin-astro: 1.1.1(prettier@3.9.10)
-    transitivePeerDependencies:
-      - '@emnapi/runtime'
-      - typescript
 
   '@astrojs/markdoc@2.1.1(@types/react@19.3.0)(astro@7.4.2(patch_hash=74950e75e5c1b6b481917ab76bdc51751e1359ee6e6c5618fa69037bad96d2a5)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.5)(@upstash/redis@1.40.0)(@vercel/functions@3.10.1(@aws-sdk/credential-provider-web-identity@3.972.80)(ws@8.22.0(utf-8-validate@6.0.6)))(crossws@0.4.15(srvx@1.0.5))(db0@0.4.1)(esbuild@0.28.2)(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(ocache@0.3.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(react@19.3.1)':
     dependencies:
@@ -18015,29 +17768,6 @@ snapshots:
 
   '@davepagurek/bezier-path@0.0.7': {}
 
-  '@emmetio/abbreviation@2.3.3':
-    dependencies:
-      '@emmetio/scanner': 1.0.4
-
-  '@emmetio/css-abbreviation@2.1.8':
-    dependencies:
-      '@emmetio/scanner': 1.0.4
-
-  '@emmetio/css-parser@0.4.1':
-    dependencies:
-      '@emmetio/stream-reader': 2.2.0
-      '@emmetio/stream-reader-utils': 0.1.0
-
-  '@emmetio/html-matcher@1.3.0':
-    dependencies:
-      '@emmetio/scanner': 1.0.4
-
-  '@emmetio/scanner@1.0.4': {}
-
-  '@emmetio/stream-reader-utils@0.1.0': {}
-
-  '@emmetio/stream-reader@2.2.0': {}
-
   '@emnapi/core@1.10.0':
     dependencies:
       '@emnapi/wasi-threads': 1.2.1
@@ -18060,6 +17790,7 @@ snapshots:
     dependencies:
       '@emnapi/wasi-threads': 1.2.3
       tslib: 2.8.1
+    optional: true
 
   '@emnapi/runtime@1.10.0':
     dependencies:
@@ -18079,6 +17810,7 @@ snapshots:
   '@emnapi/runtime@1.11.3':
     dependencies:
       tslib: 2.8.1
+    optional: true
 
   '@emnapi/wasi-threads@1.2.1':
     dependencies:
@@ -18093,6 +17825,7 @@ snapshots:
   '@emnapi/wasi-threads@1.2.3':
     dependencies:
       tslib: 2.8.1
+    optional: true
 
   '@envelop/core@5.6.1':
     dependencies:
@@ -19777,12 +19510,6 @@ snapshots:
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
-
-  '@napi-rs/wasm-runtime@1.2.4(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)':
-    dependencies:
-      '@emnapi/core': 1.11.3
-      '@emnapi/runtime': 1.11.3
-      '@tybys/wasm-util': 0.10.4
 
   '@napi-rs/wasm-runtime@1.2.5(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
@@ -22928,6 +22655,7 @@ snapshots:
   '@tybys/wasm-util@0.10.4':
     dependencies:
       tslib: 2.8.1
+    optional: true
 
   '@types/aria-query@5.0.4': {}
 
@@ -24024,41 +23752,9 @@ snapshots:
       convert-source-map: 2.0.0
       tinyrainbow: 3.2.0
 
-  '@volar/kit@2.4.28(typescript@5.8.3)':
-    dependencies:
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-      '@volar/typescript': 2.4.28(typescript@5.8.3)
-      typesafe-path: 0.2.2
-      typescript: 5.8.3
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-uri: 3.2.0
-
   '@volar/language-core@2.4.28':
     dependencies:
       '@volar/source-map': 2.4.28
-
-  '@volar/language-server@2.4.28(typescript@5.8.3)':
-    dependencies:
-      '@volar/language-core': 2.4.28
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-      '@volar/typescript': 2.4.28(typescript@5.8.3)
-      path-browserify: 1.0.1
-      request-light: 0.7.0
-      vscode-languageserver: 9.0.1
-      vscode-languageserver-protocol: 3.18.4
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-uri: 3.2.0
-    optionalDependencies:
-      typescript: 5.8.3
-
-  '@volar/language-service@2.4.28(typescript@5.8.3)':
-    dependencies:
-      '@volar/language-core': 2.4.28
-      vscode-languageserver-protocol: 3.18.4
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-uri: 3.2.0
-    optionalDependencies:
-      typescript: 5.8.3
 
   '@volar/source-map@2.4.28': {}
 
@@ -24069,16 +23765,6 @@ snapshots:
       vscode-uri: 3.2.0
     optionalDependencies:
       typescript: 5.8.3
-
-  '@vscode/emmet-helper@2.11.0':
-    dependencies:
-      emmet: 2.4.11
-      jsonc-parser: 2.3.1
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-languageserver-types: 3.18.4
-      vscode-uri: 3.2.0
-
-  '@vscode/l10n@0.0.18': {}
 
   '@vue/compiler-core@3.5.44':
     dependencies:
@@ -24306,10 +23992,6 @@ snapshots:
       ajv: 8.20.0
 
   ajv-formats@3.0.1:
-    dependencies:
-      ajv: 8.20.0
-
-  ajv-i18n@4.2.0(ajv@8.20.0):
     dependencies:
       ajv: 8.20.0
 
@@ -25750,11 +25432,6 @@ snapshots:
   electron-to-chromium@1.5.456: {}
 
   emittery@0.13.1: {}
-
-  emmet@2.4.11:
-    dependencies:
-      '@emmetio/abbreviation': 2.3.3
-      '@emmetio/css-abbreviation': 2.1.8
 
   emoji-regex-xs@2.0.1: {}
 
@@ -28103,8 +27780,6 @@ snapshots:
 
   jsonc-parser@2.2.1: {}
 
-  jsonc-parser@2.3.1: {}
-
   jsonc-parser@3.3.1: {}
 
   jsonfile@6.2.1:
@@ -29327,8 +29002,6 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
       - supports-color
-
-  muggle-string@0.4.1: {}
 
   multer-s3@3.0.1(@aws-sdk/client-s3@3.1156.0):
     dependencies:
@@ -30561,10 +30234,6 @@ snapshots:
   remove-trailing-separator@1.1.0: {}
 
   remove-trailing-spaces@1.0.9: {}
-
-  request-light@0.5.8: {}
-
-  request-light@0.7.0: {}
 
   require-directory@2.1.1: {}
 
@@ -31908,12 +31577,6 @@ snapshots:
     dependencies:
       is-typedarray: 1.0.0
 
-  typesafe-path@0.2.2: {}
-
-  typescript-auto-import-cache@0.3.6:
-    dependencies:
-      semver: 7.8.5
-
   typescript-eslint@8.71.2(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3):
     dependencies:
       '@typescript-eslint/eslint-plugin': 8.71.2(@typescript-eslint/parser@8.71.2(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3))(eslint@10.13.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)
@@ -32454,96 +32117,9 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  volar-service-css@0.0.71(@volar/language-service@2.4.28(typescript@5.8.3)):
-    dependencies:
-      vscode-css-languageservice: 6.3.10
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-uri: 3.2.0
-    optionalDependencies:
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-
-  volar-service-emmet@0.0.71(@volar/language-service@2.4.28(typescript@5.8.3)):
-    dependencies:
-      '@emmetio/css-parser': 0.4.1
-      '@emmetio/html-matcher': 1.3.0
-      '@vscode/emmet-helper': 2.11.0
-      vscode-uri: 3.2.0
-    optionalDependencies:
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-
-  volar-service-html@0.0.71(@volar/language-service@2.4.28(typescript@5.8.3)):
-    dependencies:
-      vscode-html-languageservice: 5.6.2
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-uri: 3.2.0
-    optionalDependencies:
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-
-  volar-service-prettier@0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))(prettier@3.9.10):
-    dependencies:
-      vscode-uri: 3.2.0
-    optionalDependencies:
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-      prettier: 3.9.10
-
-  volar-service-typescript-twoslash-queries@0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))(typescript@5.8.3):
-    dependencies:
-      vscode-uri: 3.2.0
-    optionalDependencies:
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-      typescript: 5.8.3
-
-  volar-service-typescript@0.0.71(@volar/language-service@2.4.28(typescript@5.8.3))(typescript@5.8.3):
-    dependencies:
-      path-browserify: 1.0.1
-      semver: 7.8.5
-      typescript-auto-import-cache: 0.3.6
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-nls: 5.2.0
-      vscode-uri: 3.2.0
-    optionalDependencies:
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-      typescript: 5.8.3
-
-  volar-service-yaml@0.0.71(@volar/language-service@2.4.28(typescript@5.8.3)):
-    dependencies:
-      vscode-uri: 3.2.0
-      yaml-language-server: 1.23.0
-    optionalDependencies:
-      '@volar/language-service': 2.4.28(typescript@5.8.3)
-
-  vscode-css-languageservice@6.3.10:
-    dependencies:
-      '@vscode/l10n': 0.0.18
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-languageserver-types: 3.17.5
-      vscode-uri: 3.2.0
-
-  vscode-html-languageservice@5.6.2:
-    dependencies:
-      '@vscode/l10n': 0.0.18
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-languageserver-types: 3.18.4
-      vscode-uri: 3.2.0
-
-  vscode-json-languageservice@4.1.8:
-    dependencies:
-      jsonc-parser: 3.3.1
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-languageserver-types: 3.18.4
-      vscode-nls: 5.2.0
-      vscode-uri: 3.2.0
-
-  vscode-jsonrpc@8.2.0: {}
-
   vscode-jsonrpc@8.2.1: {}
 
   vscode-jsonrpc@9.0.3: {}
-
-  vscode-languageserver-protocol@3.17.5:
-    dependencies:
-      vscode-jsonrpc: 8.2.0
-      vscode-languageserver-types: 3.17.5
 
   vscode-languageserver-protocol@3.18.4:
     dependencies:
@@ -32552,19 +32128,11 @@ snapshots:
 
   vscode-languageserver-textdocument@1.0.15: {}
 
-  vscode-languageserver-types@3.17.5: {}
-
   vscode-languageserver-types@3.18.4: {}
 
   vscode-languageserver@10.1.2:
     dependencies:
       vscode-languageserver-protocol: 3.18.4
-
-  vscode-languageserver@9.0.1:
-    dependencies:
-      vscode-languageserver-protocol: 3.17.5
-
-  vscode-nls@5.2.0: {}
 
   vscode-uri@3.2.0: {}
 
@@ -32851,21 +32419,6 @@ snapshots:
 
   yallist@5.0.0: {}
 
-  yaml-language-server@1.23.0:
-    dependencies:
-      '@vscode/l10n': 0.0.18
-      ajv: 8.20.0
-      ajv-draft-04: 1.0.0(ajv@8.20.0)
-      ajv-i18n: 4.2.0(ajv@8.20.0)
-      prettier: 3.9.10
-      request-light: 0.5.8
-      vscode-json-languageservice: 4.1.8
-      vscode-languageserver: 9.0.1
-      vscode-languageserver-textdocument: 1.0.15
-      vscode-languageserver-types: 3.18.4
-      vscode-uri: 3.2.0
-      yaml: 2.8.4
-
   yaml@2.8.4: {}
 
   yargs-parser@13.1.2:
@@ -32992,3 +32545,356 @@ snapshots:
       use-sync-external-store: 1.7.0(react@19.3.1)
 
   zwitch@2.0.4: {}
+
+time:
+  '@ai-sdk/anthropic@4.0.81': '2026-10-15T18:11:11.001Z'
+  '@ai-sdk/harness-fx@1.0.67': '2026-10-15T18:09:54.799Z'
+  '@ai-sdk/harness@1.0.153': '2026-10-15T18:09:49.080Z'
+  '@ai-sdk/mcp@2.0.77': '2026-10-15T18:10:16.600Z'
+  '@ai-sdk/openai@4.0.95': '2026-10-15T18:12:27.740Z'
+  '@ai-sdk/sandbox-vercel@1.0.153': '2026-10-15T18:11:35.061Z'
+  '@astrojs/cloudflare@14.4.3': '2026-10-28T14:49:33.291Z'
+  '@astrojs/markdoc@2.1.1': '2026-10-21T14:15:22.006Z'
+  '@astrojs/node@11.1.7': '2026-10-06T12:47:46.874Z'
+  '@astrojs/react@7.1.1': '2026-10-21T14:16:31.356Z'
+  '@astrojs/rss@4.0.19': '2026-06-30T12:18:42.031Z'
+  '@astrojs/ts-plugin@1.10.12': '2026-09-16T19:39:10.652Z'
+  '@astrojs/vercel@11.0.15': '2026-10-15T14:46:39.089Z'
+  '@auth0/auth0-react@2.28.2': '2026-10-02T13:09:57.364Z'
+  '@aws-sdk/client-dynamodb@3.1151.0': '2026-10-13T19:01:18.332Z'
+  '@aws-sdk/client-ec2@3.1151.0': '2026-10-13T19:05:42.786Z'
+  '@aws-sdk/client-eks@3.1151.0': '2026-10-13T19:03:48.553Z'
+  '@aws-sdk/client-kms@3.1151.0': '2026-10-13T19:03:04.214Z'
+  '@aws-sdk/client-rds@3.1151.0': '2026-10-13T19:04:44.718Z'
+  '@aws-sdk/client-s3@3.1151.0': '2026-10-13T18:59:52.007Z'
+  '@aws-sdk/client-s3@3.1156.0': '2026-10-22T18:47:41.148Z'
+  '@aws-sdk/lib-dynamodb@3.1151.0': '2026-10-13T18:59:05.055Z'
+  '@aws-sdk/s3-request-presigner@3.1152.0': '2026-10-14T18:46:44.637Z'
+  '@axe-core/playwright@4.14.0': '2026-10-15T13:33:17.706Z'
+  '@azure/storage-blob@12.34.0': '2026-09-24T18:26:09.592Z'
+  '@browserbasehq/stagehand@4.3.0': '2026-10-20T00:40:20.973Z'
+  '@clack/prompts@0.7.0': '2023-08-09T19:16:28.030Z'
+  '@cloudflare/ai-chat@0.12.2': '2026-10-20T15:23:04.829Z'
+  '@cloudflare/shell@0.5.0': '2026-10-20T15:20:53.129Z'
+  '@cloudflare/think@0.21.0': '2026-10-20T15:30:14.672Z'
+  '@cloudflare/workers-types@4.20260611.1': '2026-06-11T01:46:03.079Z'
+  '@composio/core@0.27.0': '2026-10-22T12:43:44.495Z'
+  '@composio/vercel@0.13.0': '2026-10-21T21:45:00.622Z'
+  '@eslint/css@2.0.1': '2026-10-15T20:59:38.200Z'
+  '@eslint/js@10.0.1': '2026-02-06T22:34:56.290Z'
+  '@eslint/json@2.1.1': '2026-10-06T20:57:41.668Z'
+  '@eslint/markdown@8.0.3': '2026-07-01T13:28:44.339Z'
+  '@fontsource-variable/instrument-sans@5.3.0': '2026-07-19T03:50:25.023Z'
+  '@fontsource-variable/literata@5.3.0': '2026-07-19T03:50:38.294Z'
+  '@fontsource-variable/space-grotesk@5.3.0': '2026-07-19T03:52:15.366Z'
+  '@fontsource-variable/spline-sans-mono@5.3.0': '2026-07-19T03:52:15.829Z'
+  '@fontsource/ibm-plex-mono@5.3.0': '2026-07-19T03:39:57.977Z'
+  '@fontsource/instrument-serif@5.3.0': '2026-07-19T03:40:12.806Z'
+  '@github/copilot-sdk@1.0.22': '2026-10-14T20:08:06.355Z'
+  '@google-cloud/storage@8.4.0': '2026-10-09T00:33:42.672Z'
+  '@graphql-codegen/cli@7.4.6': '2026-10-09T11:21:51.682Z'
+  '@graphql-codegen/typescript-operations@6.2.0': '2026-10-25T03:48:04.895Z'
+  '@graphql-codegen/typescript@6.1.2': '2026-10-09T11:23:29.888Z'
+  '@graphql-tools/schema@11.0.6': '2026-10-22T16:27:13.068Z'
+  '@graphql-tools/utils@13.2.1': '2026-10-31T12:22:53.887Z'
+  '@graphql-yoga/plugin-persisted-operations@4.0.1': '2026-10-23T16:30:13.870Z'
+  '@heroicons/react@2.2.0': '2024-11-18T15:33:27.317Z'
+  '@hookform/resolvers@6.0.0': '2026-10-19T05:35:47.214Z'
+  '@iconify-json/lucide@1.2.147': '2026-10-20T15:42:00.143Z'
+  '@iconify-json/ri@1.2.10': '2026-02-10T08:41:46.666Z'
+  '@iconify-json/uil@1.2.3': '2024-12-17T07:58:52.252Z'
+  '@lhci/cli@0.15.1': '2025-06-25T23:52:10.718Z'
+  '@mastra/core@1.79.0': '2026-10-21T11:41:43.495Z'
+  '@mastra/mcp@2.5.0': '2026-10-21T11:45:21.263Z'
+  '@microsoft/clarity@1.0.2': '2025-11-27T11:43:46.043Z'
+  '@modelcontextprotocol/sdk@1.32.2': '2026-10-23T18:11:38.362Z'
+  '@neondatabase/serverless@1.2.0': '2026-10-01T16:42:06.683Z'
+  '@opentelemetry/api@1.9.1': '2026-03-25T15:53:54.092Z'
+  '@opentelemetry/auto-instrumentations-node@0.77.0': '2026-06-11T15:18:17.209Z'
+  '@opentelemetry/context-async-hooks@1.30.1': '2025-01-14T09:16:05.688Z'
+  '@opentelemetry/exporter-metrics-otlp-http@0.218.0': '2026-05-13T08:55:40.987Z'
+  '@opentelemetry/exporter-trace-otlp-grpc@0.218.0': '2026-05-13T08:55:52.013Z'
+  '@opentelemetry/exporter-trace-otlp-http@0.218.0': '2026-05-13T08:55:36.128Z'
+  '@opentelemetry/exporter-trace-otlp-http@0.219.0': '2026-06-11T12:38:09.894Z'
+  '@opentelemetry/instrumentation-http@0.219.0': '2026-06-11T12:37:54.512Z'
+  '@opentelemetry/instrumentation-mongodb@0.72.0': '2026-06-11T14:55:02.109Z'
+  '@opentelemetry/instrumentation-pg@0.73.0': '2026-07-23T17:57:48.249Z'
+  '@opentelemetry/instrumentation-redis@0.67.0': '2026-06-11T14:55:05.883Z'
+  '@opentelemetry/instrumentation@0.218.0': '2026-05-13T08:55:07.575Z'
+  '@opentelemetry/resources@2.8.0': '2026-06-11T12:36:56.420Z'
+  '@opentelemetry/sdk-metrics@2.12.0': '2026-10-06T13:38:58.839Z'
+  '@opentelemetry/sdk-node@0.218.0': '2026-05-13T08:55:57.827Z'
+  '@opentelemetry/sdk-node@0.219.0': '2026-06-11T12:38:34.747Z'
+  '@opentelemetry/sdk-trace-base@2.8.0': '2026-06-11T12:37:15.667Z'
+  '@opentelemetry/sdk-trace-node@2.12.0': '2026-10-06T13:39:11.160Z'
+  '@opentelemetry/semantic-conventions@1.43.0': '2026-07-09T20:06:28.122Z'
+  '@oslojs/encoding@1.1.0': '2024-09-24T11:08:24.035Z'
+  '@playwright/test@1.64.1': '2026-10-14T11:58:13.696Z'
+  '@radix-ui/react-slot@1.5.0': '2026-10-12T00:48:46.238Z'
+  '@radix-ui/react-tooltip@1.4.1': '2026-10-12T21:04:06.692Z'
+  '@sentry/astro@10.76.2': '2026-10-08T16:37:19.799Z'
+  '@sentry/cloudflare@10.78.0': '2026-10-28T16:58:30.270Z'
+  '@sentry/node@10.76.2': '2026-10-08T16:34:54.148Z'
+  '@sentry/profiling-node@10.76.2': '2026-10-08T16:34:34.764Z'
+  '@sentry/react@10.76.2': '2026-10-08T16:40:00.026Z'
+  '@sentry/vite-plugin@5.4.1': '2026-10-06T12:59:57.030Z'
+  '@spotlightjs/astro@3.2.6': '2025-08-07T03:12:01.267Z'
+  '@stoplight/spectral-cli@6.17.0': '2026-10-01T12:40:18.254Z'
+  '@tanstack/react-query@5.105.0': '2026-10-26T09:31:29.126Z'
+  '@tarquinen/opencode-dcp@3.2.0': '2026-09-20T17:34:01.031Z'
+  '@tensorflow/tfjs-layers@4.22.0': '2024-10-21T18:51:16.292Z'
+  '@tensorflow/tfjs@4.22.0': '2024-10-21T18:51:42.166Z'
+  '@testing-library/dom@10.4.2': '2026-09-13T18:08:36.116Z'
+  '@testing-library/jest-dom@7.0.1': '2026-08-09T23:44:33.598Z'
+  '@testing-library/react@16.3.3': '2026-08-27T17:41:18.735Z'
+  '@testing-library/user-event@14.6.8': '2026-10-13T06:41:22.306Z'
+  '@types/bcrypt@6.0.0': '2025-07-19T00:04:40.213Z'
+  '@types/compression@1.8.1': '2025-06-07T02:15:43.005Z'
+  '@types/cors@2.8.19': '2025-06-07T02:16:26.348Z'
+  '@types/crypto-js@4.2.2': '2024-01-22T06:37:12.244Z'
+  '@types/express-session@1.19.0': '2026-04-16T18:35:32.778Z'
+  '@types/express@5.0.6': '2025-12-01T20:35:51.488Z'
+  '@types/geoip-lite@1.4.4': '2023-11-07T05:46:05.097Z'
+  '@types/jest@30.0.0': '2025-06-16T07:35:50.850Z'
+  '@types/jsonwebtoken@9.0.10': '2025-06-16T07:36:00.187Z'
+  '@types/mdast@4.0.4': '2024-05-14T07:35:37.616Z'
+  '@types/mongo-sanitize@1.0.3': '2023-11-07T11:19:51.261Z'
+  '@types/morgan@1.9.10': '2025-06-07T02:17:59.602Z'
+  '@types/multer-s3@3.0.3': '2023-11-07T11:28:39.508Z'
+  '@types/multer@2.3.0': '2026-09-28T22:35:38.274Z'
+  '@types/node@22.20.5': '2026-10-01T22:38:10.803Z'
+  '@types/node@24.19.2': '2026-10-09T18:44:25.189Z'
+  '@types/node@26.6.5': '2026-10-09T18:46:47.657Z'
+  '@types/nodemailer@8.0.2': '2026-09-15T20:36:24.078Z'
+  '@types/nprogress@0.2.3': '2023-11-07T12:08:21.183Z'
+  '@types/p5@1.7.7': '2025-10-24T04:24:41.684Z'
+  '@types/pdfkit@0.17.6': '2026-04-16T20:46:04.922Z'
+  '@types/pg@8.23.1': '2026-08-17T20:10:18.296Z'
+  '@types/qrcode@1.5.6': '2025-10-24T04:28:45.136Z'
+  '@types/react-dom@19.3.0': '2026-09-09T18:07:51.886Z'
+  '@types/react@19.3.0': '2026-09-09T18:08:49.750Z'
+  '@types/slug@5.0.9': '2024-08-13T17:36:14.972Z'
+  '@types/ws@8.18.2': '2026-09-29T08:07:45.655Z'
+  '@typescript-eslint/eslint-plugin@8.71.2': '2026-10-12T17:09:51.996Z'
+  '@typescript-eslint/parser@8.71.2': '2026-10-12T17:11:57.903Z'
+  '@typescript/native-preview@7.0.0-dev.20260707.2': '2026-07-07T08:20:24.277Z'
+  '@unocss/astro@66.11.0': '2026-10-12T06:41:51.081Z'
+  '@unocss/core@66.11.0': '2026-10-12T06:39:13.409Z'
+  '@unocss/reset@66.11.0': '2026-10-12T06:40:24.248Z'
+  '@upstash/ratelimit@2.2.0': '2026-09-23T15:08:13.042Z'
+  '@upstash/redis@1.40.0': '2026-10-26T05:53:45.440Z'
+  '@vercel/analytics@2.0.1': '2026-03-12T14:46:08.217Z'
+  '@vercel/connect@2.5.6': '2026-10-27T02:01:35.625Z'
+  '@vercel/speed-insights@2.0.0': '2026-03-10T16:37:05.993Z'
+  '@vitejs/plugin-react@6.1.2': '2026-10-05T10:08:27.143Z'
+  '@vitest/coverage-v8@4.1.12': '2026-10-15T14:39:54.281Z'
+  '@vitest/eslint-plugin@1.6.27': '2026-08-10T02:34:20.099Z'
+  agents@0.30.1: '2026-10-23T15:40:10.943Z'
+  ai@7.0.141: '2026-10-15T02:22:36.508Z'
+  archiver@8.0.0: '2026-05-08T08:05:23.358Z'
+  astro-eslint-parser@3.2.0: '2026-09-24T13:19:51.516Z'
+  astro-icon@1.2.0: '2026-08-18T04:41:27.677Z'
+  astro-robots-txt@1.0.0: '2023-09-08T13:23:14.551Z'
+  astro@7.4.2: '2026-10-21T14:18:56.764Z'
+  auth0@4.37.1: '2026-05-22T13:38:38.500Z'
+  auth0@7.5.0: '2026-10-14T11:06:53.372Z'
+  autoprefixer@10.6.1: '2026-09-15T13:48:16.959Z'
+  axe-core@4.14.0: '2026-10-05T17:43:36.099Z'
+  axios@1.20.0: '2026-08-26T08:20:14.517Z'
+  bcryptjs@3.0.3: '2025-11-02T22:09:43.466Z'
+  better-sqlite3@13.0.3: '2026-08-05T03:47:44.751Z'
+  browserify-zlib@0.2.0: '2017-06-03T16:02:05.764Z'
+  buffer@6.0.3: '2020-11-23T02:51:27.107Z'
+  chalk@6.0.1: '2026-09-27T03:40:44.397Z'
+  chart.js@4.6.1: '2026-10-22T17:23:24.755Z'
+  class-transformer@0.5.1: '2021-11-22T19:04:09.677Z'
+  class-validator@0.15.1: '2026-02-26T10:46:55.062Z'
+  class-variance-authority@0.7.1: '2024-11-26T08:20:34.604Z'
+  clsx@2.1.1: '2024-04-23T05:26:04.645Z'
+  commander@11.1.0: '2023-10-13T00:29:34.905Z'
+  commander@12.1.0: '2024-05-18T11:16:54.043Z'
+  compression@1.8.2: '2026-09-11T11:16:47.669Z'
+  concurrently@10.0.6: '2026-10-08T12:53:46.263Z'
+  connect-redis@10.0.0: '2026-07-24T20:26:40.365Z'
+  cors@2.8.6: '2026-01-22T14:41:30.223Z'
+  cross-env@10.1.0: '2025-09-29T17:34:12.232Z'
+  crypto-js@4.2.0: '2023-10-24T22:20:29.229Z'
+  date-fns@4.4.0: '2026-05-29T23:23:42.628Z'
+  dayjs@1.11.23: '2026-08-17T11:52:35.217Z'
+  del-cli@8.0.1: '2026-10-09T04:00:31.928Z'
+  dependency-cruiser@18.7.0: '2026-10-19T19:55:19.067Z'
+  devalue@5.9.4: '2026-09-18T19:05:10.961Z'
+  digest-fetch@3.1.1: '2023-08-29T12:31:37.448Z'
+  dompurify@3.4.17: '2026-10-12T12:41:28.880Z'
+  dotenv@18.0.1: '2026-09-18T23:35:09.516Z'
+  drizzle-orm@0.45.4: '2026-10-08T10:50:41.953Z'
+  es-module-lexer@3.0.4: '2026-10-15T04:35:33.820Z'
+  esbuild@0.28.2: '2026-08-08T20:00:55.454Z'
+  eslint-plugin-astro@3.2.1: '2026-09-17T02:54:46.351Z'
+  eslint-plugin-jsx-a11y@6.10.2: '2024-10-26T04:45:18.067Z'
+  eslint-plugin-n@18.5.0: '2026-10-18T05:29:01.470Z'
+  eslint-plugin-react-hooks@7.1.1: '2026-04-17T18:03:19.591Z'
+  eslint-plugin-vitest-globals@1.6.1: '2026-03-13T07:09:03.308Z'
+  eslint@10.12.0: '2026-10-02T20:08:19.213Z'
+  eslint@10.13.0: '2026-10-16T14:24:10.765Z'
+  espree@11.2.0: '2026-03-06T22:32:40.951Z'
+  eve@0.84.0: '2026-10-26T22:14:50.018Z'
+  events@3.3.0: '2021-02-27T16:51:27.318Z'
+  express-openid-connect@3.4.0: '2026-08-07T12:30:16.134Z'
+  express-rate-limit@8.7.1: '2026-10-06T02:04:46.635Z'
+  express-session@1.19.0: '2026-01-22T14:46:26.195Z'
+  express@5.3.0: '2026-10-09T12:56:54.505Z'
+  fake-indexeddb@6.2.6: '2026-10-16T12:47:35.972Z'
+  flexsearch@0.8.212: '2025-09-06T23:41:14.877Z'
+  framer-motion@14.6.0: '2026-10-22T08:19:13.715Z'
+  geoip-lite@2.0.3: '2026-06-17T17:13:07.615Z'
+  glob@13.0.6: '2026-02-19T17:26:33.269Z'
+  globals@17.13.0: '2026-10-01T03:57:11.938Z'
+  globby@16.2.4: '2026-08-19T17:05:37.965Z'
+  graphql-depth-limit@1.1.0: '2017-08-09T22:23:53.743Z'
+  graphql-query-complexity@2.0.0: '2026-07-23T01:58:51.573Z'
+  graphql-request@7.4.0: '2025-12-12T15:49:52.637Z'
+  graphql-ws@6.4.1: '2026-10-15T18:42:32.405Z'
+  graphql-yoga@6.0.1: '2026-10-23T16:30:32.440Z'
+  graphql@17.0.2: '2026-07-03T06:28:49.985Z'
+  gray-matter@4.0.3: '2021-04-24T03:06:31.539Z'
+  hastscript@9.0.1: '2025-02-19T13:18:00.722Z'
+  headroom-ai@0.42.0: '2026-10-26T23:06:50.338Z'
+  helmet@8.3.0: '2026-07-12T01:20:06.201Z'
+  hono@4.13.13: '2026-10-04T03:53:48.117Z'
+  html-entities@2.6.0: '2025-03-30T15:40:10.885Z'
+  html-escaper@3.0.3: '2021-02-18T08:35:19.586Z'
+  husky@9.1.7: '2024-11-18T15:28:26.026Z'
+  i18next@26.5.11: '2026-10-25T18:34:06.532Z'
+  idb@8.0.4: '2026-10-06T08:20:40.245Z'
+  ioredis-mock@8.13.1: '2025-10-29T15:34:25.148Z'
+  ioredis@5.11.1: '2026-06-04T10:14:59.752Z'
+  isomorphic-dompurify@4.6.0: '2026-10-16T14:12:38.850Z'
+  jest@30.5.2: '2026-09-18T13:58:07.141Z'
+  jigsawstack@0.4.6: '2026-07-06T22:49:40.597Z'
+  joi@17.13.9: '2026-10-28T10:04:26.342Z'
+  jotai@2.20.3: '2026-08-24T07:26:18.202Z'
+  js-base64@3.9.4: '2026-09-19T07:56:46.696Z'
+  jscpd@5.4.1: '2026-10-09T11:42:46.149Z'
+  jsdom@30.1.3: '2026-10-15T09:24:38.912Z'
+  jsonwebtoken@9.0.3: '2025-12-04T10:27:57.257Z'
+  just-bash@3.6.0: '2026-10-01T12:48:02.977Z'
+  knip@6.43.0: '2026-10-24T08:32:43.813Z'
+  langsmith@0.10.13: '2026-10-13T11:38:45.948Z'
+  lighthouse@13.5.0: '2026-09-18T14:13:55.261Z'
+  lint-staged@17.6.0: '2026-09-26T06:01:39.503Z'
+  lucide-react@1.61.0: '2026-10-21T06:12:38.158Z'
+  markdown-table-prettify@4.1.0: '2026-05-22T12:48:20.853Z'
+  markdownlint-cli@0.50.0: '2026-10-24T23:25:08.838Z'
+  markdownlint@0.42.0: '2026-10-15T06:09:15.328Z'
+  mcp-remote@0.15.2: '2026-10-20T17:19:09.950Z'
+  mdast-util-directive@3.1.1: '2026-10-03T16:31:20.450Z'
+  mdast-util-to-string@4.0.0: '2023-07-07T16:19:50.488Z'
+  medium-zoom@1.1.2: '2026-10-25T22:15:09.050Z'
+  micromatch@4.0.8: '2024-08-23T16:31:18.748Z'
+  mixpanel-browser@2.84.0: '2026-10-06T14:46:29.722Z'
+  mongo-sanitize@1.1.0: '2020-03-02T01:13:16.280Z'
+  mongodb-memory-server@11.3.0: '2026-09-21T15:14:06.795Z'
+  mongodb-query-validator@1.4.0: '2025-06-09T11:41:00.651Z'
+  mongodb@7.6.0: '2026-08-24T17:35:26.113Z'
+  mongoose@9.11.4: '2026-10-23T17:05:33.476Z'
+  morgan@1.12.1: '2026-09-11T08:57:42.376Z'
+  msw@3.0.3: '2026-10-10T01:38:37.376Z'
+  multer-s3@3.0.1: '2022-05-31T11:54:33.466Z'
+  multer@2.5.0: '2026-10-22T11:58:46.216Z'
+  nanoid@6.0.2: '2026-10-05T21:23:00.134Z'
+  node-cron@4.6.0: '2026-07-05T14:44:45.185Z'
+  node-gyp-build@4.8.4: '2024-11-19T14:43:46.572Z'
+  node-seal@7.0.0: '2025-11-08T22:07:23.821Z'
+  nodemailer@10.2.1: '2026-10-22T13:46:48.749Z'
+  nprogress@0.2.0: '2015-05-13T10:31:26.370Z'
+  ora@8.2.0: '2025-02-02T07:26:16.712Z'
+  otplib@13.5.0: '2026-08-21T14:48:15.571Z'
+  oxc-parser@0.151.0: '2026-09-21T12:33:39.865Z'
+  oxc-resolver@11.24.2: '2026-07-12T16:30:52.655Z'
+  oxfmt@0.74.0: '2026-10-19T17:26:47.800Z'
+  oxlint-tsgolint@7.0.2004: '2026-10-10T13:00:10.601Z'
+  oxlint@1.89.0: '2026-10-19T17:24:22.105Z'
+  p5@2.3.4: '2026-09-25T19:05:11.227Z'
+  path-browserify@1.0.1: '2020-03-03T16:52:38.480Z'
+  path-to-regexp@6.3.0: '2024-09-12T01:09:36.065Z'
+  pdfkit@0.20.2: '2026-08-30T01:59:10.699Z'
+  pg@8.23.1: '2026-09-30T15:39:58.489Z'
+  piccolore@0.1.3: '2025-11-19T12:34:51.401Z'
+  picocolors@1.1.1: '2024-10-16T18:20:03.921Z'
+  postcss-import@17.0.1: '2026-10-13T19:24:24.940Z'
+  postcss@8.5.30: '2026-10-12T20:38:43.212Z'
+  postgres@3.4.9: '2026-04-05T15:18:33.078Z'
+  postinstall-postinstall@2.1.0: '2020-03-27T11:28:06.658Z'
+  prettier-plugin-astro@1.1.1: '2026-10-09T11:32:13.607Z'
+  prettier@3.9.10: '2026-10-10T08:35:28.472Z'
+  prop-types@15.8.1: '2022-01-05T00:08:33.458Z'
+  qrcode@1.5.4: '2024-08-05T21:52:58.518Z'
+  react-chartjs-2@5.3.1: '2025-10-27T16:41:52.213Z'
+  react-dom@19.3.1: '2026-10-14T16:49:10.081Z'
+  react-hook-form@7.91.0: '2026-10-23T21:37:28.462Z'
+  react-hot-toast@2.6.1: '2026-09-16T12:45:49.652Z'
+  react-i18next@17.1.9: '2026-10-25T17:19:46.101Z'
+  react@19.3.1: '2026-10-14T16:47:15.290Z'
+  reading-time@1.5.0: '2021-09-10T09:59:02.691Z'
+  recharts@3.10.1: '2026-07-25T15:23:05.240Z'
+  redis@6.3.0: '2026-09-30T11:03:30.883Z'
+  rehype-callouts@2.2.0: '2026-06-15T16:07:32.936Z'
+  rehype-external-links@3.0.0: '2023-09-03T15:00:48.705Z'
+  rehype-sanitize@6.0.0: '2023-08-26T11:11:05.469Z'
+  rehype-stringify@10.0.1: '2024-09-27T15:08:52.733Z'
+  remark-code-import@1.2.0: '2023-05-06T14:54:21.568Z'
+  remark-imgattr@1.1.1: '2026-02-23T22:08:30.092Z'
+  remark-parse@11.0.0: '2023-09-18T09:42:28.170Z'
+  remark-rehype@11.1.2: '2025-04-02T13:46:59.156Z'
+  remark@15.0.1: '2023-09-18T10:20:58.543Z'
+  resend@6.34.1: '2026-10-16T17:30:15.051Z'
+  rollup-plugin-visualizer@7.1.1: '2026-08-14T07:53:43.553Z'
+  satori-html@0.3.2: '2022-12-12T14:59:25.450Z'
+  satori@0.63.2: '2026-10-20T12:33:55.084Z'
+  scheduler@0.28.0: '2026-09-09T17:17:30.281Z'
+  sharp@0.35.5: '2026-09-27T13:46:24.509Z'
+  shiki@4.5.0: '2026-10-01T06:46:31.760Z'
+  simple-git@4.0.2: '2026-09-26T14:22:46.199Z'
+  slug@12.0.1: '2026-07-21T19:38:14.242Z'
+  socket.io-client@4.8.4: '2026-09-25T08:35:02.910Z'
+  socket.io@4.8.4: '2026-09-25T08:51:53.015Z'
+  sonner@2.0.8: '2026-08-09T08:46:10.174Z'
+  standardwebhooks@1.1.1: '2026-08-28T20:44:17.913Z'
+  stream-browserify@3.0.0: '2020-04-16T12:50:54.368Z'
+  supertest@7.3.1: '2026-10-02T14:51:40.083Z'
+  tailwind-merge@3.7.0: '2026-09-12T20:10:15.257Z'
+  tar@7.5.22: '2026-07-24T15:48:51.111Z'
+  terser@5.51.2: '2026-08-27T11:31:25.786Z'
+  ts-jest@29.4.15: '2026-10-15T05:41:43.481Z'
+  tsc-alias@1.9.8: '2026-10-17T13:49:23.808Z'
+  tsconfig-paths@4.2.0: '2023-03-29T20:47:10.433Z'
+  tsconfig@7.0.0: '2017-08-28T23:40:02.474Z'
+  tsup@8.5.1: '2025-11-12T21:21:42.746Z'
+  tsx@4.23.15: '2026-09-20T07:22:17.792Z'
+  turbo@2.11.9: '2026-10-16T19:07:34.393Z'
+  turndown@7.2.4: '2026-04-03T14:59:43.309Z'
+  tw-animate-css@1.4.0: '2025-09-24T05:25:53.055Z'
+  twilio@6.2.0: '2026-10-12T16:12:20.048Z'
+  typescript-eslint@8.71.2: '2026-10-12T17:10:00.963Z'
+  typescript@5.7.3: '2025-01-08T19:05:34.766Z'
+  typescript@5.8.3: '2025-04-05T00:17:37.851Z'
+  unocss@66.11.0: '2026-10-12T06:41:36.594Z'
+  url-polyfill@1.1.14: '2025-09-08T16:30:08.509Z'
+  utf-8-validate@6.0.6: '2025-12-18T16:38:00.865Z'
+  uuid@14.0.3: '2026-10-10T00:30:19.423Z'
+  vfile@6.0.3: '2024-08-27T09:12:42.377Z'
+  viewerjs@1.15.2: '2026-10-01T05:13:02.336Z'
+  vite-tsconfig-paths@6.1.1: '2026-02-11T23:26:08.179Z'
+  vite@8.3.5: '2026-10-21T06:38:54.907Z'
+  vitest@4.1.11: '2026-08-18T14:27:07.240Z'
+  vitest@4.1.12: '2026-10-15T14:51:24.991Z'
+  vue@3.5.44: '2026-10-13T07:45:32.806Z'
+  wait-on@9.5.1: '2026-09-29T15:33:22.495Z'
+  winston@3.19.0: '2025-12-07T07:37:16.009Z'
+  workers-ai-provider@4.0.1: '2026-10-20T15:24:00.030Z'
+  wrangler@4.156.0: '2026-10-29T18:42:47.181Z'
+  ws@8.22.0: '2026-09-26T15:00:57.748Z'
+  yaml@2.8.4: '2026-05-02T09:09:40.093Z'
+  zod@4.6.7: '2026-10-12T16:29:37.778Z'
+  zustand@5.0.16: '2026-10-22T04:32:02.337Z'
