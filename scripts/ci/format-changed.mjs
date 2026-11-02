@@ -5,47 +5,28 @@ import { spawnSync } from "node:child_process";
 
 /** @typedef {import('child_process').SpawnSyncReturns<string>} SpawnSyncTextResult */
 
-const EXCLUDED_FROM_OXFMT = new Set([
-  "apps/web/src/lib/access-control.ts",
-  "apps/web/src/lib/auth/__tests__/integration.test.ts",
-  "apps/web/src/lib/auth/__tests__/middleware.test.ts",
-  "apps/web/src/lib/auth/auth0-adaptive-mfa-service.ts",
-  "apps/web/src/lib/auth/auth0-identity-provider.ts",
-  "apps/web/src/lib/auth/auth0-impersonation-service.ts",
-  "apps/web/src/lib/auth/auth0-jwt-service.ts",
-  "apps/web/src/lib/auth/auth0-middleware.ts",
-  "apps/web/src/lib/auth/index.ts",
-  "apps/web/src/lib/ehr-native/auth/supervisor-guard.ts",
-  "apps/web/src/lib/ehr-native/gates/types.ts",
-  "apps/web/src/lib/ehr-native/integrations/hie/types.ts",
-  "apps/web/src/lib/ehr-native/services/patient-service.ts",
-  "apps/web/src/lib/ehr-native/services/offline-sync.service.ts",
-  "apps/web/src/lib/ehr-native/services/treatment-plan.service.ts",
-  "apps/web/src/lib/ehr-native/services/analytics.service.ts",
-  "apps/web/src/components/ehr/dashboards/types.ts",
-  "apps/web/src/lib/encryption.ts",
-  "apps/web/src/lib/fhe/encrypted-memory.ts",
-  "apps/web/src/lib/graphql/redis-pubsub.ts",
-  "apps/web/src/lib/hooks/journal-research/useWebSocket.ts",
-  "apps/web/src/lib/jobs/queue.ts",
-  "apps/web/src/lib/patient/patientManager.ts",
-  "apps/web/src/lib/research/ResearchPlatform.ts",
-  "apps/web/src/lib/research/services/HIPAADataService.ts",
-  "apps/web/src/lib/security/consent/ConsentService.ts",
-  "apps/web/src/lib/services/BusinessIntelligenceService.ts",
-  "apps/web/src/lib/services/auth0.service.ts",
-  "apps/web/src/lib/services/patient-rights/__tests__/dataPortabilityService.test.ts",
-  "apps/web/src/lib/services/patient-rights/dataPortabilityService.ts",
-  "apps/web/src/tests/api/session/skills-api.test.ts",
-  "apps/web/src/tests/api/v1/health.test.ts",
-  "apps/web/src/types/index.ts",
-  "astro.config.mjs",
-  "eslint.config.js",
-  "packages/sdk-typescript/src/runtime.ts",
-  "tests/unit/auth0/auth0-jwt-service.test.ts"
-]);
+/**
+ * oxfmt's scope — including which files it must not touch — is defined in
+ * `.oxfmtrc.jsonc` (`ignorePatterns`) plus `.gitignore`, and nowhere else.
+ *
+ * Do not reintroduce a per-file exclusion list here. The pre-commit hook runs
+ * oxfmt over staged files with the same flags, so a list that only existed in
+ * this script made the hook format files CI never checked.
+ */
+const OXFMT_ARGS = ["--ignore-path", ".gitignore"];
 
-const OXFMT_APPLICABLE_EXTENSIONS = new Set([".js", ".ts", ".mjs", ".cjs", ".mts", ".cts"]);
+// Mirrors the oxfmt glob in `.lintstagedrc.json` exactly, so every extension
+// the hook formats is also checked here.
+const OXFMT_APPLICABLE_EXTENSIONS = new Set([
+  ".js",
+  ".ts",
+  ".jsx",
+  ".tsx",
+  ".mjs",
+  ".cjs",
+  ".mts",
+  ".cts",
+]);
 
 /** Session dump markdown files are local artifacts and are not formatted. */
 const SESSION_DUMP_PATTERN = /^session-ses_[^/]+\.md$/;
@@ -154,14 +135,15 @@ if (ASTRO_FILES.length > 0) {
 }
 
 const oxfmtFiles = changedFiles.filter((filePath) => {
-  if (EXCLUDED_FROM_OXFMT.has(filePath)) {
-    return false;
-  }
-
   const extension = filePath.slice(filePath.lastIndexOf("."));
   return OXFMT_APPLICABLE_EXTENSIONS.has(extension);
 });
 
 if (oxfmtFiles.length > 0) {
-  runCommand("oxfmt", ["--check", "--no-error-on-unmatched-pattern", ...oxfmtFiles]);
+  runCommand("oxfmt", [
+    "--check",
+    ...OXFMT_ARGS,
+    "--no-error-on-unmatched-pattern",
+    ...oxfmtFiles,
+  ]);
 }
