@@ -4,30 +4,38 @@ from __future__ import annotations
 
 import hashlib
 import json
+from typing import Any
 
+from scripts.training.build_v6_safety_judge_packets import ROOT
 from scripts.training.generate_v6_acknowledgment import build_transport
 from scripts.training.replay_v6_support_trace import RecordedTransport
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write
 from scripts.training.verify_v6_policy_current import source_trace
 from scripts.training.verify_v6_policy_final import groups, verify_response
 
 
 class CompleteDecodingReplay(RecordedTransport):
-    def __init__(self, records):
+    def __init__(self, records: list[dict[str, Any]]) -> None:
         super().__init__(records)
         self.decoding_records = iter(records)
 
-    def complete(self, arm, messages, tools, decoding):
+    def complete(
+        self,
+        arm: dict[str, Any],
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        decoding: dict[str, Any],
+    ) -> dict[str, Any]:
         record = next(self.decoding_records)
         if "decoding" in record and decoding != record["decoding"]:
             raise ValueError("actual provider decoding differs from frozen ledger")
         return super().complete(arm, messages, tools, decoding)
 
 
-def verify():
+def verify() -> dict[str, Any]:
     router = json.loads((DIRECTORY / "calibration-v2/gemma4-calibration-config.json").read_text())["arms"][0]
     certificate = json.loads((DIRECTORY / "task-review-v12/certificate.json").read_text())
-    proof = {"network_calls": 0, "clinical_validation": False, "runs": []}
+    proof: dict[str, Any] = {"network_calls": 0, "clinical_validation": False, "runs": []}
     for name in ("acknowledgment-fresh-v1", *(f"acknowledgment-candidate-v{i}" for i in range(1, 9))):
         cases = {c["id"]: c for c in rows(DIRECTORY / name / "cases.jsonl")}
         config = json.loads((DIRECTORY / name / "config.json").read_text())

@@ -9,18 +9,22 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from typing import Any
 
 from ai.training.contextual_support_policy import ContextualSupportTransport
 from ai.training.support_task_review import TaskResponseReviewer
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write
+from scripts.training.build_v6_safety_judge_packets import ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write
 
 
 class RecordedTransport:
-    def __init__(self, records: list[dict]):
+    def __init__(self, records: list[dict[str, Any]]):
         self.records = iter(records)
         self.count = 0
 
-    def complete(self, arm: dict, messages: list[dict], tools: list[dict], decoding: dict) -> dict:
+    def complete(
+        self, arm: dict[str, Any], messages: list[dict[str, Any]], tools: list[dict[str, Any]], decoding: dict[str, Any]
+    ) -> dict[str, Any]:
         record = next(self.records)
         self.count += 1
         prompt_hash = hashlib.sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
@@ -34,7 +38,7 @@ class RecordedTransport:
         return {key: record[key] for key in ("response", "usage", "finish_reason")} | {"tool_calls": []}
 
 
-def replay_stage(stage: str, version: str) -> dict:
+def replay_stage(stage: str, version: str) -> dict[str, Any]:
     path = OUTPUT / f"bounded-{version}-{stage}"
     source = DIRECTORY / f"bounded-support-{version}" / stage
     raw = RecordedTransport(rows(path / "all-provider-calls.jsonl"))
@@ -47,7 +51,7 @@ def replay_stage(stage: str, version: str) -> dict:
         transport.task_fallback_arm = config["arms"][0]
     cases = {row["id"]: row for row in rows(source / "cases.jsonl")}
     arms = {arm["id"]: arm for arm in config["arms"]}
-    matched = []
+    matched: list[dict[str, Any]] = []
     for row in rows(path / "results.jsonl"):
         if row["status"] != "success":
             raise ValueError("cannot replay an incomplete response as a pass")
@@ -75,7 +79,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", default="v12", choices=("v4", "v5", "v11", "v12"))
     version = parser.parse_args().version
-    proof = {
+    proof: dict[str, Any] = {
         "passed": True,
         "network_calls": 0,
         "current_implementation_sha256": hashlib.sha256(

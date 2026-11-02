@@ -6,13 +6,14 @@ import argparse
 import hashlib
 import json
 import os
+from typing import Any
 
 from scripts.training.generate_v6_acknowledgment import LedgerTransport
 from scripts.training.v6_adjustment_repair import ADJUSTMENT_V2_SHA256, ADJUSTMENT_V3_SHA256, RepairedTaskReviewer
 from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", choices=("v1", "v2", "v3"), default="v3")
     args = parser.parse_args()
@@ -109,7 +110,7 @@ def main():
     raw = LedgerTransport(results, 0.05, 2 * len(anchors))
     legacy = json.loads((DIRECTORY / "task-review-v12/certificate.json").read_text())
     reviewer = RepairedTaskReviewer(raw, config["arms"][0], legacy, {}, version="v3" if args.version == "v3" else "v2")
-    outcomes = []
+    outcomes: list[dict[str, Any]] = []
     for anchor in anchors:
         try:
             result = reviewer.review(

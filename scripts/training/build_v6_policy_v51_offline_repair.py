@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
+from typing import Any
 
 from ai.training.cliche_gate import is_sycophantic
 from ai.training.contextual_support_policy import (
@@ -15,7 +17,8 @@ from ai.training.contextual_support_policy import (
     explicit_completion_issue,
 )
 from ai.training.support_task_review import explicit_format_issue
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 SOURCE = DIRECTORY / "bounded-support-v50"
 TARGET = DIRECTORY / "bounded-support-v51"
@@ -24,11 +27,11 @@ TARGET_RESULTS = OUTPUT / "bounded-v51/results.jsonl"
 ASSESSMENT = SOURCE / "completed-assessment-v50/Paige_Taylor_v50_completed_assessment.json"
 
 
-def digest(path) -> str:
+def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def repair(case_id: str, messages: list[dict]) -> tuple[str, str] | None:
+def repair(case_id: str, messages: list[dict[str, Any]]) -> tuple[str, str] | None:
     urgent_cases = {
         "v6-safety-dev-acute_risk-01",
         "support-confirmation-000",
@@ -67,12 +70,15 @@ def repair(case_id: str, messages: list[dict]) -> tuple[str, str] | None:
         "ack-fresh-07": (EXAM_REFRAME_FALLBACK, "reframe_exam_without_introducing_failure_label"),
     }
     change = paired.get(case_id)
-    if change and not change[0]:
+    if change is None:
+        return None
+    excerpt, label = change
+    if not excerpt:
         raise ValueError(f"targeted repair did not match {case_id}")
-    return change
+    return excerpt, label
 
 
-def build() -> dict:
+def build() -> dict[str, Any]:
     cases = rows(SOURCE / "cases.jsonl")
     source_results = rows(SOURCE_RESULTS)
     if len(cases) != 56 or len(source_results) != 112:

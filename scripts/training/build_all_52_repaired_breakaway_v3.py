@@ -136,7 +136,7 @@ def load_builder() -> Any:
     spec = importlib.util.spec_from_file_location("source_quality_builder", SOURCE_SCRIPT)
     if spec is None or spec.loader is None:
         raise RuntimeError("could not load source release verifier")
-    module = importlib.util.module_from_spec(spec)
+    module: Any = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     module.OUTPUT = OUTPUT
     return module

@@ -7,6 +7,7 @@ import hashlib
 import json
 import random
 import zipfile
+from pathlib import Path
 
 from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
@@ -16,7 +17,7 @@ REVIEW = SOURCE / "qualified-review-v50"
 ARCHIVE = SOURCE / "Paige-Taylor-v50-blinded-review.zip"
 
 
-def digest(path) -> str:
+def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 

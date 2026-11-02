@@ -6,6 +6,7 @@ import argparse
 import hashlib
 import json
 import os
+from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
 from scripts.training.calibrate_v6_acknowledgment_single import audit, packet
@@ -16,7 +17,7 @@ TARGET = DIRECTORY / "acknowledgment-candidate-v8-review"
 RESULTS = OUTPUT / TARGET.name
 
 
-def prepare():
+def prepare() -> dict[str, Any]:
     if TARGET.exists() or RESULTS.exists():
         raise ValueError("candidate review inputs already exist")
     source = DIRECTORY / "acknowledgment-candidate-v8"
@@ -33,7 +34,8 @@ def prepare():
     config = json.loads((DIRECTORY / "acknowledgment-v11/judge-config.json").read_text())
     config["run_id"] = "v6-acknowledgment-candidate-v8-review"
     config["pricing"]["hard_cap_usd"] = 0.08
-    packets, mapping = [], []
+    packets: list[dict[str, Any]] = []
+    mapping: list[dict[str, Any]] = []
     for i, row in enumerate(originals):
         ident = f"review-evidence-{i:03d}"
         packets.append(packet(ident, cases[row["case_id"]]["messages"], row["response"], instruction))
@@ -68,7 +70,7 @@ def prepare():
     return {"responses": len(packets), "cap_usd": 0.08}
 
 
-def run():
+def run() -> dict[str, Any]:
     if RESULTS.exists():
         raise ValueError("review outputs already exist; no automatic retries")
     from ai.training.launch.wandb_sft_v6_execute import _ensure_api_key
@@ -87,7 +89,7 @@ def run():
     return audit(TARGET, RESULTS)
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("prepare", "run", "audit"))
     action = parser.parse_args().action

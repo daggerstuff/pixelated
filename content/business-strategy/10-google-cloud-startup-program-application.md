@@ -67,16 +67,16 @@ institutional round closes.
 Status as of 2026-10-22, against the Start-tier rules and application
 prerequisites:
 
-| # | Requirement | Status | Notes |
-| --- | --- | --- | --- |
-| 1 | Founded within 24 months | Done | Founded within the last 12 months. |
-| 2 | Working MVP | Done | Clinician-training / supervision platform, live. |
-| 3 | Clear business model | Done | Documented in the business-strategy series. |
-| 4 | Plans to seek VC funding | Done (stated honestly) | Bootstrapped today; open to institutional rounds. |
-| 5 | Less than $300 prior trial-equivalent credits | Open | Self-audit required against billing account `013214-CFE7B2-9F16D5` before submitting (Section 9, Action A1). |
-| 6 | 18-character GCP billing account ID, owned/administered by a user on the company domain | Done | Account `013214-CFE7B2-9F16D5` ("My Billing Account", OPEN); administrator `chad@pixelatedempathy.com` is on the application domain. |
-| 7 | Business email matching the website domain | Open | `pixelatedempathy.com` mail currently runs on Cloudflare Email Routing; the Google Workspace migration (Section 3) closes this. |
-| 8 | Active website describing company, team, and product | Done | `pixelatedempathy.com` is live with company, product, and team pages; the team page names the founder, Chad Coburn. Google screens for AI-generated content and rejects high volumes of low-substance applications - our pages carry real substance (privacy ~15.3K, terms ~23.3K, full product and company sections). |
+| #   | Requirement                                                                             | Status                 | Notes                                                                                                                                                                                                                                                                                                                  |
+| --- | --------------------------------------------------------------------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Founded within 24 months                                                                | Done                   | Founded within the last 12 months.                                                                                                                                                                                                                                                                                     |
+| 2   | Working MVP                                                                             | Done                   | Clinician-training / supervision platform, live.                                                                                                                                                                                                                                                                       |
+| 3   | Clear business model                                                                    | Done                   | Documented in the business-strategy series.                                                                                                                                                                                                                                                                            |
+| 4   | Plans to seek VC funding                                                                | Done (stated honestly) | Bootstrapped today; open to institutional rounds.                                                                                                                                                                                                                                                                      |
+| 5   | Less than $300 prior trial-equivalent credits                                           | Open                   | Self-audit required against billing account `013214-CFE7B2-9F16D5` before submitting (Section 9, Action A1).                                                                                                                                                                                                           |
+| 6   | 18-character GCP billing account ID, owned/administered by a user on the company domain | Done                   | Account `013214-CFE7B2-9F16D5` ("My Billing Account", OPEN); administrator `chad@pixelatedempathy.com` is on the application domain.                                                                                                                                                                                   |
+| 7   | Business email matching the website domain                                              | Open                   | `pixelatedempathy.com` mail currently runs on Cloudflare Email Routing; the Google Workspace migration (Section 3) closes this.                                                                                                                                                                                        |
+| 8   | Active website describing company, team, and product                                    | Done                   | `pixelatedempathy.com` is live with company, product, and team pages; the team page names the founder, Chad Coburn. Google screens for AI-generated content and rejects high volumes of low-substance applications - our pages carry real substance (privacy ~15.3K, terms ~23.3K, full product and company sections). |
 
 The billing account is linked to three projects, all created in mid-2026:
 `gemcity-kick` (48388400806, created 2026-07-20), `one-moon-505501-u3`
@@ -225,34 +225,34 @@ Current state and steps:
 Field-by-field plan for the Start-tier application form. Every answer is
 truthful and consistent with the fact base and the public site.
 
-| Form field | Honest answer | Supporting evidence |
-| --- | --- | --- |
-| Company name | Pixelated Empathy (pre-incorporation, founder-led) | Application domain and site |
-| Legal entity status | Pre-incorporation / sole-proprietor stage - no entity details invented | This document, Section 5 |
-| Website | `https://pixelatedempathy.com` | Live site with company, team, product pages |
-| Business email | An address on `pixelatedempathy.com` (post-Workspace-migration) | Email migration runbook |
-| Billing account ID | `013214-CFE7B2-9F16D5` | Verified live GCP state, 2026-10-22 |
-| Cloud Organization / domain verification | `pixelatedempathy.com`, Cloud Identity org `334502034583` (already exists) | Verified live GCP state, 2026-10-22 |
-| What the company does | Clinician-training / supervision platform with humans in the loop; not a medical device; not direct-to-patient | Site content; compliance addendum |
-| Stage / MVP | Working MVP, live | Product pages, demo-hub |
-| Business model | Documented subscription/pilot model for training institutions | Business-strategy series (internal) |
-| Funding status | Bootstrapped; no institutional funding; plans to seek VC funding | This document, Sections 1 and 5 |
-| Founded | Within the last 12 months (as of 2026-10-22) | Eligibility check, Section 2 |
-| Prior Google Cloud credits | Under $300 trial-equivalent - confirm via self-audit before submitting | Action A1, Section 9 |
-| AI usage on Google Cloud | Product Gemini via Vertex AI only; BAA signed before any PHI; no PHI via Gemini API / AI Studio; no PHI in logs or metadata | Sections 6 and 7; `/docs/compliance/google-cloud-gemini-usage` |
-| Team | Chad Coburn, founder (product engineering, platform architecture, AI workflow design) | `/team` |
+| Form field                               | Honest answer                                                                                                               | Supporting evidence                                            |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Company name                             | Pixelated Empathy (pre-incorporation, founder-led)                                                                          | Application domain and site                                    |
+| Legal entity status                      | Pre-incorporation / sole-proprietor stage - no entity details invented                                                      | This document, Section 5                                       |
+| Website                                  | `https://pixelatedempathy.com`                                                                                              | Live site with company, team, product pages                    |
+| Business email                           | An address on `pixelatedempathy.com` (post-Workspace-migration)                                                             | Email migration runbook                                        |
+| Billing account ID                       | `013214-CFE7B2-9F16D5`                                                                                                      | Verified live GCP state, 2026-10-22                            |
+| Cloud Organization / domain verification | `pixelatedempathy.com`, Cloud Identity org `334502034583` (already exists)                                                  | Verified live GCP state, 2026-10-22                            |
+| What the company does                    | Clinician-training / supervision platform with humans in the loop; not a medical device; not direct-to-patient              | Site content; compliance addendum                              |
+| Stage / MVP                              | Working MVP, live                                                                                                           | Product pages, demo-hub                                        |
+| Business model                           | Documented subscription/pilot model for training institutions                                                               | Business-strategy series (internal)                            |
+| Funding status                           | Bootstrapped; no institutional funding; plans to seek VC funding                                                            | This document, Sections 1 and 5                                |
+| Founded                                  | Within the last 12 months (as of 2026-10-22)                                                                                | Eligibility check, Section 2                                   |
+| Prior Google Cloud credits               | Under $300 trial-equivalent - confirm via self-audit before submitting                                                      | Action A1, Section 9                                           |
+| AI usage on Google Cloud                 | Product Gemini via Vertex AI only; BAA signed before any PHI; no PHI via Gemini API / AI Studio; no PHI in logs or metadata | Sections 6 and 7; `/docs/compliance/google-cloud-gemini-usage` |
+| Team                                     | Chad Coburn, founder (product engineering, platform architecture, AI workflow design)                                       | `/team`                                                        |
 
 ## 9. Open Actions & Owners
 
-| # | Action | Owner | Status / notes |
-| --- | --- | --- | --- |
-| A1 | Prior-credits self-audit: confirm total trial-equivalent credit consumption on billing account `013214-CFE7B2-9F16D5` is under $300 | Chad Coburn (user) | Required before submission. |
-| A2 | Sequence the Google Workspace signup/migration respecting the 31-day no-paid-Workspace rule, then complete the Cloudflare-to-Workspace email cutover | Chad Coburn (user) | Follow `google-workspace-email-migration-runbook.md`; user-executed. |
-| A3 | Submit the Start-tier application via Google's form with the worksheet answers | Chad Coburn (user) | User-owned; agents prepare, never submit. |
-| A4 | On acceptance: sign the Google Cloud HIPAA BAA and complete BAA verification before any PHI touches GCP; update the vendor inventory | Chad Coburn (user) | Hard gate per Section 7. |
-| A5 | Enforce Vertex-AI-only routing for all product Gemini usage from day one | Chad Coburn (user) | Standing rule per Section 6. |
-| A6 | If rejected on unincorporated grounds: incorporate, then re-apply | Chad Coburn (user) | Fallback per Section 5; 24-month window is ample. |
-| A7 | After an institutional round (SAFE from a known investor): revisit the Scale tier | Chad Coburn (user) | Future path per Section 1. |
+| #   | Action                                                                                                                                               | Owner              | Status / notes                                                       |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | -------------------------------------------------------------------- |
+| A1  | Prior-credits self-audit: confirm total trial-equivalent credit consumption on billing account `013214-CFE7B2-9F16D5` is under $300                  | Chad Coburn (user) | Required before submission.                                          |
+| A2  | Sequence the Google Workspace signup/migration respecting the 31-day no-paid-Workspace rule, then complete the Cloudflare-to-Workspace email cutover | Chad Coburn (user) | Follow `google-workspace-email-migration-runbook.md`; user-executed. |
+| A3  | Submit the Start-tier application via Google's form with the worksheet answers                                                                       | Chad Coburn (user) | User-owned; agents prepare, never submit.                            |
+| A4  | On acceptance: sign the Google Cloud HIPAA BAA and complete BAA verification before any PHI touches GCP; update the vendor inventory                 | Chad Coburn (user) | Hard gate per Section 7.                                             |
+| A5  | Enforce Vertex-AI-only routing for all product Gemini usage from day one                                                                             | Chad Coburn (user) | Standing rule per Section 6.                                         |
+| A6  | If rejected on unincorporated grounds: incorporate, then re-apply                                                                                    | Chad Coburn (user) | Fallback per Section 5; 24-month window is ample.                    |
+| A7  | After an institutional round (SAFE from a known investor): revisit the Scale tier                                                                    | Chad Coburn (user) | Future path per Section 1.                                           |
 
 No GCP mutations, spend, or `gcloud` operations are performed by agents at any
 point in this plan; every action above is user-executed.

@@ -46,7 +46,7 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def check_source_manifest() -> dict[str, Any]:
-    manifest = json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8"))
+    manifest: dict[str, Any] = json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8"))
     if manifest["release_id"] != "wandb-full-corpus-current-master-20261019-v4":
         raise RuntimeError("unexpected source release id")
     if manifest["source_candidate_sha256"] != "f56e10b52ed83645ec3eca1b468724644dcbf6f843da96d7e82b5b4ef47bc349":

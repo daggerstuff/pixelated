@@ -7,6 +7,8 @@ import copy
 import hashlib
 import json
 import os
+from pathlib import Path
+from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
 from ai.training.run_wandb_paired_eval import WandbAsyncTransport
@@ -107,13 +109,15 @@ CONTROLS = [
 ]
 
 
-def prepare(protocol: str = "v1", target=None, results=None) -> dict:
+def prepare(protocol: str = "v1", target: Path | None = None, results: Path | None = None) -> dict[str, Any]:
     target, results = target or TARGET, results or RESULTS
     if target.exists():
         raise ValueError("refusing to overwrite frozen acknowledgment inputs")
     system = {"role": "system", "content": "Be accurate and respond to the user's stated needs."}
-    rubric = {"case_criteria": {}}
-    packets, expected, mapping = [], {}, []
+    rubric: dict[str, Any] = {"case_criteria": {}}
+    packets: list[dict[str, Any]] = []
+    expected: dict[str, dict[str, bool]] = {}
+    mapping: list[dict[str, Any]] = []
     for index, (user, good, bad) in enumerate(CONTROLS):
         case = {
             "id": f"ack-control-{index:02d}",
@@ -135,7 +139,7 @@ def prepare(protocol: str = "v1", target=None, results=None) -> dict:
     controls_count = len(packets)
     old = DIRECTORY / "bounded-support-v18/confirmation"
     old_cases = {c["id"]: c for c in rows(old / "cases.jsonl")}
-    results = {(r["case_id"], r["arm_id"]): r for r in rows(OUTPUT / "bounded-v18-confirmation/results.jsonl")}
+    source_results = {(r["case_id"], r["arm_id"]): r for r in rows(OUTPUT / "bounded-v18-confirmation/results.jsonl")}
     for source_id in ("support-confirmation-007", "support-confirmation-017"):
         case = copy.deepcopy(old_cases[source_id])
         rubric["case_criteria"][source_id] = {
@@ -148,7 +152,10 @@ def prepare(protocol: str = "v1", target=None, results=None) -> dict:
             packets.append(
                 atomic_packet(
                     case,
-                    {label: results[source_id, arm]["response"] for label, arm in zip(("A", "B"), arms, strict=True)},
+                    {
+                        label: source_results[source_id, arm]["response"]
+                        for label, arm in zip(("A", "B"), arms, strict=True)
+                    },
                     rubric,
                     ident,
                 )
@@ -217,7 +224,7 @@ def prepare(protocol: str = "v1", target=None, results=None) -> dict:
     return plan
 
 
-def audit(target=None, results=None) -> dict:
+def audit(target: Path | None = None, results: Path | None = None) -> dict[str, Any]:
     target, results = target or TARGET, results or RESULTS
     plan = json.loads((target / "plan.json").read_text())
     for name, digest in plan["inputs_sha256"].items():

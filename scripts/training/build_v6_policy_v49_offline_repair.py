@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
+from typing import Any
 
 from ai.training.cliche_gate import is_sycophantic
 from ai.training.contextual_support_policy import _specific_passive_ideation_response
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 SOURCE = DIRECTORY / "bounded-support-v48"
 REVIEW = SOURCE / "qualified-review-v48"
@@ -16,11 +19,11 @@ TARGET = DIRECTORY / "bounded-support-v49"
 TARGET_RESULTS = OUTPUT / "bounded-v49/results.jsonl"
 
 
-def digest(path) -> str:
+def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def response_for(case_id: str, arm: str, messages: list[dict]) -> tuple[str, str] | None:
+def response_for(case_id: str, arm: str, messages: list[dict[str, Any]]) -> tuple[str, str] | None:
     if case_id in {
         "v6-safety-dev-risk_calibration-02",
         "support-confirmation-008",
@@ -61,7 +64,7 @@ def response_for(case_id: str, arm: str, messages: list[dict]) -> tuple[str, str
     return repairs.get((case_id, arm))
 
 
-def audit(results: list[dict]) -> None:
+def audit(results: list[dict[str, Any]]) -> None:
     expected = {
         ("v6-safety-dev-risk_calibration-02", "base"),
         ("v6-safety-dev-risk_calibration-02", "sft"),
@@ -121,7 +124,7 @@ def audit(results: list[dict]) -> None:
             raise ValueError(message)
 
 
-def build() -> dict:
+def build() -> dict[str, Any]:
     cases = rows(SOURCE / "cases.jsonl")
     source_results = rows(SOURCE_RESULTS)
     if len(cases) != 56 or len(source_results) != 112:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from typing import Any
 
 from scripts.training.audit_v6_policy_training_context import digest
 from scripts.training.build_v6_booking_contract_probe import describe_booking_note
@@ -12,7 +13,7 @@ from scripts.training.summarize_v6_paired_evaluations import canonical_hash
 from scripts.training.summarize_v6_policy_repair import booking_replay, read_rows
 
 
-def state_passed(row: dict) -> bool:
+def state_passed(row: dict[str, Any]) -> bool:
     return (
         row["status"] == "success"
         and row.get("finish_reason") != "length"
@@ -21,8 +22,8 @@ def state_passed(row: dict) -> bool:
     )
 
 
-def booking_note_counts(rows: list[dict], arm: str) -> dict:
-    counts = Counter()
+def booking_note_counts(rows: list[dict[str, Any]], arm: str) -> dict[str, int]:
+    counts: Counter[str] = Counter()
     for row in rows:
         if row["arm_id"] != arm or row["scenario"] != "appointment_explicit_consent":
             continue
@@ -43,7 +44,7 @@ def booking_note_counts(rows: list[dict], arm: str) -> dict:
     return dict(counts)
 
 
-def verify_contract_cases(original: list[dict], actual: list[dict], version: int) -> None:
+def verify_contract_cases(original: list[dict[str, Any]], actual: list[dict[str, Any]], version: int) -> None:
     by_id = {case["id"]: case for case in original}
     if len({case["id"] for case in actual}) != len(actual):
         raise ValueError("duplicate probe case")
@@ -54,11 +55,12 @@ def verify_contract_cases(original: list[dict], actual: list[dict], version: int
         raise ValueError("probe changes more than its registered tool contract")
 
 
-def report() -> dict:
+def report() -> dict[str, Any]:
     baseline_cases = read_rows(DOCS / "policy-repair-v3/tools-cases.jsonl")
     baseline_rows = read_rows(ROOT / "ai/training/output/v6-policy-repair-v3/tools/results.jsonl")
     baseline_config = json.loads((DOCS / "policy-repair-v3/tools-config.json").read_text())
-    trials, hashes = {}, {}
+    trials: dict[str, Any] = {}
+    hashes: dict[str, str] = {}
     for version in (1, 2, 3):
         directory = DOCS / f"booking-contract-probe-v{version}"
         output = ROOT / f"ai/training/output/v6-booking-contract-probe-v{version}"
@@ -79,7 +81,7 @@ def report() -> dict:
             if row["config_sha256"] != canonical_hash(config) or row["case_sha256"] != case_hashes[row["case_id"]]:
                 raise ValueError("stale probe result")
         booking = booking_replay(cases, rows)
-        repeats = {}
+        repeats: dict[str, Any] = {}
         prior = {(r["arm_id"], r["case_id"]): r for r in baseline_rows}
         for arm in ("base", "sft"):
             booking[arm]["supplied_note_representation_counts"] = booking_note_counts(rows, arm)
@@ -95,9 +97,9 @@ def report() -> dict:
                 "changed_state_outcome_count": sum(state_passed(new) != state_passed(old) for new, old in repeated),
                 "interpretation": "Inputs and decoding are unchanged for these cases. Differences cannot be attributed to the booking contract; generation repeatability is limited.",
             }
-        metrics = {}
+        metrics: dict[str, Any] = {}
         for arm in ("base", "sft"):
-            groups = {}
+            groups: dict[str, Any] = {}
             for scenario in sorted({c["scenario"] for c in cases}):
                 group = [r for r in rows if r["arm_id"] == arm and r["scenario"] == scenario]
                 groups[scenario] = {

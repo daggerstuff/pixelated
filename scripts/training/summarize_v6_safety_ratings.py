@@ -6,21 +6,25 @@ import json
 import statistics
 from collections import Counter
 from datetime import UTC, datetime
+from typing import Any
 
 from scripts.training.build_v6_safety_judge_packets import DOCS, OUTPUT, validate_rating
 from scripts.training.summarize_v6_paired_evaluations import canonical_hash, paired_interval
 
 
-def parse_rating(text: str) -> dict:
+def parse_rating(text: str) -> dict[str, Any]:
     value = text.strip()
     if value.startswith("```json\n") and value.endswith("\n```"):
         value = value[len("```json\n") : -len("\n```")]
     elif value.startswith("```\n") and value.endswith("\n```"):
         value = value[len("```\n") : -len("\n```")]
-    return json.loads(value)
+    parsed: dict[str, Any] = json.loads(value)
+    return parsed
 
 
-def critical_disagreements(cases: dict, mapping: dict, judgments: dict) -> list[dict]:
+def critical_disagreements(
+    cases: dict[str, Any], mapping: dict[str, Any], judgments: dict[tuple[str, str], dict[str, Any]]
+) -> list[dict[str, Any]]:
     disagreements = []
     for case_id in cases:
         first, second = judgments.get(("gemma4", case_id)), judgments.get(("nemotron35", case_id))
@@ -44,7 +48,7 @@ def critical_disagreements(cases: dict, mapping: dict, judgments: dict) -> list[
 def main() -> None:
     rubric = json.loads((DOCS / "safety-quality-dev-v1.rubric.json").read_text())
     dimensions = set(rubric["rating_protocol"]["dimensions"])
-    report = {
+    report: dict[str, Any] = {
         "observed_at_utc": datetime.now(UTC).isoformat(),
         "models": {},
         "limitations": [
@@ -63,19 +67,21 @@ def main() -> None:
             row["judge_case_id"]: row for row in map(json.loads, (directory / "mapping.jsonl").read_text().splitlines())
         }
         manifest = json.loads((directory / "packet-manifest.json").read_text())
-        model_report = {
+        model_report: dict[str, Any] = {
             "expected_pairs": manifest["expected_pairs"],
             "ratable_pairs": manifest["ratable_pairs"],
             "excluded_pairs": manifest["excluded_pairs"],
             "judges": {},
         }
-        judgments = {}
+        judgments: dict[tuple[str, str], dict[str, Any]] = {}
         for judge in ("gemma4", "nemotron35", "gemma4-schema-v2", "nemotron35-schema-v2"):
             path = directory / f"{judge}-ratings/results.jsonl"
             if not path.exists():
                 continue
             config = json.loads((directory / f"{judge}-judge-config.json").read_text())
-            valid, invalid, seen = [], [], set()
+            valid: list[dict[str, Any]] = []
+            invalid: list[dict[str, Any]] = []
+            seen: set[str] = set()
             for line in path.read_text().splitlines():
                 row = json.loads(line)
                 case_id = row["case_id"]
@@ -118,7 +124,7 @@ def main() -> None:
                         "pair_rationale": value["rationale"],
                     }
                 )
-            by_arm = {}
+            by_arm: dict[str, Any] = {}
             for arm in ("base", "sft"):
                 ratings = [value["ratings_by_arm"][arm] for value in valid]
                 by_arm[arm] = {

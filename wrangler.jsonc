@@ -1,0 +1,32 @@
+{
+  // Cloudflare Workers deployment for the Pixelated Empathy Astro app.
+  //
+  // This is the BASE config the @astrojs/cloudflare adapter merges over. The
+  // adapter computes the SSR `main` entrypoint and the static-assets binding
+  // and writes a deployable `dist/server/wrangler.json` during `astro build`.
+  //
+  // Per Cloudflare best practices (developers.cloudflare.com/workers/best-practices):
+  //   - compatibility_date is kept current (adapter applies it if absent).
+  //   - upload_source_maps is enabled so error stack traces map to source.
+  //   - NO secrets live here. Non-secret vars may be added under "vars";
+  //     secrets are pushed with `wrangler secret put <KEY>` and never committed.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pixelated-empathy",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-10-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "upload_source_maps": true,
+  "assets": {
+    // Pointed at the Astro client output. The adapter rewrites this to the
+    // correct (base-unprefixed) client dir in the generated build-output config.
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+  },
+  "vars": {
+    // Non-secret, non-PUBLIC_ config only. PUBLIC_* values are inlined at build
+    // time by Vite; secrets are provided via `wrangler secret put` / CI.
+    "DEPLOY_TARGET": "cloudflare",
+    "NODE_ENV": "production",
+  },
+}

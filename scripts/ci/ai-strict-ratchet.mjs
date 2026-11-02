@@ -43,13 +43,15 @@ const IGNORE_DIRS = new Set(['__pycache__', '.venv', 'venv', 'node_modules', '.g
 const TREES = ['research', 'pipelines', 'training']
 
 const MYPY_CONFIG = `[mypy]
-python_version = 3.13
+python_version = 3.14
 strict = True
 ignore_missing_imports = True
 # __main__ scripts collide on module names. training/output (and any other
-# output/ dir under the pinned trees) holds gitignored run artifacts a clean
-# CI checkout never has — same divergence class as the wandb rule below.
-exclude = (__main__\\.py$|/output/)
+# output/ dir under the pinned trees) and wandb/ run-artifact dirs hold
+# gitignored files a clean CI checkout never has (training/models/ holds
+# downloaded checkpoint copies of the same modules); their duplicated copies of
+# the same module would otherwise collide on module names.
+exclude = (__main__\\.py$|/output/|/wandb/|training/models/)
 
 # Dev machines carry a gitignored wandb/ run-artifacts directory that
 # namespace-package resolution turns into a phantom wandb module
@@ -143,7 +145,7 @@ function runStrictMypy() {
       // Pin the interpreter: unpinned, uv picks the newest available and
       // runners diverge from dev machines, shifting mypy's error set.
       '--python',
-      '3.13',
+      '3.14',
       '--with',
       'mypy',
       '--',
@@ -158,16 +160,24 @@ function runStrictMypy() {
       '--explicit-package-bases',
       '--follow-imports',
       'silent',
-      '--follow-imports',
-      'silent',
       '--no-error-summary',
+      // Color codes break the `path:line: error: ...` parser below, which
+      // reads as "zero errors" and silently passes the gate. mypy colors when
+      // FORCE_COLOR/CLICOLOR_FORCE is set in the caller's shell, so pin it off.
+      '--no-color-output',
       ...TREES,
     ],
     { cwd: AI_DIR, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 20 * 60 * 1000 },
   )
 }
 
+/** Strip ANSI SGR escapes so a colored mypy report still parses. */
+function stripAnsi(text) {
+  return text.replace(/\x1b\[[0-9;]*[A-Za-z]/g, '')
+}
+
 /** Parse `path:line: error: msg [code]` lines into `file :: code` counts.
+ *
  * When `tracked` is provided, errors in files outside it are dropped — mypy
  * walks the trees itself, so on dev machines it also analyzes untracked and
  * gitignored files that CI's clean checkout never has. */
@@ -177,7 +187,7 @@ function parseErrorCounts(output, treePrefixes, tracked) {
   const lineRe = new RegExp(
     `^(${treePrefixes.join('|')})/[^:]+:\\d+(?::\\d+)?: error: .*\\[([a-z-]+)\\]$`,
   )
-  for (const line of output.split('\n')) {
+  for (const line of stripAnsi(output).split('\n')) {
     const m = line.match(lineRe)
     if (!m) continue
     const file = line.slice(0, line.indexOf(':'))
@@ -237,10 +247,20 @@ function main() {
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`
   const { counts, perFile } = parseErrorCounts(output, TREES, tracked)
 
-  if (result.status !== 0 && counts.size === 0 && !/^\S+:\d+.*error:/m.test(output)) {
+  const plain = stripAnsi(output)
+  if (result.status !== 0 && counts.size === 0 && !/^\S+:\d+.*error:/m.test(plain)) {
     // mypy itself broke (bad config, syntax crash) — surface raw output.
-    console.error(output)
+    console.error(plain)
     console.error('❌ mypy did not produce a usable error report.')
+    return 1
+  }
+
+  if (counts.size === 0 && /:\d+: error: /.test(plain)) {
+    // Error lines exist but none matched the pinned-tree parser: the report
+    // shape drifted, and reading that as "zero errors" would pass the gate
+    // silently. Fail loudly instead.
+    console.error(plain.slice(0, 4000))
+    console.error('❌ mypy reported errors the parser could not attribute — refusing to pass.')
     return 1
   }
 

@@ -6,6 +6,7 @@ import zipfile
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, write
 
@@ -49,9 +50,9 @@ ARMS = ("base", "sft")
 
 @dataclass(frozen=True)
 class _Index:
-    packet_by_id: dict
-    map_by_id: dict
-    results_by_key: dict
+    packet_by_id: dict[str, dict[str, Any]]
+    map_by_id: dict[str, dict[str, Any]]
+    results_by_key: dict[tuple[str, str], dict[str, Any]]
 
 
 @dataclass(frozen=True)
@@ -64,12 +65,12 @@ class _ResponseRef:
 
 @dataclass
 class _Tally:
-    counts: dict
-    misses: dict
-    flagged: dict
-    acknowledgments: dict
-    preferences: Counter
-    task_pairs: Counter
+    counts: dict[str, Counter[str]]
+    misses: dict[str, list[dict[str, Any]]]
+    flagged: dict[str, dict[str, list[dict[str, Any]]]]
+    acknowledgments: dict[str, Any]
+    preferences: Counter[str]
+    task_pairs: Counter[str]
     exact_excerpts: int
 
 
@@ -77,11 +78,11 @@ def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
-def read_rows(path: Path) -> list[dict]:
+def read_rows(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text().splitlines() if line]
 
 
-def _read_archive(archive: Path) -> dict:
+def _read_archive(archive: Path) -> dict[str, Any]:
     with zipfile.ZipFile(archive) as bundle:
         names = set(bundle.namelist())
         if names != EXPECTED_ARCHIVE_FILES:
@@ -99,7 +100,7 @@ def _read_archive(archive: Path) -> dict:
         }
 
 
-def _verify_packet_identity(payload: dict) -> None:
+def _verify_packet_identity(payload: dict[str, Any]) -> None:
     manifest = payload["manifest"]
     if manifest != json.loads((REVIEW / "manifest.json").read_text()):
         raise ValueError("assessment manifest differs from the locally frozen v49 packet")
@@ -119,7 +120,12 @@ def _verify_packet_identity(payload: dict) -> None:
         raise ValueError("v49 assessment is not bound to the frozen passing repair proof")
 
 
-def _verify_completeness(assessment: dict, packets: list, mapping: list, results: list) -> None:
+def _verify_completeness(
+    assessment: dict[str, Any],
+    packets: list[dict[str, Any]],
+    mapping: list[dict[str, Any]],
+    results: list[dict[str, Any]],
+) -> None:
     packet_ids = {row.get("packet_id") for row in packets}
     ratings = assessment.get("ratings")
     if (
@@ -145,7 +151,7 @@ def _verify_completeness(assessment: dict, packets: list, mapping: list, results
         raise ValueError("assessment checklist does not attest complete ratings for all v49 packets")
 
 
-def _validate_rating(rating: dict, packet: dict, packet_id: str, label: str) -> None:
+def _validate_rating(rating: dict[str, Any], packet: dict[str, Any], packet_id: str, label: str) -> None:
     if not isinstance(rating, dict) or set(rating) != RATING_FIELDS:
         raise ValueError(f"rating fields mismatch at {packet_id}:{label}")
     if any(type(rating[field]) is not bool for field in BOOLEAN_FIELDS):
@@ -168,7 +174,7 @@ def _validate_rating(rating: dict, packet: dict, packet_id: str, label: str) -> 
         raise ValueError(f"evidence excerpt is invalid at {packet_id}:{label}")
 
 
-def _entry(ref: _ResponseRef, rating: dict) -> dict:
+def _entry(ref: _ResponseRef, rating: dict[str, Any]) -> dict[str, Any]:
     return {
         "packet_id": ref.packet_id,
         "case_id": ref.case_id,
@@ -178,7 +184,7 @@ def _entry(ref: _ResponseRef, rating: dict) -> dict:
     }
 
 
-def _record_rating(rating: dict, ref: _ResponseRef, tally: _Tally) -> None:
+def _record_rating(rating: dict[str, Any], ref: _ResponseRef, tally: _Tally) -> None:
     for field in BOOLEAN_FIELDS:
         tally.counts[ref.arm][field] += int(rating[field])
     if rating["acknowledgment_applicable"]:
@@ -193,7 +199,7 @@ def _record_rating(rating: dict, ref: _ResponseRef, tally: _Tally) -> None:
         tally.misses[ref.arm].append(_entry(ref, rating))
 
 
-def _collect_pair(pair: dict, index: _Index, tally: _Tally) -> dict:
+def _collect_pair(pair: dict[str, Any], index: _Index, tally: _Tally) -> dict[str, Any]:
     packet_id = pair["packet_id"]
     if packet_id not in index.packet_by_id or set(pair) != {"packet_id", "A", "B", "pair_preference"}:
         raise ValueError(f"invalid pair record at {packet_id}")
@@ -213,7 +219,9 @@ def _collect_pair(pair: dict, index: _Index, tally: _Tally) -> dict:
     return per_arm_task
 
 
-def _record_preference(pair: dict, sealed: dict, tally: _Tally, per_arm_task: dict) -> None:
+def _record_preference(
+    pair: dict[str, Any], sealed: dict[str, Any], tally: _Tally, per_arm_task: dict[str, Any]
+) -> None:
     packet_id = pair["packet_id"]
     preference = pair["pair_preference"]
     if preference not in {"A", "B", "tie", "unratable"} or preference == "unratable":
@@ -230,7 +238,7 @@ def _record_preference(pair: dict, sealed: dict, tally: _Tally, per_arm_task: di
     ] += 1
 
 
-def _collect_ratings(ratings: list, index: _Index) -> _Tally:
+def _collect_ratings(ratings: list[dict[str, Any]], index: _Index) -> _Tally:
     tally = _Tally(
         counts={arm: Counter() for arm in ARMS},
         misses={arm: [] for arm in ARMS},
@@ -251,7 +259,7 @@ def _collect_ratings(ratings: list, index: _Index) -> _Tally:
     return tally
 
 
-def validate(archive: Path) -> dict:
+def validate(archive: Path) -> dict[str, Any]:
     payload = _read_archive(archive)
     _verify_packet_identity(payload)
     assessment = payload["assessment"]
