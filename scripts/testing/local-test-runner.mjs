@@ -80,7 +80,6 @@ const ADVISORY_BUCKET_DIRS = {
   ],
   "lib-services": [
     "apps/web/src/lib/services",
-    "apps/web/src/lib/metaaligner",
     "apps/web/src/lib/fhe",
   ],
   "lib-security-hooks": [

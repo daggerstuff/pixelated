@@ -1,7 +1,7 @@
 /**
  * IdentityProvider abstraction.
  *
- * Decouples consumer code (user-identity.ts, auth-legacy.ts, session.ts) from
+ * Decouples consumer code (user-identity.ts, session.ts) from
  * the underlying identity provider (currently Auth0). A future second provider
  * (e.g. Okta, Cognito) can ship as a new implementation of this interface
  * without touching the call sites.

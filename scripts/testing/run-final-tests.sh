@@ -71,13 +71,13 @@ else
     exit 1
 fi
 
-# Run type checking
-npm run typecheck
+# Run type-aware lint (oxlint) — typecheck scripts were removed per AGENTS.md
+pnpm lint
 
 if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✅ Type checking passed!${NC}"
+    echo -e "${GREEN}✅ Type-aware lint passed!${NC}"
 else
-    echo -e "${RED}❌ Type checking failed!${NC}"
+    echo -e "${RED}❌ Type-aware lint failed!${NC}"
     exit 1
 fi
 

@@ -59,7 +59,7 @@ def mock_provider_status(provider: str) -> ProviderStatus | ProviderStatusSkippe
         return {
             "status": "pass",
             "pipelineUrl": "https://github.com/daggerstuff/pixelated/actions/runs/123456",
-            "checks": {"build": "pass", "ai-validation": "pass", "security-scanning": "pass", "bias-detection": "pass"},
+            "checks": {"build": "pass", "ai-validation": "pass", "security": "pass", "bias-detection": "pass"},
         }
     if provider == "gitlab":
         return {

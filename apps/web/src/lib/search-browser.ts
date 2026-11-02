@@ -1,34 +1,22 @@
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('search-browser') // Define search document structure
-export interface SearchDocument {
+interface SearchDocument {
   id: string | number
   title: string
   content: string
   url: string
   tags?: string[]
   category?: string
-}
-
-// Define search result structure
-export interface SearchResult {
-  id: string | number
-  title: string
-  content: string
-  url: string
-  tags?: string[]
-  category?: string
-  score?: number
-  match?: string[]
 }
 
 // Define minimal types for flexsearch
-export interface IndexOptions {
+interface IndexOptions {
   tokenize?: string
   cache?: number
   context?: boolean
 }
 
-export interface SearchOptions {
+interface SearchOptions {
   limit?: number
   suggest?: boolean
   fuzzy?: number
@@ -237,42 +225,14 @@ export async function initBrowserSearch(
     // Dynamic import with proper error handling
     let Document: FlexSearchDocumentConstructor
 
-    try {
-      // Use dynamic import with module specifier pattern that Vite can analyze
-      // First attempt - standard import path for ESM
-      const flexsearchPath = 'flexsearch'
-      const flexsearch = (await import(flexsearchPath)) as {
-        default?: { Document?: FlexSearchDocumentConstructor }
-        Document?: FlexSearchDocumentConstructor
-      }
-      Document = (flexsearch.default?.Document ??
-        flexsearch.Document) as FlexSearchDocumentConstructor
-    } catch (err: unknown) {
-      logger.warn(
-        'Failed to load flexsearch directly, trying alternative path:',
-        err,
-      )
-      try {
-        // Second attempt - alternate path for CommonJS fallback
-        const documentModulePath = 'flexsearch/dist/module/document'
-        const documentModule = (await import(documentModulePath)) as {
-          default: FlexSearchDocumentConstructor
-        }
-        // Use default export as the Document class
-        Document = documentModule.default
-      } catch (docErr) {
-        logger.error(
-          'Failed to load flexsearch Document from alternate path:',
-          docErr,
-        )
-        const error = new Error('Cannot load flexsearch Document')
-        ;(error as Error & { cause?: unknown }).cause = {
-          primary: err,
-          fallback: docErr,
-        }
-        throw error
-      }
+    // Use dynamic import with module specifier pattern that Vite can analyze
+    const flexsearchPath = 'flexsearch'
+    const flexsearch = (await import(flexsearchPath)) as {
+      default?: { Document?: FlexSearchDocumentConstructor }
+      Document?: FlexSearchDocumentConstructor
     }
+    Document = (flexsearch.default?.Document ??
+      flexsearch.Document) as FlexSearchDocumentConstructor
 
     if (Document) {
       return new BrowserSearchClient(Document, config)

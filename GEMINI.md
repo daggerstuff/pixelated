@@ -49,8 +49,7 @@ Python):
 # Frontend & Services (Astro 6 / React 19 / Express)
 pnpm dev                     # Start Astro frontend (port 5173)
 pnpm dev:all-services        # Start complete local service ecosystem
-pnpm typecheck               # Run TypeScript compiler checks
-pnpm lint                    # ESLint & formatting audits
+pnpm lint                    # oxlint (type-aware) and repo lint gates
 pnpm vitest run -c config/vitest.config.ts  # Run unit/integration tests
 pnpm build                   # Production build
 
@@ -92,6 +91,6 @@ uv run python -m <pkg>       # Run Python module
 1. **Grounded Approach**: Confirm understanding against Foresight context.
 2. **Minimal-Safe Edits**: Implement surgical code changes.
 3. **Targeted Verification**: Run tests (`pnpm vitest`, `uv run pytest`) and
-   linting (`pnpm typecheck`).
+   linting (`pnpm lint`).
 4. **State Capture**: Update `pending_items` or store new decisions in Foresight
    before closing.

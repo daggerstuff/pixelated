@@ -201,17 +201,17 @@ def run_lint(dry_run: bool, cwd: str) -> LaneResult:
 
 
 def run_typecheck(dry_run: bool, cwd: str) -> LaneResult:
-    """Run the project's type checker (tsc + astro check)."""
+    """Run the type-aware lint gate (oxlint) — replaces the removed tsc/astro check."""
     if dry_run:
-        logger.info("  ▌ [dry-run] Typecheck (astro check + tsc)")
+        logger.info("  ▌ [dry-run] Type-aware lint (oxlint)")
         return {
-            "command": "pnpm typecheck",
+            "command": "pnpm lint",
             "status": "pass",
             "exitCode": 0,
             "stdout": "",
             "stderr": "",
         }
-    return run_command(["pnpm", "typecheck"], timeout=600, cwd=cwd, max_retries=2)
+    return run_command(["pnpm", "lint"], timeout=600, cwd=cwd, max_retries=2)
 
 
 def run_tests(dry_run: bool, cwd: str) -> LaneResult:
