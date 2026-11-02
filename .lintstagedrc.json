@@ -7,7 +7,7 @@
   ],
   "*.astro": ["pnpm exec prettier --write"],
   "*.{js,ts,jsx,tsx,mjs,cjs}": [
-    "pnpm exec oxfmt --write --no-error-on-unmatched-pattern"
+    "pnpm exec oxfmt --write --ignore-path .gitignore --no-error-on-unmatched-pattern"
   ],
   "*.{ts,tsx}": ["node scripts/ci/check-zod-deprecations.mjs"],
   "*.{md,mdx}": [

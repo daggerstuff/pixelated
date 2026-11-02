@@ -9,7 +9,7 @@
   "quoteProps": "consistent",
   "trailingComma": "all",
   "insertFinalNewline": true,
-  "proseWrap": "always",
+  "proseWrap": "preserve",
   "sortImports": {
     "groups": [
       "builtin",
@@ -32,17 +32,57 @@
     "dist",
     ".astro",
     "helm",
-    "ai",
     ".agent",
     ".ralph",
     ".memory",
     "infra/docker",
-    "infra/k8s",
+    "k8s",
     ".openskills",
     ".openagents",
     "scripts",
     ".vercel",
     "package-lock.yaml",
     "pnpm-lock.yaml",
+
+    // Submodules own their own formatting; oxfmt runs inside their repos, not
+    // from here. Without this, `pnpm format` rewrites files in the submodule
+    // worktrees and dirties them for no reason.
+    "ai",
+    "docs",
+    "foresight",
+
+    // Vendored / generated / not-actually-formattable inputs. These used to be
+    // skipped only because oxfmt also reads .prettierignore; they live here now
+    // so oxfmt's scope is defined in exactly one file.
+    "metoro-exporter",
+    ".Jules",
+    "monitoring",
+    "api-docs",
+    "apps/web/src/content-store",
+    "public/test-results",
+    "tests/test-results",
+    "tests/pending-implementation",
+    "session-ses_*.md",
+    "tests/AGENTS.md",
+    "*.min.js",
+
+    // Session scratch workspace (one-off scripts, a run log, a minified state
+    // blob). Not source of record; formatting it only adds diff noise.
+    ".churn",
+
+    // Vendored third-party builds. They are kept byte-comparable with upstream
+    // so their diffs stay reviewable; the syntax fix in fetch.umd.js was made
+    // by hand for that reason.
+    "apps/web/public/polyfills",
+
+    // Playwright artifacts written into the published web root. Generated, not
+    // authored — the root-level `public/test-results` entry above never matched
+    // these because they live under apps/.
+    "apps/web/public/test-results",
+
+    // Prettier-formatted and frozen: oxfmt would reflow it. Keeping it here
+    // (instead of a separate exclusion list in the CI script) means the hook
+    // and CI cannot disagree about who owns a file.
+    "packages/sdk-typescript/src/runtime.ts",
   ],
 }
