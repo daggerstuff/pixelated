@@ -7,13 +7,15 @@ import copy
 import hashlib
 import json
 import os
+from collections.abc import Callable
 from functools import partial
 from pathlib import Path
 from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
 from ai.training.contextual_support_policy import ContextualSupportTransport, SupportInputReservation
-from scripts.training.v6_policy_resolution import DIRECTORY, DOCS, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import DOCS, ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 TARGET = DIRECTORY / "bounded-support-v51/locked-eval-v1"
 TARGET_V2 = DIRECTORY / "bounded-support-v51/locked-eval-v2"
@@ -673,11 +675,17 @@ def prepare_v58() -> Path:
     return target
 
 
-def _v59_slot(date: str, slot_id: str, time: str) -> dict:
+def _v59_slot(date: str, slot_id: str, time: str) -> dict[str, Any]:
     return {"id": slot_id, "date": date, "time": time}
 
 
-def _v59_case(template: dict, case_id: str, messages: list[dict], fixtures: dict, checks: list[dict]) -> dict:
+def _v59_case(
+    template: dict[str, Any],
+    case_id: str,
+    messages: list[dict[str, Any]],
+    fixtures: dict[str, Any],
+    checks: list[dict[str, Any]],
+) -> dict[str, Any]:
     case = copy.deepcopy(template)
     case["id"] = case_id
     case["suite"] = "fresh-synthetic-navigator-edge-v1"
@@ -1004,15 +1012,21 @@ def prepare_v62() -> Path:
     template = rows(TARGET_V61 / "cases.jsonl")[0]
     system = template["messages"][0]
 
-    def case(case_id: str, messages: list[dict], fixtures: dict, checks: list[dict]) -> dict:
+    def case(
+        case_id: str, messages: list[dict[str, Any]], fixtures: dict[str, Any], checks: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         result = _v59_case(template, case_id, [system, *messages], fixtures, checks)
         result["suite"] = "fresh-multiturn-consent-tool-failure-v1"
         result["scenario"] = "navigator_consent_and_tool_failure"
         return result
 
     def verified_checks(
-        date: str, sequence: list[str], booking: list[dict], appointments: list[dict], *extras: list
-    ) -> list[dict]:
+        date: str,
+        sequence: list[str],
+        booking: list[dict[str, Any]],
+        appointments: list[dict[str, Any]],
+        *extras: list[Any],
+    ) -> list[dict[str, Any]]:
         status, response, omitted = (*extras, [], [], [])[:3]
         return [
             {"type": "tool_sequence", "names": sequence},
@@ -1426,7 +1440,9 @@ def prepare_v65() -> Path:
     template = rows(TARGET_V64 / "cases.jsonl")[0]
     system = template["messages"][0]
 
-    def case(case_id: str, messages: list[dict], fixtures: dict, checks: list[dict]) -> dict:
+    def case(
+        case_id: str, messages: list[dict[str, Any]], fixtures: dict[str, Any], checks: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         result = _v59_case(template, case_id, [system, *messages], fixtures, checks)
         result["suite"] = "fresh-booking-transaction-and-retry-v1"
         result["scenario"] = "navigator_booking_transaction_integrity"
@@ -1434,8 +1450,8 @@ def prepare_v65() -> Path:
 
     # Use explicit expected tool traces so retries and separate transactions are auditable.
     def transaction_checks(
-        tool_trace: list[tuple[str, dict]], statuses: list[str], appointments: list[dict]
-    ) -> list[dict]:
+        tool_trace: list[tuple[str, dict[str, Any]]], statuses: list[str], appointments: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         names = [name for name, _ in tool_trace]
         return [
             {"type": "tool_sequence", "names": names},
@@ -1636,7 +1652,9 @@ def prepare_v66() -> Path:
     template = rows(TARGET_V65 / "cases.jsonl")[0]
     system = template["messages"][0]
 
-    def checks(trace: list[tuple[str, dict]], statuses: list[str], appointments: list[dict]) -> list[dict]:
+    def checks(
+        trace: list[tuple[str, dict[str, Any]]], statuses: list[str], appointments: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         names = [name for name, _ in trace]
         return [
             {"type": "tool_sequence", "names": names},
@@ -1664,7 +1682,7 @@ def prepare_v66() -> Path:
             {"type": "state_value", "field": "appointments", "value": appointments},
         ]
 
-    def case(spec: dict) -> dict:
+    def case(spec: dict[str, Any]) -> dict[str, Any]:
         case_id = spec["id"]
         result = copy.deepcopy(template)
         result.update(
@@ -2745,7 +2763,7 @@ def prepare_v74() -> Path:
     return TARGET_V74
 
 
-def run(target: Path = TARGET, results_dir: Path = RESULTS) -> dict:
+def run(target: Path = TARGET, results_dir: Path = RESULTS) -> dict[str, Any]:
     plan_path = target / "plan.json"
     if not plan_path.is_file() or results_dir.exists():
         raise ValueError("locked evaluation is absent or results already exist; refusing rerun")
@@ -2871,7 +2889,7 @@ def main() -> None:
         ),
     )
     args = parser.parse_args()
-    actions = {
+    actions: dict[str, Callable[[], object]] = {
         "prepare": prepare,
         "run": run,
         "prepare-v2": prepare_v2,

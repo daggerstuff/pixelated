@@ -10,8 +10,7 @@
     (typeof globalThis !== 'undefined' && globalThis) ||
     (typeof self !== 'undefined' && self) ||
     // eslint-disable-next-line no-undef
-    (typeof global !== 'undefined' && global) ??
-    {};
+    (typeof global !== 'undefined' && global);
 
   const support = {
     searchParams: 'URLSearchParams' in g,

@@ -35,7 +35,7 @@ def origin_references(sidecar_path: Path) -> dict[int, dict[str, Any]]:
 
 def validate_status_counts(counts: dict[str, Counter[str]], validation: dict[str, Any]) -> None:
     for mode in ("exact", "normalized"):
-        observed = Counter()
+        observed: Counter[str] = Counter()
         for values in counts.values():
             for status in validation["results"][f"{mode}_status_counts"]:
                 observed[status] += values[f"{mode}_{status}"]

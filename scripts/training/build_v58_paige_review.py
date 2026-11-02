@@ -9,6 +9,7 @@ import re
 import shutil
 import subprocess
 from pathlib import Path
+from typing import Any, cast
 
 ROOT = Path(__file__).resolve().parents[2]
 RUN = ROOT / "docs/training/execution-2026-10-21/policy-resolution-v1/bounded-support-v58/unseen-availability-v1"
@@ -17,7 +18,7 @@ REVIEW = ROOT / "docs/training/execution-2026-10-21/policy-resolution-v1/bounded
 ZIP = REVIEW.parent / "Paige-Taylor-v58-completed-assessment.zip"
 
 
-def read_jsonl(path: Path) -> list[dict]:
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
 
 
@@ -29,9 +30,9 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def blinded_packet() -> list[dict]:
+def blinded_packet() -> list[dict[str, Any]]:
     cases = read_jsonl(RUN / "cases.jsonl")
-    by_case: dict[str, list[dict]] = {}
+    by_case: dict[str, list[dict[str, Any]]] = {}
     for row in read_jsonl(OUTPUT / "results.jsonl"):
         # Retain response evidence and execution traces without consulting identity fields.
         by_case.setdefault(row["case_id"], []).append(
@@ -65,10 +66,10 @@ def blinded_packet() -> list[dict]:
     return packet
 
 
-def rate_response(pair: dict, label: str) -> dict:
+def rate_response(pair: dict[str, Any], label: str) -> dict[str, Any]:
     response = pair[label]["response"]
     trace = pair[label]["tool_trace"]
-    date = re.search(r"\b2032-\d{2}-\d{2}\b", pair["messages"][-1]["content"]).group()
+    date = cast(re.Match[str], re.search(r"\b2032-\d{2}-\d{2}\b", pair["messages"][-1]["content"])).group()
     expected = pair["tool_fixtures"]["navigator_slots"][date]
     listing_calls = [entry for entry in trace if entry["name"] == "list_navigator_slots"]
     booking_calls = [entry for entry in trace if entry["name"] == "book_navigator_slot"]

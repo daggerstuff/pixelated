@@ -110,7 +110,7 @@ def main() -> int:
     pinned_files = set(origin_report["upstream_files"])
     counts: dict[str, int] = defaultdict(int)
     output_lines = []
-    unique_lines = set()
+    unique_lines: set[tuple[str, Any]] = set()
     for candidate in candidate_rows:
         matches = artifact_matches.get(candidate["candidate_messages_sha256"], [])
         matches = sorted(matches, key=lambda match: (match["source_file_basename"], match["artifact_line_ordinal"]))

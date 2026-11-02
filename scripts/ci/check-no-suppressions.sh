@@ -98,6 +98,10 @@ EXCLUDE_GLOBS=(
     '*/foresight-mcp/*'
     # Generated OpenAPI SDKs have generator-emitted suppression headers.
     '*packages/sdk-typescript/*'
+    # Vendored third-party browser build (whatwg-fetch UMD). The
+    # `eslint-disable` comments ship from upstream and are kept so the file
+    # stays byte-comparable with it.
+    '*/public/polyfills/*'
 )
 
 # Source roots scanned when no CLI files are passed. Missing directories

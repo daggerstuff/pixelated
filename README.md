@@ -184,15 +184,15 @@ pnpm submodules:sync                      # Re-sync after pull
 
 ## Tech Stack
 
-| Layer           | Technology                                        |
-| --------------- | ------------------------------------------------- |
-| Frontend / SSR  | Astro 6 + React 19 (TypeScript, Tailwind CSS)     |
-| Backend / AI    | FastAPI / Express / Flask (Python 3.14 via `uv`)  |
-| Database        | PostgreSQL 17 + pgvector                          |
-| Caching         | Redis                                             |
-| State           | Zustand                                           |
-| Package Manager | pnpm 12.16.1                                      |
-| Runtime         | Node.js >= 24                                     |
+| Layer           | Technology                                       |
+| --------------- | ------------------------------------------------ |
+| Frontend / SSR  | Astro 6 + React 19 (TypeScript, Tailwind CSS)    |
+| Backend / AI    | FastAPI / Express / Flask (Python 3.14 via `uv`) |
+| Database        | PostgreSQL 17 + pgvector                         |
+| Caching         | Redis                                            |
+| State           | Zustand                                          |
+| Package Manager | pnpm 12.16.1                                     |
+| Runtime         | Node.js >= 24                                    |
 
 ---
 

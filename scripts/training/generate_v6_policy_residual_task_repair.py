@@ -7,9 +7,10 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
-from ai.training.contextual_support_policy import SupportInputReservation, canonical_hash
+from ai.training.contextual_support_policy import ContextualSupportTransport, SupportInputReservation, canonical_hash
 from ai.training.launch.wandb_sft_v6_execute import _ensure_api_key
 from ai.training.run_wandb_paired_eval import WandbAsyncTransport
 from scripts.training.generate_v6_acknowledgment import build_transport
@@ -24,7 +25,7 @@ MAX_PROVIDER_CALLS = 800
 
 
 class LedgerTransport:
-    def __init__(self):
+    def __init__(self) -> None:
         self.raw = WandbAsyncTransport()
         self.spent = 0.0
         self.calls = 0
@@ -33,7 +34,13 @@ class LedgerTransport:
     def set_active_response(self, case_id: str, arm_id: str) -> None:
         self.active_key = f"{case_id}:{arm_id}"
 
-    def complete(self, arm, messages, tools, decoding):
+    def complete(
+        self,
+        arm: dict[str, Any],
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        decoding: dict[str, Any],
+    ) -> dict[str, Any]:
         input_rate, output_rate = (0.1, 0.3) if "gemma-4" in arm["model"] else (0.07, 0.2)
         reserve = (8192 * input_rate + decoding["max_tokens"] * output_rate) / 1_000_000
         if self.calls >= MAX_PROVIDER_CALLS or self.spent + reserve > ESTIMATED_SPEND_CAP_USD:
@@ -75,12 +82,18 @@ class LedgerTransport:
 
 
 class KeyedTransport:
-    def __init__(self, raw: LedgerTransport, inner, case_by_input: dict[str, str]):
+    def __init__(self, raw: LedgerTransport, inner: ContextualSupportTransport, case_by_input: dict[str, str]) -> None:
         self.raw = raw
         self.inner = inner
         self.case_by_input = case_by_input
 
-    def complete(self, arm, messages, tools, decoding):
+    def complete(
+        self,
+        arm: dict[str, Any],
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        decoding: dict[str, Any],
+    ) -> dict[str, Any]:
         if not tools:
             user_key = canonical_hash(messages)
             case_id = self.case_by_input.get(user_key)
@@ -90,7 +103,7 @@ class KeyedTransport:
         return self.inner.complete(arm, messages, tools, decoding)
 
 
-def prepare() -> tuple[dict, list[dict]]:
+def prepare() -> tuple[dict[str, Any], list[dict[str, Any]]]:
     if RESULTS.exists():
         raise ValueError(f"{VERSION} results exist; refusing automatic repeat or resume")
     if TARGET.exists():

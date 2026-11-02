@@ -6,6 +6,8 @@ import argparse
 import hashlib
 import json
 import os
+from pathlib import Path
+from typing import Any
 
 from ai.qa.validation.therapy_bench import paired_eval
 from ai.training.run_wandb_paired_eval import WandbAsyncTransport
@@ -49,7 +51,7 @@ CONCISE_INSTRUCTION = (
 )
 
 
-def response_format():
+def response_format() -> dict[str, Any]:
     properties = {
         "recognition": {
             "type": "string",
@@ -74,7 +76,9 @@ def response_format():
     }
 
 
-def packet(ident, conversation, candidate, instruction=INSTRUCTION):
+def packet(
+    ident: str, conversation: list[dict[str, Any]], candidate: str, instruction: str = INSTRUCTION
+) -> dict[str, Any]:
     return {
         "id": ident,
         "group_id": ident,
@@ -100,7 +104,7 @@ def packet(ident, conversation, candidate, instruction=INSTRUCTION):
     }
 
 
-def validate(value, case):
+def validate(value: Any, case: dict[str, Any]) -> dict[str, Any]:
     payload = json.loads(case["messages"][1]["content"])
     if "Check nonclinical support quality" in case["messages"][0]["content"]:
         value = task_validate(value)
@@ -133,7 +137,7 @@ def validate(value, case):
     }
 
 
-def judge_config(target, instruction, thinking, sampling):
+def judge_config(target: Path, instruction: str, thinking: bool, sampling: bool) -> tuple[dict[str, Any], float]:
     config = json.loads((DIRECTORY / "calibration-v2/gemma4-calibration-config.json").read_text())
     config["run_id"] = f"v6-{target.name}-single"
     config["decoding"].update(max_tokens=512, response_format=response_format())
@@ -149,10 +153,18 @@ def judge_config(target, instruction, thinking, sampling):
     return config, cap
 
 
-def prepare(target=TARGET, results=RESULTS, instruction=INSTRUCTION, thinking=False, sampling=False):
+def prepare(
+    target: Path = TARGET,
+    results: Path = RESULTS,
+    instruction: str = INSTRUCTION,
+    thinking: bool = False,
+    sampling: bool = False,
+) -> dict[str, Any]:
     if target.exists():
         raise ValueError("single-candidate inputs already frozen")
-    cases, expected, mapping = [], {}, []
+    cases: list[dict[str, Any]] = []
+    expected: dict[str, bool] = {}
+    mapping: list[dict[str, Any]] = []
     for index, (user, good, bad) in enumerate(CONTROLS):
         for label, candidate, met in [("positive", good, True), ("negative", bad, False)]:
             ident = f"ack-single-{index:02d}-{label}"
@@ -168,7 +180,7 @@ def prepare(target=TARGET, results=RESULTS, instruction=INSTRUCTION, thinking=Fa
         cases.append(packet(ident, originals[row["case_id"]]["messages"], row["response"], instruction))
         mapping.append({"packet_id": ident, "case_id": row["case_id"], "arm": row["arm_id"]})
     # IDs visible to the judge carry neither arm nor expected quality labels.
-    sealed = []
+    sealed: list[dict[str, Any]] = []
     for index, case in enumerate(cases):
         old = case["id"]
         case["id"] = case["group_id"] = f"ack-evidence-{index:03d}"
@@ -219,7 +231,7 @@ def prepare(target=TARGET, results=RESULTS, instruction=INSTRUCTION, thinking=Fa
     return {"calibration": 24, "diagnostic": 4, "cap_usd": cap}
 
 
-def audit(target=TARGET, results=RESULTS):
+def audit(target: Path = TARGET, results: Path = RESULTS) -> dict[str, Any]:
     plan = json.loads((target / "plan.json").read_text())
     for name, digest in plan["inputs_sha256"].items():
         if hashlib.sha256((target / name).read_bytes()).hexdigest() != digest:
@@ -227,7 +239,9 @@ def audit(target=TARGET, results=RESULTS):
     config = json.loads((target / "judge-config.json").read_text())
     cases = {c["id"]: c for c in rows(target / "judge-cases.jsonl")}
     expected = json.loads((target / "expected-labels.json").read_text())
-    ratings, invalid, seen = {}, [], set()
+    ratings: dict[str, dict[str, Any]] = {}
+    invalid: list[dict[str, Any]] = []
+    seen: set[str] = set()
     for row in rows(results / "results.jsonl"):
         ident = row["case_id"]
         if ident not in cases or ident in seen:
@@ -266,7 +280,7 @@ def audit(target=TARGET, results=RESULTS):
     return {k: v for k, v in result.items() if k != "ratings"}
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("prepare", "run", "audit"))
     parser.add_argument("--protocol", choices=("v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11"), default="v3")

@@ -51,7 +51,7 @@ def audit(root: Path) -> dict[str, Any]:
         or train_digest.hexdigest() != release["partitions"]["train"]["sha256"]
     ):
         raise ValueError("v6 training payload identity changed")
-    suites = []
+    suites: list[dict[str, Any]] = []
     for relative in SUITES:
         raw = (root / relative).read_bytes()
         cases = load_cases(root / relative)

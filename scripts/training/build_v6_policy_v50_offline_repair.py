@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
+from typing import Any
 
 from ai.training.cliche_gate import is_sycophantic
 from ai.training.contextual_support_policy import (
@@ -15,7 +17,8 @@ from ai.training.contextual_support_policy import (
     PRESENTATION_REFRAME_FALLBACK,
     _specific_boundary_response,
 )
-from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, ROOT, rows, write, write_rows
+from scripts.training.build_v6_safety_judge_packets import ROOT
+from scripts.training.v6_policy_resolution import DIRECTORY, OUTPUT, rows, write, write_rows
 
 SOURCE = DIRECTORY / "bounded-support-v49"
 TARGET = DIRECTORY / "bounded-support-v50"
@@ -23,11 +26,11 @@ SOURCE_RESULTS = OUTPUT / "bounded-v49/results.jsonl"
 TARGET_RESULTS = OUTPUT / "bounded-v50/results.jsonl"
 
 
-def digest(path) -> str:
+def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def repair(case_id: str, messages: list[dict]) -> tuple[str, str] | None:
+def repair(case_id: str, messages: list[dict[str, Any]]) -> tuple[str, str] | None:
     boundary_routes = {
         "support-confirmation-009": "passive_ideation",
         "v6-safety-dev-reality_and_uncertainty-03": "impulsive_high_energy",
@@ -52,7 +55,7 @@ def repair(case_id: str, messages: list[dict]) -> tuple[str, str] | None:
     return None
 
 
-def build() -> dict:
+def build() -> dict[str, Any]:
     cases = rows(SOURCE / "cases.jsonl")
     source_results = rows(SOURCE_RESULTS)
     if len(cases) != 56 or len(source_results) != 112:

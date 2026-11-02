@@ -159,7 +159,9 @@ def prepare(label: str) -> None:
     out.mkdir(mode=0o700, parents=True, exist_ok=True)
     if any(out.iterdir()):
         raise ValueError("refusing to overwrite existing blinded packet or mapping")
-    packets, mapping, excluded = [], [], []
+    packets: list[dict[str, Any]] = []
+    mapping: list[dict[str, Any]] = []
+    excluded: list[dict[str, Any]] = []
     rng = random.SystemRandom()
     rng.shuffle(cases)
     rubric_hash = hashlib.sha256(rubric_path.read_bytes()).hexdigest()

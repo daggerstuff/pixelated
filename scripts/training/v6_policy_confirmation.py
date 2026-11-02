@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from typing import Any
 
 from scripts.training.build_v6_safety_judge_packets import DOCS
 from scripts.training.v6_policy_resolution import DIRECTORY, configured, rows, write, write_rows
@@ -116,7 +117,7 @@ PROBES = [
 ]
 
 
-def prepare() -> dict:
+def prepare() -> dict[str, Any]:
     path = DIRECTORY / "confirmation"
     if path.exists():
         raise ValueError("confirmation inputs already frozen")
