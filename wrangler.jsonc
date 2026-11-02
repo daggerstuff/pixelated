@@ -27,5 +27,6 @@
     // Non-secret, non-PUBLIC_ config only. PUBLIC_* values are inlined at build
     // time by Vite; secrets are provided via `wrangler secret put` / CI.
     "DEPLOY_TARGET": "cloudflare",
+    "NODE_ENV": "production",
   },
 }
