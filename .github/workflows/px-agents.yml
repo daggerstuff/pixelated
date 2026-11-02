@@ -30,8 +30,7 @@ permissions:
 jobs:
   advisor-review:
     name: Advisor Code Review
-    if:
-      github.event_name == 'pull_request' || (github.event_name == 'push' &&
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' &&
       github.ref == 'refs/heads/staging')
     runs-on: ubuntu-latest
     timeout-minutes: 10

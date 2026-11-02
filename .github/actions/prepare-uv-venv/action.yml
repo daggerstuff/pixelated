@@ -10,8 +10,7 @@ inputs:
     default: '.'
 outputs:
   use-system:
-    description:
-      'If non-empty, contains the --system flag to use for uv pip installs'
+    description: 'If non-empty, contains the --system flag to use for uv pip installs'
     value: ${{ steps.create_venv.outputs.use-system }}
 runs:
   using: 'composite'

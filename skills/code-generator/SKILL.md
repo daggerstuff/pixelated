@@ -1,11 +1,11 @@
 ---
 name: code-generator
-description: "Generates code, including unit tests, for service endpoints and worker functions."
+description: 'Generates code, including unit tests, for service endpoints and worker functions.'
 triggers:
-  - "write unit tests"
-  - "worker endpoints"
-  - "generate code"
-  - "implement a function"
+  - 'write unit tests'
+  - 'worker endpoints'
+  - 'generate code'
+  - 'implement a function'
 ---
 
 # Code Generator

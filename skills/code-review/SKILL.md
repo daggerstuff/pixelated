@@ -1,11 +1,11 @@
 ---
 name: code-review
-description: "Reviews git commits, diffs, and pull requests for correctness and style."
+description: 'Reviews git commits, diffs, and pull requests for correctness and style.'
 triggers:
-  - "review a commit"
-  - "review this diff"
-  - "commit diff"
-  - "pull request review"
+  - 'review a commit'
+  - 'review this diff'
+  - 'commit diff'
+  - 'pull request review'
 ---
 
 # Code Review

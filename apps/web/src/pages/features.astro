@@ -202,7 +202,8 @@ const foundations = [
         {readinessEnhancements.map((enhancement, index) => (
           <article class="marketing-card">
             <span class="marketing-card__label">
-              Readiness {String(index + 1).padStart(2, '0')} · {enhancement.audience}
+              Readiness {String(index + 1).padStart(2, '0')} ·{' '}
+              {enhancement.audience}
             </span>
             <h3 class="marketing-title marketing-title--medium">
               {enhancement.title}

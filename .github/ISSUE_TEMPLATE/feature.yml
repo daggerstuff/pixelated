@@ -22,8 +22,7 @@ body:
     id: proposal
     attributes:
       label: Proposed solution
-      description:
-        What should exist instead. Sketches or bullet points are fine.
+      description: What should exist instead. Sketches or bullet points are fine.
     validations:
       required: true
   - type: textarea
