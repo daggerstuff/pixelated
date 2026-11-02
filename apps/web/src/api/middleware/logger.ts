@@ -40,43 +40,6 @@ export function requestLogger(
 }
 
 // ============================================================================
-// RATE LIMITING MIDDLEWARE
-// ============================================================================
-
-const requestCounts = new Map<string, { count: number; resetTime: number }>()
-const RATE_LIMIT_WINDOW = 60000 // 1 minute
-const RATE_LIMIT_MAX = 100 // requests per window
-
-export function rateLimiter(req: Request, res: Response, next: NextFunction) {
-  const ip = req.ip ?? 'unknown'
-  const now = Date.now()
-
-  let record = requestCounts.get(ip)
-
-  if (!record || record.resetTime < now) {
-    record = { count: 1, resetTime: now + RATE_LIMIT_WINDOW }
-    requestCounts.set(ip, record)
-    return next()
-  }
-
-  record.count++
-
-  if (record.count > RATE_LIMIT_MAX) {
-    return res.status(429).json({
-      error: 'Too Many Requests',
-      message: `Rate limit exceeded. Max ${RATE_LIMIT_MAX} requests per ${RATE_LIMIT_WINDOW / 1000} seconds`,
-    })
-  }
-
-  // Set rate limit headers
-  res.setHeader('X-RateLimit-Limit', RATE_LIMIT_MAX)
-  res.setHeader('X-RateLimit-Remaining', RATE_LIMIT_MAX - record.count)
-  res.setHeader('X-RateLimit-Reset', record.resetTime)
-
-  next()
-}
-
-// ============================================================================
 // AUDIT LOGGING
 // ============================================================================
 
