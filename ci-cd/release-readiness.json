@@ -11,7 +11,7 @@
       "checks": {
         "build": "pass",
         "ai-validation": "pass",
-        "security-scanning": "pass",
+        "security": "pass",
         "bias-detection": "pass"
       }
     },

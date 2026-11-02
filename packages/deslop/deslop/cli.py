@@ -1,10 +1,12 @@
+import sys
 from pathlib import Path
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
-from deslop.engine import CleanOptions, apply_deslop_to_file, preview_file
+from deslop.engine import CleanOptions, apply_deslop_to_file, clean_text, preview_file
+from deslop.gate import AntiSycophancyGate
 from deslop.models import CleanReport, RegenReport, ScanReport, dump_json
 from deslop.regen import OpenAICompatibleClient, regen_file, regen_file_with_ollama
 from deslop.reports import write_report
@@ -179,6 +181,63 @@ def regen(
         console.print(dump_json(report.to_dict()))
     else:
         print_clean(report)
+
+
+@app.command()
+def gate(
+    text: str | None = typer.Argument(None, help="Text to check for sycophancy (reads stdin if omitted)."),
+    general_only: bool = typer.Option(False, "--general-only", help="Skip clinical somatic and crisis checks."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    """Check text against zero-tolerance anti-sycophancy rules."""
+    if text is None:
+        if sys.stdin.isatty():
+            raise typer.BadParameter("Please provide text as argument or pipe via stdin.")
+        text = sys.stdin.read()
+
+    active_gate = AntiSycophancyGate.general_assistant() if general_only else AntiSycophancyGate.default()
+    result = active_gate.check(text)
+
+    if json_output:
+        print(dump_json(result.to_dict()))
+    elif result.passed:
+        console.print("[bold green]PASSED[/bold green]: No sycophancy or banned clichés detected.")
+    else:
+        console.print(f"[bold red]REJECTED[/bold red]: [cyan]{result.reason}[/cyan]")
+        console.print(f"[yellow]{result.correction}[/yellow]")
+
+    if not result.passed:
+        raise typer.Exit(1)
+
+
+@app.command("text")
+def clean_text_cmd(
+    text: str | None = typer.Argument(None, help="Text to clean (reads stdin if omitted)."),
+    rules: Path | None = typer.Option(None, "--rules", help="Custom rules.yaml."),
+    packs: str | None = typer.Option(None, "--packs", help="Comma-separated bundled rule packs."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    """Clean slop from a single text string."""
+    if text is None:
+        if sys.stdin.isatty():
+            raise typer.BadParameter("Please provide text as argument or pipe via stdin.")
+        text = sys.stdin.read()
+
+    active_rules = build_rules(rules, packs)
+    cleaned = clean_text(text, rules=active_rules)
+
+    if json_output:
+        print(dump_json({"original": text, "cleaned": cleaned, "changed": cleaned != text}))
+    else:
+        console.print(cleaned)
+
+
+@app.command("mcp")
+def mcp_server() -> None:
+    """Run the Model Context Protocol (MCP) stdio server for agents."""
+    from deslop.mcp import run_stdio_server
+
+    run_stdio_server()
 
 
 @rules_app.command("list")

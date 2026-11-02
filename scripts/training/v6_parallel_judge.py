@@ -8,7 +8,7 @@ from scripts.training.generate_v6_acknowledgment import LedgerTransport
 from scripts.training.v6_policy_resolution import rows, write, write_rows
 
 
-def run_fourway(target, results, cap):
+def run_fourway(target, results, cap, max_input_tokens=8192):
     if results.exists():
         raise ValueError("judge output exists; automatic retries prohibited")
     packets = rows(target / "judge-cases.jsonl")
@@ -18,12 +18,21 @@ def run_fourway(target, results, cap):
     def worker(i):
         dest = results / f"shard-{i}"
         dest.mkdir(parents=True)
-        transport = LedgerTransport(dest, cap / 4, len(packets[i::4]))
+        transport = LedgerTransport(
+            dest,
+            cap / 4,
+            len(packets[i::4]),
+            input_token_cap=max_input_tokens,
+        )
         request = paired_eval.RunRequest(
             target / f"shard-{i}/cases.jsonl",
             target / "judge-config.json",
             dest,
-            paired_eval.RunnerOptions(arm_selection="base", max_input_tokens=8192, max_tool_rounds=0),
+            paired_eval.RunnerOptions(
+                arm_selection="base",
+                max_input_tokens=max_input_tokens,
+                max_tool_rounds=0,
+            ),
         )
         return paired_eval.run_paired(request, transport=transport)
 

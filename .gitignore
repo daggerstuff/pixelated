@@ -94,7 +94,16 @@ job.md
 KIMI.md
 PRODUCT.md
 scratch
-skills/
+# Agent runtime skill caches are local-only, but the repository's own skill
+# routing definitions (skills/*/SKILL.md) are source-controlled and are
+# validated by tests/test_skill_routing.py — un-ignore those.
+skills/*
+!skills/code-generator/
+!skills/code-review/
+!skills/documentation-drafter/
+!skills/general-qa/
+# Vendored agent skill catalog (installed copies) is a local cache.
+agent/
 skills-lock.json
 struct-agent-key.json
 TASTES.md
@@ -329,6 +338,8 @@ values.yaml
 /security-report.md
 /security-reports/
 /test-results/
+tests/test-results/
+tests/security/security-reports/
 config/test-results/
 config/playwright-report/
 *_output.txt
@@ -492,6 +503,8 @@ infra/sinker/run_*.json
 HANDOFF_training_dataset.md
 Modern Multi-Agent Coding Architectures.pdf
 *.bak
+*.log.old
+*.log.v2
 NF_PIPELINE_HANDOFF.md
 thread-5302e593-transcript.md
 .jscpd-report/
@@ -582,7 +595,6 @@ apps/web/src/layouts/TailusLayout.astro
 apps/web/src/lib/content/features.ts
 apps/web/src/lib/content/intro.ts
 apps/web/src/lib/content/scenarios.ts
-apps/web/src/lib/metaaligner/explainability/visualization.tsx
 apps/web/src/lib/services/emotionTracking.ts
 apps/web/src/lib/supabase.ts
 apps/web/src/lib/utils/code-splitting.ts
@@ -610,3 +622,4 @@ scripts/devops/run-outlier-ai.sh
 tools_local/
 apps/web/src/pages/docs/api/_openapi.yaml
 apps/web/src/simulator/utils/__tests__/scenarios.test.ts
+/push_err.txt

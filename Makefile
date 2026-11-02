@@ -1,7 +1,7 @@
 # Pixelated Empathy — Developer Makefile
 # Usage: make <target>
 
-.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down lockfile-resolve
+.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test regression-suite python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down lockfile-resolve
 
 .DEFAULT_GOAL := help
 
@@ -37,6 +37,9 @@ e2e-ui: ## Run E2E tests with UI
 python-test: ## Run Python tests via uv
 	uv run pytest
 
+regression-suite: ## Run local skill/routing/config regression suite
+	bash scripts/regression-suite.sh
+
 # ── Quality ─────────────────────────────────────────────
 
 lint: ## Run linter (oxlint)
@@ -57,11 +60,11 @@ format: ## Format all code
 format-check: ## Check formatting
 	pnpm format:check
 
-typecheck: ## Run TypeScript type check
-	pnpm typecheck
+typecheck: ## Run oxlint type-aware lint (see AGENTS.md — no tsc/astro check)
+	pnpm lint
 
-check-all: ## Run all checks (typecheck + lint + format)
-	pnpm check:all
+check-all: ## Run lint gates (formerly check:all; typecheck scripts removed)
+	pnpm lint
 
 # ── Docker ──────────────────────────────────────────────
 
