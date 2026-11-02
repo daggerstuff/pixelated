@@ -429,11 +429,10 @@ const title = `Temporal Analysis - ${client.name}`
   // In a production environment, this would connect to your actual API
   document.addEventListener('DOMContentLoaded', (_event: Event) => {
     // For demo purposes we'll populate with mock data
-    // In production, you'd fetch from the API using the useTemporalEmotionAnalysis hook
+    // In production, fetch temporal analysis data from the API.
     const clientId = document.location.pathname.split('/')[2]
     console.log(`Would fetch temporal analysis data for client: ${clientId}`)
 
-    // The actual data fetching happens in the EmotionTemporalAnalysisChart component
-    // through the useTemporalEmotionAnalysis hook
+    // Chart data is loaded by the EmotionTemporalAnalysisChart component.
   })
 </script>

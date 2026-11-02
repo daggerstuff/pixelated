@@ -5,7 +5,6 @@
   "total": 35,
   "files": {
     "agents/qa-agent/agent/tools/summarize_cohort.ts": 2,
-    "apps/web/src/components/chat/PixelMultimodalChat.tsx": 2,
     "apps/web/src/components/research/DatasetCard.tsx": 5,
     "apps/web/src/components/research/ResultCard.tsx": 4,
     "apps/web/src/components/ui/EnhancedMentalHealthChat.tsx": 6,
