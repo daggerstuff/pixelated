@@ -46,7 +46,7 @@ dependencies = [
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
   "transformers>=5.14.1",
-  "torch==2.14.1", # Matches apps/web/src/lib/ai/training/requirements.txt
+  "torch==2.15.0", # Matches apps/web/src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
@@ -106,7 +106,7 @@ dependencies = [
   "lancedb>=0.30.2",
   "openai-whisper>=20250625",
   "faster-whisper>=1.2.0",
-  "kernels>=0.12.1,<0.18",
+  "kernels>=0.12.1,<0.19",
   "peft>=0.10.0",
   "accelerate>=0.28.0",
   "bitsandbytes>=0.43.0",
