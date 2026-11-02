@@ -71,6 +71,16 @@ async function main() {
     return
   }
 
+  // Cloudflare adapter emits a fetch-handler entry the generated wrangler.json
+  // already points at (main: entry2.mjs); its bundle imports 'cloudflare:workers',
+  // which Node cannot import here.
+  if (process.env.DEPLOY_TARGET === 'cloudflare') {
+    console.log(
+      '[ensure-server-entry] Skipping: Cloudflare adapter writes its own entry2.mjs fetch handler',
+    )
+    return
+  }
+
   const targetName = await resolveServerEntryName()
   const targetPath = path.join(serverDir, targetName)
   const handlerFile = await findHandlerEntryFile()
