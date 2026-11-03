@@ -1,13 +1,3 @@
-/**
- * @pixelated/memory-schema — Unified Memory Schema
- *
- * Canonical type definitions for the Pixelated Empathy memory system.
- * All services (Astro frontend, Foresight MCP, AI services) use these types
- * at their API boundaries to ensure consistent memory representation.
- *
- * Sprint 1 — ADHD-318: Design Unified Memory Schema
- * Epic: ADHD-3 Foresight Memory Architecture
- */
 
 import { z } from 'zod'
 
