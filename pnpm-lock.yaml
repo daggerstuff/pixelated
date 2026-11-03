@@ -1248,9 +1248,6 @@ importers:
       tsx:
         specifier: 4.23.15
         version: 4.23.15
-      turbo:
-        specifier: ^2.11.9
-        version: 2.11.9
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
