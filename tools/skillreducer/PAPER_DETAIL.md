@@ -6,7 +6,6 @@ Wang
 **Affiliations:** HKUST, Tsinghua University, Zhejiang University of
 Technology  
 **arXiv:** [2603.29919](https://arxiv.org/abs/2603.29919) (v2, June 2026)  
-**Local copy:** [`skill_reducer.pdf`](skill_reducer.pdf)
 
 > **Two papers, two jobs.** Sections 1–19 explain the **SkillReducer** paper
 > (Gao et al.) — skill `SKILL.md` tokens.  
@@ -1039,7 +1038,7 @@ full eval sets.
 
 | Paper              | Link                                                                         |
 | ------------------ | ---------------------------------------------------------------------------- |
-| SkillReducer       | https://arxiv.org/abs/2603.29919 · [`skill_reducer.pdf`](skill_reducer.pdf)  |
+| SkillReducer       | https://arxiv.org/abs/2603.29919  |
 | TSCG               | https://arxiv.org/abs/2605.04107                                             |
 | TSCG + Agentic RAG | https://arxiv.org/abs/2605.26165                                             |
 | SkillRevise        | https://arxiv.org/abs/2606.01139 · https://github.com/xuansenpa1/skillrevise |
@@ -1062,7 +1061,7 @@ full eval sets.
 ---
 
 _For the full SkillReducer academic treatment, equations, and appendices, see
-[`skill_reducer.pdf`](skill_reducer.pdf)._  
+[arXiv:2603.29919](https://arxiv.org/abs/2603.29919)._  
 _For TSCG depth, see [docs/TSCG_PAPER_DETAIL.md](docs/TSCG_PAPER_DETAIL.md)._  
 _For SkillRevise CLI / vendor notes, see
 [src/skillrevise/README.md](src/skillrevise/README.md)._  

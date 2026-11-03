@@ -1,11 +1,3 @@
-/**
- * @pixelated/memory-schema — Factory defaults & construction helpers
- *
- * Canonical default values for memory creation so every service starts
- * from the same baseline. Centralising these here prevents drift where
- * different services hard-code their own fallbacks.
- */
-
 import type {
   CreateMemoryInput,
   UnifiedMemory,

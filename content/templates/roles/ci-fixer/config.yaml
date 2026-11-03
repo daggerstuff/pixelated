@@ -1,3 +1,0 @@
-default_model: sonnet
-default_effort: medium
-max_tasks_per_session: 3
