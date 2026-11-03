@@ -425,6 +425,7 @@ patchedDependencies:
   # Patched for URL-unsafe characters in file paths. Versionless key for 0.10–0.12
   # (space-formatted upstream) survives transitive version bumps. 0.13.0 reformatted
   # to tabs so it needs its own patch file and pinned key.
+  '@astrojs/internal-helpers': patches/@astrojs__internal-helpers@0.10.0.patch
   '@astrojs/internal-helpers@0.13.0': patches/@astrojs__internal-helpers@0.13.0.patch
   '@astrojs/vercel': patches/@astrojs__vercel.patch
   astro: patches/astro.patch
