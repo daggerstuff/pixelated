@@ -353,7 +353,6 @@ Keep AI, data, and governance validation checks in Bitbucket, aligning triggers 
 - Configure Bitbucket triggers to run security and quality validations strictly on updates to the `ai/` folder, database models, or scheduling rules.
 
 ### Atlassian & Code Linkages
-- **Bitbucket Config**: [bitbucket-pipelines.yml](bitbucket-pipelines.yml)
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
 
 ### Verification & Testing Checklist
