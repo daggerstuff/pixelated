@@ -16,7 +16,6 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.32.2",
     "@vercel/connect": "2.6.0",
     "ai": "7.0.141",
     "eve": "^0.90.0",
