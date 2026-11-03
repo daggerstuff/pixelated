@@ -16,42 +16,20 @@ frontend/SSR; Express/FastAPI/Flask backend.
 - **Privacy & Safety Gating**: Preserve therapeutic, privacy, and
   HIPAA-compliant boundaries for client/patient-facing workflows. Clinical
   health data is paramount.
-- **Verify Explicitly**: Validate edits w/ concrete commands (tests, lint,
-  typecheck) before completion. Restate what was requested, review diffs for
-  suppression comments, report results and residual risks.
+- **Verify Explicitly**: Validate edits with concrete commands (tests, lint)
+  before completion. See `AGENTS.md` for the canonical command matrix and
+  anti-suppression policy.
 
 ### ⚠️ Ask First
 
 - Modifying authentication, security controls, or clinical gating.
 - Modifying public API contracts, routing architectures, or CI/CD pipelines.
 
-### 🚫 Never (Strict Anti-Suppression Policy)
+### 🚫 Never
 
-> [!IMPORTANT] **No suppression.** Never mask linter errors, TypeScript errors,
-> compile warnings, or test failures. Fix the issue—never hide it.
->
-> - **TypeScript**: `@ts-ignore` `@ts-nocheck` `@ts-expect-error` (unless
->   strictly required in pre-existing test mock files).
-> - **Python**: `# noqa` `# type: ignore` (do not bypass linting or pyright
->   checks).
-> - **JavaScript / ESLint**: `/* eslint-disable */` or file-level/block-level
->   rule exclusions to cover up new warning flags.
-> - **Config Bypasses**: Modifying `tsconfig.json` `.eslintrc` `.oxlintrc` or
->   test configs to lower strictness or hide failures.
-> - **Secrets & PHI**: Hardcoding credentials, API tokens, passwords, or
->   patient-identifiable details in codebase, fixtures, or test environments.
-
----
-
-## Core Developer Rules
-
-Follow conventions in `.agents/rules/`:
-
-- `typescript.md` — TypeScript and React patterns
-- `astro.md` — Astro 6 component, routing, and SSR rules
-- `python.md` — Python/uv toolchain and ruff/pyright conventions
-- `testing.md` — Vitest, Playwright, and pytest patterns
-- `security.md` — HIPAA, secrets, auth/gating, threat modeling
+Do not suppress linter errors, TypeScript errors, compile warnings, or test
+failures, and do not weaken configs to hide them. See `AGENTS.md` §3 for the
+full anti-suppression policy (including secrets and PHI).
 
 ---
 
