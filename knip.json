@@ -31,12 +31,14 @@
     "apps/web/src/lib/fhe/exports.ts",
     "apps/web/src/lib/fhe/operations.ts",
     "apps/web/src/utils/offline/offlineManager.ts",
-    "apps/web/src/lib/ehr-native/consent/state-rules/*.ts"
+    "apps/web/src/lib/ehr-native/consent/state-rules/*.ts",
+    ".eslintrc.naming.mjs"
   ],
   "project": [
     "apps/web/src/**/*.{ts,tsx,js,jsx,astro}",
     "config/**/*.{ts,js,mjs}",
-    "apps/business-strategy-cms/src/**/*.{ts,tsx,js,jsx}"
+    "apps/business-strategy-cms/src/**/*.{ts,tsx,js,jsx}",
+    ".eslintrc.naming.mjs"
   ],
   "ignore": [
     "**/*.d.ts",

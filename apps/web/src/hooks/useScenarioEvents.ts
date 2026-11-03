@@ -57,34 +57,38 @@ function parseScenarioEvent(data: unknown): ScenarioEvent | null {
   // { updated_vitals, emotional_state, branch }
   // and the backend ServerMessage form:
   // { type: 'vitals_update', payload: { vitals } }
-  let updated_vitals: Vitals | undefined
-  let emotional_state: string | undefined
+  let updatedVitals: Vitals | undefined
+  let emotionalState: string | undefined
   let branch: string | undefined
 
   if (typeof d['type'] === 'string' && d['type'] === 'vitals_update') {
     const payload = d['payload']
     if (typeof payload === 'object' && payload !== null) {
       const p = payload as Record<string, unknown>
-      if (isValidVitals(p['vitals'])) updated_vitals = p['vitals']
+      if (isValidVitals(p['vitals'])) updatedVitals = p['vitals']
       if (typeof p['emotional_state'] === 'string')
-        emotional_state = p['emotional_state']
+        emotionalState = p['emotional_state']
       if (typeof p['branch'] === 'string') branch = p['branch']
     }
   } else {
-    if (isValidVitals(d['updated_vitals'])) updated_vitals = d['updated_vitals']
+    if (isValidVitals(d['updated_vitals'])) updatedVitals = d['updated_vitals']
     if (typeof d['emotional_state'] === 'string')
-      emotional_state = d['emotional_state']
+      emotionalState = d['emotional_state']
     if (typeof d['branch'] === 'string') branch = d['branch']
   }
 
   if (
-    updated_vitals === undefined &&
-    emotional_state === undefined &&
+    updatedVitals === undefined &&
+    emotionalState === undefined &&
     branch === undefined
   ) {
     return null
   }
-  return { updated_vitals, emotional_state, branch }
+  return {
+    updated_vitals: updatedVitals,
+    emotional_state: emotionalState,
+    branch,
+  }
 }
 
 export function useScenarioEvents({
