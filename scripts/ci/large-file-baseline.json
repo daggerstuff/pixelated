@@ -8,7 +8,6 @@
   },
   "oversizedFiles": [
     "foresight/foresight/server.py",
-    "scripts/training/run_v6_policy_v51_locked_eval.py",
     "apps/web/src/lib/security/threat-intelligence/feeds/ExternalThreatFeedIntegration.ts",
     "apps/web/src/lib/fhe/hipaa-monitoring.ts",
     "apps/web/src/components/admin/bias-detection/BiasDashboard.components.tsx",
@@ -129,5 +128,5 @@
     "apps/web/src/lib/auth/auth0-jwt-service.ts",
     "apps/web/src/types.ts"
   ],
-  "oversizedCount": 123
+  "oversizedCount": 122
 }
