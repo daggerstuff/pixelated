@@ -1,4 +1,3 @@
-
 import { z } from 'zod'
 
 import { GatingMetadataSchema } from './gate-types'
