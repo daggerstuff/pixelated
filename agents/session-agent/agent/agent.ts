@@ -18,6 +18,6 @@ export default defineAgent({
     // Rehearsal sessions routinely exceed 30 minutes. Compact framing (state
     // transitions, tool summaries) earlier than the framework default so the
     // transcript itself stays in-context for the whole session.
-    thresholdPercent: 0.75,
+    threshold: 0.75,
   },
 })

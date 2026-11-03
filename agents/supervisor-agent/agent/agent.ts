@@ -10,6 +10,6 @@ export default defineAgent({
   modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   reasoning: 'medium',
   compaction: {
-    thresholdPercent: 0.7,
+    threshold: 0.7,
   },
 })
