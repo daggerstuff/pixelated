@@ -40,6 +40,7 @@ const createStubScope = () => ({
   init: (options: Record<string, unknown>) => void
   close: () => Promise<void> | void
   captureException: CaptureHandler
+  captureMessage: (message: string, level?: string) => string | undefined
   setUser: (user: SentryUser | null) => void
   setContext: (key: string, context: EventData) => void
   withScope: (callback: (scope: SentryScope) => void) => void
@@ -60,6 +61,7 @@ const createStubSentry = () => ({
   init: () => {},
   close: async () => {},
   captureException: (_err) => {},
+  captureMessage: (_message, _level) => undefined,
   setUser: (_user) => {},
   setContext: (_key, _context) => {},
   withScope: (callback = (_scope) => {}) => {
@@ -155,6 +157,16 @@ const getNodeMajorVersion = () => {
   }
 }
 
+/**
+ * Cloudflare Workers reject timers, random values and async I/O in module
+ * scope, and the Astro Cloudflare adapter already initialises
+ * `@sentry/cloudflare` for every request. Initialising the Node SDK there as
+ * well leaves two SDKs recursing into each other's span API, so on Workers this
+ * module re-exports the Workers SDK instead.
+ */
+const isCloudflareWorkers =
+  globalThis.navigator?.userAgent === 'Cloudflare-Workers'
+
 try {
   const sentryNode = await import('@sentry/node')
   if (isSentryInstance(sentryNode)) {
@@ -175,7 +187,20 @@ try {
     try {
       const profiling = await import('@sentry/profiling-node')
       if (typeof profiling.nodeProfilingIntegration === 'function') {
-        nodeProfilingIntegration = () => profiling.nodeProfilingIntegration()
+        // Resolving the addon is not the same as being able to start it: some
+        // runtimes expose the module but throw when the integration is built.
+        // Construct it here so a failure disables profiling instead of
+        // escaping `Sentry.init` at module scope.
+        try {
+          const profilingIntegration = profiling.nodeProfilingIntegration()
+          nodeProfilingIntegration = () => profilingIntegration
+        } catch (profilingIntegrationError) {
+          console.warn(
+            '[Sentry Profiling] Profiling addon resolved but cannot start on this runtime. ' +
+              'Profiling integration will be disabled.',
+            profilingIntegrationError,
+          )
+        }
       }
     } catch (profilingError) {
       console.warn(
@@ -208,8 +233,27 @@ if (!resolvedSentryDsn && process.env.NODE_ENV === 'production') {
   )
 }
 
+/**
+ * Workers have no Node SDK to initialise; reuse the Workers SDK the adapter
+ * already set up so capture calls inside a request still reach Sentry.
+ */
+if (isCloudflareWorkers) {
+  try {
+    const sentryCloudflare = await import('@sentry/cloudflare')
+    if (isSentryInstance(sentryCloudflare)) {
+      Sentry = sentryCloudflare
+    }
+  } catch (cloudflareSdkError) {
+    console.warn(
+      '[Sentry] @sentry/cloudflare is not available; Sentry calls will not be sent.',
+      cloudflareSdkError,
+    )
+    Sentry = createStubSentry()
+  }
+}
+
 // Enhanced Sentry configuration with comprehensive instrumentation
-Sentry.init({
+const sentryOptions = {
   dsn: resolvedSentryDsn, // Must be set in environment
   environment: process.env.NODE_ENV ?? 'production',
   release:
@@ -333,7 +377,12 @@ Sentry.init({
       node_version: process.version,
     },
   },
-})
+}
+
+// The Cloudflare adapter owns SDK initialisation on Workers.
+if (!isCloudflareWorkers) {
+  Sentry.init(sentryOptions)
+}
 
 // Performance monitoring helpers
 /** @param {string} name @param {string} operation */
