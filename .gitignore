@@ -341,6 +341,7 @@ values.yaml
 tests/test-results/
 tests/security/security-reports/
 config/test-results/
+apps/web/public/test-results/
 config/playwright-report/
 *_output.txt
 test_output.txt
