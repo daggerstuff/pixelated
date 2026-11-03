@@ -10,7 +10,6 @@
     ".github/cookbook/**/*.ts",
     ".github/cookbook/**/*.tsx",
     "apps/web/src/lib/collaboration/**/*.ts",
-    "apps/web/src/lib/ai/modelOptimizer.ts",
     "apps/web/src/lib/export/index.node.ts",
     "apps/web/src/lib/fhe/fhe-factory.ts",
     "apps/web/src/scripts/task-manager-cli.ts",
