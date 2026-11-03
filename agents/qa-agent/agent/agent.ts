@@ -11,6 +11,6 @@ export default defineAgent({
   reasoning: 'medium',
   compaction: {
     // Scoring reports are short. Compact sooner than default.
-    thresholdPercent: 0.7,
+    threshold: 0.7,
   },
 })
