@@ -16,6 +16,14 @@ import type {
 const logger = createBuildSafeLogger('rate-limit-analytics')
 
 /**
+ * Cloudflare Workers reject timers created in module scope, and this service is
+ * instantiated at module scope. Request-scoped metrics still work there; only
+ * the background sweep is unavailable.
+ */
+const isCloudflareWorkers =
+  globalThis.navigator?.userAgent === 'Cloudflare-Workers'
+
+/**
  * Rate limiting analytics service
  */
 export class RateLimitAnalyticsService {
@@ -619,6 +627,13 @@ export class RateLimitAnalyticsService {
    * Start monitoring loop
    */
   private startMonitoring(): void {
+    if (isCloudflareWorkers) {
+      logger.debug(
+        'Rate limit analytics background monitoring skipped on Cloudflare Workers',
+      )
+      return
+    }
+
     // Run monitoring checks every 30 seconds
     setInterval(async () => {
       try {
