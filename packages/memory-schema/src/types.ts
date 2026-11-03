@@ -16,7 +16,7 @@ import type { GateDecision } from './gate-types'
  */
 export type MemoryScope = 'session' | 'arc' | 'trait' | 'fact'
 
-export const MemoryScopeSchema = z.enum(['session', 'arc', 'trait', 'fact'])
+const MemoryScopeSchema = z.enum(['session', 'arc', 'trait', 'fact'])
 
 /**
  * Retention policy controls how long a memory stays in active vector space
@@ -28,7 +28,7 @@ export type RetentionPolicy =
   | 'long_term' // 1 week – 6 months
   | 'permanent' // Never evicted (only explicit delete)
 
-export const RetentionPolicySchema = z.enum([
+const RetentionPolicySchema = z.enum([
   'ephemeral',
   'short_term',
   'long_term',
@@ -40,7 +40,7 @@ export const RetentionPolicySchema = z.enum([
  */
 export type StrengthTrend = 'stable' | 'strengthening' | 'weakening' | 'stale'
 
-export const StrengthTrendSchema = z.enum([
+const StrengthTrendSchema = z.enum([
   'stable',
   'strengthening',
   'weakening',
@@ -57,7 +57,7 @@ export type SourceService =
   | 'astro-frontend'
   | 'unknown'
 
-export const SourceServiceSchema = z.enum([
+const SourceServiceSchema = z.enum([
   'foresight',
   'ai-services',
   'astro-frontend',
@@ -85,7 +85,7 @@ export interface EmotionalContext {
   intensity: number
 }
 
-export const EmotionalContextSchema = z.object({
+const EmotionalContextSchema = z.object({
   valence: z.number().min(-1).max(1),
   arousal: z.number().min(0).max(1),
   dominance: z.number().min(0).max(1),
@@ -106,7 +106,7 @@ export interface EmpathyMetrics {
   resistanceLevel: number
 }
 
-export const EmpathyMetricsSchema = z.object({
+const EmpathyMetricsSchema = z.object({
   reciprocity: z.number().min(0).max(1),
   validationAccuracy: z.number().min(0).max(1),
   resistanceLevel: z.number().min(0).max(1),
@@ -247,7 +247,7 @@ export interface UnifiedMemory {
   lastRetrievedAt: string | null
 }
 
-export const UnifiedMemorySchema = z.object({
+const UnifiedMemorySchema = z.object({
   // ── Identity ──────────────────────────────────────────────────────────────
   id: z.uuid(),
   tenantId: z.string().min(1),
@@ -314,7 +314,7 @@ export interface CreateMemoryInput {
   empathyMetrics?: EmpathyMetrics
 }
 
-export const CreateMemoryInputSchema = z.object({
+const CreateMemoryInputSchema = z.object({
   content: z.string().min(1).max(100000),
   userId: z.string().min(1),
   tenantId: z.string().min(1).optional(),
@@ -343,7 +343,7 @@ export interface UpdateMemoryInput {
   empathyMetrics?: EmpathyMetrics | null
 }
 
-export const UpdateMemoryInputSchema = z
+const UpdateMemoryInputSchema = z
   .object({
     content: z.string().min(1).max(100000).optional(),
     scope: MemoryScopeSchema.optional(),
@@ -379,7 +379,7 @@ export interface MemoryQueryOptions {
   sortOrder?: 'asc' | 'desc'
 }
 
-export const MemoryQueryOptionsSchema = z.object({
+const MemoryQueryOptionsSchema = z.object({
   userId: z.string().min(1),
   tenantId: z.string().min(1).optional(),
   bankId: z.string().min(1).optional(),
