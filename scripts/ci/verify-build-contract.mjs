@@ -57,7 +57,6 @@ const PACKAGE_IGNORE_SET = new Set([
 ]);
 const LOCAL_IGNORE_FILES = [
   "apps/web/src/pages/api/auth/auth0-engagement-analytics.ts",
-  "apps/web/src/lib/services/auth.service.ts",
 ];
 const LOCAL_IGNORE_PREFIXES = ["apps/web/src/lib/", "apps/web/src/components/", "apps/web/src/lib/services/"];
 

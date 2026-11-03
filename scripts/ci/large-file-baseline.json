@@ -121,7 +121,6 @@
     "apps/web/src/lib/config/performance-config.ts",
     "apps/web/src/lib/ai/services/AutomatedEscalationService.ts",
     "apps/web/src/components/demos/bias-detection/EnhancedBiasDetectionInterface.tsx",
-    "apps/web/src/lib/deployment/productionManager.ts",
     "foresight/foresight/graph_store.py",
     "apps/web/src/lib/ai/mental-llama/ClinicalAnalysisHelpers.ts",
     "apps/web/src/lib/research/services/PatternDiscoveryService.ts",
