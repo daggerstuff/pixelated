@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/card/index'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
+import type { CrisisPrediction } from '@/lib/ai/types/crisis-prediction-types'
 
 export interface PatientRiskData {
   id: string

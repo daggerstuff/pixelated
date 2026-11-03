@@ -3,13 +3,53 @@
  * Type definitions for intervention effectiveness analysis
  */
 
-// Re-export from InterventionAnalysisService for consistency
-import type { InterventionEffectivenessResult } from '../services/InterventionAnalysisService'
-export type {
-  InterventionEffectivenessResult,
-  InterventionContext,
-  PatientResponse,
-} from '../services/InterventionAnalysisService'
+import type { EmotionAnalysis } from '../emotions/types'
+
+export interface InterventionEffectivenessResult {
+  interventionId: string
+  effectivenessScore: number // 0-1 scale
+  confidence: number // 0-1 scale
+  metrics: {
+    emotionalImprovement: number
+    engagementLevel: number
+    responseQuality: number
+    stabilityIndicator: number
+  }
+  trends: {
+    valenceChange: number
+    arousalChange: number
+    dominanceChange: number
+  }
+  recommendations: string[]
+  riskFactors: string[]
+  timestamp: string
+}
+
+export interface InterventionContext {
+  interventionId: string
+  type:
+    | 'cognitive'
+    | 'behavioral'
+    | 'mindfulness'
+    | 'exposure'
+    | 'acceptance'
+    | 'other'
+  description: string
+  startTime: string
+  duration: number // minutes
+  techniques: string[]
+}
+
+export interface PatientResponse {
+  emotionBefore: EmotionAnalysis
+  emotionAfter: EmotionAnalysis
+  verbalFeedback?: string
+  engagementMetrics?: {
+    participationLevel: number // 0-1
+    responseLatency: number // milliseconds
+    coherenceScore: number // 0-1
+  }
+}
 
 // Additional intervention-related types
 export interface InterventionRecommendation {

@@ -10,7 +10,6 @@
     "foresight/foresight/server.py",
     "scripts/training/run_v6_policy_v51_locked_eval.py",
     "apps/web/src/lib/security/threat-intelligence/feeds/ExternalThreatFeedIntegration.ts",
-    "apps/web/src/lib/fhe/hipaa-monitoring.ts",
     "apps/web/src/components/admin/bias-detection/BiasDashboard.components.tsx",
     "apps/web/src/lib/security/threat-detection/predictive/predictive-threat-intelligence.ts",
     "apps/web/src/lib/security/threat-detection/monitoring/ai-enhanced-monitoring.ts",
@@ -87,9 +86,7 @@
     "apps/web/src/lib/security/pii/index.ts",
     "scripts/ci/_measure-no-unsafe-clamp-apply.mjs",
     "apps/web/src/utils/sync/tabSyncManager.ts",
-    "apps/web/src/lib/ai/services/AdvancedPatternAnalysisService.ts",
     "foresight/foresight/event_bus.py",
-    "apps/web/src/lib/ai/services/PromptOptimizerService.ts",
     "apps/web/src/pages/api/mental-health/crisis-detection.ts",
     "tools/skillreducer/src/skillrevise/method/revision.py",
     "apps/web/src/lib/services/websocket/BiasWebSocketServer.ts",
@@ -119,7 +116,6 @@
     "scripts/ci/ci-ops-dashboard.py",
     "apps/web/src/lib/fhe/analytics.ts",
     "apps/web/src/lib/config/performance-config.ts",
-    "apps/web/src/lib/ai/services/AutomatedEscalationService.ts",
     "apps/web/src/components/demos/bias-detection/EnhancedBiasDetectionInterface.tsx",
     "apps/web/src/lib/deployment/productionManager.ts",
     "foresight/foresight/graph_store.py",
@@ -129,5 +125,5 @@
     "apps/web/src/lib/auth/auth0-jwt-service.ts",
     "apps/web/src/types.ts"
   ],
-  "oversizedCount": 123
+  "oversizedCount": 119
 }
