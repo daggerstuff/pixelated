@@ -19,9 +19,9 @@ describe('Sentry sourcemap source rewriting', () => {
   })
 
   it('preserves normal relative source paths', () => {
-    expect(rewriteSentrySource('apps/web/src/components/Navbar.astro')).toBe(
-      'apps/web/src/components/Navbar.astro',
-    )
+    expect(
+      rewriteSentrySource('apps/web/src/components/mizu/Navbar.astro'),
+    ).toBe('apps/web/src/components/mizu/Navbar.astro')
   })
 
   it('normalizes protocol-prefixed sourcemap sources', () => {

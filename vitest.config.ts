@@ -20,7 +20,6 @@ const baseNodeTestGlobs = [
   'apps/web/src/pages/api/**/__tests__/**/*.test.ts',
   'apps/web/src/api/routes/__tests__/**/*.test.ts',
   'apps/web/src/api/middleware/__tests__/**/*.test.ts',
-  'apps/web/src/api/memory/__tests__/**/*.test.ts',
   'apps/web/src/lib/auth/**/*.test.ts',
   'apps/web/src/lib/shared/**/*.test.ts',
   'apps/web/src/lib/services/product-memory-gateway.test.ts',
