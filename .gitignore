@@ -189,6 +189,7 @@ verbose/coverage/
 /.python
 /.vite/deps/
 /artifacts/
+/ci-cd/release-readiness.json
 /bin/
 /build/
 /data/

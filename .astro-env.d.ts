@@ -1,8 +1,6 @@
 /// <reference types="astro/client" />
 /// <reference types="vitest/globals" />
 
-import './src/env.d.ts'
-
 // Override Vite's ImportMetaEnv to avoid index signature issues
 // Vite's types use Record<ImportMetaEnvFallbackKey, any> which creates an index signature
 // that causes TS4111 errors when using dot notation on explicitly declared properties

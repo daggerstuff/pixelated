@@ -1,11 +1,10 @@
 /**
  * Naming-convention check (TypeScript/TSX only).
  *
- * Kept separate from `eslint.config.js` because the shared flat config also
- * registers language plugins for JSON/CSS/Markdown, and linting a directory
- * that contains those files crashes on incompatibility. This config scopes the
- * run to TS/TSX (`pnpm lint:naming` passes explicit globs) so the naming rule
- * can be enforced and ratcheted independently of the rest of ESLint.
+ * Kept as a standalone flat config (root `eslint.config.js` was removed; lint
+ * is oxlint plus this naming pass). This config scopes the run to TS/TSX
+ * (`pnpm lint:naming` passes explicit globs) so the naming rule can be
+ * enforced and ratcheted independently of oxlint.
  *
  * The rule encodes the documented style: camelCase for values, functions, and
  * parameters; PascalCase for types and classes; UPPER_CASE or PascalCase for

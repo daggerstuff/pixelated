@@ -20,7 +20,6 @@ on:
       - '.jscpd.json'
       - '.oxlintrc.complexity.json'
       - '.eslintrc.naming.mjs'
-      - 'eslint.config.js'
       - 'astro.config.*'
       - 'config/**'
       - 'pyproject.toml'

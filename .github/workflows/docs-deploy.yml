@@ -34,13 +34,6 @@ jobs:
         with:
           node-version: '24.16.0'
 
-      - name: Typecheck docs pages
-        id: typecheck
-        # Use safe:typecheck to report errors without blocking the build.
-        # Full TS error cleanup is tracked as a separate code quality task.
-        run: pnpm safe:typecheck
-        continue-on-error: true
-
       - name: Build site
         id: build
         run: pnpm build

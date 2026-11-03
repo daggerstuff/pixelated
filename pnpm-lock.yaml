@@ -32677,7 +32677,6 @@ time:
   '@lhci/cli@0.15.1': '2025-06-25T23:52:10.718Z'
   '@microsoft/clarity@1.0.2': '2025-11-27T11:43:46.043Z'
   '@modelcontextprotocol/sdk@1.32.2': '2026-10-23T18:11:38.362Z'
-  '@neondatabase/serverless@1.2.0': '2026-10-01T16:42:06.683Z'
   '@opentelemetry/api@1.9.1': '2026-03-25T15:53:54.092Z'
   '@opentelemetry/auto-instrumentations-node@0.77.0': '2026-06-11T15:18:17.209Z'
   '@opentelemetry/context-async-hooks@1.30.1': '2025-01-14T09:16:05.688Z'

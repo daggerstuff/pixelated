@@ -4,7 +4,8 @@
 # Pre-lint hook: source nvm (best-effort), switch to the version pinned in
 # .nvmrc, and verify the active Node major meets `engines.node` in
 # package.json. Invoked from `prelint*` scripts so that every lint command
-# (pnpm lint, pnpm lint:fix, pnpm lint:ci:all, lint:ci:type-aware:all)
+# (pnpm lint, pnpm lint:fix, and npm lifecycle pre-hooks for lint:ci:all /
+# lint:ci:type-aware:all when those scripts are invoked directly)
 # runs on the project's pinned Node.
 #
 # Why this exists:
