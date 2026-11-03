@@ -58,7 +58,7 @@ The engine has been packaged to support any stack or agent architecture:
 | **Python Package**         | `pip install deslop-cli` or `dist/*.whl` | Direct Python import in agent runtimes                        |
 | **Standalone Drop-In**     | `anti_sycophancy_filter.py`              | Zero-dependency single-file embed in any repo                 |
 | **MCP Server**             | `deslop mcp` (stdio)                     | Native tool for Claude Desktop, Cursor, Antigravity, OpenCode |
-| **HTTP REST Microservice** | Docker / `marketplace/deslop-saas`       | Non-Python agents (Node.js, Go, Rust, Ruby)                   |
+| **HTTP REST Microservice** | Docker (wrap `deslop` in your own HTTP service) | Non-Python agents (Node.js, Go, Rust, Ruby)                   |
 | **CLI / Shell Pipe**       | `deslop gate` / `deslop text`            | CI/CD pipelines, pre-commit hooks, bash scripts               |
 
 ---
@@ -174,13 +174,12 @@ Or run via python directly:
 
 ### E. HTTP REST Microservice (For Node.js, Go, Rust, etc.)
 
-Run the containerized microservice:
+Expose the Python `deslop` package over HTTP from your own container or service
+(for example FastAPI calling `deslop.gate` / `deslop` CLI helpers). Build the
+image from `packages/deslop` rather than relying on a bundled sample in this
+monorepo.
 
-```bash
-docker run -p 8000:8000 pixelated/deslop-saas:latest
-```
-
-**Check text endpoint:**
+**Check text endpoint (example):**
 
 ```bash
 curl -X POST http://localhost:8000/gate \
@@ -252,4 +251,3 @@ The distribution artifacts are located in:
 - Wheel: `packages/deslop/dist/deslop_cli-0.3.0-py3-none-any.whl`
 - Source tarball: `packages/deslop/dist/deslop_cli-0.3.0.tar.gz`
 - Standalone zero-dep script: `packages/deslop/standalone/anti_sycophancy_filter.py`
-- SaaS microservice: `marketplace/deslop-saas/`

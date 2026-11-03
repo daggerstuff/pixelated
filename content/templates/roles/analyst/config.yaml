@@ -1,3 +1,0 @@
-default_model: opus
-default_effort: max
-max_tasks_per_session: 1

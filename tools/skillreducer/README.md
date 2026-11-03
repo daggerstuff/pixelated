@@ -14,7 +14,7 @@ research papers:
 
 | Resource           | Link                                                                                                  |
 | ------------------ | ----------------------------------------------------------------------------------------------------- |
-| SkillReducer arXiv | [2603.29919](https://arxiv.org/abs/2603.29919) · [PDF](skill_reducer.pdf) · [Detail](PAPER_DETAIL.md) |
+| SkillReducer arXiv | [2603.29919](https://arxiv.org/abs/2603.29919) · [Detail](PAPER_DETAIL.md) |
 | TSCG arXiv         | [2605.04107](https://arxiv.org/abs/2605.04107) · [Detail](docs/TSCG_PAPER_DETAIL.md)                  |
 | SkillRevise arXiv  | [2606.01139](https://arxiv.org/abs/2606.01139) · [Docs](src/skillrevise/README.md)                    |
 | Paper index        | [docs/PAPERS.md](docs/PAPERS.md)                                                                      |
@@ -414,7 +414,6 @@ ruff check skillreducer tests
 | [docs/TSCG_PAPER_DETAIL.md](docs/TSCG_PAPER_DETAIL.md) | TSCG papers (Sakizli) in depth                      |
 | [src/skillrevise/README.md](src/skillrevise/README.md) | Vendored SkillRevise (Liu et al.)                   |
 | [CITATION.md](CITATION.md)                             | BibTeX / APA for all three papers                   |
-| [skill_reducer.pdf](skill_reducer.pdf)                 | SkillReducer paper (local copy)                     |
 
 If you use this tool in research, please cite the **SkillReducer paper** (Gao et
 al., 2026) for skill debloating, the **TSCG papers** (Sakizli, 2026) when

@@ -1,11 +1,3 @@
-/**
- * @pixelated/memory-schema — Zod runtime validation schemas
- *
- * Mirrors the canonical TypeScript types in `./types.ts` so consumers can
- * validate untrusted input against a single source of truth instead of
- * maintaining drift-prone local schemas.
- */
-
 import { z } from 'zod'
 
 import { GatingMetadataSchema } from './gate-types'
