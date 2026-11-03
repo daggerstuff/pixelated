@@ -690,7 +690,6 @@ Make dependency vulnerability scanning a required, automated CI gate — not jus
 
 ### Atlassian & Code Linkages
 - **GitHub Workflow**: `.github/workflows/security.yml` (extend existing)
-- **Bitbucket Pipeline**: `bitbucket-pipelines.yml` (extend existing)
 - **Exemption File**: `.auditignore` [NEW]
 
 ### Verification & Testing Checklist

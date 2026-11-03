@@ -182,7 +182,6 @@
     "package.json :: devDependencies :: tar",
     "package.json :: devDependencies :: tsconfig",
     "package.json :: devDependencies :: tsconfig-paths",
-    "package.json :: devDependencies :: turbo",
     "package.json :: devDependencies :: tw-animate-css",
     "package.json :: devDependencies :: url-polyfill",
     "package.json :: devDependencies :: vfile",

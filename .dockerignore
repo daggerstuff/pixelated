@@ -8,9 +8,6 @@
 .gitmodules
 
 # CI/CD files
-.gitlab-ci.yml
-.gitlab-ci.yml.backup
-.gitlab/
 .github/
 
 # Documentation and notes
@@ -244,7 +241,6 @@ workspace/
 .pre-commit-config.yaml
 .sourcery.yaml
 browserstack.yml
-bitbucket-pipelines.yaml
 cloudbuild.yaml
 fly.toml
 app.json
