@@ -543,8 +543,7 @@ export interface Ui {
   /**
    * Configures external links' behavior and appearance.
    *
-   * Used in `plugins/index.ts`, `src/components/base/Link.astro`
-   * and `src/layouts/BaseLayout.astro`.
+   * Used in `src/components/base/Link.astro` and `src/layouts/BaseLayout.astro`.
    */
   externalLink: ExternalLink
 

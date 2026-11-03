@@ -69,7 +69,6 @@
     "./*.config.mts",
     "./vitest.setup.ts",
     "./api/**/*.ts",
-    "./plugins/**/*.ts",
     "./packages/memory-schema/src/**/*.ts",
     "./.astro-env.d.ts",
     "./apps/web/src/types/declarations.d.ts",
