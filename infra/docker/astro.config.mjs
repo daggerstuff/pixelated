@@ -90,10 +90,7 @@ function getChunkName(id) {
   if (normalizedId.includes("/apps/web/src/components/ui/SwiperCarousel")) {
     return "feature-swiper";
   }
-  if (
-    normalizedId.includes("/apps/web/src/components/treatment/TreatmentPlanManager") ||
-    normalizedId.includes("/apps/web/src/components/therapy/TreatmentPlanManager")
-  ) {
+  if (normalizedId.includes("/apps/web/src/components/therapy/TreatmentPlanManager")) {
     return "feature-treatment-plan";
   }
   if (normalizedId.includes("/apps/web/src/components/security/FHEDemo")) {
