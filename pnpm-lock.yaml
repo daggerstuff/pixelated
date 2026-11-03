@@ -305,7 +305,6 @@ overrides:
   '@modelcontextprotocol/server': ^2.3.0
 
 patchedDependencies:
-  '@astrojs/internal-helpers': 585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3
   '@astrojs/internal-helpers@0.13.0': ebdd1966ecd34c914d725ce2525d1ab4e759c3335374079650f9e3b4ebabc706
   '@astrojs/vercel': 37c25580fd5acc62ecc02dc29c5db95dcc6221249433cee01a3e184183c9fd0a
   astro: 74950e75e5c1b6b481917ab76bdc51751e1359ee6e6c5618fa69037bad96d2a5
