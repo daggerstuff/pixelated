@@ -43,14 +43,9 @@ pnpm test:e2e:report
 
 ## Configuration
 
-The tests use a dedicated configuration file at `tests/e2e-config.ts`, which
-extends the base Playwright configuration with settings specific to end-to-end
-testing:
-
-- Increased timeouts for complex flows
-- Video recording for better debugging
-- Focused browser selection for faster iteration
-- Detailed HTML and JSON reports
+E2E tests use the shared Playwright configuration at `config/playwright.config.ts`
+(`testDir: tests/`). Use the `pnpm test:e2e*` scripts above rather than ad-hoc
+config files under `tests/`.
 
 ## Test Coverage
 
@@ -109,70 +104,3 @@ If tests become flaky, consider:
 Some tests include visual comparison using Playwright's screenshot comparison
 capabilities. The baseline screenshots are stored in the repository and compared
 during test execution.
-
-# MCP Integration with Playwright
-
-This directory contains end-to-end tests that utilize the Model Context Protocol
-(MCP) server integration with Playwright.
-
-## Setup and Configuration
-
-The MCP integration is configured in `tests/mcp-e2e-config.ts`. This
-configuration:
-
-- Connects to an MCP server running at `http://localhost:8033`
-- Configures test reporters and output formats
-- Sets up browsers and devices for testing
-- Manages the web server for testing
-
-## Running MCP Tests
-
-To run the MCP-integrated tests:
-
-```bash
-# First, ensure you've connected to the MCP server through Cursor
-# Then run tests with the MCP configuration
-pnpm test:e2e:mcp
-```
-
-## Available Test Features
-
-The MCP integration enables several advanced testing capabilities:
-
-1. **Browser Tools Integration**: Access browser console logs, network requests,
-   screenshots, and more through the MCP server
-2. **Accessibility Testing**: Run automated accessibility audits on your pages
-3. **Performance Testing**: Generate performance reports for your application
-4. **SEO Auditing**: Check SEO best practices compliance
-5. **Network Analysis**: Monitor and analyze network requests and responses
-
-## Example Tests
-
-See `mcp-example.spec.ts` for a basic example of how to integrate with the MCP
-server in your tests.
-
-## Adding Your Own MCP Tests
-
-When creating new MCP-integrated tests:
-
-1. Create a new `.spec.ts` file in this directory
-2. Import from `@playwright/test` as usual
-3. Use the standard Playwright test API
-4. Leverage MCP-specific features through annotations or API calls
-5. Run using the MCP configuration
-
-## Troubleshooting
-
-If you encounter issues with the MCP integration:
-
-1. Ensure the MCP server is running and accessible
-2. Verify your connection to the MCP server through Cursor
-3. Check that the configuration points to the correct MCP server URL
-4. Review browser console logs for any connection errors
-5. Make sure all required dependencies are installed
-
-## Resources
-
-- [MCP Documentation](https://example.com/mcp-docs)
-- [Playwright Documentation](https://playwright.dev/docs/intro)
-- [Astro Testing Guide](https://docs.astro.build/en/guides/testing/)

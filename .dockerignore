@@ -54,7 +54,6 @@ Thumbs.db
 
 # Test files and coverage
 tests/
-!tests/integration/package.json
 coverage/
 .nyc_output/
 test-results/
