@@ -2,7 +2,6 @@
   "include": ["apps/web/src", "tests", "ai"],
   "exclude": [
     "**/node_modules/**",
-    "apps/business-strategy-cms/node_modules",
     "stubs",
     "**/venv/**",
     "**/.venv/**",

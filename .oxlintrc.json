@@ -5,7 +5,6 @@
     "scripts/**/*.js",
     "scripts/**/*.mjs",
     "scripts/**/*.ts",
-    "apps/business-strategy-cms/scripts/**/*.ts",
     "apps/web/public/polyfills/**/*.js",
     ".github/cookbook/**/*.ts",
     ".github/cookbook/**/*.tsx",

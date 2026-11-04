@@ -97,9 +97,6 @@ function getResourceType(req: Request): string {
 
   if (path.includes('/documents')) return 'document'
   if (path.includes('/projects')) return 'project'
-  if (path.includes('/strategic-plans')) return 'strategic_plan'
-  if (path.includes('/market-research')) return 'market_research'
-  if (path.includes('/sales-opportunities')) return 'sales_opportunity'
 
   return 'unknown'
 }

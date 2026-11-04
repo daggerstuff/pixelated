@@ -52,7 +52,7 @@ def test_audit_cloudwatch_logs():
                     "storedBytes": 1024 * 1024 * 1024,
                 },
                 {
-                    "logGroupName": "/ecs/business-strategy-cms",
+                    "logGroupName": "/ecs/legacy-app-service",
                     "retentionInDays": None,  # No retention set
                     "storedBytes": 10 * 1024 * 1024 * 1024,  # 10 GB
                 },
@@ -64,7 +64,7 @@ def test_audit_cloudwatch_logs():
     findings = optimizer.audit_cloudwatch_logs(target_retention_days=30, apply_fix=False)
 
     assert len(findings) == 1
-    assert findings[0].resource_id == "/ecs/business-strategy-cms"
+    assert findings[0].resource_id == "/ecs/legacy-app-service"
     assert findings[0].estimated_monthly_savings_usd > 0
     assert not findings[0].remediated
 
