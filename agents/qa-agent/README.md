@@ -18,7 +18,7 @@ digests. Sub-agent of the broader Eve workflow. Status: **Done** (PIX-3958).
 | Schedules (1)   | `agent/schedules/daily-review.ts` — cron `30 23 * * *` (daily QA review digest)                                                            |
 | Lib             | `agent/lib/runtime-mode.ts`, `agent/lib/workers-ai.ts`, `agent/foresight-client.ts`                                                        |
 | Evals           | `evals/evals.config.ts`, `evals/no-sessions.eval.ts`                                                                                       |
-| K8s             | `k8s/deployment.yaml`                                                                                                                      |
+| Deploy          | `agents/deploy/docker-compose.yaml` (host port 2030 → container 2000)                                                                      |
 | Tests           | `tests/` — 7 files (6 unit + 1 `qa-review-lifecycle.integration.test.ts`)                                                                  |
 
 ## Handoff protocol

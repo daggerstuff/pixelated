@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 
+import { applyEndpointOverrides } from '../lib/endpoint-overrides.js'
 import type { PxConfig, AgentConfig } from './schema.js'
 import { WorkspaceConfigSchema } from './schema.js'
 
@@ -100,6 +101,9 @@ export function loadConfig(cwd: string = process.cwd()): LoadedConfig {
     sources.push(repoLocalPath)
     config = mergeConfigs(config, repoLocalRaw)
   }
+
+  // 4. Environment overrides (PX_FLEET_HOST, PX_LOCAL)
+  config = { ...config, agents: applyEndpointOverrides(config.agents) }
 
   return { config, sources }
 }
