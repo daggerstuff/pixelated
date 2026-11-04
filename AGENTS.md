@@ -7,25 +7,28 @@
 
 ## CI/CD Pipeline Policy
 
-**Production is deployed off AWS: Vercel is the production origin for
-pixelatedempathy.com; Cloudflare Workers is the migration target; app/agent
+**Production is deployed off AWS and serves from Cloudflare Workers:
+deploy-cloudflare.yml builds the Worker bundle after green staging CI, syncs
+the production runtime env from the `CF_WORKER_*` repository secrets, and
+attaches pixelatedempathy.com as a Workers custom domain. Vercel stays warm as
+the standby origin (its `*.vercel.app` URL and the `www` redirect). App/agent
 images publish to Docker Hub from green staging CI. The former AWS EKS
 deployment has been retired.** `staging` is the main branch.
 
 ### Trigger Rules
 
 - Push to `staging` → CI **+ image publish (backend/agents, Docker Hub) +
-  Vercel production deploy (frontend, path-filtered) + Cloudflare Workers
-  bundle (migration target, credential-gated)**
+  Cloudflare Workers production deploy (credential-gated, follows CI) +
+  Vercel standby deploy (frontend, path-filtered)**
 - PR to `staging` → Vercel preview (frontend only, path-filtered)
-- Feature branches → no Vercel; use staging for previews
+- Feature branches → no deploys; use staging for previews
 
 ### Files
 
-- `.github/workflows/vercel.yml` — production Vercel pipeline (path-filtered)
+- `.github/workflows/deploy-cloudflare.yml` — Cloudflare Workers production deploy
 - `.github/workflows/build-images.yml` — app + agent image publishes
-- `.github/workflows/deploy-cloudflare.yml` — Cloudflare Workers migration target
-- `.github/workflows/vercel-policy.md` — full policy doc
+- `.github/workflows/vercel.yml` — Vercel standby pipeline (path-filtered)
+- `.github/workflows/vercel-policy.md` — full Vercel policy doc
 - `.github/branch-pipeline.md` — branch roles diagram
 - `scripts/ci/get-changed-frontend-files.sh` — path filter helper
 

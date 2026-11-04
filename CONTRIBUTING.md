@@ -227,12 +227,15 @@ intentional change.
 - **Release notes**: pushing a `vX.Y.Z` tag verifies the tagged revision builds,
   then creates a GitHub Release with auto-generated notes
   ([release workflow](.github/workflows/release-notes.yml)).
-- **Deploys** ([vercel.yml](.github/workflows/vercel.yml),
+- **Deploys** ([deploy-cloudflare.yml](.github/workflows/deploy-cloudflare.yml),
+  [vercel.yml](.github/workflows/vercel.yml),
   [build-images.yml](.github/workflows/build-images.yml)): production is
-  deployed off AWS. Vercel serves pixelatedempathy.com (staging pushes,
-  path-filtered); a successful CI run on `staging` publishes the app and agent
-  Docker images automatically (manual dispatch still works). Publishes
-  serialize via a `publish-images` concurrency group.
+  deployed off AWS and serves from Cloudflare Workers, which attaches
+  pixelatedempathy.com as a custom domain after green staging CI; Vercel keeps
+  the warm standby (staging pushes, path-filtered); a successful CI run on
+  `staging` publishes the app and agent Docker images automatically (manual
+  dispatch still works). Publishes serialize via a `publish-images`
+  concurrency group.
 
 ## Python Code
 

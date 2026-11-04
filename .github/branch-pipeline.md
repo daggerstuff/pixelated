@@ -1,17 +1,18 @@
 # Branch Pipeline Policy
 
-Production is deployed **off AWS**: Vercel serves pixelatedempathy.com as the
-production origin, Cloudflare Workers is the migration target, and app/agent
-images publish to Docker Hub from green staging CI. The former AWS EKS
-deployment has been retired.
+Production is deployed **off AWS**: Cloudflare Workers serves
+pixelatedempathy.com as the production origin (Vercel stays warm at its
+`*.vercel.app` URL and still issues the `www` redirect), and app/agent images
+publish to Docker Hub from green staging CI. The former AWS EKS deployment has
+been retired.
 
 ## Branches
 
-| Branch      | Purpose             | Vercel?                   | Images?                    |
-| ----------- | ------------------- | ------------------------- | -------------------------- |
-| `staging`   | **The main branch** | Yes (prod, path-filtered) | Yes (auto-publish from CI) |
-| `feature/*` | Feature development | No                        | No                         |
-| `agent/*`   | Agent work          | No                        | No                         |
+| Branch      | Purpose             | Cloudflare?          | Vercel?       | Images?                    |
+| ----------- | ------------------- | -------------------- | ------------- | -------------------------- |
+| `staging`   | **The main branch** | Yes (prod, after CI) | Yes (standby) | Yes (auto-publish from CI) |
+| `feature/*` | Feature development | No                   | No            | No                         |
+| `agent/*`   | Agent work          | No                   | No            | No                         |
 
 ## Pipeline Flow
 
@@ -21,25 +22,21 @@ feature branch
 staging
     ├─ CI workflow (lint, test, security)                      → .github/workflows/ci.yml
     ├─ Build and Publish Images (app + agents → Docker Hub)    → .github/workflows/build-images.yml
-    ├─ Deploy to Cloudflare Workers (migration target)         → .github/workflows/deploy-cloudflare.yml
-    └─ Vercel (frontend production only, path-filtered)        → .github/workflows/vercel.yml
+    ├─ Deploy to Cloudflare Workers (production origin)        → .github/workflows/deploy-cloudflare.yml
+    └─ Vercel (warm standby, path-filtered)                    → .github/workflows/vercel.yml
 
-The Vercel production deploy and the Cloudflare bundle fire on their own
-path/credential gates; image publishes follow a successful CI run — no
-overlap, no wasted builds.
+The Cloudflare deploy follows a successful CI run; Vercel keeps building the
+standby on frontend changes — no overlap, no wasted builds.
 ```
-
-## Why Vercel is Throttled
-
-- Vercel is the production origin; builds still only make sense when
-  frontend files actually change
-- Every unnecessary Vercel build wastes money and slows feedback
-- Path filtering ensures Vercel only builds when frontend actually changes
 
 ## Rules
 
-1. **Vercel only builds on frontend path changes** — see vercel.yml path filter.
-2. **No Vercel build on feature branches.** Use staging for previews.
-3. **Production serves from Vercel**; Cloudflare Workers is the migration
-   target origin (deploy-cloudflare.yml).
+1. **Production serves from Cloudflare Workers** — deploy-cloudflare.yml builds
+   the `@astrojs/cloudflare` bundle, syncs the runtime env from the
+   `CF_WORKER_*` repository secrets, and attaches `pixelatedempathy.com` as a
+   Workers custom domain (wrangler.jsonc `routes`).
+2. **Vercel stays warm**: it builds on staging pushes (path-filtered), but
+   `pixelatedempathy.com` resolves to the Worker. Fail back by detaching the
+   custom domain and re-pointing the zone records at Vercel.
+3. **No Vercel build on feature branches.** Use staging for previews.
 4. **Manual dispatch is always allowed** for emergency production verification.
