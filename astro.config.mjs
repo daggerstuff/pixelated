@@ -248,12 +248,6 @@ export default defineConfig({
     // "hidden" generates .map files but omits the //# sourceMappingURL comment
     // so maps are never exposed to users, yet Sentry can still use them.
     sourcemap: hasSentryDSN ? 'hidden' : !isProduction,
-    copy: [
-      {
-        from: 'content/templates/email',
-        to: 'content/templates/email',
-      },
-    ],
   },
   vite: {
     server: {
