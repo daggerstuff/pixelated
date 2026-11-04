@@ -1,0 +1,924 @@
+[
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 2,
+    "fields": {
+      "Name": "Kickoff: CI Federation Initiative",
+      "Due Date": "2026-03-18",
+      "Section/Column": "0. Program Setup",
+      "Priority": "High",
+      "Tags": "ci,federation,governance",
+      "Dependencies": ""
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 3,
+    "fields": {
+      "Name": "Create pipeline inventory across providers",
+      "Due Date": "2026-03-18",
+      "Section/Column": "0. Program Setup",
+      "Priority": "High",
+      "Tags": "inventory,ci",
+      "Dependencies": ""
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 4,
+    "fields": {
+      "Name": "Map capability ownership matrix",
+      "Due Date": "2026-03-19",
+      "Section/Column": "1. Ownership & Design",
+      "Priority": "High",
+      "Tags": "ownership,design",
+      "Dependencies": "Create pipeline inventory across providers"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 5,
+    "fields": {
+      "Name": "Define duplication removal list",
+      "Due Date": "2026-03-19",
+      "Section/Column": "1. Ownership & Design",
+      "Priority": "High",
+      "Tags": "dedupe,ci",
+      "Dependencies": "Map capability ownership matrix"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 6,
+    "fields": {
+      "Name": "Publish CI operating model RFC",
+      "Due Date": "2026-03-20",
+      "Section/Column": "1. Ownership & Design",
+      "Priority": "High",
+      "Tags": "rfc,governance",
+      "Dependencies": "Define duplication removal list"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 7,
+    "fields": {
+      "Name": "Approval checkpoint: ownership and RFC",
+      "Due Date": "2026-03-20",
+      "Section/Column": "1. Ownership & Design",
+      "Priority": "High",
+      "Tags": "approval,checkpoint",
+      "Dependencies": "Publish CI operating model RFC"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 8,
+    "fields": {
+      "Name": "Standardize command contract",
+      "Due Date": "2026-03-23",
+      "Section/Column": "2. Consolidation",
+      "Priority": "High",
+      "Tags": "scripts,standardization",
+      "Dependencies": "Approval checkpoint: ownership and RFC"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 9,
+    "fields": {
+      "Name": "Consolidate GitHub security lane",
+      "Due Date": "2026-03-24",
+      "Section/Column": "2. Consolidation",
+      "Priority": "High",
+      "Tags": "github,security",
+      "Dependencies": "Standardize command contract"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 10,
+    "fields": {
+      "Name": "Consolidate GitLab MR quality lane",
+      "Due Date": "2026-03-25",
+      "Section/Column": "2. Consolidation",
+      "Priority": "High",
+      "Tags": "gitlab,quality",
+      "Dependencies": "Standardize command contract"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 11,
+    "fields": {
+      "Name": "Consolidate Bitbucket AI validation lane",
+      "Due Date": "2026-03-26",
+      "Section/Column": "2. Consolidation",
+      "Priority": "High",
+      "Tags": "bitbucket,ai",
+      "Dependencies": "Standardize command contract"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 12,
+    "fields": {
+      "Name": "Disable duplicate non-owner jobs",
+      "Due Date": "2026-03-27",
+      "Section/Column": "2. Consolidation",
+      "Priority": "High",
+      "Tags": "dedupe,cleanup",
+      "Dependencies": "Consolidate GitHub security lane;Consolidate GitLab MR quality lane;Consolidate Bitbucket AI validation lane"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 13,
+    "fields": {
+      "Name": "Add branch and path trigger policy",
+      "Due Date": "2026-03-27",
+      "Section/Column": "2. Consolidation",
+      "Priority": "Medium",
+      "Tags": "triggers,optimization",
+      "Dependencies": "Disable duplicate non-owner jobs"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 14,
+    "fields": {
+      "Name": "Design release-readiness schema",
+      "Due Date": "2026-03-30",
+      "Section/Column": "3. Release Gate Integration",
+      "Priority": "High",
+      "Tags": "release-gate,azure",
+      "Dependencies": "Disable duplicate non-owner jobs"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 15,
+    "fields": {
+      "Name": "Implement readiness aggregator endpoint/script",
+      "Due Date": "2026-04-01",
+      "Section/Column": "3. Release Gate Integration",
+      "Priority": "High",
+      "Tags": "integration,status",
+      "Dependencies": "Design release-readiness schema"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 16,
+    "fields": {
+      "Name": "Wire readiness check into Azure pre-deploy stage",
+      "Due Date": "2026-04-03",
+      "Section/Column": "3. Release Gate Integration",
+      "Priority": "High",
+      "Tags": "azure,deploy-gate",
+      "Dependencies": "Implement readiness aggregator endpoint/script"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 17,
+    "fields": {
+      "Name": "Run dry-run promotion tests (staging)",
+      "Due Date": "2026-04-04",
+      "Section/Column": "3. Release Gate Integration",
+      "Priority": "High",
+      "Tags": "testing,staging",
+      "Dependencies": "Wire readiness check into Azure pre-deploy stage;Add branch and path trigger policy"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 18,
+    "fields": {
+      "Name": "Create CI failure auto-ticketing rules",
+      "Due Date": "2026-04-07",
+      "Section/Column": "4. Operations & Observability",
+      "Priority": "Medium",
+      "Tags": "ops,alerts",
+      "Dependencies": "Run dry-run promotion tests (staging)"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 19,
+    "fields": {
+      "Name": "Build CI operations dashboard",
+      "Due Date": "2026-04-09",
+      "Section/Column": "4. Operations & Observability",
+      "Priority": "Medium",
+      "Tags": "dashboard,metrics",
+      "Dependencies": "Run dry-run promotion tests (staging)"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 20,
+    "fields": {
+      "Name": "Define weekly operating review",
+      "Due Date": "2026-04-10",
+      "Section/Column": "4. Operations & Observability",
+      "Priority": "Medium",
+      "Tags": "cadence,review",
+      "Dependencies": "Build CI operations dashboard"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 21,
+    "fields": {
+      "Name": "Write runbook and escalation map",
+      "Due Date": "2026-04-11",
+      "Section/Column": "4. Operations & Observability",
+      "Priority": "High",
+      "Tags": "runbook,governance",
+      "Dependencies": "Build CI operations dashboard;Define weekly operating review"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+    "record_row": 22,
+    "fields": {
+      "Name": "Final acceptance review",
+      "Due Date": "2026-04-17",
+      "Section/Column": "5. Closeout",
+      "Priority": "High",
+      "Tags": "closeout,acceptance",
+      "Dependencies": "Write runbook and escalation map;Wire readiness check into Azure pre-deploy stage"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 2,
+    "fields": {
+      "Name": "MTGC-00: Create Asana Project Scaffold",
+      "Due Date": "2026-03-19",
+      "Section/Column": "0. Program Setup",
+      "Priority": "High",
+      "Tags": "mtgc,governance",
+      "Dependencies": ""
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 3,
+    "fields": {
+      "Name": "MTGC-01: Catalog Available Datasets",
+      "Due Date": "2026-03-20",
+      "Section/Column": "1. Data Discovery",
+      "Priority": "High",
+      "Tags": "mtgc,datasets",
+      "Dependencies": "MTGC-00"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 4,
+    "fields": {
+      "Name": "MTGC-02: Update TRAINING_MANIFEST",
+      "Due Date": "2026-03-21",
+      "Section/Column": "1. Data Discovery",
+      "Priority": "High",
+      "Tags": "mtgc,manifest",
+      "Dependencies": "MTGC-01"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 5,
+    "fields": {
+      "Name": "MTGC-03: Execute Edge Case Pipeline",
+      "Due Date": "2026-03-24",
+      "Section/Column": "2. Stage 3 Readiness",
+      "Priority": "High",
+      "Tags": "mtgc,stage3,edge-cases",
+      "Dependencies": "MTGC-02"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 6,
+    "fields": {
+      "Name": "MTGC-04: Execute Pixel Voice Pipeline",
+      "Due Date": "2026-03-26",
+      "Section/Column": "2. Stage 4 Readiness",
+      "Priority": "High",
+      "Tags": "mtgc,stage4,voice",
+      "Dependencies": "MTGC-02"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 7,
+    "fields": {
+      "Name": "MTGC-05: Populate Prompt Corpus",
+      "Due Date": "2026-03-27",
+      "Section/Column": "2. Prompt Infrastructure",
+      "Priority": "Medium",
+      "Tags": "mtgc,prompts",
+      "Dependencies": "MTGC-03"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 8,
+    "fields": {
+      "Name": "MTGC-06: Sync Drive Datasets",
+      "Due Date": "2026-03-28",
+      "Section/Column": "3. Data Expansion",
+      "Priority": "Medium",
+      "Tags": "mtgc,datasets,drive",
+      "Dependencies": "MTGC-02"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 9,
+    "fields": {
+      "Name": "MTGC-07: Implement Stage Ratio Validation",
+      "Due Date": "2026-03-29",
+      "Section/Column": "3. Governance",
+      "Priority": "High",
+      "Tags": "mtgc,validation",
+      "Dependencies": "MTGC-02"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 10,
+    "fields": {
+      "Name": "MTGC-08: Update Split Export Logic",
+      "Due Date": "2026-03-30",
+      "Section/Column": "3. Artifact Integrity",
+      "Priority": "High",
+      "Tags": "mtgc,splits",
+      "Dependencies": "MTGC-07"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 11,
+    "fields": {
+      "Name": "MTGC-09: Create Ops Freshness Checks",
+      "Due Date": "2026-04-01",
+      "Section/Column": "4. Operations",
+      "Priority": "Medium",
+      "Tags": "mtgc,ops",
+      "Dependencies": "MTGC-05"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 12,
+    "fields": {
+      "Name": "MTGC-10: Build Stage Health Report",
+      "Due Date": "2026-04-03",
+      "Section/Column": "4. Observability",
+      "Priority": "High",
+      "Tags": "mtgc,reporting",
+      "Dependencies": "MTGC-08"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 13,
+    "fields": {
+      "Name": "MTGC-11: Implement Closure Pack",
+      "Due Date": "2026-04-05",
+      "Section/Column": "4. Signoff Automation",
+      "Priority": "High",
+      "Tags": "mtgc,closure",
+      "Dependencies": "MTGC-10"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 14,
+    "fields": {
+      "Name": "MTGC-12: CI Verification Gate",
+      "Due Date": "2026-04-08",
+      "Section/Column": "5. CI Integration",
+      "Priority": "High",
+      "Tags": "mtgc,ci",
+      "Dependencies": "MTGC-11"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+    "record_row": 15,
+    "fields": {
+      "Name": "MTGC-13: Final Signoff",
+      "Due Date": "2026-04-10",
+      "Section/Column": "5. Closeout",
+      "Priority": "High",
+      "Tags": "mtgc,signoff",
+      "Dependencies": "MTGC-12;MTGC-06"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
+    "record_row": 2,
+    "fields": {
+      "name": "Test Coverage Baseline - Coverage Audit",
+      "due_on": "2026-03-21"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "description",
+      "assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
+    "record_row": 3,
+    "fields": {
+      "name": "Test Coverage Baseline - Baseline Measurement",
+      "due_on": "2026-03-21"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "description",
+      "assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
+    "record_row": 4,
+    "fields": {
+      "name": "Test Coverage Baseline - HIPAA Tests Python",
+      "due_on": "2026-03-21"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "description",
+      "assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
+    "record_row": 5,
+    "fields": {
+      "name": "Test Coverage Baseline - HIPAA Tests TypeScript",
+      "due_on": "2026-03-21"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "description",
+      "assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
+    "record_row": 6,
+    "fields": {
+      "name": "Test Coverage Baseline - Security Tests Python",
+      "due_on": "2026-03-21"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "description",
+      "assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
+    "record_row": 7,
+    "fields": {
+      "name": "Test Coverage Baseline - Security Tests TypeScript",
+      "due_on": "2026-03-21"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "description",
+      "assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
+    "record_row": 8,
+    "fields": {
+      "name": "Test Coverage Baseline - Fix Import Errors",
+      "due_on": "2026-03-28"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "description",
+      "assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
+    "record_row": 9,
+    "fields": {
+      "name": "Test Coverage Baseline - Configure Thresholds",
+      "due_on": "2026-03-28"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "description",
+      "assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 2,
+    "fields": {
+      "Name": "DACT-00: Source Inventory and Licensing Matrix",
+      "Due Date": "2026-03-24",
+      "Section/Column": "00. Intake",
+      "Priority": "High",
+      "Tags": "dataset-acquisition,licensing,discovery",
+      "Dependencies": ""
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 3,
+    "fields": {
+      "Name": "DACT-01: Acquisition Rubric and Acceptance Gates",
+      "Due Date": "2026-03-25",
+      "Section/Column": "00. Intake",
+      "Priority": "High",
+      "Tags": "dataset-acquisition,governance,validation",
+      "Dependencies": "DACT-00"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 4,
+    "fields": {
+      "Name": "DACT-02: Trusted Source Pull v1",
+      "Due Date": "2026-03-27",
+      "Section/Column": "10. Discovery",
+      "Priority": "High",
+      "Tags": "dataset-acquisition,trusted-sources,open-access",
+      "Dependencies": "DACT-01"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 5,
+    "fields": {
+      "Name": "DACT-03: Bright Data Public-Web Pilot",
+      "Due Date": "2026-03-28",
+      "Section/Column": "20. Acquisition",
+      "Priority": "Medium",
+      "Tags": "brightdata,pilot,public-web",
+      "Dependencies": "DACT-01"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 6,
+    "fields": {
+      "Name": "DACT-04: Normalize and Deduplicate Ingested Data",
+      "Due Date": "2026-04-01",
+      "Section/Column": "30. Validation",
+      "Priority": "High",
+      "Tags": "normalization,dedup,provenance",
+      "Dependencies": "DACT-02;DACT-03"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 7,
+    "fields": {
+      "Name": "DACT-05: PII and Safety Screening",
+      "Due Date": "2026-04-02",
+      "Section/Column": "30. Validation",
+      "Priority": "High",
+      "Tags": "pii,safety,screening",
+      "Dependencies": "DACT-04"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 8,
+    "fields": {
+      "Name": "DACT-06: Stage-Based Dataset Slicing",
+      "Due Date": "2026-04-04",
+      "Section/Column": "40. Delivery",
+      "Priority": "High",
+      "Tags": "dataset-slicing,stageing,training",
+      "Dependencies": "DACT-05"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 9,
+    "fields": {
+      "Name": "DACT-07: Human Review and Borderline Decisions",
+      "Due Date": "2026-04-07",
+      "Section/Column": "30. Validation",
+      "Priority": "Medium",
+      "Tags": "human-review,quality-control,decisions",
+      "Dependencies": "DACT-05"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 10,
+    "fields": {
+      "Name": "DACT-08: Freeze v1 Training Slice",
+      "Due Date": "2026-04-10",
+      "Section/Column": "40. Delivery",
+      "Priority": "High",
+      "Tags": "dataset-freeze,versioning,training",
+      "Dependencies": "DACT-06;DACT-07"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  },
+  {
+    "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+    "record_row": 11,
+    "fields": {
+      "Name": "DACT-09: Acquisition Report and Next Backlog",
+      "Due Date": "2026-04-14",
+      "Section/Column": "90. Signoff",
+      "Priority": "Medium",
+      "Tags": "reporting,backlog,follow-up",
+      "Dependencies": "DACT-08"
+    },
+    "reported_status": null,
+    "implementation_verified": false,
+    "omitted_fields": [
+      "Description",
+      "Assignee"
+    ]
+  }
+]
