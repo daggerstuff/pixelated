@@ -31,6 +31,11 @@ REPO = "ShenLab/MentalChat16K"
 REVISION = "5f60cd380cfc58f0f12d44892bed41ee3670a70a"
 
 
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise SystemExit(message)
+
+
 def sha256_file(path: Path) -> tuple[int, str]:
     digest = hashlib.sha256()
     size = 0
@@ -57,6 +62,14 @@ def locator_key(locator: dict[str, Any]) -> tuple[Any, ...]:
         locator["revision"],
         locator["adapter_non_system_message_count"],
     )
+
+
+def match_status(count: int) -> str:
+    if count == 0:
+        return "unmatched"
+    if count == 1:
+        return "unique_upstream_row"
+    return "ambiguous_upstream_rows"
 
 
 def load_adapter_sequences() -> tuple[
@@ -101,32 +114,68 @@ def load_adapter_sequences() -> tuple[
     return exact, normalized_index, source_hashes, usable_rows
 
 
-def main() -> int:
-    if PRIVATE_ROOT.stat().st_mode & 0o777 != 0o700:
-        raise SystemExit("private source directory permissions are not 0700")
-    if SIDECAR.stat().st_mode & 0o777 != 0o600:
-        raise SystemExit("private sidecar permissions are not 0600")
+def verify_private_inputs() -> tuple[dict[str, Any], int, str]:
+    require((PRIVATE_ROOT.stat().st_mode & 0o777) == 0o700, "private source directory permissions are not 0700")
+    require((SIDECAR.stat().st_mode & 0o777) == 0o600, "private sidecar permissions are not 0600")
 
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if (
-        manifest["sources"]["mentalchat16k"]["repo"] != REPO
-        or manifest["sources"]["mentalchat16k"]["revision"] != REVISION
-    ):
-        raise SystemExit("manifest repository or revision differs from pinned source")
+    require(
+        manifest["sources"]["mentalchat16k"]["repo"] == REPO
+        and manifest["sources"]["mentalchat16k"]["revision"] == REVISION,
+        "manifest repository or revision differs from pinned source",
+    )
 
     candidate_bytes, candidate_hash = sha256_file(CANDIDATE)
-    if candidate_hash != manifest["candidate"]["sha256"]:
-        raise SystemExit("candidate file hash differs from binding manifest")
+    require(candidate_hash == manifest["candidate"]["sha256"], "candidate file hash differs from binding manifest")
+    return manifest, candidate_bytes, candidate_hash
 
-    exact_index, normalized_index, source_hashes, usable_rows = load_adapter_sequences()
-    if source_hashes != manifest["sources"]["mentalchat16k"]["files"]:
-        raise SystemExit("local source hashes differ from binding manifest")
 
+def load_recorded_sidecar() -> dict[int, dict[str, Any]]:
     recorded: dict[int, dict[str, Any]] = {}
     with SIDECAR.open(encoding="utf-8") as stream:
         for line in stream:
             entry = json.loads(line)
             recorded[entry["candidate_row_number_1based"]] = entry
+    return recorded
+
+
+def recompute_row_bindings(
+    entry: dict[str, Any],
+    turns: tuple[tuple[str, str], ...],
+    normalized_turns: tuple[tuple[str, str], ...],
+    exact_index: dict[tuple[tuple[str, str], ...], list[dict[str, Any]]],
+    normalized_index: dict[tuple[tuple[str, str], ...], list[dict[str, Any]]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    matches = exact_index.get(turns, [])
+    norm_matches = normalized_index.get(normalized_turns, [])
+    old_matches = entry["exact_adapter_sequence_matches"]
+    old_norm = entry["normalized_adapter_sequence_matches"]
+    require(
+        sorted(map(locator_key, matches)) == sorted(map(locator_key, old_matches))
+        and sorted(map(locator_key, norm_matches)) == sorted(map(locator_key, old_norm)),
+        "recomputed source locators differ from private sidecar",
+    )
+    # Verify the recorded locators themselves point to exact adapter
+    # rows. The legacy window count is retained as audit metadata.
+    exact_locator_keys = set(map(locator_key, matches))
+    normalized_locator_keys = set(map(locator_key, norm_matches))
+    for ref in old_matches:
+        require(locator_key(ref) in exact_locator_keys, "exact sidecar locator does not bind to source row")
+    for ref in old_norm:
+        require(locator_key(ref) in normalized_locator_keys, "normalized sidecar locator does not bind to source row")
+    return matches, norm_matches
+
+
+def main() -> int:
+    manifest, candidate_bytes, candidate_hash = verify_private_inputs()
+
+    exact_index, normalized_index, source_hashes, usable_rows = load_adapter_sequences()
+    require(
+        source_hashes == manifest["sources"]["mentalchat16k"]["files"],
+        "local source hashes differ from binding manifest",
+    )
+
+    recorded = load_recorded_sidecar()
 
     totals: dict[str, Any] = {
         "candidate_family_rows": 0,
@@ -144,62 +193,36 @@ def main() -> int:
             if entry is None:
                 continue
             row = json.loads(line)
-            if hashlib.sha256(line.rstrip("\r\n").encode("utf-8")).hexdigest() != entry["candidate_line_sha256"]:
-                raise SystemExit("candidate row hash differs from private sidecar")
-            if row.get("source") != "mentalchat16k":
-                raise SystemExit("sidecar row does not identify MentalChat16K")
+            require(
+                hashlib.sha256(line.rstrip("\r\n").encode("utf-8")).hexdigest() == entry["candidate_line_sha256"],
+                "candidate row hash differs from private sidecar",
+            )
+            require(row.get("source") == "mentalchat16k", "sidecar row does not identify MentalChat16K")
             visited.add(row_number)
             totals["candidate_family_rows"] += 1
             turns = sequence(row.get("messages", []))
-            normalized_turns = normalized(row.get("messages", []))
-            matches = exact_index.get(turns, [])
-            norm_matches = normalized_index.get(normalized_turns, [])
-            old_matches = entry["exact_adapter_sequence_matches"]
-            old_norm = entry["normalized_adapter_sequence_matches"]
-            if sorted(map(locator_key, matches)) != sorted(map(locator_key, old_matches)) or sorted(
-                map(locator_key, norm_matches)
-            ) != sorted(map(locator_key, old_norm)):
-                raise SystemExit("recomputed source locators differ from private sidecar")
-            # Verify the recorded locators themselves point to exact adapter
-            # rows. The legacy window count is retained as audit metadata.
-            exact_locator_keys = set(map(locator_key, matches))
-            normalized_locator_keys = set(map(locator_key, norm_matches))
-            for ref in old_matches:
-                if locator_key(ref) not in exact_locator_keys:
-                    raise SystemExit("exact sidecar locator does not bind to source row")
-            for ref in old_norm:
-                if locator_key(ref) not in normalized_locator_keys:
-                    raise SystemExit("normalized sidecar locator does not bind to source row")
-            exact_count = len(matches)
-            normalized_count = len(norm_matches)
-            exact_status = (
-                "unmatched"
-                if exact_count == 0
-                else "unique_upstream_row"
-                if exact_count == 1
-                else "ambiguous_upstream_rows"
+            matches, norm_matches = recompute_row_bindings(
+                entry, turns, normalized(row.get("messages", [])), exact_index, normalized_index
             )
-            normalized_status = (
-                "unmatched"
-                if normalized_count == 0
-                else "unique_upstream_row"
-                if normalized_count == 1
-                else "ambiguous_upstream_rows"
+            exact_status = match_status(len(matches))
+            normalized_status = match_status(len(norm_matches))
+            require(
+                exact_status == entry["exact_match_status"] and normalized_status == entry["normalized_match_status"],
+                "recomputed match status differs from private sidecar",
             )
-            if exact_status != entry["exact_match_status"] or normalized_status != entry["normalized_match_status"]:
-                raise SystemExit("recomputed match status differs from private sidecar")
             totals["exact_status_counts"][exact_status] += 1
             totals["normalized_status_counts"][normalized_status] += 1
-            totals["exact_contiguous_sequence_matches"] += exact_count > 0
-            totals["normalized_contiguous_sequence_matches"] += normalized_count > 0
+            totals["exact_contiguous_sequence_matches"] += len(matches) > 0
+            totals["normalized_contiguous_sequence_matches"] += len(norm_matches) > 0
             totals["exact_full_non_system_sequence_equal_rows"] += any(
                 locator["adapter_non_system_message_count"] == len(turns) for locator in matches
             )
 
-    if visited != set(recorded):
-        raise SystemExit("sidecar contains candidate row ordinals not validated")
-    if totals["candidate_family_rows"] != 11135 or usable_rows != 16057:
-        raise SystemExit("candidate or adapter-usable row totals differ from audit")
+    require(visited == set(recorded), "sidecar contains candidate row ordinals not validated")
+    require(
+        totals["candidate_family_rows"] == 11135 and usable_rows == 16057,
+        "candidate or adapter-usable row totals differ from audit",
+    )
 
     output = {
         "adapter_sha256": sha256_file(ROOT / "ai/sourcing/dataset_adapters/mentalchat16k_adapter.py")[1],
