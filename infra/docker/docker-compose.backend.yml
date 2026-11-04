@@ -218,26 +218,6 @@ services:
     networks:
       - pe-net
 
-  worker:
-    build:
-      context: ../..
-      dockerfile: infra/docker/worker.Dockerfile
-    container_name: pe-worker
-    env_file:
-      - ../../.env.backend
-    environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-pixelated}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-pixelated_empathy}
-      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
-      - MONGODB_URI=mongodb://mongo:27017/pixelated_empathy?authSource=admin
-      - BIAS_DETECTION_SERVICE_URL=http://pe-bias-detection:8001
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - pe-net
 
   training-server:
     build:

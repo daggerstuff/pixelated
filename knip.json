@@ -69,8 +69,6 @@
 		"apps/web/src/lib/ehr-native/types/*.ts",
 		"apps/web/src/lib/ehr-native/compliance/**/*.ts",
 		"apps/web/src/lib/audit/logger.ts",
-		"apps/web/src/lib/governance/policy-engine.ts",
-		"apps/web/src/lib/jobs/queue.ts",
 		"apps/web/src/lib/middleware/csrf.ts",
 		"apps/web/src/lib/research/services/*.ts",
 		"apps/web/src/lib/services/auth0.service.ts",
