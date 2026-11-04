@@ -71,6 +71,7 @@ type FindingClass =
   | 'short_ack_collapse'
   | 'repeated_filler_combo'
   | 'email_thread_score_below_gate'
+  | 'duplicate_subject'
 
 interface AuditFinding {
   class: FindingClass

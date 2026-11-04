@@ -1,7 +1,7 @@
 import { defineEvalConfig } from 'eve/evals'
 
-import { agentModel } from '../agent/lib/workers-ai.js'
+import { AGENT_MODEL } from '../agent/lib/workers-ai.js'
 
 export default defineEvalConfig({
-  judge: { model: agentModel },
+  judge: { model: AGENT_MODEL },
 })
