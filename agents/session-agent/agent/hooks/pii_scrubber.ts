@@ -7,8 +7,11 @@ import { defineHook } from 'eve/hooks'
 
 export default defineHook({
   events: {
-    'message.completed'(event) {
-      const text = event.data?.message ?? ''
+    'content.completed'(event) {
+      const data = (event as { data?: { kind?: unknown; phase?: unknown; value?: unknown } })
+        .data
+      if (data?.kind !== 'text' || data?.phase !== 'reply') return
+      const text = typeof data.value === 'string' ? data.value : ''
       if (typeof text === 'string') {
         // error handled by caller
       }
