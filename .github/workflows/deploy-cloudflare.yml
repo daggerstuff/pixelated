@@ -3,168 +3,168 @@ name: Deploy to Cloudflare Workers
 # Cloudflare Workers is the migration target origin for pixelatedempathy.com
 # (Vercel remains the current production origin and warm standby). Deploys are
 # gated behind workflow_dispatch until the DNS cutover is approved; the CI gate
-# mirrors deploy-aws.yml: auto-deploys must follow a successful CI run.
+# mirrors build-images.yml: auto-deploys must follow a successful CI run.
 on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
-    branches: [staging]
+    workflow_dispatch:
+    workflow_run:
+        workflows: [CI]
+        types: [completed]
+        branches: [staging]
 
 # Deploys must not overlap: a newer run waits for the current one.
 concurrency:
-  group: deploy-cloudflare
-  cancel-in-progress: false
+    group: deploy-cloudflare
+    cancel-in-progress: false
 
 permissions:
-  contents: read
+    contents: read
 
 env:
-  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
 jobs:
-  # The pipeline lands before the credentials exist, so it must be a no-op
-  # rather than a red X on every green staging CI run. A job-level `if` cannot
-  # read the secrets context reliably, so gate through a step output instead.
-  preflight:
-    name: Check deploy credentials
-    runs-on: ubuntu-latest
-    outputs:
-      enabled: ${{ steps.check.outputs.enabled }}
-    steps:
-      - name: Check for Cloudflare API token
-        id: check
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: |
-          if [ -n "${CLOUDFLARE_API_TOKEN}" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::CLOUDFLARE_API_TOKEN is not configured; skipping the Cloudflare deploy."
-          fi
+    # The pipeline lands before the credentials exist, so it must be a no-op
+    # rather than a red X on every green staging CI run. A job-level `if` cannot
+    # read the secrets context reliably, so gate through a step output instead.
+    preflight:
+        name: Check deploy credentials
+        runs-on: ubuntu-latest
+        outputs:
+            enabled: ${{ steps.check.outputs.enabled }}
+        steps:
+            - name: Check for Cloudflare API token
+              id: check
+              env:
+                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+              run: |
+                  if [ -n "${CLOUDFLARE_API_TOKEN}" ]; then
+                    echo "enabled=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "enabled=false" >> "$GITHUB_OUTPUT"
+                    echo "::notice::CLOUDFLARE_API_TOKEN is not configured; skipping the Cloudflare deploy."
+                  fi
 
-  build:
-    name: Build Cloudflare bundle
-    needs: preflight
-    if: >-
-      needs.preflight.outputs.enabled == 'true' &&
-      (github.event_name == 'workflow_dispatch' ||
-       (github.event.workflow_run.conclusion == 'success' &&
-        github.event.workflow_run.head_branch == 'staging'))
-    runs-on: ubuntu-latest
-    outputs:
-      artifact-name: ${{ steps.pack.outputs.name }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
+    build:
+        name: Build Cloudflare bundle
+        needs: preflight
+        if: >-
+            needs.preflight.outputs.enabled == 'true' &&
+            (github.event_name == 'workflow_dispatch' ||
+             (github.event.workflow_run.conclusion == 'success' &&
+              github.event.workflow_run.head_branch == 'staging'))
+        runs-on: ubuntu-latest
+        outputs:
+            artifact-name: ${{ steps.pack.outputs.name }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v7
 
-      - name: Setup Node.js with pnpm
-        uses: ./.github/actions/setup-node-pnpm
-        with:
-          node-version: '24.16.0'
+            - name: Setup Node.js with pnpm
+              uses: ./.github/actions/setup-node-pnpm
+              with:
+                  node-version: "24.16.0"
 
-      - name: Build Cloudflare target
-        # The wrapper runs verify-build-contract + astro build + ensure-server-entry.
-        # ensure-server-entry skips on DEPLOY_TARGET=cloudflare (the adapter emits
-        # its own fetch-handler entry that imports 'cloudflare:workers', which the
-        # guard's Node import check cannot load).
-        run: pnpm build
-        env:
-          CI: 'true'
-          DEPLOY_TARGET: 'cloudflare'
+            - name: Build Cloudflare target
+              # The wrapper runs verify-build-contract + astro build + ensure-server-entry.
+              # ensure-server-entry skips on DEPLOY_TARGET=cloudflare (the adapter emits
+              # its own fetch-handler entry that imports 'cloudflare:workers', which the
+              # guard's Node import check cannot load).
+              run: pnpm build
+              env:
+                  CI: "true"
+                  DEPLOY_TARGET: "cloudflare"
 
-      - name: Verify build artifact
-        run: |
-          test -f dist/server/entry2.mjs || { echo "::error::dist/server/entry2.mjs missing"; exit 1; }
-          test -f dist/server/wrangler.json || { echo "::error::dist/server/wrangler.json missing"; exit 1; }
-          node -e '
-            const config = require("./dist/server/wrangler.json");
-            if (config.name !== "pixelated-empathy") throw new Error(`unexpected worker name: ${config.name}`);
-            if (config.main !== "entry2.mjs") throw new Error(`unexpected main: ${config.main}`);
-            if (config.compatibility_flags?.includes("nodejs_compat") !== true) throw new Error("nodejs_compat missing");
-            if (!config.kv_namespaces?.some((ns) => ns.binding === "SESSION")) throw new Error("SESSION KV binding missing");
-            if (!config.images) throw new Error("IMAGES binding missing");
-            console.log("wrangler.json contract verified:", config.name, config.main);
-          '
-          test -d dist/client || { echo "::error::dist/client missing"; exit 1; }
-          echo "Build artifact verified: dist/server (entry2.mjs + wrangler.json) + dist/client"
+            - name: Verify build artifact
+              run: |
+                  test -f dist/server/entry2.mjs || { echo "::error::dist/server/entry2.mjs missing"; exit 1; }
+                  test -f dist/server/wrangler.json || { echo "::error::dist/server/wrangler.json missing"; exit 1; }
+                  node -e '
+                    const config = require("./dist/server/wrangler.json");
+                    if (config.name !== "pixelated-empathy") throw new Error(`unexpected worker name: ${config.name}`);
+                    if (config.main !== "entry2.mjs") throw new Error(`unexpected main: ${config.main}`);
+                    if (config.compatibility_flags?.includes("nodejs_compat") !== true) throw new Error("nodejs_compat missing");
+                    if (!config.kv_namespaces?.some((ns) => ns.binding === "SESSION")) throw new Error("SESSION KV binding missing");
+                    if (!config.images) throw new Error("IMAGES binding missing");
+                    console.log("wrangler.json contract verified:", config.name, config.main);
+                  '
+                  test -d dist/client || { echo "::error::dist/client missing"; exit 1; }
+                  echo "Build artifact verified: dist/server (entry2.mjs + wrangler.json) + dist/client"
 
-      - name: Pack deploy artifact
-        id: pack
-        run: |
-          NAME="cf-deploy-${{ github.run_id }}-${{ github.run_attempt }}"
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
-          tar --directory dist --create --gzip --file "dist/${NAME}.tar.gz" server client
-          echo "Packed dist/${NAME}.tar.gz ($(du -h "dist/${NAME}.tar.gz" | cut -f1))"
+            - name: Pack deploy artifact
+              id: pack
+              run: |
+                  NAME="cf-deploy-${{ github.run_id }}-${{ github.run_attempt }}"
+                  echo "name=$NAME" >> "$GITHUB_OUTPUT"
+                  tar --directory dist --create --gzip --file "dist/${NAME}.tar.gz" server client
+                  echo "Packed dist/${NAME}.tar.gz ($(du -h "dist/${NAME}.tar.gz" | cut -f1))"
 
-      - name: Upload deploy artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ steps.pack.outputs.name }}
-          path: dist/cf-deploy-*.tar.gz
-          retention-days: 7
+            - name: Upload deploy artifact
+              uses: actions/upload-artifact@v7
+              with:
+                  name: ${{ steps.pack.outputs.name }}
+                  path: dist/cf-deploy-*.tar.gz
+                  retention-days: 7
 
-  deploy:
-    name: Deploy to Cloudflare
-    needs: [preflight, build]
-    if: needs.preflight.outputs.enabled == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+    deploy:
+        name: Deploy to Cloudflare
+        needs: [preflight, build]
+        if: needs.preflight.outputs.enabled == 'true'
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
-      # wrangler is a devDependency, so the CLI has to be installed before
-      # `pnpm exec wrangler` can run.
-      - name: Setup Node.js with pnpm
-        uses: ./.github/actions/setup-node-pnpm
-        with:
-          node-version: '24.16.0'
-          install-native-deps: 'false'
+            # wrangler is a devDependency, so the CLI has to be installed before
+            # `pnpm exec wrangler` can run.
+            - name: Setup Node.js with pnpm
+              uses: ./.github/actions/setup-node-pnpm
+              with:
+                  node-version: "24.16.0"
+                  install-native-deps: "false"
 
-      - name: Download deploy artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ needs.build.outputs.artifact-name }}
-          path: artifact
+            - name: Download deploy artifact
+              uses: actions/download-artifact@v8
+              with:
+                  name: ${{ needs.build.outputs.artifact-name }}
+                  path: artifact
 
-      - name: Extract bundle
-        run: |
-          tar --extract --gzip --file artifact/cf-deploy-*.tar.gz
-          test -f server/wrangler.json || { echo "::error::server/wrangler.json missing from artifact"; exit 1; }
+            - name: Extract bundle
+              run: |
+                  tar --extract --gzip --file artifact/cf-deploy-*.tar.gz
+                  test -f server/wrangler.json || { echo "::error::server/wrangler.json missing from artifact"; exit 1; }
 
-      - name: Deploy Worker
-        id: deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: |
-          set -euo pipefail
-          pnpm exec wrangler deploy --config server/wrangler.json 2>&1 | tee "$RUNNER_TEMP/deploy.log"
-          # The workers.dev host is the account's subdomain, not the account ID,
-          # so take the URL wrangler prints instead of constructing one.
-          URL=$(grep -oE 'https://[A-Za-z0-9._-]+\.workers\.dev' "$RUNNER_TEMP/deploy.log" | head -n 1 || true)
-          if [ -z "$URL" ]; then
-            echo "::error::wrangler deploy did not report a workers.dev URL"
-            exit 1
-          fi
-          echo "url=$URL" >> "$GITHUB_OUTPUT"
-          echo "Deployed: $URL"
+            - name: Deploy Worker
+              id: deploy
+              env:
+                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+              run: |
+                  set -euo pipefail
+                  pnpm exec wrangler deploy --config server/wrangler.json 2>&1 | tee "$RUNNER_TEMP/deploy.log"
+                  # The workers.dev host is the account's subdomain, not the account ID,
+                  # so take the URL wrangler prints instead of constructing one.
+                  URL=$(grep -oE 'https://[A-Za-z0-9._-]+\.workers\.dev' "$RUNNER_TEMP/deploy.log" | head -n 1 || true)
+                  if [ -z "$URL" ]; then
+                    echo "::error::wrangler deploy did not report a workers.dev URL"
+                    exit 1
+                  fi
+                  echo "url=$URL" >> "$GITHUB_OUTPUT"
+                  echo "Deployed: $URL"
 
-      - name: Smoke test Worker URL
-        env:
-          WORKER_URL: ${{ steps.deploy.outputs.url }}
-        run: |
-          set -euo pipefail
-          for i in 1 2 3 4 5; do
-            STATUS=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 30 "$WORKER_URL/" || true)
-            if [ "$STATUS" = "200" ]; then
-              echo "Smoke test passed: $WORKER_URL returned 200"
-              exit 0
-            fi
-            echo "Attempt $i: $WORKER_URL returned $STATUS; retrying in 15s..."
-            sleep 15
-          done
-          echo "::error::Smoke test failed: $WORKER_URL did not return 200 after 5 attempts"
-          exit 1
+            - name: Smoke test Worker URL
+              env:
+                  WORKER_URL: ${{ steps.deploy.outputs.url }}
+              run: |
+                  set -euo pipefail
+                  for i in 1 2 3 4 5; do
+                    STATUS=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 30 "$WORKER_URL/" || true)
+                    if [ "$STATUS" = "200" ]; then
+                      echo "Smoke test passed: $WORKER_URL returned 200"
+                      exit 0
+                    fi
+                    echo "Attempt $i: $WORKER_URL returned $STATUS; retrying in 15s..."
+                    sleep 15
+                  done
+                  echo "::error::Smoke test failed: $WORKER_URL did not return 200 after 5 attempts"
+                  exit 1

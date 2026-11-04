@@ -227,12 +227,12 @@ intentional change.
 - **Release notes**: pushing a `vX.Y.Z` tag verifies the tagged revision builds,
   then creates a GitHub Release with auto-generated notes
   ([release workflow](.github/workflows/release-notes.yml)).
-- **Deploys** ([deploy-aws.yml](.github/workflows/deploy-aws.yml)): a successful
-  CI run on `staging` deploys to EKS automatically (manual dispatch still
-  works). Rollout status gates, a smoke test through the cluster service, and —
-  if the smoke test fails — an automatic `kubectl rollout undo` of the app and
-  agent deployments back to the previous revision. Deploys serialize via a
-  `deploy-production` concurrency group.
+- **Deploys** ([vercel.yml](.github/workflows/vercel.yml),
+  [build-images.yml](.github/workflows/build-images.yml)): production is
+  deployed off AWS. Vercel serves pixelatedempathy.com (staging pushes,
+  path-filtered); a successful CI run on `staging` publishes the app and agent
+  Docker images automatically (manual dispatch still works). Publishes
+  serialize via a `publish-images` concurrency group.
 
 ## Python Code
 

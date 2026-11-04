@@ -11,7 +11,7 @@ permissions:
 # reproductions stays in one place.
 on:
   workflow_run:
-    workflows: [CI, Deploy to AWS EKS, Quality, Monitoring]
+    workflows: [CI, Build and Publish Images, Quality, Monitoring]
     types: [completed]
     branches: [staging]
 

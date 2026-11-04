@@ -1,109 +1,110 @@
-name: Vercel (Frontend Test Center)
+name: Vercel Deploy
 
-# Vercel is the frontend test center and temporary fallback for pixelatedempathy.com while AWS EKS is stabilized.
+# Vercel is the production origin for pixelatedempathy.com (production is deployed
+# off AWS). Cloudflare Workers is the migration target origin; see deploy-cloudflare.yml.
 on:
-  workflow_dispatch:
-  pull_request:
-    branches: [staging]
-    paths:
-      # Rebuild Vercel when frontend assets or deployment configs change.
-      - apps/web/**
-      - astro.config.*
-      - packages/ui/**
-      - packages/components/**
-      - vercel.json
-      - .vercelignore
-      - package.json
-      - pnpm-lock.yaml
-      - .github/workflows/vercel.yml
-  push:
-    branches: [staging]
-    paths:
-      # Production Vercel deploy from staging.
-      # Throttled to frontend changes and deployment configs to avoid burning build credits on infra/backend pushes.
-      - apps/web/**
-      - astro.config.*
-      - packages/ui/**
-      - packages/components/**
-      - vercel.json
-      - .vercelignore
-      - package.json
-      - pnpm-lock.yaml
-      - .github/workflows/vercel.yml
+    workflow_dispatch:
+    pull_request:
+        branches: [staging]
+        paths:
+            # Rebuild Vercel when frontend assets or deployment configs change.
+            - apps/web/**
+            - astro.config.*
+            - packages/ui/**
+            - packages/components/**
+            - vercel.json
+            - .vercelignore
+            - package.json
+            - pnpm-lock.yaml
+            - .github/workflows/vercel.yml
+    push:
+        branches: [staging]
+        paths:
+            # Production Vercel deploy from staging.
+            # Throttled to frontend changes and deployment configs to avoid burning build credits on infra/backend pushes.
+            - apps/web/**
+            - astro.config.*
+            - packages/ui/**
+            - packages/components/**
+            - vercel.json
+            - .vercelignore
+            - package.json
+            - pnpm-lock.yaml
+            - .github/workflows/vercel.yml
 
 concurrency:
-  group: vercel-${{ github.ref }}
-  cancel-in-progress: true
+    group: vercel-${{ github.ref }}
+    cancel-in-progress: true
 
 permissions:
-  contents: read
-  pull-requests: write
+    contents: read
+    pull-requests: write
 
 env:
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
 jobs:
-  preview:
-    name: Preview (Vercel)
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
+    preview:
+        name: Preview (Vercel)
+        if: github.event_name == 'pull_request'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
 
-      - uses: ./.github/actions/setup-node-pnpm
-        with:
-          node-version: '24.16.0'
+            - uses: ./.github/actions/setup-node-pnpm
+              with:
+                  node-version: "24.16.0"
 
-      - name: Build frontend
-        run: pnpm build
-        env:
-          NODE_ENV: production
+            - name: Build frontend
+              run: pnpm build
+              env:
+                  NODE_ENV: production
 
-      - name: Deploy Preview
-        run: |
-          npx vercel deploy \
-            --token ${{ secrets.VERCEL_TOKEN }} \
-            --yes \
-            --prod=false \
-            ${{ env.VERCEL_PROJECT_ID && format('--project={0}', env.VERCEL_PROJECT_ID) || '' }}
-        continue-on-error: true
+            - name: Deploy Preview
+              run: |
+                  npx vercel deploy \
+                    --token ${{ secrets.VERCEL_TOKEN }} \
+                    --yes \
+                    --prod=false \
+                    ${{ env.VERCEL_PROJECT_ID && format('--project={0}', env.VERCEL_PROJECT_ID) || '' }}
+              continue-on-error: true
 
-  production:
-    name: Production (Vercel)
-    # Do NOT add `needs: preview` here: preview only runs on pull_request,
-    # so the dependency skips this job on every push/dispatch.
-    if: >-
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-      && github.ref == 'refs/heads/staging'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
+    production:
+        name: Production (Vercel)
+        # Do NOT add `needs: preview` here: preview only runs on pull_request,
+        # so the dependency skips this job on every push/dispatch.
+        if: >-
+            (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+            && github.ref == 'refs/heads/staging'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v7
 
-      - uses: ./.github/actions/setup-node-pnpm
-        with:
-          node-version: '24.16.0'
+            - uses: ./.github/actions/setup-node-pnpm
+              with:
+                  node-version: "24.16.0"
 
-      - name: Build frontend
-        run: pnpm build
-        env:
-          NODE_ENV: production
+            - name: Build frontend
+              run: pnpm build
+              env:
+                  NODE_ENV: production
 
-      - name: Deploy Production
-        run: |
-          DEPLOY_OUTPUT=$(npx vercel deploy \
-            --token ${{ secrets.VERCEL_TOKEN }} \
-            --yes \
-            --prod=true \
-            ${{ env.VERCEL_PROJECT_ID && format('--project={0}', env.VERCEL_PROJECT_ID) || '' }})
-          echo "$DEPLOY_OUTPUT"
-          DEPLOYMENT_URL=$(echo "$DEPLOY_OUTPUT" | grep -E '^https://[a-zA-Z0-9.-]+\.vercel\.app' | tail -n 1)
-          if [ -n "$DEPLOYMENT_URL" ]; then
-            echo "Aliasing $DEPLOYMENT_URL to pixelatedempathy.com..."
-            npx vercel alias set "$DEPLOYMENT_URL" pixelatedempathy.com \
-              --token ${{ secrets.VERCEL_TOKEN }} \
-              --scope wutanglan || true
-            npx vercel alias set "$DEPLOYMENT_URL" www.pixelatedempathy.com \
-              --token ${{ secrets.VERCEL_TOKEN }} \
-              --scope wutanglan || true
-          fi
-        continue-on-error: true
+            - name: Deploy Production
+              run: |
+                  DEPLOY_OUTPUT=$(npx vercel deploy \
+                    --token ${{ secrets.VERCEL_TOKEN }} \
+                    --yes \
+                    --prod=true \
+                    ${{ env.VERCEL_PROJECT_ID && format('--project={0}', env.VERCEL_PROJECT_ID) || '' }})
+                  echo "$DEPLOY_OUTPUT"
+                  DEPLOYMENT_URL=$(echo "$DEPLOY_OUTPUT" | grep -E '^https://[a-zA-Z0-9.-]+\.vercel\.app' | tail -n 1)
+                  if [ -n "$DEPLOYMENT_URL" ]; then
+                    echo "Aliasing $DEPLOYMENT_URL to pixelatedempathy.com..."
+                    npx vercel alias set "$DEPLOYMENT_URL" pixelatedempathy.com \
+                      --token ${{ secrets.VERCEL_TOKEN }} \
+                      --scope wutanglan || true
+                    npx vercel alias set "$DEPLOYMENT_URL" www.pixelatedempathy.com \
+                      --token ${{ secrets.VERCEL_TOKEN }} \
+                      --scope wutanglan || true
+                  fi
+              continue-on-error: true

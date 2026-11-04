@@ -1,0 +1,141 @@
+name: Build and Publish Images
+
+# Production is deployed off AWS: Vercel is the production origin for
+# pixelatedempathy.com and the app/agent images below are what the current
+# deployment consumes. Publishing follows a successful CI run on staging, so
+# shipping stays the default instead of a manual step; manual dispatch is
+# always allowed.
+on:
+    workflow_dispatch:
+    workflow_run:
+        workflows: [CI]
+        types: [completed]
+        branches: [staging]
+
+# Publishes must not overlap: a newer run waits for the current one.
+concurrency:
+    group: publish-images
+    cancel-in-progress: false
+
+permissions:
+    contents: read
+
+env:
+    REGISTRY: docker.io
+    IMAGE_NAME: pixelatedempathy/api
+    SESSION_AGENT_IMAGE_NAME: pixelatedempathy/session-agent
+    QA_AGENT_IMAGE_NAME: pixelatedempathy/qa-agent
+    PIPELINE_AGENT_IMAGE_NAME: pixelatedempathy/pipeline-agent
+
+jobs:
+    build-and-push:
+        # Auto-publishes only follow a successful CI run; manual dispatch is always allowed.
+        if: >-
+            github.event_name == 'workflow_dispatch' ||
+            (github.event.workflow_run.conclusion == 'success' &&
+             github.event.workflow_run.head_branch == 'staging')
+        runs-on: ubuntu-latest
+        outputs:
+            image_tag: ${{ steps.vars.outputs.image_tag }}
+            app_digest: ${{ steps.build-app.outputs.digest }}
+            session_digest: ${{ steps.build-session.outputs.digest }}
+            qa_digest: ${{ steps.build-qa.outputs.digest }}
+            pipeline_digest: ${{ steps.build-pipeline.outputs.digest }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v4
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v4
+              with:
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+            - name: Determine image tag
+              id: vars
+              run: |
+                  if [[ "${{ github.ref_name }}" == "main" ]]; then
+                    IMAGE_TAG="production"
+                  else
+                    IMAGE_TAG="${{ github.ref_name }}"
+                  fi
+                  echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
+                  echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+                  echo "Built image tag: $IMAGE_TAG"
+
+            - name: Build and push app
+              id: build-app
+              uses: docker/build-push-action@v7
+              with:
+                  context: .
+                  file: ./infra/Dockerfile
+                  push: true
+                  tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
+                      steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+                      env.IMAGE_NAME }}:latest
+                  cache-from: type=gha
+                  cache-to: type=gha,mode=max
+                  platforms: linux/amd64
+
+            - name: Build and push session agent
+              id: build-session
+              uses: docker/build-push-action@v7
+              with:
+                  context: .
+                  file: ./agents/Dockerfile
+                  build-args: |
+                      AGENT_DIR=agents/session-agent
+                  push: true
+                  tags:
+                      ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
+                      steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+                      env.SESSION_AGENT_IMAGE_NAME }}:latest
+                  cache-from: type=gha,scope=session-agent
+                  cache-to: type=gha,mode=max,scope=session-agent
+                  platforms: linux/amd64
+
+            - name: Build and push QA agent
+              id: build-qa
+              uses: docker/build-push-action@v7
+              with:
+                  context: .
+                  file: ./agents/Dockerfile
+                  build-args: |
+                      AGENT_DIR=agents/qa-agent
+                  push: true
+                  tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
+                      steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+                      env.QA_AGENT_IMAGE_NAME }}:latest
+                  cache-from: type=gha,scope=qa-agent
+                  cache-to: type=gha,mode=max,scope=qa-agent
+                  platforms: linux/amd64
+
+            - name: Build and push pipeline agent
+              id: build-pipeline
+              uses: docker/build-push-action@v7
+              with:
+                  context: .
+                  file: ./agents/Dockerfile
+                  build-args: |
+                      AGENT_DIR=agents/pipeline-agent
+                  push: true
+                  tags:
+                      ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
+                      steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+                      env.PIPELINE_AGENT_IMAGE_NAME }}:latest
+                  cache-from: type=gha,scope=pipeline-agent
+                  cache-to: type=gha,mode=max,scope=pipeline-agent
+                  platforms: linux/amd64
+
+            - name: Image digests
+              run: |
+                  echo "app:      ${{ steps.build-app.outputs.digest }}"
+                  echo "session:  ${{ steps.build-session.outputs.digest }}"
+                  echo "qa:       ${{ steps.build-qa.outputs.digest }}"
+                  echo "pipeline: ${{ steps.build-pipeline.outputs.digest }}"

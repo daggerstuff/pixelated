@@ -33,7 +33,6 @@ Two gateway implementations are maintained:
 | ------------------- | ---------------------------------- | ---------------------------------------------------------- |
 | Traefik             | Primary (Docker Compose, K8s)       | `docker/traefik/traefik.yml`, `docker/traefik/dynamic.yml` |
 | Caddy               | Alternate (subdomains, Ollama)     | `docker/caddy/Caddyfile`                                   |
-| K8s Traefik Ingress | AWS EKS production                  | `k8s/aws/ingress.yaml`                                     |
 
 ## TLS Termination
 
@@ -58,10 +57,6 @@ certificatesResolvers:
 
 - Automatic HTTPS via Caddy's built-in ACME client
 - `auto_https on` in global options
-
-### K8s
-
-- EKS: Traefik ingress with `traefik.ingress.kubernetes.io/router.tls: true`
 
 ## CORS Policy
 
