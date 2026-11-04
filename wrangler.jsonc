@@ -23,13 +23,15 @@
 		"binding": "ASSETS",
 		"not_found_handling": "none"
 	},
+	"workers_dev": true,
 	"routes": [
-		// Workers custom domain: `wrangler deploy` attaches pixelatedempathy.com to
-		// this Worker and manages the zone's proxied apex records. To fail back
-		// to Vercel, remove this block, redeploy, and restore the Vercel records.
+		// Zone route: the zone's apex records are already Cloudflare-proxied (to
+		// the Vercel standby), so a Workers route takes the traffic with no DNS
+		// change at all. To fail back to Vercel, remove this block and redeploy —
+		// the untouched records resume serving immediately.
 		{
-			"pattern": "pixelatedempathy.com",
-			"custom_domain": true
+			"pattern": "pixelatedempathy.com/*",
+			"zone_name": "pixelatedempathy.com"
 		}
 	],
 	"vars": {

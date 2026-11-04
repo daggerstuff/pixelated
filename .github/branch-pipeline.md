@@ -33,10 +33,11 @@ standby on frontend changes — no overlap, no wasted builds.
 
 1. **Production serves from Cloudflare Workers** — deploy-cloudflare.yml builds
    the `@astrojs/cloudflare` bundle, syncs the runtime env from the
-   `CF_WORKER_*` repository secrets, and attaches `pixelatedempathy.com` as a
-   Workers custom domain (wrangler.jsonc `routes`).
-2. **Vercel stays warm**: it builds on staging pushes (path-filtered), but
-   `pixelatedempathy.com` resolves to the Worker. Fail back by detaching the
-   custom domain and re-pointing the zone records at Vercel.
+   `CF_WORKER_*` repository secrets, and routes `pixelatedempathy.com` to the
+   Worker via a zone route (wrangler.jsonc `routes`; the zone's proxied records
+   are untouched).
+2. **Vercel stays warm**: it builds on staging pushes (path-filtered), and its
+   proxied apex records stay in place. Fail back by removing the route and
+   redeploying — Vercel resumes serving immediately.
 3. **No Vercel build on feature branches.** Use staging for previews.
 4. **Manual dispatch is always allowed** for emergency production verification.

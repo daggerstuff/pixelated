@@ -85,7 +85,8 @@ jobs:
                     if (config.compatibility_flags?.includes("nodejs_compat") !== true) throw new Error("nodejs_compat missing");
                     if (!config.kv_namespaces?.some((ns) => ns.binding === "SESSION")) throw new Error("SESSION KV binding missing");
                     if (!config.images) throw new Error("IMAGES binding missing");
-                    if (!config.routes?.some((r) => r.pattern === "pixelatedempathy.com" && r.custom_domain)) throw new Error("production custom domain route missing");
+                    if (!config.routes?.some((r) => r.pattern === "pixelatedempathy.com/*" && r.zone_name === "pixelatedempathy.com")) throw new Error("production zone route missing");
+                    if (config.workers_dev !== true) throw new Error("workers.dev mirror must stay enabled");
                     console.log("wrangler.json contract verified:", config.name, config.main);
                   '
                   test -d dist/client || { echo "::error::dist/client missing"; exit 1; }

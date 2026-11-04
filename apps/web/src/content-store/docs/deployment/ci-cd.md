@@ -29,7 +29,7 @@ depending on the trigger:
 The pipeline is defined in `.github/workflows/ci.yml` (CI),
 `.github/workflows/build-images.yml` (app and agent image publishes to Docker
 Hub), `.github/workflows/deploy-cloudflare.yml` (Cloudflare Workers production
-deploys on the pixelatedempathy.com custom domain) and
+deploys, routed from pixelatedempathy.com via a Workers zone route) and
 `.github/workflows/vercel.yml` (warm-standby frontend deploys), and consists
 of the following jobs:
 
