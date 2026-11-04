@@ -378,8 +378,5 @@ export const BusinessDocument =
     'BusinessDocument',
     BusinessDocumentSchema,
   )
-export const Project = mongoose.model('Project', ProjectSchema)
-export const KnowledgeArticle = mongoose.model(
-  'KnowledgeArticle',
-  KnowledgeArticleSchema,
-)
+mongoose.model('Project', ProjectSchema)
+mongoose.model('KnowledgeArticle', KnowledgeArticleSchema)
