@@ -62,14 +62,14 @@ describe('pipeline lifecycle (integration)', () => {
       },
       ctx,
     )
-    expect(staged.deploy_namespace).toBe('pixelated-staging')
+    expect(staged.deploy_target).toBe('docker_compose')
     expect(storeMemory).toHaveBeenCalled()
 
     const prod = await promoteToProduction.execute(
       { staging_release_id: staged.training_job_id, image_tag: 'v1' },
       ctx,
     )
-    expect(prod.deploy_namespace).toBe('pixelated-prod')
+    expect(prod.production_release_id).toMatch(/^release-/)
 
     const rolled = await rollbackModel.execute(
       {

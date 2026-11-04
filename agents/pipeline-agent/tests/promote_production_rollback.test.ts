@@ -7,7 +7,7 @@ import rollbackModel from '../agent/tools/rollback_model.js'
 const ctx = {} as ToolContext
 
 describe('promote_to_production tool', () => {
-  it('deploys to the production namespace and returns a release- id', async () => {
+  it('records the production release and deploy target', async () => {
     const result = await promoteToProduction.execute(
       {
         staging_release_id: 'stg-1',
@@ -16,7 +16,7 @@ describe('promote_to_production tool', () => {
       },
       ctx,
     )
-    expect(result.deploy_namespace).toBe('pixelated-prod')
+    expect(result.deploy_target).toBe('docker_compose')
     expect(result.production_release_id).toMatch(/^release-/)
     expect(result.staging_release_id).toBe('stg-1')
   })

@@ -13,7 +13,7 @@ import { getSystemStatus } from '../foresight-client.js'
 export default defineTool({
   description:
     'Preflight the pipeline infrastructure configuration (training-infra MCP, ' +
-    'K8s MCP, Foresight MCP, Slack channel, Linear channel). Reports env ' +
+    'Foresight MCP, Slack channel, Linear channel). Reports env ' +
     'configuration presence only and is non-gating.',
   inputSchema: z.object({}),
   async execute() {
@@ -36,7 +36,6 @@ export default defineTool({
     const trainingInfra = process.env.TRAINING_INFRA_MCP_URL
       ? 'configured'
       : 'not_configured'
-    const k8s = process.env.K8S_MCP_URL ? 'configured' : 'not_configured'
     const slack = process.env.SLACK_BOT_TOKEN ? 'configured' : 'not_configured'
     const linear = process.env.LINEAR_AGENT_ACCESS_TOKEN
       ? 'configured'
@@ -44,7 +43,6 @@ export default defineTool({
 
     return {
       training_infra: trainingInfra,
-      k8s,
       foresight,
       slack,
       linear,
