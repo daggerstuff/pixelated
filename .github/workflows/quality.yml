@@ -96,6 +96,15 @@ jobs:
           persist-credentials: false
           submodules: false
 
+      # scripts/training imports ai.* directly; without the submodule those
+      # imports degrade to Any under --strict (subclasses of ai classes and
+      # ai-typed returns then fail). python-typecheck.sh already silences
+      # ai-internal errors via --follow-imports silent.
+      - name: Init submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true

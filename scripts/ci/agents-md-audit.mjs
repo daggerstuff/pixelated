@@ -66,6 +66,7 @@ for (const match of agents.matchAll(/pnpm ([A-Za-z0-9:._-]+)/g)) {
   const name = match[1]
   if (BUILTIN.has(name)) continue
   if (name === 'lint') continue // documented alias; lint exists but keep parity with CLAUDE.md
+  if (name === 'typecheck') continue // named in the banned-tooling warning (the script was removed on purpose), not a command
   if (!scripts.has(name)) {
     errors.push(`pnpm command in AGENTS.md has no matching script: "pnpm ${name}"`)
   }
