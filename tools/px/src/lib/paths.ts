@@ -22,8 +22,8 @@ function findRepoRoot(startDir = process.cwd()): string {
   }
 }
 
-export function defaultConfigPath(): string {
-  const repoRoot = findRepoRoot()
+export function defaultConfigPath(cwd = process.cwd()): string {
+  const repoRoot = findRepoRoot(cwd)
   return join(repoRoot, 'agents', 'px.config.json')
 }
 

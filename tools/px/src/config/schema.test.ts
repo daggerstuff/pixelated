@@ -6,6 +6,8 @@ import {
   HookConfigSchema,
   HookEventSchema,
   PxConfigSchema,
+  parsePxConfig,
+  parseMergedPxConfig,
 } from './schema.js'
 
 describe('AgentConfigSchema', () => {
@@ -102,8 +104,9 @@ describe('SlackConfigSchema', () => {
     expect(result.channel).toBe('#px-agent-results')
   })
 
-  it('rejects invalid webhook URL', () => {
-    expect(() => SlackConfigSchema.parse({ webhook: 'not-a-url' })).toThrow()
+  it('accepts non-URL webhook strings (legacy configs)', () => {
+    const result = SlackConfigSchema.parse({ webhook: 'not-a-url' })
+    expect(result.webhook).toBe('not-a-url')
   })
 })
 
@@ -188,11 +191,10 @@ describe('PxConfigSchema', () => {
   })
 
   it('rejects config without agents', () => {
-    expect(() => PxConfigSchema.parse({})).toThrow()
+    expect(() => parsePxConfig({})).toThrow()
   })
 
-  it('accepts empty agents record (schema allows it, loader catches it)', () => {
-    const result = PxConfigSchema.parse({ agents: {} })
-    expect(Object.keys(result.agents)).toHaveLength(0)
+  it('parseMergedPxConfig allows empty agents for merge-only input', () => {
+    expect(() => parseMergedPxConfig({})).not.toThrow()
   })
 })

@@ -1,12 +1,40 @@
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 
+import { deepMerge } from '../lib/deep-merge.js'
+import { isPlainObject } from '../lib/is-plain-object.js'
+import {
+  defaultConfigPath,
+  repoConfigPath,
+  userConfigPath,
+} from '../lib/paths.js'
 import type { PxConfig, AgentConfig } from './schema.js'
-import { WorkspaceConfigSchema } from './schema.js'
+import {
+  parseMergedPxConfig,
+  parsePxConfig,
+  WorkspaceConfigSchema,
+} from './schema.js'
 
 const DEFAULT_CONFIG_PATH = 'agents/px.config.json'
 const REPO_LOCAL_OVERRIDE = '.px/config.json'
-const USER_OVERRIDE = '.px/config.json' // relative to home
+const USER_OVERRIDE = '.px/config.json'
+
+type ConfigSource = 'default' | 'user' | 'repo' | 'cli'
+
+export type LoadedConfig =
+  | {
+      config: PxConfig
+      sources: string[]
+    }
+  | {
+      config: PxConfig
+      sources: Partial<Record<ConfigSource, string>>
+    }
+
+export interface LoadConfigOptions {
+  cwd?: string
+  cliOverrides?: Record<string, unknown>
+}
 
 function findRepoRoot(start: string): string | null {
   let dir = start
@@ -23,6 +51,22 @@ function readJsonSafe(path: string): Record<string, unknown> | null {
     return JSON.parse(readFileSync(path, 'utf-8')) as Record<string, unknown>
   } catch {
     return null
+  }
+}
+
+function readJsonFile(path: string): Record<string, unknown> | undefined {
+  try {
+    const raw = readFileSync(path, 'utf8')
+    const parsed: unknown = JSON.parse(raw)
+    if (!isPlainObject(parsed)) {
+      throw new Error(`Config at ${path} must be a JSON object`)
+    }
+    return parsed
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return undefined
+    }
+    throw error
   }
 }
 
@@ -50,7 +94,6 @@ function mergeConfigs(base: PxConfig, override: Partial<PxConfig>): PxConfig {
   if (base.hooks && override.hooks) {
     merged.hooks = { ...base.hooks, ...override.hooks }
   }
-  // Validate workspace config after merge
   if (merged.workspace) {
     const parsed = WorkspaceConfigSchema.parse(merged.workspace)
     merged.workspace = parsed
@@ -58,15 +101,100 @@ function mergeConfigs(base: PxConfig, override: Partial<PxConfig>): PxConfig {
   return merged
 }
 
-export interface LoadedConfig {
-  config: PxConfig
-  sources: string[]
+function cliOverridesToConfig(
+  overrides: Record<string, unknown>,
+): Record<string, unknown> {
+  const config: Record<string, unknown> = {}
+
+  if (typeof overrides.endpoint === 'string') {
+    const agentName =
+      typeof overrides.agent === 'string' ? overrides.agent : 'default'
+    config.agents = {
+      [agentName]: { endpoint: overrides.endpoint },
+    }
+  }
+
+  if (typeof overrides.timeout === 'number') {
+    const agentName =
+      typeof overrides.agent === 'string' ? overrides.agent : 'default'
+    config.agents = {
+      ...(isPlainObject(config.agents) ? config.agents : {}),
+      [agentName]: {
+        ...(isPlainObject(
+          (config.agents as Record<string, unknown>)?.[agentName],
+        )
+          ? ((config.agents as Record<string, unknown>)[agentName] as Record<
+              string,
+              unknown
+            >)
+          : {}),
+        timeout: overrides.timeout,
+      },
+    }
+  }
+
+  for (const [key, value] of Object.entries(overrides)) {
+    if (key === 'endpoint' || key === 'timeout' || key === 'agent') {
+      continue
+    }
+    config[key] = value
+  }
+
+  return config
 }
 
-export function loadConfig(cwd: string = process.cwd()): LoadedConfig {
+function loadConfigFromPaths(
+  options: LoadConfigOptions = {},
+): LoadedConfig & { sources: Partial<Record<ConfigSource, string>> } {
+  const cwd = options.cwd ?? process.cwd()
+  const sources: Partial<Record<ConfigSource, string>> = {}
+
+  const defaultPath = defaultConfigPath(cwd)
+  const userPath = userConfigPath()
+  const repoPath = repoConfigPath(cwd)
+
+  const defaultRaw = readJsonFile(defaultPath)
+  if (defaultRaw) {
+    sources.default = defaultPath
+  }
+
+  const userRaw = readJsonFile(userPath)
+  if (userRaw) {
+    sources.user = userPath
+  }
+
+  const repoRaw = readJsonFile(repoPath)
+  if (repoRaw) {
+    sources.repo = repoPath
+  }
+
+  const cliRaw = options.cliOverrides
+    ? cliOverridesToConfig(options.cliOverrides)
+    : undefined
+  if (cliRaw && Object.keys(cliRaw).length > 0) {
+    sources.cli = 'cli flags'
+  }
+
+  const merged = deepMerge(defaultRaw ?? {}, userRaw, repoRaw, cliRaw)
+  const config = parseMergedPxConfig(merged)
+
+  if (process.env['PX_LOCAL'] === '1') {
+    const localPort = process.env['PX_LOCAL_PORT'] ?? '2000'
+    const localEndpoint = `http://localhost:${localPort}`
+    for (const agentName of Object.keys(config.agents)) {
+      config.agents[agentName] = {
+        ...config.agents[agentName],
+        endpoint: localEndpoint,
+      }
+    }
+  }
+
+  return { config, sources }
+}
+
+function loadConfigStrict(cwd: string = process.cwd()): LoadedConfig {
   const sources: string[] = []
 
-  // 1. Default config from repo root
   const repoRoot = findRepoRoot(cwd)
   if (!repoRoot) {
     throw new Error(
@@ -85,7 +213,6 @@ export function loadConfig(cwd: string = process.cwd()): LoadedConfig {
 
   let config: PxConfig = defaultRaw as unknown as PxConfig
 
-  // 2. User override (~/.px/config.json)
   const userPath = join(process.env['HOME'] ?? '/tmp', USER_OVERRIDE)
   const userRaw = readJsonSafe(userPath)
   if (userRaw) {
@@ -93,7 +220,6 @@ export function loadConfig(cwd: string = process.cwd()): LoadedConfig {
     config = mergeConfigs(config, userRaw)
   }
 
-  // 3. Repo-local override (.px/config.json relative to repo root)
   const repoLocalPath = join(repoRoot, REPO_LOCAL_OVERRIDE)
   const repoLocalRaw = readJsonSafe(repoLocalPath)
   if (repoLocalRaw) {
@@ -102,6 +228,29 @@ export function loadConfig(cwd: string = process.cwd()): LoadedConfig {
   }
 
   return { config, sources }
+}
+
+export function loadConfig(): LoadedConfig
+export function loadConfig(cwd: string): LoadedConfig
+export function loadConfig(options: LoadConfigOptions): LoadedConfig
+export function loadConfig(
+  cwdOrOptions?: string | LoadConfigOptions,
+): LoadedConfig {
+  if (cwdOrOptions === undefined) {
+    return loadConfigStrict()
+  }
+  if (typeof cwdOrOptions === 'string') {
+    return loadConfigStrict(cwdOrOptions)
+  }
+  return loadConfigFromPaths(cwdOrOptions)
+}
+
+export function loadConfigFile(path: string): PxConfig {
+  const raw = readJsonFile(path)
+  if (!raw) {
+    throw new Error(`Config file not found: ${path}`)
+  }
+  return parsePxConfig(raw)
 }
 
 export function findAgent(config: PxConfig, name: string): AgentConfig {

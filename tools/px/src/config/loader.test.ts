@@ -50,6 +50,18 @@ describe('loadConfig', () => {
     rmSync(tempDir, { recursive: true, force: true })
   })
 
+  it('uses strict loading when called with no arguments', () => {
+    const noGitDir = mkdtempSync(join(tmpdir(), 'px-nogit-strict-'))
+    const prevCwd = process.cwd()
+    try {
+      process.chdir(noGitDir)
+      expect(() => loadConfig()).toThrow('repo root')
+    } finally {
+      process.chdir(prevCwd)
+      rmSync(noGitDir, { recursive: true, force: true })
+    }
+  })
+
   it('loads default config from agents/px.config.json', () => {
     const { config, sources } = loadConfig(tempDir)
     expect(config.agents).toHaveProperty('advisor')

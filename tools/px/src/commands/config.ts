@@ -1,7 +1,7 @@
 import type { Command } from 'commander'
 import pc from 'picocolors'
 
-import { loadConfig } from '../lib/config-loader.js'
+import { loadConfig } from '../config/loader.js'
 
 export function registerConfig(program: Command): void {
   program
@@ -9,7 +9,7 @@ export function registerConfig(program: Command): void {
     .description('Show the resolved px config (merged from all sources)')
     .option('--sources', 'Include config source paths in output')
     .action((options: { sources?: boolean }) => {
-      const loaded = loadConfig()
+      const loaded = loadConfig({})
 
       if (!options.sources) {
         console.log(JSON.stringify(loaded.config, null, 2))

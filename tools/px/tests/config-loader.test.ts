@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { dirname } from 'node:path'
@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { loadConfig, loadConfigFile } from '../src/lib/config-loader.js'
-import { parsePxConfig } from '../src/lib/config-schema.js'
+import { loadConfig, loadConfigFile } from '../src/config/loader.js'
+import { parsePxConfig } from '../src/config/schema.js'
 import { deepMerge } from '../src/lib/deep-merge.js'
 
 const testDir = dirname(fileURLToPath(import.meta.url))
@@ -36,6 +36,13 @@ describe('config schema', () => {
       }),
     ).toThrow()
   })
+
+  it('rejects config files with no agents section', () => {
+    const path = join(tmpdir(), `px-no-agents-${Date.now()}.json`)
+    writeFileSync(path, JSON.stringify({ hooks: {} }))
+    expect(() => loadConfigFile(path)).toThrow()
+    rmSync(path, { force: true })
+  })
 })
 
 describe('deepMerge', () => {
@@ -44,7 +51,7 @@ describe('deepMerge', () => {
       {
         agents: {
           content: {
-            endpoint: 'http://localhost:2002',
+            endpoint: 'http://[REDACTED]:2002',
             tools: ['audit_corpus'],
           },
         },
@@ -56,7 +63,7 @@ describe('deepMerge', () => {
       },
     )
 
-    expect(merged.agents.content.endpoint).toBe('http://localhost:2002')
+    expect(merged.agents.content.endpoint).toBe('http://[REDACTED]:2002')
     expect(merged.agents.content.timeout).toBe(60_000)
     expect(merged.agents.content.tools).toEqual(['audit_corpus'])
   })
@@ -128,6 +135,48 @@ describe('loadConfig precedence', () => {
       expect(loaded.sources.cli).toBe('cli flags')
     } finally {
       process.env.HOME = originalHome
+    }
+  })
+
+  it('resolves default config from options.cwd, not process.cwd', () => {
+    const repoRoot = mkdtempSync(join(tmpdir(), 'px-config-cwd-'))
+    const otherDir = mkdtempSync(join(tmpdir(), 'px-config-other-'))
+
+    mkdirSync(join(repoRoot, 'agents'))
+    mkdirSync(join(repoRoot, '.git'))
+    writeFileSync(
+      join(repoRoot, 'agents', 'px.config.json'),
+      JSON.stringify({
+        agents: {
+          content: {
+            endpoint: 'http://repo-cwd:2000',
+            tools: ['audit_corpus'],
+            async: false,
+            timeout: 30000,
+          },
+        },
+      }),
+    )
+
+    const originalHome = process.env.HOME
+    process.env.HOME = otherDir
+
+    try {
+      const prevCwd = process.cwd()
+      process.chdir(otherDir)
+      try {
+        const loaded = loadConfig({ cwd: repoRoot })
+        expect(loaded.config.agents.content?.endpoint).toBe(
+          'http://repo-cwd:2000',
+        )
+        expect(loaded.sources.default).toContain('agents/px.config.json')
+      } finally {
+        process.chdir(prevCwd)
+      }
+    } finally {
+      process.env.HOME = originalHome
+      rmSync(repoRoot, { recursive: true, force: true })
+      rmSync(otherDir, { recursive: true, force: true })
     }
   })
 })
