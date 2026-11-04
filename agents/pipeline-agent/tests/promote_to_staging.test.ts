@@ -33,7 +33,7 @@ describe('promote_to_staging tool', () => {
       },
       ctx,
     )
-    expect(result.deploy_namespace).toBe('pixelated-staging')
+    expect(result.deploy_target).toBe('docker_compose')
     expect(result.training_provenance.model_card_hash).toBe(
       createHash('sha256')
         .update('models/my-model:v1.2.3')

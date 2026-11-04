@@ -28,11 +28,12 @@ export default defineTool({
       from_release: input.current_release_id,
       reason: input.reason,
       rolled_back_at: new Date().toISOString(),
-      k8s_mcp_stub: {
+      deploy_stub: {
         note:
-          'k8s-mcp tool `rollback_deployment` is not yet wired. When ' +
-          'wired, this tool should return the rollout status (progressing / ' +
-          'complete / failed) after the rollback finishes.',
+          'Automated rollback is not wired. The fleet runs from ' +
+          'agents/deploy/docker-compose.yaml on the fleet host; roll back by ' +
+          'pinning AGENT_IMAGE_TAG to the previous release and re-running ' +
+          '`make deploy`, then confirm the service reports healthy.',
       },
     }
   },
