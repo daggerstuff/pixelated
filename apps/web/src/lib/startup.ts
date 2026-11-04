@@ -1,11 +1,9 @@
 import { getStartupLogger } from './logging/build-safe-logger'
-
-const startupLogger = getStartupLogger()
 import { LogRotationService } from './logging/rotation'
 import { initializeSecurity } from './security'
 import { initializeTracing } from './tracing'
 
-const logger = startupLogger
+const logger = getStartupLogger()
 
 /**
  * Initialize the application
@@ -46,11 +44,6 @@ export async function shutdownApplication(): Promise<void> {
     // Close database connections
     const dbModule = await import('./db')
     await dbModule.closeDatabase()
-    // Stop background services
-    const workerModule = (await import('./jobs/worker')) as {
-      shutdown?: () => Promise<void>
-    }
-    await workerModule.shutdown?.()
     // Save any pending data
     const notifModule =
       (await import('./services/notification/NotificationService')) as {

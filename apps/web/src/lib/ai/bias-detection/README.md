@@ -934,11 +934,10 @@ For robust, scalable background job processing in production environments:
   - Implement dead-letter queues for failed jobs
   - Regularly backup job queue data
 
-**Example Redis-backed Setup**:
+**Example in-memory job queue** (see `job-queue.ts`, wired from `submit-batch-job` API):
 
 ```typescript
-import { RedisJobQueue } from '@/lib/ai/bias-detection/redis-job-queue'
-const jobQueue = new RedisJobQueue(handler, process.env.REDIS_URL)
+import { JobQueue } from '@/lib/ai/bias-detection/job-queue'
 ```
 
 **Kubernetes Worker Deployment**:
