@@ -19,7 +19,6 @@ PROCESSING_README.md
 LICENSE
 .notes/
 docs/
-business-strategy/
 runbooks/
 plan/
 
@@ -37,7 +36,6 @@ plan/
 .roomodes
 .oracle_deployment
 checkpoints/
-apps/business-strategy-cms/
 
 # Environment and config files
 .env*
@@ -292,7 +290,6 @@ tsconfig*.json
 !patches/
 !.npmrc
 # Workspace member package.json files needed for pnpm workspace resolution
-!apps/business-strategy-cms/package.json
 
 # Exclude deployment backups from Docker context
 deployment-backup*/

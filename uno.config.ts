@@ -8,7 +8,6 @@ export default defineConfig({
         /node_modules/,
         /dist/,
         /content-store/,
-        /apps\/business-strategy-cms/,
         /docs\//,
         /tests?\//,
         /public\//,

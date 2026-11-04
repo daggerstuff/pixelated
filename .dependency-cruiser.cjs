@@ -66,17 +66,6 @@ module.exports = {
       from: {},
       to: { path: '(^|/)(dist|build|out)/' },
     },
-    {
-      name: 'no-cross-app-source-imports',
-      comment:
-        'Workspace apps may only consume each other through published package ' +
-        'boundaries, never by reaching directly into another app source tree. ' +
-        'Direct source imports defeat package encapsulation and break consumers ' +
-        'when the source moves.',
-      severity: 'error',
-      from: { path: '^apps/web/src' },
-      to: { path: '^apps/(business-strategy-cms)/src' },
-    },
   ],
   options: {
     tsConfig: { fileName: 'tsconfig.json' },
