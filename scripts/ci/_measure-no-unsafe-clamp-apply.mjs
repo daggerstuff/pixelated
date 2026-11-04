@@ -2,7 +2,7 @@
 // scripts/ci/_measure-no-unsafe-clamp-apply.mjs
 //
 // Apply companion for `scripts/ci/measure-no-unsafe-clamp.sh`. Performs
-// Phase 1 typed-I/O-boundary surface edits across the 4 quick-win files.
+// Phase 1 typed-I/O-boundary surface edits across the 3 quick-win files.
 //
 // Each entry below MUST be:
 //   - Unique in the file (the patcher fails if an anchor appears more than once).
@@ -540,166 +540,10 @@ export const SearchResultSchema: z.ZodType<SearchResult> = z.object({
   },
 
   // ========================================================================
-  // 3. src/lib/sdk/index.ts
+  // 3. src/lib/api/therapeutic.ts (already has Zod schemas)
   // ========================================================================
 
-  // 3a. Add zod import.
-  {
-    file: 'src/lib/sdk/index.ts',
-    find: `import { MemoryApiClient } from '../memory/memory-api-client'
-import { ForesightClient } from './foresight'`,
-    replace: `import { z } from 'zod'
-
-import { MemoryApiClient } from '../memory/memory-api-client'
-import { ForesightClient } from './foresight'`,
-  },
-
-  // 3b. Add UserProfileSchema after UserProfileUpdate interface.
-  {
-    file: 'src/lib/sdk/index.ts',
-    find: `export interface UserProfileUpdate {
-  fullName?: string
-  avatarUrl?: string
-  userMetadata?: Record<string, any>
-}`,
-    replace: `export interface UserProfileUpdate {
-  fullName?: string
-  avatarUrl?: string
-  userMetadata?: Record<string, any>
-}
-
-export const UserProfileSchema: z.ZodType<{
-  id: string
-  fullName?: string
-  email: string
-  role: string
-  avatarUrl?: string
-  createdAt: string
-  lastLogin?: string
-}> = z.object({
-  id: z.string(),
-  fullName: z.string().optional(),
-  email: z.string(),
-  role: z.string(),
-  avatarUrl: z.string().optional(),
-  createdAt: z.string(),
-  lastLogin: z.string().optional(),
-})`,
-  },
-
-  // 3c. request() — add schema parameter, thread to response.json(z.parse).
-  {
-    file: 'src/lib/sdk/index.ts',
-    find: `  private async request(path: string, options: RequestInit = {}) {
-    const url = \`\${this.baseUrl}\${path}\`
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'X-API-Key': this.apiKey,
-      ...(options.headers as Record<string, string>),
-    }
-
-    const controller = new AbortController()
-    const id = setTimeout(() => controller.abort(), this.timeout)
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-        signal: controller.signal,
-      })
-
-      clearTimeout(id)
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error ?? \`API Error: \${response.statusText}\`)
-      }
-
-      return await response.json()
-    } catch (error) {
-      clearTimeout(id)
-      throw error
-    }
-  }`,
-    replace: `  private async request<T>(
-    path: string,
-    schema: z.ZodType<T>,
-    options: RequestInit = {},
-  ): Promise<T> {
-    const url = \`\${this.baseUrl}\${path}\`
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'X-API-Key': this.apiKey,
-      ...(options.headers as Record<string, string>),
-    }
-
-    const controller = new AbortController()
-    const id = setTimeout(() => controller.abort(), this.timeout)
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-        signal: controller.signal,
-      })
-
-      clearTimeout(id)
-
-      if (!response.ok) {
-        let errorData: { error?: string } = {}
-        try {
-          errorData = await response.json()
-        } catch {
-          /* ignore */
-        }
-        throw new Error(errorData.error ?? \`API Error: \${response.statusText}\`)
-      }
-
-      return schema.parse(await response.json())
-    } catch (error) {
-      clearTimeout(id)
-      throw error
-    }
-  }`,
-  },
-
-  // 3d. user.getProfile: pass UserProfileSchema (single profile, not wrapped).
-  {
-    file: 'src/lib/sdk/index.ts',
-    find: `      getProfile: async () => {
-        return this.request('/profile')
-      },`,
-    replace: `      getProfile: async () => {
-        return this.request('/profile', UserProfileSchema)
-      },`,
-  },
-
-  // 3e. user.updateProfile: pass UserProfileSchema.
-  {
-    file: 'src/lib/sdk/index.ts',
-    find: `      updateProfile: async (updates: UserProfileUpdate) => {
-        return this.request('/profile', {
-          method: 'PUT',
-          body: JSON.stringify(updates),
-        })
-      },`,
-    replace: `      updateProfile: async (updates: UserProfileUpdate) => {
-        return this.request(
-          '/profile',
-          UserProfileSchema,
-          {
-            method: 'PUT',
-            body: JSON.stringify(updates),
-          },
-        )
-      },`,
-  },
-
-  // ========================================================================
-  // 4. src/lib/api/therapeutic.ts (already has Zod schemas)
-  // ========================================================================
-
-  // 4a. post<T>(endpoint, data, schema): require schema.
+  // 3a. post<T>(endpoint, data, schema): require schema.
   {
     file: 'src/lib/api/therapeutic.ts',
     find: `  private async post<T>(endpoint: string, data: unknown): Promise<T> {
@@ -748,7 +592,7 @@ export const UserProfileSchema: z.ZodType<{
   }`,
   },
 
-  // 4b. validateEmotion: pass ValidationResultSchema.
+  // 3b. validateEmotion: pass ValidationResultSchema.
   {
     file: 'src/lib/api/therapeutic.ts',
     find: `  async validateEmotion(data: EmotionData): Promise<ValidationResult> {
@@ -763,7 +607,7 @@ export const UserProfileSchema: z.ZodType<{
   }`,
   },
 
-  // 4c. detectCrisis: pass CrisisResultSchema.
+  // 3c. detectCrisis: pass CrisisResultSchema.
   {
     file: 'src/lib/api/therapeutic.ts',
     find: `  async detectCrisis(text: string, sessionId?: string): Promise<CrisisResult> {
@@ -781,7 +625,7 @@ export const UserProfileSchema: z.ZodType<{
   }`,
   },
 
-  // 4d. analyzeBias: pass BiasResultSchema.
+  // 3d. analyzeBias: pass BiasResultSchema.
   {
     file: 'src/lib/api/therapeutic.ts',
     find: `  async analyzeBias(data: Record<string, unknown>): Promise<BiasResult> {
@@ -796,7 +640,7 @@ export const UserProfileSchema: z.ZodType<{
   }`,
   },
 
-  // 4e. scrubPII: pass PIIScrubResultSchema.
+  // 3e. scrubPII: pass PIIScrubResultSchema.
   {
     file: 'src/lib/api/therapeutic.ts',
     find: `  async scrubPII(text: string, sessionId?: string): Promise<PIIScrubResult> {
@@ -814,7 +658,7 @@ export const UserProfileSchema: z.ZodType<{
   }`,
   },
 
-  // 4f. healthCheck: define a HealthResponse schema + use it.
+  // 3f. healthCheck: define a HealthResponse schema + use it.
   {
     file: 'src/lib/api/therapeutic.ts',
     find: `  async healthCheck(): Promise<{

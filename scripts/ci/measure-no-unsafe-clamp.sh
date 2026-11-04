@@ -2,10 +2,10 @@
 # scripts/ci/measure-no-unsafe-clamp.sh
 #
 # Executable estimate of the no-unsafe-* warning clamp from running Phase 1
-# of the typed-I/O-boundary migration locally on the 4 quick-win surfaces.
+# of the typed-I/O-boundary migration locally on the 3 quick-win surfaces.
 #
 # What it does:
-#   1. Pre-flight: abort if any of the 4 target files has working-tree changes.
+#   1. Pre-flight: abort if any of the 3 target files has working-tree changes.
 #   2. `pnpm lint > before.txt` captures baseline lint (with cache cleared).
 #   3. Apply Phase 1 surface edits via the node companion (precise str_replace).
 #   4. `pnpm lint > after.txt` captures post-edit lint (cache cleared again).
@@ -41,7 +41,6 @@ cd "$REPO_ROOT"
 TARGET_FILES=(
   packages/pixelated-sdk/src/index.ts
   packages/pixelated-sdk/src/foresight.ts
-  src/lib/sdk/index.ts
   src/lib/api/therapeutic.ts
 )
 
