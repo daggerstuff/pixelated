@@ -5,8 +5,8 @@ export default defineEval({
   description:
     'Verifies the pipeline orchestrator responds to a health check without crashing.',
   async test(t: EveEvalContext) {
-    await t.send('Check pipeline health')
+    const turn = await t.send('Check pipeline health')
     t.succeeded()
-    t.check(t.reply, includes('health'))
+    t.check(turn.reply, includes('health'))
   },
 })

@@ -26,32 +26,31 @@ export default defineChannel({
       // See eve custom channels docs: "Only send() can create a session when
       // the address is unowned."
       const address = body.session_id ?? body.token ?? crypto.randomUUID()
-      const session = await args.from(address).send(body.message, {
+      const delivery = await args.from(address).send(body.message, {
         auth: null,
       })
-      return Response.json({ sessionId: session.id })
+      return Response.json({ sessionId: delivery.sessionId })
     }),
 
     GET('/sessions/:sessionId/stream', async (_req, args) => {
       // attachSession pins a fixed handle to the durable session ID; the first
-      // operation (getEventStream) reports whether that ID is currently active.
+      // operation (stream) reports whether that ID is currently active.
       const session = args.attachSession(args.params.sessionId)
-      const stream = await session.getEventStream({ startIndex: 0 })
-      const reader = stream.getReader()
+      const events = session.stream({ startIndex: 0 })[Symbol.asyncIterator]()
       const encoder = new TextEncoder()
       // Manually pipe the event stream into an NDJSON response. Passing the raw
       // ReadableStream to new Response() causes a socket hang-up in Nitro dev.
       const body = new ReadableStream<Uint8Array>({
         async pull(controller) {
-          const { done, value } = await reader.read()
+          const { done, value } = await events.next()
           if (done) {
             controller.close()
             return
           }
           controller.enqueue(encoder.encode(JSON.stringify(value) + '\n'))
         },
-        cancel() {
-          void reader.cancel()
+        async cancel() {
+          await events.return?.(undefined)
         },
       })
       return new Response(body, {

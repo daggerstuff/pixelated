@@ -1362,6 +1362,9 @@ importers:
       '@types/node':
         specifier: 24.x
         version: 24.19.2
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260707.2
+        version: 7.0.0-dev.20260707.2
       just-bash:
         specifier: ^3.6.0
         version: 3.6.0(supports-color@10.2.2)
@@ -1399,6 +1402,9 @@ importers:
       '@types/node':
         specifier: 24.x
         version: 24.19.2
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260707.2
+        version: 7.0.0-dev.20260707.2
       just-bash:
         specifier: ^3.6.0
         version: 3.6.0(supports-color@10.2.2)
@@ -1610,6 +1616,9 @@ importers:
       '@types/node':
         specifier: 24.x
         version: 24.19.2
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260707.2
+        version: 7.0.0-dev.20260707.2
       just-bash:
         specifier: ^3.6.0
         version: 3.6.0(supports-color@10.2.2)
