@@ -5,16 +5,14 @@
 #   build-<agent>   Build a single agent image (e.g. make build-supervisor)
 #   push-all        Push all images to Docker Hub
 #   push-<agent>    Push a single agent image
-#   deploy-k8s      Apply all k8s manifests
 #   clean           Remove .output directories
 
 REGISTRY    := docker.io/pixelatedempathy
 TAG         := latest
 AGENTS      := supervisor advisor content eve intake pipeline qa session
 AGENT_DIRS  := supervisor-agent advisor-agent content-agent eve-agent intake-agent pipeline-agent qa-agent session-agent
-K8S_DIR     := agents
 
-.PHONY: build-all push-all deploy-k8s clean $(addprefix build-,$(AGENTS)) $(addprefix push-,$(AGENTS))
+.PHONY: build-all push-all clean $(addprefix build-,$(AGENTS)) $(addprefix push-,$(AGENTS))
 
 build-all: $(addprefix build-,$(AGENTS))
 
@@ -34,13 +32,6 @@ push-$(1): build-$(1)
 	docker push $(REGISTRY)/$(1)-agent:$(TAG)
 endef
 $(foreach agent,$(AGENTS),$(eval $(call push_template,$(agent))))
-
-deploy-k8s:
-	kubectl apply -f agents/k8s/namespace-secrets.yaml
-	@for agent in $(AGENT_DIRS); do \
-		echo "Applying $$agent..."; \
-		kubectl apply -f agents/$$agent/k8s/deployment.yaml; \
-	done
 
 clean:
 	@for dir in $(AGENT_DIRS); do \
