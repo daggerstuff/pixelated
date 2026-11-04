@@ -117,8 +117,9 @@ existing task; do not duplicate work.
   is not real, or a demo/mock is mistaken for a live result.
 - The exact model/policy/tool bundle lacks a fresh evaluation and explicit
   qualified-reviewer decision.
-- Deployment, rollback, backup/restore, security checks, alerts, or incident
-  response cannot be demonstrated on the pinned release.
+- The technical fix is deployed, but rollback, backup/restore, release-specific
+  security checks, alerting and incident response cannot yet be demonstrated
+  on the pinned release.
 - No named person accepts support coverage, data terms, customer-facing claims
   and the commercial offer.
 
@@ -132,6 +133,7 @@ are confirmed.
 “authentication, security controls” and “public API contracts, routing
 architectures, or CI/CD pipelines.” The user explicitly approved the scoped
 session authorization and missing training-session read route changes. They
-are implemented locally and covered by focused tests; no deployment or launch
-approval was given. The remaining G2/G4 proof still requires release and
-cross-organization verification. No enrollment or launch is authorized.
+are covered by focused tests and deployed to production under commit
+`f497d82ce`. The remaining G2/G4 proof still requires cross-organization and
+release/operations verification. No enrollment or customer launch is
+authorized.

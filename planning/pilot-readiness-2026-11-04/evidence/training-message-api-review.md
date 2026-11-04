@@ -2,7 +2,7 @@
 
 Date: 2026-11-04
 
-## Implemented locally
+## Implementation and production rollout
 
 - The page uses an authenticated same-origin POST endpoint, compatible with the
   Astro Vercel function route used by the current production build.
@@ -14,6 +14,14 @@ Date: 2026-11-04
 - The page no longer claims an emergency button notified a supervisor. It
   identifies client replies, coaching analysis and supervisor alerts as
   inactive.
+- Commit `f497d82ce` was deployed to production through the staging Vercel
+  workflow. `pixelatedempathy.com` resolves to Ready deployment
+  `pixelated-agdxbtelu-wutanglan.vercel.app`.
+- Migration workflow run `41796100473` applied
+  `017_training_session_messages.sql` to the production app database configured
+  as `APP_DATABASE_URL`; its status step confirmed migration 017.
+- Live smoke checks returned 200 for `/`, 302 for `/training/` (authentication
+  required), and 401 for an unauthenticated POST to the new message endpoint.
 
 ## Verification
 
@@ -27,15 +35,16 @@ Date: 2026-11-04
 
 ## Limits and remaining work
 
-- `db/migrations/017_training_session_messages.sql` was applied with the repo
-  migration runner to the configured Neon database `pixelated`. The configured
-  branch/environment was not identified from the connection metadata. The
-  table, constraints, index and migration record were verified afterward.
+- The local `.env` Neon database also received migration 017 during initial
+  verification. The production migration was separately applied through the
+  repository's `APP_DATABASE_URL` workflow after confirming the Vercel
+  environment's `DATABASE_URL` is a different database.
 - No real session creation/context writer exists, so the training portal has
   no supported way to populate an approved synthetic scenario.
 - The API stores trainee turns; it does not generate synthetic-client replies
   or evidence-grounded coaching.
-- Faculty access/review, two-organization isolation, release deployment,
-  rollback and cohort measurement remain unverified.
+- Faculty access/review, two-organization isolation, rollback, backup/restore,
+  incident response and cohort measurement remain unverified. Deployment of
+  this technical change does not pass the pilot gates.
 
 The pilot remains **NO-GO**. No customer enrollment or launch is authorized.

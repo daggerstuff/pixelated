@@ -6,15 +6,13 @@ synthetic scenarios, 2–4 weeks. Buyer, named owners and contract terms remain
 open.
 
 **Readiness decision (2026-11-04): NO-GO.** Enrollment and customer launch are
-not authorized. Session progress/snapshot ownership checks and the authenticated
-training-session read handler are implemented locally and have focused test
-coverage, but have not been deployed or verified across organizations. The
-training page now saves trainee messages through an authenticated same-origin
-API to a Postgres table with owner and synthetic-session checks; the migration
-is applied to the configured Neon database but not yet included in a verified
-production release. Session creation, automated synthetic
+not authorized. Session progress/snapshot ownership checks, the authenticated
+training-session read handler and trainee-message persistence have focused test
+coverage and are deployed to production under commit `f497d82ce`. Migration 017
+is applied to the production app database. Cross-organization verification is
+still open. Session creation, automated synthetic
 client replies, coaching analysis, faculty review and end-to-end release proof
-remain incomplete. The candidate bundle remains unpromoted. See
+remain incomplete. The technical release does not authorize the pilot. See
 [`LAUNCH_DECISIONS.md`](LAUNCH_DECISIONS.md) for package statuses, evidence,
 owner roles, proposed defaults and closure criteria.
 

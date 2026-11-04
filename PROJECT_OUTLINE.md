@@ -22,18 +22,17 @@ customer workflow are three different states.
 | Submodule GitHub issues       | Foresight: one closed; AI/docs: zero                 | All four feeds were queried to their terminal page                                |
 | Code inventory                | Root plus AI, Foresight and docs; no nested gitlinks | All repository boundaries and tracked domains inventoried; critical paths sampled |
 | Current model/policy evidence | Campaign handoff reaches v74, October 30             | Narrow consent/tool repairs progressed; candidates remain unpromoted              |
-| Deployed launch readiness     | Not established by this audit                        | No production, customer, billing or clinical validation run was performed         |
+| Deployed launch readiness     | Not established by this audit                        | Technical training/auth fix shipped; customer, billing and clinical validation remain open |
 
 Do **not** turn 783 Done issues into “73% product complete,” or remove canceled
 work from the denominator and call the result “95% ready.” Neither number
 measures a working release. Measure progress against the six launch gates below
 and the selected customer journey.
 
-**Pilot execution update (2026-11-04): NO-GO.** Local fixes now cover
-session-route ownership checks, an authenticated same-origin training-message
-API, and Postgres trainee-message storage/readback. Migration 017 is applied to
-the configured Neon database; the production release is pending. Session
-creation, approved scenarios,
+**Pilot execution update (2026-11-04): NO-GO.** Production commit `f497d82ce`
+ships session-route ownership checks, an authenticated same-origin
+training-message API, and Postgres trainee-message storage/readback. Migration
+017 is applied to the production app database. Session creation, approved scenarios,
 automated client replies, transcript-grounded coaching, faculty review,
 cross-organization verification and pinned-release evidence remain open. The
 gate-by-gate record and verification are in
@@ -156,7 +155,7 @@ linked to these packages rather than copied into another parallel backlog.
 | ID  | Outcome / acceptance criterion                                                                                                                                                                                                              | Priority and proposed owner          | Depends on          |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------- |
 | L01 | Approve a one-page pilot contract: buyer, user roles, use case, included routes/scenarios, data boundaries, acceptance and stop conditions; name accountable owners                                                                         | P0 · Product/founder                 | None                |
-| L02 | Select release commits across all four repos; deploy to EKS, demonstrate health and rollback, and tie each CI/deploy incident to a successful equivalent run or a reproduced blocker                                                        | P0 · Platform                        | L01                 |
+| L02 | Select release commits across all four repos; deploy to the current production targets, demonstrate health and rollback, and tie each CI/deploy incident to a successful equivalent run or a reproduced blocker | P0 · Platform                        | L01                 |
 | L03 | Prove invite/sign-in/role/tenant boundaries with two isolated organizations and a forbidden cross-tenant attempt; remove or disable pilot-exposed unfinished token/auth paths                                                               | P0 · Security + application          | L01, L02            |
 | L04 | Run the full trainee → feedback → retry → persisted session → faculty review journey in a real browser with released APIs and database readback; include failure/reconnect behavior                                                         | P0 · Application + QA                | L02, L03, L07       |
 | L05 | Replace pilot analytics with persisted session/cohort measurements; verify counts against source events. Gate mocked metrics, exports and simulated multimodal claims outside the supported journey                                         | P0 · Application/data                | L01, L02            |
@@ -195,7 +194,7 @@ documentation can run alongside engineering.
 | Gate                                  | Pass condition                                                                                        | Current assessment                                                      |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | G1 — Product boundary                 | L01 accepted; included/excluded features and named owners published                                   | Proposed scope; owner acceptance needed                                 |
-| G2 — Working training journey         | L02–L05 pass on one pinned release; supported failure cases recorded                                  | Implementation exists; integrated release proof missing from this audit |
+| G2 — Working training journey         | L02–L05 pass on one pinned release; supported failure cases recorded                                  | Technical routes deployed; session creation, client replies, coaching, faculty review and integrated proof remain open |
 | G3 — Evaluation and release decision  | L06–L10 pass for included AI/data/tools; explicit reviewer provenance and promotion decision recorded | Targeted progress through v74; candidate remains unpromoted             |
 | G4 — Privacy, security and operations | L03/L11/L12 pass; support/incident ownership is real                                                  | Foundations exist; current release sign-off not established             |
 | G5 — Honest, supportable offer        | L13–L15 complete; price/cost/support and customer-facing claims agree                                 | Draft business materials exist; validation and scope alignment needed   |
