@@ -103,7 +103,10 @@ skills/*
 !skills/documentation-drafter/
 !skills/general-qa/
 # Vendored agent skill catalog (installed copies) is a local cache.
-agent/
+# Anchored to the repo root: an unanchored `agent/` also matched
+# `agents/*/agent/` and `tests/agent/`, which are tracked source, and made
+# `git add` under `agents/` fail with "paths are ignored".
+/agent/
 skills-lock.json
 struct-agent-key.json
 TASTES.md
