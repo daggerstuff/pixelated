@@ -186,11 +186,12 @@ Develop a comprehensive suite of unit tests for the AI safety gating layer, ensu
 ### Atlassian & Code Linkages
 - **Parent Task**: [ADHD-317: Sprint 2: Gating & Ingestion](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
-  - Test Suite: `packages/memory-schema/tests/gate-rules.test.ts`
-  - Ingestion Gate Rules: `packages/memory-schema/src/gate-rules.ts`
+  - Schema guards: `packages/memory-schema/src/guards.ts`
+  - Guard tests: `packages/memory-schema/src/guards.test.ts`
+  - Gate collection types: `packages/memory-schema/src/gate-types.ts`
 
 ### Verification & Testing Checklist
-- [ ] **Coverage Verification**: Run `pnpm vitest run --coverage packages/memory-schema/tests/gate-rules.test.ts` and confirm coverage metrics are fully satisfied.
+- [ ] **Coverage Verification**: Run `pnpm vitest run -c config/vitest.config.ts packages/memory-schema` and confirm guard and schema tests pass with satisfactory coverage.
 - [ ] **Boundary Verification**: Ensure the test suite executes successfully in less than 3000ms.
 - [ ] **CI Pipeline Validation**: Integrate test execution directly into the advisory check pipeline to block broken gate regressions.
 """,

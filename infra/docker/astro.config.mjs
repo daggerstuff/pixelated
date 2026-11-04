@@ -159,12 +159,6 @@ export default defineConfig({
     format: "directory",
     // Enable source maps in production for Sentry (hidden, not served to users)
     sourcemap: hasSentryDSN || !isProduction,
-    copy: [
-      {
-        from: "content/templates/email",
-        to: "content/templates/email",
-      },
-    ],
     rollupOptions: {
       output: {
         // Manual chunk splitting for better caching
