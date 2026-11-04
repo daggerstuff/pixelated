@@ -5,7 +5,7 @@ import { defineSchedule } from 'eve/schedules'
 
 export default defineSchedule({
   cron: '0 7 * * *',
-  markdown:
+  content:
     'Daily supervisor report: aggregate agent metrics from the prior 24h, ' +
     'flag unresolved issues, and post a summary digest for review.',
 })

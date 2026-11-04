@@ -5,7 +5,7 @@ import { defineSchedule } from 'eve/schedules'
 
 export default defineSchedule({
   cron: '0 6 * * *',
-  markdown:
+  content:
     'Daily content freshness review: scan clinical content for outdated ' +
     'references, flag stale guidelines, and queue updates for review.',
 })
