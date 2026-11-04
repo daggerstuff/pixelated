@@ -28,10 +28,10 @@ declare module './objectives' {
 }
 
 declare module '../types/index.ts' {
-  export * from '../../types/audit'
-  export * from '../../types/collaboration'
-  export * from '../../types/deployment'
-  export * from '../../types/monitoring'
+  export * from './audit'
+  export * from './collaboration'
+  export * from './deployment'
+  export * from './monitoring'
 }
 
 declare module '../../simulator/types' {
