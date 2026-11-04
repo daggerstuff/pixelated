@@ -1,4 +1,5 @@
 import {
+  createEveSession,
   invokeViaEveSession,
   type EveSessionResult,
 } from '../client/eve-session.js'
@@ -19,11 +20,25 @@ export interface InvokeAgentToolOptions {
  * per tool. Instead, we POST to /eve/v1/session with a message instructing the
  * agent to run the specified tool, then stream the NDJSON response to collect
  * the final assistant message.
+ *
+ * In async mode the session is created and handed off — the call returns as
+ * soon as the agent accepts it, and the reply is delivered out of band (e.g.
+ * to the configured Slack channel).
  */
 export async function invokeAgentTool(
   options: InvokeAgentToolOptions,
 ): Promise<EveSessionResult> {
   const message = buildToolMessage(options.tool, options.body)
+
+  if (options.async) {
+    const { sessionId } = await createEveSession({
+      endpoint: options.endpoint,
+      message,
+      timeoutMs: options.timeout,
+      authHeader: options.authHeader,
+    })
+    return { sessionId, message: '' }
+  }
 
   return invokeViaEveSession({
     endpoint: options.endpoint,
