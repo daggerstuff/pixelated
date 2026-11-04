@@ -1,0 +1,8 @@
+minimumReleaseAge: 0
+minimumReleaseAgeExclude:
+  - eve
+allowBuilds:
+  protobufjs: false
+  sharp: false
+  '@mongodb-js/zstd': true
+  node-liblzma: false
