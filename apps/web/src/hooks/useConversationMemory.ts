@@ -6,7 +6,7 @@
  *   in the Pixelated Empathy dashboard. This hook composes session timing, progress/milestone, and message
  *   management logic into a single, ergonomic API for therapist-client chat and analytics.
  *
- *   - Session timing and metrics logic is delegated to `useSessionTimingMetrics`.
+ *   - Session timing and active-duration metrics are managed locally alongside message state.
  *   - Progress and milestone logic is delegated to `useSessionProgressMilestones`.
  *   - Message and session state logic is managed locally and integrated with the above.
  *
@@ -20,8 +20,7 @@
  *     } = useConversationMemory();
  */
 
-// Session timing/metrics logic (active/idle/paused/ended spans, durations, etc.)
-// Progress and milestone tracking (progress %, skill scores, milestones, etc.)
+// Session timing and progress metrics (active/idle/paused/ended spans, durations, etc.)
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 import type { SessionProgressMetrics } from '@/types/dashboard'
@@ -42,8 +41,7 @@ interface ConversationMemory {
 }
 
 /**
- * Internal memory state used by timing and progress hooks. Extends ConversationMemory
- * with progress-related fields expected by `useSessionTimingMetrics`.
+ * Internal memory state combining conversation fields with progress and timing metrics.
  */
 interface MemoryState extends ConversationMemory {
   progress: number
@@ -100,7 +98,6 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
     sessionState: initialState?.sessionState ?? DEFAULT_MEMORY.sessionState,
   })
 
-  // Extracted session timing and metrics logic
   const sessionStartTimeRef = useRef<number | null>(null)
   const lastActiveTimeRef = useRef<number | null>(null)
   // Lazily track the timestamp of the last message. Start as null so the initial
@@ -124,10 +121,6 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
     progressSnapshots: initialState?.progressSnapshots,
     progressMetrics: initialState?.progressMetrics,
   })
-
-  // Actually, useSessionTimingMetrics is very simple, we can just inline its logic or update it.
-  // Given we can't easily change useSessionTimingMetrics without affecting other things,
-  // let's just inline the active time update effect here for clarity and correct state management.
 
   useEffect(() => {
     sessionStartTimeRef.current ??= Date.now()
