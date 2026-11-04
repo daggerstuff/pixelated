@@ -16,7 +16,6 @@ import { loadEnv, createLogger } from 'vite'
 import { rewriteSentrySource } from './config/sentry-source-map.mjs'
 
 /** @typedef {import("rollup").RollupLog} RollupLog */
-// ECS Fargate requires the Node adapter.
 // Force the Node adapter regardless of any Vercel-provided env vars
 // (VERCEL, DEPLOY_TARGET) that the Vercel build sandbox injects automatically.
 const isVercelDeploy = !!process.env.VERCEL
