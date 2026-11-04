@@ -8,7 +8,6 @@
     "apps/web/public/polyfills/**/*.js",
     ".github/cookbook/**/*.ts",
     ".github/cookbook/**/*.tsx",
-    "apps/web/src/lib/collaboration/**/*.ts",
     "apps/web/src/lib/export/index.node.ts",
     "apps/web/src/lib/fhe/fhe-factory.ts",
     "apps/web/src/scripts/task-manager-cli.ts",
@@ -416,8 +415,7 @@
         "apps/web/src/**/*.test.tsx",
         "apps/web/src/**/*.spec.ts",
         "apps/web/src/**/*.spec.tsx",
-        "tests/**/*",
-        "apps/web/src/lib/collaboration/**/*"
+        "tests/**/*"
       ],
       "rules": {
         "typescript/no-unsafe-member-access": "off",
