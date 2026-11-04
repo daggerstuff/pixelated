@@ -248,7 +248,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: trivy
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         env:
           NODE_OPTIONS:
             ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
@@ -273,7 +273,7 @@ jobs:
       - name: Run Checkov infrastructure scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_infra
-        uses: bridgecrewio/checkov-action@v12.3136.0
+        uses: bridgecrewio/checkov-action@c10e2438743528f9e4549758fad8b7a62052541d # v12.3136.0
         with:
           directory: .
           framework: terraform,terraform_plan,bicep
@@ -287,7 +287,7 @@ jobs:
       - name: Run Checkov Helm scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_helm
-        uses: bridgecrewio/checkov-action@v12.3136.0
+        uses: bridgecrewio/checkov-action@c10e2438743528f9e4549758fad8b7a62052541d # v12.3136.0
         with:
           directory: ai/inference/deployment/pixel-voice
           framework: kubernetes,helm
@@ -385,7 +385,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Generate SBOM with Syft
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0
         with:
           format: cyclonedx-json
           output-file: sbom.cyclonedx.json
@@ -441,7 +441,7 @@ jobs:
 
       - name: Scan base image with Trivy
         id: trivy_image
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: ${{ matrix.image }}
           scan-type: image
@@ -498,7 +498,7 @@ jobs:
 
       - name: Scan Dockerfiles with Trivy config
         id: trivy_config
-        uses: aquasecurity/trivy-action@v0.36.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: config
           scanners: misconfig,secret
