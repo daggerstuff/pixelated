@@ -29,7 +29,6 @@ import {
   registerSentryExpressErrorHandler,
 } from './lib/sentry/express.js'
 import { SocketService } from './lib/services/socketService.js'
-import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceRoutes.js'
 import { createFileRoutes } from './routes/fileRoutes.js'
 
 const app = express()
@@ -138,7 +137,6 @@ app.get('/health', async (_req, res) => {
 
 // API routes
 app.use('/api/files', createFileRoutes(db))
-app.use('/api/business-intelligence', createBusinessIntelligenceRoutes(db))
 app.use('/api/health', healthRoutes)
 
 // 404 handler
