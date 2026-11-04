@@ -135,6 +135,58 @@ jobs:
                   tar --extract --gzip --file artifact/cf-deploy-*.tar.gz
                   test -f server/wrangler.json || { echo "::error::server/wrangler.json missing from artifact"; exit 1; }
 
+            # Mirror the web app's runtime env (the same values Vercel
+            # production runs with) onto the Worker. Repository secrets are
+            # namespaced CF_WORKER_* so the un-prefixed names stay free for
+            # the CI jobs that consume them. nodejs_compat exposes the Worker
+            # secrets as process.env, which is how
+            # apps/web/src/config/env.config.ts reads them.
+            - name: Sync Worker secrets
+              env:
+                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  CF_WORKER_AUDIT_LOG_RETENTION_DAYS: ${{ secrets.CF_WORKER_AUDIT_LOG_RETENTION_DAYS }}
+                  CF_WORKER_EMAIL_FROM: ${{ secrets.CF_WORKER_EMAIL_FROM }}
+                  CF_WORKER_ENABLE_AUDIT_LOGGING: ${{ secrets.CF_WORKER_ENABLE_AUDIT_LOGGING }}
+                  CF_WORKER_ENABLE_RATE_LIMITING: ${{ secrets.CF_WORKER_ENABLE_RATE_LIMITING }}
+                  CF_WORKER_ENCRYPTION_ALGORITHM: ${{ secrets.CF_WORKER_ENCRYPTION_ALGORITHM }}
+                  CF_WORKER_ENCRYPTION_KEY: ${{ secrets.CF_WORKER_ENCRYPTION_KEY }}
+                  CF_WORKER_JWT_EXPIRES_IN: ${{ secrets.CF_WORKER_JWT_EXPIRES_IN }}
+                  CF_WORKER_JWT_SECRET: ${{ secrets.CF_WORKER_JWT_SECRET }}
+                  CF_WORKER_LOG_LEVEL: ${{ secrets.CF_WORKER_LOG_LEVEL }}
+                  CF_WORKER_MONGODB_DB_NAME: ${{ secrets.CF_WORKER_MONGODB_DB_NAME }}
+                  CF_WORKER_MONGODB_URI: ${{ secrets.CF_WORKER_MONGODB_URI }}
+                  CF_WORKER_OPENAI_API_KEY: ${{ secrets.CF_WORKER_OPENAI_API_KEY }}
+                  CF_WORKER_OPENAI_BASE_URL: ${{ secrets.CF_WORKER_OPENAI_BASE_URL }}
+                  CF_WORKER_PUBLIC_SENTRY_DSN: ${{ secrets.CF_WORKER_PUBLIC_SENTRY_DSN }}
+                  CF_WORKER_RATE_LIMIT_MAX_REQUESTS: ${{ secrets.CF_WORKER_RATE_LIMIT_MAX_REQUESTS }}
+                  CF_WORKER_RATE_LIMIT_WINDOW_MS: ${{ secrets.CF_WORKER_RATE_LIMIT_WINDOW_MS }}
+                  CF_WORKER_REDIS_URL: ${{ secrets.CF_WORKER_REDIS_URL }}
+                  CF_WORKER_RESEND_API_KEY: ${{ secrets.CF_WORKER_RESEND_API_KEY }}
+                  CF_WORKER_SENTRY_DSN: ${{ secrets.CF_WORKER_SENTRY_DSN }}
+                  CF_WORKER_SLACK_WEBHOOK_URL: ${{ secrets.CF_WORKER_SLACK_WEBHOOK_URL }}
+                  CF_WORKER_UPSTASH_REDIS_REST_TOKEN: ${{ secrets.CF_WORKER_UPSTASH_REDIS_REST_TOKEN }}
+                  CF_WORKER_UPSTASH_REDIS_REST_URL: ${{ secrets.CF_WORKER_UPSTASH_REDIS_REST_URL }}
+              run: |
+                  set -euo pipefail
+                  node -e '
+                    const fs = require("fs");
+                    const prefix = "CF_WORKER_";
+                    const secrets = {};
+                    const missing = [];
+                    for (const [key, value] of Object.entries(process.env)) {
+                      if (!key.startsWith(prefix)) continue;
+                      if (value) secrets[key.slice(prefix.length)] = value;
+                      else missing.push(key.slice(prefix.length));
+                    }
+                    if (missing.length) {
+                      console.log("::warning::unset repository secrets skipped: " + missing.join(", "));
+                    }
+                    fs.writeFileSync("worker-secrets.json", JSON.stringify(secrets));
+                    console.log("secret bulk payload keys:", Object.keys(secrets).join(", "));
+                  '
+                  pnpm exec wrangler secret bulk --config server/wrangler.json worker-secrets.json
+                  rm -f worker-secrets.json
+
             - name: Deploy Worker
               id: deploy
               env:
