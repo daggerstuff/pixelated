@@ -1,29 +1,54 @@
 # Pixelated Empathy Training Pilot — Decision Draft
 
-**Status:** Proposed; not approved or offered. **Decision requested:** accept,
-edit, or reject the scope and assign accountable people before any customer
-commitment.
+**Status:** Proposed; not approved or offered. **Decision:** accept or edit the
+scope and assign accountable owners before making a customer commitment.
 
-| Contract item | Proposed term | Decision / owner |
-| --- | --- | --- |
-| Buyer and users | One university or professional training program; one faculty champion; 5–10 trainee users. The institutional buyer and procurement path are unconfirmed. | Founder/product: select target program and buyer. Institution: name faculty champion. |
-| Teaching use case | Supervised practice of one difficult-conversation skill: trainee completes a synthetic scenario, reviews evidence-grounded feedback, retries, then discusses the saved session with faculty. | Faculty champion: choose skill and approve rubric. |
-| Pilot boundary | After internal release rehearsal, propose a 2–4 week design-partner study using 3–5 approved scenarios. Training and simulation only. | Product + release owner: approve included scenarios and release. |
-| Included | Invitation and sign-in; assigned synthetic scenarios; conversation, feedback and retry; saved-session and faculty-review journey. Include only features that pass the pinned-release rehearsal. | Engineering/QA: verify complete journey and failure recovery. |
-| Excluded | Clinical care or advice; real patient records or PHI; diagnosis or treatment decisions; EHR, prescribing, payer or external scheduling integrations; emergency monitoring; unverified analytics, exports, multimodal features or outcome claims. | Product + safety owner: verify exclusions are disabled or clearly marked as demos. |
-| Data and research | Use synthetic training content and minimum necessary account/session data. Agree access, retention, deletion, consent and incident handling before enrollment. Educational feedback is not clinical validation. Any research use needs separate institutional determination, authorization and consent. | Privacy/data owner + institution: approve data schedule and research status. |
-| Acceptance and learning | Before enrollment, agree a rubric and thresholds. Measure journey completion, evidence-grounded feedback, retries, faculty review/usefulness, defects, support load, latency and cost per completed session where available. Report counts and limitations; do not promise improvement or compare against clinical outcomes. | Faculty + product: set baseline, thresholds, sample and review cadence. Analytics owner: confirm measurement source. |
-| Support | Name a responder and coverage window before enrollment. Publish a contact route, severity definitions, response expectations and escalation/stop path in the signed scope. No 24/7 or dedicated-staff commitment is assumed. | Founder/customer success: confirm staffing and written hours. |
-| Commercial terms | Price, payment, duration beyond the experiment, renewal, refunds, IP, publicity and research publication rights are undecided. No price or ROI guarantee is authorized by this draft. | Founder + institution procurement/legal: agree terms before signature. |
-| Go/no-go and stop | Do not enroll until G1 product boundary and the applicable G2–G5 release, evaluation, privacy/security, operations and offer gates pass. Pause for cross-tenant access, data exposure, unsafe or misleading behavior, inability to honor deletion, unavailable support owner, material service failure, or measurement integrity failure. Resume only after documented review and approval. | Named release owner + safety/privacy owner: approve entry and any restart. |
+**Partner and learning goal.** One university or professional training program,
+one faculty champion, and a proposed 5–10 trainees. Practice one difficult-
+conversation skill: complete an approved synthetic scenario, review feedback
+grounded in the transcript, retry, and review the saved session with faculty.
+Buyer, procurement path and faculty champion are unconfirmed.
 
-**Owners required before external use:** founder/executive sponsor; product owner;
-release/engineering owner; qualified safety/evaluation reviewer; privacy/data
-owner; support responder; institution buyer; faculty champion. Names are not yet
-assigned. This draft does not establish production readiness, customer
-commitment, educational efficacy, clinical safety, or a launch date.
+**Format and included journey.** After internal release rehearsal, propose 2–4
+weeks with 3–5 approved scenarios. Include invitation/sign-in, scenario,
+conversation, feedback, retry, saved session and faculty review, only where
+each step passes on the pinned release. The small cohort and duration are
+learning hypotheses from `PROJECT_OUTLINE.md` M2, not customer commitments.
 
-**Basis:** proposed experiment size follows `PROJECT_OUTLINE.md` M2; the journey
-and prerequisite gates follow L01, L04–L15 and G1–G6. Older commercial drafts
-contain larger cohorts, long durations, prices, support promises and outcomes;
-those remain unvalidated historical proposals, not terms of this draft.
+**Out of scope.** Clinical care or advice, diagnosis or treatment decisions,
+real patient records or PHI, emergency monitoring, EHR/prescribing/payer or
+scheduling integrations, and any unverified analytics, exports, multimodal
+features or outcome claims. Disable excluded functions or label them as demos.
+Educational feedback is not clinical validation. Research use requires separate
+institutional determination, authorization and consent.
+
+**Data and measurement.** Use synthetic training content and minimum necessary
+account/session data. Before enrollment, agree access, retention, deletion,
+consent and incident handling. Agree a supervisor rubric, baseline and
+thresholds in advance. Report journey completion, grounded-feedback and retry
+rates, faculty usefulness, defects, support load, latency and cost where
+measurable, with sample limits. Promise no improvement or clinical outcome.
+
+**Support and commercial terms.** Name a responder, coverage window, contact
+route, severity levels, response expectations and escalation path in the signed
+scope. Price, payment, refunds, renewal, IP, publicity and publication rights
+remain undecided. No 24/7 support, ROI guarantee, refund, dedicated staffing or
+research co-authorship is included.
+
+**Go/no-go.** Do not enroll until G1 and applicable G2–G5 gates pass: defined
+scope; pinned release and working journey; evaluation decision; privacy,
+security and operations approval; and a supportable offer. Pause for cross-
+tenant access, data exposure, unsafe or misleading behavior, failed deletion,
+unavailable support, material service failure or unreliable measurement.
+Document review and approval before resuming.
+
+**Continuation (G6).** After the pilot, review observed results and decide paid
+continuation or no-go; no renewal or expansion is assumed.
+
+**Owners needed:** founder/sponsor, product, release/engineering,
+qualified safety/evaluation reviewer, privacy/data, support responder,
+institution buyer and faculty champion. No names are assigned. This draft
+establishes no production readiness, customer commitment, efficacy, safety
+approval or launch date. Older pilot/pricing documents contain larger cohorts,
+prices, guarantees and service promises; retain them as historical proposals,
+not current terms.
