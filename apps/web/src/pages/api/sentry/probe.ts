@@ -22,28 +22,50 @@ const resolveSentryRelease = () =>
   process.env['CI_COMMIT_SHA'] ??
   process.env['npm_package_version']
 
+// On Cloudflare Workers process.env['NODE_ENV'] may be unset, so also rely
+// on Astro's build-time PROD flag to detect production.
+const isProductionRuntime = () =>
+  import.meta.env.PROD === true || process.env['NODE_ENV'] === 'production'
+
 const hasValidProbeToken = (request: Request) => {
   const requiredToken =
     process.env['SENTRY_DIAGNOSTIC_TOKEN'] ?? process.env['SENTRY_TEST_TOKEN']
-  if (!requiredToken || process.env['NODE_ENV'] !== 'production') {
-    return true
+
+  if (!isProductionRuntime()) {
+    // Outside production the probe is open unless a token is configured.
+    if (!requiredToken) {
+      return true
+    }
+  } else if (!requiredToken) {
+    // Fail closed: never expose the probe in production without a token.
+    return false
   }
 
   const providedToken =
     request.headers.get('x-sentry-probe-token') ??
     request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
 
-  return providedToken === requiredToken
+  return Boolean(providedToken) && providedToken === requiredToken
 }
 
 const redactDsn = (dsn?: string): string | null =>
   dsn ? `${dsn.slice(0, 10)}...${dsn.slice(-8)}` : null
 
 const emitProbeEvent = (mode: ProbeMode, message: string) => {
-  const eventId =
-    mode === 'error'
-      ? Sentry.captureException(new Error(message))
-      : Sentry.captureMessage(message, 'error')
+  let eventId: unknown
+  Sentry.withScope((scope: any) => {
+    // Mark probe events so they group separately and can be excluded from
+    // alerting on real application errors.
+    scope?.setTag?.('probe', 'true')
+    scope?.setTag?.('probe.mode', mode)
+    scope?.setFingerprint?.(['sentry-probe', mode])
+    scope?.setExtra?.('probe.release', resolveSentryRelease() ?? null)
+    eventId =
+      mode === 'error'
+        ? Sentry.captureException(new Error(message))
+        : // Diagnostic health check, not an application failure.
+          Sentry.captureMessage(message, 'info')
+  })
 
   return typeof eventId === 'string' ? eventId : undefined
 }
