@@ -1,0 +1,235 @@
+[
+  {
+    "id": "P-PIX-53",
+    "name": "alexa-submit",
+    "url": "https://linear.app/pixelated/project/alexa-submit-f3e655ed7d06",
+    "status": "To Do",
+    "category": "alexa-optional",
+    "issue_count": 12,
+    "issue_status_counts": {
+      "Backlog": 12
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Separate workstream; defer from core training launch unless a concrete dependency is proved."
+  },
+  {
+    "id": "P-PIX-52",
+    "name": "Steering & Adaptive Development Loop",
+    "url": "https://linear.app/pixelated/project/steering-and-adaptive-development-loop-764dbea100df",
+    "status": "Completed",
+    "category": "governance",
+    "issue_count": 1,
+    "issue_status_counts": {
+      "Done": 1
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-51",
+    "name": "EHR Module Add-On",
+    "url": "https://linear.app/pixelated/project/ehr-module-add-on-78f290569157",
+    "status": "Completed",
+    "category": "ehr-adjacent",
+    "issue_count": 64,
+    "issue_status_counts": {
+      "Done": 64
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Separate workstream; defer from core training launch unless a concrete dependency is proved."
+  },
+  {
+    "id": "P-PIX-50",
+    "name": "Stub & Technical Debt Remediation",
+    "url": "https://linear.app/pixelated/project/stub-and-technical-debt-remediation-3b971b825d71",
+    "status": "Completed",
+    "category": "developer-tooling",
+    "issue_count": 32,
+    "issue_status_counts": {
+      "Done": 31,
+      "Backlog": 1
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Retain for core-product gate review; status does not prove delivery."
+  },
+  {
+    "id": "P-PIX-43",
+    "name": "AI Training Pipeline",
+    "url": "https://linear.app/pixelated/project/ai-training-pipeline-44f334455738",
+    "status": "To Do",
+    "category": "core-training-product",
+    "issue_count": 150,
+    "issue_status_counts": {
+      "Done": 48,
+      "In Progress": 3,
+      "Canceled": 99
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Retain for core-product gate review; status does not prove delivery."
+  },
+  {
+    "id": "P-PIX-39",
+    "name": "Foresight",
+    "url": "https://linear.app/pixelated/project/foresight-bf8c21fea3e8",
+    "status": "To Do",
+    "category": "foresight",
+    "issue_count": 18,
+    "issue_status_counts": {
+      "Done": 18
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Separate workstream; defer from core training launch unless a concrete dependency is proved."
+  },
+  {
+    "id": "P-PIX-33",
+    "name": "px CLI + Git Hook Integration",
+    "url": "https://linear.app/pixelated/project/px-cli-git-hook-integration-0681fb026edf",
+    "status": "Completed",
+    "category": "developer-tooling",
+    "issue_count": 9,
+    "issue_status_counts": {
+      "Done": 9
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-32",
+    "name": "Project Nightmare Fuel (V7 Scale)",
+    "url": "https://linear.app/pixelated/project/project-nightmare-fuel-v7-scale-039c7a1d779c",
+    "status": "Completed",
+    "category": "deferred-offscope",
+    "issue_count": 15,
+    "issue_status_counts": {
+      "Done": 15
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-31",
+    "name": "PAL Framework → 100% Roadmap",
+    "url": "https://linear.app/pixelated/project/pal-framework-100percent-roadmap-41c9e00676bd",
+    "status": "Completed",
+    "category": "core-training-product",
+    "issue_count": 8,
+    "issue_status_counts": {
+      "Done": 8
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-29",
+    "name": "ML & Platform Remediation Sprint",
+    "url": "https://linear.app/pixelated/project/ml-and-platform-remediation-sprint-feac411ebbe1",
+    "status": "Completed",
+    "category": "deferred-offscope",
+    "issue_count": 9,
+    "issue_status_counts": {
+      "Done": 8,
+      "Canceled": 1
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-28",
+    "name": "Vertical Fidelity Stack Implementation",
+    "url": "https://linear.app/pixelated/project/vertical-fidelity-stack-implementation-940abc410664",
+    "status": "Completed",
+    "category": "core-training-product",
+    "issue_count": 18,
+    "issue_status_counts": {
+      "Done": 18
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-27",
+    "name": "Enterprise Readiness Program",
+    "url": "https://linear.app/pixelated/project/enterprise-readiness-program-a3d18e977dfe",
+    "status": "Completed",
+    "category": "deferred-offscope",
+    "issue_count": 40,
+    "issue_status_counts": {
+      "Done": 40
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-26",
+    "name": "Training Pipeline v2 — Audit Remediation",
+    "url": "https://linear.app/pixelated/project/training-pipeline-v2-audit-remediation-5d8c8b65d816",
+    "status": "Completed",
+    "category": "governance",
+    "issue_count": 3,
+    "issue_status_counts": {
+      "Done": 3
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-17",
+    "name": "AI Research-Clinical Integration",
+    "url": "https://linear.app/pixelated/project/ai-research-clinical-integration-b7778f7f5d30",
+    "status": "Completed",
+    "category": "core-training-product",
+    "issue_count": 8,
+    "issue_status_counts": {
+      "Done": 8
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-14",
+    "name": "Churnmeon Reliability",
+    "url": "https://linear.app/pixelated/project/churnmeon-reliability-8d3df056b892",
+    "status": "Completed",
+    "category": "developer-tooling",
+    "issue_count": 17,
+    "issue_status_counts": {
+      "Done": 16,
+      "Backlog": 1
+    },
+    "missing_exported_ids": [],
+    "recommendation": "Retain for core-product gate review; status does not prove delivery."
+  },
+  {
+    "id": "P-PIX-3",
+    "name": "CPTSD Dataset Quality & Coverage Improvement",
+    "url": "https://linear.app/pixelated/project/cptsd-dataset-quality-and-coverage-improvement-369106ad5d0b",
+    "status": "Completed",
+    "category": "corpus-data",
+    "issue_count": 0,
+    "issue_status_counts": {},
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-2",
+    "name": "Phase 1 Completion: Final Dataset Assembly & Validation (85% → 100%)",
+    "url": "https://linear.app/pixelated/project/phase-1-completion-final-dataset-assembly-and-validation-85percent-6b471d549bef",
+    "status": "Canceled",
+    "category": "corpus-data",
+    "issue_count": 0,
+    "issue_status_counts": {},
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  },
+  {
+    "id": "P-PIX-1",
+    "name": "Pixelated Empathy Model Training",
+    "url": "https://linear.app/pixelated/project/pixelated-empathy-model-training-5b3895d8ad91",
+    "status": "Canceled",
+    "category": "core-training-product",
+    "issue_count": 0,
+    "issue_status_counts": {},
+    "missing_exported_ids": [],
+    "recommendation": "Archive planning view after evidence review; preserve issue history and reopen only explicit gaps."
+  }
+]

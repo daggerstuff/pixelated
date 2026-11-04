@@ -1,0 +1,4262 @@
+[
+  {
+    "source_id": "linear:PIX-4814",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4814/quality-failed-on-staging",
+    "title": "Quality failed on staging",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4814",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4814",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-4794",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4793",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4789",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4788",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4756",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4743",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4739",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4719",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4709",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4698",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4681",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4668",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4814/quality-failed-on-staging",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "infrastructure-ci",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4807",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4807/submission-prep-for-aws-builder-mini-challenge-demo-readme-checklist",
+    "title": "Submission prep for AWS Builder mini-challenge (demo, README, checklist)",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4807",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4807",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4807/submission-prep-for-aws-builder-mini-challenge-demo-readme-checklist",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4806",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4806/frontend-event-listener-for-real-time-vital-spikes",
+    "title": "Frontend event listener for real-time vital spikes",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4806",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4806",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4806/frontend-event-listener-for-real-time-vital-spikes",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4805",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4805/set-up-agentcore-integrationdeployment-for-the-debrief-pipeline",
+    "title": "Set up AgentCore integration/deployment for the debrief pipeline",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4805",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4805",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4805/set-up-agentcore-integrationdeployment-for-the-debrief-pipeline",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4804",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4804/iam-grant-bedrockinvokemodel-for-claude-35-sonnet-in-us-east-1-and",
+    "title": "IAM: grant bedrock:InvokeModel for Claude 3.5 Sonnet in us-east-1 and enable model access",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4804",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4804",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4804/iam-grant-bedrockinvokemodel-for-claude-35-sonnet-in-us-east-1-and",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4803",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4803/define-competency-rubric-format-and-transcript-ingestion-from-sessions",
+    "title": "Define competency rubric format and transcript ingestion from sessions",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4803",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4803",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4803/define-competency-rubric-format-and-transcript-ingestion-from-sessions",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4802",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4802/add-error-handling-wrapper-for-bedrock-debrief-call",
+    "title": "Add error-handling wrapper for Bedrock debrief call",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4802",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4802",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4802/add-error-handling-wrapper-for-bedrock-debrief-call",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4801",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4801/implement-generate-clinical-debrief-with-boto3-bedrock-runtime",
+    "title": "Implement generate_clinical_debrief with boto3 bedrock-runtime",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4801",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4801",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4801/implement-generate-clinical-debrief-with-boto3-bedrock-runtime",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4800",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4800/integrate-adjust-clinical-scenario-with-alexa-conversational-runtime",
+    "title": "Integrate adjust_clinical_scenario with Alexa+ conversational runtime and test end to end",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4800",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4800",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4800/integrate-adjust-clinical-scenario-with-alexa-conversational-runtime",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4799",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4799/compute-friction-metric-from-real-time-trainee-telemetry",
+    "title": "Compute friction_metric from real-time trainee telemetry",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4799",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4799",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4799/compute-friction-metric-from-real-time-trainee-telemetry",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4798",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4798/implement-scenario-branching-logic-friction-metric-trigger-event",
+    "title": "Implement scenario branching logic (friction_metric + trigger_event → vitals & branch)",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4798",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4798",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4798/implement-scenario-branching-logic-friction-metric-trigger-event",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4797",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4797/implement-python-mcp-server-routing-handler-for-adjust-clinical",
+    "title": "Implement Python MCP server routing handler for adjust_clinical_scenario",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4797",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4797",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4797/implement-python-mcp-server-routing-handler-for-adjust-clinical",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4796",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4796/define-adjust-clinical-scenario-tool-json-schema-in-mcp-server",
+    "title": "Define adjust_clinical_scenario tool JSON schema in MCP server manifest",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4796",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4796",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4796/define-adjust-clinical-scenario-tool-json-schema-in-mcp-server",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "alexa-optional",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4795",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4795/deploy-to-aws-eks-failed-on-staging",
+    "title": "Deploy to AWS EKS failed on staging",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4795",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4795",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-4790",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4755",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4716",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4692",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4795/deploy-to-aws-eks-failed-on-staging",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "infrastructure-ci",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4751",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4751/ci-failed-on-staging",
+    "title": "CI failed on staging",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4751",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4751",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-4742",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4728",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4726",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4717",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4708",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4707",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4696",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4679",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4669",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4751/ci-failed-on-staging",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "infrastructure-ci",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4609",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4609/multi-agent-coordination-and-architecture-discussion",
+    "title": "Multi-Agent Coordination & Architecture Discussion",
+    "source_status": "In Review",
+    "planning_packages": [
+      "X-COORDINATION"
+    ],
+    "primary_group": "X-COORDINATION",
+    "proposed_outcome": "Retain coordination notes; assign concrete acceptance gaps to launch packages.",
+    "disposition": "coordination-only",
+    "candidate_linear_id": "PIX-4609",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4609",
+        "status": "In Review"
+      }
+    ],
+    "candidate_linear_status": "In Review",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4609/multi-agent-coordination-and-architecture-discussion",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "governance",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4584",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4584/split-construction-releases-by-source-product-and-safety-axes",
+    "title": "Split construction releases by source, product, and safety axes",
+    "source_status": "In Progress",
+    "planning_packages": [
+      "L10"
+    ],
+    "primary_group": "L10",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4584",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4584",
+        "status": "In Progress"
+      }
+    ],
+    "candidate_linear_status": "In Progress",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4584/split-construction-releases-by-source-product-and-safety-axes",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "corpus-data",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4583",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4583/version-construction-registry-and-preview-artifacts",
+    "title": "Version construction registry and preview artifacts",
+    "source_status": "In Progress",
+    "planning_packages": [
+      "L10"
+    ],
+    "primary_group": "L10",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4583",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4583",
+        "status": "In Progress"
+      }
+    ],
+    "candidate_linear_status": "In Progress",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4583/version-construction-registry-and-preview-artifacts",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "corpus-data",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4343",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4343/2b-llm-judge-dual-model-deepseek-primary-kimi-k3-secondary-golden",
+    "title": "2B: LLM judge dual-model (DeepSeek primary + Kimi-K3 secondary) + golden calibration",
+    "source_status": "In Progress",
+    "planning_packages": [
+      "L06",
+      "L08"
+    ],
+    "primary_group": "L06",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4343",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4343",
+        "status": "In Progress"
+      }
+    ],
+    "candidate_linear_status": "In Progress",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4343/2b-llm-judge-dual-model-deepseek-primary-kimi-k3-secondary-golden",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "core-training-product",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4665",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4665/epic-ci-federation-execution-and-go-live",
+    "title": "EPIC: CI Federation — Execution & Go-Live",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4665",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4665",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4665/epic-ci-federation-execution-and-go-live",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "infrastructure-ci",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4672",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4672/blocking-gaps-remediation-training-pipeline-blockers",
+    "title": "Blocking gaps remediation: training pipeline blockers",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "L07",
+      "L10"
+    ],
+    "primary_group": "L07",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4672",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4672",
+        "status": "Backlog"
+      },
+      {
+        "id": "PIX-170",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4672/blocking-gaps-remediation-training-pipeline-blockers",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "core-training-product",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4675",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4675/explore-vr-travel-features",
+    "title": "Explore VR travel features",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-DEFER"
+    ],
+    "primary_group": "X-DEFER",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4675",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4675",
+        "status": "Backlog"
+      },
+      {
+        "id": "PIX-235",
+        "status": "Canceled"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4675/explore-vr-travel-features",
+    "candidate_linear_projects": [
+      "Stub & Technical Debt Remediation"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "developer-tooling",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4688",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4688/c3-human-in-the-loop-escalation",
+    "title": "C3: Human-in-the-loop escalation",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "L12"
+    ],
+    "primary_group": "L12",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4688",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4688",
+        "status": "Backlog"
+      },
+      {
+        "id": "PIX-349",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4688/c3-human-in-the-loop-escalation",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4808",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4808/phase-5-cleanup-and-optimization-sprint-6",
+    "title": "Phase 5: Cleanup & Optimization (Sprint 6)",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L12"
+    ],
+    "primary_group": "L12",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4808",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4808",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1887",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4808/phase-5-cleanup-and-optimization-sprint-6",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4809",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4809/phase-3-auth-consolidation-sprint-4",
+    "title": "Phase 3: Auth Consolidation (Sprint 4)",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L03"
+    ],
+    "primary_group": "L03",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4809",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4809",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1922",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4809/phase-3-auth-consolidation-sprint-4",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4810",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4810/map-capability-ownership-matrix",
+    "title": "Map capability ownership matrix",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L01"
+    ],
+    "primary_group": "L01",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4810",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4810",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1889",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4810/map-capability-ownership-matrix",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4811",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4811/home-directory-backup-system-redesign-implementation",
+    "title": "Home Directory Backup System Redesign - implementation",
+    "source_status": "Triage",
+    "planning_packages": [
+      "X-HOME"
+    ],
+    "primary_group": "X-HOME",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4811",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4811",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1890",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4811/home-directory-backup-system-redesign-implementation",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4812",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4812/data-governance-task-41-retention-policies",
+    "title": "Data Governance - Task 4.1: Retention policies",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L11"
+    ],
+    "primary_group": "L11",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4812",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4812",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1909",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4812/data-governance-task-41-retention-policies",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "governance",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4813",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4813/data-governance-task-13-mongodb-policy-storage-with-versioning",
+    "title": "Data Governance - Task 1.3: MongoDB policy storage with versioning",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L11"
+    ],
+    "primary_group": "L11",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4813",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4813",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-190",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4813/data-governance-task-13-mongodb-policy-storage-with-versioning",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "governance",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4817",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4817/consolidate-github-security-lane",
+    "title": "Consolidate GitHub security lane",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4817",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4817",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1881",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4817/consolidate-github-security-lane",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "security-privacy",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-4818",
+    "source_url": "https://linear.app/pixelated/issue/PIX-4818/create-pipeline-inventory-across-providers",
+    "title": "Create pipeline inventory across providers",
+    "source_status": "Triage",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4818",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4818",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1902",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Triage",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4818/create-pipeline-inventory-across-providers",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#1892",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1892",
+    "title": "Phase 3: Auth Consolidation (Sprint 4)",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L03"
+    ],
+    "primary_group": "L03",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4809",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1922",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-1922"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1883",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1883",
+    "title": "Map capability ownership matrix",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L01"
+    ],
+    "primary_group": "L01",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4810",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1889",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-1889"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1285",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1285",
+    "title": "Discovery: define waiting list experience improvements",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L14"
+    ],
+    "primary_group": "L14",
+    "proposed_outcome": "Validate demand and buyer path under L14; waiting-list enhancements are optional.",
+    "disposition": "optional-discovery",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1876",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-211",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-1876"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1672",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1672",
+    "title": "Implement readiness aggregator endpoint/script",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-TRIAGE"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-1873",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1873",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-1873/implement-readiness-aggregator-endpointscript",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-1873"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1876",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1876",
+    "title": "Home Directory Backup System Redesign - implementation",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-HOME"
+    ],
+    "primary_group": "X-HOME",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4811",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1890",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-1890"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1895",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1895",
+    "title": "Phase 5: Cleanup & Optimization (Sprint 6)",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L12"
+    ],
+    "primary_group": "L12",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4808",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1887",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-1887"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1858",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1858",
+    "title": "Data Governance - Task 4.1: Retention policies",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L11"
+    ],
+    "primary_group": "L11",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4812",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1909",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "governance",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-1909"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1481",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1481",
+    "title": "Data Governance - Task 2.2: FHE integration tests",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L11"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-1912",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1912",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-1912/data-governance-task-22-fhe-integration-tests",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-1912"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1610",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1610",
+    "title": "Data Governance - Task 2.3: Audit integration",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L11"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-1910",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1910",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-1910/data-governance-task-23-audit-integration",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "governance",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-1910"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1797",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1797",
+    "title": "Sprint 3: Dreaming & Consolidation (June 9 – June 22)",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-TRIAGE"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-1915",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1915",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-1915/sprint-3-dreaming-and-consolidation-june-9-june-22",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-1915"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1826",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1826",
+    "title": "Create pipeline inventory across providers",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4818",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1902",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-1902"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1822",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1822",
+    "title": "Consolidate Bitbucket AI validation lane",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-TRIAGE"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-1893",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1893",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-1893/consolidate-bitbucket-ai-validation-lane",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-1893"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1832",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1832",
+    "title": "Consolidate GitHub security lane",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L03",
+      "L12"
+    ],
+    "primary_group": "L03",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4817",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-1881",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "security-privacy",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-1881"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1764",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1764",
+    "title": "Add branch and path trigger policy",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-GOVERNANCE"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-1925",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1925",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-1925/add-branch-and-path-trigger-policy",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "governance",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-1925"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1776",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1776",
+    "title": "Build CI operations dashboard",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-1924",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1924",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-1924/build-ci-operations-dashboard",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-1924"
+    ]
+  },
+  {
+    "source_id": "linear:PIX-376",
+    "source_url": "https://linear.app/pixelated/issue/PIX-376/churnmeon-align-readme-and-packaging-narrative-with-the-current",
+    "title": "Churnmeon: align README and packaging narrative with the current workflow and plugin architecture",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-CHURNMEON"
+    ],
+    "primary_group": "X-CHURNMEON",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-376",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-376",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-376/churnmeon-align-readme-and-packaging-narrative-with-the-current",
+    "candidate_linear_projects": [
+      "Churnmeon Reliability"
+    ],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "infrastructure-ci",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#2366",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/2366",
+    "title": "C3: Human-in-the-loop escalation",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L12"
+    ],
+    "primary_group": "L12",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4688",
+        "status": "Backlog"
+      },
+      {
+        "id": "PIX-349",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-349"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1197",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1197",
+    "title": "B2: LLM timeout handling and fallback for large files",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-343",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-343",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-343/b2-llm-timeout-handling-and-fallback-for-large-files",
+    "candidate_linear_projects": [
+      "Churnmeon Reliability"
+    ],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-343"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#4048",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/4048",
+    "title": "Explore VR travel features",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-DEFER"
+    ],
+    "primary_group": "X-DEFER",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4675",
+        "status": "Backlog"
+      },
+      {
+        "id": "PIX-235",
+        "status": "Canceled"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-235"
+    ]
+  },
+  {
+    "source_id": "linear:PIX-219",
+    "source_url": "https://linear.app/pixelated/issue/PIX-219/document-idea-archival-policy-and-backlog-cleanup-workflow",
+    "title": "Document idea archival policy and backlog cleanup workflow",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-GOVERNANCE"
+    ],
+    "primary_group": "X-GOVERNANCE",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-219",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1877",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-219",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-219/document-idea-archival-policy-and-backlog-cleanup-workflow",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "governance",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-211",
+    "source_url": "https://linear.app/pixelated/issue/PIX-211/discovery-define-waiting-list-experience-improvements",
+    "title": "Discovery: define waiting list experience improvements",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "L14"
+    ],
+    "primary_group": "L14",
+    "proposed_outcome": "Validate demand and buyer path under L14; waiting-list enhancements are optional.",
+    "disposition": "optional-discovery",
+    "candidate_linear_id": "PIX-211",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-1876",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-211",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-211/discovery-define-waiting-list-experience-improvements",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-210",
+    "source_url": "https://linear.app/pixelated/issue/PIX-210/discovery-define-rewards-program-concept-and-rollout-criteria",
+    "title": "Discovery: define rewards program concept and rollout criteria",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-DEFER"
+    ],
+    "primary_group": "X-DEFER",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-210",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-210",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-210/discovery-define-rewards-program-concept-and-rollout-criteria",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-205",
+    "source_url": "https://linear.app/pixelated/issue/PIX-205/discovery-define-express-checkout-scope-and-rollout-path",
+    "title": "Discovery: define express checkout scope and rollout path",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-DEFER"
+    ],
+    "primary_group": "X-DEFER",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-205",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-205",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-205/discovery-define-express-checkout-scope-and-rollout-path",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "linear:PIX-202",
+    "source_url": "https://linear.app/pixelated/issue/PIX-202/discovery-assess-vr-travel-feature-opportunity",
+    "title": "Discovery: assess VR travel feature opportunity",
+    "source_status": "Backlog",
+    "planning_packages": [
+      "X-DEFER"
+    ],
+    "primary_group": "X-DEFER",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-202",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-202",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-202/discovery-assess-vr-travel-feature-opportunity",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "source-linear",
+    "identity_crosswalk_method": "source-linear",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#1845",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1845",
+    "title": "Data Governance - Task 1.3: MongoDB policy storage with versioning",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L11"
+    ],
+    "primary_group": "L11",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4813",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-190",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "governance",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-190"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#4053",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/4053",
+    "title": "Blocking gaps remediation: training pipeline blockers",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L07",
+      "L10"
+    ],
+    "primary_group": "L07",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4672",
+        "status": "Backlog"
+      },
+      {
+        "id": "PIX-170",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "core-training-product",
+    "category_provenance": "source title and project",
+    "identity_disputes": [
+      "PIX-170"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1821",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1821",
+    "title": "Test Coverage Baseline - Coverage Audit",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-160",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-160",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-160/test-coverage-baseline-coverage-audit",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "confirmed-identity",
+    "identity_crosswalk_method": "source-uuid",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-160"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1210",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1210",
+    "title": "17.0 Checkpoint — Phase 2 complete",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-TRIAGE"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-454",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-454",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-454/170-checkpoint-phase-2-complete",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "manual-review",
+    "category": "deferred-offscope",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": [
+      "PIX-454"
+    ]
+  },
+  {
+    "source_id": "github:pixelated#1680",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1680",
+    "title": "Kickoff: CI Federation Initiative",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-COORDINATION"
+    ],
+    "primary_group": "X-COORDINATION",
+    "proposed_outcome": "Retain coordination notes; assign concrete acceptance gaps to launch packages.",
+    "disposition": "coordination-only",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unmatched-triage",
+    "identity_crosswalk_method": "manual-review",
+    "category": "infrastructure-ci",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#1767",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/1767",
+    "title": "Approval checkpoint: ownership and RFC",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L01"
+    ],
+    "primary_group": "L01",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unmatched-triage",
+    "identity_crosswalk_method": "manual-review",
+    "category": "deferred-offscope",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#4125",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/4125",
+    "title": "EPIC: CI Federation — Execution & Go-Live",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4665",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4665",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4665/epic-ci-federation-execution-and-go-live",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#4264",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/4264",
+    "title": "Milestone: Sprint 6 — Memory Intelligence & Block Architecture",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-DEVELOPER"
+    ],
+    "primary_group": "X-DEVELOPER",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unmatched-triage",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-api-memory",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#4299",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/4299",
+    "title": "29.0 Checkpoint — Phase 5 complete",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-TRIAGE"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-3865",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-3865",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-3865/290-checkpoint-phase-5-complete",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "deferred-offscope",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5033",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5033",
+    "title": "ZK Proof Verification — Enterprise Hardening (Nonce, Audit, Replay Protection)",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L03"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4120",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4120",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4120/zk-proof-verification-enterprise-hardening-nonce-audit-replay",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "governance",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5392",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5392",
+    "title": "Fix CORS/build issues and rework Neutral Precision landing UI",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L04",
+      "L15"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4337",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4337",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4337/fix-corsbuild-issues-and-rework-neutral-precision-landing-ui",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "core-training-product",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5411",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5411",
+    "title": "Bump development tooling versions and regen lockfile",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4338",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4338",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4338/bump-development-tooling-versions-and-regen-lockfile",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5413",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5413",
+    "title": "Add accessible region to State transition velocity chart",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L04",
+      "L15"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4339",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4339",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4339/add-accessible-region-to-state-transition-velocity-chart",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "core-training-product",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5418",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5418",
+    "title": "2B: LLM judge dual-model (DeepSeek primary + Kimi-K3 secondary) + golden calibration",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L06",
+      "L08"
+    ],
+    "primary_group": "L06",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4343",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4343",
+        "status": "In Progress"
+      }
+    ],
+    "candidate_linear_status": "In Progress",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4343/2b-llm-judge-dual-model-deepseek-primary-kimi-k3-secondary-golden",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "core-training-product",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5438",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5438",
+    "title": "Bump pydantic-settings to 2.15.0 in bias detection service",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4353",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4353",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4353/bump-pydantic-settings-to-2150-in-bias-detection-service",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5441",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5441",
+    "title": "Bump @astrojs/vercel to 11.0.5 and trim local patches",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4354",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4354",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4354/bump-astrojsvercel-to-1105-and-trim-local-patches",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5446",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5446",
+    "title": "Remove hardcoded pnpm version and fix px-cli filter",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4356",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4356",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4356/remove-hardcoded-pnpm-version-and-fix-px-cli-filter",
+    "candidate_linear_projects": [
+      "px CLI + Git Hook Integration"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5447",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5447",
+    "title": "Fix CI pnpm setup and px-cli build filter",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4357",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4357",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4357/fix-ci-pnpm-setup-and-px-cli-build-filter",
+    "candidate_linear_projects": [
+      "px CLI + Git Hook Integration"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5453",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5453",
+    "title": "Verify Palette file has no UX or accessibility gaps",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L04",
+      "L15"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4358",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4358",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4358/verify-palette-file-has-no-ux-or-accessibility-gaps",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "core-training-product",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5497",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5497",
+    "title": "Consolidate pnpm version pins and restore docs submodule",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4388",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4388",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4388/consolidate-pnpm-version-pins-and-restore-docs-submodule",
+    "candidate_linear_projects": [
+      "Stub & Technical Debt Remediation"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5498",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5498",
+    "title": "Document security-conscious escrow escrow proposals",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-DEFER"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4389",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4389",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4389/document-security-conscious-escrow-escrow-proposals",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "security-privacy",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5499",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5499",
+    "title": "Gate optional IAA import in curate pipeline",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L10"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4390",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4390",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4390/gate-optional-iaa-import-in-curate-pipeline",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "core-training-product",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5515",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5515",
+    "title": "Mark declarations-only target files as Covered",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4391",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4391",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4391/mark-declarations-only-target-files-as-covered",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5520",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5520",
+    "title": "Sync vetted local pipeline work to staging with fixes",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L10"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4392",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4392",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4392/sync-vetted-local-pipeline-work-to-staging-with-fixes",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "core-training-product",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5725",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5725",
+    "title": "Version construction registry and preview artifacts",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L10"
+    ],
+    "primary_group": "L10",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4583",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4583",
+        "status": "In Progress"
+      }
+    ],
+    "candidate_linear_status": "In Progress",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4583/version-construction-registry-and-preview-artifacts",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "corpus-data",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5726",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5726",
+    "title": "Split construction releases by source, product, and safety axes",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L10"
+    ],
+    "primary_group": "L10",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": "PIX-4584",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4584",
+        "status": "In Progress"
+      }
+    ],
+    "candidate_linear_status": "In Progress",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4584/split-construction-releases-by-source-product-and-safety-axes",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "corpus-data",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5752",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5752",
+    "title": "Implement tenant- and state-aware EHR consent engine with RBAC integration",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4596",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4596",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4596/implement-tenant-and-state-aware-ehr-consent-engine-with-rbac",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5753",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5753",
+    "title": "Add RLS-aware EHR repositories for core FHIR resources",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4597",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4597",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4597/add-rls-aware-ehr-repositories-for-core-fhir-resources",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5755",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5755",
+    "title": "Thread tenantId and stateCode through EHR RBAC checks",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4598",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4598",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4598/thread-tenantid-and-statecode-through-ehr-rbac-checks",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5757",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5757",
+    "title": "Add request-scoped PatientService for chart management",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L04",
+      "L15"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4599",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4599",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4599/add-request-scoped-patientservice-for-chart-management",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5759",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5759",
+    "title": "Add behavioral health NoteTemplateService for FHIR notes",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4600",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4600",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4600/add-behavioral-health-notetemplateservice-for-fhir-notes",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5761",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5761",
+    "title": "Add SchedulingService for appointment management",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4601",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4601",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4601/add-schedulingservice-for-appointment-management",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5763",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5763",
+    "title": "Add ClaimsService for clearinghouse claim lifecycle (F1.10)",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4602",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4602",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4602/add-claimsservice-for-clearinghouse-claim-lifecycle-f110",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5765",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5765",
+    "title": "Expose tenant-aware, RBAC-protected REST API for EHR resources",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4603",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4603",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4603/expose-tenant-aware-rbac-protected-rest-api-for-ehr-resources",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5779",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5779",
+    "title": "Add service-level tests for EHR claims, notes, patients, scheduling",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4604",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4604",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4604/add-service-level-tests-for-ehr-claims-notes-patients-scheduling",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5780",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5780",
+    "title": "Add clearinghouse adapter integration for eligibility and claims",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4605",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4605",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4605/add-clearinghouse-adapter-integration-for-eligibility-and-claims",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5781",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5781",
+    "title": "Add structured, type-safe EHR audit logging builders (F2.4)",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4606",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4606",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4606/add-structured-type-safe-ehr-audit-logging-builders-f24",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5782",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5782",
+    "title": "Add safety-gated e-prescribing adapter with stub workflow",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4607",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4607",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4607/add-safety-gated-e-prescribing-adapter-with-stub-workflow",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5783",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5783",
+    "title": "Add HIE integration adapter for patient discovery and document exchange",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4608",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4608",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4608/add-hie-integration-adapter-for-patient-discovery-and-document",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5809",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5809",
+    "title": "Multi-Agent Coordination & Architecture Discussion",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-COORDINATION"
+    ],
+    "primary_group": "X-COORDINATION",
+    "proposed_outcome": "Retain coordination notes; assign concrete acceptance gaps to launch packages.",
+    "disposition": "coordination-only",
+    "candidate_linear_id": "PIX-4609",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4609",
+        "status": "In Review"
+      }
+    ],
+    "candidate_linear_status": "In Review",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4609/multi-agent-coordination-and-architecture-discussion",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "governance",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5813",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5813",
+    "title": "Fix broken relative import paths to restore staging builds",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4611",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4611",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4611/fix-broken-relative-import-paths-to-restore-staging-builds",
+    "candidate_linear_projects": [
+      "Stub & Technical Debt Remediation"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5829",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5829",
+    "title": "Fix CI workflows to use correct submodules and paths",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4612",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4612",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4612/fix-ci-workflows-to-use-correct-submodules-and-paths",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5876",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5876",
+    "title": "Reduce CodeQL false positives for EHR and FHIR security rules",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-EHR"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4615",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4615",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4615/reduce-codeql-false-positives-for-ehr-and-fhir-security-rules",
+    "candidate_linear_projects": [
+      "EHR Module Add-On"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "ehr-adjacent",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5931",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5931",
+    "title": "Extend corpus HOLD conversion to support remaining DS corpora",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L10"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4635",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4635",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4635/extend-corpus-hold-conversion-to-support-remaining-ds-corpora",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "corpus-data",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5932",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5932",
+    "title": "Extend CONVERT/HASH HOLD batch with remaining corpora",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L10"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4636",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4636",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4636/extend-converthash-hold-batch-with-remaining-corpora",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "corpus-data",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5951",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5951",
+    "title": "Update kubectl fallback pinned version to v1.37.0",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4638",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4638",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4638/update-kubectl-fallback-pinned-version-to-v1370",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5952",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5952",
+    "title": "Add Cloud Agent environment config for repo dev flow",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4639",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4639",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4639/add-cloud-agent-environment-config-for-repo-dev-flow",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5954",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5954",
+    "title": "Provision and deploy Pixelated Empathy on AWS EKS",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4640",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4640",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4640/provision-and-deploy-pixelated-empathy-on-aws-eks",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5956",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5956",
+    "title": "Temporarily grant EKS bootstrap IAM permissions during cluster creation",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4641",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4641",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4641/temporarily-grant-eks-bootstrap-iam-permissions-during-cluster",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5958",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5958",
+    "title": "Require EKS provisioning to fail until IAM permissions exist",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4642",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4642",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4642/require-eks-provisioning-to-fail-until-iam-permissions-exist",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5961",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5961",
+    "title": "Probe GitHub Actions role self-grant IAM permission",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4643",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4643",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4643/probe-github-actions-role-self-grant-iam-permission",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5963",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5963",
+    "title": "Add AWS Agent Toolkit idempotent rules to AGENTS.md",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4644",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4644",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4644/add-aws-agent-toolkit-idempotent-rules-to-agentsmd",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5965",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5965",
+    "title": "Add EKS diagnostics workflow for Traefik routing",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4645",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4645",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4645/add-eks-diagnostics-workflow-for-traefik-routing",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#5968",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/5968",
+    "title": "Fix Traefik middleware refs for AWS ingress (v3)",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4646",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4646",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4646/fix-traefik-middleware-refs-for-aws-ingress-v3",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6077",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6077",
+    "title": "Consolidate duplicate patch-level transitive dependency versions",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4699",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4699",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4699/consolidate-duplicate-patch-level-transitive-dependency-versions",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6161",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6161",
+    "title": "Improve desktop header nav spacing and clean footer tagline",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L04",
+      "L15"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4731",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4731",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4731/improve-desktop-header-nav-spacing-and-clean-footer-tagline",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "core-training-product",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6175",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6175",
+    "title": "Fix flaky-test detection nightly using wrong vitest bucket",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4736",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4736",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4736/fix-flaky-test-detection-nightly-using-wrong-vitest-bucket",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6190",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6190",
+    "title": "Refresh lockfiles to clear Dependabot uv security alerts",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4740",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4740",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4740/refresh-lockfiles-to-clear-dependabot-uv-security-alerts",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6202",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6202",
+    "title": "Unblock staging CI by fixing Docker deps, AI ratchet, and a11y scroll region",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4744",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4744",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4744/unblock-staging-ci-by-fixing-docker-deps-ai-ratchet-and-a11y-scroll",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6217",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6217",
+    "title": "CI failed on staging",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4751",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-4742",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4728",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4726",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4717",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4708",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4707",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4696",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4679",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4669",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unmatched-triage",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6221",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6221",
+    "title": "Run CI tests against job-local Postgres to avoid flakes",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4752",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4752",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4752/run-ci-tests-against-job-local-postgres-to-avoid-flakes",
+    "candidate_linear_projects": [
+      "Foresight"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6223",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6223",
+    "title": "Commit pending Postgres transactions before returning pool conn",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4753",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4753",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4753/commit-pending-postgres-transactions-before-returning-pool-conn",
+    "candidate_linear_projects": [
+      "Foresight"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6228",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6228",
+    "title": "Pin pnpm 12.9.0 in production Docker images to match packageManager",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4754",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4754",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4754/pin-pnpm-1290-in-production-docker-images-to-match-packagemanager",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6235",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6235",
+    "title": "Update remaining Dockerfiles to pnpm 12.9.0",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4757",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4757",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4757/update-remaining-dockerfiles-to-pnpm-1290",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6237",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6237",
+    "title": "Re-pin AI strict-typing baseline so CI ratchet stays green",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4758",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4758",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4758/re-pin-ai-strict-typing-baseline-so-ci-ratchet-stays-green",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6239",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6239",
+    "title": "Fix Docker pnpm version pin to unblock EKS deploy builds",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4759",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4759",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4759/fix-docker-pnpm-version-pin-to-unblock-eks-deploy-builds",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6312",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6312",
+    "title": "Restore experimental_decide export by bumping ai SDK",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-DEVELOPER"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4783",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4783",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4783/restore-experimental-decide-export-by-bumping-ai-sdk",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-api-memory",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6352",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6352",
+    "title": "Unblock API image builds by allowing Pillow 13",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4791",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4791",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4791/unblock-api-image-builds-by-allowing-pillow-13",
+    "candidate_linear_projects": [
+      "AI Training Pipeline"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6360",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6360",
+    "title": "Deploy to AWS EKS failed on staging",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4795",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-4790",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4755",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4716",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4692",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unmatched-triage",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6369",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6369",
+    "title": "Define adjust_clinical_scenario tool JSON schema in MCP server manifest",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4796",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4796",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4796/define-adjust-clinical-scenario-tool-json-schema-in-mcp-server",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6370",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6370",
+    "title": "Implement Python MCP server routing handler for adjust_clinical_scenario",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4797",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4797",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4797/implement-python-mcp-server-routing-handler-for-adjust-clinical",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6371",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6371",
+    "title": "Implement scenario branching logic (friction_metric + trigger_event → vitals & branch)",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4798",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4798",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4798/implement-scenario-branching-logic-friction-metric-trigger-event",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6372",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6372",
+    "title": "Compute friction_metric from real-time trainee telemetry",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4799",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4799",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4799/compute-friction-metric-from-real-time-trainee-telemetry",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6373",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6373",
+    "title": "Integrate adjust_clinical_scenario with Alexa+ conversational runtime and test end to end",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4800",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4800",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4800/integrate-adjust-clinical-scenario-with-alexa-conversational-runtime",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6374",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6374",
+    "title": "Implement generate_clinical_debrief with boto3 bedrock-runtime",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4801",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4801",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4801/implement-generate-clinical-debrief-with-boto3-bedrock-runtime",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6375",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6375",
+    "title": "Add error-handling wrapper for Bedrock debrief call",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4802",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4802",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4802/add-error-handling-wrapper-for-bedrock-debrief-call",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6376",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6376",
+    "title": "Define competency rubric format and transcript ingestion from sessions",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4803",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4803",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4803/define-competency-rubric-format-and-transcript-ingestion-from-sessions",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6377",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6377",
+    "title": "IAM: grant bedrock:InvokeModel for Claude 3.5 Sonnet in us-east-1 and enable model access",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4804",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4804",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4804/iam-grant-bedrockinvokemodel-for-claude-35-sonnet-in-us-east-1-and",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6378",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6378",
+    "title": "Set up AgentCore integration/deployment for the debrief pipeline",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4805",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4805",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4805/set-up-agentcore-integrationdeployment-for-the-debrief-pipeline",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6379",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6379",
+    "title": "Frontend event listener for real-time vital spikes",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4806",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4806",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4806/frontend-event-listener-for-real-time-vital-spikes",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6380",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6380",
+    "title": "Submission prep for AWS Builder mini-challenge (demo, README, checklist)",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "X-ALEXA"
+    ],
+    "primary_group": "X-ALEXA",
+    "proposed_outcome": "Keep outside pilot critical path unless a release dependency is demonstrated; preserve source history.",
+    "disposition": "defer-or-separate",
+    "candidate_linear_id": "PIX-4807",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4807",
+        "status": "Backlog"
+      }
+    ],
+    "candidate_linear_status": "Backlog",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4807/submission-prep-for-aws-builder-mini-challenge-demo-readme-checklist",
+    "candidate_linear_projects": [
+      "alexa-submit"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "alexa-optional",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6433",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6433",
+    "title": "Quality failed on staging",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "L02",
+    "proposed_outcome": "Verify the corresponding launch acceptance on the pinned release; implement only the remaining demonstrated gap.",
+    "disposition": "evidence-needed",
+    "candidate_linear_id": null,
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4814",
+        "status": "Triage"
+      },
+      {
+        "id": "PIX-4794",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4793",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4789",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4788",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4756",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4743",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4739",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4719",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4709",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4698",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4681",
+        "status": "Done"
+      },
+      {
+        "id": "PIX-4668",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": null,
+    "candidate_linear_url": null,
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unmatched-triage",
+    "identity_crosswalk_method": "unlinked",
+    "category": "infrastructure-ci",
+    "category_provenance": "source title and project",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6436",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6436",
+    "title": "Upgrade Astro to 7.4.x and refresh the Astro patch",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4815",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4815",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4815/upgrade-astro-to-74x-and-refresh-the-astro-patch",
+    "candidate_linear_projects": [],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  },
+  {
+    "source_id": "github:pixelated#6441",
+    "source_url": "https://github.com/daggerstuff/pixelated/issues/6441",
+    "title": "Refresh development dependencies and regenerate lockfile",
+    "source_status": "OPEN",
+    "planning_packages": [
+      "L02",
+      "L12"
+    ],
+    "primary_group": "HISTORY",
+    "proposed_outcome": "Candidate Linear record is Done; verify identity and current acceptance, then reconcile stale mirror. Do not recreate historical work.",
+    "disposition": "history-review",
+    "candidate_linear_id": "PIX-4816",
+    "all_exact_title_linear_candidates": [
+      {
+        "id": "PIX-4816",
+        "status": "Done"
+      }
+    ],
+    "candidate_linear_status": "Done",
+    "candidate_linear_url": "https://linear.app/pixelated/issue/PIX-4816/refresh-development-dependencies-and-regenerate-lockfile",
+    "candidate_linear_projects": [
+      "Foresight"
+    ],
+    "planning_match_basis": "unique-exact-title-candidate-only",
+    "identity_crosswalk_method": "unlinked",
+    "category": "developer-tooling",
+    "category_provenance": "title plus unique exact-title Linear project candidate; planning only",
+    "identity_disputes": []
+  }
+]

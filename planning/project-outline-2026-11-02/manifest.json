@@ -1,0 +1,75 @@
+{
+  "generator": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/reconcile.py",
+  "generator_sha256": "1e62431dd7112cfc1d75af3928edf9a8b0f14127a462ebfb808b67173e26f982",
+  "inputs": [
+    {
+      "path": "/home/vivi/pixelated/PROJECT_OUTLINE.md",
+      "sha256": "d36fab56d5cb263715e72936792eb2c2a6d80deb2ad11f4a92cc1b0f9408dbec"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/linear-issues-page0.json",
+      "sha256": "8163a8f6541a037bf54ab6adf8b24fda73d64f02971aae400b253b97d63262c4"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/linear-issues-page1.json",
+      "sha256": "7ccb90d7c58953007daded17706bda0d008044e9dd4091994e3991aace0bab8e"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/linear-issues-page2.json",
+      "sha256": "1fd42723bb0fa93322623a85f7790dcf7c520a1e521c56f561f2d10b3e4619e2"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/linear-issues-page3.json",
+      "sha256": "9f993d5105890074abd9baa17de7c0d8badb58fdf03504ec3793a28e8b29e22d"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/linear-issues-page4.json",
+      "sha256": "f52d5d7e218fc1ae496931b3eebc3fe934db0e559c35def86fbcabc4fc8f9627"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/linear-project-memberships.json",
+      "sha256": "3d72a782bfd77ae8abc5d0c9d377cbbc20f829a8b2ef9ed1d316f1b7ddbb664d"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/linear-projects.json",
+      "sha256": "8af4833e20e4b80f93eaf9e680eb99ceef8fed897f7f3cab502386e7ef875327"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/github-coverage.json",
+      "sha256": "5a2d0e77cd37f4315d4c14a9fa84bda4550c6f81875b03bf84e6ec95532aea11"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/github-pixelated-issues.json",
+      "sha256": "57c8dfce15bbca9e2c42e74a56c9b21ecd2b83730d7af0233e2420c2ea71128b"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/github-ai-issues.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/github-foresight-issues.json",
+      "sha256": "67f09f4f6feb4fcfd1292745dda2f281285451d88c65f8f696b859f8a07a3d30"
+    },
+    {
+      "path": "/home/vivi/.codex/task-runs/pixelated-outline-20261102/evidence/github-docs-issues.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "artifacts": [
+    "ACTION_MAP.csv",
+    "ACTION_MAP.json",
+    "ACTIVE_TASKS.md",
+    "RECONCILIATION.md",
+    "coverage.json",
+    "crosswalk.json",
+    "internal-checklists.json",
+    "internal-csv-tasks.json",
+    "internal-documents.json",
+    "internal-structured-tasks.json",
+    "projects.json",
+    "repository-inventory.json",
+    "task-ledger.csv",
+    "task-ledger.json"
+  ],
+  "cleanup_receipt": "No temporary files or caches created by generator. Raw exports and reproducible script intentionally retained globally."
+}

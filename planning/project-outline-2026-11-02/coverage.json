@@ -1,0 +1,272 @@
+{
+  "snapshot_date": "2026-11-02",
+  "linear_records": 1073,
+  "linear_statuses": {
+    "Done": 783,
+    "Triage": 11,
+    "Backlog": 22,
+    "Canceled": 253,
+    "In Review": 1,
+    "In Progress": 3
+  },
+  "github_records": 1106,
+  "github_statuses": {
+    "OPEN": 102,
+    "CLOSED/NOT_PLANNED": 257,
+    "CLOSED/COMPLETED": 712,
+    "CLOSED/DUPLICATE": 35
+  },
+  "canonical_rows": 2082,
+  "source_records": 2179,
+  "matching_methods": {
+    "source-uuid": 97,
+    "manual-review": 60,
+    "unlinked": 949
+  },
+  "identity_conflicts": 49,
+  "title_conflicts": 8,
+  "status_disagreements_all_candidates": 50,
+  "status_disagreements_merged": 39,
+  "github_without_linear_reference": 949,
+  "github_with_unresolved_linear_reference": 47,
+  "exact_title_candidate_rows_not_merged": 913,
+  "github_open_separate_rows": 81,
+  "linear_active": 37,
+  "internal_files_seen": 892,
+  "internal_documents": 488,
+  "excluded_files": 404,
+  "internal_classifications": {
+    "reference-triage": 168,
+    "actual-plan-status": 97,
+    "separate-product-checkmate": 23,
+    "archive-history": 96,
+    "reusable-workflow-runbook-template": 104
+  },
+  "exact_duplicate_documents": 94,
+  "checklists": 4520,
+  "checked": 2248,
+  "unchecked": 2272,
+  "planning_checklist_candidates": 2433,
+  "canonical_categories": {
+    "developer-tooling": 342,
+    "security-privacy": 81,
+    "foresight": 73,
+    "infrastructure-ci": 199,
+    "alexa-optional": 24,
+    "developer-api-memory": 105,
+    "core-training-product": 145,
+    "model-evaluation": 98,
+    "deferred-offscope": 423,
+    "ehr-adjacent": 132,
+    "corpus-data": 398,
+    "governance": 61,
+    "commercial-pilot": 1
+  },
+  "linear_pagination": [
+    {
+      "page": 0,
+      "records": 250,
+      "has_next_page": true
+    },
+    {
+      "page": 1,
+      "records": 250,
+      "has_next_page": true
+    },
+    {
+      "page": 2,
+      "records": 250,
+      "has_next_page": true
+    },
+    {
+      "page": 3,
+      "records": 250,
+      "has_next_page": true
+    },
+    {
+      "page": 4,
+      "records": 73,
+      "has_next_page": false
+    }
+  ],
+  "github_pagination": [
+    {
+      "repo": "pixelated",
+      "totalCount": 1105,
+      "fetched": 1105,
+      "open": 102,
+      "closed": 1003,
+      "pages": [
+        {
+          "page": 0,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wNi0wMlQyMjo1NToyOFrPAAAAARC5Jp0="
+        },
+        {
+          "page": 1,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wNi0wOFQxMzo1MDowNlrPAAAAARL7ueM="
+        },
+        {
+          "page": 2,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wNi0xNFQwMDowOToxMFrPAAAAARWZxNc="
+        },
+        {
+          "page": 3,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wNy0xNVQxNzo1ODowMlrPAAAAASPE_2g="
+        },
+        {
+          "page": 4,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wNy0yOVQxNjo0OToxM1rPAAAAASq3jQY="
+        },
+        {
+          "page": 5,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wOC0wNlQwNTo1MToyMlrPAAAAAS6tTSQ="
+        },
+        {
+          "page": 6,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wOC0xM1QwMzowMDo1MVrPAAAAATI1XoI="
+        },
+        {
+          "page": 7,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wOC0yMFQxODoxODo0OFrPAAAAATZV4dM="
+        },
+        {
+          "page": 8,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wOC0yMVQwMDoxMDo1MVrPAAAAATZ7S78="
+        },
+        {
+          "page": 9,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0wOS0yNFQwNzoyMjoxMVrPAAAAAUuvIQ4="
+        },
+        {
+          "page": 10,
+          "count": 100,
+          "hasNextPage": true,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0zMFQwMzoxOTozMVrPAAAAAWxWt5A="
+        },
+        {
+          "page": 11,
+          "count": 5,
+          "hasNextPage": false,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMS0wMVQyMzoyNDoyOVrPAAAAAW7E1t8="
+        }
+      ],
+      "terminal": true
+    },
+    {
+      "repo": "ai",
+      "totalCount": 0,
+      "fetched": 0,
+      "open": 0,
+      "closed": 0,
+      "pages": [
+        {
+          "page": 0,
+          "count": 0,
+          "hasNextPage": false,
+          "endCursor": null
+        }
+      ],
+      "terminal": true
+    },
+    {
+      "repo": "foresight",
+      "totalCount": 1,
+      "fetched": 1,
+      "open": 0,
+      "closed": 1,
+      "pages": [
+        {
+          "page": 0,
+          "count": 1,
+          "hasNextPage": false,
+          "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0wNVQxMTo1OToyMFrPAAAAAVRv74A="
+        }
+      ],
+      "terminal": true
+    },
+    {
+      "repo": "docs",
+      "totalCount": 0,
+      "fetched": 0,
+      "open": 0,
+      "closed": 0,
+      "pages": [
+        {
+          "page": 0,
+          "count": 0,
+          "hasNextPage": false,
+          "endCursor": null
+        }
+      ],
+      "terminal": true
+    }
+  ],
+  "projects": 18,
+  "limitations": [
+    "Local checklist marks are historical assertions, never implementation proof.",
+    "Source exports are a sequential snapshot, not an atomic transaction.",
+    "Linear descriptions can be truncated; identity uses GitHub sync metadata and explicit issue links.",
+    "Title equality is required for identity merges; title drift remains separate pending human review.",
+    "Keyword categories are provisional; deferred-offscope includes unclassified work requiring triage.",
+    "Sensitive files and files outside Markdown/CSV or task-named JSON/TXT are excluded before content reads; no dataset payload or transcript inventory.",
+    "CSV task descriptions and assignees omitted; remaining fields and row provenance extracted. Safe task/plan/roadmap/status/checklist JSON/TXT names are cataloged; JSON fields are allowlisted. Local source status remains historical."
+  ],
+  "csv_task_rows": 53,
+  "structured_task_rows": 316,
+  "local_task_extraction": [
+    {
+      "path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
+      "record_count": 21,
+      "type": "csv"
+    },
+    {
+      "path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
+      "record_count": 14,
+      "type": "csv"
+    },
+    {
+      "path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
+      "record_count": 8,
+      "type": "csv"
+    },
+    {
+      "path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
+      "record_count": 10,
+      "type": "csv"
+    },
+    {
+      "path": ".agent/internal/task-sync-state.json",
+      "record_count": 316,
+      "declared_record_count": 316,
+      "type": "json"
+    }
+  ],
+  "action_map_records": 139,
+  "action_dispositions": {
+    "evidence-needed": 33,
+    "defer-or-separate": 34,
+    "coordination-only": 3,
+    "optional-discovery": 2,
+    "history-review": 67
+  }
+}
