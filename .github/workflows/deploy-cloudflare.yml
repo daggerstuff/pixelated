@@ -221,6 +221,11 @@ jobs:
               env:
                   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   CF_WORKER_AUDIT_LOG_RETENTION_DAYS: ${{ secrets.CF_WORKER_AUDIT_LOG_RETENTION_DAYS }}
+                  # The Worker reads DATABASE_URL (the sync step strips the
+                  # CF_WORKER_ prefix). Reuse the same production Postgres the
+                  # db-migrate workflow uses so the pg-backed API routes
+                  # (e.g. /api/evaluation) have a database on the Worker.
+                  CF_WORKER_DATABASE_URL: ${{ secrets.APP_DATABASE_URL }}
                   CF_WORKER_EMAIL_FROM: ${{ secrets.CF_WORKER_EMAIL_FROM }}
                   CF_WORKER_ENABLE_AUDIT_LOGGING: ${{ secrets.CF_WORKER_ENABLE_AUDIT_LOGGING }}
                   CF_WORKER_ENABLE_RATE_LIMITING: ${{ secrets.CF_WORKER_ENABLE_RATE_LIMITING }}
