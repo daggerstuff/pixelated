@@ -1,10 +1,11 @@
 # Vercel Deployment Policy
 
-Vercel is the **warm standby** for pixelatedempathy.com: production serves from
-Cloudflare Workers (`deploy-cloudflare.yml`), which owns the production custom
-domain. Vercel keeps a current build at its `*.vercel.app` URL and keeps
-issuing the `www.pixelatedempathy.com` redirect. The former AWS EKS deployment
-has been retired. Vercel provides:
+Vercel is the **warm standby** for pixelatedempathy.com: production serves
+from Cloudflare Workers (`deploy-cloudflare.yml`), which takes the apex traffic
+via a Workers zone route. Vercel keeps a current build at its `*.vercel.app`
+URL, keeps its proxied apex records in place, and keeps issuing the
+`www.pixelatedempathy.com` redirect. The former AWS EKS deployment has been
+retired. Vercel provides:
 
 - Standby production builds from staging (path-filtered)
 - Preview URLs on PRs targeting staging (fast feedback)
@@ -77,8 +78,7 @@ gates — no overlap, no wasted builds.
 
 ## Failing back to Vercel
 
-Detach the Workers custom domain (remove the `routes` block from
-`wrangler.jsonc`, redeploy), then restore the zone's apex records to Vercel
-(`A 76.76.21.21` / `CNAME cname.vercel-dns.com` per Vercel's recommendation)
-and re-run the Vercel alias step. Vercel builds stayed warm throughout the
-cutover, so the standby serves immediately.
+Remove the Workers zone route (the `routes` block in `wrangler.jsonc`) and
+redeploy: the zone's proxied apex records still point at Vercel, so it resumes
+serving immediately. Re-run the Vercel alias step if the project alias ever
+drifted. Vercel builds stayed warm throughout the cutover.

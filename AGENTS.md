@@ -10,7 +10,7 @@
 **Production is deployed off AWS and serves from Cloudflare Workers:
 deploy-cloudflare.yml builds the Worker bundle after green staging CI, syncs
 the production runtime env from the `CF_WORKER_*` repository secrets, and
-attaches pixelatedempathy.com as a Workers custom domain. Vercel stays warm as
+routes pixelatedempathy.com to the Worker via a Workers zone route. Vercel stays warm as
 the standby origin (its `*.vercel.app` URL and the `www` redirect). App/agent
 images publish to Docker Hub from green staging CI. The former AWS EKS
 deployment has been retired.** `staging` is the main branch.

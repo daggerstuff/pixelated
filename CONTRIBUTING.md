@@ -231,7 +231,7 @@ intentional change.
   [vercel.yml](.github/workflows/vercel.yml),
   [build-images.yml](.github/workflows/build-images.yml)): production is
   deployed off AWS and serves from Cloudflare Workers, which attaches
-  pixelatedempathy.com as a custom domain after green staging CI; Vercel keeps
+  pixelatedempathy.com via a Workers zone route after green staging CI; Vercel keeps
   the warm standby (staging pushes, path-filtered); a successful CI run on
   `staging` publishes the app and agent Docker images automatically (manual
   dispatch still works). Publishes serialize via a `publish-images`
