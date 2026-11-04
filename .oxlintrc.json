@@ -381,7 +381,6 @@
         "apps/web/src/lib/api/journal-research/**/*.ts",
         "apps/web/src/lib/api/research.ts",
         "apps/web/src/lib/api/therapeutic.ts",
-        "apps/web/src/utils/serverUtils.ts",
         "apps/web/src/utils/post.ts",
         "config/security.ts",
         "config/env.config.ts",

@@ -67,12 +67,9 @@ Tests include:
 
 ### 4. Testing Utilities
 
-The `src/utils/accessibilityTestUtils.ts` file contains helper functions for
-accessibility testing, including:
-
-- Custom matchers for testing accessibility violations
-- Functions for formatting accessibility errors with WCAG criteria
-- Utilities for filtering violations by impact level
+Accessibility checks in this repo use Vitest with `@axe-core/react` / Playwright
+axe helpers in the relevant component and E2E test files (see
+`tests/e2e/accessibility.spec.ts` and component `__tests__` suites).
 
 ## Running Accessibility Tests
 

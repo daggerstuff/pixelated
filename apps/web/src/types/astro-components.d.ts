@@ -19,33 +19,6 @@ declare module '@/lib/analytics/service' {
   }
 }
 
-declare module '../../config/azure.config' {
-  export interface AzureConfig {
-    clientId: string
-    tenantId: string
-    clientSecret: string
-  }
-  export const azureConfig: AzureConfig
-}
-
-declare module '../config/azure.config' {
-  export interface AzureConfig {
-    clientId: string
-    tenantId: string
-    clientSecret: string
-  }
-  export const azureConfig: AzureConfig
-}
-
-declare module '@/config/azure.config' {
-  export interface AzureConfig {
-    clientId: string
-    tenantId: string
-    clientSecret: string
-  }
-  export const azureConfig: AzureConfig
-}
-
 declare module './objectives' {
   export interface Objective {
     id: string
