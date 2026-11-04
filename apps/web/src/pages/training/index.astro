@@ -47,20 +47,19 @@ const trainingPrograms: any[] = []
         </div>
 
         <p class="max-w-3xl mx-auto text-xl text-muted-foreground sm:text-2xl">
-          Revolutionary therapeutic training platform where AI role-plays as
-          difficult clients for comprehensive therapist education and supervisor
-          evaluation.
+          Proposed synthetic conversation practice for education. Training
+          scenarios, session creation, and supervisor review are not yet
+          available in this portal.
         </p>
 
         <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           {userRole === 'trainee' && (
-            <Button
-              href="/training/session/new"
-              size="lg"
-              class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            <p
+              class="rounded-md border border-border bg-background px-4 py-3 text-sm text-muted-foreground"
+              role="status"
             >
-              🎬 Start Training Session
-            </Button>
+              No training sessions are available. Pilot enrollment is not open.
+            </p>
           )}
           {userRole === 'supervisor' && (
             <Button

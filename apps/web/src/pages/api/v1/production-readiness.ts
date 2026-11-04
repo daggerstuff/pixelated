@@ -422,9 +422,11 @@ async function checkDocumentationStandards(): Promise<ProductionReadinessCheck> 
   try {
     const docChecks = [
       existsSync(path.join(REPO_ROOT, 'README.md')),
-      existsSync(path.join(SRC_DIR, 'docs')),
-      existsSync(path.join(REPO_ROOT, 'docs')),
-      existsSync(path.join(SRC_DIR, 'content-store/docs/api.md')),
+      existsSync(
+        path.join(SRC_DIR, 'content-store/docs/development/overview.md'),
+      ),
+      existsSync(path.join(SRC_DIR, 'content-store/docs/api-overview.md')),
+      existsSync(path.join(SRC_DIR, 'pages/docs/index.astro')),
     ]
 
     const docScore = (docChecks.filter(Boolean).length / docChecks.length) * 100

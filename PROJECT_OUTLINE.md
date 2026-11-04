@@ -1,7 +1,9 @@
 # Pixelated Empathy — Project Outline
 
-Snapshot: **2026-11-02**. Decision: **prepare a bounded institutional training
-pilot; general availability is not established.** This is the consolidated
+Inventory snapshot: **2026-11-02**. Pilot readiness update: **2026-11-04**.
+Decision: **NO-GO; enrollment and customer launch are not authorized.** The
+bounded institutional training pilot remains a proposal and general
+availability is not established. This is the consolidated
 planning baseline for the application, AI engine, Foresight, documentation,
 Linear, GitHub, and internal plans.
 
@@ -26,6 +28,16 @@ Do **not** turn 783 Done issues into “73% product complete,” or remove cance
 work from the denominator and call the result “95% ready.” Neither number
 measures a working release. Measure progress against the six launch gates below
 and the selected customer journey.
+
+**Pilot execution update (2026-11-04): NO-GO.** Local fixes now cover
+session-route ownership checks, an authenticated same-origin training-message
+API, and Postgres trainee-message storage/readback. Migration 017 is applied to
+the configured Neon database; the production release is pending. Session
+creation, approved scenarios,
+automated client replies, transcript-grounded coaching, faculty review,
+cross-organization verification and pinned-release evidence remain open. The
+gate-by-gate record and verification are in
+[`planning/pilot-readiness-2026-11-04/LAUNCH_DECISIONS.md`](planning/pilot-readiness-2026-11-04/LAUNCH_DECISIONS.md).
 
 The [task ledger](planning/project-outline-2026-11-02/task-ledger.csv) retains
 completed and canceled history alongside remaining work. The

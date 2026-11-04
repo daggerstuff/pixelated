@@ -1,155 +1,164 @@
 import type { APIRoute } from 'astro'
-import { Pool } from 'pg'
 
-// Database connection pool
-const { DATABASE_URL } = process.env
-if (!DATABASE_URL) {
-  throw new Error('DATABASE_URL is not set')
+import { getSession } from '../../../lib/auth/session'
+import { getPool } from '../../../lib/db'
+
+type ProgressSnapshot = {
+  value: number
+  timestamp: string | number
 }
-interface PgPoolGlobal {
-  __pgPool?: Pool
-}
-const globalWithPool = globalThis as unknown as PgPoolGlobal
-const pool =
-  globalWithPool.__pgPool ??
-  new Pool({
-    connectionString: DATABASE_URL,
+
+const jsonResponse = (body: unknown, status: number): Response =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
   })
-globalWithPool.__pgPool = pool
+
+const isValidSnapshot = (value: unknown): value is ProgressSnapshot => {
+  if (typeof value !== 'object' || value === null) return false
+  const snapshot = value as Record<string, unknown>
+  if (
+    typeof snapshot['value'] !== 'number' ||
+    !Number.isFinite(snapshot['value'])
+  ) {
+    return false
+  }
+  if (
+    typeof snapshot['timestamp'] !== 'string' &&
+    typeof snapshot['timestamp'] !== 'number'
+  ) {
+    return false
+  }
+  return Number.isFinite(new Date(snapshot['timestamp']).getTime())
+}
 
 export const POST: APIRoute = async ({ request }) => {
+  const session = await getSession(request)
+  if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
+
   try {
-    const { sessionId, snapshots } = (await request.json()) as {
-      sessionId: string
-      snapshots: any[]
+    const payload: unknown = await request.json()
+    if (
+      typeof payload !== 'object' ||
+      payload === null ||
+      Array.isArray(payload)
+    ) {
+      return jsonResponse({ error: 'Invalid payload' }, 400)
     }
-
-    const isValidSnapshot = (s: any) =>
-      typeof s?.value === 'number' &&
-      (typeof s?.timestamp === 'string' ||
-        typeof s?.timestamp === 'number' ||
-        s?.timestamp instanceof Date)
-    const isSnapshotArray =
-      Array.isArray(snapshots) && snapshots.every(isValidSnapshot)
-
-    if (!sessionId || !isSnapshotArray) {
-      return new Response(
-        JSON.stringify({
+    const body = payload as Record<string, unknown>
+    const sessionId = body['sessionId']
+    const snapshots = body['snapshots']
+    if (
+      typeof sessionId !== 'string' ||
+      !Array.isArray(snapshots) ||
+      snapshots.length > 500 ||
+      !snapshots.every(isValidSnapshot)
+    ) {
+      return jsonResponse(
+        {
           error:
-            'Invalid payload: require sessionId and snapshots[] of {timestamp,value:number}',
-        }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
+            'Invalid payload: require sessionId and up to 500 snapshots of {timestamp,value:number}',
+        },
+        400,
       )
     }
 
-    const client = await pool.connect()
+    const client = await getPool().connect()
     try {
-      // Update session with progress snapshots
-      const query = `
-        UPDATE sessions
-        SET progress_snapshots = $1::jsonb, updated_at = NOW()
-        WHERE id = $2
-        RETURNING id
-      `
-
-      const result = await client.query(query, [
-        JSON.stringify(snapshots),
-        sessionId,
-      ])
-
-      if (result.rowCount === 0) {
-        return new Response(JSON.stringify({ error: 'Session not found' }), {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' },
-        })
+      await client.query('BEGIN')
+      const ownership = await client.query(
+        'SELECT id FROM sessions WHERE id = $1 AND therapist_id = $2 FOR UPDATE',
+        [sessionId, session.user.id],
+      )
+      if (ownership.rowCount === 0) {
+        await client.query('ROLLBACK')
+        return jsonResponse({ error: 'Session not found' }, 404)
       }
 
-      // Also insert into session_milestones table for detailed tracking
+      await client.query(
+        `UPDATE sessions
+         SET progress_snapshots = $1::jsonb, updated_at = NOW()
+         WHERE id = $2 AND therapist_id = $3`,
+        [JSON.stringify(snapshots), sessionId, session.user.id],
+      )
+
       if (snapshots.length > 0) {
         const values: Array<string | number> = []
-        const placeholders = snapshots.map(
-          (
-            s: { value: number; timestamp: string | number | Date },
-            i: number,
-          ) => {
-            const base = i * 4
-            values.push(
-              sessionId,
-              `Progress_${s.value}`,
-              s.value,
-              new Date(s.timestamp).toISOString(),
-            )
-            return `($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4})`
-          },
+        const placeholders = snapshots.map((snapshot, index) => {
+          const base = index * 4
+          values.push(
+            sessionId,
+            `Progress_${snapshot.value}`,
+            snapshot.value,
+            new Date(snapshot.timestamp).toISOString(),
+          )
+          return `($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4})`
+        })
+        await client.query(
+          `INSERT INTO session_milestones (session_id, milestone_name, milestone_value, achieved_at)
+           VALUES ${placeholders.join(',')}`,
+          values,
         )
-        const milestoneQuery = `
-          INSERT INTO session_milestones (session_id, milestone_name, milestone_value, achieved_at)
-          VALUES ${placeholders.join(',')}
-        `
-        await client.query(milestoneQuery, values)
       }
 
-      return new Response(JSON.stringify({ success: true, sessionId }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      await client.query('COMMIT')
+      return jsonResponse({ success: true, sessionId }, 200)
+    } catch (error: unknown) {
+      await client.query('ROLLBACK')
+      throw error
     } finally {
       client.release()
     }
-  } catch (err) {
-    console.error('Error handling POST /api/session/snapshots', err)
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+  } catch (error: unknown) {
+    console.error('Error handling POST /api/session/snapshots', error)
+    return jsonResponse({ error: 'Internal server error' }, 500)
   }
 }
 
 export const GET: APIRoute = async ({ request }) => {
-  try {
-    const url = new URL(request.url)
-    const sessionId = url.searchParams.get('sessionId')
-    if (!sessionId) {
-      return new Response(
-        JSON.stringify({ error: 'Missing sessionId parameter' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
-    }
+  const session = await getSession(request)
+  if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
-    const client = await pool.connect()
+  const sessionId = new URL(request.url).searchParams.get('sessionId')
+  if (!sessionId) {
+    return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
+  }
+
+  try {
+    const client = await getPool().connect()
     try {
-      const sessionQuery =
-        'SELECT progress_snapshots FROM sessions WHERE id = $1'
-      const sessionResult = await client.query(sessionQuery, [sessionId])
+      const sessionResult = await client.query(
+        'SELECT progress_snapshots FROM sessions WHERE id = $1 AND therapist_id = $2',
+        [sessionId, session.user.id],
+      )
       if (sessionResult.rowCount === 0) {
-        return new Response(JSON.stringify({ error: 'Session not found' }), {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' },
-        })
+        return jsonResponse({ error: 'Session not found' }, 404)
       }
 
-      const milestoneQuery =
-        'SELECT milestone_name, milestone_value, achieved_at FROM session_milestones WHERE session_id = $1 ORDER BY achieved_at ASC'
-      const milestoneResult = await client.query(milestoneQuery, [sessionId])
+      const milestoneResult = await client.query(
+        `SELECT milestone_name, milestone_value, achieved_at
+         FROM session_milestones
+         WHERE session_id = $1
+         ORDER BY achieved_at ASC`,
+        [sessionId],
+      )
 
-      return new Response(
-        JSON.stringify({
+      const sessionData = sessionResult.rows[0] as {
+        progress_snapshots?: unknown[]
+      }
+      return jsonResponse(
+        {
           sessionId,
-          snapshots: (
-            sessionResult.rows[0] as { progress_snapshots?: unknown[] }
-          ).progress_snapshots,
+          snapshots: sessionData.progress_snapshots,
           milestones: milestoneResult.rows,
-        }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } },
+        },
+        200,
       )
     } finally {
       client.release()
     }
-  } catch (err) {
-    console.error('Error handling GET /api/session/snapshots', err)
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+  } catch (error: unknown) {
+    console.error('Error handling GET /api/session/snapshots', error)
+    return jsonResponse({ error: 'Internal server error' }, 500)
   }
 }

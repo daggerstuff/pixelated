@@ -4,6 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { initializeDatabase } from '../../../lib/db'
 import { GET, POST } from '../../../pages/api/session/progress'
 
+vi.mock('../../../lib/auth/session', () => ({
+  getSession: vi.fn(),
+}))
+
+import { getSession } from '../../../lib/auth/session'
+
 type QueryResultStub = {
   rowCount: number
   rows: unknown[]
@@ -189,6 +195,10 @@ describe('Session Progress API', () => {
     mockClient.query.mockReset()
     mockClient.release.mockReset()
     mockConnect.mockReset()
+    vi.mocked(getSession).mockResolvedValue({
+      user: { id: 'therapist-123', role: 'therapist' },
+      expires: new Date(Date.now() + 60_000).toISOString(),
+    })
   })
 
   afterEach(() => {
@@ -206,7 +216,12 @@ describe('Session Progress API', () => {
 
       const mockPoolClient = await mockConnect()
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(1))
+      mockPoolClient.query.mockResolvedValueOnce(
+        createMockQueryResult(1, [{ id: 'test-session-123' }]),
+      )
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(1))
+      mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(1))
+      mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(0))
 
       const response = await POST(mockRequest as any)
       const responseBody = await parseResponseBody(
@@ -217,6 +232,21 @@ describe('Session Progress API', () => {
       expect(response.status).toBe(200)
       expect(responseBody.success).toBe(true)
       expect(responseBody.sessionId).toBe('test-session-123')
+      expect(mockPoolClient.query.mock.calls[1]?.[0]).toContain(
+        'id = $1 AND therapist_id = $2 FOR UPDATE',
+      )
+      expect(mockPoolClient.query.mock.calls[1]?.[1]).toEqual([
+        'test-session-123',
+        'therapist-123',
+      ])
+      expect(mockPoolClient.query.mock.calls[3]?.[0]).toContain(
+        'INSERT INTO evaluations',
+      )
+      expect(mockPoolClient.query.mock.calls[3]?.[1]).toEqual([
+        'test-session-123',
+        'therapist-123',
+        'Good session',
+      ])
     })
 
     it('should return 400 for missing sessionId', async () => {
@@ -242,6 +272,7 @@ describe('Session Progress API', () => {
 
       const mockPoolClient = await mockConnect()
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(0))
+      mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(0))
 
       const response = await POST(mockRequest as any)
       const responseBody = await parseResponseBody(
@@ -260,6 +291,7 @@ describe('Session Progress API', () => {
       })
 
       const mockPoolClient = await mockConnect()
+      mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(0))
       mockPoolClient.query.mockRejectedValueOnce(new Error('Database error'))
 
       const response = await POST(mockRequest as any)
@@ -308,6 +340,13 @@ describe('Session Progress API', () => {
       expect(responseBody.sessionId).toBe('test-session-123')
       expect(responseBody.progressMetrics).toBeDefined()
       expect(responseBody.feedback).toHaveLength(1)
+      expect(mockPoolClient.query.mock.calls[0]?.[0]).toContain(
+        'id = $1 AND therapist_id = $2',
+      )
+      expect(mockPoolClient.query.mock.calls[0]?.[1]).toEqual([
+        'test-session-123',
+        'therapist-123',
+      ])
     })
 
     it('should return 400 for missing sessionId', async () => {
@@ -360,5 +399,22 @@ describe('Session Progress API', () => {
       expect(response.status).toBe(500)
       expect(responseBody.error).toBe('Internal server error')
     })
+  })
+
+  it('returns 401 for unauthenticated progress reads and writes', async () => {
+    vi.mocked(getSession).mockResolvedValue(null)
+
+    const postResponse = await POST(
+      createPostRequest({ sessionId: 'test-session-123' }) as never,
+    )
+    const getResponse = await GET(
+      createGetRequest(
+        'http://localhost:3000/api/session/progress?sessionId=test-session-123',
+      ) as never,
+    )
+
+    expect(postResponse.status).toBe(401)
+    expect(getResponse.status).toBe(401)
+    expect(mockConnect).not.toHaveBeenCalled()
   })
 })
