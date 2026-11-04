@@ -16,8 +16,6 @@ REDIS_FILES=(
   "$ROOT_DIR/infra/docker/docker-compose.production.yml"
   "$ROOT_DIR/infra/docker/docker-compose.prod.yml"
   "$ROOT_DIR/infra/docker/docker-compose.training.yml"
-  "$ROOT_DIR/business-strategy-cms/docker-compose.yml"
-  "$ROOT_DIR/business-strategy-cms/aws-ecs/docker-compose.aws.yml"
   "$ROOT_DIR/ai/docker/phase1-services.docker-compose.yaml"
   "$ROOT_DIR/apps/web/src/lib/ai/bias-detection/python-service/docker-compose.yml"
   "$ROOT_DIR/apps/web/src/lib/ai/multimodal-bias-detection/python-service/docker-compose.yml"

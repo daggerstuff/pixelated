@@ -48,7 +48,6 @@ COPY config/package/.npmrc ./.npmrc
 # Copy workspace member package.jsons so pnpm can resolve the workspace
 COPY packages/pixelated-sdk/package.json ./packages/pixelated-sdk/package.json
 COPY packages/memory-schema/package.json ./packages/memory-schema/package.json
-COPY apps/business-strategy-cms/package.json ./apps/business-strategy-cms/package.json
 
 # Install all dependencies (dev + prod) required for build
 # Retry with --no-frozen-lockfile if --frozen-lockfile fails (lockfile drift in CI)

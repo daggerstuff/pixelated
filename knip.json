@@ -35,8 +35,7 @@
   ],
   "project": [
     "apps/web/src/**/*.{ts,tsx,js,jsx,astro}",
-    "config/**/*.{ts,js,mjs}",
-    "apps/business-strategy-cms/src/**/*.{ts,tsx,js,jsx}"
+    "config/**/*.{ts,js,mjs}"
   ],
   "ignore": [
     "**/*.d.ts",

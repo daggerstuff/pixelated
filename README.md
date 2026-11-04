@@ -108,8 +108,7 @@ Together, they form the secure, intelligent backbone of our clinical AI engine:
 ```
 pixelated/
 ├── apps/
-│   ├── web/                    # Main Astro 6 + React 19 application
-│   └── business-strategy-cms/  # Business strategy CMS
+│   └── web/                    # Main Astro 6 + React 19 application
 ├── ai/                         # Submodule: AI inference & training (Python)
 ├── foresight/                  # Submodule: Foresight MCP memory server (Python)
 ├── docs/                       # Submodule: Documentation knowledge base
