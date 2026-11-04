@@ -30,7 +30,6 @@ COPY scripts ./scripts
 COPY config/package/.npmrc ./.npmrc
 COPY packages/pixelated-sdk/package.json ./packages/pixelated-sdk/package.json
 COPY packages/memory-schema/package.json ./packages/memory-schema/package.json
-COPY apps/business-strategy-cms/package.json ./apps/business-strategy-cms/package.json
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile

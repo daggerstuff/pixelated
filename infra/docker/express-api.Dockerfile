@@ -1,5 +1,4 @@
-# Pixelated Empathy — Express API Server
-# Serves the business-strategy API routes on port 5000
+# Pixelated Empathy — Express API Server (apps/web Express routes on port 5000)
 
 FROM node:24-bookworm-slim AS base
 
