@@ -62,6 +62,7 @@ stats.html
 
 # Development dependencies and caches
 node_modules/
+**/node_modules/
 .pnpm-store/
 .npm/
 .yarn/
@@ -97,6 +98,8 @@ out/
 .next/
 .nuxt/
 .output/
+**/.output/
+**/.eve/
 .vercel/
 .netlify/
 
