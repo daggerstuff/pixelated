@@ -241,6 +241,17 @@ export function loadConfig(
   return loadConfigFromPaths(cwdOrOptions)
 }
 
+/**
+ * Flatten `LoadedConfig.sources` to a precedence-ordered list. Strict loading
+ * records paths in order; path-based loading records them by source name.
+ */
+export function listSources(loaded: LoadedConfig): string[] {
+  const { sources } = loaded
+  return Array.isArray(sources)
+    ? sources
+    : Object.values(sources).filter((s): s is string => typeof s === 'string')
+}
+
 export function loadConfigFile(path: string): PxConfig {
   const raw = readJsonFile(path)
   if (!raw) {

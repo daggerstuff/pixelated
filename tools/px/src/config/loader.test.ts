@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import { loadConfig, findAgent, validateTool } from './loader.js'
+import { loadConfig, listSources, findAgent, validateTool } from './loader.js'
 import type { PxConfig, AgentConfig } from './schema.js'
 
 // findRepoRoot() walks up from the given directory until it finds a `.git`
@@ -80,7 +80,9 @@ describe('loadConfig', () => {
   })
 
   it('loads default config from agents/px.config.json', () => {
-    const { config, sources } = loadConfig(tempDir)
+    const loaded = loadConfig(tempDir)
+    const { config } = loaded
+    const sources = listSources(loaded)
     expect(config.agents).toHaveProperty('advisor')
     expect(config.agents).toHaveProperty('content')
     expect(sources.length).toBeGreaterThanOrEqual(1)
@@ -117,9 +119,9 @@ describe('loadConfig', () => {
       }),
     )
 
-    const { config, sources } = loadConfig(tempDir)
-    expect(config.agents.advisor.endpoint).toBe('http://override:3000')
-    expect(sources.length).toBe(2)
+    const loaded = loadConfig(tempDir)
+    expect(loaded.config.agents.advisor.endpoint).toBe('http://override:3000')
+    expect(listSources(loaded).length).toBe(2)
   })
 
   it('merges hooks from override', () => {
