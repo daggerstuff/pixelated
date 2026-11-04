@@ -26,8 +26,11 @@ depending on the trigger:
 
 ## Pipeline Configuration
 
-The pipeline is defined in `.github/workflows/deploy.yml` and consists of the
-following jobs:
+The pipeline is defined in `.github/workflows/ci.yml` (CI),
+`.github/workflows/build-images.yml` (app and agent image publishes to Docker
+Hub), `.github/workflows/vercel.yml` (production frontend deploys) and
+`.github/workflows/deploy-cloudflare.yml` (Cloudflare Workers migration
+target), and consists of the following jobs:
 
 1. **Build**: Compiles and packages the application
 2. **Deploy**: Pushes the application to the target environment

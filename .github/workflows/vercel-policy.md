@@ -1,34 +1,33 @@
 # Vercel Deployment Policy
 
-Vercel is the **frontend test center**, not the production deployment. EKS with
-Amazon is production and will remain so. Vercel exists for:
+Vercel is the **production origin** for pixelatedempathy.com. Production is
+deployed off AWS; the former AWS EKS deployment has been retired. Vercel
+provides:
 
+- Production deploys from staging (path-filtered)
 - Preview URLs on PRs targeting staging (fast feedback)
-- Occasional manual production verification from staging
-
-It is NOT the source of truth for running the app in production.
 
 ## Branch Roles
 
-| Branch      | Role                | Vercel?                          | EKS?                      |
-| ----------- | ------------------- | -------------------------------- | ------------------------- |
-| `staging`   | **The main branch** | Yes (prod deploy, path-filtered) | Yes (auto-deploy from CI) |
-| `feature/*` | Feature development | No                               | No                        |
-| `agent/*`   | Agent work          | No                               | No                        |
+| Branch      | Role                | Vercel?                          | Images?                    |
+| ----------- | ------------------- | -------------------------------- | -------------------------- |
+| `staging`   | **The main branch** | Yes (prod deploy, path-filtered) | Yes (auto-publish from CI) |
+| `feature/*` | Feature development | No                               | No                         |
+| `agent/*`   | Agent work          | No                               | No                         |
 
 ## Trigger Rules
 
-| Event                    | Vercel Build?                                 | Notes                                                     |
-| ------------------------ | --------------------------------------------- | --------------------------------------------------------- |
-| Push to `staging`        | Yes (prod), **only on frontend path changes** | EKS deploys non-frontend changes; Vercel handles frontend |
-| PR to `staging`          | Yes (preview)                                 | Only when frontend files change                           |
-| Push to feature branches | No                                            | Use `staging` for previews                                |
-| Manual dispatch          | Yes                                           | `workflow_dispatch` always allowed                        |
+| Event                    | Vercel Build?                                 | Notes                                       |
+| ------------------------ | --------------------------------------------- | ------------------------------------------- |
+| Push to `staging`        | Yes (prod), **only on frontend path changes** | Image publishes cover backend/agent changes |
+| PR to `staging`          | Yes (preview)                                 | Only when frontend files change             |
+| Push to feature branches | No                                            | Use `staging` for previews                  |
+| Manual dispatch          | Yes                                           | `workflow_dispatch` always allowed          |
 
 ## Path Filtering
 
 Vercel builds only fire when frontend-relevant files change. All other pushes
-(infra, backend, config, docs) are handled by EKS or other workflows — never by
+(infra, backend, config, docs) are handled by other workflows — never by
 Vercel.
 
 ### Frontend-relevant paths (Vercel):
@@ -46,12 +45,11 @@ vercel.json
 
 ### NOT Vercel paths (handled elsewhere):
 
-- `ai/**` — Python ML (EKS/K8s)
-- `infra/**` — Terraform/K8s (EKS)
-- `terraform/**` — AWS infra (EKS)
-- `scripts/**` — deployment scripts (EKS)
+- `ai/**` — Python ML (submodule, typecheck/ratchet gates)
+- `infra/**` — local/VPS infrastructure (docker-compose)
+- `scripts/**` — tooling and CI scripts
 - `docs/**` — static content (docs-deploy.yml)
-- `agents/**` — agent code (EKS)
+- `agents/**` — agent code (Docker images via build-images.yml)
 
 ## Cost Control
 
@@ -60,14 +58,16 @@ vercel.json
 - Vercel only builds on frontend path changes — no wasted builds on staging
 - `workflow_dispatch` is the only way to force a Vercel build on demand
 
-## Relationship to EKS Pipeline
+## Pipeline on staging pushes
 
 ```
 git push to staging
   ├─ CI (lint/test/build)          → .github/workflows/ci.yml
-  ├─ Deploy to AWS EKS             → .github/workflows/deploy-aws.yml
-  └─ Vercel (frontend only)        → .github/workflows/vercel.yml (path-filtered)
+  ├─ Build and Publish Images       → .github/workflows/build-images.yml (app + agents → Docker Hub)
+  ├─ Deploy to Cloudflare Workers   → .github/workflows/deploy-cloudflare.yml (migration target, credential-gated)
+  └─ Vercel production (frontend only) → .github/workflows/vercel.yml (path-filtered)
 ```
 
-Both EKS and Vercel fire on staging pushes, but each only on their relevant
-paths — no overlap, no wasted builds.
+The Vercel production deploy, the image publishes, and the Cloudflare bundle
+all fire on staging pushes, each only on their relevant paths or gates — no
+overlap, no wasted builds.

@@ -175,8 +175,8 @@ If GitHub Actions is unavailable:
 # Build
    NODE_ENV=production pnpm build
 
-# Deploy using AWS CLI
-   ./scripts/deploy-aws.sh
+# Deploy the production frontend (Vercel)
+   npx vercel deploy --prod
    ```
 
 ## Incident Response Protocol

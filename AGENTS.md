@@ -7,19 +7,24 @@
 
 ## CI/CD Pipeline Policy
 
-**EKS with Amazon is production. Vercel is the frontend test center only.**
-`staging` is the main branch.
+**Production is deployed off AWS: Vercel is the production origin for
+pixelatedempathy.com; Cloudflare Workers is the migration target; app/agent
+images publish to Docker Hub from green staging CI. The former AWS EKS
+deployment has been retired.** `staging` is the main branch.
 
 ### Trigger Rules
 
-- Push to `staging` → CI + EKS deploy (backend/infra) **+ Vercel deploy
-  (frontend, path-filtered)**
+- Push to `staging` → CI **+ image publish (backend/agents, Docker Hub) +
+  Vercel production deploy (frontend, path-filtered) + Cloudflare Workers
+  bundle (migration target, credential-gated)**
 - PR to `staging` → Vercel preview (frontend only, path-filtered)
 - Feature branches → no Vercel; use staging for previews
 
 ### Files
 
-- `.github/workflows/vercel.yml` — throttled Vercel pipeline
+- `.github/workflows/vercel.yml` — production Vercel pipeline (path-filtered)
+- `.github/workflows/build-images.yml` — app + agent image publishes
+- `.github/workflows/deploy-cloudflare.yml` — Cloudflare Workers migration target
 - `.github/workflows/vercel-policy.md` — full policy doc
 - `.github/branch-pipeline.md` — branch roles diagram
 - `scripts/ci/get-changed-frontend-files.sh` — path filter helper
