@@ -58,7 +58,7 @@ when all its packages pass and required owner decisions are recorded.
 | Gate | Result | Blocking conditions |
 | --- | --- | --- |
 | G1 Product boundary | **OWNER DECISION** | Scope envelope accepted; actual buyer/program, named owners, faculty champion, rubric, data terms and thresholds are not. |
-| G2 Working journey | **OPEN** | Session authorization, the authenticated message API, and Postgres trainee-message persistence/readback are implemented locally; migration 017 is applied to the configured Neon database. Production deployment, approved session creation, synthetic-client replies, evidence-grounded coaching, faculty review, cross-organization verification, reconnect and cohort measures remain unproven. |
+| G2 Working journey | **OPEN** | Session authorization, the authenticated message API, and Postgres trainee-message persistence/readback are deployed; migration 017 is applied to the production app database. Approved session creation, synthetic-client replies, evidence-grounded coaching, faculty review, cross-organization verification, reconnect and cohort measures remain unproven. |
 | G3 Evaluation and release | **OPEN** | Candidate remains unpromoted; exact pilot bundle, broad fresh evaluation, tool boundary, rights and release decision are missing. |
 | G4 Privacy, security and operations | **OPEN** | Local route authorization fixes are covered by focused tests; release-level tenant isolation, lifecycle, security, restore, alert, incident and owner proof remain missing. |
 | G5 Honest, supportable offer | **OPEN / OWNER DECISION** | Reviewed public copy was corrected; remaining public/demo claims, measurements and written terms/support owner are not verified or approved. |
@@ -84,14 +84,15 @@ when all its packages pass and required owner decisions are recorded.
   pnpm vitest run -c config/vitest.config.ts apps/web/src/tests/api/session/progress-api.test.ts apps/web/src/pages/api/session/__tests__/snapshots.test.ts apps/web/src/pages/api/training/sessions/__tests__/session.test.ts --coverage.enabled=false
   ```
 - Targeted `pnpm exec oxlint` over the changed route, service, and test files
-  passed. `pnpm build` completed successfully. These are local checks, not a
-  deployment, database integration, or end-to-end pilot proof.
+  passed. `pnpm build` and the production Vercel deployment completed. The
+  message endpoint returned 401 without authentication; integrated journey,
+  cross-organization and end-to-end pilot proof remain open.
 - `pnpm lint` ran repository-wide and exited **123** after reporting numerous
   warnings in unrelated files across the monorepo. Treat the lint gate as
   unresolved; this run did not provide a clean project-wide result.
 - Static inspection and `rg` established the owner-only behavior, remaining
-  mock-backed training index, and absent session-creation flow. No production
-  deployment, customer contact, tracker write, or patient data use occurred.
+  mock-backed training index, and absent session-creation flow. No customer
+  contact, tracker write, or patient data use occurred.
 - The October 25 campaign handoff reports narrow v74 development evidence and
   explicitly withholds promotion/deployment. It does not satisfy G3 for a
   chosen pilot release.
@@ -119,7 +120,9 @@ when all its packages pass and required owner decisions are recorded.
 **Current decision: no enrollment, customer launch, or launch-ready claim.**
 G1–G5 have not passed. This document is a local readiness assessment, not an
 offer, safety determination, institutional approval, legal advice, or release
-authorization. Authentication, ownership, and the training-session read
-handler were implemented locally after explicit user approval; tests and a
-build pass. Reassess every gate against one pinned release after the remaining
-journey, deployment, operations and owner decisions are closed.
+authorization. Authentication, ownership and synthetic training message
+persistence were deployed to production after explicit user direction; the
+production database migration and Vercel deployment both completed. This
+technical rollout does not pass G1–G5. Reassess every gate against the pinned
+production release after the remaining journey, operations and owner decisions
+are closed.
