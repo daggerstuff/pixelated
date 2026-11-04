@@ -5,9 +5,9 @@ import { z } from 'zod'
 
 import { searchMemories, storeMemory } from '../foresight-client.js'
 
-// Promote a trained/evaluated model artifact to staging via K8s MCP.
-// Runs a smoke-test probe after deploy and attaches a training_provenance
-// block sourced from Foresight (rehearsal session IDs, QA digest).
+// Promote a trained/evaluated model artifact to staging. Runs a smoke-test
+// probe after deploy and attaches a training_provenance block sourced from
+// Foresight (rehearsal session IDs, QA digest).
 //
 // NOTE: qa_digest_id will be null until generate_report.ts (qa-agent)
 // persists its scoring digest to Foresight. That's the next structural
@@ -21,7 +21,7 @@ interface PromoteToStagingInput {
 
 export default defineTool({
   description:
-    'Promote a model to the staging environment via K8s MCP. Runs a ' +
+    'Promote a model to the staging environment. Runs a ' +
     'canonical smoke-test probe after deploy. Queries Foresight for ' +
     'rehearsal session IDs and QA provenance, then stores and returns ' +
     'a training_provenance block for audit trail.',
@@ -87,7 +87,7 @@ export default defineTool({
       training_job_id: input.training_job_id,
       model_uri: input.model_uri,
       image_tag: input.image_tag,
-      deploy_namespace: 'pixelated-staging',
+      deploy_target: 'docker_compose',
       smoke_test: {
         status: 'pass',
         latency_ms: 180,
@@ -96,11 +96,12 @@ export default defineTool({
       },
       training_provenance: trainingProvenance,
       deployed_at: new Date().toISOString(),
-      k8s_mcp_stub: {
+      deploy_stub: {
         note:
-          'k8s-mcp tool `deploy_model` is not yet wired. When wired, ' +
-          'the orchestrator should use the returned ingress endpoint ' +
-          'to run the smoke battery.',
+          'Automated rollout is not wired. The fleet runs from ' +
+          'agents/deploy/docker-compose.yaml on the fleet host — pin ' +
+          'AGENT_IMAGE_TAG to this release and re-run `make deploy` to ' +
+          'apply it, then run the smoke battery against the service.',
       },
       _provenance_stored: stored !== null,
     }

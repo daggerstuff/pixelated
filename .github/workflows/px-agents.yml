@@ -5,9 +5,12 @@
 # On PR open: advisor review (async) — posts findings as a PR comment.
 # On PR merge to staging: qa score_session (async) — evaluates session quality.
 #
-# Requires PX_AGENT_ENDPOINT configured as a repository secret pointing to
-# the deployed agent ingress (see agents/px.config.json for the endpoints).
-# When PX_LOCAL is not set, the CLI uses endpoints from agents/px.config.json.
+# Fleet endpoints come from agents/px.config.json (the documented port map).
+#
+# This workflow never reaches a live fleet: it sets PX_LOCAL=1 so px talks to
+# the stub server from `px serve`. To point it at a real host instead, set
+# PX_FLEET_HOST to that host — agents/px.config.json already carries the port
+# map.
 name: px Agent CI
 
 on:
@@ -94,12 +97,29 @@ jobs:
                         } else {
                           lines.push('No findings.');
                         }
-                        await github.rest.issues.createComment({
+                        const body = lines.join('\n');
+                        // Find existing px Advisor Review comment to avoid spam
+                        const { data: comments } = await github.rest.issues.listComments({
                           owner: context.repo.owner,
                           repo: context.repo.repo,
                           issue_number: context.issue.number,
-                          body: lines.join('\n'),
                         });
+                        const existing = comments.find(c => c.body && c.body.includes('## px Advisor Review'));
+                        if (existing) {
+                          await github.rest.issues.updateComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            comment_id: existing.id,
+                            body,
+                          });
+                        } else {
+                          await github.rest.issues.createComment({
+                            owner: context.repo.owner,
+                            repo: context.repo.repo,
+                            issue_number: context.issue.number,
+                            body,
+                          });
+                        }
                       } catch (e) {
                         console.log('Could not post review comment:', e.message);
                       }

@@ -180,3 +180,81 @@ describe('loadConfig precedence', () => {
     }
   })
 })
+
+describe('fleet host override', () => {
+  it('swaps the host on every endpoint and keeps each agent port', () => {
+    const repoRoot = mkdtempSync(join(tmpdir(), 'px-config-fleet-'))
+    const userDir = mkdtempSync(join(tmpdir(), 'px-config-fleet-user-'))
+
+    mkdirSync(join(repoRoot, 'agents'))
+    mkdirSync(join(repoRoot, '.git'))
+    mkdirSync(join(userDir, '.px'), { recursive: true })
+
+    writeFileSync(
+      join(repoRoot, 'agents', 'px.config.json'),
+      JSON.stringify({
+        agents: {
+          qa: { endpoint: 'http://127.0.0.1:2030', tools: ['score_session'] },
+          session: {
+            endpoint: 'http://127.0.0.1:2035',
+            tools: ['start_session'],
+          },
+        },
+      }),
+    )
+
+    const originalHome = process.env.HOME
+    const originalFleetHost = process.env.PX_FLEET_HOST
+    process.env.HOME = userDir
+    process.env.PX_FLEET_HOST = '10.4.5.6'
+
+    try {
+      const loaded = loadConfig({ cwd: repoRoot })
+
+      expect(loaded.config.agents.qa?.endpoint).toBe('http://10.4.5.6:2030')
+      expect(loaded.config.agents.session?.endpoint).toBe(
+        'http://10.4.5.6:2035',
+      )
+    } finally {
+      process.env.HOME = originalHome
+      if (originalFleetHost === undefined) {
+        delete process.env.PX_FLEET_HOST
+      } else {
+        process.env.PX_FLEET_HOST = originalFleetHost
+      }
+    }
+  })
+
+  it('leaves endpoints untouched when PX_FLEET_HOST is unset', () => {
+    const repoRoot = mkdtempSync(join(tmpdir(), 'px-config-nofleet-'))
+    const userDir = mkdtempSync(join(tmpdir(), 'px-config-nofleet-user-'))
+
+    mkdirSync(join(repoRoot, 'agents'))
+    mkdirSync(join(repoRoot, '.git'))
+    mkdirSync(join(userDir, '.px'), { recursive: true })
+
+    writeFileSync(
+      join(repoRoot, 'agents', 'px.config.json'),
+      JSON.stringify({
+        agents: {
+          qa: { endpoint: 'http://127.0.0.1:2030', tools: ['score_session'] },
+        },
+      }),
+    )
+
+    const originalHome = process.env.HOME
+    const originalFleetHost = process.env.PX_FLEET_HOST
+    process.env.HOME = userDir
+    delete process.env.PX_FLEET_HOST
+
+    try {
+      const loaded = loadConfig({ cwd: repoRoot })
+      expect(loaded.config.agents.qa?.endpoint).toBe('http://127.0.0.1:2030')
+    } finally {
+      process.env.HOME = originalHome
+      if (originalFleetHost !== undefined) {
+        process.env.PX_FLEET_HOST = originalFleetHost
+      }
+    }
+  })
+})

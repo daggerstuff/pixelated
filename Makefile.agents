@@ -1,18 +1,29 @@
 # Pixelated Empathy Agent Fleet — Build & Deploy
 #
+# The fleet's production home is agents/deploy/docker-compose.yaml on a single
+# host. Images are published to Docker Hub by .github/workflows/build-images.yml
+# from a green staging CI run, so deploying normally means `make pull` +
+# `make deploy` rather than building on the host.
+#
 # Targets:
-#   build-all       Build all 8 agent Docker images
+#   build-all       Build all 8 agent Docker images locally
 #   build-<agent>   Build a single agent image (e.g. make build-supervisor)
 #   push-all        Push all images to Docker Hub
 #   push-<agent>    Push a single agent image
+#   pull            Pull the published fleet images
+#   deploy          Start (or update) the Compose fleet
+#   down            Stop the Compose fleet
+#   check           Validate docker-compose.yaml without a real .env.agents
+#   lockfiles       Regenerate the git-ignored per-agent pnpm-lock.yaml files
 #   clean           Remove .output directories
 
-REGISTRY    := docker.io/pixelatedempathy
-TAG         := latest
+REGISTRY    ?= docker.io/pixelatedempathy
+TAG         ?= latest
+COMPOSE     := docker compose -f agents/deploy/docker-compose.yaml
 AGENTS      := supervisor advisor content eve intake pipeline qa session
 AGENT_DIRS  := supervisor-agent advisor-agent content-agent eve-agent intake-agent pipeline-agent qa-agent session-agent
 
-.PHONY: build-all push-all clean $(addprefix build-,$(AGENTS)) $(addprefix push-,$(AGENTS))
+.PHONY: build-all push-all pull deploy down check lockfiles clean $(addprefix build-,$(AGENTS)) $(addprefix push-,$(AGENTS))
 
 build-all: $(addprefix build-,$(AGENTS))
 
@@ -32,6 +43,50 @@ push-$(1): build-$(1)
 	docker push $(REGISTRY)/$(1)-agent:$(TAG)
 endef
 $(foreach agent,$(AGENTS),$(eval $(call push_template,$(agent))))
+
+pull:
+	AGENT_IMAGE_TAG=$(TAG) $(COMPOSE) pull
+
+deploy:
+	AGENT_IMAGE_TAG=$(TAG) $(COMPOSE) up -d
+
+down:
+	$(COMPOSE) down
+
+# Compose refuses to even parse the file when a service `env_file` is missing,
+# so validation would otherwise require real credentials on the host. The
+# env_file stays REQUIRED (dropping it would let agents boot unauthenticated);
+# instead, when .env.agents is absent we validate against a temporary copy of
+# the committed example and delete it again.
+check:
+	@set -e; \
+	if [ -f agents/deploy/.env.agents ]; then \
+		$(COMPOSE) config --quiet; \
+		echo "compose config OK (agents/deploy/.env.agents)"; \
+	else \
+		tmp=agents/deploy/.env.agents; \
+		trap 'rm -f "$$tmp"' EXIT INT TERM; \
+		cp agents/deploy/.env.agents.example "$$tmp"; \
+		$(COMPOSE) config --quiet; \
+		echo "compose config OK (validated against .env.agents.example)"; \
+	fi
+
+# Each agent is a project of the root pnpm workspace, but the Docker build
+# copies only package.json + pnpm-workspace.yaml into the image and installs
+# standalone. That standalone install needs a lockfile next to the agent, and
+# the ones committed to git are deliberately absent (see .gitignore), so pnpm
+# writes git-ignored per-agent lockfiles locally. Those go stale whenever an
+# agent's pnpm-workspace.yaml changes (pnpm records a packageExtensions
+# checksum), and a stale one makes every `pnpm <script>` inside that agent fail
+# its pre-run frozen install with ERR_PNPM_LOCKFILE_CONFIG_MISMATCH. Rewrite
+# them from the current config with this target.
+lockfiles:
+	@for dir in $(AGENT_DIRS); do \
+		printf '%-16s ' "$$dir"; \
+		(cd agents/$$dir && pnpm install --ignore-workspace --lockfile-only --no-frozen-lockfile >/dev/null 2>&1 \
+			&& pnpm install --frozen-lockfile >/dev/null 2>&1 \
+			&& echo "ok" || echo "FAILED"); \
+	done
 
 clean:
 	@for dir in $(AGENT_DIRS); do \

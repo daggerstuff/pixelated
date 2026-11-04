@@ -25,25 +25,52 @@ let tempRepo: string
  */
 const MOCK_SERVER_SCRIPT = `
 const http = require('http');
+const sessions = new Map();
+let sessionCounter = 0;
+
 const server = http.createServer((req, res) => {
-  if (req.url === '/eve/v1/health') {
+  const url = req.url || '';
+
+  if (req.method === 'GET' && url === '/eve/v1/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ status: 'ok' }));
+    res.end(JSON.stringify({ ok: true, status: 'ok' }));
     return;
   }
-  if (req.method === 'POST' && req.url?.startsWith('/eve/v1/')) {
+
+  if (req.method === 'POST' && url === '/eve/v1/session') {
     let body = '';
     req.on('data', (chunk) => { body += chunk; });
     req.on('end', () => {
+      let message = '';
+      try { message = JSON.parse(body).message || ''; } catch (e) { message = ''; }
+      sessionCounter += 1;
+      const sessionId = 'wrun_mock_' + sessionCounter;
+      sessions.set(sessionId, message);
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({
-        status: 'ok',
-        result: { reviewed: true, score: 87, issues: [] },
-        task_id: 'task-abc-123',
-      }));
+      res.end(JSON.stringify({ ok: true, sessionId, status: 'accepted' }));
     });
     return;
   }
+
+  const streamMatch = url.match(/^\\/eve\\/v1\\/session\\/([^/]+)\\/stream$/);
+  if (req.method === 'GET' && streamMatch) {
+    const sessionId = streamMatch[1];
+    const message = sessions.get(sessionId);
+    if (message === undefined) {
+      res.writeHead(404, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'session not found' }));
+      return;
+    }
+    sessions.delete(sessionId);
+    res.writeHead(200, { 'Content-Type': 'application/x-ndjson' });
+    res.write(JSON.stringify({ type: 'session.started', data: { sessionId } }) + '\\n');
+    res.write(JSON.stringify({ type: 'turn.started', data: {} }) + '\\n');
+    res.write(JSON.stringify({ type: 'message.completed', data: { message: 'ok — score 87 (' + message + ')' } }) + '\\n');
+    res.write(JSON.stringify({ type: 'turn.completed', data: {} }) + '\\n');
+    res.end();
+    return;
+  }
+
   res.writeHead(404);
   res.end('not found');
 });
@@ -226,14 +253,16 @@ describe('integration: CLI against mock eve server', () => {
     expect(status).toBe(0)
     expect(stdout).toContain('ok')
     expect(stdout).toContain('87')
+    // The session message must ask the agent for the requested tool.
+    expect(stdout).toContain('Run the review tool')
   })
 
   it('px advisor review --json — returns raw JSON', () => {
     const { stdout, status } = runCli(['advisor', 'review', '--json'], tempRepo)
     expect(status).toBe(0)
     const parsed = JSON.parse(stdout)
-    expect(parsed.status).toBe('ok')
-    expect(parsed.result.score).toBe(87)
+    expect(parsed.sessionId).toMatch(/^wrun_mock_/)
+    expect(parsed.message).toContain('87')
   })
 
   it('px advisor review --dry-run — prints intent without calling', () => {
@@ -246,13 +275,14 @@ describe('integration: CLI against mock eve server', () => {
     expect(parsed.method).toBe('POST')
     expect(parsed.agent).toBe('advisor')
     expect(parsed.tool).toBe('review')
-    expect(parsed.url).toContain('/eve/v1/review')
+    expect(parsed.url).toContain('/eve/v1/session')
   })
 
-  it('px qa score_session — async mode returns task ID', () => {
+  it('px qa score_session — async mode returns session ID', () => {
     const { stdout, status } = runCli(['qa', 'score_session'], tempRepo)
     expect(status).toBe(0)
-    expect(stdout).toContain('task-abc-123')
+    expect(stdout).toContain('Queued')
+    expect(stdout).toContain('wrun_mock_')
     expect(stdout).toContain('#test-results')
   })
 

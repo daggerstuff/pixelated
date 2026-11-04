@@ -1,14 +1,21 @@
 # Pixelated Empathy Agent Fleet — standalone Docker Compose
 #
-# Builds and runs all 8 agents + supporting services (MongoDB, Redis)
-# on a single host. Use for staging, development, or production on a
-# single VM.
+# This is the fleet's production home: one host runs all 8 eve agents plus the
+# MongoDB and Redis they depend on. Images are published to Docker Hub by
+# .github/workflows/build-images.yml from a green staging CI run, so a host
+# only needs `docker compose pull` to track CI. Adding `--build` builds the
+# same agents from the checkout instead (local dev, or an unreleased change).
 #
 # Usage:
+#   cp agents/deploy/.env.agents.example agents/deploy/.env.agents
+#   $EDITOR agents/deploy/.env.agents
 #   docker compose -f agents/deploy/docker-compose.yaml up -d
 #   docker compose -f agents/deploy/docker-compose.yaml logs -f
 #   docker compose -f agents/deploy/docker-compose.yaml down
 #
+# Image coordinates default to docker.io/pixelatedempathy/<agent>-agent:latest.
+# Override AGENT_IMAGE_PREFIX / AGENT_IMAGE_TAG to pin a different tag (for
+# example `AGENT_IMAGE_TAG=staging`).
 services:
   # --- Supporting services ---
 
@@ -24,11 +31,12 @@ services:
     image: redis:latest
     ports:
       - '6379:6379'
-    restart: unless-Stopped
+    restart: unless-stopped
 
   # --- Agent fleet ---
 
   supervisor-agent:
+    image: ${AGENT_IMAGE_PREFIX:-docker.io/pixelatedempathy}/supervisor-agent:${AGENT_IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: agents/Dockerfile
@@ -45,6 +53,7 @@ services:
     depends_on: [mongo, redis]
 
   advisor-agent:
+    image: ${AGENT_IMAGE_PREFIX:-docker.io/pixelatedempathy}/advisor-agent:${AGENT_IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: agents/Dockerfile
@@ -60,6 +69,7 @@ services:
     restart: unless-stopped
 
   content-agent:
+    image: ${AGENT_IMAGE_PREFIX:-docker.io/pixelatedempathy}/content-agent:${AGENT_IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: agents/Dockerfile
@@ -75,6 +85,7 @@ services:
     restart: unless-stopped
 
   eve-agent:
+    image: ${AGENT_IMAGE_PREFIX:-docker.io/pixelatedempathy}/eve-agent:${AGENT_IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: agents/Dockerfile
@@ -90,6 +101,7 @@ services:
     restart: unless-stopped
 
   intake-agent:
+    image: ${AGENT_IMAGE_PREFIX:-docker.io/pixelatedempathy}/intake-agent:${AGENT_IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: agents/Dockerfile
@@ -105,6 +117,7 @@ services:
     restart: unless-stopped
 
   pipeline-agent:
+    image: ${AGENT_IMAGE_PREFIX:-docker.io/pixelatedempathy}/pipeline-agent:${AGENT_IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: agents/Dockerfile
@@ -120,6 +133,7 @@ services:
     restart: unless-stopped
 
   qa-agent:
+    image: ${AGENT_IMAGE_PREFIX:-docker.io/pixelatedempathy}/qa-agent:${AGENT_IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: agents/Dockerfile
@@ -135,6 +149,7 @@ services:
     restart: unless-stopped
 
   session-agent:
+    image: ${AGENT_IMAGE_PREFIX:-docker.io/pixelatedempathy}/session-agent:${AGENT_IMAGE_TAG:-latest}
     build:
       context: ../..
       dockerfile: agents/Dockerfile

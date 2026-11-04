@@ -6,18 +6,18 @@ then returns scored, actionable advice without modifying files.
 
 ## What's in this slice
 
-| Slot              | File                                                                                                                         |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Runtime config    | `agent/agent.ts`                                                                                                             |
-| Standing rules    | `agent/instructions.md`                                                                                                      |
-| Model             | `agent/lib/workers-ai.ts`                                                                                                    |
-| Tools             | `agent/tools/get_worktree.ts`, `agent/tools/read_file.ts`                                                                    |
-| Channels          | `agent/channels/eve.ts`, `agent/channels/slack.ts`, `agent/channels/slack-events.ts`, `agent/channels/linear.ts`             |
-| Connections       | `agent/connections/foresight.ts`, `agent/connections/linear.ts`, `agent/connections/notion.ts` (eager)                       |
-| Sub-agent         | `agent/subagents/evaluator/{agent.ts,instructions.md}`                                                                       |
-| Pipeline guidance | `agent/instructions/approval-gates.md`, `agent/instructions/pipeline-states.md`, `agent/instructions/recovery-procedures.md` |
-| Schedule          | `agent/schedules/weekly-train.ts`                                                                                            |
-| Hook              | `agent/hooks/pipeline_audit.ts`                                                                                              |
+| Slot              | File                                                                                                                                           |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime config    | `agent/agent.ts`                                                                                                                               |
+| Standing rules    | `agent/instructions.md`                                                                                                                        |
+| Model             | `agent/lib/workers-ai.ts`                                                                                                                      |
+| Tools             | `agent/tools/get_worktree.ts`, `agent/tools/read_file.ts`                                                                                      |
+| Channels          | `agent/channels/eve.ts`, `agent/channels/slack.ts`, `agent/channels/slack-events.ts`, `agent/channels/linear.ts`                               |
+| Connections       | `agent/connections/linear.ts`, `agent/connections/notion.ts`, `agent/connections/training-infra-mcp.ts`, `agent/connections/workers-ai-mcp.ts` |
+| Sub-agent         | `agent/subagents/evaluator/{agent.ts,instructions.md}`                                                                                         |
+| Pipeline guidance | `agent/instructions/approval-gates.md`, `agent/instructions/pipeline-states.md`, `agent/instructions/recovery-procedures.md`                   |
+| Schedule          | `agent/schedules/weekly-train.ts`                                                                                                              |
+| Hook              | `agent/hooks/pipeline_audit.ts`                                                                                                                |
 
 ## Status
 

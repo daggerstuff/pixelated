@@ -1,3 +1,4 @@
+import { listSources } from '../config/loader.js'
 import type { LoadedConfig } from '../config/loader.js'
 import type { PxConfig, AgentConfig, HookConfig } from '../config/schema.js'
 
@@ -25,12 +26,12 @@ function formatHooks(config: PxConfig): string {
 }
 
 export function formatConfig(loaded: LoadedConfig): string {
-  const { config, sources } = loaded
+  const { config } = loaded
   const lines: string[] = []
   lines.push('px config — resolved configuration')
   lines.push('')
   lines.push('Sources (precedence low → high):')
-  for (const s of sources) lines.push(`  ${s}`)
+  for (const s of listSources(loaded)) lines.push(`  ${s}`)
   lines.push('')
   lines.push('Agents:')
   lines.push(formatAgents(config.agents))

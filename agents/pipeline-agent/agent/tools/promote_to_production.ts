@@ -25,13 +25,14 @@ export default defineTool({
       production_release_id: `release-${Date.now().toString(36)}`,
       staging_release_id: input.staging_release_id,
       image_tag: input.image_tag,
-      deploy_namespace: 'pixelated-prod',
+      deploy_target: 'docker_compose',
       deployed_at: new Date().toISOString(),
-      k8s_mcp_stub: {
+      deploy_stub: {
         note:
-          'k8s-mcp tool `deploy_production` is not yet wired. Once wired, ' +
-          'the orchestrator should record the release in Linear via the ' +
-          'linear channel.',
+          'Automated rollout is not wired. The fleet runs from ' +
+          'agents/deploy/docker-compose.yaml on the fleet host; promote by ' +
+          'pinning AGENT_IMAGE_TAG to this release and re-running ' +
+          '`make deploy`.',
       },
     }
   },

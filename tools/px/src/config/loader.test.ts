@@ -4,8 +4,25 @@ import { join } from 'node:path'
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import { loadConfig, findAgent, validateTool } from './loader.js'
+import { loadConfig, listSources, findAgent, validateTool } from './loader.js'
 import type { PxConfig, AgentConfig } from './schema.js'
+
+// findRepoRoot() walks up from the given directory until it finds a `.git`
+// entry, so a stray `.git` anywhere above the temp dir (e.g. /tmp/.git left by
+// another tool) would make the "no repo root" case unreachable. Hide `.git`
+// from existsSync for that one test so it stays deterministic.
+const fsState = vi.hoisted(() => ({ hideGitDirs: false }))
+
+vi.mock('node:fs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:fs')>()
+  return {
+    ...actual,
+    existsSync: (target: Parameters<typeof actual.existsSync>[0]) => {
+      if (fsState.hideGitDirs && String(target).endsWith('.git')) return false
+      return actual.existsSync(target)
+    },
+  }
+})
 
 // Helper: create a temp git repo with config
 function createTempRepo(config: Record<string, unknown>): string {
@@ -63,7 +80,9 @@ describe('loadConfig', () => {
   })
 
   it('loads default config from agents/px.config.json', () => {
-    const { config, sources } = loadConfig(tempDir)
+    const loaded = loadConfig(tempDir)
+    const { config } = loaded
+    const sources = listSources(loaded)
     expect(config.agents).toHaveProperty('advisor')
     expect(config.agents).toHaveProperty('content')
     expect(sources.length).toBeGreaterThanOrEqual(1)
@@ -72,8 +91,13 @@ describe('loadConfig', () => {
 
   it('throws if no repo root found', () => {
     const noGitDir = mkdtempSync(join(tmpdir(), 'px-nogit-'))
-    expect(() => loadConfig(noGitDir)).toThrow('repo root')
-    rmSync(noGitDir, { recursive: true, force: true })
+    fsState.hideGitDirs = true
+    try {
+      expect(() => loadConfig(noGitDir)).toThrow('repo root')
+    } finally {
+      fsState.hideGitDirs = false
+      rmSync(noGitDir, { recursive: true, force: true })
+    }
   })
 
   it('throws if config file missing', () => {
@@ -95,9 +119,9 @@ describe('loadConfig', () => {
       }),
     )
 
-    const { config, sources } = loadConfig(tempDir)
-    expect(config.agents.advisor.endpoint).toBe('http://override:3000')
-    expect(sources.length).toBe(2)
+    const loaded = loadConfig(tempDir)
+    expect(loaded.config.agents.advisor.endpoint).toBe('http://override:3000')
+    expect(listSources(loaded).length).toBe(2)
   })
 
   it('merges hooks from override', () => {
@@ -114,6 +138,64 @@ describe('loadConfig', () => {
     const { config } = loadConfig(tempDir)
     expect(config.hooks).toHaveProperty('pre-commit')
     expect(config.hooks).toHaveProperty('pre-push')
+  })
+})
+
+describe('environment endpoint overrides', () => {
+  const originalFleetHost = process.env['PX_FLEET_HOST']
+  const originalLocal = process.env['PX_LOCAL']
+
+  afterEach(() => {
+    if (originalFleetHost === undefined) {
+      delete process.env['PX_FLEET_HOST']
+    } else {
+      process.env['PX_FLEET_HOST'] = originalFleetHost
+    }
+    if (originalLocal === undefined) {
+      delete process.env['PX_LOCAL']
+    } else {
+      process.env['PX_LOCAL'] = originalLocal
+    }
+  })
+
+  it('applies PX_FLEET_HOST to every agent, keeping each port', () => {
+    const dir = createTempRepo({
+      agents: {
+        advisor: { endpoint: 'http://127.0.0.1:2005', tools: ['review'] },
+        qa: { endpoint: 'http://127.0.0.1:2030', tools: ['score_session'] },
+      },
+    })
+    delete process.env['PX_LOCAL']
+    process.env['PX_FLEET_HOST'] = 'agents.example.com'
+
+    try {
+      const { config } = loadConfig(dir)
+      expect(config.agents.advisor.endpoint).toBe(
+        'http://agents.example.com:2005',
+      )
+      expect(config.agents.qa.endpoint).toBe('http://agents.example.com:2030')
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('points every agent at the local stub server when PX_LOCAL=1', () => {
+    const dir = createTempRepo({
+      agents: {
+        advisor: { endpoint: 'http://127.0.0.1:2005', tools: ['review'] },
+        qa: { endpoint: 'http://127.0.0.1:2030', tools: ['score_session'] },
+      },
+    })
+    delete process.env['PX_FLEET_HOST']
+    process.env['PX_LOCAL'] = '1'
+
+    try {
+      const { config } = loadConfig(dir)
+      expect(config.agents.advisor.endpoint).toBe('http://localhost:2000')
+      expect(config.agents.qa.endpoint).toBe('http://localhost:2000')
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
   })
 })
 
