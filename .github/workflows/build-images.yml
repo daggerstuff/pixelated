@@ -23,9 +23,6 @@ permissions:
 env:
     REGISTRY: docker.io
     IMAGE_NAME: pixelatedempathy/api
-    SESSION_AGENT_IMAGE_NAME: pixelatedempathy/session-agent
-    QA_AGENT_IMAGE_NAME: pixelatedempathy/qa-agent
-    PIPELINE_AGENT_IMAGE_NAME: pixelatedempathy/pipeline-agent
 
 jobs:
     build-and-push:
@@ -38,9 +35,6 @@ jobs:
         outputs:
             image_tag: ${{ steps.vars.outputs.image_tag }}
             app_digest: ${{ steps.build-app.outputs.digest }}
-            session_digest: ${{ steps.build-session.outputs.digest }}
-            qa_digest: ${{ steps.build-qa.outputs.digest }}
-            pipeline_digest: ${{ steps.build-pipeline.outputs.digest }}
         steps:
             - name: Checkout code
               uses: actions/checkout@v7
@@ -83,59 +77,76 @@ jobs:
                   cache-to: type=gha,mode=max
                   platforms: linux/amd64
 
-            - name: Build and push session agent
-              id: build-session
-              uses: docker/build-push-action@v7
-              with:
-                  context: .
-                  file: ./agents/Dockerfile
-                  build-args: |
-                      AGENT_DIR=agents/session-agent
-                  push: true
-                  tags:
-                      ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
-                      steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
-                      env.SESSION_AGENT_IMAGE_NAME }}:latest
-                  cache-from: type=gha,scope=session-agent
-                  cache-to: type=gha,mode=max,scope=session-agent
-                  platforms: linux/amd64
+            - name: Image digest
+              run: 'echo "app: ${{ steps.build-app.outputs.digest }}"'
 
-            - name: Build and push QA agent
-              id: build-qa
-              uses: docker/build-push-action@v7
+    # Every agent in the fleet is published, not just the three the retired
+    # EKS manifests used: agents/deploy/docker-compose.yaml pulls all eight
+    # from these tags, so the fleet host never needs a checkout to deploy.
+    build-agent-images:
+        if: >-
+            github.event_name == 'workflow_dispatch' ||
+            (github.event.workflow_run.conclusion == 'success' &&
+             github.event.workflow_run.head_branch == 'staging')
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                agent:
+                    - supervisor
+                    - advisor
+                    - content
+                    - eve
+                    - intake
+                    - pipeline
+                    - qa
+                    - session
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v7
               with:
-                  context: .
-                  file: ./agents/Dockerfile
-                  build-args: |
-                      AGENT_DIR=agents/qa-agent
-                  push: true
-                  tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
-                      steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
-                      env.QA_AGENT_IMAGE_NAME }}:latest
-                  cache-from: type=gha,scope=qa-agent
-                  cache-to: type=gha,mode=max,scope=qa-agent
-                  platforms: linux/amd64
+                  fetch-depth: 0
+                  persist-credentials: false
 
-            - name: Build and push pipeline agent
-              id: build-pipeline
-              uses: docker/build-push-action@v7
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v4
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v4
               with:
-                  context: .
-                  file: ./agents/Dockerfile
-                  build-args: |
-                      AGENT_DIR=agents/pipeline-agent
-                  push: true
-                  tags:
-                      ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
-                      steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
-                      env.PIPELINE_AGENT_IMAGE_NAME }}:latest
-                  cache-from: type=gha,scope=pipeline-agent
-                  cache-to: type=gha,mode=max,scope=pipeline-agent
-                  platforms: linux/amd64
+                  username: ${{ secrets.DOCKERHUB_USERNAME }}
+                  password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-            - name: Image digests
+            - name: Determine image tag
+              id: vars
               run: |
-                  echo "app:      ${{ steps.build-app.outputs.digest }}"
-                  echo "session:  ${{ steps.build-session.outputs.digest }}"
-                  echo "qa:       ${{ steps.build-qa.outputs.digest }}"
-                  echo "pipeline: ${{ steps.build-pipeline.outputs.digest }}"
+                  if [[ "${{ github.ref_name }}" == "main" ]]; then
+                    IMAGE_TAG="production"
+                  else
+                    IMAGE_TAG="${{ github.ref_name }}"
+                  fi
+                  echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
+                  echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+                  echo "Built image tag: $IMAGE_TAG"
+
+            - name: Build and push ${{ matrix.agent }} agent
+              id: build
+              uses: docker/build-push-action@v7
+              with:
+                  context: .
+                  file: ./agents/Dockerfile
+                  build-args: |
+                      AGENT_DIR=agents/${{ matrix.agent }}-agent
+                  push: true
+                  tags: >-
+                      ${{ env.REGISTRY }}/pixelatedempathy/${{
+                      matrix.agent }}-agent:${{
+                      steps.vars.outputs.image_tag }},${{
+                      env.REGISTRY }}/pixelatedempathy/${{
+                      matrix.agent }}-agent:latest
+                  cache-from: type=gha,scope=${{ matrix.agent }}-agent
+                  cache-to: type=gha,mode=max,scope=${{ matrix.agent }}-agent
+                  platforms: linux/amd64
+
+            - name: Image digest
+              run: 'echo "${{ matrix.agent }}: ${{ steps.build.outputs.digest }}"'

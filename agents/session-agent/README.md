@@ -16,7 +16,7 @@ backend agent in Pixelated Empathy's Eve workflow. Status: **Done** (PIX-3957).
 | Hooks (1)       | `agent/hooks/pii_scrubber.ts` (logs-only scrubber on `message.completed`)                                                                                                                                                                         |
 | Lib             | `agent/lib/process-shutdown.ts`, `agent/lib/workers-ai.ts`, `agent/foresight-client.ts` (SSEClientTransport → `/sse`)                                                                                                                             |
 | Evals           | `evals/evals.config.ts`, `evals/smoke.eval.ts`, `evals/boundary_flag.eval.ts`                                                                                                                                                                     |
-| K8s             | `k8s/deployment.yaml` (`session-agent` + `session-agent-mc`; startupProbe/readiness/liveness at `/eve/v1/health`; secret `cloudflare-workers-ai`; env `FORESIGHT_URL=http://foresight:8765`, `PIXELATED_SESSION_MCP_URL=http://session-mcp:8766`) |
+| Deploy          | `agents/deploy/docker-compose.yaml` (host port 2035 → container 2000; health at `/eve/v1/health`; env `FORESIGHT_URL`, `PIXELATED_SESSION_MCP_URL`)                                                                                               |
 | Tests           | `tests/` — 10 files (9 unit + 1 `session-lifecycle.integration.test.ts`)                                                                                                                                                                          |
 
 ## Foresight transport

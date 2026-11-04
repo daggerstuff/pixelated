@@ -1,53 +1,109 @@
 # Agent Fleet Deployment
 
-Three deployment options for the 8-agent Pixelated Empathy fleet.
+How the 8-agent Pixelated Empathy fleet is deployed. There are two supported
+homes: **Docker Compose on a fleet host** (the default) and **systemd on a
+bare-metal host**. The retired AWS EKS deployment is not an option — the
+Kubernetes manifests and their secret template have been removed.
 
 ## Prerequisites
 
-- Node.js 24.x (agents use Eve framework)
-- Each agent must be built: `cd agents/<agent>-agent && pnpm exec eve build`
+- Docker Engine with Compose v2 for the Compose path, or Node.js 24.x plus
+  systemd for the bare-metal path
 - Cloudflare Workers AI credentials (`CLOUDFLARE_ACCOUNT_ID`,
   `CLOUDFLARE_AI_API_KEY`)
-- Foresight MCP server running and reachable (streamable HTTP at `/mcp`)
+- Foresight MCP server reachable over streamable HTTP at `/mcp`
 - MongoDB for session-agent persistence
 
 ## Port Assignments
 
-| Agent      | Port |
-| ---------- | ---- |
-| supervisor | 2000 |
-| advisor    | 2005 |
-| content    | 2010 |
-| eve        | 2015 |
-| intake     | 2020 |
-| pipeline   | 2025 |
-| qa         | 2030 |
-| session    | 2035 |
+Every agent listens on container port `2000`. The host port map below is what
+callers outside the Compose network use, and what
+`agents/px.config.json` points at:
 
-## Option 1: systemd (bare-metal / VM)
+| Agent      | Host port |
+| ---------- | --------- |
+| supervisor | 2000      |
+| advisor    | 2005      |
+| content    | 2010      |
+| eve        | 2015      |
+| intake     | 2020      |
+| pipeline   | 2025      |
+| qa         | 2030      |
+| session    | 2035      |
 
-Best for single-server deployment on standard Linux hosts.
+## Option 1: Docker Compose (default)
+
+Images are published to Docker Hub by `.github/workflows/build-images.yml` on a
+green `staging` CI run, so the host does not need a checkout to deploy.
+
+```bash
+# 1. Create the env file
+cp agents/deploy/.env.agents.example agents/deploy/.env.agents
+$EDITOR agents/deploy/.env.agents   # fill in credentials
+
+# 2. Validate the Compose file (no credentials needed — see below)
+make -f Makefile.agents check
+
+# 3. Pull and start the fleet
+make -f Makefile.agents pull
+make -f Makefile.agents deploy
+
+# 4. Check health
+curl http://127.0.0.1:2000/eve/v1/health
+
+# 5. View logs
+docker compose -f agents/deploy/docker-compose.yaml logs -f
+
+# 6. Stop
+make -f Makefile.agents down
+```
+
+`docker compose config` refuses to parse the file when a service `env_file` is
+missing, and `.env.agents` stays **required** on purpose — making it optional
+would let agents boot without auth. `make -f Makefile.agents check` therefore
+validates against a temporary copy of the committed example when
+`.env.agents` is absent, and deletes the copy afterwards.
+
+To run an unreleased change instead of the published images, build from the
+checkout — every service declares both `image` and `build`, so the same
+commands work:
+
+```bash
+docker compose -f agents/deploy/docker-compose.yaml up -d --build
+```
+
+Pin a different tag (for example a staging build) by exporting
+`AGENT_IMAGE_TAG=staging` or passing `make -f Makefile.agents deploy TAG=staging`.
+`AGENT_IMAGE_PREFIX` overrides the registry/namespace.
+
+### Publishing images
+
+```bash
+make -f Makefile.agents build-all   # build all 8 locally
+make -f Makefile.agents push-all    # build + push to docker.io/pixelatedempathy
+```
+
+## Option 2: systemd (bare-metal / VM)
+
+Best for a single host without a container runtime.
 
 ```bash
 # 1. Build all agents
 for agent in supervisor advisor content eve intake pipeline qa session; do
-  cd agents/${agent}-agent && pnpm exec eve build && cd ../..
+  (cd agents/${agent}-agent && pnpm exec eve build)
 done
 
-# 2. Create env file with credentials
-sudo bash agents/deploy/systemd/install.sh  # creates /opt/pixelated/agents.env
-sudo nano /opt/pixelated/agents.env          # fill in real credentials
-
-# 3. Install and start services
+# 2. Install services (creates /opt/pixelated/agents.env)
 sudo bash agents/deploy/systemd/install.sh
+sudo nano /opt/pixelated/agents.env   # fill in real credentials
 
-# 4. Start all services
+# 3. Start all services
 for u in pixelated-{supervisor,advisor,content,eve,intake,pipeline,qa,session}-agent; do
   sudo systemctl start $u
 done
 
-# 5. Verify
-sudo systemctl status pixelated-*-agent
+# 4. Verify
+sudo systemctl status 'pixelated-*-agent'
 curl http://127.0.0.1:2000/eve/v1/health
 ```
 
@@ -57,49 +113,21 @@ Uninstall:
 sudo bash agents/deploy/systemd/install.sh --uninstall
 ```
 
-## Option 2: Docker Compose
+## Pointing clients at the fleet
 
-Best for isolated, reproducible deployments.
+`agents/px.config.json` holds the endpoints `px` talks to, and they default to
+the local port map above (`http://127.0.0.1:<port>`). Two environment
+overrides change where they resolve, applied in this order:
 
-```bash
-# 1. Create env file
-cp agents/deploy/.env.agents.example agents/deploy/.env.agents
-nano agents/deploy/.env.agents  # fill in credentials
+| Variable        | Effect                                                                 |
+| --------------- | ---------------------------------------------------------------------- |
+| `PX_FLEET_HOST` | Swaps the hostname on every agent endpoint, keeping each agent's port. |
+| `PX_LOCAL=1`    | Points every agent at `http://localhost:${PX_LOCAL_PORT:-2000}`.       |
 
-# 2. Build and start all services
-docker compose -f agents/deploy/docker-compose.yaml up -d --build
-
-# 3. Check health
-curl http://127.0.0.1:2000/eve/v1/health
-
-# 4. View logs
-docker compose -f agents/deploy/docker-compose.yaml logs -f
-
-# 5. Stop
-docker compose -f agents/deploy/docker-compose.yaml down
-```
-
-## Option 3: Kubernetes
-
-Best for multi-node, auto-scaling, or managed cloud deployments.
+So a remote fleet host needs no config edit:
 
 ```bash
-# 1. Build and push all images
-make -f Makefile.agents push-all
-
-# 2. Create namespace and secrets
-#    Edit agents/k8s/namespace-secrets.yaml with real values, then:
-kubectl apply -f agents/k8s/namespace-secrets.yaml
-
-# 3. Deploy all agents (apply each agent manifest)
-for agent in supervisor-agent advisor-agent content-agent eve-agent intake-agent pipeline-agent qa-agent session-agent; do
-  kubectl apply -f "agents/$agent/k8s/deployment.yaml"
-done
-
-# 4. Verify
-kubectl get pods -n pixelated-empathy
-kubectl port-forward -n pixelated-empathy svc/supervisor-agent 8080:80
-curl http://127.0.0.1:8080/eve/v1/health
+PX_FLEET_HOST=agents.example.com px config   # endpoints resolve to that host
 ```
 
 ## Health Check
@@ -117,10 +145,15 @@ All agents accept conversational sessions via:
 - `POST /eve/v1/session` — create a session (requires HTTP Basic auth)
 - `GET /eve/v1/session/:sessionId/stream` — SSE stream of session events
 
+Inbound auth has no default credential: when `EVE_AUTH_USERNAME` /
+`EVE_AUTH_PASSWORD` are unset, requests answer `401` and the supervisor sends
+no `Authorization` header to its subagents. On Vercel the fleet uses
+`vercelOidc()` instead.
+
 ## Scheduled Agents
 
-Three agents have cron schedules (handled automatically on Vercel; on
-bare-metal/k8s, point the host scheduler at the POST endpoint):
+Three agents have cron schedules (handled automatically on Vercel; on a Compose
+or systemd host, point the host scheduler at the POST endpoint):
 
 | Agent    | Schedule      | Endpoint                                   |
 | -------- | ------------- | ------------------------------------------ |
@@ -131,7 +164,7 @@ bare-metal/k8s, point the host scheduler at the POST endpoint):
 Example crontab entry:
 
 ```cron
-30 23 * * *  curl -s -u admin:secret -X POST http://127.0.0.1:2030/eve/v1/dev/schedules/daily-review
- 0  9 * * 1  curl -s -u admin:secret -X POST http://127.0.0.1:2005/eve/v1/dev/schedules/weekly-review
- 0  9 * * 1  curl -s -u admin:secret -X POST http://127.0.0.1:2025/eve/v1/dev/schedules/weekly-train
+30 23 * * *  curl -s -u "$EVE_AUTH_USERNAME:$EVE_AUTH_PASSWORD" -X POST http://127.0.0.1:2030/eve/v1/dev/schedules/daily-review
+ 0  9 * * 1  curl -s -u "$EVE_AUTH_USERNAME:$EVE_AUTH_PASSWORD" -X POST http://127.0.0.1:2005/eve/v1/dev/schedules/weekly-review
+ 0  9 * * 1  curl -s -u "$EVE_AUTH_USERNAME:$EVE_AUTH_PASSWORD" -X POST http://127.0.0.1:2025/eve/v1/dev/schedules/weekly-train
 ```

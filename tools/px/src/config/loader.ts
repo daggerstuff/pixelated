@@ -2,6 +2,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 
 import { deepMerge } from '../lib/deep-merge.js'
+import { applyEndpointOverrides } from '../lib/endpoint-overrides.js'
 import { isPlainObject } from '../lib/is-plain-object.js'
 import {
   defaultConfigPath,
@@ -178,16 +179,8 @@ function loadConfigFromPaths(
   const merged = deepMerge(defaultRaw ?? {}, userRaw, repoRaw, cliRaw)
   const config = parseMergedPxConfig(merged)
 
-  if (process.env['PX_LOCAL'] === '1') {
-    const localPort = process.env['PX_LOCAL_PORT'] ?? '2000'
-    const localEndpoint = `http://localhost:${localPort}`
-    for (const agentName of Object.keys(config.agents)) {
-      config.agents[agentName] = {
-        ...config.agents[agentName],
-        endpoint: localEndpoint,
-      }
-    }
-  }
+  // Environment overrides (PX_FLEET_HOST, PX_LOCAL)
+  config.agents = applyEndpointOverrides(config.agents)
 
   return { config, sources }
 }
@@ -226,6 +219,9 @@ function loadConfigStrict(cwd: string = process.cwd()): LoadedConfig {
     sources.push(repoLocalPath)
     config = mergeConfigs(config, repoLocalRaw)
   }
+
+  // 4. Environment overrides (PX_FLEET_HOST, PX_LOCAL)
+  config = { ...config, agents: applyEndpointOverrides(config.agents) }
 
   return { config, sources }
 }

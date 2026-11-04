@@ -6,6 +6,9 @@
 
 # === IDE & EDITORS ===
 .cursor/
+!/.cursor/
+/.cursor/*
+!/.cursor/BUGBOT.md
 .idea/
 .kiro/
 .kiro_tmp/
@@ -251,6 +254,7 @@ qualified_channels.json
 !.env.example
 !.env.project
 !.env.vault
+!.env.agents.example
 !config/secrets/*.example
 !config/secrets/README.md
 !config/secrets/.gitignore

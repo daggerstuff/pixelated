@@ -1,13 +1,17 @@
 {
   "agents": {
     "advisor": {
-      "endpoint": "http://advisor-agent.pixelated.svc.cluster.local:2000",
-      "tools": ["review", "get_worktree", "read_file"],
+      "endpoint": "http://127.0.0.1:2005",
+      "tools": [
+        "review",
+        "get_worktree",
+        "read_file"
+      ],
       "async": false,
       "timeout": 30000
     },
     "content": {
-      "endpoint": "http://content-agent.pixelated.svc.cluster.local:2000",
+      "endpoint": "http://127.0.0.1:2010",
       "tools": [
         "audit_corpus",
         "audit_clinical_corpus",
@@ -19,7 +23,7 @@
       "timeout": 30000
     },
     "qa": {
-      "endpoint": "http://qa-agent.pixelated.svc.cluster.local:2000",
+      "endpoint": "http://127.0.0.1:2030",
       "tools": [
         "score_session",
         "fetch_sessions",
@@ -32,7 +36,7 @@
       "timeout": 30000
     },
     "pipeline": {
-      "endpoint": "http://pipeline-agent.pixelated.svc.cluster.local:2000",
+      "endpoint": "http://127.0.0.1:2025",
       "tools": [
         "curate_dataset",
         "run_training",
@@ -47,7 +51,7 @@
       "timeout": 30000
     },
     "intake": {
-      "endpoint": "http://intake-agent.pixelated.svc.cluster.local:2000",
+      "endpoint": "http://127.0.0.1:2020",
       "tools": [
         "register_trainee",
         "assign_cohort",
@@ -60,7 +64,7 @@
       "timeout": 30000
     },
     "supervisor": {
-      "endpoint": "http://supervisor-agent.pixelated.svc.cluster.local:2000",
+      "endpoint": "http://127.0.0.1:2000",
       "tools": [
         "query_cohort_trends",
         "compare_trainees",
@@ -75,7 +79,7 @@
       "timeout": 30000
     },
     "session": {
-      "endpoint": "http://session-agent.pixelated.svc.cluster.local:2000",
+      "endpoint": "http://127.0.0.1:2035",
       "tools": [
         "start_session",
         "process_message",
@@ -91,7 +95,7 @@
       "timeout": 30000
     },
     "eve": {
-      "endpoint": "http://eve-agent.pixelated.svc.cluster.local:2000",
+      "endpoint": "http://127.0.0.1:2015",
       "tools": [
         "clean_corpus",
         "replace_slop",
@@ -111,13 +115,20 @@
       "tool": "audit_clinical_corpus",
       "filter": "scenarios/**"
     },
-    "pre-push": { "agent": "advisor", "tool": "review" },
+    "pre-push": {
+      "agent": "advisor",
+      "tool": "review"
+    },
     "post-merge": {
       "agent": "pipeline",
       "tool": "check_pipeline_health",
       "async": true
     },
-    "pr-open": { "agent": "advisor", "tool": "review", "async": true },
+    "pr-open": {
+      "agent": "advisor",
+      "tool": "review",
+      "async": true
+    },
     "pr-merge": {
       "agent": "qa",
       "tool": "score_session",
