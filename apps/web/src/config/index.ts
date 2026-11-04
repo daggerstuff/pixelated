@@ -8,8 +8,6 @@
 import type { AuthConfig, AuthRole } from './auth.config'
 // Authentication configuration
 import { authConfig, hasRolePrivilege } from './auth.config'
-// Deployment configuration
-import deploymentConfig from './deployment.config'
 import type { Env } from './env.config'
 // Environment variables configuration
 import { config as envConfig } from './env.config'
@@ -75,14 +73,12 @@ export const FEATURES = {
 }
 
 export { type Env, envConfig }
-export { deploymentConfig }
 export { rateLimitConfig, type RateLimitOptions }
 export { authConfig, type AuthConfig, type AuthRole, hasRolePrivilege }
 
 // Default export for all configurations
 export default {
   env: envConfig,
-  deployment: deploymentConfig,
   rateLimit: rateLimitConfig,
   auth: authConfig,
   site: SITE,

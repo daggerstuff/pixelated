@@ -19,33 +19,6 @@ declare module '@/lib/analytics/service' {
   }
 }
 
-declare module '../../config/azure.config' {
-  export interface AzureConfig {
-    clientId: string
-    tenantId: string
-    clientSecret: string
-  }
-  export const azureConfig: AzureConfig
-}
-
-declare module '../config/azure.config' {
-  export interface AzureConfig {
-    clientId: string
-    tenantId: string
-    clientSecret: string
-  }
-  export const azureConfig: AzureConfig
-}
-
-declare module '@/config/azure.config' {
-  export interface AzureConfig {
-    clientId: string
-    tenantId: string
-    clientSecret: string
-  }
-  export const azureConfig: AzureConfig
-}
-
 declare module './objectives' {
   export interface Objective {
     id: string
@@ -55,10 +28,10 @@ declare module './objectives' {
 }
 
 declare module '../types/index.ts' {
-  export * from '../../types/audit'
-  export * from '../../types/collaboration'
-  export * from '../../types/deployment'
-  export * from '../../types/monitoring'
+  export * from './audit'
+  export * from './collaboration'
+  export * from './deployment'
+  export * from './monitoring'
 }
 
 declare module '../../simulator/types' {
