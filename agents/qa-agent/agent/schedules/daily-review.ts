@@ -6,6 +6,6 @@ import { defineSchedule } from 'eve/schedules'
 
 export default defineSchedule({
   cron: '30 23 * * *',
-  markdown:
+  content:
     'Daily QA review: fetch closed sessions since last cursor, score, and post digest.',
 })

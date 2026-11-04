@@ -5,7 +5,7 @@ import { defineSchedule } from 'eve/schedules'
 
 export default defineSchedule({
   cron: '0 * * * *',
-  markdown:
+  content:
     'Hourly intake sweep: process queued intake requests, triage by ' +
     'priority, and route to downstream agents (session, content, qa).',
 })

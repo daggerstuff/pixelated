@@ -5,7 +5,7 @@ import { defineSchedule } from 'eve/schedules'
 
 export default defineSchedule({
   cron: '0 22 * * *',
-  markdown:
+  content:
     'Daily session cleanup: archive sessions inactive for >24h, compact ' +
     'long-running session state, and verify PII scrub coverage.',
 })

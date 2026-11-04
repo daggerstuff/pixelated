@@ -6,7 +6,7 @@ import { defineSchedule } from 'eve/schedules'
 
 export default defineSchedule({
   cron: '0 9 * * 1',
-  markdown:
+  content:
     'Initiate the weekly training pipeline: run infrastructure health ' +
     'check, then kick off dataset curation.',
 })

@@ -5,7 +5,7 @@ import { defineSchedule } from 'eve/schedules'
 
 export default defineSchedule({
   cron: '0 8 * * *',
-  markdown:
+  content:
     'Daily health check: verify all downstream agents (intake, content, ' +
     'session, qa, pipeline, advisor, supervisor) are responsive, check ' +
     'schedule fire history, and report anomalies.',
