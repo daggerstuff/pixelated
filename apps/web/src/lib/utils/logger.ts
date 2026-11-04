@@ -4,9 +4,8 @@
  * support for different environments and log levels
  */
 
-// Explicit .ts extension: this file is also loaded through Node's native
-// type stripping (via the standardized-logger.js twin), which requires
-// explicit extensions on relative imports.
+// Explicit .ts extension: Node native type stripping requires explicit
+// extensions on relative imports when this module is loaded outside the bundler.
 import { scrub } from '../logging/scrub.ts'
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error'

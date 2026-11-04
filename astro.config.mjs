@@ -692,7 +692,6 @@ export default defineConfig({
         'apps/web/src/lib/fhe',
         'apps/web/src/lib/security/threat-detection',
         'apps/web/src/lib/security/threat-intelligence',
-        'apps/web/src/lib/visual-regression',
         'apps/web/src/scripts',
         'apps/web/src/server.prod.ts',
         // ── Node built-ins (never pre-bundle) ──────────────────────────────

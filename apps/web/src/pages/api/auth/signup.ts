@@ -11,7 +11,6 @@ import {
   isValidEmail,
   isValidPassword,
 } from '../../../lib/auth/utils'
-import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
 import { auth0UserService } from '../../../lib/services/auth0.service'
 import { validateRequestBody } from '../../../lib/validation/validateRequestBody'
@@ -126,9 +125,6 @@ export const POST = async ({
         role: user.role,
       },
     )
-
-    // Update Phase 6 MCP server
-    await updatePhase6AuthenticationProgress(user.id, 'user_registered')
 
     return new Response(
       JSON.stringify({
