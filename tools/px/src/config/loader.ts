@@ -8,9 +8,12 @@ import {
   repoConfigPath,
   userConfigPath,
 } from '../lib/paths.js'
-
 import type { PxConfig, AgentConfig } from './schema.js'
-import { parsePxConfig, WorkspaceConfigSchema } from './schema.js'
+import {
+  parseMergedPxConfig,
+  parsePxConfig,
+  WorkspaceConfigSchema,
+} from './schema.js'
 
 const DEFAULT_CONFIG_PATH = 'agents/px.config.json'
 const REPO_LOCAL_OVERRIDE = '.px/config.json'
@@ -146,7 +149,7 @@ function loadConfigFromPaths(
   const cwd = options.cwd ?? process.cwd()
   const sources: Partial<Record<ConfigSource, string>> = {}
 
-  const defaultPath = defaultConfigPath()
+  const defaultPath = defaultConfigPath(cwd)
   const userPath = userConfigPath()
   const repoPath = repoConfigPath(cwd)
 
@@ -173,11 +176,11 @@ function loadConfigFromPaths(
   }
 
   const merged = deepMerge(defaultRaw ?? {}, userRaw, repoRaw, cliRaw)
-  const config = parsePxConfig(merged)
+  const config = parseMergedPxConfig(merged)
 
   if (process.env['PX_LOCAL'] === '1') {
     const localPort = process.env['PX_LOCAL_PORT'] ?? '2000'
-    const localEndpoint = `http://[REDACTED]:${localPort}`
+    const localEndpoint = `http://localhost:${localPort}`
     for (const agentName of Object.keys(config.agents)) {
       config.agents[agentName] = {
         ...config.agents[agentName],
@@ -227,11 +230,15 @@ function loadConfigStrict(cwd: string = process.cwd()): LoadedConfig {
   return { config, sources }
 }
 
+export function loadConfig(): LoadedConfig
 export function loadConfig(cwd: string): LoadedConfig
-export function loadConfig(options?: LoadConfigOptions): LoadedConfig
+export function loadConfig(options: LoadConfigOptions): LoadedConfig
 export function loadConfig(
   cwdOrOptions?: string | LoadConfigOptions,
 ): LoadedConfig {
+  if (cwdOrOptions === undefined) {
+    return loadConfigStrict()
+  }
   if (typeof cwdOrOptions === 'string') {
     return loadConfigStrict(cwdOrOptions)
   }

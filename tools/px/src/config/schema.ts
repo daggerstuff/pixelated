@@ -40,7 +40,7 @@ export const PxConfigSchema = z.object({
   workspace: WorkspaceConfigSchema.optional(),
 })
 
-/** Validates merged config (allows empty agents when no files are present). */
+/** Validates merged config (allows empty agents when no config files contribute). */
 const MergedPxConfigSchema = PxConfigSchema.extend({
   agents: z.record(z.string(), AgentConfigSchema).default({}),
 })
@@ -53,5 +53,9 @@ export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>
 export type PxConfig = z.infer<typeof PxConfigSchema>
 
 export function parsePxConfig(input: unknown): PxConfig {
+  return PxConfigSchema.parse(input)
+}
+
+export function parseMergedPxConfig(input: unknown): PxConfig {
   return MergedPxConfigSchema.parse(input)
 }
