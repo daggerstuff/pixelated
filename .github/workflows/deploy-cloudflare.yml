@@ -2,8 +2,10 @@ name: Deploy to Cloudflare Workers
 
 # Cloudflare Workers is the production origin for pixelatedempathy.com
 # (Vercel remains the warm standby at its vercel.app URL and issues the www
-# redirect). Auto-deploys follow a successful CI run; the runtime env is
-# synced from the CF_WORKER_* repository secrets before every deploy.
+# redirect). Auto-deploys follow a successful CI run, but only when the
+# compare against the last deployed head shows app-facing changes — a docs-only
+# or agents-only push skips the rebuild. The runtime env is synced from the
+# CF_WORKER_* repository secrets before every deploy.
 on:
     workflow_dispatch:
     workflow_run:
@@ -18,6 +20,7 @@ concurrency:
 
 permissions:
     contents: read
+    actions: read
 
 env:
     CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -44,11 +47,80 @@ jobs:
                     echo "::notice::CLOUDFLARE_API_TOKEN is not configured; skipping the Cloudflare deploy."
                   fi
 
+    # The Worker only serves the web app, so a green CI run that changed no
+    # app-facing file (docs-only, agents-only, submodule-pointer pushes) does
+    # not need a rebuild. Compare against the head of the last successful
+    # deploy; anything ambiguous (no history, truncated compare, rerun of the
+    # same head) errs on deploying. Manual dispatch always deploys.
+    paths:
+        name: Detect app-facing changes
+        runs-on: ubuntu-latest
+        outputs:
+            needed: ${{ steps.decide.outputs.needed }}
+        steps:
+            - name: Compare against the last deployed head
+              id: decide
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  set -euo pipefail
+                  if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+                    echo "Manual dispatch: deploying." >&2
+                    echo "needed=true" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+                  HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+                  # The base must be the last run that actually BUILT and deployed:
+                  # skipped deploy runs also conclude success, and comparing from
+                  # one would silently skip any app changes below it. Walk the
+                  # recent successful runs back to one whose build job ran.
+                  LAST=""
+                  for ENTRY in $(gh run list -R "$GITHUB_REPOSITORY" --workflow deploy-cloudflare.yml --status success --limit 15 --json databaseId,headSha --jq '.[] | (.databaseId|tostring) + "@" + .headSha' 2>/dev/null); do
+                    RID="${ENTRY%%@*}"; RSHA="${ENTRY##*@}"
+                    BUILT=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RID/jobs" --jq '[.jobs[] | select(.name == "Build Cloudflare bundle") | .conclusion] | index("success") != null' 2>/dev/null || true)
+                    if [ "$BUILT" = "true" ]; then
+                      LAST="$RSHA"
+                      break
+                    fi
+                  done
+                  if [ -z "$LAST" ]; then
+                    echo "No prior deploy to compare against: deploying." >&2
+                    echo "needed=true" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+                  if [ "$LAST" = "$HEAD_SHA" ]; then
+                    echo "This exact head already deployed successfully: skipping (use workflow_dispatch to redeploy, e.g. after a secret rotation)." >&2
+                    echo "needed=false" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+                  gh api "repos/$GITHUB_REPOSITORY/compare/$LAST...$HEAD_SHA" > "$RUNNER_TEMP/compare.json" 2>/dev/null || true
+                  if [ ! -s "$RUNNER_TEMP/compare.json" ]; then
+                    echo "Compare failed: deploying." >&2
+                    echo "needed=true" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+                  COMMITS=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["total_commits"])' "$RUNNER_TEMP/compare.json")
+                  if [ "${COMMITS:-999}" -gt 250 ]; then
+                    echo "Large compare range: deploying." >&2
+                    echo "needed=true" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+                  python3 -c 'import json,sys; [print(f["filename"]) for f in json.load(open(sys.argv[1]))["files"]]' "$RUNNER_TEMP/compare.json" > "$RUNNER_TEMP/changed.txt"
+                  rm -f "$RUNNER_TEMP/compare.json"
+                  if grep -qE '^(apps/web/|packages/ui/|packages/components/|astro\.config\.|wrangler\.jsonc$|package\.json$|pnpm-lock\.yaml$|tsconfig\.json$|scripts/ci/build-cloudflare\.sh$|\.github/workflows/deploy-cloudflare\.yml$|\.github/actions/)' "$RUNNER_TEMP/changed.txt"; then
+                    echo "App-facing files changed: deploying." >&2
+                    echo "needed=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "No app-facing changes since $LAST: skipping the deploy." >&2
+                    echo "needed=false" >> "$GITHUB_OUTPUT"
+                  fi
+
     build:
         name: Build Cloudflare bundle
-        needs: preflight
+        needs: [preflight, paths]
         if: >-
             needs.preflight.outputs.enabled == 'true' &&
+            needs.paths.outputs.needed == 'true' &&
             (github.event_name == 'workflow_dispatch' ||
              (github.event.workflow_run.conclusion == 'success' &&
               github.event.workflow_run.head_branch == 'staging'))
@@ -109,8 +181,10 @@ jobs:
 
     deploy:
         name: Deploy to Cloudflare
-        needs: [preflight, build]
-        if: needs.preflight.outputs.enabled == 'true'
+        needs: [preflight, paths, build]
+        if: >-
+            needs.preflight.outputs.enabled == 'true' &&
+            needs.paths.outputs.needed == 'true'
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code

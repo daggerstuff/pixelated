@@ -35,7 +35,8 @@ standby on frontend changes — no overlap, no wasted builds.
    the `@astrojs/cloudflare` bundle, syncs the runtime env from the
    `CF_WORKER_*` repository secrets, and routes `pixelatedempathy.com` to the
    Worker via a zone route (wrangler.jsonc `routes`; the zone's proxied records
-   are untouched).
+   are untouched). Deploys skip pushes with no app-facing changes since the
+   last deployed head; `workflow_dispatch` always deploys.
 2. **Vercel stays warm**: it builds on staging pushes (path-filtered), and its
    proxied apex records stay in place. Fail back by removing the route and
    redeploying — Vercel resumes serving immediately.

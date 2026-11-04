@@ -169,17 +169,14 @@ If GitHub Actions is unavailable:
 4. Build and deploy manually:
 
    ```bash
-# Install dependencies
    pnpm install --no-frozen-lockfile
-
-# Build
    NODE_ENV=production pnpm build
-
-# Deploy the production frontend (Cloudflare Workers follows green CI automatically;
-   # manual fallback: re-dispatch deploy-cloudflare.yml or fail back to Vercel per
-   # .github/workflows/vercel-policy.md)
    gh workflow run deploy-cloudflare.yml --ref staging
    ```
+
+   Cloudflare Workers deploys automatically after green staging CI. The manual
+   dispatch above is the fallback; to fail back to Vercel wholesale, follow
+   "Failing back to Vercel" in `.github/workflows/vercel-policy.md`.
 
 ## Incident Response Protocol
 
@@ -300,4 +297,3 @@ For planned maintenance:
 3. Implement changes during low-traffic periods
 4. Have rollback plan prepared
 5. Verify all systems after maintenance
-
