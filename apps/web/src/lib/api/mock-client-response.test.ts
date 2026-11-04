@@ -17,7 +17,7 @@ describe('API /mock-client-response', () => {
   it('should handle missing message', async () => {
     const badRequest = new Request(
       'http://localhost/api/mock-client-response',
-      { method: 'POST', body: JSON.stringify({ message: '' }) },
+      { method: 'POST', body: JSON.stringify({}) },
     )
     const response = await POST({ request: badRequest })
     expect(response.status).toBe(400)

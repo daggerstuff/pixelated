@@ -1,7 +1,6 @@
 export const prerender = false
 import { AuditEventType, createAuditLog } from '../../../lib/audit'
 import { extractTokenFromRequest } from '../../../lib/auth/auth0-middleware'
-import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
 import { auth0UserService } from '../../../lib/services/auth0.service'
 
 /**
@@ -45,7 +44,6 @@ export const POST = async ({ request }: { request: Request }) => {
             userId,
             'auth',
           )
-          await updatePhase6AuthenticationProgress(userId, 'user_logged_out')
         }
       } catch {
         // Token might be invalid already
