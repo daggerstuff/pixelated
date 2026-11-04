@@ -1,7 +1,22 @@
 # Pixelated Empathy Training Pilot — Decision Draft
 
-**Status:** Proposed; not approved or offered. **Decision:** accept or edit the
-scope and assign accountable owners before making a customer commitment.
+**Status:** Starting scope accepted by user on 2026-11-04; not an approved
+customer offer. Accepted scope: one training program, 5–10 trainees, 3–5
+synthetic scenarios, 2–4 weeks. Buyer, named owners and contract terms remain
+open.
+
+**Readiness decision (2026-11-04): NO-GO.** Enrollment and customer launch are
+not authorized. Session progress/snapshot ownership checks and the authenticated
+training-session read handler are implemented locally and have focused test
+coverage, but have not been deployed or verified across organizations. The
+training page now saves trainee messages through an authenticated same-origin
+API to a Postgres table with owner and synthetic-session checks; the migration
+is applied to the configured Neon database but not yet included in a verified
+production release. Session creation, automated synthetic
+client replies, coaching analysis, faculty review and end-to-end release proof
+remain incomplete. The candidate bundle remains unpromoted. See
+[`LAUNCH_DECISIONS.md`](LAUNCH_DECISIONS.md) for package statuses, evidence,
+owner roles, proposed defaults and closure criteria.
 
 **Partner and learning goal.** One university or professional training program,
 one faculty champion, and a proposed 5–10 trainees. Practice one difficult-
@@ -46,9 +61,10 @@ Document review and approval before resuming.
 continuation or no-go; no renewal or expansion is assumed.
 
 **Owners needed:** founder/sponsor, product, release/engineering,
-qualified safety/evaluation reviewer, privacy/data, support responder,
-institution buyer and faculty champion. No names are assigned. This draft
-establishes no production readiness, customer commitment, efficacy, safety
-approval or launch date. Older pilot/pricing documents contain larger cohorts,
-prices, guarantees and service promises; retain them as historical proposals,
-not current terms.
+privacy/data, support responder, institution buyer and faculty champion. Paige
+Taylor, LPCC-S, is the established qualified assessment reviewer in Foresight
+context; confirm availability and a pilot-specific review before relying on a
+candidate assessment. Other people are not assigned. This draft establishes no
+production readiness, customer commitment, efficacy, safety approval or launch
+date. Older pilot/pricing documents contain larger cohorts, prices, guarantees
+and service promises; retain them as historical proposals, not current terms.

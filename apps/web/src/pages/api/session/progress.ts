@@ -1,131 +1,136 @@
+import type { APIRoute } from 'astro'
+
+import { getSession } from '../../../lib/auth/session'
 import { getPool } from '../../../lib/db'
 
-export const POST: import('astro').APIRoute = async ({ request }) => {
-  try {
-    const { sessionId, progressMetrics, therapistId, evaluationFeedback } =
-      await request.json()
+const jsonResponse = (body: unknown, status: number): Response =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  })
 
-    if (!sessionId) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required field: sessionId' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
+export const POST: APIRoute = async ({ request }) => {
+  const session = await getSession(request)
+  if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
+
+  try {
+    const payload: unknown = await request.json()
+    if (!isRecord(payload) || typeof payload['sessionId'] !== 'string') {
+      return jsonResponse({ error: 'Missing required field: sessionId' }, 400)
+    }
+
+    const sessionId = payload['sessionId']
+    const progressMetrics = payload['progressMetrics']
+    const evaluationFeedback = payload['evaluationFeedback']
+    if (
+      progressMetrics === undefined &&
+      (typeof evaluationFeedback !== 'string' ||
+        evaluationFeedback.length === 0)
+    ) {
+      return jsonResponse({ error: 'No progress or feedback supplied' }, 400)
     }
 
     const client = await getPool().connect()
     try {
-      // Update session with progress metrics if provided
-      if (progressMetrics) {
-        const query = `
-          UPDATE sessions
-          SET progress_metrics = $1, updated_at = NOW()
-          WHERE id = $2
-          RETURNING id
-        `
-        const result = await client.query(query, [
-          JSON.stringify(progressMetrics),
-          sessionId,
-        ])
-        if (result.rowCount === 0) {
-          return new Response(JSON.stringify({ error: 'Session not found' }), {
-            status: 404,
-            headers: { 'Content-Type': 'application/json' },
-          })
-        }
+      await client.query('BEGIN')
+      const ownership = await client.query(
+        'SELECT id FROM sessions WHERE id = $1 AND therapist_id = $2 FOR UPDATE',
+        [sessionId, session.user.id],
+      )
+      if (ownership.rowCount === 0) {
+        await client.query('ROLLBACK')
+        return jsonResponse({ error: 'Session not found' }, 404)
       }
 
-      // Insert evaluation feedback if provided
-      if (therapistId && evaluationFeedback) {
-        // Insert feedback into session_feedback table (assumes table exists)
-        const feedbackQuery = `
-          INSERT INTO session_feedback (session_id, therapist_id, feedback, created_at)
-          VALUES ($1, $2, $3, NOW())
-          RETURNING id
-        `
-        await client.query(feedbackQuery, [
-          sessionId,
-          therapistId,
-          evaluationFeedback,
-        ])
+      if (progressMetrics !== undefined) {
+        await client.query(
+          `UPDATE sessions
+           SET progress_metrics = $1::jsonb, updated_at = NOW()
+           WHERE id = $2 AND therapist_id = $3`,
+          [JSON.stringify(progressMetrics), sessionId, session.user.id],
+        )
       }
 
-      return new Response(JSON.stringify({ success: true, sessionId }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      })
+      if (
+        typeof evaluationFeedback === 'string' &&
+        evaluationFeedback.length > 0
+      ) {
+        await client.query(
+          `INSERT INTO evaluations (session_id, therapist_id, feedback, created_at)
+           VALUES ($1, $2, $3, NOW())`,
+          [sessionId, session.user.id, evaluationFeedback],
+        )
+      }
+
+      await client.query('COMMIT')
+      return jsonResponse({ success: true, sessionId }, 200)
+    } catch (error: unknown) {
+      await client.query('ROLLBACK')
+      throw error
     } finally {
       client.release()
     }
   } catch (error: unknown) {
     console.error('Error saving session progress:', error)
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return jsonResponse({ error: 'Internal server error' }, 500)
   }
 }
 
-export const GET = async ({ request }) => {
+export const GET: APIRoute = async ({ request }) => {
+  const session = await getSession(request)
+  if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
+
+  const url = new URL(request.url)
+  const sessionId = url.searchParams.get('sessionId')
+  if (!sessionId) {
+    return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
+  }
+
   try {
-    const url = new URL(request.url)
-    const sessionId = url.searchParams.get('sessionId')
-    const includeFeedback = url.searchParams.get('includeFeedback') === 'true'
-
-    if (!sessionId) {
-      return new Response(
-        JSON.stringify({ error: 'Missing sessionId parameter' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
-    }
-
     const client = await getPool().connect()
     try {
-      const query = `
-        SELECT progress_metrics, progress_snapshots, skill_scores
-        FROM sessions
-        WHERE id = $1
-      `
-
-      const result = await client.query(query, [sessionId])
+      const result = await client.query(
+        `SELECT progress_metrics, progress_snapshots, skill_scores
+         FROM sessions
+         WHERE id = $1 AND therapist_id = $2`,
+        [sessionId, session.user.id],
+      )
 
       if (result.rowCount === 0) {
-        return new Response(JSON.stringify({ error: 'Session not found' }), {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' },
-        })
+        return jsonResponse({ error: 'Session not found' }, 404)
       }
 
-      const sessionData = result.rows[0] as Record<string, unknown> | undefined
-      let feedback = null
-      if (includeFeedback) {
-        // Fetch feedback for this session
-        const feedbackQuery = `
-          SELECT therapist_id, feedback, created_at
-          FROM session_feedback
-          WHERE session_id = $1
-          ORDER BY created_at DESC
-        `
-        const feedbackResult = await client.query(feedbackQuery, [sessionId])
-        feedback = feedbackResult.rows as unknown[]
+      const sessionData = result.rows[0] as Record<string, unknown>
+      let feedback: unknown[] | null = null
+      if (url.searchParams.get('includeFeedback') === 'true') {
+        const feedbackResult = await client.query(
+          `SELECT therapist_id, feedback, created_at
+           FROM evaluations
+           WHERE session_id = $1 AND therapist_id = $2
+           ORDER BY created_at DESC`,
+          [sessionId, session.user.id],
+        )
+        feedback = feedbackResult.rows
       }
-      return new Response(
-        JSON.stringify({
+
+      return jsonResponse(
+        {
           sessionId,
-          progressMetrics: sessionData!['progress_metrics'],
-          progressSnapshots: sessionData!['progress_snapshots'],
-          skillScores: sessionData!['skill_scores'],
+          progressMetrics: sessionData['progress_metrics'],
+          progressSnapshots: sessionData['progress_snapshots'],
+          skillScores: sessionData['skill_scores'],
           feedback,
-        }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } },
+        },
+        200,
       )
     } finally {
       client.release()
     }
   } catch (error: unknown) {
     console.error('Error fetching session progress:', error)
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return jsonResponse({ error: 'Internal server error' }, 500)
   }
 }

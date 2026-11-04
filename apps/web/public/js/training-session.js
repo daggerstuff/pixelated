@@ -7,12 +7,9 @@
 class TrainingSession {
   constructor() {
     this.sessionData = null
-    this.userData = null
-    this.socket = null
     this.sessionTimer = null
     this.startTime = null
     this.isConnected = false
-    this.messageQueue = []
 
     this.init()
   }
@@ -21,8 +18,7 @@ class TrainingSession {
     // Load session data from page
     this.loadSessionData()
 
-    // Initialize WebSocket connection
-    this.initializeSocket()
+    this.isConnected = true
 
     // Setup event listeners
     this.setupEventListeners()
@@ -32,6 +28,8 @@ class TrainingSession {
 
     // Initialize UI components
     this.initializeUI()
+    this.showConnectionStatus(true)
+    this.updateSendButton()
 
     console.log('🎭 Pixelated Empathy Training Session initialized')
   }
@@ -68,7 +66,6 @@ class TrainingSession {
 
   loadSessionData() {
     const sessionScript = document.getElementById('session-data')
-    const userScript = document.getElementById('user-data')
 
     if (sessionScript) {
       // use defensive JSON parse
@@ -76,71 +73,11 @@ class TrainingSession {
       this.sessionData = parsed ?? null
     }
 
-    if (userScript) {
-      const parsed = this.safeParseJSON(userScript.textContent)
-      this.userData = parsed ?? null
-    }
-
     // Validate ids before using them elsewhere (prevents accidental injection of unexpected values)
     if (this.sessionData?.sessionId) {
       this.sessionData.sessionId = this.validateId(this.sessionData.sessionId)
     }
-    if (this.userData?.id) {
-      this.userData.id = this.validateId(String(this.userData.id))
-    }
-
     console.log('Session data loaded:', this.sessionData)
-  }
-
-  initializeSocket() {
-    // Connect to WebSocket server
-    const socketUrl =
-      window.location.protocol === 'https:'
-        ? `wss://${window.location.host}`
-        : `ws://${window.location.host}`
-
-    this.socket = io(socketUrl, {
-      path: '/api/training/socket',
-      auth: {
-        // only send validated ids
-        sessionId: this.sessionData?.sessionId,
-        userId: this.userData?.id,
-        role: this.userData?.role,
-      },
-    })
-
-    this.socket.on('connect', () => {
-      console.log('🔗 Connected to training session')
-      this.isConnected = true
-      this.joinSession()
-      this.processMessageQueue()
-    })
-
-    this.socket.on('disconnect', () => {
-      console.log('🔌 Disconnected from training session')
-      this.isConnected = false
-      this.showConnectionStatus(false)
-    })
-
-    this.socket.on('client_response', (data) => {
-      this.handleClientResponse(data)
-    })
-
-    this.socket.on('session_update', (data) => {
-      this.handleSessionUpdate(data)
-    })
-
-    this.socket.on('crisis_alert', (data) => {
-      this.handleCrisisAlert(data)
-    })
-
-    this.socket.on('feedback_update', (data) => {
-      this.handleFeedbackUpdate(data)
-    })
-
-    this.socket.on('supervisor_intervention', (data) => {
-      this.handleSupervisorIntervention(data)
-    })
   }
 
   setupEventListeners() {
@@ -149,14 +86,14 @@ class TrainingSession {
     const messageInput = document.getElementById('message-input')
 
     if (sendButton) {
-      sendButton.addEventListener('click', () => this.sendMessage())
+      sendButton.addEventListener('click', () => void this.sendMessage())
     }
 
     if (messageInput) {
       messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault()
-          this.sendMessage()
+          void this.sendMessage()
         }
       })
 
@@ -244,51 +181,55 @@ class TrainingSession {
         timestamp: new Date(),
       })
     }
-  }
 
-  joinSession() {
-    if (this.socket && this.isConnected) {
-      this.socket.emit('join_session', {
-        sessionId: this.sessionData?.sessionId,
-        role: this.userData?.role,
+    for (const message of this.sessionData?.messages ?? []) {
+      this.addMessage('therapist', message.content, {
+        timestamp: new Date(message.createdAt),
       })
     }
   }
 
-  sendMessage() {
+  async sendMessage() {
     const messageInput = document.getElementById('message-input')
     const interventionSelect = document.getElementById('intervention-type')
 
     if (!messageInput?.value.trim()) return
 
-    const message = {
-      content: messageInput.value.trim(),
-      interventionType: interventionSelect?.value ?? 'reflection',
-      timestamp: new Date().toISOString(),
-      sessionId: this.sessionData?.sessionId,
-    }
-
-    // Add message to UI immediately
-    this.addMessage('therapist', message.content, {
-      timestamp: new Date(),
-      interventionType: message.interventionType,
-    })
-
-    // Send to server
-    if (this.isConnected) {
-      this.socket.emit('therapist_message', message)
-    } else {
-      this.messageQueue.push(message)
+    const content = messageInput.value.trim()
+    const sessionId = this.sessionData?.sessionId
+    if (!sessionId) {
       this.showConnectionStatus(false)
+      return
     }
 
-    // Clear input
-    messageInput.value = ''
+    this.isConnected = false
     this.updateSendButton()
-    this.updateCharacterCount()
+    try {
+      const response = await fetch(
+        `/api/training/sessions/${encodeURIComponent(sessionId)}/messages`,
+        {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content }),
+        },
+      )
+      const result = await response.json()
+      if (!response.ok) throw new Error('Training message was not saved')
 
-    // Show typing indicator
-    this.showTypingIndicator()
+      this.addMessage('therapist', result.content, {
+        timestamp: new Date(result.createdAt),
+        interventionType: interventionSelect?.value ?? 'reflection',
+      })
+      messageInput.value = ''
+      this.updateCharacterCount()
+      this.showConnectionStatus(true)
+    } catch {
+      this.showConnectionStatus(false)
+    } finally {
+      this.isConnected = true
+      this.updateSendButton()
+    }
   }
 
   handleClientResponse(data) {
@@ -703,63 +644,35 @@ class TrainingSession {
 
   showConnectionStatus(connected) {
     const statusMessage = connected
-      ? 'Connected to training session'
-      : 'Connection lost - attempting to reconnect...'
+      ? 'Session message service is ready'
+      : 'Message could not be saved; your text remains available to retry'
 
     this.addFeedbackMessage(statusMessage, connected ? 'success' : 'warning')
   }
 
   pauseSession() {
-    if (this.socket && this.isConnected) {
-      this.socket.emit('pause_session', {
-        sessionId: this.sessionData?.sessionId,
-      })
-    }
-
-    this.addFeedbackMessage('Session paused', 'info')
+    this.addFeedbackMessage(
+      'Pause is not available for this session.',
+      'warning',
+    )
   }
 
   endSession() {
-    if (confirm('Are you sure you want to end this training session?')) {
-      if (this.socket && this.isConnected) {
-        this.socket.emit('end_session', {
-          sessionId: this.sessionData?.sessionId,
-        })
-      }
-
-      // Redirect to session summary
-      window.location.href = `/training/session/${this.sessionData?.sessionId}/summary`
+    if (confirm('Exit this session? Saved messages will remain available.')) {
+      window.location.href = '/training'
     }
   }
 
   triggerEmergency() {
-    if (this.socket && this.isConnected) {
-      this.socket.emit('emergency_intervention', {
-        sessionId: this.sessionData?.sessionId,
-        reason: 'User triggered emergency button',
-      })
-    }
-
     this.showCrisisAlert(
-      'Emergency intervention requested - supervisor notified',
-      'critical',
+      'This training page does not contact a supervisor or emergency service.',
+      'warning',
     )
-  }
-
-  processMessageQueue() {
-    while (this.messageQueue.length > 0 && this.isConnected) {
-      const message = this.messageQueue.shift()
-      this.socket.emit('therapist_message', message)
-    }
   }
 
   cleanup() {
     if (this.sessionTimer) {
       clearInterval(this.sessionTimer)
-    }
-
-    if (this.socket) {
-      this.socket.disconnect()
     }
   }
 }

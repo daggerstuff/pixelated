@@ -4,9 +4,12 @@
 
 import Layout from '@/layouts/Layout.astro'
 import { getSession } from '@/lib/auth'
+import { getTrainingSessionResponse } from '@/lib/services/training/session-api'
 import VitalsMonitorIsland from '@/components/simulation/VitalsMonitorIsland.tsx'
 
 type TrainingSessionResponse = {
+  sessionId: string
+  messages: Array<{ id: string; content: string; createdAt: string }>
   clientProfile: {
     name: string
     age: number
@@ -30,6 +33,8 @@ const isTrainingSessionResponse = (
   const clientProfile = maybeValue['clientProfile']
 
   return (
+    typeof maybeValue['sessionId'] === 'string' &&
+    Array.isArray(maybeValue['messages']) &&
     (typeof maybeValue['difficultyLevel'] === 'string' ||
       typeof maybeValue['difficultyLevel'] === 'number') &&
     typeof clientProfile === 'object' &&
@@ -46,24 +51,9 @@ if (!session) {
   )
 }
 
-// Extract token for API call
-const authHeader = Astro.request.headers.get('authorization')
-const fetchCookieValue = (cookieName: string): string | undefined => {
-  const cookieHeader = Astro.request.headers.get('cookie')
-  if (!cookieHeader) {
-    return undefined
-  }
-  const cookies = cookieHeader.split(';').map((c) => c.trim())
-  for (const cookie of cookies) {
-    const [name, value] = cookie.split('=')
-    if (name === cookieName && value !== undefined) {
-      return decodeURIComponent(value)
-    }
-  }
-  return undefined
+if (!sessionId) {
+  return Astro.redirect('/training?error=session-not-found')
 }
-const token =
-  authHeader?.replace('Bearer ', '') || fetchCookieValue('auth-token')
 
 const escapeJsonForScriptTag = (value: unknown): string => {
   const serialized = JSON.stringify(value)
@@ -76,11 +66,9 @@ const escapeJsonForScriptTag = (value: unknown): string => {
 // Get session data from API
 let sessionData: TrainingSessionResponse | undefined
 try {
-  const response = await fetch(`/api/training/sessions/${sessionId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+  const response = await getTrainingSessionResponse(Astro.request, sessionId)
   const rawSessionData = await response.json()
-  if (isTrainingSessionResponse(rawSessionData)) {
+  if (response.ok && isTrainingSessionResponse(rawSessionData)) {
     sessionData = rawSessionData
   }
 } catch {
@@ -101,10 +89,9 @@ const isSupervisor = userRole === 'admin'
 
 <Layout
   title={`Training Session - ${sessionData.clientProfile.name}`}
-  description="Immersive therapeutic training session with AI client simulation"
+  description="Synthetic educational conversation practice; not clinical care"
 >
   {/* $1 */}
-  <script is:inline src="/js/socket.io.min.js"></script>
   <script is:inline src="/js/training-session.js" type="module"></script>
   <main class="h-screen flex flex-col bg-background">
     {/* $1 */}
@@ -164,29 +151,19 @@ const isSupervisor = userRole === 'admin'
           </div>
 
           {/* $1 */}
-          <button
-            id="emergency-button"
-            class="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-none text-sm font-medium transition-colors"
-          >
-            🚨 Emergency
-          </button>
-
-          {/* $1 */}
           <div class="flex items-center space-x-2">
-            <button
-              id="pause-session"
-              class="bg-secondary hover:bg-accent text-foreground border border-ring px-3 py-2 rounded-none text-sm transition-colors"
-            >
-              ⏸️ Pause
-            </button>
             <button
               id="end-session"
               class="bg-secondary hover:bg-accent text-foreground px-3 py-2 rounded-none text-sm transition-colors"
             >
-              ⏹️ End
+              Exit Session
             </button>
           </div>
         </div>
+        <p class="mt-3 text-sm text-muted-foreground" role="status">
+          Messages save to this synthetic session. Automated client replies,
+          coaching analysis, and supervisor alerts are not active.
+        </p>
       </div>
     </header>
 
@@ -569,12 +546,6 @@ const isSupervisor = userRole === 'admin'
     id="session-data"
     is:inline
     set:html={escapeJsonForScriptTag(sessionData)}
-  ></script>
-  <script
-    type="application/json"
-    id="user-data"
-    is:inline
-    set:html={escapeJsonForScriptTag({ role: userRole, id: session.user.id })}
   ></script>
 </Layout>
 
