@@ -102,8 +102,9 @@ describe('SlackConfigSchema', () => {
     expect(result.channel).toBe('#px-agent-results')
   })
 
-  it('rejects invalid webhook URL', () => {
-    expect(() => SlackConfigSchema.parse({ webhook: 'not-a-url' })).toThrow()
+  it('accepts non-URL webhook strings (legacy configs)', () => {
+    const result = SlackConfigSchema.parse({ webhook: 'not-a-url' })
+    expect(result.webhook).toBe('not-a-url')
   })
 })
 

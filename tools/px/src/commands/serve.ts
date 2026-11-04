@@ -8,7 +8,7 @@ import {
 import type { Command } from 'commander'
 import pc from 'picocolors'
 
-import { loadConfig } from '../lib/config-loader.js'
+import { loadConfig } from '../config/loader.js'
 
 /**
  * Stubs for each agent tool. Keys are tool names; values are functions

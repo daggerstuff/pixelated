@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { loadConfig, loadConfigFile } from '../src/lib/config-loader.js'
-import { parsePxConfig } from '../src/lib/config-schema.js'
+import { loadConfig, loadConfigFile } from '../src/config/loader.js'
+import { parsePxConfig } from '../src/config/schema.js'
 import { deepMerge } from '../src/lib/deep-merge.js'
 
 const testDir = dirname(fileURLToPath(import.meta.url))
@@ -44,7 +44,7 @@ describe('deepMerge', () => {
       {
         agents: {
           content: {
-            endpoint: 'http://localhost:2002',
+            endpoint: 'http://[REDACTED]:2002',
             tools: ['audit_corpus'],
           },
         },
@@ -56,7 +56,7 @@ describe('deepMerge', () => {
       },
     )
 
-    expect(merged.agents.content.endpoint).toBe('http://localhost:2002')
+    expect(merged.agents.content.endpoint).toBe('http://[REDACTED]:2002')
     expect(merged.agents.content.timeout).toBe(60_000)
     expect(merged.agents.content.tools).toEqual(['audit_corpus'])
   })
