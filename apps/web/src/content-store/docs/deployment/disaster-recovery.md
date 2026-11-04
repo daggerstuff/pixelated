@@ -175,8 +175,10 @@ If GitHub Actions is unavailable:
 # Build
    NODE_ENV=production pnpm build
 
-# Deploy the production frontend (Vercel)
-   npx vercel deploy --prod
+# Deploy the production frontend (Cloudflare Workers follows green CI automatically;
+   # manual fallback: re-dispatch deploy-cloudflare.yml or fail back to Vercel per
+   # .github/workflows/vercel-policy.md)
+   gh workflow run deploy-cloudflare.yml --ref staging
    ```
 
 ## Incident Response Protocol
