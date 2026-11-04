@@ -6,16 +6,16 @@ import { defineHook } from 'eve/hooks'
 
 export default defineHook({
   events: {
-    'action.result'(event, _ctx) {
+    'call.settled'(event, _ctx) {
       const eventData = (event as { data?: unknown }).data
       const status =
         typeof eventData === 'object' &&
         eventData !== null &&
-        'status' in eventData
-          ? (eventData as { status?: unknown }).status
+        'outcome' in eventData
+          ? (eventData as { outcome?: unknown }).outcome
           : eventData
     },
-    'message.completed'(event, _ctx) {
+    'content.completed'(event, _ctx) {
       const eventType = (event as { type?: unknown }).type
     },
   },

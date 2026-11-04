@@ -6,7 +6,7 @@ import { defineHook } from 'eve/hooks'
 
 export default defineHook({
   events: {
-    'action.result'(_event, _ctx) {
+    'call.settled'(_event, _ctx) {
       // error handled by caller
     },
   },

@@ -8,17 +8,18 @@ export default defineHook({
     'session.started'(_event, ctx) {
       // error handled by caller
     },
-    'action.result'(event, _ctx) {
+    'call.settled'(event, _ctx) {
       const eventData = (event as { data?: unknown }).data
       const status =
         typeof eventData === 'object' &&
         eventData !== null &&
-        'status' in eventData
-          ? (eventData as { status?: unknown }).status
+        'outcome' in eventData
+          ? (eventData as { outcome?: unknown }).outcome
           : eventData
     },
-    'message.completed'(event, _ctx) {
-      const text = event.data?.message ?? ''
+    'content.completed'(event, _ctx) {
+      const data = (event as { data?: { value?: unknown } }).data
+      const text = typeof data?.value === 'string' ? data.value : ''
     },
   },
 })
