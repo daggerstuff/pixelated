@@ -1,9 +1,9 @@
 name: Deploy to Cloudflare Workers
 
-# Cloudflare Workers is the migration target origin for pixelatedempathy.com
-# (Vercel remains the current production origin and warm standby). Deploys are
-# gated behind workflow_dispatch until the DNS cutover is approved; the CI gate
-# mirrors build-images.yml: auto-deploys must follow a successful CI run.
+# Cloudflare Workers is the production origin for pixelatedempathy.com
+# (Vercel remains the warm standby at its vercel.app URL and issues the www
+# redirect). Auto-deploys follow a successful CI run; the runtime env is
+# synced from the CF_WORKER_* repository secrets before every deploy.
 on:
     workflow_dispatch:
     workflow_run:
@@ -85,6 +85,7 @@ jobs:
                     if (config.compatibility_flags?.includes("nodejs_compat") !== true) throw new Error("nodejs_compat missing");
                     if (!config.kv_namespaces?.some((ns) => ns.binding === "SESSION")) throw new Error("SESSION KV binding missing");
                     if (!config.images) throw new Error("IMAGES binding missing");
+                    if (!config.routes?.some((r) => r.pattern === "pixelatedempathy.com" && r.custom_domain)) throw new Error("production custom domain route missing");
                     console.log("wrangler.json contract verified:", config.name, config.main);
                   '
                   test -d dist/client || { echo "::error::dist/client missing"; exit 1; }
@@ -219,4 +220,21 @@ jobs:
                     sleep 15
                   done
                   echo "::error::Smoke test failed: $WORKER_URL did not return 200 after 5 attempts"
+                  exit 1
+
+            - name: Smoke test production domain
+              env:
+                  WORKER_URL: https://pixelatedempathy.com
+              run: |
+                  set -euo pipefail
+                  for i in 1 2 3 4 5; do
+                    STATUS=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 30 "$WORKER_URL/" || true)
+                    if [ "$STATUS" = "200" ]; then
+                      echo "Production domain smoke test passed: $WORKER_URL returned 200"
+                      exit 0
+                    fi
+                    echo "Attempt $i: $WORKER_URL returned $STATUS; retrying in 15s..."
+                    sleep 15
+                  done
+                  echo "::error::Production domain smoke test failed: $WORKER_URL did not return 200 after 5 attempts"
                   exit 1

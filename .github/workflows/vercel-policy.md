@@ -1,28 +1,31 @@
 # Vercel Deployment Policy
 
-Vercel is the **production origin** for pixelatedempathy.com. Production is
-deployed off AWS; the former AWS EKS deployment has been retired. Vercel
-provides:
+Vercel is the **warm standby** for pixelatedempathy.com: production serves from
+Cloudflare Workers (`deploy-cloudflare.yml`), which owns the production custom
+domain. Vercel keeps a current build at its `*.vercel.app` URL and keeps
+issuing the `www.pixelatedempathy.com` redirect. The former AWS EKS deployment
+has been retired. Vercel provides:
 
-- Production deploys from staging (path-filtered)
+- Standby production builds from staging (path-filtered)
 - Preview URLs on PRs targeting staging (fast feedback)
+- The `www` redirect target and an origin to fail back to
 
 ## Branch Roles
 
-| Branch      | Role                | Vercel?                          | Images?                    |
-| ----------- | ------------------- | -------------------------------- | -------------------------- |
-| `staging`   | **The main branch** | Yes (prod deploy, path-filtered) | Yes (auto-publish from CI) |
-| `feature/*` | Feature development | No                               | No                         |
-| `agent/*`   | Agent work          | No                               | No                         |
+| Branch      | Role                | Vercel?                            | Images?                    |
+| ----------- | ------------------- | ---------------------------------- | -------------------------- |
+| `staging`   | **The main branch** | Yes (standby build, path-filtered) | Yes (auto-publish from CI) |
+| `feature/*` | Feature development | No                                 | No                         |
+| `agent/*`   | Agent work          | No                                 | No                         |
 
 ## Trigger Rules
 
-| Event                    | Vercel Build?                                 | Notes                                       |
-| ------------------------ | --------------------------------------------- | ------------------------------------------- |
-| Push to `staging`        | Yes (prod), **only on frontend path changes** | Image publishes cover backend/agent changes |
-| PR to `staging`          | Yes (preview)                                 | Only when frontend files change             |
-| Push to feature branches | No                                            | Use `staging` for previews                  |
-| Manual dispatch          | Yes                                           | `workflow_dispatch` always allowed          |
+| Event                    | Vercel Build?                          | Notes                                       |
+| ------------------------ | -------------------------------------- | ------------------------------------------- |
+| Push to `staging`        | Yes, **only on frontend path changes** | Image publishes cover backend/agent changes |
+| PR to `staging`          | Yes (preview)                          | Only when frontend files change             |
+| Push to feature branches | No                                     | Use `staging` for previews                  |
+| Manual dispatch          | Yes                                    | `workflow_dispatch` always allowed          |
 
 ## Path Filtering
 
@@ -64,10 +67,18 @@ vercel.json
 git push to staging
   ├─ CI (lint/test/build)          → .github/workflows/ci.yml
   ├─ Build and Publish Images       → .github/workflows/build-images.yml (app + agents → Docker Hub)
-  ├─ Deploy to Cloudflare Workers   → .github/workflows/deploy-cloudflare.yml (migration target, credential-gated)
-  └─ Vercel production (frontend only) → .github/workflows/vercel.yml (path-filtered)
+  ├─ Deploy to Cloudflare Workers   → .github/workflows/deploy-cloudflare.yml (production origin, after CI)
+  └─ Vercel standby (frontend only) → .github/workflows/vercel.yml (path-filtered)
 ```
 
-The Vercel production deploy, the image publishes, and the Cloudflare bundle
-all fire on staging pushes, each only on their relevant paths or gates — no
-overlap, no wasted builds.
+The Cloudflare deploy (production), the image publishes, and the Vercel
+standby build all fire on staging pushes, each only on its relevant paths or
+gates — no overlap, no wasted builds.
+
+## Failing back to Vercel
+
+Detach the Workers custom domain (remove the `routes` block from
+`wrangler.jsonc`, redeploy), then restore the zone's apex records to Vercel
+(`A 76.76.21.21` / `CNAME cname.vercel-dns.com` per Vercel's recommendation)
+and re-run the Vercel alias step. Vercel builds stayed warm throughout the
+cutover, so the standby serves immediately.

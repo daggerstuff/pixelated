@@ -1,7 +1,9 @@
 name: Vercel Deploy
 
-# Vercel is the production origin for pixelatedempathy.com (production is deployed
-# off AWS). Cloudflare Workers is the migration target origin; see deploy-cloudflare.yml.
+# Vercel is the warm-standby origin: production serves from Cloudflare Workers
+# (see deploy-cloudflare.yml), which owns the pixelatedempathy.com custom
+# domain. Vercel keeps building on staging pushes so the standby stays warm
+# (and keeps issuing the www.pixelatedempathy.com redirect).
 on:
     workflow_dispatch:
     pull_request:

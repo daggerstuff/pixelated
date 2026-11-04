@@ -28,9 +28,10 @@ depending on the trigger:
 
 The pipeline is defined in `.github/workflows/ci.yml` (CI),
 `.github/workflows/build-images.yml` (app and agent image publishes to Docker
-Hub), `.github/workflows/vercel.yml` (production frontend deploys) and
-`.github/workflows/deploy-cloudflare.yml` (Cloudflare Workers migration
-target), and consists of the following jobs:
+Hub), `.github/workflows/deploy-cloudflare.yml` (Cloudflare Workers production
+deploys on the pixelatedempathy.com custom domain) and
+`.github/workflows/vercel.yml` (warm-standby frontend deploys), and consists
+of the following jobs:
 
 1. **Build**: Compiles and packages the application
 2. **Deploy**: Pushes the application to the target environment
