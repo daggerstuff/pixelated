@@ -618,7 +618,6 @@ apps/web/src/simulator/utils/scenarios.test.ts
 apps/web/src/simulator/utils/scenarios.ts
 apps/web/src/styles/fonts.css
 apps/web/src/styles/tokens.css
-deploy/production/deploy-therapeutic-ai.sh
 infra/k8s/civo/
 scripts/corpus/pixelated_empathy/
 scripts/corpus/pyproject.toml

@@ -91,8 +91,10 @@ make -f Makefile.agents push-all
 #    Edit agents/k8s/namespace-secrets.yaml with real values, then:
 kubectl apply -f agents/k8s/namespace-secrets.yaml
 
-# 3. Deploy all agents
-make -f Makefile.agents deploy-k8s
+# 3. Deploy all agents (apply each agent manifest)
+for agent in supervisor-agent advisor-agent content-agent eve-agent intake-agent pipeline-agent qa-agent session-agent; do
+  kubectl apply -f "agents/$agent/k8s/deployment.yaml"
+done
 
 # 4. Verify
 kubectl get pods -n pixelated-empathy
