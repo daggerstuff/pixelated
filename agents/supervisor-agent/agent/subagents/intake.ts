@@ -1,8 +1,12 @@
 import { defineRemoteAgent } from 'eve'
 import { httpBasic, vercelOidc } from 'eve/agents/auth'
 
-const authUsername = process.env.EVE_AUTH_USERNAME ?? 'admin'
-const authPassword = process.env.EVE_AUTH_PASSWORD ?? 'iI4Vce1IQs8z2dN4Ypk6zYSt'
+// Credentials come from EVE_AUTH_USERNAME/EVE_AUTH_PASSWORD (the k8s
+// `eve-auth` secret, or the agent fleet env file). With neither set we send no
+// Authorization header at all, so the remote answers 401 — fail closed, never a
+// built-in default password.
+const authUsername = process.env.EVE_AUTH_USERNAME
+const authPassword = process.env.EVE_AUTH_PASSWORD
 
 export default defineRemoteAgent({
   url: () => process.env.INTAKE_AGENT_URL ?? 'http://localhost:2020',
@@ -10,8 +14,7 @@ export default defineRemoteAgent({
     'Intake and cohort manager. Onboards new clinical trainees, manages cohort assignments, tracks curriculum progress, and surfaces trainee status to other agents and supervisors.',
   auth: process.env.VERCEL
     ? vercelOidc()
-    : httpBasic({
-        username: authUsername,
-        password: authPassword,
-      }),
+    : authUsername && authPassword
+      ? httpBasic({ username: authUsername, password: authPassword })
+      : undefined,
 })
