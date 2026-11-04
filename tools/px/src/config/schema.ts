@@ -46,10 +46,10 @@ const MergedPxConfigSchema = PxConfigSchema.extend({
 })
 
 export type AgentConfig = z.infer<typeof AgentConfigSchema>
-export type SlackConfig = z.infer<typeof SlackConfigSchema>
+type SlackConfig = z.infer<typeof SlackConfigSchema>
 export type HookConfig = z.infer<typeof HookConfigSchema>
-export type HookEvent = z.infer<typeof HookEventSchema>
-export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>
+type HookEvent = z.infer<typeof HookEventSchema>
+type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>
 export type PxConfig = z.infer<typeof PxConfigSchema>
 
 export function parsePxConfig(input: unknown): PxConfig {

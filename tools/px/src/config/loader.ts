@@ -19,7 +19,7 @@ const DEFAULT_CONFIG_PATH = 'agents/px.config.json'
 const REPO_LOCAL_OVERRIDE = '.px/config.json'
 const USER_OVERRIDE = '.px/config.json'
 
-export type ConfigSource = 'default' | 'user' | 'repo' | 'cli'
+type ConfigSource = 'default' | 'user' | 'repo' | 'cli'
 
 export type LoadedConfig =
   | {
