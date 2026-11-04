@@ -24,12 +24,20 @@ const resolveSentryRelease = () =>
 
 // On Cloudflare Workers process.env['NODE_ENV'] may be unset, so also rely
 // on Astro's build-time PROD flag to detect production.
+// Guard import.meta.env access: it can be undefined in some SSR/preview runtimes.
 const isProductionRuntime = () =>
-  import.meta.env.PROD === true || process.env['NODE_ENV'] === 'production'
+  import.meta.env?.PROD === true || process.env['NODE_ENV'] === 'production'
+
+// Treat empty or whitespace-only values as absent so fallbacks still apply.
+const nonEmpty = (value: string | null | undefined): string | undefined => {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : undefined
+}
 
 const hasValidProbeToken = (request: Request) => {
   const requiredToken =
-    process.env['SENTRY_DIAGNOSTIC_TOKEN'] ?? process.env['SENTRY_TEST_TOKEN']
+    nonEmpty(process.env['SENTRY_DIAGNOSTIC_TOKEN']) ??
+    nonEmpty(process.env['SENTRY_TEST_TOKEN'])
 
   if (!isProductionRuntime()) {
     // Outside production the probe is open unless a token is configured.
@@ -42,8 +50,8 @@ const hasValidProbeToken = (request: Request) => {
   }
 
   const providedToken =
-    request.headers.get('x-sentry-probe-token') ??
-    request.headers.get('authorization')?.replace(/^Bearer\s+/i, '')
+    nonEmpty(request.headers.get('x-sentry-probe-token')) ??
+    nonEmpty(request.headers.get('authorization')?.replace(/^Bearer\s+/i, ''))
 
   return Boolean(providedToken) && providedToken === requiredToken
 }
