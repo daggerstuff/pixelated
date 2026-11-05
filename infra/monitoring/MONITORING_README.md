@@ -108,9 +108,6 @@ WARNING_ALERT_EMAIL=warnings@pixelatedempathy.com
 | `alerts/safety-alerts.yaml` | 3 | Safety gates, content invalidations, PII |
 | `alerts/launch-alerts.yaml` | 12 | Launch metrics, crisis detection, engagement, readiness |
 
-**Note**: `memory-alerts.yaml` is a K8s ConfigMap for GitLab Runner monitoring
-and is NOT loaded by the Docker Compose Prometheus instance.
-
 ### Severity Routing
 
 | Severity | Receiver | Channels | Repeat |
