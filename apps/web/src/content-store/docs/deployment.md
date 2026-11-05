@@ -11,9 +11,22 @@ title: Deployment Guide
 
 # Deployment Guide
 
-This guide covers how to deploy the Astro application to various environments.
+## Production (Cloudflare Workers)
 
-## Prerequisites
+**[REDACTED]** is served from **Cloudflare Workers** after green CI on `staging`.
+The deploy pipeline is [`.github/workflows/deploy-cloudflare.yml`](../../../../../.github/workflows/deploy-cloudflare.yml);
+policy and triggers are summarized in [`AGENTS.md`](../../../../../AGENTS.md) and
+[`CONTRIBUTING.md`](../../../../../CONTRIBUTING.md).
+
+**Vercel** remains a **warm standby** origin (path-filtered deploy from
+[`.github/workflows/vercel.yml`](../../../../../.github/workflows/vercel.yml)).
+It is not the primary production surface for the public site.
+
+**Docker Hub** receives app and agent images from
+[`.github/workflows/build-images.yml`](../../../../../.github/workflows/build-images.yml)
+when staging CI succeeds.
+
+## Prerequisites (any target)
 
 Before deploying, ensure:
 
@@ -44,173 +57,60 @@ PUBLIC_SITE_URL=https://your-site-url.com
 OPENAI_API_KEY=your-openai-key
 ```
 
-## Deployment Options
+## Local development and Docker Compose
 
-### 1. Static Hosting (Recommended)
+Use **`pnpm dev`** or **`pnpm dev:all-services`** for day-to-day work. Scripts
+**`pnpm deploy`** / **`pnpm deploy:prod`** invoke `scripts/deploy/deploy.sh` for
+**local Docker Compose** environments (`infra/docker/`), not Workers production.
 
-Astro supports static generation, which is the recommended approach for
-deploying this application.
-
-#### Build for Static Hosting
-
-```bash
-pnpm build
-```
-
-This will generate a static site in the `dist/` directory, which can be deployed
-to any static hosting service.
-
-#### Deploy to Vercel
+### Docker image (lab / self-hosted)
 
 ```bash
-vercel --prod
+docker build -f infra/Dockerfile -t your-app-name .
 ```
 
-#### Deploy to Netlify
+See `infra/docker/README.md` for compose variants.
 
-```bash
-netlify deploy --prod
-```
+## Vercel (standby / previews)
 
-#### Deploy to GitHub Pages
-
-```bash
-pnpm deploy
-```
-
-This runs a script that pushes the `dist/` directory to the `gh-pages` branch.
-
-### 2. Server-Side Rendering (SSR)
-
-For dynamic content that needs to be generated at request time, use SSR
-deployment.
-
-#### Build for SSR
-
-Update `astro.config.mjs` to use the appropriate adapter:
-
-```js
-import { defineConfig } from 'astro/config'
-import node from '@astrojs/node'
-
-export default defineConfig({
-  output: 'server',
-  adapter: node({
-    mode: 'standalone',
-  }),
-})
-```
-
-Then build the application:
-
-```bash
-pnpm build
-```
-
-#### Deploy to Vercel with SSR
-
-Add a `vercel.json` file:
-
-```json
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/dist/server/entry.mjs"
-    }
-  ]
-}
-```
-
-Then deploy:
+Vercel deploys are automated for **`staging`** (standby) and PR previews when
+frontend paths change. Manual CLI deploy remains available:
 
 ```bash
 vercel --prod
 ```
 
-#### Deploy to Netlify with SSR
+Treat Vercel as standby unless you are explicitly testing that origin.
 
-Create a `netlify.toml` file:
+## Other hosting (legacy notes)
 
-```toml
-[build]
-  command = "pnpm build"
-  publish = "dist/"
+The sections below describe generic Astro static/SSR and third-party hosts
+(Netlify, GitHub Pages). They are retained for reference only and do not describe
+the primary production path.
 
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/entry"
-  status = 200
-
-[functions]
-  node_bundler = "esbuild"
-```
-
-Then deploy:
+### Static hosting
 
 ```bash
-netlify deploy --prod
+pnpm build
 ```
 
-### 3. Docker Deployment
+Output is under `dist/` for static hosts.
 
-For containerized environments, use Docker:
+### SSR adapters
 
-#### Build the Docker Image
+For SSR experiments, configure an Astro adapter in `astro.config.mjs` and run
+`pnpm build`. Production SSR for the public site is handled by the Workers
+bundle, not the samples below.
 
-```bash
-docker build -t your-app-name .
-```
+<details>
+<summary>Legacy SSR examples (Netlify, sample vercel.json)</summary>
 
-#### Run the Docker Container
+See [Astro deploy docs](https://docs.astro.build/en/guides/deploy/) for
+adapter-specific configuration.
 
-```bash
-docker run -p 3000:3000 \
-  -e POSTGRES_URL=your-database-url \
-  -e SUPABASE_URL=your-supabase-url \
-  -e SUPABASE_ANON_KEY=your-supabase-anon-key \
-  -e AUTH_SECRET=your-auth-secret \
-  -e AUTH_TRUST_HOST=true \
-  -e PUBLIC_SITE_URL=https://your-site-url.com \
-  -e OPENAI_API_KEY=your-openai-key \
-  your-app-name
-```
+</details>
 
-#### Deploying with Docker Compose
-
-Create a `docker-compose.yml` file:
-
-```yaml
-version: '3'
-services:
-  app:
-    build: .
-    ports:
-      - '3000:3000'
-    environment:
-      - POSTGRES_URL=your-database-url
-      - SUPABASE_URL=your-supabase-url
-      - SUPABASE_ANON_KEY=your-supabase-anon-key
-      - AUTH_SECRET=your-auth-secret
-      - AUTH_TRUST_HOST=true
-      - PUBLIC_SITE_URL=https://your-site-url.com
-      - OPENAI_API_KEY=your-openai-key
-```
-
-Then run:
-
-```bash
-docker-compose up -d
-```
-
-## Database Setup
+## Database setup
 
 Before deploying the frontend, ensure your database is set up:
 
@@ -219,54 +119,15 @@ Before deploying the frontend, ensure your database is set up:
 3. Configure connection strings in your environment variables
 4. Test database connectivity
 
-## Continuous Integration/Continuous Deployment (CI/CD)
+## CI/CD
 
-### GitHub Actions
+Production deploys are **not** driven by a root `deploy.yml` sample. Use:
 
-Create a `.github/workflows/deploy.yml` file:
+- [`deploy-cloudflare.yml`](../../../../../.github/workflows/deploy-cloudflare.yml)
+- [`vercel.yml`](../../../../../.github/workflows/vercel.yml)
+- [`build-images.yml`](../../../../../.github/workflows/build-images.yml)
 
-```yaml
-name: Deploy
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6.0.2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6.4.0
-        with:
-          node-version: '22'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6.0.6
-        with:
-          version: 11.12.0
-
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Run tests
-        run: pnpm test
-
-      - name: Build
-        run: pnpm build
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-```
-
-## Post-Deployment Verification
+## Post-deployment verification
 
 After deploying, perform these checks:
 
@@ -275,40 +136,18 @@ After deploying, perform these checks:
 3. Check that database connections are working
 4. Verify all interactive components function properly
 5. Test responsiveness on different devices
-6. Run Lighthouse audit for performance and accessibility
 
-## Rollback Procedure
+## Rollback
 
-If issues are encountered after deployment:
-
-1. For Vercel/Netlify: Use their dashboard to roll back to the previous
-   deployment
-2. For Docker: Restart the container with the previous image version
-3. For database changes: Have a rollback plan for schema migrations
-
-## Performance Monitoring
-
-Set up monitoring for your deployed application:
-
-1. Add [Sentry](https://sentry.io/) for error tracking
-2. Set up [LogRocket](https://logrocket.com/) for session replay
-3. Configure [Vercel Analytics](https://vercel.com/analytics) or
-   [Google Analytics](https://analytics.google.com/)
+- **Workers:** use the Cloudflare dashboard or workflow rollback procedures for
+  the active Worker revision.
+- **Vercel standby:** roll back via the Vercel deployment history.
+- **Docker Compose (local):** restart with the previous image tag.
 
 ## Troubleshooting
 
-### Common Issues
+1. **Build failures:** run `pnpm build` locally on the same commit as CI.
+2. **Missing env:** compare Worker/Vercel project env with `CONTRIBUTING.md`.
+3. **Local stack:** see `infra/docker/README.md` and `pnpm docker:logs`.
 
-1. **Static assets not loading**: Check paths in the build output
-2. **API calls failing**: Verify environment variables are set correctly
-3. **Authentication issues**: Check Auth settings and secret keys
-4. **SSR rendering errors**: Look for server logs in your hosting provider
-
-### Getting Help
-
-If you encounter issues not covered here:
-
-1. Check the [Astro documentation](https://docs.astro.build/en/guides/deploy/)
-2. Post in the [Astro Discord](https://astro.build/chat)
-3. Search for similar issues in the
-   [Astro GitHub repository](https://github.com/withastro/astro/issues)
+For platform policy, see [`AGENTS.md`](../../../../../AGENTS.md).
