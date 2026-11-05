@@ -31,7 +31,7 @@ const isVercelDeploy = !!process.env['VERCEL']
 // Note: Unauthenticated /admin requests are already redirected in middleware
 // (projectAuthMiddleware) to avoid ResponseSentError. This is a defense-in-depth
 // check for authenticated non-admin users or edge cases where middleware was bypassed.
-const isLoggedIn = await isAuthenticated()
+const isLoggedIn = await isAuthenticated(Astro.cookies)
 const user = isLoggedIn ? await getUser(Astro.request) : null
 const isAdmin = isLoggedIn && user && (await hasAdminRole(user))
 const isAuthorized = Boolean(isAdmin)
