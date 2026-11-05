@@ -60,7 +60,7 @@ following key components:
    - S3 for file storage
    - Vector database for AI embeddings
 
-5. Infrastructure:
+5. Infrastructure (2024 decision; see **Updates** for current platform):
    - AWS for cloud infrastructure
    - Vercel for frontend deployment
    - Terraform for infrastructure as code
@@ -148,6 +148,12 @@ Negative:
 - Security considerations are documented in docs/security/
 
 ## Updates
+
+2026-11-05:
+
+- **Production platform:** Cloudflare Workers (primary), Vercel (warm standby),
+  Docker Hub image publish. AWS EKS / Kubernetes production deploy is retired.
+  Authoritative CI policy: [`AGENTS.md`](../../../../../../../AGENTS.md).
 
 2024-03-04:
 

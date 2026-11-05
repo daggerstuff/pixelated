@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Pixelated Deployment Script
-# Automated deployment with health checks and rollback capabilities
+# Local Docker Compose deploy (staging/production compose targets).
+# Production site: Cloudflare Workers via CI — see AGENTS.md and deploy-cloudflare.yml.
 
 set -euo pipefail
 

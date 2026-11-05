@@ -9,7 +9,6 @@ NC='\033[0m'
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 REDIS_FILES=(
-  "$ROOT_DIR/infra/k8s/base/redis-deployment.yaml"
   "$ROOT_DIR/infra/docker/docker-compose.yml"
   "$ROOT_DIR/infra/docker/docker-compose.dev.yml"
   "$ROOT_DIR/infra/docker/docker-compose.db.yml"

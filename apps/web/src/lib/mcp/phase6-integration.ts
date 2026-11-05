@@ -4,8 +4,8 @@
  * Provides authentication tracking, security metrics, and enhanced sign-off workflows
  */
 
-// Stub implementation to prevent build failures
-// The full implementation exists in src/lib/auth/phase6-integration.ts but needs to be migrated
+// Lightweight stub used by Auth0 services for Phase 6 MCP hand-off tracking.
+// Callers import this module directly; expand here when full MCP integration ships.
 
 import { secureRandomUUID } from '../crypto/secure-random'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
