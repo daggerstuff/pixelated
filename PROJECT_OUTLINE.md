@@ -91,7 +91,7 @@ application or training campaign.
 | Latest targeted research           | [Campaign handoff, v71–v74](docs/training/execution-2026-10-21/CAMPAIGN_HANDOFF.md), lines 338–360, records note-scope, lookup-retry and final-denial repairs                                                                                                                   | v74's final-denial path passed 16/16 checks; that narrow mocked pass is not a complete promotion or deployment approval |
 | Foresight                          | MCP/CLI/TUI/SDK, hybrid retrieval, graph/temporal memory, auth and proof-benchmark implementations exist                                                                                                                                                                        | Trace actual application callers, persistence, isolation and deletion against the deployed backend                      |
 | EHR                                | Linear records all 64 project issues Done; FHIR, RBAC, service and adapter code exists                                                                                                                                                                                          | Completed engineering tickets do not establish operational EHR, prescribing or payer readiness                          |
-| Infrastructure and developer tools | EKS/Kubernetes, monitoring, CI, SDKs, `px`, agents, audit tooling and runbooks exist                                                                                                                                                                                            | A current release must still demonstrate successful deploy, rollback, alerts and support                                |
+| Infrastructure and developer tools | Cloudflare Workers production, Vercel standby, Docker Hub image publish, local Docker compose, CI, SDKs, `px`, agents, audit tooling and runbooks exist (AWS EKS production retired)                                                                                                                                                         | A current release must still demonstrate successful deploy, rollback, alerts and support                                |
 | Historical programs                | Linear marks enterprise-readiness, PAL, vertical fidelity, Nightmare Fuel, remediation and CLI projects completed                                                                                                                                                               | Preserve their artifacts as foundations; require current evidence for the capabilities the pilot promises               |
 
 ## The material gaps
@@ -127,14 +127,11 @@ application or training campaign.
 6. **Current CI and deployment incidents require evidence-based closure.**
    PIX-4751, PIX-4795 and PIX-4814 are failure reports. They may be historical;
    inspect a later successful equivalent run at the chosen release before
-   retaining or closing them. A read of the latest 30 staging workflow runs
-   found
-   [CI failed](https://github.com/daggerstuff/pixelated/actions/runs/41371150579),
-   [Quality failed](https://github.com/daggerstuff/pixelated/actions/runs/41371150586),
-   and
-   [EKS deployment skipped](https://github.com/daggerstuff/pixelated/actions/runs/41371644264)
-   at remote commit `854deb99`. This sampled workflow state does not establish
-   current production health or validate the newer local commits.
+   retaining or closing them. Production deploys via
+   [deploy-cloudflare.yml](.github/workflows/deploy-cloudflare.yml) after green
+   staging CI; EKS deploy workflows are retired. Re-check the latest `staging`
+   workflow runs (CI, Quality, Cloudflare deploy, image publish) on the release
+   commit rather than stale sampled failures.
    [CI](.github/workflows/ci.yml), lines 95–101, currently allows the security
    bucket to fail with a warning.
 7. **Commercial documents overstate what is proven.** Existing

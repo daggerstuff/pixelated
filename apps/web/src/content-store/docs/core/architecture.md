@@ -175,12 +175,10 @@ Development environment requires:
 
 ### Deployment
 
-Deployment options include:
-
-- Docker containers
-- Kubernetes clusters
-- Cloud services (AWS, GCP)
-- Custom infrastructure
+**Production:** Cloudflare Workers ([REDACTED] zone route after green `staging`
+CI). **Standby:** Vercel origin. **Images:** Docker Hub (app and agents). **Local
+/ lab:** Docker Compose under `infra/docker/`. AWS EKS production orchestration
+is retired; see [`AGENTS.md`](../../../../../../AGENTS.md).
 
 ## Next Steps
 
