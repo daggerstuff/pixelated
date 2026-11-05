@@ -3,6 +3,7 @@
 
 import fs from 'node:fs'
 import process from 'node:process'
+import os from 'node:os'
 import { spawn } from 'node:child_process'
 
 /** @param {string} fileEnv
@@ -56,6 +57,13 @@ injectSecret('REDIS_PASSWORD_FILE', 'REDIS_PASSWORD', 'REDIS_URL')
 // Inject DB Password
 injectSecret('DB_PASSWORD_FILE', 'PGPASSWORD', 'DATABASE_URL')
 injectSecret('DB_PASSWORD_FILE', 'DB_PASSWORD')
+injectSecret('JWT_SECRET_FILE', 'JWT_SECRET')
+injectSecret('JWT_REFRESH_SECRET_FILE', 'JWT_REFRESH_SECRET')
+injectSecret('AUTH0_DOMAIN_FILE', 'AUTH0_DOMAIN')
+injectSecret('AUTH0_CLIENT_ID_FILE', 'AUTH0_CLIENT_ID')
+injectSecret('AUTH0_CLIENT_SECRET_FILE', 'AUTH0_CLIENT_SECRET')
+injectSecret('AUTH0_MANAGEMENT_CLIENT_ID_FILE', 'AUTH0_MANAGEMENT_CLIENT_ID')
+injectSecret('AUTH0_MANAGEMENT_CLIENT_SECRET_FILE', 'AUTH0_MANAGEMENT_CLIENT_SECRET')
 
 // Run the command passed as arguments
 const args = process.argv.slice(2)
@@ -67,8 +75,14 @@ process.stdout.write(`[Entrypoint] Starting: ${args.join(' ')}\n`)
 
 const child = spawn(args[0], args.slice(1), { stdio: 'inherit' })
 
-child.on('close', (code) => {
-  process.exit(code)
+child.on('close', (code, signal) => {
+  // A signal kill (e.g. OOM SIGKILL) sets code=null; process.exit(null) would
+  // exit 0 and mask the crash from orchestrators. Re-derive the exit status.
+  if (code === null && signal) {
+    process.exit(128 + (os.constants.signals[signal] ?? 0) || 1)
+    return
+  }
+  process.exit(code ?? 1)
 })
 
 child.on('error', (err) => {
