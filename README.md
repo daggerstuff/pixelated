@@ -96,7 +96,7 @@ Together, they form the secure, intelligent backbone of our clinical AI engine:
 | **[pixelated](https://github.com/daggerstuff/pixelated)** (Main Core) | Primary orchestrator: application surfaces, clinical dashboards, API routes, shared product logic. |
 | **[ai](ai/)** (Cognitive Engine)                                      | Model research and training: inference, emotional signal analysis, clinical validity pipelines.    |
 | **[foresight](foresight/)** (Continuity & Memory)                     | Persistent contextual memory for AI agents across longitudinal therapeutic simulations.            |
-| **[docs](docs/)** (Knowledge Base)                                    | HIPAA compliance, security posture, clinical feedback loops, architecture decisions.               |
+| **[docs](docs/)** (Knowledge Base submodule)                          | HIPAA, security, ADRs, and operations when the submodule is initialized (see below).               |
 
 `ai/`, `foresight/`, and `docs/` are **git submodules** — run
 `git submodule update --init --recursive` after cloning to populate them.
@@ -117,7 +117,7 @@ pixelated/
 ├── config/                     # Vitest, Playwright, and other configs
 ├── content/                    # Astro content collections
 ├── data/                       # Seed data and fixtures
-├── infra/                      # Infrastructure (Docker, K8s)
+├── infra/                      # Docker images & compose (local/lab); prod = Workers (see AGENTS.md)
 ├── scripts/                    # DevOps and utility scripts
 └── tests/                      # Integration and E2E tests
 ```
@@ -139,6 +139,10 @@ pnpm test:integration     # Integration tests
 pnpm e2e                  # End-to-end tests (Playwright)
 pnpm e2e:ui               # Interactive E2E
 ```
+
+> **`pnpm deploy` / `pnpm deploy:prod`** run local Docker Compose via
+> `scripts/deploy/deploy.sh`. Production deploys to Cloudflare Workers follow CI
+> on `staging` (see [`AGENTS.md`](AGENTS.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md)).
 
 ### Python (ai/ and foresight/ submodules)
 
@@ -212,9 +216,16 @@ testing, and security rules.
 
 ## Documentation
 
-The `docs/` submodule contains 980 files across 28 subdirectories. See
-[`DOCS.md`](DOCS.md) for a full index of all subdirectories, or browse the key
-areas below:
+**Two doc locations:**
+
+1. **`docs/` submodule** — run `git submodule update --init --recursive` first.
+   When empty, the tree is not checked out; see [`DOCS.md`](DOCS.md) for the
+   index once initialized.
+2. **In-app docs** — `apps/web/src/content-store/docs/` (served with the web app;
+   includes [`documentation-index.md`](apps/web/src/content-store/docs/documentation-index.md)).
+
+The `docs/` submodule holds HIPAA, operations, and ADR material. Browse the key
+areas below after initializing the submodule:
 
 - **[Getting Started](docs/getting-started/)** — Onboarding guides
 - **[Architecture](docs/architecture/)** — System design and ADRs

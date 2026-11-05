@@ -65,7 +65,6 @@ const ADVISORY_BUCKET_DIRS = {
     "apps/web/src/lib/sentry",
     "apps/web/src/lib/styles",
     "apps/web/src/lib/security/threat-intelligence",
-    "apps/web/src/lib/websocket",
     "apps/web/src/lib/crypto",
   ],
   // Bucket 2: the former ~248-file `lib` bucket, split into four balanced

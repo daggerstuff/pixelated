@@ -42,10 +42,6 @@ files in `alerts/` directory are now loaded by `prometheus.yml`:
 - `alerts/safety-alerts.yaml` (3 rules: safety gate violations, invalidations, PII)
 - `alerts/launch-alerts.yaml` (12 rules: launch metrics, crisis detection, engagement, performance, readiness)
 
-**Note**: `memory-alerts.yaml` at root level is a K8s ConfigMap targeting
-`gitlab-runner` namespace — retained as reference but not loaded by Prometheus.
-It is not applicable to the Docker Compose monitoring stack.
-
 ### 4. Mount via `docker-compose.production.yml` (add a `monitoring` profile) — TRIAGED
 
 **Decision**: Deferred to infrastructure provisioning. The monitoring stack

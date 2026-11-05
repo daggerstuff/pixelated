@@ -17,7 +17,7 @@ Operational utilities, deployment helpers, and developer workflows for Pixelated
 | `research/` | Dataset sourcing and academic pull automation |
 | `content/` | Blog publishing and post scheduling |
 | `migration/` | Database migration helpers |
-| `infrastructure/` | Deploy targets (staging/production), K8s secret rendering |
+| `infrastructure/` | Deploy targets (staging/production helpers) |
 | `qa/` | Quality assurance scripts |
 | `governance/` | Compliance and audit tooling |
 | `utils/` | General-purpose helpers (no-fail wrapper, credential scanner) |

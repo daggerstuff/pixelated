@@ -36,7 +36,7 @@ available for the Pixelated project.
 - [Deployment](./deployment.md) - Deployment procedures
 - [DevOps](./devops.md) - DevOps processes and tools
 - [Health Checks](./health-check.md) - Health check implementation
-  - [AWS Deployment](./deploy/aws/README.md) - AWS deployment configuration
+- [Deployment guide (in-app)](./guides/deployment.md) - Cloudflare Workers production; see also [`AGENTS.md`](../../../../../AGENTS.md)
 
 ## Services & Integrations
 
