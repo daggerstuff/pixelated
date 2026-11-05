@@ -10,11 +10,11 @@ describe('Sentry sourcemap source rewriting', () => {
   it('rewrites Astro virtual script sources to their component file', () => {
     const source = path.join(
       process.cwd(),
-      'apps/web/src/components/ThemeSwitcher.astro?astro&type=script&index=0&lang.ts',
+      'apps/web/src/components/mizu/Navbar.astro?astro&type=script&index=0&lang.ts',
     )
 
     expect(rewriteSentrySource(source)).toBe(
-      'apps/web/src/components/ThemeSwitcher.astro',
+      'apps/web/src/components/mizu/Navbar.astro',
     )
   })
 
@@ -27,8 +27,8 @@ describe('Sentry sourcemap source rewriting', () => {
   it('normalizes protocol-prefixed sourcemap sources', () => {
     expect(
       rewriteSentrySource(
-        'webpack:///apps/web/src/components/ThemeSwitcher.astro?astro&type=script',
+        'webpack:///apps/web/src/components/mizu/Navbar.astro?astro&type=script',
       ),
-    ).toBe('apps/web/src/components/ThemeSwitcher.astro')
+    ).toBe('apps/web/src/components/mizu/Navbar.astro')
   })
 })
