@@ -1,5 +1,8 @@
 ---
 import { SITE } from '../config'
+import { isAuthenticated, hasAdminRole } from '@/lib/auth/authUtils'
+import { getUser } from '@/lib/auth/sessionUtils'
+import { ClientRouter } from 'astro:transitions'
 import AdminSidebarNav from '@/components/admin/AdminSidebarNav.astro'
 import '@/lib/fonts'
 import '@/styles/np-tokens.css'
@@ -23,7 +26,230 @@ const {
 
 const { cspNonce } = Astro.locals
 const isVercelDeploy = !!process.env['VERCEL']
+
+// Verify authentication and admin role
+// Note: Unauthenticated /admin requests are already redirected in middleware
+// (projectAuthMiddleware) to avoid ResponseSentError. This is a defense-in-depth
+// check for authenticated non-admin users or edge cases where middleware was bypassed.
+const isLoggedIn = await isAuthenticated()
+const user = isLoggedIn ? await getUser(Astro.request) : null
+const isAdmin = isLoggedIn && user && (await hasAdminRole(user))
+const isAuthorized = Boolean(isAdmin)
+
+if (!isAuthorized) {
+  // Layouts cannot safely `return Astro.redirect()` — it causes
+  // "Response has already been sent" (PIXEL-ASTRO-S) because the parent page
+  // has already started streaming. Set redirect headers and render no admin
+  // content: the template below outputs only a minimal redirect shell.
+  Astro.response.status = 302
+  Astro.response.headers.set('Location', '/login?redirect=/admin')
+}
 ---
+
+{isAuthorized ? (
+  <html lang={SITE.lang} class="enhanced-dark-theme">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <meta name="generator" content={Astro.generator} />
+      <title>{title} | Admin Dashboard</title>
+      <meta name="description" content={description} />
+      <meta name="color-scheme" content="dark" />
+      <meta name="theme-color" content="#000000" />
+
+      <!-- Open Graph / Facebook -->
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={image} />
+
+      <!-- Twitter -->
+      <meta property="twitter:card" content="summary_large_image" />
+      <meta property="twitter:title" content={title} />
+      <meta property="twitter:description" content={description} />
+      <meta property="twitter:image" content={image} />
+
+      <ClientRouter />
+      {cspNonce && <meta name="csp-nonce" content={cspNonce} />}
+
+      <UmamiAnalytics nonce={cspNonce} />
+    </head>
+    <body
+      class="enhanced-dark-theme min-h-screen"
+      style="background: var(--bg-primary); color: var(--text-primary);"
+    >
+      <!-- Skip to content link for accessibility -->
+      <a
+        href="#main-content"
+        class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 rounded-md focus:shadow-lg transition-transform"
+        style="background: var(--accent-primary); color: var(--bg-primary);"
+      >
+        Skip to content
+      </a>
+      <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside
+          id="admin-sidebar"
+          class="w-64 hidden md:block glass-panel"
+          style="border-right: 1px solid var(--border-primary);"
+        >
+          <div class="p-6">
+            <h1
+              class="text-2xl font-bold"
+              style="color: var(--text-primary); font-family: var(--font-sans);"
+            >
+              Admin
+            </h1>
+          </div>
+          <nav class="mt-6">
+            <AdminSidebarNav
+              items={ADMIN_NAV_ITEMS}
+              {activeItem}
+              variant="refined"
+              showIcons
+            />
+          </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main
+          class="flex-1 overflow-x-hidden overflow-y-auto"
+          id="main-content"
+          style="background: var(--bg-primary);"
+        >
+          <!-- Top Navigation -->
+          <header
+            class="glass-panel py-4 px-6"
+            style="border-bottom: 1px solid var(--border-primary);"
+          >
+            <div class="flex items-center justify-between">
+              <button
+                id="mobile-menu-button"
+                class="md:hidden text-muted-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
+                aria-label="Toggle navigation menu"
+                aria-controls="admin-sidebar"
+                aria-expanded="false"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  ></path>
+                </svg>
+              </button>
+
+              <div class="flex items-center">
+                <button
+                  class="text-muted-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring mr-4"
+                  aria-label="Notifications"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                    ></path>
+                  </svg>
+                </button>
+
+                <div class="relative">
+                  <button class="flex items-center text-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring">
+                    <img
+                      class="h-8 w-8 rounded-full object-cover"
+                      src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
+                      alt="Admin"
+                    />
+                    <span class="ml-2">Admin</span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5 ml-1"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- Content -->
+          <div>
+            <slot />
+          </div>
+        </main>
+      </div>
+      <script>
+        // Mobile sidebar toggle — works on initial load and client-side nav
+        const initSidebar = () => {
+          const button = document.getElementById('mobile-menu-button')
+          const sidebar = document.getElementById('admin-sidebar')
+          if (!button || !sidebar) return
+
+          button.addEventListener('click', () => {
+            const expanded = button.getAttribute('aria-expanded') === 'true'
+            button.setAttribute('aria-expanded', String(!expanded))
+            sidebar.classList.toggle('hidden')
+            if (!expanded) {
+              const firstLink = sidebar.querySelector('a') as HTMLElement
+              firstLink?.focus()
+            }
+          })
+
+          // Close on Escape
+          button.addEventListener('keydown', (e) => {
+            if (
+              e.key === 'Escape' &&
+              button.getAttribute('aria-expanded') === 'true'
+            ) {
+              button.setAttribute('aria-expanded', 'false')
+              sidebar.classList.add('hidden')
+              button.focus()
+            }
+          })
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initSidebar)
+        } else {
+          initSidebar()
+        }
+        document.addEventListener('astro:page-load', initSidebar)
+      </script>
+      {isVercelDeploy && <SpeedInsights />}
+    </body>
+  </html>
+) : (
+  <html lang={SITE.lang}>
+    <head>
+      <meta charset="utf-8" />
+      <meta http-equiv="refresh" content="0; url=/login?redirect=/admin" />
+      <title>Redirecting</title>
+    </head>
+    <body></body>
+  </html>
+)}
 
 <style>
   .glass-panel {
@@ -77,194 +303,3 @@ const isVercelDeploy = !!process.env['VERCEL']
     outline-offset: 2px;
   }
 </style>
-
-<html lang={SITE.lang} class="enhanced-dark-theme">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content="Astro" />
-    <title>{title} | Admin Dashboard</title>
-    <meta name="description" content={description} />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#000000" />
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={image} />
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={image} />
-
-    <UmamiAnalytics nonce={cspNonce} />
-  </head>
-  <body
-    class="enhanced-dark-theme min-h-screen"
-    style="background: var(--bg-primary); color: var(--text-primary);"
-  >
-    <!-- Skip to content link for accessibility -->
-    <a
-      href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 rounded-md focus:shadow-lg transition-transform"
-      style="background: var(--accent-primary); color: var(--bg-primary);"
-    >
-      Skip to content
-    </a>
-    <div class="flex min-h-screen">
-      <!-- Sidebar -->
-      <aside
-        id="admin-sidebar"
-        class="w-64 hidden md:block glass-panel"
-        style="border-right: 1px solid var(--border-primary);"
-      >
-        <div class="p-6">
-          <h1
-            class="text-2xl font-bold"
-            style="color: var(--text-primary); font-family: var(--font-sans);"
-          >
-            Admin
-          </h1>
-        </div>
-        <nav class="mt-6">
-          <AdminSidebarNav
-            items={ADMIN_NAV_ITEMS}
-            {activeItem}
-            variant="refined"
-            showIcons
-          />
-        </nav>
-      </aside>
-
-      <!-- Main Content -->
-      <main
-        class="flex-1 overflow-x-hidden overflow-y-auto"
-        id="main-content"
-        style="background: var(--bg-primary);"
-      >
-        <!-- Top Navigation -->
-        <header
-          class="glass-panel py-4 px-6"
-          style="border-bottom: 1px solid var(--border-primary);"
-        >
-          <div class="flex items-center justify-between">
-            <button
-              id="mobile-menu-button"
-              class="md:hidden text-muted-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
-              aria-label="Toggle navigation menu"
-              aria-controls="admin-sidebar"
-              aria-expanded="false"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                ></path>
-              </svg>
-            </button>
-
-            <div class="flex items-center">
-              <button
-                class="text-muted-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring mr-4"
-                aria-label="Notifications"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  ></path>
-                </svg>
-              </button>
-
-              <div class="relative">
-                <button class="flex items-center text-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring">
-                  <img
-                    class="h-8 w-8 rounded-full object-cover"
-                    src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
-                    alt="Admin"
-                  />
-                  <span class="ml-2">Admin</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5 ml-1"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <!-- Content -->
-        <div>
-          <slot />
-        </div>
-      </main>
-    </div>
-    <script>
-      // Mobile sidebar toggle — works on initial load and client-side nav
-      const initSidebar = () => {
-        const button = document.getElementById('mobile-menu-button')
-        const sidebar = document.getElementById('admin-sidebar')
-        if (!button || !sidebar) return
-
-        button.addEventListener('click', () => {
-          const expanded = button.getAttribute('aria-expanded') === 'true'
-          button.setAttribute('aria-expanded', String(!expanded))
-          sidebar.classList.toggle('hidden')
-          if (!expanded) {
-            const firstLink = sidebar.querySelector('a') as HTMLElement
-            firstLink?.focus()
-          }
-        })
-
-        // Close on Escape
-        button.addEventListener('keydown', (e) => {
-          if (
-            e.key === 'Escape' &&
-            button.getAttribute('aria-expanded') === 'true'
-          ) {
-            button.setAttribute('aria-expanded', 'false')
-            sidebar.classList.add('hidden')
-            button.focus()
-          }
-        })
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initSidebar)
-      } else {
-        initSidebar()
-      }
-      document.addEventListener('astro:page-load', initSidebar)
-    </script>
-    {isVercelDeploy && <SpeedInsights />}
-  </body>
-</html>
