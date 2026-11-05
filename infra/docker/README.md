@@ -31,7 +31,6 @@ See `README.playwright.md` for the Playwright test image stack.
 | ---------- | ----------- |
 | `backend.Dockerfile` | Backend API service |
 | `pe.Dockerfile` | Pixelated Empathy web/app build context |
-| `Dockerfile.prod` / `Dockerfile.production` | Production-oriented image builds |
 | `Dockerfile.playwright` | Playwright E2E runner |
 | `ai-service.Dockerfile`, `bias-detection.Dockerfile`, `celery.Dockerfile` | AI and worker services |
 | `express-api.Dockerfile`, `websocket-server.Dockerfile`, `worker.Dockerfile` | Supporting services |

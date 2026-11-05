@@ -203,7 +203,6 @@ docker-compose*.yml
 !infra/docker-compose.yml
 Dockerfile.*
 !infra/Dockerfile
-!infra/docker/Dockerfile.production
 infra/k8s/
 infra/deploy/
 infra/metoro-exporter/
