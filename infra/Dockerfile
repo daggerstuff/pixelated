@@ -76,6 +76,10 @@ RUN pnpm build
 RUN find /app/node_modules -type f -name "*.map" -delete && \
     find /app/dist -type f -name "*.map" -delete 2>/dev/null || true
 
+# Production dependencies only (dev tooling excluded from runtime scan surface)
+FROM builder AS prod-deps
+RUN pnpm prune --prod --ignore-scripts --yes
+
 # Runtime stage: minimal image with only production bits
 FROM base AS runtime
 WORKDIR /app
@@ -84,8 +88,14 @@ WORKDIR /app
 RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy all dependencies from builder (includes workspace packages)
-COPY --from=builder /app/node_modules ./node_modules
+# Runtime only needs `node`; drop bundled npm/pnpm so Trivy does not flag unused toolchain CVEs.
+RUN rm -rf /usr/local/lib/node_modules/npm \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx \
+    && rm -rf /usr/local/lib/node_modules/pnpm \
+    && rm -f /usr/local/bin/pnpm /usr/local/bin/pnpx
+
+# Pruned deps still include packages required at SSR runtime (see prod-deps stage).
+COPY --from=prod-deps /app/node_modules ./node_modules
 
 # Copy built output and public assets from builder.
 # Astro config uses publicDir './apps/web/public' (repo restructure 2026-08-26),
