@@ -3,7 +3,7 @@ services:
   app:
     build:
       context: ../..
-      dockerfile: infra/docker/Dockerfile.production
+      dockerfile: infra/Dockerfile
     container_name: pixelated-app
     restart: unless-stopped
     ports:

@@ -1,10 +1,9 @@
 name: Build and Publish Images
 
-# Production is deployed off AWS: Vercel is the production origin for
-# pixelatedempathy.com and the app/agent images below are what the current
-# deployment consumes. Publishing follows a successful CI run on staging, so
-# shipping stays the default instead of a manual step; manual dispatch is
-# always allowed.
+# Production serves pixelatedempathy.com from Cloudflare Workers; Vercel remains
+# the standby origin. App and agent images below publish to Docker Hub for the
+# fleet runtime. Publishing follows a successful CI run on staging so shipping
+# stays the default; manual dispatch is always allowed.
 on:
     workflow_dispatch:
     workflow_run:

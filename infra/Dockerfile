@@ -76,6 +76,10 @@ RUN pnpm build
 RUN find /app/node_modules -type f -name "*.map" -delete && \
     find /app/dist -type f -name "*.map" -delete 2>/dev/null || true
 
+# Production dependencies only (dev tooling excluded from runtime scan surface)
+FROM builder AS prod-deps
+RUN pnpm prune --prod --ignore-scripts --yes
+
 # Runtime stage: minimal image with only production bits
 FROM base AS runtime
 WORKDIR /app
@@ -84,8 +88,19 @@ WORKDIR /app
 RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy all dependencies from builder (includes workspace packages)
-COPY --from=builder /app/node_modules ./node_modules
+# Runtime only needs `node`; drop bundled npm/pnpm so Trivy does not flag unused toolchain CVEs.
+RUN rm -rf /usr/local/lib/node_modules/npm \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx \
+    && rm -rf /usr/local/lib/node_modules/pnpm \
+    && rm -f /usr/local/bin/pnpm /usr/local/bin/pnpx
+
+# Pruned deps still include packages required at SSR runtime (see prod-deps stage).
+COPY --from=prod-deps /app/node_modules ./node_modules
+
+# Secret-file entrypoint: resolves *_FILE env vars into plain vars at runtime
+# (docker-compose.production.yml passes DB_PASSWORD_FILE etc.). No-ops when
+# no *_FILE vars are set, so direct `node start-server.mjs` behavior is unchanged.
+COPY --from=builder --chown=node:node /app/scripts/ci/docker-entrypoint.js ./docker-entrypoint.js
 
 # Copy built output and public assets from builder.
 # Astro config uses publicDir './apps/web/public' (repo restructure 2026-08-26),
@@ -104,4 +119,4 @@ EXPOSE 4321
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD node -e "const http=require('http');const opts={host:'127.0.0.1',port:4321,path:'/health',timeout:5000};const req=http.request(opts,res=>{if(res.statusCode>=200&&res.statusCode<500){process.exit(0);}process.exit(1);});req.on('error',()=>process.exit(1));req.end();"
 
-CMD ["node", "start-server.mjs"]
+CMD ["node", "docker-entrypoint.js", "node", "start-server.mjs"]

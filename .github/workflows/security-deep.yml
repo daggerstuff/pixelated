@@ -446,10 +446,6 @@ jobs:
         include:
           - image: node:24-bookworm-slim
             dockerfile: infra/Dockerfile
-          - image: node:24-bookworm-slim
-            dockerfile: infra/docker/Dockerfile.production
-          - image: node:24-alpine
-            dockerfile: infra/docker/Dockerfile.prod
           - image: python:3.14-slim
             dockerfile: infra/docker/backend.Dockerfile
           - image: mcr.microsoft.com/playwright:v1.60.0-jammy

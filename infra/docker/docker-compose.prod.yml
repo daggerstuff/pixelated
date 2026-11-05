@@ -55,8 +55,8 @@ services:
   # Business Strategy CMS Application
   app:
     build:
-      context: .
-      dockerfile: Dockerfile.prod
+      context: ../..
+      dockerfile: infra/Dockerfile
     environment:
       NODE_ENV: production
       PORT: 3000
