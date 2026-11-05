@@ -1041,9 +1041,6 @@ importers:
       events:
         specifier: ^3.3.0
         version: 3.3.0
-      fake-indexeddb:
-        specifier: ^6.2.7
-        version: 6.2.7
       glob:
         specifier: ^13.0.0
         version: 13.0.6
@@ -9820,10 +9817,6 @@ packages:
     engines: {node: '>= 10.17.0'}
     hasBin: true
 
-  fake-indexeddb@6.2.7:
-    resolution: {integrity: sha512-g0ghQ+BmU3CSZaHup5FigEAAtCmtNyxkrmID7OAeK2qONHghw1aQ2l2T1RxmfhP1H1tEXVRWArUTGVCk5832ww==}
-    engines: {node: '>=18'}
-
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
 
@@ -12831,7 +12824,7 @@ packages:
     peerDependencies:
       i18next: '>= 26.2.0'
       react: ^19.2.4
-      react-dom: '*'
+      react-dom: ^19.2.4
       react-native: '*'
       typescript: ^5 || ^6 || ^7
     peerDependenciesMeta:
@@ -23890,8 +23883,6 @@ snapshots:
       '@types/yauzl': 2.10.3
     transitivePeerDependencies:
       - supports-color
-
-  fake-indexeddb@6.2.7: {}
 
   fast-deep-equal@3.1.3: {}
 
