@@ -39,8 +39,6 @@ including usage examples, available props, and best practices.
   - [PasswordResetRequestForm](#passwordresetrequestform)
   - [RegisterForm](#registerform)
   - [AuthCard](#authcard)
-- [Transition Components](#transition-components)
-  - [PageTransitions](#pagetransitions)
 
 ## Layout Components
 
@@ -732,51 +730,6 @@ import AuthCard from '@/components/auth/AuthCard.astro';
 - Responsive design that fits on screen without scrolling
 - Dark theme styling with black background
 - Subtle animations on appearance
-
-## Transition Components
-
-Components that handle page transitions and animations.
-
-### PageTransitions
-
-An Astro component that creates smooth transitions between pages using Astro's
-View Transitions API.
-
-**File:** `src/components/transitions/PageTransitions.astro`
-
-**Props:**
-
-```typescript
-interface Props {
-  mode?: 'default' | 'fade' | 'slide' | 'slide-up' | 'slide-down' | 'zoom'
-  duration?: number
-}
-```
-
-**Usage:**
-
-```astro
----
-import PageTransitions from '@/components/transitions/PageTransitions.astro';
-import BaseLayout from '@/layouts/BaseLayout.astro';
----
-
-<BaseLayout title="My Page">
-  <PageTransitions mode="slide" duration={400}>
-    <div>Page content here</div>
-  </PageTransitions>
-</BaseLayout>
-```
-
-**Features:**
-
-- Multiple transition animations (fade, slide, zoom)
-- Customizable duration
-- Dark mode support
-- Individual element transitions with named view transitions
-- Browser compatibility handling
-- Smooth animations with proper timing functions
-- Event handling for transition completion
 
 ## Best Practices
 
