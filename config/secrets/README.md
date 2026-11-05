@@ -1,8 +1,9 @@
 # Local Development Secrets
 
-This directory contains secret files for local development. In production,
-secrets are managed by External Secrets Operator (ESO) backed by Vault or AWS
-Secrets Manager — see `k8s/base/external-secrets.yaml`.
+This directory holds secret **files** for local Docker Compose and developer
+workflows. Production traffic is served from Cloudflare Workers; runtime secrets
+there are configured via repository `CF_WORKER_*` GitHub Actions secrets and
+synced during deploy (see `AGENTS.md` and `.github/workflows/deploy-cloudflare.yml`).
 
 ## Setup
 
@@ -40,12 +41,12 @@ echo "your-auth0-mgmt-client-secret" > auth0-management-client-secret
 | `auth0-management-client-id`     | Auth0 management API client ID     |
 | `auth0-management-client-secret` | Auth0 management API client secret |
 
-## Production
+## Production vs local
 
-In production, these files are NOT used. Secrets are synced from the external
-secret store (Vault/AWS Secrets Manager/Doppler) by ESO into Kubernetes Secret
-resources. See `k8s/base/external-secrets.yaml`.
-
-Docker Compose production (`docker/docker-compose.production.yml`) uses these
-files as Docker secrets. For production deployments, mount secrets from the
-secret store instead.
+- **Local / Compose**: stacks under `infra/docker/` mount these paths as Docker
+  secrets (for example `docker-compose.prod.yml` and environment-specific
+  compose files). Do not commit real values; keep only `*.example` templates in
+  git.
+- **Production (Workers)**: do not copy this directory to Cloudflare. Use the
+  Worker secret workflow documented in `AGENTS.md`; Vercel standby uses its own
+  project environment variables when deployed.
