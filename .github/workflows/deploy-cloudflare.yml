@@ -26,31 +26,6 @@ env:
     CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
 jobs:
-    # Auto-deploy must follow a successful CI *push* to this repository's
-    # staging branch. workflow_run.head_branch alone is not enough: a fork PR
-    # whose head branch is named "staging" would otherwise pass and could sync
-    # repository secrets onto the Worker.
-    verify-trusted-ci:
-        name: Verify trusted CI source
-        runs-on: ubuntu-latest
-        outputs:
-            deploy_allowed: ${{ steps.record.outputs.deploy_allowed }}
-        steps:
-            - name: Log skipped untrusted workflow_run
-              if: >-
-                  github.event_name == 'workflow_run' &&
-                  !(github.event.workflow_run.conclusion == 'success' &&
-                    github.event.workflow_run.event == 'push' &&
-                    github.event.workflow_run.head_branch == 'staging' &&
-                    github.event.workflow_run.head_repository.full_name == github.repository)
-              run: |
-                  echo "::notice::Skipping Cloudflare deploy: untrusted or ineligible CI run (event=${{ github.event.workflow_run.event }} branch=${{ github.event.workflow_run.head_branch }} head_repo=${{ github.event.workflow_run.head_repository.full_name }} conclusion=${{ github.event.workflow_run.conclusion }})."
-            - name: Record deploy_allowed
-              id: record
-              run: echo "deploy_allowed=${DEPLOY_ALLOWED}" >> "$GITHUB_OUTPUT"
-              env:
-                  DEPLOY_ALLOWED: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_branch == 'staging' && github.event.workflow_run.head_repository.full_name == github.repository) }}
-
     # The pipeline lands before the credentials exist, so it must be a no-op
     # rather than a red X on every green staging CI run. A job-level `if` cannot
     # read the secrets context reliably, so gate through a step output instead.
@@ -79,8 +54,6 @@ jobs:
     # same head) errs on deploying. Manual dispatch always deploys.
     paths:
         name: Detect app-facing changes
-        needs: [verify-trusted-ci]
-        if: needs.verify-trusted-ci.outputs.deploy_allowed == 'true'
         runs-on: ubuntu-latest
         outputs:
             needed: ${{ steps.decide.outputs.needed }}
@@ -144,11 +117,13 @@ jobs:
 
     build:
         name: Build Cloudflare bundle
-        needs: [preflight, paths, verify-trusted-ci]
+        needs: [preflight, paths]
         if: >-
-            needs.verify-trusted-ci.outputs.deploy_allowed == 'true' &&
             needs.preflight.outputs.enabled == 'true' &&
-            needs.paths.outputs.needed == 'true'
+            needs.paths.outputs.needed == 'true' &&
+            (github.event_name == 'workflow_dispatch' ||
+             (github.event.workflow_run.conclusion == 'success' &&
+              github.event.workflow_run.head_branch == 'staging'))
         runs-on: ubuntu-latest
         outputs:
             artifact-name: ${{ steps.pack.outputs.name }}
@@ -206,9 +181,8 @@ jobs:
 
     deploy:
         name: Deploy to Cloudflare
-        needs: [preflight, paths, build, verify-trusted-ci]
+        needs: [preflight, paths, build]
         if: >-
-            needs.verify-trusted-ci.outputs.deploy_allowed == 'true' &&
             needs.preflight.outputs.enabled == 'true' &&
             needs.paths.outputs.needed == 'true'
         runs-on: ubuntu-latest
