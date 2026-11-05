@@ -676,7 +676,6 @@ export default defineConfig({
         'apps/web/src/lib/server',
         'apps/web/src/lib/server-only',
         'apps/web/src/lib/auth',
-        'apps/web/src/lib/websocket',
         'apps/web/src/lib/agent-note-collab',
         'apps/web/src/lib/logging',
         'apps/web/src/lib/middleware',
