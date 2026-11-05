@@ -295,6 +295,18 @@ jobs:
           log_level: WARNING
           container_user: 0
         continue-on-error: true
+      - name: Run Checkov Helm scan (metoro-exporter)
+        if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
+        id: checkov_helm_metoro
+        uses: bridgecrewio/checkov-action@c10e2438743528f9e4549758fad8b7a62052541d # v12.3136.0
+        with:
+          directory: infra/metoro-exporter
+          framework: kubernetes,helm
+          output_format: sarif
+          output_file_path: checkov-helm-metoro-results.sarif
+          log_level: WARNING
+          container_user: 0
+        continue-on-error: true
 
       # --- SARIF uploads ---
       - name: Check for Trivy SARIF
