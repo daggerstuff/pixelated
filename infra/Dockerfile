@@ -97,6 +97,11 @@ RUN rm -rf /usr/local/lib/node_modules/npm \
 # Pruned deps still include packages required at SSR runtime (see prod-deps stage).
 COPY --from=prod-deps /app/node_modules ./node_modules
 
+# Secret-file entrypoint: resolves *_FILE env vars into plain vars at runtime
+# (docker-compose.production.yml passes DB_PASSWORD_FILE etc.). No-ops when
+# no *_FILE vars are set, so direct `node start-server.mjs` behavior is unchanged.
+COPY --from=builder --chown=node:node /app/scripts/ci/docker-entrypoint.js ./docker-entrypoint.js
+
 # Copy built output and public assets from builder.
 # Astro config uses publicDir './apps/web/public' (repo restructure 2026-08-26),
 # so public assets live at /app/apps/web/public in the builder stage.
@@ -114,4 +119,4 @@ EXPOSE 4321
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD node -e "const http=require('http');const opts={host:'127.0.0.1',port:4321,path:'/health',timeout:5000};const req=http.request(opts,res=>{if(res.statusCode>=200&&res.statusCode<500){process.exit(0);}process.exit(1);});req.on('error',()=>process.exit(1));req.end();"
 
-CMD ["node", "start-server.mjs"]
+CMD ["node", "docker-entrypoint.js", "node", "start-server.mjs"]
