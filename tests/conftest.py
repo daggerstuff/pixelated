@@ -8,8 +8,8 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT_STR = str(PROJECT_ROOT)
-# The `src` Python package (apps/web/src) is imported by tests under tests/pe
-# and tests/video_emotion; it only resolves when apps/web is on sys.path.
+# The `src` Python package (apps/web/src) is imported by tests under
+# tests/video_emotion; it only resolves when apps/web is on sys.path.
 APPS_WEB_STR = str(PROJECT_ROOT / "apps" / "web")
 
 if PROJECT_ROOT_STR not in sys.path:
