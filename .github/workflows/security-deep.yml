@@ -232,7 +232,7 @@ jobs:
       - name: Set up uv
         uses: ./.github/actions/setup-uv
 
-      - name: Prepare Helm dependencies for Trivy scan
+      - name: Prepare Helm dependencies for Checkov scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         run: |
           if ! command -v helm >/dev/null 2>&1; then
@@ -243,7 +243,6 @@ jobs:
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
           helm repo add grafana https://grafana.github.io/helm-charts --force-update
           helm dep update ai/inference/deployment/pixel-voice
-          helm dep update ai/inference/deployment/helm/pixelated-empathy
 
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
@@ -296,6 +295,18 @@ jobs:
           log_level: WARNING
           container_user: 0
         continue-on-error: true
+      - name: Run Checkov Helm scan (metoro-exporter)
+        if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
+        id: checkov_helm_metoro
+        uses: bridgecrewio/checkov-action@c10e2438743528f9e4549758fad8b7a62052541d # v12.3136.0
+        with:
+          directory: infra/metoro-exporter
+          framework: kubernetes,helm
+          output_format: sarif
+          output_file_path: checkov-helm-metoro-results.sarif
+          log_level: WARNING
+          container_user: 0
+        continue-on-error: true
 
       # --- SARIF uploads ---
       - name: Check for Trivy SARIF
@@ -320,6 +331,15 @@ jobs:
         id: checkov_helm_sarif
         run: |
           if [ -s checkov-helm-results.sarif ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for Checkov Helm SARIF (metoro-exporter)
+        id: checkov_helm_metoro_sarif
+        run: |
+          if [ -s checkov-helm-metoro-results.sarif ]; then
             echo "found=true" >> "$GITHUB_OUTPUT"
           else
             echo "found=false" >> "$GITHUB_OUTPUT"
@@ -353,15 +373,24 @@ jobs:
           sarif_file: checkov-helm-results.sarif
           category: checkov-helm
 
+      - name: Upload Checkov Helm (metoro-exporter) SARIF to Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && steps.checkov_helm_metoro_sarif.outputs.found == 'true'
+        with:
+          sarif_file: checkov-helm-metoro-results.sarif
+          category: checkov-helm-metoro
+
       - name: Upload Checkov artifacts
         if: always() && (steps.checkov_infra_sarif.outputs.found == 'true' ||
-          steps.checkov_helm_sarif.outputs.found == 'true')
+          steps.checkov_helm_sarif.outputs.found == 'true' ||
+          steps.checkov_helm_metoro_sarif.outputs.found == 'true')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: checkov-sarif
           path: |
             checkov-infra-results.sarif
             checkov-helm-results.sarif
+            checkov-helm-metoro-results.sarif
 
       - name: Trivy security gate notice
         if: always() && steps.trivy_sarif.outputs.found == 'true'
