@@ -460,8 +460,6 @@
     "espree": "^11.2.0",
     "events": "^3.3.0",
     "glob": "^14.0.3",
-    "globby": "^16.2.4",
-    "gray-matter": "^4.0.3",
     "hastscript": "^9.0.3",
     "headroom-ai": "^0.42.0",
     "html-entities": "^2.3.3",
