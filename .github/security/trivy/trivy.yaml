@@ -1,3 +1,11 @@
-rego:
-  data:
-    - .github/security/trivy/data
+# Filesystem misconfig scans omit kubernetes/helm: cluster manifests were
+# removed from the repo root (Checkov still covers ai/inference/deployment/pixel-voice).
+misconfiguration:
+  scanners:
+    - azure-arm
+    - cloudformation
+    - dockerfile
+    - terraform
+    - terraformplan-json
+    - terraformplan-snapshot
+    - ansible

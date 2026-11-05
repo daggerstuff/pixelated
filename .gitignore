@@ -563,6 +563,7 @@ docker-compose.gpu.override.yml
 neon.ts
 config/astro.config.mjs
 churnmeon/
+scripts/task_sync/.validate_cache/
 scripts/ci/python-strict-baseline.json
 scripts/ci/python-strict-ratchet.mjs
 scripts/create_ai_vm.sh
