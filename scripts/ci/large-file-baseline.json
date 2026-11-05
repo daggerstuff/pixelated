@@ -117,7 +117,6 @@
     "apps/web/src/lib/services/bias-audit-service.ts",
     "scripts/ci/ci-ops-dashboard.py",
     "apps/web/src/lib/fhe/analytics.ts",
-    "apps/web/src/lib/config/performance-config.ts",
     "apps/web/src/lib/ai/services/AutomatedEscalationService.ts",
     "apps/web/src/components/demos/bias-detection/EnhancedBiasDetectionInterface.tsx",
     "foresight/foresight/graph_store.py",

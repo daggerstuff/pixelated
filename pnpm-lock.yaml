@@ -755,9 +755,6 @@ importers:
       sonner:
         specifier: ^2.0.8
         version: 2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
-      standardwebhooks:
-        specifier: ^1.1.1
-        version: 1.1.1
       tailwind-merge:
         specifier: ^3.7.0
         version: 3.7.0
@@ -29935,7 +29932,6 @@ time:
   socket.io-client@4.8.4: '2026-09-25T08:35:02.910Z'
   socket.io@4.8.4: '2026-09-25T08:51:53.015Z'
   sonner@2.0.8: '2026-08-09T08:46:10.174Z'
-  standardwebhooks@1.1.1: '2026-08-28T20:44:17.913Z'
   stream-browserify@3.0.0: '2020-04-16T12:50:54.368Z'
   supertest@7.3.1: '2026-10-02T14:51:40.083Z'
   tailwind-merge@3.7.0: '2026-09-12T20:10:15.257Z'

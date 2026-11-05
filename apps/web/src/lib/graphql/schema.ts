@@ -6,7 +6,7 @@
  * Type mappings:
  * - Session           → TherapySession from `src/lib/ai/models/ai-types.ts` (DB canonical)
  * - EmotionAnalysis   → EmotionAnalysis from `src/lib/ai/emotions/types.ts`
- * - ConversationTurn  → ConversationTurn from `src/lib/pixel-conversation-integration.ts`
+ * - ConversationTurn  → `ConversationTurn` in `src/lib/graphql/generated/types.ts`
  * - InterventionRecord → InterventionAnalysisResult from `src/lib/db/ai/types.ts`
  * - AnonymizedMetrics → AnonymizedMetrics from `src/lib/research/types/research-types.ts`
  *
