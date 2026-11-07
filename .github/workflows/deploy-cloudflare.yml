@@ -247,6 +247,15 @@ jobs:
                   CF_WORKER_SLACK_WEBHOOK_URL: ${{ secrets.CF_WORKER_SLACK_WEBHOOK_URL }}
                   CF_WORKER_UPSTASH_REDIS_REST_TOKEN: ${{ secrets.CF_WORKER_UPSTASH_REDIS_REST_TOKEN }}
                   CF_WORKER_UPSTASH_REDIS_REST_URL: ${{ secrets.CF_WORKER_UPSTASH_REDIS_REST_URL }}
+                  CF_WORKER_AUTH0_AUDIENCE: ${{ secrets.CF_WORKER_AUTH0_AUDIENCE }}
+                  CF_WORKER_AUTH0_CALLBACK_URL: ${{ secrets.CF_WORKER_AUTH0_CALLBACK_URL }}
+                  CF_WORKER_AUTH0_CLIENT_ID: ${{ secrets.CF_WORKER_AUTH0_CLIENT_ID }}
+                  CF_WORKER_AUTH0_CLIENT_SECRET: ${{ secrets.CF_WORKER_AUTH0_CLIENT_SECRET }}
+                  CF_WORKER_AUTH0_DOMAIN: ${{ secrets.CF_WORKER_AUTH0_DOMAIN }}
+                  CF_WORKER_AUTH0_MANAGEMENT_CLIENT_ID: ${{ secrets.CF_WORKER_AUTH0_MANAGEMENT_CLIENT_ID }}
+                  CF_WORKER_AUTH0_MANAGEMENT_CLIENT_SECRET: ${{ secrets.CF_WORKER_AUTH0_MANAGEMENT_CLIENT_SECRET }}
+                  CF_WORKER_PUBLIC_AUTH0_CLIENT_ID: ${{ secrets.CF_WORKER_PUBLIC_AUTH0_CLIENT_ID }}
+                  CF_WORKER_PUBLIC_AUTH0_DOMAIN: ${{ secrets.CF_WORKER_PUBLIC_AUTH0_DOMAIN }}
               run: |
                   set -euo pipefail
                   node -e '
