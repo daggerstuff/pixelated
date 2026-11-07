@@ -32,8 +32,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 WORKDIR /workspaces/pixelated
 
-RUN useradd --create-home --shell /bin/bash --uid 1000 vscode
-USER vscode
+USER node
 HEALTHCHECK NONE
 
 # The workspace is bind-mounted by the devcontainer runtime; post-create
