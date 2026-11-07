@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro'
 import { Pool } from 'pg'
 
+import { getSession } from '../../../lib/auth/session'
+
 // Database connection pool
 const { DATABASE_URL } = process.env
 if (!DATABASE_URL) {
@@ -16,19 +18,37 @@ const pool: Pool =
   globalWithPool.__pgPool ?? new Pool({ connectionString: DATABASE_URL })
 globalWithPool.__pgPool = pool
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const {
-      therapistId,
-      currentSessionId,
-      previousSessionId,
-      improvementScore,
-      metrics,
-    } = await request.json()
+    const session = await getSession(request)
+    if (!session) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+    const therapistId = session.user.id
+
+    const body: unknown = await request.json()
+    if (!isRecord(body)) {
+      return new Response(JSON.stringify({ error: 'Invalid payload' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+    const { currentSessionId, previousSessionId, improvementScore, metrics } =
+      body
 
     if (
-      !therapistId ||
+      typeof currentSessionId !== 'string' ||
       !currentSessionId ||
+      (previousSessionId != null && typeof previousSessionId !== 'string') ||
       improvementScore === undefined ||
       improvementScore === null ||
       !metrics
@@ -36,7 +56,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           error:
-            'Missing required fields: therapistId, currentSessionId, improvementScore, metrics',
+            'Missing required fields: currentSessionId, improvementScore, metrics',
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
@@ -44,6 +64,21 @@ export const POST: APIRoute = async ({ request }) => {
 
     const client = await pool.connect()
     try {
+      for (const sessionId of [currentSessionId, previousSessionId].filter(
+        (id) => id != null,
+      )) {
+        const ownedSession = await client.query(
+          'SELECT id FROM sessions WHERE id = $1 AND therapist_id = $2',
+          [sessionId, therapistId],
+        )
+        if (ownedSession.rows.length === 0) {
+          return new Response(JSON.stringify({ error: 'Session not found' }), {
+            status: 404,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+      }
+
       // Insert session comparison data into session_comparisons table
       const query = `
         INSERT INTO session_comparisons (
@@ -83,12 +118,24 @@ export const POST: APIRoute = async ({ request }) => {
 
 export const GET: APIRoute = async ({ request }) => {
   try {
+    const session = await getSession(request)
+    if (!session) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+    const therapistId = session.user.id
+
     const url = new URL(request.url)
-    const therapistId = url.searchParams.get('therapistId')
+    const requestedTherapistId = url.searchParams.get('therapistId')
     const sessionId = url.searchParams.get('sessionId')
     const timeRange = url.searchParams.get('timeRange') ?? '30d'
 
-    if (!therapistId && !sessionId) {
+    if (!requestedTherapistId && !sessionId) {
       return new Response(
         JSON.stringify({ error: 'Missing therapistId or sessionId parameter' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
@@ -117,10 +164,13 @@ export const GET: APIRoute = async ({ request }) => {
           LEFT JOIN sessions cs ON sc.current_session_id = cs.id
           LEFT JOIN sessions ps ON sc.previous_session_id = ps.id
           WHERE sc.current_session_id = $1
+            AND sc.therapist_id = $2
+            AND cs.therapist_id = $2
+            AND (sc.previous_session_id IS NULL OR ps.therapist_id = $2)
           ORDER BY sc.analyzed_at DESC
           LIMIT 1
         `
-        queryParams = [sessionId]
+        queryParams = [sessionId, therapistId]
       } else if (therapistId) {
         // Get therapist's session comparisons
         // Allowlist simple forms like '7 days', '30 days', '24 hours', '30d'
@@ -144,6 +194,8 @@ export const GET: APIRoute = async ({ request }) => {
           LEFT JOIN sessions cs ON sc.current_session_id = cs.id
           LEFT JOIN sessions ps ON sc.previous_session_id = ps.id
           WHERE sc.therapist_id = $1
+            AND cs.therapist_id = $1
+            AND (sc.previous_session_id IS NULL OR ps.therapist_id = $1)
             AND sc.analyzed_at >= NOW() - $2::interval
           ORDER BY sc.analyzed_at DESC
         `
@@ -188,9 +240,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       return new Response(
         JSON.stringify({
-          therapistId:
-            therapistId ??
-            (result.rows[0] as ComparisonRow | undefined)?.therapist_id,
+          therapistId,
           sessionId: sessionId,
           comparisons,
         }),

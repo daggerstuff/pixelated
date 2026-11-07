@@ -160,31 +160,16 @@ export const POST: APIRoute = async ({ request }) => {
     const client = await getPool().connect()
     try {
       const sessionQuery = `
-        SELECT therapist_id FROM sessions WHERE id = $1
+        SELECT therapist_id FROM sessions WHERE id = $1 AND therapist_id = $2
       `
       const sessionResult = await client.query<SessionOwnershipRow>(
         sessionQuery,
-        [sessionId],
+        [sessionId, session.user.id],
       )
 
       if (sessionResult.rows.length === 0) {
         return new Response(JSON.stringify({ error: 'Session not found' }), {
           status: 404,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      }
-
-      const sessionOwnerId = sessionResult?.rows[0].therapist_id
-      const userId = session.user.id
-      const userRole = session.user.role
-
-      // Check if user owns the session or has therapist/admin role
-      const isOwner = sessionOwnerId === userId
-      const hasPermission = userRole === 'therapist' || userRole === 'admin'
-
-      if (!isOwner && !hasPermission) {
-        return new Response(JSON.stringify({ error: 'Access denied' }), {
-          status: 403,
           headers: { 'Content-Type': 'application/json' },
         })
       }
@@ -284,31 +269,16 @@ export const GET: APIRoute = async ({ request }) => {
     const client = await getPool().connect()
     try {
       const sessionQuery = `
-        SELECT therapist_id FROM sessions WHERE id = $1
+        SELECT therapist_id FROM sessions WHERE id = $1 AND therapist_id = $2
       `
       const sessionResult = await client.query<SessionOwnershipRow>(
         sessionQuery,
-        [sessionId],
+        [sessionId, session.user.id],
       )
 
       if (sessionResult.rows.length === 0) {
         return new Response(JSON.stringify({ error: 'Session not found' }), {
           status: 404,
-          headers: { 'Content-Type': 'application/json' },
-        })
-      }
-
-      const sessionOwnerId = sessionResult?.rows[0].therapist_id
-      const userId = session.user.id
-      const userRole = session.user.role
-
-      // Check if user owns the session or has therapist/admin role
-      const isOwner = sessionOwnerId === userId
-      const hasPermission = userRole === 'therapist' || userRole === 'admin'
-
-      if (!isOwner && !hasPermission) {
-        return new Response(JSON.stringify({ error: 'Access denied' }), {
-          status: 403,
           headers: { 'Content-Type': 'application/json' },
         })
       }

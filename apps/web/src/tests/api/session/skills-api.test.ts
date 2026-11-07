@@ -2,6 +2,7 @@ import type { APIContext } from 'astro'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 
 import { AstroCookies } from '../../../../../../node_modules/astro/dist/core/cookies/cookies.js'
+import { getSession } from '../../../lib/auth/session'
 import { initializeDatabase } from '../../../lib/db'
 import { POST, GET } from '../../../pages/api/session/skills'
 
@@ -173,6 +174,8 @@ const createPostContext = (
 const createGetContext = (url: string): Parameters<typeof GET>[0] =>
   createRequestContext(new Request(url))
 
+vi.mock('../../../lib/auth/session', () => ({ getSession: vi.fn() }))
+
 vi.mock('pg', () => ({
   Pool: class {
     // initializeDatabase() registers pool error/connect listeners.
@@ -194,6 +197,9 @@ initializeDatabase()
 describe('Session Skills API', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(getSession).mockResolvedValue({
+      user: { id: 'therapist-123', role: 'therapist' },
+    } as Awaited<ReturnType<typeof getSession>>)
     mockClient.query.mockReset()
     mockClient.release.mockReset()
     mockConnect.mockReset()
@@ -238,7 +244,7 @@ describe('Session Skills API', () => {
       expect(mockClient.query).toHaveBeenNthCalledWith(
         1,
         expect.stringContaining('UPDATE sessions'),
-        [JSON.stringify(skillScores), 'test-session-123'],
+        [JSON.stringify(skillScores), 'test-session-123', 'therapist-123'],
       )
 
       // Verify batched skill insert query
@@ -333,7 +339,7 @@ describe('Session Skills API', () => {
 
       expect(response.status).toBe(400)
       expect(responseBody.error).toBe(
-        'Missing required fields: sessionId, therapistId, skillScores',
+        'Missing required fields: sessionId, skillScores',
       )
     })
 
@@ -508,5 +514,127 @@ describe('Session Skills API', () => {
       expect(response.status).toBe(500)
       expect(responseBody.error).toBe('Internal server error')
     })
+  })
+})
+
+describe('skills owner boundary', () => {
+  beforeEach(() => {
+    vi.mocked(getSession).mockResolvedValue({
+      user: { id: 'owner', role: 'admin' },
+    } as Awaited<ReturnType<typeof getSession>>)
+    mockConnect.mockResolvedValue(mockClient)
+    mockClient.query.mockReset()
+  })
+
+  it.each([null, [], 'invalid', 42, true].map((body) => ({ body })))(
+    'rejects non-object JSON payload $body',
+    async ({ body }) => {
+      const response = await POST(
+        createRequestContext(
+          new Request('http://localhost/api/session/skills', {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        ),
+      )
+      expect(response.status).toBe(400)
+      expect(await response.json()).toEqual({ error: 'Invalid payload' })
+      expect(mockClient.query).not.toHaveBeenCalled()
+    },
+  )
+
+  it.each(['GET', 'POST'])('rejects unauthenticated %s', async (method) => {
+    vi.mocked(getSession).mockResolvedValue(null)
+    mockClient.query.mockResolvedValue({
+      rowCount: 1,
+      rows: [{ skill_scores: { Empathy: 90 } }],
+    })
+    const response =
+      method === 'GET'
+        ? await GET(
+            createGetContext(
+              'http://localhost/api/session/skills?sessionId=foreign',
+            ),
+          )
+        : await POST(
+            createPostContext({
+              sessionId: 'foreign',
+              therapistId: 'victim',
+              skillScores: {},
+            }),
+          )
+    expect(response.status).toBe(401)
+    expect(await response.json()).toEqual({ error: 'Authentication required' })
+  })
+
+  it.each(['GET', 'POST'])(
+    'denies cross-owner %s without leaking or changing skills',
+    async (method) => {
+      let changed = false
+      mockClient.query.mockImplementation(async (sql, values = []) => {
+        const scoped = /therapist_id\s*=/.test(sql) && values.includes('owner')
+        if (sql.includes('UPDATE sessions') && !scoped) changed = true
+        return scoped
+          ? { rowCount: 0, rows: [] }
+          : { rowCount: 1, rows: [{ skill_scores: { private: 99 } }] }
+      })
+      const response =
+        method === 'GET'
+          ? await GET(
+              createGetContext(
+                'http://localhost/api/session/skills?sessionId=foreign',
+              ),
+            )
+          : await POST(
+              createPostContext({
+                sessionId: 'foreign',
+                therapistId: 'victim',
+                skillScores: {},
+              }),
+            )
+      expect(response.status).toBe(404)
+      expect(await response.json()).toEqual({ error: 'Session not found' })
+      expect(changed).toBe(false)
+    },
+  )
+
+  it('uses authenticated owner for history even with a spoofed therapistId', async () => {
+    mockClient.query.mockImplementation(async (_sql, values) => ({
+      rowCount: 1,
+      rows: [{ skill_name: values?.[0] === 'owner' ? 'own' : 'private' }],
+    }))
+    const response = await GET(
+      createGetContext(
+        'http://localhost/api/session/skills?therapistId=victim',
+      ),
+    )
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual({
+      therapistId: 'owner',
+      skills: [{ skill_name: 'own' }],
+    })
+  })
+
+  it('attributes own-session writes to authenticated owner despite spoofed therapistId', async () => {
+    const written: unknown[][] = []
+    mockClient.query.mockImplementation(async (sql, values = []) => {
+      if (sql.includes('INSERT INTO skill_development')) written.push(values)
+      return { rowCount: 1, rows: [] }
+    })
+    const response = await POST(
+      createPostContext({
+        sessionId: 'own',
+        therapistId: 'victim',
+        skillScores: { Empathy: 80 },
+      }),
+    )
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual({
+      success: true,
+      sessionId: 'own',
+      therapistId: 'owner',
+    })
+    expect(written[0][0]).toBe('owner')
   })
 })

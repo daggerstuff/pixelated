@@ -1,16 +1,45 @@
 import type { APIRoute } from 'astro'
 
+import { getSession } from '../../../lib/auth/session'
 import { getPool } from '../../../lib/db'
 import { getSkillCategory } from '../../../lib/skillCategories'
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { sessionId, therapistId, skillScores } = await request.json()
+    const session = await getSession(request)
+    if (!session) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+    const therapistId = session.user.id
 
-    if (!sessionId || !therapistId || !skillScores) {
+    const body: unknown = await request.json()
+    if (!isRecord(body)) {
+      return new Response(JSON.stringify({ error: 'Invalid payload' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+    const { sessionId, skillScores } = body
+
+    if (
+      typeof sessionId !== 'string' ||
+      !sessionId ||
+      typeof skillScores !== 'object' ||
+      skillScores === null ||
+      Array.isArray(skillScores)
+    ) {
       return new Response(
         JSON.stringify({
-          error: 'Missing required fields: sessionId, therapistId, skillScores',
+          error: 'Missing required fields: sessionId, skillScores',
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
@@ -22,13 +51,14 @@ export const POST: APIRoute = async ({ request }) => {
       const sessionQuery = `
         UPDATE sessions
         SET skill_scores = $1, updated_at = NOW()
-        WHERE id = $2
+        WHERE id = $2 AND therapist_id = $3
         RETURNING id
       `
 
       const sessionResult = await client.query(sessionQuery, [
         JSON.stringify(skillScores),
         sessionId,
+        therapistId,
       ])
 
       if (sessionResult.rowCount === 0) {
@@ -132,9 +162,21 @@ export const POST: APIRoute = async ({ request }) => {
 
 export const GET: APIRoute = async ({ request }) => {
   try {
+    const session = await getSession(request)
+    if (!session) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+    const therapistId = session.user.id
+
     const url = new URL(request.url)
     const sessionId = url.searchParams.get('sessionId')
-    const therapistId = url.searchParams.get('therapistId')
+    const requestedTherapistId = url.searchParams.get('therapistId')
 
     const client = await getPool().connect()
     try {
@@ -143,10 +185,10 @@ export const GET: APIRoute = async ({ request }) => {
         const query = `
           SELECT skill_scores
           FROM sessions
-          WHERE id = $1
+          WHERE id = $1 AND therapist_id = $2
         `
 
-        const result = await client.query(query, [sessionId])
+        const result = await client.query(query, [sessionId, therapistId])
 
         if (result.rowCount === 0) {
           return new Response(JSON.stringify({ error: 'Session not found' }), {
@@ -163,7 +205,7 @@ export const GET: APIRoute = async ({ request }) => {
           }),
           { status: 200, headers: { 'Content-Type': 'application/json' } },
         )
-      } else if (therapistId) {
+      } else if (requestedTherapistId) {
         // Get therapist's skill development history
         const query = `
           SELECT skill_name, skill_category, current_score, practice_sessions, last_practiced, created_at
