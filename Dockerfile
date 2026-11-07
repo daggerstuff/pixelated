@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Enable pnpm
-ARG PNPM_VERSION=11.12.0
+ARG PNPM_VERSION=12.18.0
 RUN npm install -g pnpm@$PNPM_VERSION
 
 # Copy package manifests for dependency installation
@@ -36,11 +36,15 @@ RUN pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
 
 # Copy source code
 COPY . .
+RUN chown -R node:node /app
 
 ENV NODE_ENV=development
 ENV NODE_OPTIONS="--max-old-space-size=8192"
 
 EXPOSE 5173
+
+USER node
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 CMD curl -fsS http://localhost:5173/ || exit 1
 
 # Development server with hot reload
 CMD ["pnpm", "dev", "--host", "0.0.0.0", "--port", "5173"]
