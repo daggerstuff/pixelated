@@ -14,14 +14,7 @@ const state = vi.hoisted(() => {
 })
 vi.mock('../../../lib/auth/session', () => ({ getSession: vi.fn() }))
 vi.mock('../../../lib/db', () => ({
-  getPool: () => ({ connect: async () => state }),
-}))
-vi.mock('pg', () => ({
-  Pool: class {
-    async connect() {
-      return state
-    }
-  },
+  acquireClient: async () => state,
 }))
 
 const context = (

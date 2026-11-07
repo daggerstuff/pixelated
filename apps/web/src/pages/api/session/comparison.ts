@@ -1,22 +1,8 @@
 import type { APIRoute } from 'astro'
-import { Pool } from 'pg'
+
+import { acquireClient } from '@/lib/db'
 
 import { getSession } from '../../../lib/auth/session'
-
-// Database connection pool
-const { DATABASE_URL } = process.env
-if (!DATABASE_URL) {
-  throw new Error('DATABASE_URL is not set')
-}
-
-interface PgPoolGlobal {
-  __pgPool?: Pool
-}
-
-const globalWithPool = globalThis as unknown as PgPoolGlobal
-const pool: Pool =
-  globalWithPool.__pgPool ?? new Pool({ connectionString: DATABASE_URL })
-globalWithPool.__pgPool = pool
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -62,7 +48,7 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const client = await pool.connect()
+    const client = await acquireClient()
     try {
       for (const sessionId of [currentSessionId, previousSessionId].filter(
         (id) => id != null,
@@ -142,7 +128,7 @@ export const GET: APIRoute = async ({ request }) => {
       )
     }
 
-    const client = await pool.connect()
+    const client = await acquireClient()
     try {
       let query = ''
       let queryParams: string[] = []

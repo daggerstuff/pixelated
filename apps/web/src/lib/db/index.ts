@@ -101,6 +101,7 @@ function resolveDefaultConfig(): DatabaseConfig {
 
 // Connection pool
 let pool: Pool | null = null
+let lastConfig: Partial<DatabaseConfig> = {}
 
 /**
  * Initialize database connection pool
@@ -123,17 +124,27 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
     )
   }
 
+  lastConfig = config
   const finalConfig = { ...resolveDefaultConfig(), ...config }
-  pool = new Pool(finalConfig)
+  const newPool = new Pool(finalConfig)
+  pool = newPool
 
-  // Handle pool errors
-  pool.on('error', (err: unknown) => {
-    logger.error('Unexpected error on idle client', err)
-    void process.exit(-1)
+  // Idle-client error: the server (or the runtime) dropped a pooled socket.
+  // pg handles the broken client itself; what matters is that the pool does
+  // not keep handing out stale sockets. Discard the pool so the next access
+  // rebuilds it fresh. Do NOT process.exit() here: on Cloudflare Workers
+  // that would tear down the whole isolate, and on a long-lived server it is
+  // the wrong remedy for a recoverable network blip.
+  newPool.on('error', (err: unknown) => {
+    logger.error('Unexpected error on idle client; discarding the pool', err)
+    if (pool === newPool) {
+      pool = null
+    }
+    void discardPool(newPool)
   })
 
   // 'connect' is not in Pool's type definition but pool does emit it at runtime
-  ;(pool as unknown as PoolWithConnectEvent).on(
+  ;(newPool as unknown as PoolWithConnectEvent).on(
     'connect',
     (_client: PoolClient) => {
       logger.info('New client connected to database')
@@ -143,19 +154,127 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   logger.info(
     `Database pool initialized for ${finalConfig.host}:${finalConfig.port}/${finalConfig.database} with ${finalConfig.max} max connections`,
   )
+  return newPool
+}
+
+// Pools in the middle of being torn down. end() is safe to call once per
+// instance; the guard keeps error floods from ending the same pool twice.
+const closingPools = new WeakSet<Pool>()
+
+function discardPool(stale: Pool): Promise<void> {
+  if (closingPools.has(stale)) return Promise.resolve()
+  closingPools.add(stale)
+  return stale.end().catch(() => {
+    // The pool is already gone or its clients are already dead; there is
+    // nothing to clean up.
+  })
+}
+
+/**
+ * Discard the current pool (fire-and-forget teardown). A new pool is created
+ * on demand by getPool()/query()/transaction().
+ */
+function invalidatePool(): void {
+  const stale = pool
+  pool = null
+  if (stale) {
+    void discardPool(stale)
+  }
+}
+
+/**
+ * Error codes that indicate the *connection* failed or dropped, not the
+ * statement. Safe to retry by rebuilding the pool: OS-level socket codes,
+ * PostgreSQL class 08 (connection_exception), 57 (server_cannot_connect),
+ * and 58 (system_error).
+ */
+const TRANSIENT_CONNECTION_CODES = new Set([
+  'ECONNREFUSED',
+  'ECONNRESET',
+  'EPIPE',
+  'ETIMEDOUT',
+  'EAI_AGAIN',
+  'ENETUNREACH',
+  'EHOSTUNREACH',
+  'ENOTFOUND',
+  'EPROTO',
+  'EBADF',
+  '08000',
+  '08003',
+  '08006',
+  '57P01',
+  '57P02',
+  '57P03',
+  '58000',
+  '58001',
+  '58002',
+])
+
+const TRANSIENT_CONNECTION_MESSAGES = [
+  'connection timeout expired',
+  'connection terminated unexpectedly',
+  'the server closed the connection unexpectedly',
+  'could not connect to server',
+  'the database system is shutting down',
+  'network connection lost',
+  'bad file descriptor',
+  'ssl has not been negotiated',
+]
+
+function isTransientConnectionError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false
+  const err = error as { code?: unknown; message?: unknown }
+  if (
+    typeof err.code === 'string' &&
+    TRANSIENT_CONNECTION_CODES.has(err.code)
+  ) {
+    return true
+  }
+  const message =
+    typeof err.message === 'string' ? err.message.toLowerCase() : ''
+  return TRANSIENT_CONNECTION_MESSAGES.some((needle) =>
+    message.includes(needle),
+  )
+}
+
+/**
+ * Get database connection pool, creating it on demand.
+ *
+ * Callers may reach this without startup having run initializeDatabase
+ * (SSR pages, or a Workers request after the pool was discarded following a
+ * connection failure). Creating lazily is what makes the pool self-healing:
+ * the previous instance is already torn down, and a fresh one with new
+ * sockets is returned.
+ */
+export function getPool(): Pool {
+  if (!pool) {
+    return initializeDatabase(lastConfig)
+  }
   return pool
 }
 
 /**
- * Get database connection pool
+ * Acquire a client, rebuilding the pool exactly once when the failure is a
+ * transient connection error (e.g. the pool's sockets went stale across a
+ * Workers isolate freeze/thaw). If the retry fails it is re-thrown as-is.
+ *
+ * Routes that manage their own multi-statement or transactional work against
+ * pg directly should acquire clients through this instead of
+ * `getPool().connect()`, so a stale socket self-heals instead of 500-ing the
+ * request.
  */
-export function getPool(): Pool {
-  if (!pool) {
-    throw new Error(
-      'Database not initialized. Call initializeDatabase() first.',
+export async function acquireClient(): Promise<PoolClient> {
+  try {
+    return await getPool().connect()
+  } catch (error: unknown) {
+    if (!isTransientConnectionError(error)) throw error
+    logger.warn(
+      'Failed to acquire a database connection; rebuilding the pool and retrying once',
+      error,
     )
+    invalidatePool()
+    return getPool().connect()
   }
-  return pool
 }
 
 /**
@@ -166,13 +285,7 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
   params?: unknown[],
 ): Promise<DbQueryResult<T>> {
   recordQuery(text)
-  // Auto-initialize pool if caller forgot (mirrors transaction() behavior).
-  // Prevents "Database not initialized" crashes on SSR pages like consent-management
-  // when app.astro startup failed or was bypassed.
-  if (!pool) {
-    initializeDatabase()
-  }
-  const client = await getPool().connect()
+  const client = await acquireClient()
   try {
     return (await client.query<T>(text, params)) as unknown as DbQueryResult<T>
   } finally {
@@ -186,9 +299,7 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
 export async function transaction<T>(
   callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
-  // Ensure the pool is initialised before acquiring a connection.
-  initializeDatabase()
-  const client = await getPool().connect()
+  const client = await acquireClient()
   try {
     recordQuery('BEGIN')
     await client.query('BEGIN')
@@ -197,7 +308,9 @@ export async function transaction<T>(
     await client.query('COMMIT')
     return result
   } catch (error: unknown) {
-    await client.query('ROLLBACK')
+    // A dead connection has already rolled back server-side; do not let a
+    // failed ROLLBACK mask the original error.
+    await client.query('ROLLBACK').catch(() => undefined)
     throw error
   } finally {
     client.release()
@@ -208,9 +321,10 @@ export async function transaction<T>(
  * Health check for database connection
  */
 export async function closeDatabase(): Promise<void> {
-  if (pool) {
-    await pool.end()
-    pool = null
+  const stale = pool
+  pool = null
+  if (stale) {
+    await discardPool(stale)
     logger.info('Database connection pool closed')
   }
 }
