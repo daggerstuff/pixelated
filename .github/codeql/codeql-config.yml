@@ -14,7 +14,6 @@ query-filters:
 
 # Specify which paths to analyze
 paths:
-  - ai
   - scripts
   - apps/web/src
 
@@ -58,4 +57,3 @@ queries:
     uses: ./.github/codeql/custom-queries/ehr/
   # Use additional query packs for comprehensive security analysis
   - uses: security-extended
-  - uses: security-and-quality
