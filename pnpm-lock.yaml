@@ -372,9 +372,6 @@ importers:
       '@composio/core':
         specifier: ^0.27.0
         version: 0.27.0(effect@4.0.3)(ws@8.22.1(utf-8-validate@6.0.6))(zod@4.6.7)
-      '@fontsource/big-shoulders-display':
-        specifier: ^5.3.0
-        version: 5.3.0
       '@google-cloud/storage':
         specifier: ^8.4.0
         version: 8.4.0(supports-color@10.2.2)
@@ -3118,9 +3115,6 @@ packages:
 
   '@fontsource-variable/spline-sans-mono@5.3.0':
     resolution: {integrity: sha512-dH/qBj/MCE4ObiuCwlA9X1o3AftMO9dwfFgoRVYjy6VCPYkpWAlEtK/RjeyICgsR8rW763IAQARskVgShBY5JA==}
-
-  '@fontsource/big-shoulders-display@5.3.0':
-    resolution: {integrity: sha512-d4+Tcsq/WfoKeqWfB6wFdeNDsSYYnilJbSNNpf5w53MlWrGHAc9YvkAjC6id6PgFDiGaFKsXfP0RFAQtpt0bog==}
 
   '@fontsource/ibm-plex-mono@5.3.0':
     resolution: {integrity: sha512-eTgnZjZEGk1QtD3ZstF+Vclo2HLAni8YMy34/DxllwZvyz1lR/1RF/xTiAquOBO7MvqBx8D2Ig2WCPMVfdZu7Q==}
@@ -16562,8 +16556,6 @@ snapshots:
   '@fontsource-variable/space-grotesk@5.3.0': {}
 
   '@fontsource-variable/spline-sans-mono@5.3.0': {}
-
-  '@fontsource/big-shoulders-display@5.3.0': {}
 
   '@fontsource/ibm-plex-mono@5.3.0': {}
 
