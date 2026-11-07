@@ -17,6 +17,21 @@ from bias_detection.models import BiasAnalysisResponse
 
 logger = structlog.get_logger(__name__)
 
+# Isolated schema for the Python bias-detection service. The web app owns
+# `public.bias_analyses` (and related tables) via db/migrations; this schema
+# prevents CREATE TABLE IF NOT EXISTS from silently skipping incompatible DDL.
+BIAS_DETECTION_SCHEMA = "bias_detection"
+
+
+def _qualified_table(table_name: str) -> str:
+    return f"{BIAS_DETECTION_SCHEMA}.{table_name}"
+
+
+T_BIAS_ANALYSES = _qualified_table("bias_analyses")
+T_BIAS_SCORES = _qualified_table("bias_scores")
+T_API_USAGE = _qualified_table("api_usage")
+T_MODEL_METRICS = _qualified_table("model_metrics")
+
 
 class DatabaseService:
     """Database service for PostgreSQL and MongoDB operations"""
@@ -103,9 +118,19 @@ class DatabaseService:
         try:
             logger.info("Initializing database schema")
 
-            schema_sql = """
+            schema = BIAS_DETECTION_SCHEMA
+            analyses = T_BIAS_ANALYSES
+            bias_scores = T_BIAS_SCORES
+            user_sessions = _qualified_table("user_sessions")
+            api_usage = T_API_USAGE
+            model_metrics = T_MODEL_METRICS
+            system_config = _qualified_table("system_config")
+
+            schema_sql = f"""
+            CREATE SCHEMA IF NOT EXISTS {schema};
+
             -- Bias analysis results table
-            CREATE TABLE IF NOT EXISTS bias_analyses (
+            CREATE TABLE IF NOT EXISTS {analyses} (
                 id UUID PRIMARY KEY,
                 request_id VARCHAR(255) NOT NULL,
                 content_hash VARCHAR(64) NOT NULL,
@@ -131,16 +156,16 @@ class DatabaseService:
                 completed_at TIMESTAMP WITH TIME ZONE
             );
 
-            CREATE INDEX IF NOT EXISTS idx_request_id ON bias_analyses (request_id);
-            CREATE INDEX IF NOT EXISTS idx_content_hash ON bias_analyses (content_hash);
-            CREATE INDEX IF NOT EXISTS idx_user_id ON bias_analyses (user_id);
-            CREATE INDEX IF NOT EXISTS idx_created_at ON bias_analyses (created_at);
-            CREATE INDEX IF NOT EXISTS idx_status ON bias_analyses (status);
+            CREATE INDEX IF NOT EXISTS idx_bd_request_id ON {analyses} (request_id);
+            CREATE INDEX IF NOT EXISTS idx_bd_content_hash ON {analyses} (content_hash);
+            CREATE INDEX IF NOT EXISTS idx_bd_user_id ON {analyses} (user_id);
+            CREATE INDEX IF NOT EXISTS idx_bd_created_at ON {analyses} (created_at);
+            CREATE INDEX IF NOT EXISTS idx_bd_status ON {analyses} (status);
 
             -- Bias scores table (for detailed analysis)
-            CREATE TABLE IF NOT EXISTS bias_scores (
+            CREATE TABLE IF NOT EXISTS {bias_scores} (
                 id UUID PRIMARY KEY,
-                analysis_id UUID REFERENCES bias_analyses(id),
+                analysis_id UUID REFERENCES {analyses}(id),
                 bias_type VARCHAR(50) NOT NULL,
                 score FLOAT NOT NULL,
                 confidence FLOAT NOT NULL,
@@ -150,12 +175,12 @@ class DatabaseService:
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
 
-            CREATE INDEX IF NOT EXISTS idx_analysis_id ON bias_scores (analysis_id);
-            CREATE INDEX IF NOT EXISTS idx_bias_type ON bias_scores (bias_type);
-            CREATE INDEX IF NOT EXISTS idx_score ON bias_scores (score);
+            CREATE INDEX IF NOT EXISTS idx_bd_analysis_id ON {bias_scores} (analysis_id);
+            CREATE INDEX IF NOT EXISTS idx_bd_bias_type ON {bias_scores} (bias_type);
+            CREATE INDEX IF NOT EXISTS idx_bd_score ON {bias_scores} (score);
 
             -- User sessions table
-            CREATE TABLE IF NOT EXISTS user_sessions (
+            CREATE TABLE IF NOT EXISTS {user_sessions} (
                 id UUID PRIMARY KEY,
                 user_id VARCHAR(255) NOT NULL,
                 session_id VARCHAR(255) NOT NULL UNIQUE,
@@ -165,12 +190,12 @@ class DatabaseService:
                 last_activity TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
 
-            CREATE INDEX IF NOT EXISTS idx_user_id_sessions ON user_sessions (user_id);
-            CREATE INDEX IF NOT EXISTS idx_session_id ON user_sessions (session_id);
-            CREATE INDEX IF NOT EXISTS idx_last_activity ON user_sessions (last_activity);
+            CREATE INDEX IF NOT EXISTS idx_bd_user_id_sessions ON {user_sessions} (user_id);
+            CREATE INDEX IF NOT EXISTS idx_bd_session_id ON {user_sessions} (session_id);
+            CREATE INDEX IF NOT EXISTS idx_bd_last_activity ON {user_sessions} (last_activity);
 
             -- API usage tracking
-            CREATE TABLE IF NOT EXISTS api_usage (
+            CREATE TABLE IF NOT EXISTS {api_usage} (
                 id UUID PRIMARY KEY,
                 user_id VARCHAR(255),
                 session_id VARCHAR(255),
@@ -183,13 +208,13 @@ class DatabaseService:
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
 
-            CREATE INDEX IF NOT EXISTS idx_user_id_usage ON api_usage (user_id);
-            CREATE INDEX IF NOT EXISTS idx_endpoint ON api_usage (endpoint);
-            CREATE INDEX IF NOT EXISTS idx_created_at_usage ON api_usage (created_at);
-            CREATE INDEX IF NOT EXISTS idx_status_code ON api_usage (status_code);
+            CREATE INDEX IF NOT EXISTS idx_bd_user_id_usage ON {api_usage} (user_id);
+            CREATE INDEX IF NOT EXISTS idx_bd_endpoint ON {api_usage} (endpoint);
+            CREATE INDEX IF NOT EXISTS idx_bd_created_at_usage ON {api_usage} (created_at);
+            CREATE INDEX IF NOT EXISTS idx_bd_status_code ON {api_usage} (status_code);
 
             -- Model performance metrics
-            CREATE TABLE IF NOT EXISTS model_metrics (
+            CREATE TABLE IF NOT EXISTS {model_metrics} (
                 id UUID PRIMARY KEY,
                 model_name VARCHAR(100) NOT NULL,
                 model_version VARCHAR(50),
@@ -200,11 +225,11 @@ class DatabaseService:
                 last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
             );
 
-            CREATE INDEX IF NOT EXISTS idx_model_name ON model_metrics (model_name);
-            CREATE INDEX IF NOT EXISTS idx_last_updated ON model_metrics (last_updated);
+            CREATE INDEX IF NOT EXISTS idx_bd_model_name ON {model_metrics} (model_name);
+            CREATE INDEX IF NOT EXISTS idx_bd_last_updated ON {model_metrics} (last_updated);
 
             -- System configuration
-            CREATE TABLE IF NOT EXISTS system_config (
+            CREATE TABLE IF NOT EXISTS {system_config} (
                 key VARCHAR(100) PRIMARY KEY,
                 value TEXT NOT NULL,
                 description TEXT,
@@ -213,7 +238,7 @@ class DatabaseService:
             );
 
             -- Insert default configuration
-            INSERT INTO system_config (key, value, description) VALUES
+            INSERT INTO {system_config} (key, value, description) VALUES
             ('max_sequence_length', '512', 'Maximum sequence length for model input'),
             ('batch_size', '32', 'Batch size for model inference'),
             ('cache_ttl_seconds', '900', 'Cache TTL in seconds'),
@@ -250,8 +275,8 @@ class DatabaseService:
             # Store main analysis
             async with self.pg_pool.acquire() as conn:
                 await conn.execute(
-                    """
-                    INSERT INTO bias_analyses (
+                    f"""
+                    INSERT INTO {T_BIAS_ANALYSES} (
                         id, request_id, content_hash, content, content_type, language,
                         context, user_id, session_id, overall_bias_score, bias_types_detected,
                         sentiment_analysis, keyword_analysis, contextual_analysis,
@@ -289,8 +314,8 @@ class DatabaseService:
                 # Store individual bias scores
                 for bias_score in analysis.bias_scores:
                     await conn.execute(
-                        """
-                        INSERT INTO bias_scores (
+                        f"""
+                        INSERT INTO {T_BIAS_SCORES} (
                             id, analysis_id, bias_type, score, confidence,
                             confidence_level, evidence, explanation
                         ) VALUES (
@@ -331,7 +356,9 @@ class DatabaseService:
 
         try:
             async with self.pg_pool.acquire() as conn:
-                row = await conn.fetchrow("SELECT * FROM bias_analyses WHERE id = $1", analysis_id)
+                row = await conn.fetchrow(
+                    f"SELECT * FROM {T_BIAS_ANALYSES} WHERE id = $1", analysis_id
+                )
 
                 if row:
                     return dict(row)
@@ -354,7 +381,9 @@ class DatabaseService:
 
         try:
             async with self.pg_pool.acquire() as conn:
-                row = await conn.fetchrow("SELECT * FROM bias_analyses WHERE request_id = $1", request_id)
+                row = await conn.fetchrow(
+                    f"SELECT * FROM {T_BIAS_ANALYSES} WHERE request_id = $1", request_id
+                )
 
                 if row:
                     return dict(row)
@@ -378,8 +407,8 @@ class DatabaseService:
         try:
             async with self.pg_pool.acquire() as conn:
                 rows = await conn.fetch(
-                    """
-                    SELECT * FROM bias_analyses
+                    f"""
+                    SELECT * FROM {T_BIAS_ANALYSES}
                     WHERE user_id = $1
                     ORDER BY created_at DESC
                     LIMIT $2 OFFSET $3
@@ -405,8 +434,8 @@ class DatabaseService:
             async with self.pg_pool.acquire() as conn:
                 # Total analyses - use make_interval for proper parameter binding
                 total_analyses = await conn.fetchval(
-                    """
-                    SELECT COUNT(*) FROM bias_analyses
+                    f"""
+                    SELECT COUNT(*) FROM {T_BIAS_ANALYSES}
                     WHERE created_at >= NOW() - make_interval(days => $1::int)
                     """,
                     days,
@@ -414,8 +443,8 @@ class DatabaseService:
 
                 # Average bias score
                 avg_bias_score = await conn.fetchval(
-                    """
-                    SELECT AVG(overall_bias_score) FROM bias_analyses
+                    f"""
+                    SELECT AVG(overall_bias_score) FROM {T_BIAS_ANALYSES}
                     WHERE created_at >= NOW() - make_interval(days => $1::int)
                     """,
                     days,
@@ -423,10 +452,10 @@ class DatabaseService:
 
                 # Bias type distribution
                 bias_distribution = await conn.fetch(
-                    """
+                    f"""
                     SELECT bias_type, COUNT(*) as count
-                    FROM bias_scores bs
-                    JOIN bias_analyses ba ON bs.analysis_id = ba.id
+                    FROM {T_BIAS_SCORES} bs
+                    JOIN {T_BIAS_ANALYSES} ba ON bs.analysis_id = ba.id
                     WHERE ba.created_at >= NOW() - make_interval(days => $1::int)
                     GROUP BY bias_type
                     ORDER BY count DESC
@@ -436,12 +465,12 @@ class DatabaseService:
 
                 # Processing time statistics
                 processing_stats = await conn.fetchrow(
-                    """
+                    f"""
                     SELECT
                         AVG(processing_time_ms) as avg_time,
                         MIN(processing_time_ms) as min_time,
                         MAX(processing_time_ms) as max_time
-                    FROM bias_analyses
+                    FROM {T_BIAS_ANALYSES}
                     WHERE created_at >= NOW() - make_interval(days => $1::int)
                     """,
                     days,
@@ -484,8 +513,8 @@ class DatabaseService:
 
             async with self.pg_pool.acquire() as conn:
                 await conn.execute(
-                    """
-                    INSERT INTO api_usage (
+                    f"""
+                    INSERT INTO {T_API_USAGE} (
                         user_id, session_id, endpoint, method, status_code,
                         response_time_ms, request_size_bytes, response_size_bytes
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -531,7 +560,9 @@ class DatabaseService:
 
             async with self.pg_pool.acquire() as conn:
                 # Get current metrics
-                current_metrics = await conn.fetchrow("SELECT * FROM model_metrics WHERE model_name = $1", model_name)
+                current_metrics = await conn.fetchrow(
+                    f"SELECT * FROM {T_MODEL_METRICS} WHERE model_name = $1", model_name
+                )
 
                 if current_metrics:
                     # Update existing metrics
@@ -551,8 +582,8 @@ class DatabaseService:
                     new_accuracy = accuracy_score if accuracy_score is not None else current_metrics["accuracy_score"]
 
                     await conn.execute(
-                        """
-                        UPDATE model_metrics
+                        f"""
+                        UPDATE {T_MODEL_METRICS}
                         SET prediction_count = $1,
                             avg_processing_time_ms = $2,
                             accuracy_score = $3,
@@ -569,8 +600,8 @@ class DatabaseService:
                 else:
                     # Insert new metrics
                     await conn.execute(
-                        """
-                        INSERT INTO model_metrics (
+                        f"""
+                        INSERT INTO {T_MODEL_METRICS} (
                             id, model_name, model_version, prediction_count,
                             avg_processing_time_ms, accuracy_score, error_count
                         ) VALUES (
@@ -603,7 +634,9 @@ class DatabaseService:
 
         try:
             async with self.pg_pool.acquire() as conn:
-                row = await conn.fetchrow("SELECT * FROM model_metrics WHERE model_name = $1", model_name)
+                row = await conn.fetchrow(
+                    f"SELECT * FROM {T_MODEL_METRICS} WHERE model_name = $1", model_name
+                )
 
                 if row:
                     return dict(row)
