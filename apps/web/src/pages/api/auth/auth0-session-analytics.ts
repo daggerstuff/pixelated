@@ -4,18 +4,13 @@
  */
 
 import type { APIRoute } from 'astro'
-import { Pool } from 'pg'
 
 import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
+import { acquireClient } from '@/lib/db'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { getUserById } from '@/lib/services/auth0.service'
-
-// Database connection pool
-const pool = new Pool({
-  connectionString: process.env['DATABASE_URL'],
-})
 
 export const prerender = false
 
@@ -168,7 +163,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { sessionId, analyticsData } = body
 
-    const client = await pool.connect()
+    const client = await acquireClient()
 
     // Verify session ownership and permissions
     const sessionQuery = `
@@ -349,7 +344,7 @@ export const GET: APIRoute = async ({ request }) => {
       )
     }
 
-    const client = await pool.connect()
+    const client = await acquireClient()
 
     // Verify session ownership and permissions
     const sessionQuery = `

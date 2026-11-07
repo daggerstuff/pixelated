@@ -1,15 +1,10 @@
 import type { APIRoute } from 'astro'
-import { Pool } from 'pg'
 import { z } from 'zod'
 
 import { getCurrentUser } from '@/lib/auth'
+import { acquireClient } from '@/lib/db'
 
 import { createEnhancedRateLimiter } from '../../lib/middleware/enhanced-rate-limit'
-
-// Database connection pool
-const pool = new Pool({
-  connectionString: process.env['DATABASE_URL'],
-})
 
 // Initialize rate limiter
 const rateLimiter = createEnhancedRateLimiter(30, 60 * 1000) // 30 requests per minute
@@ -93,7 +88,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 
     const { sessionId } = parsedQuery.data
 
-    const client = await pool.connect()
+    const client = await acquireClient()
     try {
       // Get evaluations from evaluations table
       const query = `
@@ -211,7 +206,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const { sessionId, feedback } = parsedBody.data
 
-  const client = await pool.connect()
+  const client = await acquireClient()
   let transactionStarted = false
   try {
     await client.query('BEGIN')
