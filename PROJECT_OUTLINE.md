@@ -73,7 +73,7 @@ explicitly presented as demonstrations.
 | Foresight                                                | Verify the application's required memory behavior; keep its standalone roadmap separate            |
 | Developer API/SDK                                        | Separate release with its own auth, quotas, docs and adopter gates                                 |
 | Native EHR, prescribing, clearinghouse, HIE              | Separate product/release; exclude from the training pilot unless explicitly required and validated |
-| Alexa/AWS Builder mini-challenge                         | Optional demonstration track; its 12 backlog issues do not determine training-pilot readiness      |
+| Alexa/AWS Builder mini-challenge                         | Dropped 2026-11-07: the project is not participating; the 12-issue backlog (#6369-#6380) is closed    |
 | CMS, marketplace tools, agent tooling, Churnmeon         | Adjacent capabilities; include only dependencies of the chosen release                             |
 | VR travel, rewards, express checkout, Checkmate          | Deferred or separate-product work; remove from the launch critical path                            |
 
