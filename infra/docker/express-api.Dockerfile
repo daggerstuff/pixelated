@@ -7,7 +7,7 @@ ENV NODE_ENV=production
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl python3 make g++ \
     && rm -rf /var/lib/apt/lists/* \
-    && npm install -g pnpm@11.12.0
+    && npm install -g pnpm@12.18.0
 
 WORKDIR /app
 
