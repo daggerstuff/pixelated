@@ -9,12 +9,7 @@
 import type { ChatMessage } from '../../types/chat'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getFHEService, FHEImplementation } from './fhe-factory'
-import {
-  type FHEService,
-  type EncryptedData,
-  EncryptionMode,
-  FHEOperation,
-} from './types'
+import { type FHEService, type EncryptedData } from './types'
 
 const logger = createBuildSafeLogger('encrypted-memory')
 
@@ -340,9 +335,7 @@ export class EncryptedMemoryService {
     const entries = this.getPatientMemories(patientId)
 
     // Encrypt keywords for encrypted search
-    const encryptedKeywords = await Promise.all(
-      keywords.map((k) => this.fheService!.encrypt(k)),
-    )
+    await Promise.all(keywords.map((k) => this.fheService!.encrypt(k)))
 
     // In production, perform homomorphic search on encrypted content
     // For now, return all entries (client-side filtering after decryption)

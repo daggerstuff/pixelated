@@ -914,9 +914,10 @@ export class KeyRotationService extends EventEmitter {
       const storageKey = `${this.options.storagePrefix}${keyPair.id}`
 
       if (this.isClient) {
-        // For client environments, use localStorage
-        localStorage.setItem(storageKey, JSON.stringify(keyPair))
-      } else if (this.isServer) {
+        return
+      }
+
+      if (this.isServer) {
         // Server-side storage using AWS Secrets Manager for production
         if (isProd() && this.secretsManager) {
           logger.info(`Storing key ${keyPair.id} in AWS Secrets Manager`)
@@ -1257,7 +1258,7 @@ export class KeyRotationService extends EventEmitter {
    */
   private generateKeyId(): string {
     const timestamp = Date.now().toString(36)
-    const random = Math.random().toString(36).substring(2, 10)
+    const random = crypto.randomBytes(8).toString('hex')
     return `key_${timestamp}_${random}`
   }
 

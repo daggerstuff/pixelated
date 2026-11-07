@@ -261,8 +261,14 @@ export class EmailService {
   }
 
   private stripHtml(html: string): string {
-    return html
-      .replace(/<[^>]*>/g, '')
+    let text = html
+    let previous: string
+    do {
+      previous = text
+      text = text.replace(/<[^>]*>/g, '')
+    } while (text !== previous)
+
+    return text
       .replace(/&nbsp;/g, ' ')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')

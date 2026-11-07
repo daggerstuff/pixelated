@@ -172,9 +172,9 @@ export class S3StorageProvider implements StorageProvider {
       // Additional filtering for more complex patterns
       if (pattern?.includes('*')) {
         const regexPattern = pattern
-          .replace(/\./g, '\\.')
-          .replace(/\*/g, '.*')
-          .replace(/\?/g, '.')
+          .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+          .replace(/\\\*/g, '.*')
+          .replace(/\\\?/g, '.')
 
         const regex = new RegExp(`^${regexPattern}$`)
         return fileNames.filter((name) => regex.test(name))

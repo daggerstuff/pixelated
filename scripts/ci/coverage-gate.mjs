@@ -32,7 +32,7 @@
  * Exit codes: 0 = within budget, 1 = regression below the pinned budget.
  */
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { renameSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import {
@@ -153,7 +153,9 @@ function main() {
       coverage: { ...current },
       floors,
     }
-    writeFileSync(BASELINE_PATH, `${JSON.stringify(pinned, null, 2)}\n`, 'utf8')
+    const TMP_PATH = `${BASELINE_PATH}.tmp`
+    writeFileSync(TMP_PATH, `${JSON.stringify(pinned, null, 2)}\n`, 'utf8')
+    renameSync(TMP_PATH, BASELINE_PATH)
     console.log(`Coverage baseline written to ${BASELINE_PATH}`)
     return
   }

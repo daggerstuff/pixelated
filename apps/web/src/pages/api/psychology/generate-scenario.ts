@@ -258,7 +258,8 @@ function selectClientProfile(
   const profiles =
     CLIENT_PROFILES[difficulty as keyof typeof CLIENT_PROFILES] ||
     CLIENT_PROFILES.beginner
-  const baseProfile = profiles[Math.floor(Math.random() * profiles.length)]
+  const baseProfile =
+    profiles[crypto.getRandomValues(new Uint32Array(1))[0] % profiles.length]
 
   return {
     ...baseProfile,
@@ -535,7 +536,7 @@ export const POST = async ({ request }: { request: Request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error during scenario generation',
-        details: error instanceof Error ? String(error) : 'Unknown error',
+        details: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

@@ -19,11 +19,7 @@ import type {
   CreateSignoffInput,
   SignoffStatus,
 } from './signoff'
-import {
-  validateSignoffTransition,
-  CreateSignoffInputSchema,
-  UpdateSignoffInputSchema,
-} from './signoff'
+import { validateSignoffTransition, CreateSignoffInputSchema } from './signoff'
 
 // ---------------------------------------------------------------------------
 // Repository

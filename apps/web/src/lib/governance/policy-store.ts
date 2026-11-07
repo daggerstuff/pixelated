@@ -1,5 +1,5 @@
 import type { Db, MongoClient } from 'mongodb'
-import { ObjectId, MongoClient as MongoConstructor } from 'mongodb'
+import { MongoClient as MongoConstructor } from 'mongodb'
 
 import { mongoClient as sharedMongoClient } from '../db/mongoClient'
 import type { GovernancePolicy } from './types'

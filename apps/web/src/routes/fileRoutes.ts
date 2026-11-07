@@ -1,4 +1,5 @@
 import { Router, type Request } from 'express'
+import rateLimit from 'express-rate-limit'
 import { Pool } from 'pg'
 
 import { DocumentVersioningService } from '../lib/services/DocumentVersioningService.js'
@@ -57,6 +58,11 @@ interface CreateFolderBody {
 }
 
 const router = Router()
+
+const fileRoutesLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+})
 
 const parseQueryNumber = (value: unknown, fallback: number): number => {
   if (typeof value === 'string') {
@@ -363,48 +369,52 @@ export function createFileRoutes(db: Pool) {
   })
 
   // Delete file version
-  router.delete('/:fileId/versions/:version', async (req, res) => {
-    try {
-      const fileId = req.params['fileId']
-      const version = req.params['version']
-      if (!fileId || !version) {
-        return res
-          .status(400)
-          .json({ error: 'File ID and version are required' })
-      }
-      const userId = req.user?.id ?? 'anonymous'
-      const versionNumber = parseInt(version, 10)
-      if (Number.isNaN(versionNumber)) {
-        return res.status(400).json({ error: 'Invalid version number' })
-      }
+  router.delete(
+    '/:fileId/versions/:version',
+    fileRoutesLimiter,
+    async (req, res) => {
+      try {
+        const fileId = req.params['fileId']
+        const version = req.params['version']
+        if (!fileId || !version) {
+          return res
+            .status(400)
+            .json({ error: 'File ID and version are required' })
+        }
+        const userId = req.user?.id ?? 'anonymous'
+        const versionNumber = parseInt(version, 10)
+        if (Number.isNaN(versionNumber)) {
+          return res.status(400).json({ error: 'Invalid version number' })
+        }
 
-      // Check if user has permission to delete
-      const fileResult = await db.query<{ uploaded_by: string }>(
-        'SELECT uploaded_by FROM files WHERE id = $1',
-        [fileId],
-      )
-      if (fileResult.rows.length === 0) {
-        return res.status(404).json({ error: 'File not found' })
-      }
+        // Check if user has permission to delete
+        const fileResult = await db.query<{ uploaded_by: string }>(
+          'SELECT uploaded_by FROM files WHERE id = $1',
+          [fileId],
+        )
+        if (fileResult.rows.length === 0) {
+          return res.status(404).json({ error: 'File not found' })
+        }
 
-      const fileOwner = fileResult.rows[0]?.uploaded_by
-      if (fileOwner !== userId) {
-        return res.status(403).json({ error: 'Access denied' })
-      }
+        const fileOwner = fileResult.rows[0]?.uploaded_by
+        if (fileOwner !== userId) {
+          return res.status(403).json({ error: 'Access denied' })
+        }
 
-      await versioningService.deleteFileVersion(fileId, versionNumber)
+        await versioningService.deleteFileVersion(fileId, versionNumber)
 
-      return res.json({ success: true })
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error instanceof Error
-            ? error.message
+        return res.json({ success: true })
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
             : 'Unknown error'
-          : 'Unknown error'
-      return res.status(500).json({ error: message })
-    }
-  })
+        return res.status(500).json({ error: message })
+      }
+    },
+  )
 
   // Create folder
   router.post(
@@ -469,7 +479,7 @@ export function createFileRoutes(db: Pool) {
   })
 
   // List user's files
-  router.get('/user/:userId', async (req, res) => {
+  router.get('/user/:userId', fileRoutesLimiter, async (req, res) => {
     try {
       const userId = req.params['userId']
       const folderId = parseQueryString(req.query['folderId'])
@@ -517,7 +527,7 @@ export function createFileRoutes(db: Pool) {
   })
 
   // Search files
-  router.get('/search', async (req, res) => {
+  router.get('/search', fileRoutesLimiter, async (req, res) => {
     try {
       const q = parseQueryString(req.query['q'])
       const userId = parseQueryString(req.query['userId']) ?? 'anonymous'

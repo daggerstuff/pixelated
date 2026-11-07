@@ -76,7 +76,7 @@ export const GET = async ({ request }) => {
     }
 
     // Format response based on requested format
-    let contentType = 'application/json'
+    let contentType: string
     let body: string | Uint8Array = ''
 
     if (format === 'json') {
@@ -145,7 +145,7 @@ export const GET = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

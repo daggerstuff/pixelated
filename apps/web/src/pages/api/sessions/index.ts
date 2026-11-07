@@ -187,7 +187,7 @@ export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
     return new Response(
       JSON.stringify({
         error: ERROR_MESSAGES.INTERNAL_ERROR,
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: HTTP_STATUS.INTERNAL_SERVER_ERROR,

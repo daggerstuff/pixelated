@@ -23,7 +23,7 @@
  * gated here, because pass/fail of the suite is the main test job's signal.
  */
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { renameSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import {
@@ -150,7 +150,9 @@ function main() {
       generatedAt: new Date().toISOString(),
       tolerated: flaky.map(entryKey),
     }
-    writeFileSync(BASELINE_PATH, `${JSON.stringify(pinned, null, 2)}\n`, 'utf8')
+    const TMP_PATH = `${BASELINE_PATH}.tmp`
+    writeFileSync(TMP_PATH, `${JSON.stringify(pinned, null, 2)}\n`, 'utf8')
+    renameSync(TMP_PATH, BASELINE_PATH)
     console.log(
       `\nTolerance list written to ${BASELINE_PATH} (${pinned.tolerated.length} entries).`,
     )

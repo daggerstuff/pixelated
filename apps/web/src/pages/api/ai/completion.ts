@@ -8,7 +8,7 @@ import type { Session } from "@/lib/auth/session";
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 import { validateRequestBody } from "@/lib/validation/index";
 import { CompletionRequestSchema } from "@/lib/validation/schemas";
-import { DEFAULT_LLM_MODEL, NEON_ENABLED_MODELS } from "@/lib/ai/constants";
+import { NEON_ENABLED_MODELS } from "@/lib/ai/constants";
 import { CompletionService } from "@/lib/ai/services/completion-service";
 
 // Initialize logger
@@ -106,7 +106,7 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: "Failed to get endpoint information",
-        message: error instanceof Error ? String(error) : "Unknown error",
+        message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
         status: 500,

@@ -1,6 +1,6 @@
 import type { APIContext, APIRoute } from 'astro'
 
-import { isAuthenticated, getCurrentUser } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { NotificationService } from '../../../lib/services/notification/NotificationService'
@@ -45,7 +45,7 @@ export const GET = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -116,7 +116,7 @@ export const PUT: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

@@ -246,7 +246,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       },
     })
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? String(error) : String(error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     logger.error('Error processing crisis detection request:', {
       error: errorMessage,
       stack: error instanceof Error ? (error)?.stack : undefined,

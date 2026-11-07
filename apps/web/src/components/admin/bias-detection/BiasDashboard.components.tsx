@@ -30,10 +30,7 @@ import {
   CardHeader,
   CardTitle,
   Progress,
-  Tabs,
   TabsContent,
-  TabsList,
-  TabsTrigger,
 } from '@/components/ui'
 import {
   ResponsiveContainer,
@@ -65,7 +62,6 @@ import {
   getResponsiveChartHeight,
   getResponsiveGridCols,
 } from './BiasDashboard.helpers'
-import type { DateRange, FilterParams } from './BiasDashboard.helpers'
 import type {
   AlertAction,
   AlertItem,

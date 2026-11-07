@@ -83,7 +83,7 @@ async def analyze_bias():
         return jsonify(result)
     except Exception as e:
         logger.error(f"Analysis endpoint failed: {e}\n{traceback.format_exc()}")
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({"status": "error", "message": "Internal server error"}), 500
 
 
 @app.route("/health", methods=["GET"])
@@ -93,8 +93,8 @@ async def health_check():
     try:
         status = await bias_service.get_health_status()
         return jsonify(status)
-    except Exception as e:
-        return jsonify({"status": "unhealthy", "error": str(e)}), 500
+    except Exception:
+        return jsonify({"status": "unhealthy", "error": "Health check failed"}), 500
 
 
 if __name__ == "__main__":

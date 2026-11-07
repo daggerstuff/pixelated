@@ -10,6 +10,7 @@ import argparse
 import json
 import re
 import subprocess
+import urllib.parse
 from pathlib import Path
 from typing import Any
 
@@ -118,7 +119,7 @@ def merge_jira_import_dupes(
     by_title: dict[str, str] = {}
     for issue in issues:
         ref = issue.get("external_ref") or ""
-        if "russianvodka.atlassian.net" in ref:
+        if urllib.parse.urlparse(ref).hostname == "russianvodka.atlassian.net":
             continue
         match = re.search(r"PIX-(\d+)", ref)
         if match and "linear.app" in ref:

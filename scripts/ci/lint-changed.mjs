@@ -156,7 +156,6 @@ function getCandidateFileDiffs() {
 /** @param {string} filePath */
 /** @returns {boolean} */
 function isLintableFile(filePath) {
-  const normalizedPath = String(filePath).replaceAll("\\", "/");
   return (
     existsSync(String(filePath)) &&
     allowedExtensions.has(String(filePath).slice(String(filePath).lastIndexOf(".")))

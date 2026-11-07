@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import type { SessionDocumentation } from '../../lib/documentation/types'
 import { useDocumentation } from '../../lib/documentation/useDocumentation'

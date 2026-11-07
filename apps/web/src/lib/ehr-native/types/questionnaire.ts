@@ -22,7 +22,6 @@ import {
   fhirUriSchema,
   fhirCanonicalSchema,
   fhirDateTimeSchema,
-  fhirInstantSchema,
   fhirIntegerSchema,
   fhirPositiveIntSchema,
 } from './base.js'
@@ -30,18 +29,6 @@ import {
 // ---------------------------------------------------------------------------
 // Questionnaire item answer option types
 // ---------------------------------------------------------------------------
-
-/** Allowed answer option value types for Questionnaire.answerOption. */
-const answerOptionValueSchema = z.union([
-  z.object({ valueInteger: fhirIntegerSchema }),
-  z.object({ valueDecimal: z.number() }),
-  z.object({ valueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }),
-  z.object({ valueTime: z.string().regex(/^\d{2}:\d{2}:\d{2}/) }),
-  z.object({ valueDateTime: fhirDateTimeSchema }),
-  z.object({ valueString: fhirStringSchema }),
-  z.object({ valueCoding: fhirCodingSchema }),
-  z.object({ valueReference: fhirReferenceSchema }),
-])
 
 /** A single answer option in a Questionnaire item. */
 export const questionnaireAnswerOptionSchema = fhirBackboneElementSchema.extend(

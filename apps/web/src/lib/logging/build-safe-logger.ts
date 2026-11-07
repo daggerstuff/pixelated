@@ -14,12 +14,14 @@ export interface BuildSafeLogger {
  */
 export function createBuildSafeLogger(prefix: string = 'app'): BuildSafeLogger {
   const tag = `[build-safe-logger][${prefix}]`
+  const sanitize = (value: unknown): unknown =>
+    typeof value === 'string' ? value.replace(/[\n\r]/g, ' ') : value
 
   return {
-    info: (...args: unknown[]) => console.info(tag, ...args),
-    warn: (...args: unknown[]) => console.warn(tag, ...args),
-    error: (...args: unknown[]) => console.error(tag, ...args),
-    debug: (...args: unknown[]) => console.debug(tag, ...args),
+    info: (...args: unknown[]) => console.info(tag, ...args.map(sanitize)),
+    warn: (...args: unknown[]) => console.warn(tag, ...args.map(sanitize)),
+    error: (...args: unknown[]) => console.error(tag, ...args.map(sanitize)),
+    debug: (...args: unknown[]) => console.debug(tag, ...args.map(sanitize)),
   }
 }
 

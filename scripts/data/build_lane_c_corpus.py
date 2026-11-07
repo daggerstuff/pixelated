@@ -423,7 +423,8 @@ def driver_psychtoday() -> list[Record]:
             if not url or url in seen or any(d in url for d in DROP_HOSTS):
                 continue
             seen.add(url)
-            lic = "Reddit-ToS" if "reddit.com" in url else "fair-use-extract"
+            host = urllib.parse.urlparse(url).hostname or ""
+            lic = "Reddit-ToS" if host == "reddit.com" or host.endswith(".reddit.com") else "fair-use-extract"
             try:
                 md = firecrawl_scrape(url)
             except Exception as e:

@@ -538,7 +538,7 @@ async function main() {
   const reset = resetIdx !== -1
 
   try {
-    const result = await seedSandboxTenant({ tenantId, reset })
+    await seedSandboxTenant({ tenantId, reset })
   } catch (err) {
     process.exit(1)
   }

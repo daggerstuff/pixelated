@@ -134,16 +134,23 @@ export class ContactService {
   }
 
   private htmlToText(html: string): string {
-    return html
-      .replace(/<style[^>]*>.*?<\/style>/gis, '')
-      .replace(/<script[^>]*>.*?<\/script>/gis, '')
-      .replace(/<[^>]+>/g, '')
+    let text = html
+    let previous: string
+    do {
+      previous = text
+      text = text
+        .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, '')
+        .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, '')
+        .replace(/<[^>]*>/g, '')
+    } while (text !== previous)
+
+    return text
       .replace(/\s+/g, ' ')
       .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
+      .replace(/&amp;/g, '&')
       .trim()
   }
 

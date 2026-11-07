@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import re
 import sys
@@ -17,6 +18,8 @@ import urllib.request
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 KEY_MAP_PATH = REPO_ROOT / "exports" / "pix-to-adhd-key-map.json"
@@ -171,8 +174,8 @@ def main() -> int:
         try:
             gql(api_key, cancel_mut, {"id": issue_id, "stateId": DUPLICATE_STATE_ID})
             canceled += 1
-        except RuntimeError:
-            pass
+        except RuntimeError as exc:
+            logger.debug("Could not cancel migration issue %s: %s", issue_id, exc)
         time.sleep(args.sleep)
 
     linked = 0

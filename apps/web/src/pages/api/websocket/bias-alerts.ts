@@ -158,7 +158,9 @@ export const POST = async ({ request }: { request: Request }) => {
         preprocessing: {
           biasScore: Math.random() * 0.4 + 0.2,
           linguisticBias: {
-            genderBiasScore: Math.random() * 0.3,
+            genderBiasScore:
+              (crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296) *
+              0.3,
             racialBiasScore: Math.random() * 0.3,
             ageBiasScore: Math.random() * 0.3,
             culturalBiasScore: Math.random() * 0.3,

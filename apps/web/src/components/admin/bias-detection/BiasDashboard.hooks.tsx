@@ -11,27 +11,16 @@ import {
   useBiasDashboardWebSocket,
   type WsConnectionStatus,
 } from '@/components/admin/bias-detection/hooks/useBiasDashboardWebSocket'
-import {
-  isAlertItemArray,
-  isBiasAnalysisItemArray,
-  isTrendItemArray,
-} from '@/components/admin/bias-detection/utils/dashboard-type-guards'
+import { isAlertItemArray } from '@/components/admin/bias-detection/utils/dashboard-type-guards'
 import { exportBiasDashboardData } from '@/components/admin/bias-detection/utils/export-dashboard-data'
-import type {
-  BiasDashboardData,
-  BiasAnalysisResult,
-  DashboardRecommendation,
-  BiasAlert,
-} from '@/lib/ai/bias-detection'
+import type { BiasDashboardData } from '@/lib/ai/bias-detection'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { isObject } from '@/lib/utils'
 
 import { getFilteredData } from './BiasDashboard.helpers'
 import type {
   AlertAction,
   AlertItem,
   BiasAnalysisItem,
-  BiasDashboardProps,
   NotificationSettings,
   TrendItem,
 } from './BiasDashboard.types'
@@ -232,8 +221,9 @@ export function useAlertActions(params: UseAlertActionsParams) {
     new Map(),
   )
   const [alertNotes, setAlertNotes] = useState<Map<string, string>>(new Map())
-  const [dashboardDataProxy, setDashboardDataProxy] =
-    useState<BiasDashboardData | null>(params.dashboardData)
+  const [, setDashboardDataProxy] = useState<BiasDashboardData | null>(
+    params.dashboardData,
+  )
 
   const handleAlertAction = useCallback(
     async (alertId: string, action: AlertAction['type'], notes?: string) => {

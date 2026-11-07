@@ -27,7 +27,6 @@ import { globSync } from 'glob'
 const ROOT = resolve(import.meta.dirname, '../..')
 const FLAGS_PATH = resolve(ROOT, 'apps/web/src/lib/config/feature-flags.ts')
 const BASELINE_PATH = resolve(import.meta.dirname, 'flag-baseline.json')
-const SEARCH_ROOT = resolve(ROOT, 'apps/web/src')
 
 function sourceFiles() {
   return globSync('apps/web/src/**/*.{ts,tsx,astro}', {

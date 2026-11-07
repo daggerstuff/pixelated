@@ -195,7 +195,7 @@ export function useChatCompletion({
       }
     },
   )
-  const [sentimentDistribution, setSentimentDistribution] = useState<{
+  const [sentimentDistribution] = useState<{
     [key: string]: number
   }>({})
 

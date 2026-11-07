@@ -16,11 +16,9 @@ import type { NavBarLayout } from '../types'
 export function slug(text: string): string {
   return text
     .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w-]+/g, '')
-    .replace(/-{2,}/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '')
+    .split(/[^a-z0-9_]+/)
+    .filter(Boolean)
+    .join('-')
 }
 
 /**

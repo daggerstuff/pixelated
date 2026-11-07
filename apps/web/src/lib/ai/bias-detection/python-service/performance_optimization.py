@@ -378,6 +378,7 @@ class PerformanceOptimizedBiasDetector:
         start_time = time.time()
 
         try:
+            cache_key: str = ""
             # Check cache first
             if use_cache and self.config.enable_caching:
                 cache_key = self._generate_cache_key(session_data)

@@ -19,7 +19,7 @@ const args = process.argv.slice(2)
 const update = args.includes('--update')
 
 function countFindings(rule) {
-  let stdout = '[]'
+  let stdout
   try {
     stdout = execFileSync(
       'uv',

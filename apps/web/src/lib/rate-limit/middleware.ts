@@ -1,14 +1,10 @@
-import { randomBytes } from 'crypto'
-
 import { getLogger } from '../logging/logger'
 import { redis } from '../redis'
 import { getRateLimitService } from './RateLimitService'
 import { API_TIERS, inferTierFromRateLimit } from './types'
-import type { ApiTier, RateLimitResult } from './types'
+import type { RateLimitResult } from './types'
 
 const logger = getLogger('RateLimitMiddleware')
-
-const RATE_LIMIT_WINDOW_MS = 60 * 1000
 
 /**
  * Rate limit headers to set on responses.

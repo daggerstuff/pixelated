@@ -141,8 +141,8 @@ export class FineTuningAIService {
 
   private async buildStatus(): Promise<AIServiceStatus> {
     let activeModels: string[] = [];
-    let successRate = 0.95;
-    let errorRate = 0.05;
+    let successRate: number;
+    let errorRate: number;
 
     try {
       const models = await this.orchestrator.listAvailableModels();

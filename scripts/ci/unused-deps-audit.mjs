@@ -22,7 +22,7 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const ROOT = resolve(import.meta.dirname, '../..')
@@ -84,13 +84,16 @@ function main() {
   console.log('Running knip dependency analysis...')
   const entries = collectEntries(runKnip())
 
-  const baseline = existsSync(BASELINE_PATH)
-    ? new Set(JSON.parse(readFileSync(BASELINE_PATH, 'utf8')).entries)
-    : null
+  let baseline
+  try {
+    baseline = new Set(JSON.parse(readFileSync(BASELINE_PATH, 'utf8')).entries)
+  } catch {
+    baseline = null
+  }
 
   if (update) {
     writeFileSync(
-      BASELINE_PATH,
+      `${BASELINE_PATH}.tmp`,
       `${JSON.stringify(
         {
           $schema: 'Unused-dependency ratchet for scripts/ci/unused-deps-audit.mjs',
@@ -106,6 +109,7 @@ function main() {
       )}\n`,
       'utf8',
     )
+    renameSync(`${BASELINE_PATH}.tmp`, BASELINE_PATH)
     console.log(`Baseline re-pinned: ${entries.length} entries.`)
     return
   }

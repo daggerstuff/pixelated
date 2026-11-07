@@ -102,7 +102,7 @@ export const POST = async ({ request }) => {
       errorMessage: 'Failed to process analytics event',
       details: {
         source: 'demo-tracking',
-        message: error instanceof Error ? String(error) : String(error),
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
     }
 
@@ -158,7 +158,7 @@ export const GET = async ({ url }) => {
       errorMessage: 'Failed to retrieve analytics data',
       details: {
         source: 'demo-tracking',
-        message: error instanceof Error ? String(error) : String(error),
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
     }
 

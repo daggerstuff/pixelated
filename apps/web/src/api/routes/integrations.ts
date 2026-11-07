@@ -290,8 +290,16 @@ router.get(
         },
       )
 
-      if (stateData.returnUrl) {
-        res.redirect(stateData.returnUrl)
+      const returnUrl = stateData.returnUrl
+      const safeReturnUrl =
+        returnUrl &&
+        returnUrl.startsWith('/') &&
+        !returnUrl.startsWith('//') &&
+        !returnUrl.includes('\\')
+          ? returnUrl
+          : undefined
+      if (safeReturnUrl) {
+        res.redirect(safeReturnUrl)
         return res
       }
       return res.json({

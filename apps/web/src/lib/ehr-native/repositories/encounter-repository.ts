@@ -88,8 +88,6 @@ export class EncounterRepository extends BaseRepository<Encounter> {
       merged.participant
         ?.find((p) => p.individual?.reference?.startsWith('Practitioner/'))
         ?.individual?.reference?.replace('Practitioner/', '') ?? null
-    const periodStart = merged.period?.start ?? null
-    const periodEnd = merged.period?.end ?? null
 
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Encounter }>(

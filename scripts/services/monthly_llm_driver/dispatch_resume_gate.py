@@ -23,6 +23,7 @@ from __future__ import annotations
 import contextlib
 import datetime
 import json
+import logging
 import os
 import re
 import signal
@@ -33,6 +34,8 @@ from pathlib import Path
 from typing import Any, TypedDict
 
 from scripts.services.monthly_llm_driver.orch_db import ConnectionBundle
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Data model
@@ -321,17 +324,13 @@ def register_dispatch_pid(month: str, pid: int) -> None:
         pids_file.write_text(json.dumps(existing_pids, indent=2))
 
     # -- Redis registry (best-effort; do not fail if Redis is unreachable) --
-    with contextlib.suppress(Exception):
-        bundle = ConnectionBundle.from_env()
-        try:
-            redis_key = f"orch:dispatch:pids:{month}"
-            bundle.redis_client.sadd(redis_key, pid)
-            # Set TTL to 86400 seconds (24 hours) if the key was just created
-            # (NX semantics).  If the key already existed, we still refresh the
-            # TTL to ensure it does not expire mid-dispatch.
-            bundle.redis_client.expire(redis_key, 86400)
-        finally:
-            bundle.close()
+    with contextlib.suppress(Exception), ConnectionBundle.from_env() as bundle:
+        redis_key = f"orch:dispatch:pids:{month}"
+        bundle.redis_client.sadd(redis_key, pid)
+        # Set TTL to 86400 seconds (24 hours) if the key was just created
+        # (NX semantics).  If the key already existed, we still refresh the
+        # TTL to ensure it does not expire mid-dispatch.
+        bundle.redis_client.expire(redis_key, 86400)
 
 
 def _read_pids_from_disk(month: str) -> list[int]:
@@ -343,22 +342,18 @@ def _read_pids_from_disk(month: str) -> list[int]:
         data = json.loads(pids_file.read_text())
         if isinstance(data, list):
             return [int(p) for p in data if isinstance(p, (int, float, str))]
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug("Could not read dispatch PID registry: %s", e)
     return []
 
 
 def _read_pids_from_redis(month: str) -> list[int]:
     """Read dispatch PIDs from the Redis SET (best-effort)."""
     pids: list[int] = []
-    with contextlib.suppress(Exception):
-        bundle = ConnectionBundle.from_env()
-        try:
-            redis_key = f"orch:dispatch:pids:{month}"
-            members = bundle.redis_client.smembers(redis_key)
-            pids = [int(m) for m in members if m is not None]
-        finally:
-            bundle.close()
+    with contextlib.suppress(Exception), ConnectionBundle.from_env() as bundle:
+        redis_key = f"orch:dispatch:pids:{month}"
+        members = bundle.redis_client.smembers(redis_key)
+        pids = [int(m) for m in members if m is not None]
     return pids
 
 
@@ -478,7 +473,7 @@ def _ps_find_dispatch_processes(month: str) -> list[tuple[int, str]]:
         )
         if proc.returncode != 0:
             return results
-    except (subprocess.TimeoutExpired, OSError):
+    except subprocess.TimeoutExpired, OSError:
         return results
 
     # Pattern: python + dispatch_<month> in argv.

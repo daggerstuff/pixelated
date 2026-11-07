@@ -35,15 +35,10 @@ export function secureRandomString(
     throw new Error('Length must be positive')
   }
 
-  const bytes = getRandomBytes(length)
   let result = ''
 
   for (let i = 0; i < length; i++) {
-    const byte = bytes[i]
-    if (byte === undefined) {
-      throw new Error('Unexpected undefined byte in secure random generation')
-    }
-    result += charset.charAt(byte % charset.length)
+    result += charset.charAt(secureRandomInt(charset.length))
   }
 
   return result

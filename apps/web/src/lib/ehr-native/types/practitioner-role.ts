@@ -7,7 +7,6 @@ import {
   fhirPeriodSchema,
   fhirReferenceSchema,
   fhirContactPointSchema,
-  fhirAddressSchema,
   fhirBackboneElementSchema,
 } from './base'
 

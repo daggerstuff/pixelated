@@ -187,12 +187,19 @@ function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
   return current
 }
 
+function isSafeKey(key: string): boolean {
+  return key !== '__proto__' && key !== 'constructor' && key !== 'prototype'
+}
+
 function setNestedValue(
   obj: Record<string, unknown>,
   path: string,
   value: unknown,
 ): void {
   const parts = path.split('.')
+  if (parts.some((part) => !isSafeKey(part))) {
+    return
+  }
   let current: Record<string, unknown> = obj
   for (let i = 0; i < parts.length - 1; i++) {
     if (typeof current[parts[i]] !== 'object' || current[parts[i]] === null) {

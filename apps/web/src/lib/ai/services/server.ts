@@ -6,8 +6,6 @@ import {
 import { parse } from 'url'
 
 import { closeSentry, Sentry } from '../../../../../../config/instrument.mjs'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-const logger = createBuildSafeLogger('server')
 import { safeJsonParse } from '../../utils/json-extraction'
 import { apiMetrics, emotionMetrics } from '../../sentry/utils'
 import { getAllowedOrigin } from '../bias-detection/utils'

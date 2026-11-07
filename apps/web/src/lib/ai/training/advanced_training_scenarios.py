@@ -844,7 +844,7 @@ class AdvancedTrainingEngine:
         )
 
         # Generate feedback
-        analysis["feedback"] = self._generate_feedback(analysis, scenario)  # type: ignore
+        analysis["feedback"] = self._generate_feedback(analysis)  # type: ignore
 
         return analysis
 
@@ -1068,7 +1068,7 @@ class AdvancedTrainingEngine:
 
         # Check if scenario should branch
         for branch in scenario.branching_paths:
-            if self._evaluate_branch_condition(branch.condition, analysis, session_data):  # type: ignore
+            if self._evaluate_branch_condition(branch.condition, analysis):  # type: ignore
                 return {
                     "action": "branch",
                     "branch_id": branch.branch_id,

@@ -5,8 +5,6 @@
  * Handles request/response transformation, error handling, and caching.
  */
 
-import { createBuildSafeLogger } from "../../logging/build-safe-logger";
-
 import type {
   BatchEmbeddingRequest,
   BatchEmbeddingResponse,
@@ -21,8 +19,6 @@ import type {
   SimilaritySearchRequest,
   SimilaritySearchResponse,
 } from "./types";
-
-const logger = createBuildSafeLogger("client");
 
 /**
  * Configuration options for the embedding agent client.

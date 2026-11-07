@@ -1,8 +1,4 @@
-import type {
-  DefaultOptions,
-  MutationKey,
-  QueryKey,
-} from '@tanstack/react-query'
+import type { DefaultOptions, MutationKey } from '@tanstack/react-query'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useMemo, useState, type ReactNode } from 'react'
 
@@ -89,12 +85,7 @@ export const createJournalResearchQueryClient = (
 
 export const journalResearchQueryClient = createJournalResearchQueryClient()
 
-type QueryKeyFactory = (...args: unknown[]) => QueryKey
 type MutationKeyFactory = (...args: unknown[]) => MutationKey
-
-const buildQueryKey =
-  (...parts: unknown[]): QueryKeyFactory =>
-  (...args) => [...parts, ...args]
 
 const buildMutationKey =
   (...parts: unknown[]): MutationKeyFactory =>

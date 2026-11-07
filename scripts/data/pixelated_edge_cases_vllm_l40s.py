@@ -180,8 +180,8 @@ def generate_curated_session(row: dict[str, Any]) -> dict[str, Any]:
                 for s in data["sessions"]:
                     if isinstance(s, list) and len(s) > 0:
                         parsed_sessions.append([{"role": "system", "content": SYSTEM_PROMPT}, *s])
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("Failed to parse generated sessions payload: %s", e)
 
     if not parsed_sessions:
         parsed_sessions = [

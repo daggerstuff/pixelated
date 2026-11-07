@@ -36,7 +36,7 @@ def test_nvidia_nim_connection() -> LLMTaxonomyClassifier | None:
         logger.info("  export OPENAI_API_KEY='nvapi-...'")
         return None
 
-    logger.info(f"✅ API Key found: {api_key[:10]}...{api_key[-4:]}")
+    logger.info("✅ API Key found (length=%d)", len(api_key))
 
     # Initialize classifier
     try:

@@ -11,6 +11,7 @@ Usage:
 """
 
 import json
+import logging
 import shutil
 import subprocess
 import time
@@ -22,6 +23,8 @@ import httpx
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+
+logger = logging.getLogger(__name__)
 
 # ── Config ──────────────────────────────────────────────────────────────
 BUCKET = "pixeldata@US-EAST-VA"
@@ -136,8 +139,8 @@ def wait_for_vllm(timeout: int = 300) -> bool:
                 names = [m["id"] for m in models]
                 print(f"✅ vLLM ready — models: {names}")
                 return True
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("vLLM not ready yet: %s", e)
         time.sleep(5)
     print("❌ vLLM did not become ready in time")
     return False

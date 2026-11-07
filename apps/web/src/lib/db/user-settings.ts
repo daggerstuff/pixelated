@@ -2,8 +2,6 @@
 import type { ObjectId } from '../server-only/mongodb-types'
 import { mongoClient } from './mongoClient'
 
-let ObjectId: unknown
-
 // MongoDB-based user settings types
 
 export interface UserSettings {

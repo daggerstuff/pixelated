@@ -7,7 +7,7 @@
 
 import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
 import { BaseRepository } from '@/lib/ehr-native/repositories/base-repository'
-import { claimSchema, type Claim } from '@/lib/ehr-native/types'
+import { type Claim } from '@/lib/ehr-native/types'
 
 // ── Validation helpers (local, matching pattern in scheduling-service.ts) ──
 

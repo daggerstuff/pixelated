@@ -7,12 +7,11 @@ type CSPContext = APIContext & {
 }
 
 export const securityHeaders: MiddlewareHandler = async (
-  context: CSPContext,
+  _context: CSPContext,
   next,
 ) => {
   const response = await next()
 
-  const nonce = context.locals.cspNonce
   // Astro dev sets NODE_ENV=production for SSR; import.meta.env.DEV is the real dev signal.
   // Without this check the prod CSP (nonce-based script-src-elem) blocks island scripts.
   const isRelaxedScriptEnv =

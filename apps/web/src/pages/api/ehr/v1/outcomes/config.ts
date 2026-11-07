@@ -4,7 +4,6 @@ import {
   ehrValidationError,
   ehrSuccess,
   sanitizeFhirId,
-  sanitizeSearchParam,
 } from '@/lib/ehr-native/api'
 import { OutcomesService } from '@/lib/ehr-native/services'
 import type { OutcomeMeasureType } from '@/lib/ehr-native/types'

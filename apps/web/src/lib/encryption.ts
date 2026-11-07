@@ -16,7 +16,6 @@ interface ErrorOptions {
 }
 
 const ALGORITHM = 'AES-GCM'
-const KEY_LENGTH = 32 // 256 bits
 const TAG_LENGTH = 16
 const SALT_LENGTH = 32
 const IV_LENGTH = 12 // 96 bits for GCM

@@ -103,7 +103,12 @@ export const blogSearch: BlogSearchInterface = {
 
   addPost(post: PostInput, content: string): void {
     // Extract a summary for search results (first 200 chars)
-    const summary = content.slice(0, 200).replace(/<[^>]*>?/gm, '')
+    let summary = content.slice(0, 200)
+    let previousSummary: string
+    do {
+      previousSummary = summary
+      summary = summary.replace(/<[^>]*>?/gm, '')
+    } while (summary !== previousSummary)
 
     // Create a search document
     const doc: SearchDocument = {

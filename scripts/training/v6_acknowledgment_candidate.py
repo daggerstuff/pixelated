@@ -40,7 +40,8 @@ class _Transport(Protocol):
         messages: list[dict[str, Any]],
         tools: list[dict[str, Any]],
         decoding: dict[str, Any],
-    ) -> dict[str, Any]: ...
+    ) -> dict[str, Any]:
+        pass
 
 
 class AcknowledgmentDraftTransport:

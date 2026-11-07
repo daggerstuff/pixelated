@@ -78,9 +78,8 @@ except ImportError:
     class _FallbackTaxonomyClassifier:
         """Fallback classifier used when the optional taxonomy module is unavailable."""
 
-        def __init__(self, *args: object, **kwargs: object) -> None:
+        def __init__(self, *args: object, **_kwargs: object) -> None:
             del args
-            del kwargs
 
         def classify_record(self, _: dict[str, object]) -> _FallbackClassification:
             return _FallbackClassification(_FallbackTaxonomyCategory())

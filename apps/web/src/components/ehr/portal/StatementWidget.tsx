@@ -1,5 +1,5 @@
 import { Download, FileText, DollarSign } from 'lucide-react'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface PatientStatement {
   id: string
@@ -68,54 +68,6 @@ export function StatementWidget() {
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [downloading, setDownloading] = useState<string | null>(null)
-
-  const fetchStatements = useCallback(async () => {
-    try {
-      const params = new URLSearchParams()
-      if (statusFilter) params.set('status', statusFilter)
-      const res = await fetch(`/api/portal/v1/statements?${params.toString()}`)
-      if (!res.ok) {
-        const err = (await res.json()) as ErrorResponse
-        throw new Error(err.error?.message ?? 'Failed to load statements')
-      }
-      const result = (await res.json()) as PaginatedResponse<PatientStatement>
-      setStatements(result.data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load statements')
-    } finally {
-      setLoading(false)
-    }
-  }, [statusFilter])
-
-  const fetchSummary = useCallback(async () => {
-    try {
-      // Compute summary from all statements
-      const res = await fetch('/api/portal/v1/statements')
-      if (res.ok) {
-        const result = (await res.json()) as PaginatedResponse<PatientStatement>
-        const all = result.data
-        const totalBilled = all.reduce((sum, s) => sum + s.totalAmount, 0)
-        const totalPaid = all
-          .filter((s) => s.status === 'adjudicated')
-          .reduce((sum, s) => sum + s.totalAmount, 0)
-        setSummary({
-          totalStatements: all.length,
-          totalBilled,
-          totalPaid,
-          totalOutstanding: totalBilled - totalPaid,
-          currency: all[0]?.currency ?? 'USD',
-          recentStatements: all.slice(0, 5).map((s) => ({
-            id: s.id,
-            created: s.created,
-            totalAmount: s.totalAmount,
-            status: s.status,
-          })),
-        })
-      }
-    } catch {
-      // Best-effort
-    }
-  }, [])
 
   useEffect(() => {
     let cancelled = false

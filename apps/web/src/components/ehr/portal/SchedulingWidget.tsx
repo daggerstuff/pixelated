@@ -174,7 +174,7 @@ export function SchedulingWidget() {
         practitionerId: selectedPractitioner,
         start: start.toISOString(),
         end: end.toISOString(),
-        reason: reason || 'Routine Consultation',
+        reason,
       })
 
       const optimisticAppt: Appointment = {

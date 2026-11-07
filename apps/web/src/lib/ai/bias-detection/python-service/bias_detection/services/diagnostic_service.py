@@ -137,19 +137,15 @@ class DiagnosticService:
 
     async def run_interpretability_analysis(self, _session_data: dict[str, Any]) -> dict[str, Any]:
         """Perform SHAP or LIME interpretability analysis."""
-        try:
-            # Placeholder for complex ML interpretability logic
-            # In a real scenario, this would pass the model and inputs to SHAP/LIME
-            return {
-                "bias_score": 0.25,
-                "feature_importance": {
-                    "demographic_features": 0.3,
-                    "content_features": 0.4,
-                    "interaction_features": 0.3,
-                },
-                "explanation_quality": 0.75,
-                "confidence": 0.8,
-            }
-        except Exception as e:
-            logger.error(f"Interpretability analysis failed: {e!s}")
-            return {"bias_score": 0.0, "error": str(e)}
+        # Placeholder for complex ML interpretability logic
+        # In a real scenario, this would pass the model and inputs to SHAP/LIME
+        return {
+            "bias_score": 0.25,
+            "feature_importance": {
+                "demographic_features": 0.3,
+                "content_features": 0.4,
+                "interaction_features": 0.3,
+            },
+            "explanation_quality": 0.75,
+            "confidence": 0.8,
+        }

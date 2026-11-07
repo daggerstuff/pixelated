@@ -1,13 +1,10 @@
 import {
-  AlertCircle,
   Calendar as CalendarIcon,
-  CheckCircle2,
   Clock,
   CloudOff,
   Filter,
   Plus,
   RefreshCw,
-  User,
   X,
 } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'

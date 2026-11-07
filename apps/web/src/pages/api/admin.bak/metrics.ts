@@ -31,7 +31,7 @@ export const GET = async () => {
     return new Response(
       JSON.stringify({
         error: 'Internal Server Error',
-        message: error instanceof Error ? String(error) : String(error),
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

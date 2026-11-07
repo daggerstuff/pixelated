@@ -2,6 +2,7 @@
 // CRUD operations and document management
 
 import express, { Router, Request, Response } from 'express'
+import rateLimit from 'express-rate-limit'
 
 import { getPostgresPool } from '../../lib/db/connection'
 import { BusinessDocument } from '../../lib/db/mongodb/schemas'
@@ -44,6 +45,11 @@ const ensureString = (param: unknown): string => {
 }
 const router: Router = express.Router()
 
+const documentLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+})
+
 router.post(
   '/',
   requirePermission('edit'),
@@ -84,6 +90,7 @@ router.post(
 
 router.get(
   '/',
+  documentLimiter,
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
@@ -117,12 +124,16 @@ router.get(
       ],
     }
 
-    if (status) filter['status'] = status
-    if (type) filter['type'] = type
-    if (category) filter['category'] = category
+    const statusValue = ensureString(status)
+    const typeValue = ensureString(type)
+    const categoryValue = ensureString(category)
+
+    if (statusValue) filter['status'] = { $eq: statusValue }
+    if (typeValue) filter['type'] = { $eq: typeValue }
+    if (categoryValue) filter['category'] = { $eq: categoryValue }
 
     if (search) {
-      filter['$text'] = { $search: search }
+      filter['$text'] = { $search: ensureString(search) }
     }
 
     const documents = await BusinessDocument.find(filter)
@@ -268,6 +279,7 @@ router.post(
 
 router.post(
   '/:documentId/comments',
+  documentLimiter,
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
@@ -300,6 +312,7 @@ router.post(
 
 router.get(
   '/:documentId/comments',
+  documentLimiter,
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
@@ -324,6 +337,7 @@ router.get(
 
 router.get(
   '/:documentId/versions',
+  documentLimiter,
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response

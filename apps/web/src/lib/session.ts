@@ -10,6 +10,8 @@
  *   - Feature flag rollback via USE_REDIS_SESSIONS env var
  */
 
+import { randomBytes } from 'node:crypto'
+
 import { RedisStore } from 'connect-redis'
 import session from 'express-session'
 import type { RedisClientType } from 'redis'
@@ -100,7 +102,7 @@ export function createSessionMiddleware(): ReturnType<typeof session> {
 function generateFallbackSecret(): string {
   // Use a module-level variable to persist the secret for the process lifetime
   if (!fallbackSecret) {
-    fallbackSecret = `dev-secret-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    fallbackSecret = `dev-secret-${Date.now()}-${randomBytes(32).toString('hex')}`
     logger.warn('Generated ephemeral session secret for development')
   }
   return fallbackSecret

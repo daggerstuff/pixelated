@@ -127,10 +127,9 @@ export class Logger {
    */
   error(message: string, error?: unknown, metadata?: LogMetadata): void {
     const errorObject = error instanceof Error ? error : undefined
-    let sanitizedErrorMessage = message
 
     // Sanitize the main error message
-    sanitizedErrorMessage = this.sanitizeString(message)
+    const sanitizedErrorMessage = this.sanitizeString(message)
 
     // Sanitize error object properties if it exists
     const processedError = errorObject

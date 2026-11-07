@@ -16,6 +16,7 @@ import path from 'path'
 import { program } from 'commander'
 
 import { createMentalLLaMAFromEnv } from '../lib/ai/mental-llama'
+import { ALLOWED_DIRECTORIES, validatePath } from '../utils/path-security'
 
 // Define types for CLI options
 interface CliOptions {
@@ -293,12 +294,14 @@ async function main() {
 
     // Save results
     console.log(`\nSaving results to ${options.outputPath}...`)
-    const outputDir = path.dirname(options.outputPath)
-    await fs.mkdir(outputDir, { recursive: true })
-    await fs.writeFile(
+    const outputPath = validatePath(
       options.outputPath,
-      JSON.stringify(analysisResult, null, 2),
+      ALLOWED_DIRECTORIES.PROJECT_ROOT,
+      { allowAbsolutePath: true },
     )
+    const outputDir = path.dirname(outputPath)
+    await fs.mkdir(outputDir, { recursive: true })
+    await fs.writeFile(outputPath, JSON.stringify(analysisResult, null, 2))
 
     console.log('✅ Analysis complete!')
   } catch (error: unknown) {

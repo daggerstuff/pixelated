@@ -114,7 +114,7 @@ export function getClientIp(req: Request): string {
 
   return (
     ((req as unknown as { ip?: unknown }).ip as string | undefined) ??
-    (typeof xForwardedFor === 'string' && xForwardedFor !== null
+    (typeof xForwardedFor === 'string'
       ? xForwardedFor.split(',')[0]?.trim()
       : null) ??
     (typeof xRealIp === 'string' ? xRealIp : null) ??

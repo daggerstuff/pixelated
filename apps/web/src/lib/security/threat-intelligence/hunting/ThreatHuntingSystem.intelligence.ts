@@ -20,7 +20,6 @@ import type {
 } from './ThreatHuntingSystem.types'
 import {
   generateThreatId,
-  generateThreatKey,
   deduplicateThreats,
   mapResultToThreatType,
   normalizeSeverity,

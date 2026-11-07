@@ -413,7 +413,7 @@ echo "  - Memory Service: http://localhost:{self.deployment_config["services"]["
                 f.write(startup_script)
 
             # Make script executable
-            os.chmod(script_path, 0o755)
+            os.chmod(script_path, 0o700)
 
             self.log_deployment_step("Service Startup", "completed", "Startup script created")
             return True

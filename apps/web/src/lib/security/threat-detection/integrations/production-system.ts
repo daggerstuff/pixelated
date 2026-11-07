@@ -561,7 +561,15 @@ class ProductionHuntingService extends EventEmitter {
     templateId?: string
     description?: string
   }): Promise<Record<string, unknown>> {
-    const sanitize = (str: string) => str.replace(/<[^>]*>/g, '')
+    const sanitize = (str: string) => {
+      let result = str
+      let previous: string
+      do {
+        previous = result
+        result = result.replace(/<[^>]*>/g, '')
+      } while (result !== previous)
+      return result
+    }
     const investigation = {
       id: `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       threatId: sanitize(params.threatId),

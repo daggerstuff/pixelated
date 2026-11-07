@@ -49,8 +49,6 @@ function handleRuleUpdated(event: Event): void {
   if (!isRuleUpdatedDetail(detail)) {
     return
   }
-
-  const { id, name, isActive } = detail
 }
 
 // Function to handle rule deletions
@@ -63,7 +61,7 @@ function handleRuleDeleted(event: Event): void {
     return
   }
 
-  const { id, name } = detail
+  const { id } = detail
 
   // Find and remove the deleted rule element
   const ruleElement = document.querySelector(`[data-rule-id="${id}"]`)

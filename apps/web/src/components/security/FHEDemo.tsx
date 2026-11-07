@@ -39,6 +39,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
   const [benchmarkResults, setBenchmarkResults] = useState<
     {
       operation: string
+      plaintextResult: number
       plaintextTime: number
       fheTime: number
       overhead: number
@@ -151,23 +152,16 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
     const plaintextStart = performance.now()
 
     // Perform operation for comparison timing
-    switch (operation.operation) {
-      case 'add':
-        operation.input1 + (operation.input2 ?? 0)
-        break
-      case 'multiply':
-        operation.input1 * (operation.input2 ?? 1)
-        break
-      case 'compare':
-        operation.input1 > (operation.input2 ?? 0) ? 1 : 0
-        break
-      case 'aggregate':
-        Math.round((operation.input1 + (operation.input2 ?? 0)) / 2)
-        break
-      default:
-        0
-        break
-    }
+    const plaintextResult =
+      operation.operation === 'add'
+        ? operation.input1 + (operation.input2 ?? 0)
+        : operation.operation === 'multiply'
+          ? operation.input1 * (operation.input2 ?? 1)
+          : operation.operation === 'compare'
+            ? operation.input1 > (operation.input2 ?? 0)
+              ? 1
+              : 0
+            : Math.round((operation.input1 + (operation.input2 ?? 0)) / 2)
 
     const plaintextEnd = performance.now()
     const plaintextTime = plaintextEnd - plaintextStart
@@ -180,6 +174,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
     setBenchmarkResults((prev) => [
       {
         operation: operation.operation,
+        plaintextResult,
         plaintextTime,
         fheTime,
         overhead,

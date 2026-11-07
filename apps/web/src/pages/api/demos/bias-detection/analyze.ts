@@ -11,7 +11,6 @@ import {
   generateCounterfactualScenarios,
   generateHistoricalComparison,
   generateRecommendations,
-  generateSessionId,
   determineAlertLevel,
 } from '../../../../lib/utils/demo-helpers'
 
@@ -36,7 +35,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create session data
     const sessionData: SessionData = {
-      sessionId: body.sessionId ?? generateSessionId(),
+      sessionId: body.sessionId ?? `demo_${crypto.randomUUID()}`,
       scenario: body.scenario,
       demographics: {
         age: body.demographics.age ?? '26-35',
@@ -172,7 +171,7 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         error: 'Internal server error during bias analysis',
         message:
-          error instanceof Error ? String(error) : 'Unknown error occurred',
+          error instanceof Error ? error.message : 'Unknown error occurred',
       }),
       {
         status: 500,

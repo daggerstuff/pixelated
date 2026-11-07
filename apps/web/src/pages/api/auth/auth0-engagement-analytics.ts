@@ -230,7 +230,7 @@ export const GET: APIRoute = async ({ request }) => {
       status: 500,
       details: {
         source: 'engagement',
-        message: error instanceof Error ? String(error) : String(error),
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
     }
 

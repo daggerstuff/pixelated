@@ -159,7 +159,7 @@ async function main() {
   // 1. Run astro check
   // —————————————————————————————————————————————————
   console.log('Running astro check (may take ~2 minutes)...')
-  const { output, status: astroExit } = runAstroCheck()
+  const { output } = runAstroCheck()
   const counts = parseHintCount(output)
 
   if (!counts) {

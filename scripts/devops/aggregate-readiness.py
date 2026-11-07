@@ -301,8 +301,8 @@ class GitHubActionsClient(ProviderClient):
             match = re.search(r"github\.com[:/]([^/]+/[^/]+?)(?:\.git)?$", remote)
             if match:
                 return match.group(1)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.debug("Could not detect repo from git remote: %s", e)
         return None
 
     def fetch_pipelines(self, branch: str, commit: str) -> list[dict[str, Any]]:

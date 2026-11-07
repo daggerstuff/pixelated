@@ -243,7 +243,7 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

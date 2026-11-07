@@ -16,8 +16,6 @@ import { z } from 'zod'
 // Provider constants
 // ---------------------------------------------------------------------------
 
-const CALENDLY_PROVIDER_NAME = 'calendly' as const
-
 const CALENDLY_OAUTH_SCOPES = ['openid', 'profile', 'email'] as const
 
 // ---------------------------------------------------------------------------

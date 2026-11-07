@@ -1324,13 +1324,7 @@ export class ThreatCorrelationEngineCore
       }
 
       // Update trend analysis
-      if (pattern) {
-        pattern.trend = await this.analyzePatternTrend(pattern)
-      }
-
-      if (!pattern) {
-        return
-      }
+      pattern.trend = await this.analyzePatternTrend(pattern)
 
       // Store pattern
       this.correlationPatterns.set(pattern.patternId, pattern)

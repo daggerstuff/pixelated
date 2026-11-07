@@ -5,7 +5,6 @@ import { parse } from 'url'
 // IMPORTANT: Import Sentry instrumentation before constructing the service.
 import { Sentry } from '../../../../../../config/instrument.mjs'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-const logger = createBuildSafeLogger('server')
 import { BiasDetectionEngine } from './BiasDetectionEngine'
 import type { TherapeuticSession } from './types'
 import { getAllowedOrigin } from './utils'

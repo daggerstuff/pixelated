@@ -1,4 +1,4 @@
-import { useEffect, useState, SyntheticEvent } from 'react'
+import { useState } from 'react'
 
 import { useEvidenceAssistant } from '../../hooks/useEvidenceAssistant'
 import type { EvidenceCollection } from '../../lib/evidence-assistant/types'

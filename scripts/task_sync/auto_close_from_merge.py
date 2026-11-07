@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import contextlib
 import json
+import logging
 import os
 import re
 import subprocess
@@ -36,6 +37,8 @@ import sys
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+
+logger = logging.getLogger(__name__)
 
 LINEAR_API_URL = "https://api.linear.app/graphql"
 
@@ -165,8 +168,8 @@ def _merge_commit_message(merge_sha: str) -> str:
         )
         if result.returncode == 0:
             return result.stdout.strip()
-    except subprocess.SubprocessError, FileNotFoundError:
-        pass
+    except (subprocess.SubprocessError, FileNotFoundError) as exc:
+        logger.debug("Could not read merge commit message for %s: %s", merge_sha, exc)
     return ""
 
 

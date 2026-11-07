@@ -116,7 +116,7 @@ function main() {
   }
   for (const [file, allowed] of Object.entries(pinned)) {
     const actual = counts[file] ?? 0
-    if (actual < allowed) improved += actual - allowed === 0 ? 0 : allowed - actual
+    if (actual < allowed) improved += allowed - actual
   }
 
   const total = Object.values(counts).reduce((sum, n) => sum + n, 0)

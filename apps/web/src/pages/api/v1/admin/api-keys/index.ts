@@ -1,5 +1,4 @@
 import { developerApiKeyManager } from '@/lib/db/developer-api-keys'
-import { logSecurityEvent, SecurityEventType } from '@/lib/security'
 
 import { protectRoute } from '../../../../../lib/auth/serverAuth'
 

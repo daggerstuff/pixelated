@@ -95,8 +95,8 @@ export class AzureInsightsTelemetry {
         logger.warn('Azure Application Insights is not configured')
       }
     } else if (
-      typeof azureConfig === 'object' &&
       azureConfig !== null &&
+      typeof azureConfig === 'object' &&
       'monitoring' in azureConfig &&
       typeof (azureConfig as { monitoring?: unknown }).monitoring === 'object'
     ) {

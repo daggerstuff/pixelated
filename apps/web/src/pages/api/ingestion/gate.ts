@@ -39,7 +39,10 @@ export const POST: APIRoute = async ({ request }) => {
     })
   } catch (err) {
     return new Response(
-      JSON.stringify({ error: 'Gate proxy failed', detail: String(err) }),
+      JSON.stringify({
+        error: 'Gate proxy failed',
+        detail: err instanceof Error ? err.message : 'Unknown error',
+      }),
       {
         status: 502,
         headers: { 'Content-Type': 'application/json' },

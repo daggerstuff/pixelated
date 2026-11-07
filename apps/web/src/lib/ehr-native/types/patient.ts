@@ -10,7 +10,6 @@ import {
   fhirCodeableConceptSchema,
   fhirPeriodSchema,
   fhirReferenceSchema,
-  fhirExtensionSchema,
   fhirBackboneElementSchema,
   fhirDateSchema,
 } from './base'

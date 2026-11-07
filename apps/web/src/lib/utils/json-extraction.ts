@@ -60,7 +60,7 @@ export function extractJsonFromString(text: string): string | null {
       continue
     }
 
-    if (char === '"' && !escaped) {
+    if (char === '"') {
       inString = !inString
       continue
     }

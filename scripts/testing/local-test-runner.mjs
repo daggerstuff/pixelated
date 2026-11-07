@@ -10,7 +10,7 @@
 // If SKIP_TESTS is set to "true" (case-insensitive) or "1", the script exits 0 without running tests.
 
 import { spawn } from "node:child_process";
-import { resolve, relative } from "node:path";
+import { resolve } from "node:path";
 
 /**
  * @typedef {import('node:child_process').ChildProcess} LocalChildProcess
@@ -145,8 +145,6 @@ function buildVitestArgs(suite, passedArgs) {
     // No suite specified - run all tests
     return passedArgs;
   }
-
-  const baseDir = resolve(process.cwd());
 
   if (suite === "advisory") {
     console.log(

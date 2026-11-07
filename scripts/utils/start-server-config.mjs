@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import process from "process";
 import { existsSync, readdirSync } from "node:fs";
 import path from "path";

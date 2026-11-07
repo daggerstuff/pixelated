@@ -72,8 +72,8 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
         try:
             writer.close()
             await writer.wait_closed()
-        except Exception:
-            pass
+        except Exception as e:
+            log.debug("failed to close writer for %s: %s", peer, e)
         log.info("connection closed %s", peer)
 
 

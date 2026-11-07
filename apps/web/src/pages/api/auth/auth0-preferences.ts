@@ -280,7 +280,7 @@ export const PUT: APIRoute = async ({ request }) => {
       JSON.stringify({
         error:
           error instanceof Error
-            ? String(error)
+            ? error.message
             : 'Failed to update preferences',
       }),
       {

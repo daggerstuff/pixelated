@@ -35,14 +35,13 @@ export const MetricCard: FC<MetricCardProps> = function MetricCard({
   icon,
   subtext,
 }) {
-  const { delta, deltaPct, isPositive } = useMemo(() => {
+  const { delta, deltaPct } = useMemo(() => {
     if (previousValue === undefined || typeof value !== 'number') {
-      return { delta: undefined, deltaPct: undefined, isPositive: false }
+      return { delta: undefined, deltaPct: undefined }
     }
     const d = value - previousValue
     const pct = previousValue !== 0 ? (d / Math.abs(previousValue)) * 100 : 0
-    const positive = d > 0
-    return { delta: d, deltaPct: pct, isPositive: positive }
+    return { delta: d, deltaPct: pct }
   }, [value, previousValue])
 
   const displayValue =

@@ -1,4 +1,4 @@
-import { exec } from 'node:child_process'
+import { execFile } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { promisify } from 'node:util'
@@ -9,7 +9,7 @@ import {
   validatePath,
 } from '../../utils/path-security'
 
-const execAsync = promisify(exec)
+const execFileAsync = promisify(execFile)
 
 /**
  * Log rotation configuration
@@ -158,7 +158,7 @@ export class LogRotationService {
   async compressLog(filename: string): Promise<void> {
     try {
       // Use gzip to compress the file
-      await execAsync(`gzip -9 ${filename}`)
+      await execFileAsync('gzip', ['-9', filename])
     } catch (error: unknown) {
       console.error('Failed to compress log:', error)
     }
@@ -263,7 +263,7 @@ export class LogRotationService {
 
         // Handle compressed files
         if (file.endsWith('.gz')) {
-          const { stdout } = await execAsync(`gunzip -c ${filePath}`)
+          const { stdout } = await execFileAsync('gunzip', ['-c', filePath])
           await fs.appendFile(output, stdout)
         } else {
           const content = await fs.readFile(filePath, 'utf8')

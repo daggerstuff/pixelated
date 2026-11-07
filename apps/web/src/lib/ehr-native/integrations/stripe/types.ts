@@ -16,8 +16,6 @@ import { z } from 'zod'
 // Provider constants
 // ---------------------------------------------------------------------------
 
-const STRIPE_PROVIDER_NAME = 'stripe' as const
-
 const STRIPE_OAUTH_SCOPES = ['read_only', 'read_write'] as const
 
 // ---------------------------------------------------------------------------

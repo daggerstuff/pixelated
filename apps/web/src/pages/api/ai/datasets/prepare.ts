@@ -161,7 +161,7 @@ export const POST: APIRoute = async ({ request }) => {
       },
     );
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
+    const msg = error instanceof Error ? error.message : 'Unknown error';
 
     // Distinguish provenance validation errors
     if (msg.includes("parentMergeRunId") || msg.includes("not found in provenance store")) {

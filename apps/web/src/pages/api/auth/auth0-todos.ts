@@ -89,7 +89,7 @@ export const GET: APIRoute = async ({ request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to fetch todos',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -190,7 +190,7 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to create todo',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

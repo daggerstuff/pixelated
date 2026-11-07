@@ -99,7 +99,7 @@ bias_detection_alerts_total ${mockMetrics.summary.alertsTriggered}
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString(),
       }),
       {

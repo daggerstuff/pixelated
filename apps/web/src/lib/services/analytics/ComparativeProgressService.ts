@@ -224,7 +224,7 @@ export class ComparativeProgressService {
     const valueDifference = lastValue - firstValue
 
     // Determine trend direction
-    let trend: 'improving' | 'declining' | 'stable' = 'stable'
+    let trend: 'improving' | 'declining' | 'stable'
     if (Math.abs(valueDifference) < 1) {
       trend = 'stable'
     } else if (

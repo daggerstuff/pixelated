@@ -141,9 +141,6 @@ def main() -> None:
         "Total Dataset Size": (20000, total_records),
     }
 
-    for _metric, (target, actual) in targets.items():
-        (actual / target * 100) if target > 0 else 0
-
     # Save detailed report
     output_file = Path("metrics/final_s3_processing_report.json")
     output_file.parent.mkdir(exist_ok=True)

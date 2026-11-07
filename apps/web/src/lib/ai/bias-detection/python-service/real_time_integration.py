@@ -14,7 +14,6 @@ Key Features:
 
 import asyncio
 import logging
-from asyncio import Queue
 from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -55,9 +54,9 @@ class RealTimeBiasDetector:
         self.config = config
         self.bias_service = BiasDetectionService(config)
         self.active_sessions: dict[str, StreamingSession] = {}
-        self.analysis_queue: Queue = Queue()
-        self.feedback_queue: Queue = Queue()
-        self.memory_update_queue: Queue = Queue()
+        self.analysis_queue: asyncio.Queue = asyncio.Queue()
+        self.feedback_queue: asyncio.Queue = asyncio.Queue()
+        self.memory_update_queue: asyncio.Queue = asyncio.Queue()
 
         # Performance optimization settings
         self.batch_size = 10

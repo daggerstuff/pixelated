@@ -91,20 +91,17 @@ app.post('/events', (req: Request, res: Response): void => {
 app.get('/metrics', (_req: Request, res: Response): void => {
   const totalEvents = events.length
 
-  const eventsByType = events.reduce(
-    (acc, event) => {
-      acc[event.type] = (acc[event.type] ?? 0) + 1
-      return acc
-    },
-    {} as Record<string, number>,
-  )
+  const eventsByType = events.reduce((acc, event) => {
+    acc.set(event.type, (acc.get(event.type) ?? 0) + 1)
+    return acc
+  }, new Map<string, number>())
 
   const uniqueUsers = new Set(events.map((e) => e.userId).filter(Boolean)).size
 
   res.json({
     totalEvents,
     uniqueUsers,
-    eventsByType,
+    eventsByType: Object.fromEntries(eventsByType),
     uptime: process.uptime(),
   })
 })
@@ -114,15 +111,12 @@ app.get('/metrics/prometheus', (_req: Request, res: Response): void => {
   let promText = `# HELP http_requests_total Total number of analytics events
 # TYPE http_requests_total counter\n`
 
-  const eventsByType = events.reduce(
-    (acc, event) => {
-      acc[event.type] = (acc[event.type] ?? 0) + 1
-      return acc
-    },
-    {} as Record<string, number>,
-  )
+  const eventsByType = events.reduce((acc, event) => {
+    acc.set(event.type, (acc.get(event.type) ?? 0) + 1)
+    return acc
+  }, new Map<string, number>())
 
-  for (const [type, count] of Object.entries(eventsByType)) {
+  for (const [type, count] of eventsByType.entries()) {
     promText += `http_requests_total{type="${type}"} ${count}\n`
   }
 

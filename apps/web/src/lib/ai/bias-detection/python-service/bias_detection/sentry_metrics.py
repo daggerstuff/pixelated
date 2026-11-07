@@ -14,11 +14,8 @@ import os
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
-from functools import wraps
+from functools import cache, wraps
 from typing import Any, cast, overload
-
-_sentry_sdk: Any | None = None
-_sentry_sdk_imported = False
 
 
 def _sentry_enabled() -> bool:
@@ -32,22 +29,19 @@ def _sentry_enabled() -> bool:
 
 
 def _get_sentry_sdk() -> Any | None:
-    global _sentry_sdk, _sentry_sdk_imported
     if not _sentry_enabled():
         return None
+    return _import_sentry_sdk()
 
-    if _sentry_sdk_imported:
-        return _sentry_sdk
 
-    _sentry_sdk_imported = True
+@cache
+def _import_sentry_sdk() -> Any | None:
     try:
         import sentry_sdk
 
-        _sentry_sdk = sentry_sdk
+        return sentry_sdk
     except Exception:
-        _sentry_sdk = None
-
-    return _sentry_sdk
+        return None
 
 
 logger = logging.getLogger(__name__)
@@ -541,13 +535,15 @@ class ServiceMetrics:
 
 
 @overload
-def track_latency[T: Callable[..., Any]](metric_name_or_func: T) -> T: ...
+def track_latency[T: Callable[..., Any]](metric_name_or_func: T) -> T:
+    pass
 
 
 @overload
 def track_latency[T: Callable[..., Any]](
     metric_name_or_func: str | None = None, attributes: dict[str, Any] | None = None
-) -> Callable[[T], T]: ...
+) -> Callable[[T], T]:
+    pass
 
 
 def track_latency[T: Callable[..., Any]](

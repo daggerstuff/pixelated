@@ -28,7 +28,7 @@ export const GET: APIRoute = async () => {
     return new Response(
       JSON.stringify({
         isConfigured: false,
-        error: error instanceof Error ? String(error) : String(error),
+        error: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

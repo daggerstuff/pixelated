@@ -149,7 +149,7 @@ export const GET: APIRoute = protectRoute()(async ({
     return new Response(
       JSON.stringify({
         error: 'Failed to fetch treatment plan.',
-        details: error instanceof Error ? String(error) : 'Unknown error',
+        details: error instanceof Error ? error.message : 'Unknown error',
       }),
       { status: 500 },
     )
@@ -263,7 +263,7 @@ export const PUT: APIRoute = protectRoute()(async ({
     return new Response(
       JSON.stringify({
         error: 'Failed to update treatment plan.',
-        details: error instanceof Error ? String(error) : 'Unknown error',
+        details: error instanceof Error ? error.message : 'Unknown error',
       }),
       { status: 500 },
     )

@@ -153,7 +153,7 @@ export const PUT = protectRoute()(async ({
       JSON.stringify({
         error:
           error instanceof Error
-            ? String(error)
+            ? error.message
             : 'Failed to update preferences',
       }),
       { status: 400 },

@@ -102,7 +102,7 @@ class PatientManager {
   }
 
   private generatePatientId(): string {
-    return `P${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`
+    return `P${Date.now()}${globalThis.crypto.randomUUID().slice(0, 5).toUpperCase()}`
   }
 
   /**
@@ -617,21 +617,7 @@ class PatientManager {
     newData: unknown,
     performedBy: string,
     reason?: string,
-  ): Promise<void> {
-    // Create audit trail entry
-    const auditEntry = {
-      id: `audit_${Date.now()}`,
-      patientId,
-      action,
-      performedBy,
-      timestamp: new Date(),
-      reason,
-      changes: this.calculateChanges(
-        oldData as Record<string, unknown>,
-        newData as Record<string, unknown>,
-      ),
-    }
-  }
+  ): Promise<void> {}
 
   private calculateChanges(
     oldData: Record<string, unknown>,

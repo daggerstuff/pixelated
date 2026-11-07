@@ -77,31 +77,23 @@ def cmd_generate(args: argparse.Namespace) -> None:
 
     elif args.source == "journal":
         source = JournalSource()
-        count = 0
         for _record in source.fill_gap(args.samples):
-            count += 1
-        results = [f"{count} abstracts"]
+            pass
 
     elif args.source == "edge_case":
         source = EdgeCaseSource()
-        count = 0
         for _record in source.fill_gap(args.samples):
-            count += 1
-        results = [f"{count} edge cases"]
+            pass
 
     elif args.source == "voice":
         source = VoiceSource()
-        count = 0
         for _record in source.fill_gap(args.samples):
-            count += 1
-        results = [f"{count} voice samples"]
+            pass
 
     elif args.source == "prompt_corpus":
         source = PromptCorpusSource()
-        count = 0
         for _record in source.fill_gap(args.samples):
-            count += 1
-        results = [f"{count} prompts"]
+            pass
 
     elif args.source == "auto":
         # Auto-select based on stage
@@ -117,7 +109,6 @@ def cmd_generate(args: argparse.Namespace) -> None:
         for _record in source.fill_gap(args.samples):
             if "metadata" in _record or "source" in _record:
                 pass
-        results = [f"{args.samples} samples"]
 
     else:
         return

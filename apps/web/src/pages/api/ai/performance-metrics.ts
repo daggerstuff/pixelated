@@ -166,7 +166,7 @@ export const GET = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Failed to fetch AI performance metrics',
-        details: error instanceof Error ? error?.message : String(error),
+        details: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

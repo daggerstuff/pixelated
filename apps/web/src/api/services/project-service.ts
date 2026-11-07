@@ -291,11 +291,11 @@ export async function listProjects(
   }
 
   if (options.category) {
-    query['category'] = options.category
+    query['category'] = { $eq: String(options.category) }
   }
 
   if (options.status) {
-    query['status'] = options.status
+    query['status'] = { $eq: String(options.status) }
   }
 
   const projects = await ProjectModel.find(query)

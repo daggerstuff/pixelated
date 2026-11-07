@@ -12,10 +12,7 @@ import {
   ehrValidationError,
   ehrNotFound,
 } from '@/lib/ehr-native/api'
-import {
-  requirePortalClient,
-  resolvePortalPatientId,
-} from '@/lib/ehr-native/auth/portal-guard'
+import { requirePortalClient } from '@/lib/ehr-native/auth/portal-guard'
 import { SchedulingService } from '@/lib/ehr-native/services'
 import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 

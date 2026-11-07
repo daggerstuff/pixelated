@@ -46,8 +46,8 @@ def main() -> None:
                 record = json.loads(line)
                 if quality.passes_filter(record):
                     accepted_records.append(record)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Skipping unparsable dataset line: %s", e)
 
     total_rejected = total_read - len(accepted_records)
     rejection_rate = (total_rejected / total_read * 100) if total_read > 0 else 0

@@ -127,7 +127,7 @@ export function TabsList({ children, className = '' }: TabsListProps) {
 
     if (index < 0) return
 
-    let nextIndex = index
+    let nextIndex: number
 
     switch (e.key) {
       case 'ArrowRight':

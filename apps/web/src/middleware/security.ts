@@ -49,10 +49,22 @@ export function sanitizeString(input: unknown): string {
     return ''
   }
 
-  return input
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<[^>]*>/g, '')
-    .replace(/javascript:/gi, '')
+  let sanitized = Array.from(input)
+    .filter((char) => {
+      const code = char.charCodeAt(0)
+      return code >= 0x20 && code !== 0x7f
+    })
+    .join('')
+  let previous: string
+  do {
+    previous = sanitized
+    sanitized = sanitized
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, '')
+      .replace(/<[^>]*>/g, '')
+  } while (sanitized !== previous)
+
+  return sanitized
+    .replace(/javascript\s*:/gi, '')
     .replace(/on\w+\s*=/gi, '')
     .trim()
     .slice(0, 10000) // Limit length

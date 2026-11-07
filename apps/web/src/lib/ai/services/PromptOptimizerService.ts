@@ -691,7 +691,7 @@ export class PromptOptimizerService {
     strategy: string,
     context: PromptOptimization['therapeuticContext'],
   ): string {
-    let optimized = prompt
+    let optimized: string
 
     switch (strategy) {
       case 'stabilization_focused':

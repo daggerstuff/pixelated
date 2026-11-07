@@ -81,7 +81,16 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         success: true,
-        result,
+        result: {
+          success: result.success,
+          result: result.result,
+          operation: result.operation,
+          timestamp: result.timestamp,
+          metadata: result.metadata,
+          error: result.success
+            ? undefined
+            : 'Failed to process encrypted data',
+        },
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } },
     )

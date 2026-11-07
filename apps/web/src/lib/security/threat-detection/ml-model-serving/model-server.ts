@@ -655,40 +655,6 @@ export class ModelServingServer extends EventEmitter {
 
 // Helper classes for dependencies
 
-class RedisFeatureStore implements FeatureStore {
-  constructor(private readonly redis: Redis) {}
-
-  async getFeatures(featureSetId: string): Promise<FeatureSet | null> {
-    const data = await this.redis.get(`features:${featureSetId}`)
-    return data ? (JSON.parse(data) as FeatureSet) : null
-  }
-
-  async updateFeatures(
-    featureSetId: string,
-    features: FeatureSet,
-  ): Promise<void> {
-    await this.redis.set(
-      `features:${featureSetId}`,
-      JSON.stringify(features),
-      'EX',
-      3600,
-    )
-  }
-
-  async validateFeatures(_features: unknown[]): Promise<ValidationResult> {
-    // Implement feature validation logic
-    return { isValid: true, errors: [] }
-  }
-
-  async getFeatureHistory(
-    featureSetId: string,
-    timeframe: TimeWindow,
-  ): Promise<FeatureHistory> {
-    // Implement feature history retrieval
-    return { features: [], timeframe }
-  }
-}
-
 class MongoModelRegistry implements ModelRegistry {
   constructor(private readonly mongoClient: MongoClient) {}
 

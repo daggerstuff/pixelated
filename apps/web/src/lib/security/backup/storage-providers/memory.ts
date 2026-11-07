@@ -32,9 +32,9 @@ export class InMemoryStorageProvider implements StorageProvider {
     // Simple glob pattern matching
     // Convert glob pattern to regex
     const regexPattern = pattern
-      .replace(/\./g, '\\.')
-      .replace(/\*/g, '.*')
-      .replace(/\?/g, '.')
+      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      .replace(/\\\*/g, '.*')
+      .replace(/\\\?/g, '.')
 
     const regex = new RegExp(`^${regexPattern}$`)
 

@@ -150,7 +150,6 @@ def supadata_transcript(
                 logger.debug("Supadata error for %s (after %d retries): %s", video_id, retries, last_err)
             return None
         except Exception as e:
-            last_err = str(e)
             logger.debug("Network error for %s: %s", video_id, e)
             return None
 

@@ -60,7 +60,7 @@ export interface ProfileAndLogAgentStartupOptions {
 export function profileAndLogAgentStartup(
   options: ProfileAndLogAgentStartupOptions,
 ): void {
-  const { agentName, connectionDescriptions } = options
+  const { connectionDescriptions } = options
   const profiler = new StartupProfiler()
 
   for (const [label, description] of Object.entries(
@@ -68,6 +68,4 @@ export function profileAndLogAgentStartup(
   )) {
     profiler.profileText(label, description)
   }
-
-  const report = profiler.report()
 }

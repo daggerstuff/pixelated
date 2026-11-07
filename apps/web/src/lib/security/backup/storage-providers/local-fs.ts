@@ -102,9 +102,9 @@ export class LocalFileSystemProvider implements StorageProvider {
       // Filter by pattern if provided
       if (pattern) {
         const regexPattern = pattern
-          .replace(/\./g, '\\.')
-          .replace(/\*/g, '.*')
-          .replace(/\?/g, '.')
+          .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+          .replace(/\\\*/g, '.*')
+          .replace(/\\\?/g, '.')
 
         const regex = new RegExp(`^${regexPattern}$`)
         return relativeFiles.filter((name) => regex.test(name))

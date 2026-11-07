@@ -25,7 +25,7 @@ import {
   type AuthenticatedMemoryCaller,
 } from '@/lib/memory/contract/route-helpers'
 
-import { withV1Contract, V1RouteContext } from './with-v1-contract'
+import { V1RouteContext } from './with-v1-contract'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -48,10 +48,6 @@ function hasAnyScope(scopes: string[], allowed: Set<string>): boolean {
 
 function isReadScope(scope: DeveloperScope): boolean {
   return scope === 'read'
-}
-
-function isWriteScope(scope: DeveloperScope): boolean {
-  return scope === 'write'
 }
 
 function allowedScopesFor(operation: DeveloperScope): Set<string> {

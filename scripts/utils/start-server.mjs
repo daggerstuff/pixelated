@@ -252,12 +252,15 @@ function convertHtmlToMarkdown(html, requestUrl) {
 /** @param {string} urlPath @returns {string | null} */
 function resolveStaticFile(urlPath) {
   const normalized = urlPath.split("?")[0].split("#")[0];
+  if (normalized.includes("\0")) return null;
 
   // Resolve against clientDist, default to index.html for root
   const filePath = path.join(clientDist, normalized === "/" ? "index.html" : normalized);
 
   // Prevent directory traversal — resolved path must stay inside clientDist
-  if (filePath !== clientDist && !filePath.startsWith(clientDistRoot)) return null;
+  const resolved = path.resolve(filePath);
+  const relativeToDist = path.relative(path.resolve(clientDistRoot), resolved);
+  if (relativeToDist.startsWith("..") || path.isAbsolute(relativeToDist)) return null;
 
   // Try exact match first (must be a file with an extension)
   if (existsSync(filePath) && path.extname(filePath)) {
@@ -273,7 +276,7 @@ function resolveStaticFile(urlPath) {
   // Try directory index (Astro's build.format: "directory" emits
   // /about/index.html for prerendered /about)
   const dirIndex = path.join(filePath, "index.html");
-  if (existsSync(dirIndex) && filePath.startsWith(clientDistRoot)) {
+  if (existsSync(dirIndex)) {
     return dirIndex;
   }
 
@@ -345,7 +348,7 @@ function proxyToUmami(req, res) {
   );
 
   upstreamReq.on("error", (err) => {
-    console.error("Umami proxy error:", err);
+    console.error("Umami proxy error:", String(err).replace(/[\n\r]/g, " "));
     if (!res.headersSent) {
       res.writeHead(502, { "Content-Type": "text/plain; charset=utf-8" });
     }

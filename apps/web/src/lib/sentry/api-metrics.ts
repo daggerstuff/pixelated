@@ -23,7 +23,7 @@ export function withMetrics<T extends (...args: any[]) => Promise<Response>>(
 ): T {
   return (async (...args: Parameters<T>) => {
     const startTime = Date.now()
-    let statusCode = 500
+    let statusCode: number
     let errorType: string | undefined
 
     try {

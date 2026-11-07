@@ -44,7 +44,6 @@ from pymongo.errors import OperationFailure
 # Wall budget: 5 minutes for all index creations (MongoDB default
 # serverSelectionTimeoutMS is 30s per operation; we don't override
 # because index creation is fast on empty collections).
-_WALL_BUDGET_MINUTES = 5
 
 
 class _VerifyResult(TypedDict, total=False):

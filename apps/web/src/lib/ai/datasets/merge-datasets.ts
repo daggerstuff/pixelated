@@ -448,7 +448,7 @@ async function validateJSONDataset(filePath: string, errors: string[]): Promise<
         continue;
       }
 
-      if (char === '"' && !escapeNext) {
+      if (char === '"') {
         inString = !inString;
         currentRecord += char;
         continue;

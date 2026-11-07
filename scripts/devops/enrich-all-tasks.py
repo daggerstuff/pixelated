@@ -706,7 +706,7 @@ def _extract_linkages(clean_body: str) -> tuple[list[str], str]:
     for line in clean_body.splitlines():
         line_strip = line.strip()
         if (
-            "russianvodka.atlassian.net" in line_strip.lower()
+            re.search(r"(?<![\w.-])russianvodka\.atlassian\.net(?![\w.-])", line_strip, re.IGNORECASE)
             or "jira:" in line_strip.lower()
             or "asana:" in line_strip.lower()
             or "migrated from" in line_strip.lower()

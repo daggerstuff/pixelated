@@ -16,8 +16,6 @@ import { z } from 'zod'
 // Provider constants
 // ---------------------------------------------------------------------------
 
-const TWILIO_PROVIDER_NAME = 'twilio' as const
-
 const TWILIO_OAUTH_SCOPES = ['scope:read_only', 'scope:write'] as const
 
 // ---------------------------------------------------------------------------

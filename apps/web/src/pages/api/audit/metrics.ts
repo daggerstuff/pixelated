@@ -167,7 +167,7 @@ export const GET: APIRoute = async () => {
       JSON.stringify({
         success: false,
         error: 'Failed to generate audit metrics',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

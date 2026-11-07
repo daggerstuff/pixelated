@@ -8,7 +8,6 @@
  */
 
 import { writeFileSync, mkdirSync } from 'node:fs'
-import { join } from 'node:path'
 import { getBiasAuditRunner } from '../../apps/web/src/lib/ai/bias-detection/audit-runner'
 import type { TherapeuticSession } from '../../apps/web/src/lib/ai/bias-detection/types'
 

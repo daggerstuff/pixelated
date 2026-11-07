@@ -204,7 +204,7 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.usage.error',
-      userId ?? 'anonymous',
+      userId,
       'ai_usage',
       {
         error: String(error),

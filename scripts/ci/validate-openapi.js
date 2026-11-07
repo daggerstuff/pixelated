@@ -8,8 +8,8 @@
  *   node scripts/ci/validate-openapi.js <spec-file>     # validate a specific spec
  */
 
-import { readFileSync, existsSync } from "node:fs";
-import { execSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { join, resolve } from "node:path";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..", "..");
@@ -31,22 +31,6 @@ const RESET = "\x1b[0m";
 const BOLD = "\x1b[1m";
 
 /**
- * Check if spectral is available (npx will download if not cached).
- */
-function checkSpectral() {
-  try {
-    execSync("npx @stoplight/spectral-cli --version", {
-      cwd: REPO_ROOT,
-      stdio: "pipe",
-      timeout: 30000,
-    });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Validate a single OpenAPI spec file with spectral.
  * Returns { file, errors, warnings, infos, passed }.
  */
@@ -60,13 +44,23 @@ function validateSpec(specPath) {
 
   try {
     // Run spectral lint and capture JSON output
-    const output = execSync(
-      `npx @stoplight/spectral-cli lint "${fullPath}" --ruleset "${join(REPO_ROOT, ".spectral.yaml")}" --format json`,
+    const output = execFileSync(
+      "npx",
+      [
+        "@stoplight/spectral-cli",
+        "lint",
+        fullPath,
+        "--ruleset",
+        join(REPO_ROOT, ".spectral.yaml"),
+        "--format",
+        "json",
+      ],
       {
         cwd: REPO_ROOT,
         stdio: "pipe",
         timeout: 60000,
         encoding: "utf8",
+        shell: false,
       },
     );
 

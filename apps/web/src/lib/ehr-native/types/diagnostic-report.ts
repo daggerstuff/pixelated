@@ -9,7 +9,6 @@ import {
   fhirDateTimeSchema,
   fhirInstantSchema,
   fhirAttachmentSchema,
-  fhirBackboneElementSchema,
 } from './base.js'
 
 /** FHIR R4 DiagnosticReport resource schema. @see http://hl7.org/fhir/R4/diagnosticreport.html */

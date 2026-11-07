@@ -111,9 +111,6 @@ def main() -> None:
             for _cat, _count in sorted(stats["categories"].items(), key=lambda x: -x[1]):
                 pass
 
-    for _cat, count in all_categories.most_common():
-        (count / total_records * 100) if total_records > 0 else 0
-
     # Map categories to PRD requirements
     therapeutic_count = (
         all_categories.get("therapeutic_conversation", 0)
@@ -125,9 +122,6 @@ def main() -> None:
         "Therapeutic Samples": (10000, therapeutic_count),
         "Total Dataset Size": (20000, total_records),
     }
-
-    for _metric, (target, actual) in targets.items():
-        (actual / target * 100) if target > 0 else 0
 
     # Save report
     output = {

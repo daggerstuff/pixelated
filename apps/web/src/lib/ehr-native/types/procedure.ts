@@ -7,7 +7,6 @@ import {
   fhirReferenceSchema,
   fhirPeriodSchema,
   fhirDateTimeSchema,
-  fhirBackboneElementSchema,
 } from './base.js'
 
 /** FHIR R4 Procedure resource schema. @see http://hl7.org/fhir/R4/procedure.html */

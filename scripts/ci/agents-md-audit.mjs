@@ -42,7 +42,7 @@ for (const section of REQUIRED_SECTIONS) {
 
 // 2. Referenced repo paths must exist. Extracts path-like tokens from
 // backticks and markdown links, then resolves them against the repo root.
-const pathLike = /`([A-Za-z0-9_@./-]*(?:\/[A-Za-z0-9_@./-]+)+)`/g
+const pathLike = /`([A-Za-z0-9_@.-]*(?:\/[A-Za-z0-9_@.-]+)+)`/g
 const seen = new Set()
 for (const match of agents.matchAll(pathLike)) {
   const raw = match[1]

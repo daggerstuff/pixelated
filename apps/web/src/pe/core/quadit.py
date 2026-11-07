@@ -28,7 +28,8 @@ class LLMProviderProtocol(Protocol):
     resolves as Any — so the bridge depends only on the shape it uses.
     """
 
-    def generate(self, messages: list[dict[str, str]]) -> str: ...
+    def generate(self, messages: list[dict[str, str]]) -> str:
+        pass
 
 
 class ProviderQuaditClient:

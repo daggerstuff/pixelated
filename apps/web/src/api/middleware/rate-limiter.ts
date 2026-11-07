@@ -22,11 +22,9 @@ type RateLimiterResponse = {
   json: (body: unknown) => RateLimiterResponse
 }
 
-interface RateLimitStore {
-  [key: string]: { count: number; resetTime: number } | undefined
-}
+type RateLimitRecord = { count: number; resetTime: number }
 
-const store: RateLimitStore = {}
+const store = new Map<string, RateLimitRecord>()
 let redisAvailable = true
 
 const tooManyRequestsPayload = {
@@ -166,7 +164,7 @@ export function rateLimiter(
   }
 
   const now = Date.now()
-  const record = store[ip] ?? { count: 0, resetTime: now + windowMs }
+  const record = store.get(ip) ?? { count: 0, resetTime: now + windowMs }
 
   // Reset if window has passed
   if (now > record.resetTime) {
@@ -175,7 +173,7 @@ export function rateLimiter(
   }
 
   record.count++
-  store[ip] = record
+  store.set(ip, record)
 
   applyHeaders(record.count, record.resetTime)
 
@@ -196,7 +194,7 @@ export function rateLimitByUser(
   maxRequests: number = 30,
   windowMs: number = 60000,
 ) {
-  const userStore: RateLimitStore = {}
+  const userStore = new Map<string, RateLimitRecord>()
 
   return (
     req: RateLimiterRequest,
@@ -205,7 +203,10 @@ export function rateLimitByUser(
   ): void => {
     const userId = req.user?.id ?? getClientIp(req)
     const now = Date.now()
-    const record = userStore[userId] ?? { count: 0, resetTime: now + windowMs }
+    const record = userStore.get(userId) ?? {
+      count: 0,
+      resetTime: now + windowMs,
+    }
 
     // Reset if window has passed
     if (now > record.resetTime) {
@@ -214,7 +215,7 @@ export function rateLimitByUser(
     }
 
     record.count++
-    userStore[userId] = record
+    userStore.set(userId, record)
 
     // Set rate limit headers
     setRateLimitHeader(res, 'X-RateLimit-Limit', String(maxRequests))

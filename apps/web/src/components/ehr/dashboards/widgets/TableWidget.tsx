@@ -37,7 +37,6 @@ export const TableWidget: FC<TableWidgetProps> = ({
       result = result.slice(0, maxRows)
     }
     if (sortKey) {
-      const col = columns.find((c) => c.key === sortKey)
       result.sort((a, b) => {
         const aVal = a[sortKey]
         const bVal = b[sortKey]

@@ -1,6 +1,4 @@
-import { constants } from 'node:fs'
 import {
-  access,
   appendFile,
   mkdir,
   readFile,
@@ -82,13 +80,13 @@ function isLockAcquisitionError(error: unknown): boolean {
 async function readStoredTurns(
   filePath: string,
 ): Promise<StoredTurnsReadResult> {
+  let raw: string
   try {
-    await access(filePath, constants.F_OK)
+    raw = (await readFile(filePath, 'utf8')).trim()
   } catch {
     return { turns: [], hasValidSnapshot: false }
   }
 
-  const raw = (await readFile(filePath, 'utf8')).trim()
   if (!raw) {
     return { turns: [], hasValidSnapshot: false }
   }
@@ -114,13 +112,13 @@ async function readStoredTurns(
 }
 
 async function readJournalTurns(filePath: string): Promise<NoteTurn[]> {
+  let raw: string
   try {
-    await access(filePath, constants.F_OK)
+    raw = (await readFile(filePath, 'utf8')).trim()
   } catch {
     return []
   }
 
-  const raw = (await readFile(filePath, 'utf8')).trim()
   if (!raw) return []
 
   const lines = raw.split('\n')

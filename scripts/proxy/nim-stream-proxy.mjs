@@ -77,7 +77,7 @@ const server = http.createServer(async (req, res) => {
   delete options.headers['accept']
   options.headers['accept'] = 'application/json'
 
-  console.log(`[${new Date().toISOString()}] ${req.method} ${NIM_HOST}${NIM_BASE_PATH}${upstreamPath} model=${body.model || '?'} stream=${body.stream} tools=${body.tools ? body.tools.length : 'none'}`)
+  console.log(`[${new Date().toISOString()}] ${String(req.method).replace(/[\n\r]/g, ' ')} ${NIM_HOST}${NIM_BASE_PATH}${String(upstreamPath).replace(/[\n\r]/g, ' ')} model=${String(body.model || '?').replace(/[\n\r]/g, ' ')} stream=${String(body.stream).replace(/[\n\r]/g, ' ')} tools=${body.tools ? body.tools.length : 'none'}`)
 
   const upstreamReq = https.request(options, (upstreamRes) => {
     const chunks = []
@@ -252,7 +252,7 @@ const server = http.createServer(async (req, res) => {
   })
 
   upstreamReq.on('error', (err) => {
-    console.error(`[${new Date().toISOString()}] request error: ${err}`)
+    console.error(`[${new Date().toISOString()}] request error: ${String(err).replace(/[\n\r]/g, ' ')}`)
     if (!res.headersSent) {
       res.writeHead(502)
       res.end(JSON.stringify({ error: 'upstream error', detail: String(err) }))

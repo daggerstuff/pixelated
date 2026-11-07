@@ -88,7 +88,7 @@ export const GET = async ({ request }: { request: Request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to fetch techniques',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -131,7 +131,7 @@ export const POST = async ({
     }
 
     // Get AI recommendations
-    const patientDataObj = (patientData as Record<string, unknown>) ?? {}
+    const patientDataObj = patientData as Record<string, unknown>
     const preferencesObj = (preferences as Record<string, unknown>) ?? {}
     const recommendationRequest = { ...patientDataObj, ...preferencesObj }
     const recommendations = recommend(
@@ -154,7 +154,7 @@ export const POST = async ({
       JSON.stringify({
         success: false,
         error: 'Failed to generate recommendations',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

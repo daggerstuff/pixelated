@@ -717,7 +717,7 @@ export class ExternalThreatFeedIntegrationCore
         itemsProcessed,
         threatsDiscovered,
         errors,
-        processingTime: Date.now() - Date.now(), // Will be calculated by caller
+        processingTime: 0, // Will be calculated by caller
         threats: processedThreats,
       }
 

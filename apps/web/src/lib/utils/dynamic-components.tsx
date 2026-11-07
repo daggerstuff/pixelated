@@ -76,14 +76,6 @@ const ThreeDLoading = () => (
   </div>
 )
 
-// Error fallback component
-const ErrorFallback = ({ error }: { error: Error }) => (
-  <div className="rounded-none border border-ring bg-secondary p-4">
-    <p className="font-medium text-foreground">Failed to load component</p>
-    <p className="text-sm text-muted-foreground">{String(error)}</p>
-  </div>
-)
-
 // Dynamic imports for large visualization components
 const MultidimensionalEmotionChart = React.lazy(async () => ({
   default: MultidimensionalEmotionChartFallback,
@@ -265,17 +257,3 @@ export const DynamicGoalAttainmentScale = (
     <GoalAttainmentScale {...props} />
   </Suspense>
 )
-
-// Dynamically import Three.js module when needed
-// Dynamically import chart.js module when needed
-const useChartModule = () => {
-  const [chartModule, setChartModule] = React.useState<unknown>(null)
-
-  React.useEffect(() => {
-    void import('chart.js').then((module) => {
-      setChartModule(module)
-    })
-  }, [])
-
-  return chartModule
-}

@@ -28,7 +28,7 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { renameSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const ROOT = resolve(import.meta.dirname, '../..')
@@ -104,7 +104,9 @@ function main() {
       command: 'pnpm build',
       buildMs: summary.buildMs,
     }
-    writeFileSync(BASELINE_PATH, `${JSON.stringify(pinned, null, 2)}\n`, 'utf8')
+    const TMP_PATH = `${BASELINE_PATH}.tmp`
+    writeFileSync(TMP_PATH, `${JSON.stringify(pinned, null, 2)}\n`, 'utf8')
+    renameSync(TMP_PATH, BASELINE_PATH)
     console.log(`\nBaseline written to ${BASELINE_PATH}`)
     return
   }

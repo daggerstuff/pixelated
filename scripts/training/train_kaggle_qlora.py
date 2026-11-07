@@ -133,11 +133,13 @@ class _BitsAndBytesConfigFactory(Protocol):
         bnb_4bit_quant_type: str,
         bnb_4bit_compute_dtype: torch.dtype,
         bnb_4bit_use_double_quant: bool,
-    ) -> BitsAndBytesConfig: ...
+    ) -> BitsAndBytesConfig:
+        pass
 
 
 class _PrepareModelForKBitTraining(Protocol):
-    def __call__(self, model: _M, use_gradient_checkpointing: bool = True) -> _M: ...
+    def __call__(self, model: _M, use_gradient_checkpointing: bool = True) -> _M:
+        pass
 
 
 def load_model_and_tokenizer() -> tuple[PeftModel | PeftMixedModel, PreTrainedTokenizerBase]:

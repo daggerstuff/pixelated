@@ -9,7 +9,7 @@ const updatePasswordSchema = z.object({
 
 export const POST = async ({ request, cookies }: APIContext) => {
   try {
-    const [body, validationError] = await validateRequestBody(
+    const [, validationError] = await validateRequestBody(
       request,
       updatePasswordSchema,
     )

@@ -118,9 +118,8 @@ function isValidReferer(
   // Check if in trusted origins
   return trustedOrigins.some((origin) => {
     if (origin.includes('*')) {
-      const pattern = new RegExp(
-        `^${origin.replace(/\./g, '\\.').replace(/\*/g, '.*')}$`,
-      )
+      const escapedOrigin = origin.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const pattern = new RegExp(`^${escapedOrigin.replace(/\\\*/g, '.*')}$`)
       return pattern.test(refererUrl.origin)
     }
     return refererUrl.origin === origin

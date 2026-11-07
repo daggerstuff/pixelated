@@ -254,7 +254,7 @@ export const POST: APIRoute = async ({ request }) => {
         error: 'Internal Server Error',
         message:
           error instanceof Error
-            ? String(error)
+            ? error.message
             : 'An unexpected error occurred',
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },

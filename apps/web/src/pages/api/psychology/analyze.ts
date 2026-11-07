@@ -698,7 +698,7 @@ export const POST = async ({ request }: { request: Request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error during content analysis',
-        details: error instanceof Error ? String(error) : 'Unknown error',
+        details: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

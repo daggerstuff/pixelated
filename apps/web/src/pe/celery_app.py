@@ -55,18 +55,24 @@ class CeleryTask(Protocol):
     with ``attr-defined`` once the function type is preserved.
     """
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any: ...
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        pass
 
-    def s(self, *args: Any, **kwargs: Any) -> Any: ...
+    def s(self, *args: Any, **kwargs: Any) -> Any:
+        pass
 
-    def delay(self, *args: Any, **kwargs: Any) -> Any: ...
+    def delay(self, *args: Any, **kwargs: Any) -> Any:
+        pass
 
-    def apply_async(self, *args: Any, **kwargs: Any) -> Any: ...
+    def apply_async(self, *args: Any, **kwargs: Any) -> Any:
+        pass
 
-    def run(self, *args: Any, **kwargs: Any) -> Any: ...
+    def run(self, *args: Any, **kwargs: Any) -> Any:
+        pass
 
     @property
-    def name(self) -> str: ...
+    def name(self) -> str:
+        pass
 
 
 def task(*args: Any, **kwargs: Any) -> Callable[[Callable[..., Any]], CeleryTask]:

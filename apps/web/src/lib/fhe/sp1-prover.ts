@@ -357,7 +357,7 @@ export class SP1Prover {
   private verifySP1Format(proof: string): boolean {
     try {
       // SP1 proofs are typically base64 encoded
-      const decoded = Buffer.from(proof, 'base64')
+      Buffer.from(proof, 'base64')
     } catch {
       return false
     }

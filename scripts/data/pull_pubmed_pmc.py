@@ -150,8 +150,6 @@ def _parse_fulltext_xml(xml_text: str, pmid: str) -> dict[str, Any] | None:
         return None
 
     article = root.find(".//article") or root
-    title_el = article.find(".//article-title") or article.find(".//title")
-    title = title_el.text.strip() if title_el is not None and title_el.text else ""
 
     abstract_els = article.findall(".//abstract//p") or article.findall(".//abstract//sec//p")
     abstract = " ".join(" ".join(p.itertext()) for p in abstract_els if p.itertext())

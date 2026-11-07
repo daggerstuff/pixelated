@@ -72,7 +72,6 @@ export class DocumentService {
 
   constructor(db: Pool, redis: Redis) {
     this.db = db
-    this.db = db
     this.redis = redis
   }
 

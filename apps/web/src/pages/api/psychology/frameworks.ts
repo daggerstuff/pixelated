@@ -728,7 +728,7 @@ export const GET = async ({ url }: { url: URL }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error retrieving frameworks',
-        details: error instanceof Error ? String(error) : 'Unknown error',
+        details: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -781,7 +781,7 @@ export const POST = async ({ request }: { request: Request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error retrieving frameworks',
-        details: error instanceof Error ? String(error) : 'Unknown error',
+        details: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

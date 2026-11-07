@@ -103,16 +103,10 @@ router.get(
             ? 200
             : 503
       return res.status(statusCode).json(report)
-    } catch (error: unknown) {
-      const details = error instanceof Error ? error.message : String(error)
-      try {
-        return res.status(500).json(JSON.parse(details))
-      } catch {
-        return res.status(500).json({
-          error: 'Failed to generate readiness report',
-          details,
-        })
-      }
+    } catch {
+      return res.status(500).json({
+        error: 'Failed to generate readiness report',
+      })
     }
   },
 )
@@ -139,16 +133,10 @@ router.get(
       const reportContent = await runReadiness(scriptPath, projectRoot, true)
       const report = JSON.parse(reportContent) as unknown
       return res.status(200).json(report)
-    } catch (error: unknown) {
-      const details = error instanceof Error ? error.message : String(error)
-      try {
-        return res.status(500).json(JSON.parse(details))
-      } catch {
-        return res.status(500).json({
-          error: 'Failed to generate dry-run readiness report',
-          details,
-        })
-      }
+    } catch {
+      return res.status(500).json({
+        error: 'Failed to generate dry-run readiness report',
+      })
     }
   },
 )

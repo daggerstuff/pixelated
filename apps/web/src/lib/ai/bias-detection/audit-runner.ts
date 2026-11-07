@@ -495,7 +495,6 @@ export class BiasAuditRunner {
   ): Promise<BiasAuditReport> {
     const month = options.month ?? new Date().toISOString().slice(0, 7)
     const threshold = options.varianceThreshold ?? DEFAULT_VARIANCE_THRESHOLD
-    const minSampleSize = options.minSampleSize ?? DEFAULT_MIN_SAMPLE_SIZE
     const dimensions = options.dimensions ?? DEFAULT_DIMENSIONS
 
     const segments: SegmentResult[] = []

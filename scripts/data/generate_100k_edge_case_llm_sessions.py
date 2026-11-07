@@ -221,8 +221,8 @@ async def main_async() -> None:
                         msgs = record.get("messages", [])
                         quality.seen_hashes.add(hash("".join(m["content"] for m in msgs)))
                         existing_count += 1
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        logger.debug("Skipping unparsable dataset line: %s", e)
         logger.info("Populated QualityFilter with %d existing record fingerprints.", existing_count)
 
     semaphore = asyncio.Semaphore(4)  # 4 concurrent synthesis pipelines

@@ -14,7 +14,6 @@ import { z } from 'zod'
 
 import {
   resolveTenantId,
-  requireEHRPermission,
   requireEHRPermissionWithBreakGlass,
   sanitizeFhirId,
   ehrSuccess,

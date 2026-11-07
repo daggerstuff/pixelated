@@ -221,7 +221,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'An error occurred while analyzing the text.',
-        detail: error instanceof Error ? String(error) : 'Unknown error',
+        detail: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

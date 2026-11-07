@@ -128,7 +128,7 @@ export class AnalyticsService {
    */
   private generateSessionId(): string {
     if (typeof window === 'undefined') {
-      return `server-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+      return `server-${Date.now()}-${globalThis.crypto.randomUUID()}`
     }
 
     // Try to get from storage first
@@ -138,7 +138,7 @@ export class AnalyticsService {
     }
 
     // Generate a new one if not found
-    const newId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+    const newId = `session-${Date.now()}-${globalThis.crypto.randomUUID()}`
     sessionStorage.setItem('analytics_session_id', newId)
     return newId
   }
@@ -148,7 +148,7 @@ export class AnalyticsService {
    */
   private generateAnonymousId(): string {
     if (typeof window === 'undefined') {
-      return `anon-${Math.random().toString(36).substring(2, 9)}`
+      return `anon-${globalThis.crypto.randomUUID()}`
     }
 
     // Try to get from storage first
@@ -158,7 +158,7 @@ export class AnalyticsService {
     }
 
     // Generate a new one if not found
-    const newId = `anon-${Math.random().toString(36).substring(2, 16)}`
+    const newId = `anon-${globalThis.crypto.randomUUID()}`
     localStorage.setItem('analytics_anonymous_id', newId)
     return newId
   }
@@ -394,7 +394,7 @@ export class AnalyticsService {
         } else {
           result[key] = value
         }
-      } else if (typeof value === 'object' && value !== null) {
+      } else if (value !== null && typeof value === 'object') {
         // Recursively anonymize nested objects
         result[key] = Array.isArray(value)
           ? value.map((item) =>

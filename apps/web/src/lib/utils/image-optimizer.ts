@@ -169,17 +169,14 @@ export class ImageOptimizer {
         throw new Error(`Image file not found: ${imagePath}`)
       }
 
-      const stat = statSync(imagePath)
-      const originalSize = stat.size
+      const imageBuffer = await readFile(imagePath)
+      const originalSize = imageBuffer.length
 
       logger.info('Starting image optimization', {
         imagePath,
         originalSize,
         sizeKB: Math.round(originalSize / 1024),
       })
-
-      // Read image file
-      const imageBuffer = await readFile(imagePath)
 
       // Determine image format
       const format = this.detectImageFormat(imagePath, imageBuffer)

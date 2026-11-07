@@ -17,11 +17,9 @@ function getEnvVariable(name: string): string | undefined {
 }
 
 const hasAuth0DomainShape = (value: string): boolean => {
-  return (
-    value.includes('.auth0.com') ||
-    value.includes('.us.auth0.com') ||
-    value.includes('.eu.auth0.com') ||
-    value.includes('.au.auth0.com')
+  const host = value.trim().toLowerCase()
+  return ['auth0.com', 'us.auth0.com', 'eu.auth0.com', 'au.auth0.com'].some(
+    (domain) => host === domain || host.endsWith(`.${domain}`),
   )
 }
 

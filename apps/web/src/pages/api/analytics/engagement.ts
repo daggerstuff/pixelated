@@ -249,7 +249,7 @@ export const GET = async ({ request }: { request: Request }) => {
       errorMessage: 'Failed to fetch engagement metrics',
       details: {
         source: 'engagement',
-        message: error instanceof Error ? String(error) : String(error),
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
     } as Record<string, unknown>
 

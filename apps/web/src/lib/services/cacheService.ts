@@ -126,7 +126,7 @@ export class EnhancedCacheService implements CacheClient {
  */
 class VercelKVCacheService implements CacheService {
   private readonly redis: RedisClient | null = null
-  public connected = true
+  public connected: boolean
   private readonly prefix = 'app:cache:'
 
   constructor() {

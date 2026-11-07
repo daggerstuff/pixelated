@@ -43,8 +43,8 @@ def get_changed_files() -> list[str]:
         )
         if result.returncode == 0:
             return result.stdout.strip().split("\n")
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug("Could not read staged git diff: %s", e)
 
     # Fallback: check all crisis-related files
     crisis_files = list((project_root / "ai").rglob("*crisis*.py"))

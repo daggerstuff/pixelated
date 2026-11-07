@@ -9,7 +9,6 @@ import {
   fhirBackboneElementSchema,
   fhirAttachmentSchema,
   fhirMoneySchema,
-  fhirQuantitySchema,
 } from './base'
 
 /**

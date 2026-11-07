@@ -25,7 +25,7 @@ export const GET = async () => {
     const errorResponse = {
       status: 'unhealthy',
       timestamp: new Date().toISOString(),
-      error: error instanceof Error ? String(error) : 'Health check failed',
+      error: error instanceof Error ? error.message : 'Health check failed',
       uptime: process.uptime(),
       responseTime: 0,
       checks: [],

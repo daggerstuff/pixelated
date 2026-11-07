@@ -14,6 +14,11 @@ import { rateLimiter, rateLimitByUser } from '../middleware/rate-limiter'
 
 const router: Router = express.Router()
 
+const userRouteLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+})
+
 // All user routes require authentication
 router.use(authMiddleware)
 
@@ -29,6 +34,7 @@ const parsePositiveInteger = (value: unknown): number | undefined => {
  */
 router.get(
   '/',
+  userRouteLimiter,
   requireRoles(['admin', 'manager']),
   asyncHandler(async (req: Request, res: Response) => {
     const { page = 1, limit = 50, role, status } = req.query
@@ -96,6 +102,7 @@ router.get(
  */
 router.get(
   '/:userId',
+  userRouteLimiter,
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.params['userId'] as string
     const { user } = req as { user?: { id?: string; role?: string } }
@@ -138,6 +145,7 @@ router.get(
  */
 router.put(
   '/:userId',
+  userRouteLimiter,
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.params['userId'] as string
     const { name, email, status, role } = req.body
@@ -238,6 +246,7 @@ router.put(
  */
 router.post(
   '/:userId/permissions',
+  userRouteLimiter,
   rateLimiter,
   rateLimitByUser(20, 60000),
   requireRoles(['admin']),
@@ -284,6 +293,7 @@ router.post(
  */
 router.delete(
   '/:userId/permissions/:permissionId',
+  userRouteLimiter,
   rateLimiter,
   rateLimitByUser(20, 60000),
   requireRoles(['admin']),
@@ -331,6 +341,7 @@ router.delete(
  */
 router.delete(
   '/:userId',
+  userRouteLimiter,
   rateLimiter,
   rateLimitByUser(10, 60000),
   requireRoles(['admin']),

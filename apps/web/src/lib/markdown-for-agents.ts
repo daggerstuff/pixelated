@@ -57,7 +57,7 @@ export function htmlToAgentMarkdown(html: string, pageUrl: string): string {
 
 function extractMetaContent(html: string, marker: string): string | undefined {
   const re = new RegExp(
-    `<meta[^>]*${marker.replace(/"/g, '"')}[^>]*content="([^"]*)"`,
+    `<meta[^>]*${marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[^>]*content="([^"]*)"`,
     'i',
   )
   return html.match(re)?.[1]

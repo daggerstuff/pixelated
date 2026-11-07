@@ -8,7 +8,6 @@ import {
   fhirQuantitySchema,
   fhirDateTimeSchema,
   fhirDateSchema,
-  fhirBackboneElementSchema,
 } from './base.js'
 
 /** FHIR R4 Immunization resource schema. @see http://hl7.org/fhir/R4/immunization.html */

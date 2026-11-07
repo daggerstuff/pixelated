@@ -82,9 +82,7 @@ def parse_md_all_tasks(md_path: str) -> dict[str, dict[str, str]]:
 
 def main() -> None:
     md_path = ".agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md"
-    tasks = parse_md_all_tasks(md_path)
-    for num in sorted(tasks.keys(), key=lambda x: [int(v) for v in x.split(".")]):
-        tasks[num]
+    parse_md_all_tasks(md_path)
 
 
 if __name__ == "__main__":

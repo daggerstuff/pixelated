@@ -288,8 +288,8 @@ async def example_usage():
                     if content:
                         pass
 
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error("Example usage failed: %s", e)
 
 
 if __name__ == "__main__":

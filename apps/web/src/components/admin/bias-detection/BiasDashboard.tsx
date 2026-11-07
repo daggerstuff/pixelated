@@ -32,12 +32,7 @@ import {
   SummaryCards,
   TrendsTab,
 } from './BiasDashboard.components'
-import {
-  getAlertColor,
-  getBiasScoreColor,
-  getChartColors,
-  getFilteredData,
-} from './BiasDashboard.helpers'
+import { getFilteredData } from './BiasDashboard.helpers'
 import {
   useAccessibility,
   useAlertActions,

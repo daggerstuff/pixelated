@@ -75,7 +75,7 @@ export function processVersion(
 
   for (let i = parts.length - 1; i >= 0; i--) {
     const part = parts[i]
-    if (part && part !== '.' && part !== undefined) {
+    if (part && part !== '.') {
       const num = +part
       if (!Number.isNaN(num) && num > 0) {
         highlightedIndex = i

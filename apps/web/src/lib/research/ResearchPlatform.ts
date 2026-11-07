@@ -6,7 +6,6 @@ import {
   ConsentLevel,
   ValidationResult,
   SystemMetrics,
-  ResearchConsent,
   Alert,
   AuditLog,
 } from '@/lib/research/types/research-types'

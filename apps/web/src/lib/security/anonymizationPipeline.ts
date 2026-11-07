@@ -36,7 +36,7 @@ export interface AnonymizationOptions {
 }
 
 function isRecord(obj: unknown): obj is Record<string, unknown> {
-  return typeof obj === 'object' && obj !== null && !Array.isArray(obj)
+  return obj !== null && typeof obj === 'object' && !Array.isArray(obj)
 }
 
 /**

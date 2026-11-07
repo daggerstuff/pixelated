@@ -405,7 +405,7 @@ export const POST = async ({ request }) => {
           ? 'VALIDATION_ERROR'
           : 'PROCESSING_ERROR',
       message:
-        error instanceof Error ? String(error) : 'An unexpected error occurred',
+        error instanceof Error ? error.message : 'An unexpected error occurred',
       details: {
         processingTime,
         timestamp: new Date().toISOString(),

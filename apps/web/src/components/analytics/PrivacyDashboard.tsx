@@ -1,5 +1,5 @@
 import { Lock, Trash, RefreshCw } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button/index'
 import {

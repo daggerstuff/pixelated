@@ -31,7 +31,6 @@ from typing import Any
 import psycopg2
 
 # Wall budget: 3 minutes for DDL execution.
-_WALL_BUDGET_MINUTES = 3
 
 
 def setup_postgres_tables(pg_conn: psycopg2.extensions.connection) -> None:

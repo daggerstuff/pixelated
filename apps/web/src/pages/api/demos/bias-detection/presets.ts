@@ -164,7 +164,7 @@ export const GET = async ({ url }) => {
       JSON.stringify({
         error: 'Internal server error',
         message:
-          error instanceof Error ? String(error) : 'Unknown error occurred',
+          error instanceof Error ? error.message : 'Unknown error occurred',
       }),
       {
         status: 500,

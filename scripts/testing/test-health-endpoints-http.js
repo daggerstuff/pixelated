@@ -249,7 +249,7 @@ async function testEndpoints() {
           if (error.message.includes('timeout')) {
             console.log('✅ Timeout handling works correctly')
           } else {
-            console.log(`✅ Error handling works: ${error.message}`)
+            console.log(`✅ Error handling works: ${String(error.message).replace(/[\n\r]/g, ' ')}`)
           }
         }
 
@@ -266,7 +266,7 @@ async function testEndpoints() {
 
         resolve()
       } catch (error) {
-        console.error('❌ Test failed:', error.message)
+        console.error('❌ Test failed:', String(error.message).replace(/[\n\r]/g, ' '))
         reject(error)
       } finally {
         server.close()
@@ -279,6 +279,6 @@ async function testEndpoints() {
 testEndpoints()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error('💥 Test suite failed:', error)
+    console.error('💥 Test suite failed:', String(error).replace(/[\n\r]/g, ' '))
     process.exit(1)
   })

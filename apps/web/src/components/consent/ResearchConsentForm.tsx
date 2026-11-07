@@ -372,7 +372,7 @@ export function ResearchConsentForm({
             {!consentStatus.hasActiveConsent ? (
               <button
                 onClick={handleGrantConsent}
-                disabled={loading || !allRequiredOptionsSelected()}
+                disabled={!allRequiredOptionsSelected()}
                 className={`rounded-none px-4 py-2 font-medium ${
                   allRequiredOptionsSelected()
                     ? 'bg-primary text-primary-foreground hover:bg-accent'

@@ -133,15 +133,15 @@ function extractChanges(req: Request): string | null {
 
   // Don't log sensitive fields
   const sensitiveFields = ['password', 'token', 'secret', 'key']
-  const changes: Record<string, any> = {}
+  const changes = new Map<string, unknown>()
 
   for (const [key, value] of Object.entries(req.body)) {
     if (!sensitiveFields.some((field) => key.toLowerCase().includes(field))) {
-      changes[key] = value
+      changes.set(key, value)
     }
   }
 
-  return Object.keys(changes).length > 0 ? JSON.stringify(changes) : null
+  return changes.size > 0 ? JSON.stringify(Object.fromEntries(changes)) : null
 }
 
 function shouldAuditLog(req: Request): boolean {

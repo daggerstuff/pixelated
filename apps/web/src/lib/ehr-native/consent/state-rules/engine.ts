@@ -20,7 +20,6 @@ import type { ConsentLevel } from '@/lib/research/types/research-types'
 
 import { stateConsentRulesCache } from './cache'
 import {
-  CONSENT_ORDER,
   DEFAULT_STATE_RULES,
   getStateRules,
   requiresHigherConsent,

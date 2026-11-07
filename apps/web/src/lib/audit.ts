@@ -354,7 +354,7 @@ function getSessionId(): string {
   let sessionId = localStorage.getItem('therapy-chat-session-id')
 
   if (!sessionId) {
-    sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
+    sessionId = `session-${Date.now()}-${globalThis.crypto.randomUUID()}`
     localStorage.setItem('therapy-chat-session-id', sessionId)
   }
 

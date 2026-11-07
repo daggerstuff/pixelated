@@ -35,19 +35,6 @@ except ImportError:
 from bias_detection.models import BiasType, ConfidenceLevel
 
 try:
-    from tenacity import (
-        retry,
-        retry_if_exception_type,
-        stop_after_attempt,
-        wait_exponential,
-    )
-except ImportError:
-    retry = None
-    retry_if_exception_type = None
-    stop_after_attempt = None
-    wait_exponential = None
-
-try:
     from bias_detection.services.nvidia_api_service import NvidiaAPIService
 except ImportError:
     NvidiaAPIService = None
@@ -631,9 +618,7 @@ class PyTorchModelService(ModelService):
             kwargs["num_labels"] = num_labels
         return BiasDetectionModel(**kwargs)
 
-    def _create_basic_tokenizer(self, max_length: int | None = None) -> Any:
-        max_length = max_length or self.max_length
-
+    def _create_basic_tokenizer(self) -> Any:
         class BasicTokenizer:
             def __init__(self):
                 self.vocab = {}

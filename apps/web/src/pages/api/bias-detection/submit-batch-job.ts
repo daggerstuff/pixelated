@@ -3,7 +3,7 @@ import { JobQueue } from '../../../lib/ai/bias-detection/job-queue'
 import type { TherapeuticSession } from '../../../lib/ai/bias-detection/types'
 import type { BiasAnalysisResult } from '../../../lib/ai/bias-detection/types'
 
-const engine = new BiasDetectionEngine()
+new BiasDetectionEngine()
 const batchJobQueue = new JobQueue<TherapeuticSession[], BiasAnalysisResult>()
 
 export async function POST({

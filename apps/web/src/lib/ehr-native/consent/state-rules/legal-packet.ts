@@ -26,11 +26,7 @@ import type {
   StateChecklistItem,
 } from './checklist'
 import { US_STATE_CODE_LIST } from './schemas'
-import {
-  getAllSeeds,
-  getSeedForState,
-  SEED_JURISDICTION_COUNT,
-} from './seed-data'
+import { getSeedForState, SEED_JURISDICTION_COUNT } from './seed-data'
 import type { AttorneySignoff, SignoffStatus } from './signoff'
 import { attorneySignoffRepository } from './signoff-repository'
 

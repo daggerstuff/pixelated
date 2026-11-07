@@ -188,8 +188,6 @@ function stripComments(source) {
  */
 function extractExports(source, cleanSource) {
   const exports = [];
-  const lines = source.split("\n");
-  const cleanLines = cleanSource.split("\n");
 
   // Build a mapping from cleanLine -> realLine (in case we need line info)
   // Actually, we can compute line from the match index in source vs cleanSource.
@@ -290,7 +288,6 @@ function extractImports(cleanSource) {
   }
 
   // Dynamic imports: import('...') with member access like module.Name
-  const importMemberAccess = new Set();
   const dynamicImportRe = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
   const moduleMemberRe = /module\.([A-Za-z_$][A-Za-z0-9_$]*)/g;
 

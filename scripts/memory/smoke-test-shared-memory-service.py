@@ -285,8 +285,6 @@ def main() -> int:
         status, response = memory_repo.delete_document(document_id)
         if status not in (200, 204):
             return 1
-    else:
-        pass
 
     return 0
 

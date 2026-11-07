@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 
 import type { EHRExportOptions } from '@/lib/documentation/ehrIntegration'
 import { useDocumentation } from '@/lib/documentation/useDocumentation'

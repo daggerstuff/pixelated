@@ -728,8 +728,8 @@ async def simulation_websocket(  # noqa: PLR0912, PLR0915
                     },
                 )
 
-    except WebSocketDisconnect:
-        pass
+    except WebSocketDisconnect as exc:
+        logger.debug("websocket_disconnect", session_id=session_id, error=str(exc))
     except (RuntimeError, OSError) as exc:
         logger.error("websocket_error", session_id=session_id, error=str(exc))
         await manager.broadcast(

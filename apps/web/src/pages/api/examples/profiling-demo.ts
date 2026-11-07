@@ -47,7 +47,7 @@ export const GET = async (_context: unknown) => {
         error: isProd
           ? 'Internal server error'
           : error instanceof Error
-            ? String(error)
+            ? error.message
             : 'Unknown error',
       }),
       {

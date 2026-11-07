@@ -212,7 +212,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     return response;
   } catch (error: unknown) {
-    const msg = error instanceof Error ? error.message : String(error);
+    const msg = error instanceof Error ? error.message : 'Unknown error';
 
     if (
       msg.includes("parentMergeRunId") ||

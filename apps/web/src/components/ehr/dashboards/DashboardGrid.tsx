@@ -14,9 +14,7 @@ import {
   Save,
   RotateCcw,
   Download,
-  GripVertical,
   ChevronDown,
-  ChevronUp,
   X,
 } from 'lucide-react'
 import React, {
@@ -36,14 +34,12 @@ import type {
   DashboardLayout,
   WidgetDefinition,
   WidgetPosition,
-  WidgetSize,
 } from './types'
 import {
   DASHBOARD_LABELS,
   GRID_COLUMNS,
   WIDGET_REGISTRY,
   WIDGET_SIZE_SPANS,
-  canViewWidget,
   createDefaultLayout,
   getAccessibleWidgets,
 } from './types'

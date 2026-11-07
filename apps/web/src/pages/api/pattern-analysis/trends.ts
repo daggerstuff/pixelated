@@ -129,7 +129,7 @@ export const GET = async ({ request, cookies }) => {
         error: 'Internal Server Error',
         message:
           error instanceof Error
-            ? String(error)
+            ? error.message
             : 'An unexpected error occurred',
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },

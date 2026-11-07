@@ -68,8 +68,8 @@ def main() -> None:
                         record = json.loads(line)
                         if quality.passes_filter(record):
                             existing_records.append(record)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        logger.debug("Skipping unparsable dataset line: %s", e)
         logger.info("Loaded %d existing clean records into QualityFilter state.", len(existing_records))
 
     new_records: list[dict[str, Any]] = []
