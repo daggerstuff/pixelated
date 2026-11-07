@@ -2,7 +2,6 @@ import {
   Calendar as CalendarIcon,
   Clock,
   CloudOff,
-  Filter,
   Plus,
   RefreshCw,
   X,

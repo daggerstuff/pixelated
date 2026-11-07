@@ -7,7 +7,7 @@
  * interpretable explanations.
  *
  * Usage:
- *   ts-node mental-llama-analyze.ts --text "Sample text to analyze" --output-path ./results.json
+ *   ts-node mental-llama-analyze.ts --text "Sample text to analyze"
  */
 
 import { promises as fs } from 'fs'
@@ -16,7 +16,7 @@ import path from 'path'
 import { program } from 'commander'
 
 import { createMentalLLaMAFromEnv } from '../lib/ai/mental-llama'
-import { ALLOWED_DIRECTORIES, validatePath } from '../utils/path-security'
+import { ALLOWED_DIRECTORIES } from '../utils/path-security'
 
 // Define types for CLI options
 interface CliOptions {
@@ -25,7 +25,6 @@ interface CliOptions {
   file?: string
   crisisText?: boolean
   generalText?: boolean
-  outputPath: string
   pythonPath: string
   evaluateExplanation?: boolean
   pythonBridge?: boolean
@@ -47,11 +46,6 @@ program
   .option(
     '--general-text',
     'Use a predefined text sample for general mental health assessment testing.',
-  )
-  .option(
-    '-o, --output-path <path>',
-    'Output path for results',
-    './mental-llama-results.json',
   )
   .option(
     '-e, --evaluate-explanation',
@@ -78,6 +72,16 @@ program
   .parse(process.argv)
 
 const options = program.opts() as unknown as CliOptions
+
+const RESULTS_DIRECTORY = path.join(
+  ALLOWED_DIRECTORIES.PROJECT_ROOT,
+  'mental-llama-results',
+)
+const RUN_TIMESTAMP = new Date().toISOString().replace(/[:.]/g, '-')
+const OUTPUT_PATH = path.join(
+  RESULTS_DIRECTORY,
+  `analysis-${RUN_TIMESTAMP}.json`,
+)
 
 async function main() {
   console.log('🧠 MentalLLaMA Analysis')
@@ -292,16 +296,20 @@ async function main() {
       ).qualityMetrics = qualityMetricsResults
     }
 
-    // Save results
-    console.log(`\nSaving results to ${options.outputPath}...`)
-    const outputPath = validatePath(
-      options.outputPath,
-      ALLOWED_DIRECTORIES.PROJECT_ROOT,
-      { allowAbsolutePath: true },
+    console.log(`\nSaving run manifest to ${OUTPUT_PATH}...`)
+    await fs.mkdir(RESULTS_DIRECTORY, { recursive: true })
+    await fs.writeFile(
+      OUTPUT_PATH,
+      JSON.stringify(
+        {
+          generatedAt: new Date().toISOString(),
+          testType,
+          textLength: textToAnalyze.length,
+        },
+        null,
+        2,
+      ),
     )
-    const outputDir = path.dirname(outputPath)
-    await fs.mkdir(outputDir, { recursive: true })
-    await fs.writeFile(outputPath, JSON.stringify(analysisResult, null, 2))
 
     console.log('✅ Analysis complete!')
   } catch (error: unknown) {

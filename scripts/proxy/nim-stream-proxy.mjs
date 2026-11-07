@@ -53,7 +53,7 @@ const server = http.createServer(async (req, res) => {
   // Check if client requested streaming
   const clientOriginalStream = body.stream
   const clientWantsStream = clientOriginalStream === true
-  console.log(`[${new Date().toISOString()}] Client stream=${clientOriginalStream} -> proxy will ${clientWantsStream ? 'emit SSE' : 'pass JSON'}`)
+  console.log(`[${new Date().toISOString()}] Client stream=${JSON.stringify(clientOriginalStream)} -> proxy will ${clientWantsStream ? 'emit SSE' : 'pass JSON'}`)
 
       // Force non-streaming request to NIM — strip stream_options too
       body.stream = false
@@ -77,7 +77,7 @@ const server = http.createServer(async (req, res) => {
   delete options.headers['accept']
   options.headers['accept'] = 'application/json'
 
-  console.log(`[${new Date().toISOString()}] ${String(req.method).replace(/[\n\r]/g, ' ')} ${NIM_HOST}${NIM_BASE_PATH}${String(upstreamPath).replace(/[\n\r]/g, ' ')} model=${String(body.model || '?').replace(/[\n\r]/g, ' ')} stream=${String(body.stream).replace(/[\n\r]/g, ' ')} tools=${body.tools ? body.tools.length : 'none'}`)
+  console.log(`[${new Date().toISOString()}] ${JSON.stringify(String(req.method))} ${NIM_HOST}${NIM_BASE_PATH}${JSON.stringify(String(upstreamPath))} model=${JSON.stringify(String(body.model || '?'))} stream=${JSON.stringify(String(body.stream))} tools=${JSON.stringify(body.tools ? body.tools.length : 'none')}`)
 
   const upstreamReq = https.request(options, (upstreamRes) => {
     const chunks = []
@@ -108,7 +108,7 @@ const server = http.createServer(async (req, res) => {
         const msg = ch.message || {}
         const tc = msg.tool_calls || []
         const tcSummary = tc.length > 0 ? tc.map(t => `${t.function?.name || '?'}(${(t.function?.arguments||'').slice(0,80)})`).join('; ') : 'none'
-        console.log(`[${new Date().toISOString()}] NIM response: finish=${ch.finish_reason} content_len=${(msg.content||'').length} tool_calls_count=${tc.length} tool_calls=[${tcSummary}] reasoning_len=${(msg.reasoning_content||'').length}`)
+        console.log(`[${new Date().toISOString()}] NIM response: finish=${JSON.stringify(ch.finish_reason)} content_len=${JSON.stringify((msg.content||'').length)} tool_calls_count=${JSON.stringify(tc.length)} tool_calls=[${JSON.stringify(tcSummary)}] reasoning_len=${JSON.stringify((msg.reasoning_content||'').length)}`)
         // Log the full message when content and tool_calls are both empty
         if ((msg.content||'').length === 0 && tc.length === 0) {
           console.log(`[${new Date().toISOString()}] EMPTY RESPONSE - full message: ${JSON.stringify(msg).slice(0,500)}`)
@@ -243,7 +243,7 @@ const server = http.createServer(async (req, res) => {
     })
 
     upstreamRes.on('error', (err) => {
-      console.error(`[${new Date().toISOString()}] upstream error: ${err}`)
+      console.error(`[${new Date().toISOString()}] upstream error: ${JSON.stringify(String(err))}`)
       if (!res.headersSent) {
         res.writeHead(502)
         res.end(JSON.stringify({ error: 'upstream error', detail: String(err) }))
@@ -252,7 +252,7 @@ const server = http.createServer(async (req, res) => {
   })
 
   upstreamReq.on('error', (err) => {
-    console.error(`[${new Date().toISOString()}] request error: ${String(err).replace(/[\n\r]/g, ' ')}`)
+    console.error(`[${new Date().toISOString()}] request error: ${JSON.stringify(String(err))}`)
     if (!res.headersSent) {
       res.writeHead(502)
       res.end(JSON.stringify({ error: 'upstream error', detail: String(err) }))

@@ -125,7 +125,6 @@ const DEFAULT_DIMENSIONS: (keyof ParticipantDemographics)[] = [
 ]
 
 const DEFAULT_VARIANCE_THRESHOLD = 2.0 // 2 percentage points
-const DEFAULT_MIN_SAMPLE_SIZE = 10
 const MAX_SAMPLE_SIZE = 500
 
 /**

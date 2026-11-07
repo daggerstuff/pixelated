@@ -21,7 +21,10 @@ paths:
 paths-ignore:
   - '**/node_modules'
   - '**/dist'
+  - '**/dist/**'
+  - 'dist/**'
   - '**/build'
+  - '**/build/**'
   - '**/.next'
   - '**/.astro'
   - '**/test'

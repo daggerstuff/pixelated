@@ -1,3 +1,5 @@
+import { secureRandomElement } from '../../../lib/security/random'
+
 export const prerender = false
 
 export interface GenerateScenarioRequest {
@@ -258,8 +260,7 @@ function selectClientProfile(
   const profiles =
     CLIENT_PROFILES[difficulty as keyof typeof CLIENT_PROFILES] ||
     CLIENT_PROFILES.beginner
-  const baseProfile =
-    profiles[crypto.getRandomValues(new Uint32Array(1))[0] % profiles.length]
+  const baseProfile = secureRandomElement(profiles) ?? profiles[0]
 
   return {
     ...baseProfile,

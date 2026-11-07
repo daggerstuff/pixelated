@@ -167,9 +167,9 @@ async function testEndpoints() {
         )
         console.log(`✅ Status: ${healthResult.statusCode}`)
         console.log(`⏱️  Response time: ${healthResult.responseTime}ms`)
-        console.log(`🎯 Health status: ${healthResult.data.status}`)
+        console.log(`🎯 Health status: ${JSON.stringify(String(healthResult.data.status))}`)
         console.log(
-          `💾 Memory usage: ${healthResult.data.memory?.used || 'N/A'}MB\n`,
+          `💾 Memory usage: ${JSON.stringify(healthResult.data.memory?.used || 'N/A')}MB\n`,
         )
 
         // Test /api/health/simple
@@ -179,7 +179,7 @@ async function testEndpoints() {
         )
         console.log(`✅ Status: ${simpleResult.statusCode}`)
         console.log(`⏱️  Response time: ${simpleResult.responseTime}ms`)
-        console.log(`🎯 Health status: ${simpleResult.data.status}\n`)
+        console.log(`🎯 Health status: ${JSON.stringify(String(simpleResult.data.status))}\n`)
 
         // Performance comparison
         console.log('🏁 Performance Comparison:')
@@ -249,7 +249,7 @@ async function testEndpoints() {
           if (error.message.includes('timeout')) {
             console.log('✅ Timeout handling works correctly')
           } else {
-            console.log(`✅ Error handling works: ${String(error.message).replace(/[\n\r]/g, ' ')}`)
+            console.log(`✅ Error handling works: ${JSON.stringify(String(error.message))}`)
           }
         }
 
@@ -266,7 +266,7 @@ async function testEndpoints() {
 
         resolve()
       } catch (error) {
-        console.error('❌ Test failed:', String(error.message).replace(/[\n\r]/g, ' '))
+        console.error('❌ Test failed:', JSON.stringify(String(error.message)))
         reject(error)
       } finally {
         server.close()
@@ -279,6 +279,6 @@ async function testEndpoints() {
 testEndpoints()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error('💥 Test suite failed:', String(error).replace(/[\n\r]/g, ' '))
+    console.error('💥 Test suite failed:', JSON.stringify(String(error)))
     process.exit(1)
   })

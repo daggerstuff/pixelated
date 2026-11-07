@@ -394,7 +394,7 @@ export class AnalyticsService {
         } else {
           result[key] = value
         }
-      } else if (value !== null && typeof value === 'object') {
+      } else if (typeof value === 'object') {
         // Recursively anonymize nested objects
         result[key] = Array.isArray(value)
           ? value.map((item) =>

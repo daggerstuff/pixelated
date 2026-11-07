@@ -10,13 +10,23 @@ const isBuildTime =
     (process.env['SYSTEM_TEAMFOUNDATIONCOLLECTIONURI'] ??
       process.env['BUILD_BUILDID']))
 
+interface AzureMonitoringConfig {
+  connectionString?: string
+  instrumentationKey?: string
+  isConfigured: () => boolean
+}
+
+interface AzureConfigShape {
+  monitoring?: AzureMonitoringConfig
+}
+
 // Only import Azure config if not in build environment
-let azureConfig: unknown = null
+let azureConfig: AzureConfigShape | null = null
 if (!isBuildTime) {
   void (async () => {
     try {
       const module = await import('@/config/azure.config')
-      azureConfig = module.azureConfig
+      azureConfig = (module.azureConfig as AzureConfigShape | null) ?? null
     } catch (error: unknown) {
       logger.warn('Failed to load Azure configuration', {
         error: error instanceof Error ? String(error) : String(error),
@@ -98,14 +108,10 @@ export class AzureInsightsTelemetry {
       azureConfig !== null &&
       typeof azureConfig === 'object' &&
       'monitoring' in azureConfig &&
-      typeof (azureConfig as { monitoring?: unknown }).monitoring === 'object'
+      typeof azureConfig.monitoring === 'object'
     ) {
       const { monitoring } = azureConfig as {
-        monitoring: {
-          connectionString?: string
-          instrumentationKey?: string
-          isConfigured: () => boolean
-        }
+        monitoring: AzureMonitoringConfig
       }
 
       this.connectionString = monitoring.connectionString

@@ -134,15 +134,41 @@ export class ContactService {
   }
 
   private htmlToText(html: string): string {
-    let text = html
-    let previous: string
-    do {
-      previous = text
-      text = text
-        .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, '')
-        .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, '')
-        .replace(/<[^>]*>/g, '')
-    } while (text !== previous)
+    let text = ''
+    let index = 0
+    const lowerHtml = html.toLowerCase()
+
+    while (index < html.length) {
+      const tagStart = html.indexOf('<', index)
+      if (tagStart === -1) {
+        text += html.slice(index)
+        break
+      }
+
+      text += html.slice(index, tagStart)
+
+      const tagEnd = html.indexOf('>', tagStart + 1)
+      if (tagEnd === -1) {
+        text += html.slice(tagStart)
+        break
+      }
+
+      const tagName = lowerHtml
+        .slice(tagStart + 1, tagEnd)
+        .trim()
+        .split(/\s+/)[0]
+      index = tagEnd + 1
+
+      if (tagName === 'script' || tagName === 'style') {
+        const closingTag = `</${tagName}`
+        const closingStart = lowerHtml.indexOf(closingTag, index)
+        if (closingStart === -1) {
+          break
+        }
+        const closingEnd = html.indexOf('>', closingStart + closingTag.length)
+        index = closingEnd === -1 ? html.length : closingEnd + 1
+      }
+    }
 
     return text
       .replace(/\s+/g, ' ')

@@ -13,7 +13,7 @@ export function handleApiError(error: unknown): Response {
   return new Response(
     JSON.stringify({
       error: 'Internal Server Error',
-      message: errorMessage,
+      message: 'An unexpected error occurred',
     }),
     {
       status: 500,

@@ -44,28 +44,26 @@ const SECURITY_HEADERS = {
   'X-DNS-Prefetch-Control': 'off',
 }
 
+const HTML_ESCAPES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+}
+
 function sanitizeString(input: unknown): string {
   if (typeof input !== 'string') {
     return ''
   }
 
-  let sanitized = Array.from(input)
+  return Array.from(input)
     .filter((char) => {
       const code = char.charCodeAt(0)
       return code >= 0x20 && code !== 0x7f
     })
+    .map((char) => HTML_ESCAPES[char] ?? char)
     .join('')
-  let previous: string
-  do {
-    previous = sanitized
-    sanitized = sanitized
-      .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, '')
-      .replace(/<[^>]*>/g, '')
-  } while (sanitized !== previous)
-
-  return sanitized
-    .replace(/javascript\s*:/gi, '')
-    .replace(/on\w+\s*=/gi, '')
     .trim()
     .slice(0, 10000) // Limit length
 }

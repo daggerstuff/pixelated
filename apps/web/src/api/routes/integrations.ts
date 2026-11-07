@@ -108,6 +108,33 @@ function asString(value: unknown): string {
   return typeof value === 'string' ? value : ''
 }
 
+const DEFAULT_RETURN_ORIGIN = 'https://pixelatedempathy.com'
+
+function resolveSafeReturnUrl(value: string | undefined): string | undefined {
+  if (!value) return undefined
+
+  let parsed: URL
+  try {
+    parsed = new URL(value, DEFAULT_RETURN_ORIGIN)
+  } catch {
+    return undefined
+  }
+
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    return undefined
+  }
+
+  const hostname = parsed.hostname
+  if (
+    hostname !== 'pixelatedempathy.com' &&
+    hostname !== 'www.pixelatedempathy.com'
+  ) {
+    return undefined
+  }
+
+  return `${DEFAULT_RETURN_ORIGIN}${parsed.pathname}${parsed.search}${parsed.hash}`
+}
+
 router.get(
   '/status/:tenantId',
   async (req: Request, res: Response): Promise<Response> => {
@@ -290,14 +317,7 @@ router.get(
         },
       )
 
-      const returnUrl = stateData.returnUrl
-      const safeReturnUrl =
-        returnUrl &&
-        returnUrl.startsWith('/') &&
-        !returnUrl.startsWith('//') &&
-        !returnUrl.includes('\\')
-          ? returnUrl
-          : undefined
+      const safeReturnUrl = resolveSafeReturnUrl(stateData.returnUrl)
       if (safeReturnUrl) {
         res.redirect(safeReturnUrl)
         return res
