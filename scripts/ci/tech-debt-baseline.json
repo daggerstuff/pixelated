@@ -14,7 +14,7 @@
     "agents/session-agent/tests/process_message.test.ts:42:TODO",
     "apps/web/src/lib/ai/services/__tests__/PatientResponseService.test.ts:314:TODO",
     "apps/web/src/lib/ai/services/__tests__/PatientResponseService.test.ts:315:TODO",
-    "apps/web/src/lib/audit.ts:592:TODO",
+    "apps/web/src/lib/audit.ts:568:TODO",
     "apps/web/src/lib/security/phiDetection.ts:7:TODO",
     "apps/web/src/lib/services/mongodb.dao.ts:64:TODO",
     "apps/web/src/lib/services/mongodb.dao.ts:151:TODO",

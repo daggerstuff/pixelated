@@ -222,7 +222,7 @@ let config: AuditServiceConfig = { ...DEFAULT_CONFIG }
 /**
  * Initialize the audit service with custom configuration
  */
-function initializeAuditService(
+export function initializeAuditService(
   customConfig?: Partial<AuditServiceConfig>,
 ): void {
   config = { ...DEFAULT_CONFIG, ...customConfig }
@@ -601,6 +601,30 @@ export async function createResourceAuditLog(
     },
     notes: 'Log created from createResourceAuditLog placeholder function.',
   })
+}
+
+/**
+ * Clear audit logs from local storage
+ */
+export function clearAuditLogs() {
+  if (!config.localStorageEnabled) {
+    return
+  }
+
+  try {
+    localStorage.removeItem('hipaa-audit-logs')
+    logger.info('Audit logs cleared from local storage')
+  } catch (error: unknown) {
+    logger.error('Failed to clear audit logs', normalizeError(error))
+  }
+}
+
+/**
+ * Export audit logs as JSON string
+ */
+export function exportAuditLogs(): string {
+  const logs = getAuditLogs()
+  return JSON.stringify(logs, null, 2)
 }
 
 // Auto-initialize the service

@@ -206,6 +206,6 @@ describe('GET /api/v1/health', () => {
 
     expect(response.status).toBe(503)
     expect(data.status).toBe('unhealthy')
-    expect(data.error).toBe('Error: Health monitor failed')
+    expect(data.error).toBe('Health monitor failed')
   })
 })

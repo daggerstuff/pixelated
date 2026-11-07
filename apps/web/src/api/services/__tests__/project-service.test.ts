@@ -385,7 +385,7 @@ describe('Project Service', () => {
 
       expect(MockModel.find).toHaveBeenCalledWith(
         expect.objectContaining({
-          category: 'enterprise',
+          category: { $eq: 'enterprise' },
         }),
       )
     })
@@ -406,7 +406,7 @@ describe('Project Service', () => {
 
       expect(MockModel.find).toHaveBeenCalledWith(
         expect.objectContaining({
-          status: 'active',
+          status: { $eq: 'active' },
         }),
       )
     })
