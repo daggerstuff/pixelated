@@ -58,17 +58,17 @@ function allowedScopesFor(operation: DeveloperScope): Set<string> {
 // Auth + caller resolution
 // ---------------------------------------------------------------------------
 
-export interface DeveloperAuthFailure {
+interface DeveloperAuthFailure {
   ok: false
   response: Response
 }
 
-export interface DeveloperAuthSuccess {
+interface DeveloperAuthSuccess {
   ok: true
   caller: AuthenticatedMemoryCaller
 }
 
-export type DeveloperAuthResult = DeveloperAuthSuccess | DeveloperAuthFailure
+type DeveloperAuthResult = DeveloperAuthSuccess | DeveloperAuthFailure
 
 /**
  * Resolve a developer caller from an API key.
@@ -78,7 +78,7 @@ export type DeveloperAuthResult = DeveloperAuthSuccess | DeveloperAuthFailure
  * context (account/workspace) can be looked up, it is attached so the memory
  * gateway enforces the same isolation as product-session callers.
  */
-export async function requireDeveloperMemoryCaller(
+async function requireDeveloperMemoryCaller(
   request: Request,
   operation: DeveloperScope,
 ): Promise<DeveloperAuthResult> {

@@ -150,7 +150,7 @@ export enum AuditEventStatus {
 /**
  * Audit details type for storing structured information about events
  */
-export type AuditDetailValue =
+type AuditDetailValue =
   | string
   | number
   | boolean
@@ -158,10 +158,10 @@ export type AuditDetailValue =
   | undefined
   | AuditDetailObject
   | AuditDetailArray
-export interface AuditDetailObject {
+interface AuditDetailObject {
   [key: string]: AuditDetailValue
 }
-export type AuditDetailArray = AuditDetailValue[]
+type AuditDetailArray = AuditDetailValue[]
 export type AuditDetails = Record<string, AuditDetailValue>
 
 // Audit log entry interface
@@ -222,7 +222,7 @@ let config: AuditServiceConfig = { ...DEFAULT_CONFIG }
 /**
  * Initialize the audit service with custom configuration
  */
-export function initializeAuditService(
+function initializeAuditService(
   customConfig?: Partial<AuditServiceConfig>,
 ): void {
   config = { ...DEFAULT_CONFIG, ...customConfig }
@@ -542,30 +542,6 @@ export function getAuditLogs(): AuditLogEntry[] {
     logger.error('Failed to retrieve audit logs', normalizeError(error))
     return []
   }
-}
-
-/**
- * Clear all audit logs from local storage
- */
-export function clearAuditLogs() {
-  if (!config.localStorageEnabled) {
-    return
-  }
-
-  try {
-    localStorage.removeItem('hipaa-audit-logs')
-    logger.info('Audit logs cleared from local storage')
-  } catch (error: unknown) {
-    logger.error('Failed to clear audit logs', normalizeError(error))
-  }
-}
-
-/**
- * Export audit logs as JSON string
- */
-export function exportAuditLogs(): string {
-  const logs = getAuditLogs()
-  return JSON.stringify(logs, null, 2)
 }
 
 /**

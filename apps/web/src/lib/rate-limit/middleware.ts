@@ -1,10 +1,5 @@
-import { getLogger } from '../logging/logger'
 import { redis } from '../redis'
-import { getRateLimitService } from './RateLimitService'
-import { API_TIERS, inferTierFromRateLimit } from './types'
 import type { RateLimitResult } from './types'
-
-const logger = getLogger('RateLimitMiddleware')
 
 /**
  * Rate limit headers to set on responses.
@@ -93,33 +88,4 @@ export function createRateLimitResponse(result: RateLimitResult): Response {
       },
     },
   )
-}
-
-/**
- * Rate limit check for an API key.
- * Returns null if allowed, or a 429 Response if blocked.
- */
-export async function checkApiKeyRateLimit(
-  apiKeyId: string,
-  rateLimitValue: number,
-): Promise<
-  | { allowed: true; result: RateLimitResult }
-  | { allowed: false; response: Response }
-> {
-  const tier = API_TIERS[inferTierFromRateLimit(rateLimitValue)]
-  const service = getRateLimitService()
-  const result = await service.check(apiKeyId, tier)
-
-  if (!result.allowed) {
-    logger.warn('Rate limit exceeded', {
-      apiKeyId,
-      tier: tier.name,
-      rateLimitAllowed: result.rateLimit.allowed,
-      dailyQuotaAllowed: result.dailyQuota.allowed,
-      monthlyQuotaAllowed: result.monthlyQuota.allowed,
-    })
-    return { allowed: false, response: createRateLimitResponse(result) }
-  }
-
-  return { allowed: true, result }
 }

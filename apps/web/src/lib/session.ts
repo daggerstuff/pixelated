@@ -109,11 +109,3 @@ function generateFallbackSecret(): string {
 }
 
 let fallbackSecret: string | undefined
-
-export interface SessionData {
-  userId?: string
-  createdAt?: string
-  lastActivity?: string
-}
-
-export default createSessionMiddleware

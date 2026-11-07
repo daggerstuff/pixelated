@@ -8,8 +8,10 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { validateHIPAAEnvironment, HIPAA_SECURITY_CONFIG } from './hipaa-config'
 import { hipaaMonitoring } from './hipaa-monitoring'
 import type { SecurityAlert, ComplianceReport } from './hipaa-monitoring'
-import hipaaKeyRotationService from './key-rotation'
+import { KeyRotationService } from './key-rotation'
 import type { AuditEvent, SecurityMetrics } from './key-rotation'
+
+const hipaaKeyRotationService = KeyRotationService.getInstance()
 
 const logger = createBuildSafeLogger('hipaa-integration')
 

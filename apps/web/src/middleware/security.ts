@@ -44,7 +44,7 @@ const SECURITY_HEADERS = {
   'X-DNS-Prefetch-Control': 'off',
 }
 
-export function sanitizeString(input: unknown): string {
+function sanitizeString(input: unknown): string {
   if (typeof input !== 'string') {
     return ''
   }
@@ -107,11 +107,11 @@ export function validatePassword(password: string): {
   }
 }
 
-export function validateBiasScore(score: number): boolean {
+function validateBiasScore(score: number): boolean {
   return typeof score === 'number' && !isNaN(score) && score >= 0 && score <= 1
 }
 
-export function validateSessionId(sessionId: string): boolean {
+function validateSessionId(sessionId: string): boolean {
   const uuidRegex =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
   return uuidRegex.test(sessionId)
@@ -125,7 +125,7 @@ export const InputValidator = {
   validateSessionId,
 }
 
-export const RATE_LIMITS = {
+const RATE_LIMITS = {
   windowMs: 60 * 1000, // 1 minute
   maxRequests: 100, // limit each IP to 100 requests per windowMs
   keyGenerator: (request: Request): string => {
@@ -245,99 +245,3 @@ export async function securityMiddleware(
 
   return null
 }
-
-export function applySecurityHeaders(
-  response: Response,
-  additionalHeaders?: Record<string, string>,
-): Response {
-  const headers = new Headers(response.headers)
-
-  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-    if (value !== undefined) {
-      headers.set(key, value)
-    }
-  })
-
-  if (additionalHeaders) {
-    Object.entries(additionalHeaders).forEach(([key, value]) => {
-      headers.set(key, value)
-    })
-  }
-
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  })
-}
-
-export function validatePHIContent(content: string): {
-  compliant: boolean
-  issues: string[]
-} {
-  const issues: string[] = []
-
-  // Check for sensitive information patterns
-  const ssnPattern = /\b\d{3}-?\d{2}-?\d{4}\b/g
-  const phonePattern = /\b\d{3}-?\d{3}-?\d{4}\b/g
-  const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g
-  const addressPattern = /\b\d+\s+[A-Za-z0-9\s,.-]+\b/g
-
-  if (ssnPattern.test(content)) {
-    issues.push('Content contains Social Security Numbers')
-  }
-
-  if (phonePattern.test(content)) {
-    issues.push('Content contains phone numbers')
-  }
-
-  if (emailPattern.test(content)) {
-    issues.push('Content contains email addresses')
-  }
-
-  if (addressPattern.test(content)) {
-    issues.push('Content may contain physical addresses')
-  }
-
-  return {
-    compliant: issues.length === 0,
-    issues,
-  }
-}
-
-export function sanitizeForAudit(content: string): string {
-  return content
-    .replace(/\b\d{3}-?\d{2}-?\d{4}\b/g, '[SSN_MASKED]')
-    .replace(/\b\d{3}-?\d{3}-?\d{4}\b/g, '[PHONE_MASKED]')
-    .replace(
-      /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
-      '[EMAIL_MASKED]',
-    )
-    .replace(/\b\d+\s+[A-Za-z0-9\s,.-]+\b/g, '[ADDRESS_MASKED]')
-}
-
-export function generateAuditLog(
-  action: string,
-  userId: string,
-  resource: string,
-  details: unknown,
-): Record<string, unknown> {
-  return {
-    timestamp: new Date().toISOString(),
-    action,
-    userId,
-    resource,
-    details: sanitizeForAudit(JSON.stringify(details)),
-    ipAddress: 'masked', // Would be populated by middleware
-    userAgent: 'masked', // Would be populated by middleware
-    sessionId: 'masked', // Would be populated by middleware
-  }
-}
-
-export const HIPAACompliance = {
-  validatePHIContent,
-  sanitizeForAudit,
-  generateAuditLog,
-}
-
-export { SECURITY_HEADERS }

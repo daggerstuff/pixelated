@@ -15,14 +15,6 @@ export interface CompletionServiceConfig {
   providerBaseUrl?: string
 }
 
-export interface CompletionRequest {
-  messages: Array<{ role?: string; content?: string; name?: string }>
-  model?: string
-  temperature?: number
-  max_tokens?: number
-  stream?: boolean
-}
-
 export interface CompletionResult {
   model: string
   content: string

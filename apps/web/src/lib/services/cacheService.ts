@@ -1,5 +1,3 @@
-import { Buffer } from 'buffer'
-
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getCacheMetricsService } from './cache-metrics'
 import type { RedisClient } from './types/redis'
@@ -16,7 +14,7 @@ interface CacheEntry<T> {
  * Cache Service Interface
  * Provides methods for caching data with TTL support
  */
-export interface CacheService {
+interface CacheService {
   /**
    * Get a value from the cache
    * @param key Cache key
@@ -64,7 +62,7 @@ export interface CacheClient extends CacheService {
  * Enhanced Cache Service that includes keys method
  * This is a compatibility layer to provide CacheClient functionality
  */
-export class EnhancedCacheService implements CacheClient {
+class EnhancedCacheService implements CacheClient {
   private readonly baseService: CacheService
 
   constructor(service: CacheService) {
@@ -407,41 +405,5 @@ export function getCacheService(): CacheClient {
     return new EnhancedCacheService(vercelKVCacheService)
   } else {
     return new EnhancedCacheService(memoryCacheService)
-  }
-}
-
-/**
- * Higher-order function to cache the results of any async function
- *
- * @param fn Function to cache results for
- * @param keyPrefix Prefix for cache keys
- * @param ttl TTL in seconds
- * @returns Cached version of the function
- */
-export function withCache<T, Args extends unknown[]>(
-  fn: (...args: Args) => Promise<T>,
-  keyPrefix: string,
-  ttl: number = 300,
-): (...args: Args) => Promise<T> {
-  const cacheService = getCacheService()
-
-  return async (...args: Args): Promise<T> => {
-    // Generate cache key from function arguments
-    const argsHash = JSON.stringify(args)
-    const key = `${keyPrefix}:${Buffer.from(argsHash).toString('base64')}`
-
-    // Try to get from cache
-    const cached = await cacheService.get<T>(key)
-    if (cached !== null) {
-      return cached
-    }
-
-    // Call original function
-    const result = await fn(...args)
-
-    // Cache the result
-    await cacheService.set(key, JSON.stringify(result), ttl)
-
-    return result
   }
 }

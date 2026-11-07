@@ -23,7 +23,7 @@ export interface EmailMessage {
   attachments?: EmailAttachment[]
 }
 
-export interface EmailAttachment {
+interface EmailAttachment {
   filename: string
   content: string | Buffer
   contentType: string
@@ -326,7 +326,7 @@ let emailServiceInstance: EmailService | null = null
 /**
  * Get the default email service instance
  */
-export function getEmailService(): EmailService {
+function getEmailService(): EmailService {
   if (!emailServiceInstance) {
     const config: EmailConfig = {
       provider: 'smtp',
@@ -343,33 +343,6 @@ export function getEmailService(): EmailService {
   }
 
   return emailServiceInstance
-}
-
-/**
- * Send a breach notification email
- */
-export async function sendBreachNotification(
-  recipients: string[],
-  breachDetails: Parameters<EmailService['sendBreachNotification']>[1],
-): Promise<EmailResult> {
-  const emailService = getEmailService()
-  return emailService.sendBreachNotification(recipients, breachDetails)
-}
-
-/**
- * Send patient deletion confirmation
- */
-export async function sendPatientDeletionConfirmation(
-  patientEmail: string,
-  deletionDetails: Parameters<
-    EmailService['sendPatientDeletionConfirmation']
-  >[1],
-): Promise<EmailResult> {
-  const emailService = getEmailService()
-  return emailService.sendPatientDeletionConfirmation(
-    patientEmail,
-    deletionDetails,
-  )
 }
 
 /**

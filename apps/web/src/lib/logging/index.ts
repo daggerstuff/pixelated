@@ -21,11 +21,11 @@ export type LogMetadataValue =
   | LogMetadataObject
   | LogMetadataArray
 
-export interface LogMetadataObject {
+interface LogMetadataObject {
   [key: string]: LogMetadataValue
 }
 
-export type LogMetadataArray = LogMetadataValue[]
+type LogMetadataArray = LogMetadataValue[]
 export type LogMetadata = Record<string, LogMetadataValue>
 
 // Default PHI/PII patterns -  example, to be expanded

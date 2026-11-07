@@ -26,7 +26,7 @@ export enum AnalyticsEventType {
 }
 
 // Define value types that can be used in analytics data
-export type AnalyticsValue =
+type AnalyticsValue =
   | string
   | number
   | boolean
@@ -34,16 +34,16 @@ export type AnalyticsValue =
   | undefined
   | AnalyticsObject
   | AnalyticsArray
-export interface AnalyticsObject {
+interface AnalyticsObject {
   [key: string]: AnalyticsValue
 }
-export type AnalyticsArray = AnalyticsValue[]
+type AnalyticsArray = AnalyticsValue[]
 
 // Analytics data type
 export type AnalyticsData = Record<string, AnalyticsValue>
 
 // Analytics metadata type
-export interface AnalyticsMetadata {
+interface AnalyticsMetadata {
   userAgent: string
   language: string
   platform: string
@@ -693,6 +693,3 @@ export class AnalyticsService {
     return this.flush()
   }
 }
-
-// Export an instance
-export default AnalyticsService.getInstance()

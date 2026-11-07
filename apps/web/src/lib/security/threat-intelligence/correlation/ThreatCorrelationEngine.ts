@@ -51,7 +51,7 @@ export interface CorrelationPattern {
   trend: 'increasing' | 'decreasing' | 'stable'
 }
 
-export interface SimilarityResult {
+interface SimilarityResult {
   threatId: string
   similarityScore: number
   matchingIndicators: string[]

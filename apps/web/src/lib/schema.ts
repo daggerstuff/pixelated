@@ -183,7 +183,6 @@ export const projectsSchema = z.object({
 })
 
 export type ProjectSchema = z.infer<typeof projectSchema>
-export type ProjectGroupsSchema = z.infer<typeof projectGroupsSchema>
 export type ProjectsSchema = z.infer<typeof projectsSchema>
 
 /* Streams */

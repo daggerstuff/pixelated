@@ -38,33 +38,16 @@ const persistedOperationsStore = new Map<string, string>()
  * Register a persisted operation at module load time.
  * Used by the build step or manual registration.
  */
-export function registerPersistedOperation(
-  sha256Hash: string,
-  query: string,
-): void {
+function registerPersistedOperation(sha256Hash: string, query: string): void {
   persistedOperationsStore.set(sha256Hash, query)
   logger.debug('Registered persisted operation', { hash: sha256Hash })
-}
-
-/**
- * Bulk load persisted operations from a record.
- */
-export function loadPersistedOperations(
-  operations: Record<string, string>,
-): void {
-  for (const [hash, query] of Object.entries(operations)) {
-    persistedOperationsStore.set(hash, query)
-  }
-  logger.info('Loaded persisted operations', {
-    count: persistedOperationsStore.size,
-  })
 }
 
 /**
  * Get a persisted operation by its SHA-256 hash.
  * Returns undefined if not found.
  */
-export function getPersistedOperation(sha256Hash: string): string | undefined {
+function getPersistedOperation(sha256Hash: string): string | undefined {
   return persistedOperationsStore.get(sha256Hash)
 }
 

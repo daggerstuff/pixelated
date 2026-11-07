@@ -1,17 +1,4 @@
-import type { CollectionEntry } from 'astro:content'
-
 import type { GitHubView } from '@/types'
-
-// Define the structure for the highlights collection entry data
-export type HighlightEntry = CollectionEntry<'highlights'>
-
-// The actual schema used in the project (from config.ts)
-export interface HighlightData {
-  projects?: Record<
-    string,
-    { name: string; link: string; desc: string; icon: string }[]
-  >
-}
 
 export const VERSION_COLOR = {
   major: 'bg-rose:15 text-rose-7 dark:text-rose-3',
@@ -45,18 +32,6 @@ export function matchLogo(
  */
 export function extractPackageName(tagName: string): string {
   const match = tagName.match(/(^@?[^@]+)@/)
-  if (match) {
-    return match[1] ?? tagName
-  }
-  return tagName
-}
-
-/**
- * Extracts the version number from a `tagName`.
- */
-export function extractVersionNum(tagName: string): string {
-  // Use a more specific pattern to avoid backtracking
-  const match = tagName.match(/^\D*(\d+\.\d+\.\d+(?:-[a-z0-9.]+)?)/i)
   if (match) {
     return match[1] ?? tagName
   }
@@ -102,57 +77,6 @@ export function processVersion(
     .join('')
 
   return [versionType, nonHighlightedPart, highlightedPart]
-}
-
-/**
- * Extracts the ID from a string.
- */
-export function extractId(input: string): number | null {
-  const match = input.match(/\d+/g)
-  if (match && match.length > 0) {
-    return parseInt(match[0], 10)
-  }
-  return null
-}
-
-/**
- * Validates if a string is a valid ID.
- */
-export function validateId(id: string): boolean {
-  return /^\d+$/.test(id)
-}
-
-export interface ExampleCardData {
-  title: string
-  description?: string
-  image?: string
-  link?: string
-  tags?: string[]
-  date?: Date
-  author?: string
-}
-
-export function getCardData(): ExampleCardData[] {
-  return [
-    {
-      title: 'Example Card 1',
-      description: 'This is an example card',
-      image: '/images/example1.jpg',
-      link: '/example1',
-      tags: ['example', 'card'],
-      date: new Date(),
-      author: 'Example Author',
-    },
-    {
-      title: 'Example Card 2',
-      description: 'This is another example card',
-      image: '/images/example2.jpg',
-      link: '/example2',
-      tags: ['example', 'card'],
-      date: new Date(),
-      author: 'Example Author',
-    },
-  ]
 }
 
 /**

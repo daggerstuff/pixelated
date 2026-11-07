@@ -168,7 +168,3 @@ function shouldAuditLog(req: Request): boolean {
 function createRequestId(): string {
   return `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 }
-
-export function getRequestId(req: Request): string {
-  return (req as LoggedRequest).requestId ?? 'unknown'
-}

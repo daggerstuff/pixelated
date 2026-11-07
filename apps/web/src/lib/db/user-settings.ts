@@ -21,20 +21,6 @@ export interface UserSettings {
   updatedAt?: Date
 }
 
-export interface NewUserSettings {
-  user_id: string
-  theme: string
-  notifications_enabled: boolean
-  email_notifications: boolean
-  language: string
-  preferences: {
-    showWelcomeScreen: boolean
-    autoSave: boolean
-    fontSize: string
-    [key: string]: unknown
-  }
-}
-
 export interface UpdateUserSettings {
   theme?: string
   notifications_enabled?: boolean
@@ -46,45 +32,6 @@ export interface UpdateUserSettings {
     fontSize?: string
     [key: string]: unknown
   }
-}
-
-/**
- * Get user settings
- */
-export async function getUserSettings(
-  userId: string,
-): Promise<UserSettings | null> {
-  const settings = await mongoClient.db
-    .collection('user_settings')
-    .findOne({ user_id: userId })
-
-  return settings as unknown as UserSettings | null
-}
-
-/**
- * Create user settings
- */
-export async function createUserSettings(
-  settings: NewUserSettings,
-  _request?: Request,
-): Promise<UserSettings> {
-  await ensureUserSettingsIndex()
-  const now = new Date()
-  const result = await mongoClient.db
-    .collection('user_settings')
-    .findOneAndUpdate(
-      { user_id: settings.user_id },
-      {
-        $setOnInsert: {
-          ...settings,
-          createdAt: now,
-          updatedAt: now,
-        },
-      },
-      { upsert: true, returnDocument: 'after' },
-    )
-
-  return result as unknown as UserSettings
 }
 
 /**
@@ -175,48 +122,4 @@ export async function getOrCreateUserSettings(
   }
 
   return result as unknown as UserSettings
-}
-
-/**
- * Update theme preference
- */
-export async function updateTheme(
-  userId: string,
-  theme: string,
-  request?: Request,
-): Promise<UserSettings> {
-  return updateUserSettings(userId, { theme }, request)
-}
-
-/**
- * Update language preference
- */
-export async function updateLanguage(
-  userId: string,
-  language: string,
-  request?: Request,
-): Promise<UserSettings> {
-  return updateUserSettings(userId, { language }, request)
-}
-
-/**
- * Toggle notification settings
- */
-export async function toggleNotifications(
-  userId: string,
-  enabled: boolean,
-  request?: Request,
-): Promise<UserSettings> {
-  return updateUserSettings(userId, { notifications_enabled: enabled }, request)
-}
-
-/**
- * Toggle email notification settings
- */
-export async function toggleEmailNotifications(
-  userId: string,
-  enabled: boolean,
-  request?: Request,
-): Promise<UserSettings> {
-  return updateUserSettings(userId, { email_notifications: enabled }, request)
 }

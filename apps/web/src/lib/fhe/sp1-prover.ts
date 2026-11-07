@@ -372,7 +372,3 @@ export class SP1Prover {
 export function getSP1Prover(): SP1Prover {
   return SP1Prover.getInstance()
 }
-
-export function resetSP1Prover(): void {
-  SP1Prover.reset()
-}

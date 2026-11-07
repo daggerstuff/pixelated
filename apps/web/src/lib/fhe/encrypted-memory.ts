@@ -16,7 +16,7 @@ const logger = createBuildSafeLogger('encrypted-memory')
 /**
  * Encrypted session state
  */
-export interface EncryptedSessionState {
+interface EncryptedSessionState {
   sessionId: string
   therapistId: string
   encryptedData: EncryptedData
@@ -33,7 +33,7 @@ export interface EncryptedSessionState {
 /**
  * Encrypted memory entry for patient history
  */
-export interface EncryptedMemoryEntry {
+interface EncryptedMemoryEntry {
   entryId: string
   patientId: string
   encryptedContent: EncryptedData
@@ -54,7 +54,7 @@ export interface EncryptedMemoryEntry {
 /**
  * Emotional state vector stored encrypted
  */
-export interface EncryptedEmotionalState {
+interface EncryptedEmotionalState {
   sessionId: string
   timestamp: number
   encryptedVector: EncryptedData
@@ -68,7 +68,7 @@ export interface EncryptedEmotionalState {
 /**
  * Encrypted memory store service
  */
-export class EncryptedMemoryService {
+class EncryptedMemoryService {
   private static instance: EncryptedMemoryService | null = null
   private fheService: FHEService | null = null
   private initialized = false
@@ -436,4 +436,3 @@ export class EncryptedMemoryService {
 
 // Export singleton instance
 export const encryptedMemory = EncryptedMemoryService.getInstance()
-export default encryptedMemory

@@ -5,7 +5,7 @@ const logger = createBuildSafeLogger('search') /**
  */
 
 // Types we need in both environments
-export interface SearchDocument {
+interface SearchDocument {
   id: string | number
   title: string
   content: string
@@ -25,45 +25,20 @@ export interface SearchResult {
   tags?: string[]
 }
 
-export interface SearchConfig {
-  tokenize?: string
-  resolution?: number
-  optimize?: boolean
-  cache?: boolean | number
-}
-
-export interface SearchOptions {
+interface SearchOptions {
   limit?: number
   threshold?: number
   boost?: Record<string, number>
   suggest?: boolean
 }
 
-export interface IndexOptions {
-  tokenize?: string
-  resolution?: number
-  optimize?: boolean
-  context?: boolean
-}
-
-export interface ISearchClient {
+interface ISearchClient {
   search(query: string, options?: SearchOptions): SearchResult[]
   importDocuments(documents: SearchDocument[]): void
 }
 
-// Define post structure for content collections
-export interface BlogPost {
-  id: string
-  slug?: string
-  data: {
-    title: string
-    tags?: string[]
-    category?: string
-  }
-}
-
 // Define blogSearch interface for content collections
-export interface PostInput {
+interface PostInput {
   id: string
   slug?: string
   data: {
@@ -178,7 +153,7 @@ export const blogSearch: BlogSearchInterface = {
 }
 
 // Helper function to create a search document
-export function createSearchDocument(
+function createSearchDocument(
   id: string | number,
   title: string,
   content: string,
@@ -257,7 +232,7 @@ if (typeof window !== 'undefined') {
 }
 
 // Export the client instance
-export const searchClient = searchClientInstance
+const searchClient = searchClientInstance
 
 // Add CommonJS compatibility for server contexts that may use require()
 if (module?.exports) {

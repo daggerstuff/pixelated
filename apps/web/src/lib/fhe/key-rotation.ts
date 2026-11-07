@@ -1403,10 +1403,5 @@ export class KeyRotationService extends EventEmitter {
   }
 }
 
-// Export HIPAA++ compliant singleton instance
-const hipaaKeyRotationService = KeyRotationService.getInstance()
-
 // Export types for external use
 export type { AuditEvent, SecurityMetrics, KeyVersion }
-
-export default hipaaKeyRotationService

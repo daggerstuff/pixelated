@@ -8,7 +8,7 @@
 
 import { secureRandomInt } from '../crypto/secure-random'
 
-export function getRandomBytes(length: number): Uint8Array {
+function getRandomBytes(length: number): Uint8Array {
   if (crypto?.getRandomValues) {
     return crypto.getRandomValues(new Uint8Array(length))
   }
@@ -17,7 +17,7 @@ export function getRandomBytes(length: number): Uint8Array {
   )
 }
 
-export function secureRandomIntRange(min: number, max: number): number {
+function secureRandomIntRange(min: number, max: number): number {
   return min + secureRandomInt(max - min + 1)
 }
 
