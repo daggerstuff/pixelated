@@ -1,0 +1,39 @@
+name: cf-token-perm-probe (temp, delete after use)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe token capability matrix (no secret output)
+        env:
+          CF: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          A="$ACCT"
+          probe() {
+            code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $CF" "$1")
+            echo "$2 -> HTTP $code"
+          }
+          # tunnel surface
+          probe "https://api.cloudflare.com/client/v4/accounts/$A" "accounts read"
+          probe "https://api.cloudflare.com/client/v4/accounts/$A/cfd_tunnel?per_page=1" "tunnel list"
+          probe "https://api.cloudflare.com/client/v4/user" "user read"
+          probe "https://api.cloudflare.com/client/v4/zones?per_page=1" "zones read"
+          # create-probe would have side effects; instead use token introspection:
+          curl -s -H "Authorization: Bearer $CF" "https://api.cloudflare.com/client/v4/user/tokens/verify" | python3 -c "import json,sys; d=json.load(sys.stdin); print('token verify:', d.get('success'), d.get('result',{}).get('status'))" || true
+          # account-owned verify if cfat_
+          curl -s -H "Authorization: Bearer $CF" "https://api.cloudflare.com/client/v4/accounts/$A/tokens/verify" | python3 -c "import json,sys; d=json.load(sys.stdin); print('acct token verify:', d.get('success'), d.get('result',{}).get('status'))" || true
+          # probe tunnel create against a dummy body WITHOUT valid secret requirement - expect 400 (validation) if authorized, 403 if not:
+          probe() {
+            code=$(curl -s -o /dev/null -w '%{http_code}' -X POST -H "Authorization: Bearer $CF" -H 'Content-Type: application/json' --data '{"name":"x"}' "$1")
+            echo "$2 -> HTTP $code"
+          }
+          probe "https://api.cloudflare.com/client/v4/accounts/$A/cfd_tunnel" "tunnel CREATE (400=authorized,403=denied)"
+          probe "https://api.cloudflare.com/client/v4/zones/25f876f8f9165ed036cf3af6eb51e788/dns_records" "dns list pixelthis (200=authorized,403=denied)"
