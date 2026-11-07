@@ -1,5 +1,6 @@
 import type { APIContext } from 'astro'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { getSession } from '../../../../lib/auth/session'
 import { GET, POST } from '../analytics'
 

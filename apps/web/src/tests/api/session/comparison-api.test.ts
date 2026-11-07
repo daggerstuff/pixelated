@@ -1,13 +1,17 @@
 import type { APIContext } from 'astro'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { getSession } from '../../../lib/auth/session'
 import { GET, POST } from '../../../pages/api/session/comparison'
 
-const state = vi.hoisted(() => ({
-  writes: [] as unknown[][],
-  query: vi.fn(),
-  release: vi.fn(),
-}))
+const state = vi.hoisted(() => {
+  process.env.DATABASE_URL ??= 'postgres://test:test@localhost/test'
+  return {
+    writes: [] as unknown[][],
+    query: vi.fn(),
+    release: vi.fn(),
+  }
+})
 vi.mock('../../../lib/auth/session', () => ({ getSession: vi.fn() }))
 vi.mock('../../../lib/db', () => ({
   getPool: () => ({ connect: async () => state }),
