@@ -175,6 +175,10 @@ const createGetContext = (url: string): Parameters<typeof GET>[0] =>
   createRequestContext(new Request(url))
 
 vi.mock('../../../lib/auth/session', () => ({ getSession: vi.fn() }))
+vi.mock('../../../lib/auth/internal-identity', () => ({
+  resolveInternalUserId: async (principal: { id?: string } | null) =>
+    principal?.id ?? null,
+}))
 
 vi.mock('pg', () => ({
   Pool: class {

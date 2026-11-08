@@ -13,6 +13,10 @@ const state = vi.hoisted(() => {
   }
 })
 vi.mock('../../../lib/auth/session', () => ({ getSession: vi.fn() }))
+vi.mock('../../../lib/auth/internal-identity', () => ({
+  resolveInternalUserId: async (principal: { id?: string } | null) =>
+    principal?.id ?? null,
+}))
 vi.mock('../../../lib/db', () => ({
   acquireClient: async () => state,
 }))
