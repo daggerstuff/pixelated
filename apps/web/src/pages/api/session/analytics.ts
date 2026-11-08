@@ -1,7 +1,12 @@
 import type { APIRoute } from 'astro'
 
+import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
 import { getPool } from '../../../lib/db'
+import {
+  isMissingLegacySchema,
+  legacySessionSurfaceResponse,
+} from './_legacy-surface'
 
 type SessionMetricPayload = {
   metricName?: unknown
@@ -147,6 +152,14 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
+    const therapistId = await resolveInternalUserId(session.user)
+    if (!therapistId) {
+      return new Response(
+        JSON.stringify({ error: 'User identity not resolved' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
+
     const requestBody: unknown = await request.json()
     if (!isSaveAnalyticsPayload(requestBody)) {
       return new Response(JSON.stringify({ error: 'Invalid payload' }), {
@@ -164,7 +177,7 @@ export const POST: APIRoute = async ({ request }) => {
       `
       const sessionResult = await client.query<SessionOwnershipRow>(
         sessionQuery,
-        [sessionId, session.user.id],
+        [sessionId, therapistId],
       )
 
       if (sessionResult.rows.length === 0) {
@@ -236,6 +249,7 @@ export const POST: APIRoute = async ({ request }) => {
       client.release()
     }
   } catch (error: unknown) {
+    if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
     console.error('Error saving session analytics:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -252,6 +266,14 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
+
+    const therapistId = await resolveInternalUserId(session.user)
+    if (!therapistId) {
+      return new Response(
+        JSON.stringify({ error: 'User identity not resolved' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
@@ -273,7 +295,7 @@ export const GET: APIRoute = async ({ request }) => {
       `
       const sessionResult = await client.query<SessionOwnershipRow>(
         sessionQuery,
-        [sessionId, session.user.id],
+        [sessionId, therapistId],
       )
 
       if (sessionResult.rows.length === 0) {
@@ -353,6 +375,7 @@ export const GET: APIRoute = async ({ request }) => {
       client.release()
     }
   } catch (error: unknown) {
+    if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
     console.error('Error fetching session analytics:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

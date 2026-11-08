@@ -1,3 +1,4 @@
+import { resolveInternalUserId } from '@/lib/auth/internal-identity'
 import { getSession } from '@/lib/auth/session'
 import { getPool } from '@/lib/db'
 
@@ -83,12 +84,19 @@ export const getTrainingSessionResponse = async (
     return jsonResponse({ error: 'Invalid session ID' }, 400)
   }
 
+  // getSession() surfaces the Auth0 `sub` as user.id; sessions.therapist_id is
+  // a uuid column, so resolve through the auth_accounts bridge first.
+  const therapistId = await resolveInternalUserId(session.user)
+  if (!therapistId) {
+    return jsonResponse({ error: 'User identity not resolved' }, 403)
+  }
+
   try {
     const result = await getPool().query<{ id: string; context: unknown }>(
       `SELECT id, context
        FROM sessions
        WHERE id = $1 AND therapist_id = $2 AND session_type = 'training'`,
-      [sessionId, session.user.id],
+      [sessionId, therapistId],
     )
     if (result.rowCount === 0) {
       return jsonResponse({ error: 'Session not found' }, 404)
@@ -108,7 +116,7 @@ export const getTrainingSessionResponse = async (
        WHERE session_id = $1 AND therapist_id = $2
        ORDER BY created_at DESC
        LIMIT 500`,
-      [sessionId, session.user.id],
+      [sessionId, therapistId],
     )
     return jsonResponse(
       {

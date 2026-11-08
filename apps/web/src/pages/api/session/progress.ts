@@ -1,7 +1,12 @@
 import type { APIRoute } from 'astro'
 
+import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
 import { getPool } from '../../../lib/db'
+import {
+  isMissingLegacySchema,
+  legacySessionSurfaceResponse,
+} from './_legacy-surface'
 
 const jsonResponse = (body: unknown, status: number): Response =>
   new Response(JSON.stringify(body), {
@@ -15,6 +20,11 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 export const POST: APIRoute = async ({ request }) => {
   const session = await getSession(request)
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
+
+  const therapistId = await resolveInternalUserId(session.user)
+  if (!therapistId) {
+    return jsonResponse({ error: 'User identity not resolved' }, 403)
+  }
 
   try {
     const payload: unknown = await request.json()
@@ -38,7 +48,7 @@ export const POST: APIRoute = async ({ request }) => {
       await client.query('BEGIN')
       const ownership = await client.query(
         'SELECT id FROM sessions WHERE id = $1 AND therapist_id = $2 FOR UPDATE',
-        [sessionId, session.user.id],
+        [sessionId, therapistId],
       )
       if (ownership.rowCount === 0) {
         await client.query('ROLLBACK')
@@ -50,7 +60,7 @@ export const POST: APIRoute = async ({ request }) => {
           `UPDATE sessions
            SET progress_metrics = $1::jsonb, updated_at = NOW()
            WHERE id = $2 AND therapist_id = $3`,
-          [JSON.stringify(progressMetrics), sessionId, session.user.id],
+          [JSON.stringify(progressMetrics), sessionId, therapistId],
         )
       }
 
@@ -61,7 +71,7 @@ export const POST: APIRoute = async ({ request }) => {
         await client.query(
           `INSERT INTO evaluations (session_id, therapist_id, feedback, created_at)
            VALUES ($1, $2, $3, NOW())`,
-          [sessionId, session.user.id, evaluationFeedback],
+          [sessionId, therapistId, evaluationFeedback],
         )
       }
 
@@ -74,6 +84,7 @@ export const POST: APIRoute = async ({ request }) => {
       client.release()
     }
   } catch (error: unknown) {
+    if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
     console.error('Error saving session progress:', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
@@ -82,6 +93,11 @@ export const POST: APIRoute = async ({ request }) => {
 export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request)
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
+
+  const therapistId = await resolveInternalUserId(session.user)
+  if (!therapistId) {
+    return jsonResponse({ error: 'User identity not resolved' }, 403)
+  }
 
   const url = new URL(request.url)
   const sessionId = url.searchParams.get('sessionId')
@@ -96,7 +112,7 @@ export const GET: APIRoute = async ({ request }) => {
         `SELECT progress_metrics, progress_snapshots, skill_scores
          FROM sessions
          WHERE id = $1 AND therapist_id = $2`,
-        [sessionId, session.user.id],
+        [sessionId, therapistId],
       )
 
       if (result.rowCount === 0) {
@@ -111,7 +127,7 @@ export const GET: APIRoute = async ({ request }) => {
            FROM evaluations
            WHERE session_id = $1 AND therapist_id = $2
            ORDER BY created_at DESC`,
-          [sessionId, session.user.id],
+          [sessionId, therapistId],
         )
         feedback = feedbackResult.rows
       }
@@ -130,6 +146,7 @@ export const GET: APIRoute = async ({ request }) => {
       client.release()
     }
   } catch (error: unknown) {
+    if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
     console.error('Error fetching session progress:', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
