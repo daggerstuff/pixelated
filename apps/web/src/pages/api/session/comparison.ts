@@ -2,7 +2,12 @@ import type { APIRoute } from 'astro'
 
 import { acquireClient } from '@/lib/db'
 
+import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
+import {
+  isMissingLegacySchema,
+  legacySessionSurfaceResponse,
+} from './_legacy-surface'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -19,7 +24,13 @@ export const POST: APIRoute = async ({ request }) => {
         },
       )
     }
-    const therapistId = session.user.id
+    const therapistId = await resolveInternalUserId(session.user)
+    if (!therapistId) {
+      return new Response(
+        JSON.stringify({ error: 'User identity not resolved' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
 
     const body: unknown = await request.json()
     if (!isRecord(body)) {
@@ -94,6 +105,7 @@ export const POST: APIRoute = async ({ request }) => {
       client.release()
     }
   } catch (error: unknown) {
+    if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
     console.error('Error saving session comparison:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -114,7 +126,13 @@ export const GET: APIRoute = async ({ request }) => {
         },
       )
     }
-    const therapistId = session.user.id
+    const therapistId = await resolveInternalUserId(session.user)
+    if (!therapistId) {
+      return new Response(
+        JSON.stringify({ error: 'User identity not resolved' }),
+        { status: 403, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
 
     const url = new URL(request.url)
     const requestedTherapistId = url.searchParams.get('therapistId')
@@ -236,6 +254,7 @@ export const GET: APIRoute = async ({ request }) => {
       client.release()
     }
   } catch (error: unknown) {
+    if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
     console.error('Error fetching session comparisons:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

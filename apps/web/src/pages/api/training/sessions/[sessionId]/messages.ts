@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro'
 
+import { resolveInternalUserId } from '@/lib/auth/internal-identity'
 import { getSession } from '@/lib/auth/session'
 import { getPool } from '@/lib/db'
 
@@ -26,6 +27,13 @@ export const POST: APIRoute = async ({ request, params }) => {
   const sessionId = params['sessionId']
   if (!sessionId || !isUuid(sessionId)) {
     return jsonResponse({ error: 'Invalid session ID' }, 400)
+  }
+
+  // getSession() surfaces the Auth0 `sub` as user.id; sessions.therapist_id is
+  // a uuid column, so resolve through the auth_accounts bridge first.
+  const therapistId = await resolveInternalUserId(session.user)
+  if (!therapistId) {
+    return jsonResponse({ error: 'User identity not resolved' }, 403)
   }
 
   try {
@@ -60,7 +68,7 @@ export const POST: APIRoute = async ({ request, params }) => {
          AND session_type = 'training'
          AND context->>'synthetic' = 'true'
        RETURNING id, content, created_at`,
-      [sessionId, session.user.id, content],
+      [sessionId, therapistId, content],
     )
 
     const message = result.rows[0]

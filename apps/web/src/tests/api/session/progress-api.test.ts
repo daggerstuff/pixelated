@@ -7,6 +7,10 @@ import { GET, POST } from '../../../pages/api/session/progress'
 vi.mock('../../../lib/auth/session', () => ({
   getSession: vi.fn(),
 }))
+vi.mock('../../../lib/auth/internal-identity', () => ({
+  resolveInternalUserId: async (principal: { id?: string } | null) =>
+    principal?.id ?? null,
+}))
 
 import { getSession } from '../../../lib/auth/session'
 

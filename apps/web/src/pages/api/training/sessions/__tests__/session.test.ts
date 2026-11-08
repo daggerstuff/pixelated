@@ -6,6 +6,10 @@ const { mockQuery, mockGetSession } = vi.hoisted(() => ({
 }))
 
 vi.mock('@/lib/auth/session', () => ({ getSession: mockGetSession }))
+vi.mock('@/lib/auth/internal-identity', () => ({
+  resolveInternalUserId: async (principal: { id?: string } | null) =>
+    principal?.id ?? null,
+}))
 vi.mock('@/lib/db', () => ({
   getPool: () => ({ query: mockQuery }),
 }))
