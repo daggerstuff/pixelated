@@ -59,7 +59,7 @@ beforeEach(() => {
 })
 
 describe('legacy /api/session/* routes on absent schema', () => {
-  it('progress POST reports 501 instead of 500 when sessions.progress_metrics is absent', async () => {
+  it('progress POST reports 410 instead of 500 when sessions.progress_metrics is absent', async () => {
     state.query.mockImplementation(async (sql: string) => {
       if (sql === 'BEGIN' || sql === 'ROLLBACK') return ok()
       if (sql.includes('FOR UPDATE')) return ok([{ id: SESSION_ID }])
@@ -74,11 +74,11 @@ describe('legacy /api/session/* routes on absent schema', () => {
       }),
     )
 
-    expect(response.status).toBe(501)
+    expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
   })
 
-  it('progress GET reports 501 instead of 500 when progress columns are absent', async () => {
+  it('progress GET reports 410 instead of 500 when progress columns are absent', async () => {
     state.query.mockRejectedValue(schemaError('42703'))
 
     const response = await invoke(
@@ -86,11 +86,11 @@ describe('legacy /api/session/* routes on absent schema', () => {
       get(`/api/session/progress?sessionId=${SESSION_ID}`),
     )
 
-    expect(response.status).toBe(501)
+    expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
   })
 
-  it('skills POST reports 501 instead of 500 when sessions.skill_scores is absent', async () => {
+  it('skills POST reports 410 instead of 500 when sessions.skill_scores is absent', async () => {
     state.query.mockRejectedValue(schemaError('42703'))
 
     const response = await invoke(
@@ -101,11 +101,11 @@ describe('legacy /api/session/* routes on absent schema', () => {
       }),
     )
 
-    expect(response.status).toBe(501)
+    expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
   })
 
-  it('skills GET reports 501 instead of 500 when skill_development is absent', async () => {
+  it('skills GET reports 410 instead of 500 when skill_development is absent', async () => {
     state.query.mockRejectedValue(schemaError('42P01'))
 
     const response = await invoke(
@@ -113,11 +113,11 @@ describe('legacy /api/session/* routes on absent schema', () => {
       get('/api/session/skills?therapistId=me'),
     )
 
-    expect(response.status).toBe(501)
+    expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
   })
 
-  it('comparison POST reports 501 instead of 500 when session_comparisons is absent', async () => {
+  it('comparison POST reports 410 instead of 500 when session_comparisons is absent', async () => {
     state.query.mockImplementation(async (sql: string) => {
       if (sql.includes('FROM sessions')) return ok([{ id: SESSION_ID }])
       throw schemaError('42P01')
@@ -132,11 +132,11 @@ describe('legacy /api/session/* routes on absent schema', () => {
       }),
     )
 
-    expect(response.status).toBe(501)
+    expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
   })
 
-  it('comparison GET reports 501 instead of 500 when session_comparisons is absent', async () => {
+  it('comparison GET reports 410 instead of 500 when session_comparisons is absent', async () => {
     state.query.mockRejectedValue(schemaError('42P01'))
 
     const response = await invoke(
@@ -144,11 +144,11 @@ describe('legacy /api/session/* routes on absent schema', () => {
       get(`/api/session/comparison?sessionId=${SESSION_ID}`),
     )
 
-    expect(response.status).toBe(501)
+    expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
   })
 
-  it('analytics POST reports 501 instead of 500 when session_analytics is absent', async () => {
+  it('analytics POST reports 410 instead of 500 when session_analytics is absent', async () => {
     state.query.mockImplementation(async (sql: string) => {
       if (sql.includes('FROM sessions'))
         return ok([{ therapist_id: USER_UUID }])
@@ -166,11 +166,11 @@ describe('legacy /api/session/* routes on absent schema', () => {
       }),
     )
 
-    expect(response.status).toBe(501)
+    expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
   })
 
-  it('analytics GET reports 501 instead of 500 when session_analytics is absent', async () => {
+  it('analytics GET reports 410 instead of 500 when session_analytics is absent', async () => {
     state.query.mockImplementation(async (sql: string) => {
       if (sql.includes('FROM sessions'))
         return ok([{ therapist_id: USER_UUID }])
@@ -182,8 +182,35 @@ describe('legacy /api/session/* routes on absent schema', () => {
       get(`/api/session/analytics?sessionId=${SESSION_ID}`),
     )
 
-    expect(response.status).toBe(501)
+    expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
+  })
+
+  it('carries the stable exclusion body and a Deprecation header', async () => {
+    state.query.mockRejectedValue(schemaError('42P01'))
+
+    const response = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+
+    expect(response.status).toBe(410)
+    expect(response.headers.get('Deprecation')).toBe('true')
+    expect(await response.json()).toEqual({
+      error: 'Legacy session analytics are not available',
+      code: LEGACY_SURFACE_CODE,
+    })
+  })
+
+  it('still surfaces genuine infrastructure errors as 500', async () => {
+    state.query.mockRejectedValue(schemaError('08006'))
+
+    const response = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+
+    expect(response.status).toBe(500)
   })
 
   it('keeps 401 for unauthenticated callers on every legacy route', async () => {

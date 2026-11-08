@@ -1,7 +1,12 @@
 import type { APIRoute } from 'astro'
 
+import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
 import { getPool } from '../../../lib/db'
+import {
+  isMissingLegacySchema,
+  legacySessionSurfaceResponse,
+} from './_legacy-surface'
 
 type ProgressSnapshot = {
   value: number
@@ -36,6 +41,14 @@ export const POST: APIRoute = async ({ request }) => {
   const session = await getSession(request)
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
+  // `session.user.id` is the provider subject (`auth0|…`); `therapist_id` is a
+  // uuid column, so the principal must be resolved to the internal users.id
+  // before any ownership comparison.
+  const therapistId = await resolveInternalUserId(session.user)
+  if (!therapistId) {
+    return jsonResponse({ error: 'User identity not resolved' }, 403)
+  }
+
   try {
     const payload: unknown = await request.json()
     if (
@@ -68,7 +81,7 @@ export const POST: APIRoute = async ({ request }) => {
       await client.query('BEGIN')
       const ownership = await client.query(
         'SELECT id FROM sessions WHERE id = $1 AND therapist_id = $2 FOR UPDATE',
-        [sessionId, session.user.id],
+        [sessionId, therapistId],
       )
       if (ownership.rowCount === 0) {
         await client.query('ROLLBACK')
@@ -79,7 +92,7 @@ export const POST: APIRoute = async ({ request }) => {
         `UPDATE sessions
          SET progress_snapshots = $1::jsonb, updated_at = NOW()
          WHERE id = $2 AND therapist_id = $3`,
-        [JSON.stringify(snapshots), sessionId, session.user.id],
+        [JSON.stringify(snapshots), sessionId, therapistId],
       )
 
       if (snapshots.length > 0) {
@@ -110,6 +123,7 @@ export const POST: APIRoute = async ({ request }) => {
       client.release()
     }
   } catch (error: unknown) {
+    if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
     console.error('Error handling POST /api/session/snapshots', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
@@ -118,6 +132,12 @@ export const POST: APIRoute = async ({ request }) => {
 export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request)
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
+
+  // Same identity bridge as POST: resolve before the ownership predicate.
+  const therapistId = await resolveInternalUserId(session.user)
+  if (!therapistId) {
+    return jsonResponse({ error: 'User identity not resolved' }, 403)
+  }
 
   const sessionId = new URL(request.url).searchParams.get('sessionId')
   if (!sessionId) {
@@ -129,7 +149,7 @@ export const GET: APIRoute = async ({ request }) => {
     try {
       const sessionResult = await client.query(
         'SELECT progress_snapshots FROM sessions WHERE id = $1 AND therapist_id = $2',
-        [sessionId, session.user.id],
+        [sessionId, therapistId],
       )
       if (sessionResult.rowCount === 0) {
         return jsonResponse({ error: 'Session not found' }, 404)
@@ -158,6 +178,7 @@ export const GET: APIRoute = async ({ request }) => {
       client.release()
     }
   } catch (error: unknown) {
+    if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
     console.error('Error handling GET /api/session/snapshots', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
