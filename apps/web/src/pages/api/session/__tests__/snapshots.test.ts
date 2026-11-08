@@ -1,23 +1,35 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockConnect, mockQuery, mockRelease, mockGetSession } = vi.hoisted(
-  () => ({
-    mockConnect: vi.fn(),
-    mockQuery: vi.fn(),
-    mockRelease: vi.fn(),
-    mockGetSession: vi.fn(),
-  }),
-)
+const {
+  mockConnect,
+  mockQuery,
+  mockRelease,
+  mockGetSession,
+  mockResolveInternalUserId,
+} = vi.hoisted(() => ({
+  mockConnect: vi.fn(),
+  mockQuery: vi.fn(),
+  mockRelease: vi.fn(),
+  mockGetSession: vi.fn(),
+  mockResolveInternalUserId: vi.fn(),
+}))
 
 vi.mock('@/lib/auth/session', () => ({ getSession: mockGetSession }))
+vi.mock('@/lib/auth/internal-identity', () => ({
+  resolveInternalUserId: mockResolveInternalUserId,
+}))
 vi.mock('@/lib/db', () => ({
   getPool: () => ({ connect: mockConnect }),
 }))
 
 import { GET, POST } from '../snapshots'
 
+/** The provider subject `getSession()` exposes as `user.id`. */
+const AUTH0_SUB = 'auth0|snapshots-caller'
+/** The internal `users.id` UUID that `therapist_id` compares against. */
 const USER_ID = '6cf52d73-8188-487f-a1c6-4ebc014328c0'
 const SESSION_ID = 'bb682d68-2338-48f0-8ac5-e0243b1346d2'
+const LEGACY_SURFACE_CODE = 'LEGACY_SESSION_API_UNAVAILABLE'
 
 const createClient = () => ({ query: mockQuery, release: mockRelease })
 
@@ -34,8 +46,11 @@ const createRequest = (url: string, body?: unknown): Request =>
     body: body === undefined ? undefined : JSON.stringify(body),
   })
 
+const schemaError = (code: string) =>
+  Object.assign(new Error(`simulated schema error ${code}`), { code })
+
 const authenticatedSession = {
-  user: { id: USER_ID, role: 'therapist' },
+  user: { id: AUTH0_SUB, email: 'caller@example.test', role: 'therapist' },
   expires: new Date(Date.now() + 60_000).toISOString(),
 }
 
@@ -44,6 +59,7 @@ beforeEach(() => {
   mockQuery.mockReset()
   mockRelease.mockReset()
   mockGetSession.mockResolvedValue(authenticatedSession)
+  mockResolveInternalUserId.mockResolvedValue(USER_ID)
   mockConnect.mockResolvedValue(createClient())
 })
 
@@ -65,10 +81,34 @@ describe('session snapshots authorization', () => {
 
     expect(getResponse.status).toBe(401)
     expect(postResponse.status).toBe(401)
+    expect(mockResolveInternalUserId).not.toHaveBeenCalled()
     expect(mockConnect).not.toHaveBeenCalled()
   })
 
-  it('scopes snapshot writes to the authenticated owner', async () => {
+  it('denies an unmapped principal without touching the database', async () => {
+    mockResolveInternalUserId.mockResolvedValue(null)
+
+    const getResponse = await invoke(GET, {
+      request: createRequest(
+        `http://localhost/api/session/snapshots?sessionId=${SESSION_ID}`,
+      ),
+    })
+    const postResponse = await invoke(POST, {
+      request: createRequest('http://localhost/api/session/snapshots', {
+        sessionId: SESSION_ID,
+        snapshots: [{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }],
+      }),
+    })
+
+    expect(getResponse.status).toBe(403)
+    expect(postResponse.status).toBe(403)
+    expect(await getResponse.json()).toMatchObject({
+      error: 'User identity not resolved',
+    })
+    expect(mockConnect).not.toHaveBeenCalled()
+  })
+
+  it('resolves the principal before the ownership comparison and scopes writes to the internal uuid', async () => {
     mockQuery
       .mockResolvedValueOnce({ rowCount: 1, rows: [] })
       .mockResolvedValueOnce({ rowCount: 1, rows: [{ id: SESSION_ID }] })
@@ -84,10 +124,24 @@ describe('session snapshots authorization', () => {
     })
 
     expect(response.status).toBe(200)
+    expect(mockResolveInternalUserId).toHaveBeenCalledWith(
+      authenticatedSession.user,
+    )
     expect(mockQuery.mock.calls[1]?.[0]).toContain(
       'id = $1 AND therapist_id = $2 FOR UPDATE',
     )
     expect(mockQuery.mock.calls[1]?.[1]).toEqual([SESSION_ID, USER_ID])
+    expect(mockQuery.mock.calls[2]?.[1]).toEqual([
+      JSON.stringify([{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }]),
+      SESSION_ID,
+      USER_ID,
+    ])
+    // The raw Auth0 subject must never reach the uuid column.
+    expect(
+      mockQuery.mock.calls.some((call) =>
+        JSON.stringify(call[1] ?? []).includes(AUTH0_SUB),
+      ),
+    ).toBe(false)
     expect(mockQuery.mock.calls.at(-1)?.[0]).toBe('COMMIT')
   })
 
@@ -127,5 +181,76 @@ describe('session snapshots authorization', () => {
     expect(invalidTimestamp.status).toBe(400)
     expect(oversized.status).toBe(400)
     expect(mockConnect).not.toHaveBeenCalled()
+  })
+})
+
+describe('session snapshots on absent schema', () => {
+  it('returns the documented 410 exclusion when sessions.progress_snapshots is absent', async () => {
+    mockQuery.mockRejectedValue(schemaError('42703'))
+
+    const response = await invoke(GET, {
+      request: createRequest(
+        `http://localhost/api/session/snapshots?sessionId=${SESSION_ID}`,
+      ),
+    })
+
+    expect(response.status).toBe(410)
+    expect(response.headers.get('Deprecation')).toBe('true')
+    expect(await response.json()).toEqual({
+      error: 'Legacy session analytics are not available',
+      code: LEGACY_SURFACE_CODE,
+    })
+  })
+
+  it('returns the documented 410 exclusion when a snapshot write hits absent schema', async () => {
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN' || sql === 'ROLLBACK')
+        return { rowCount: 0, rows: [] }
+      if (sql.includes('FOR UPDATE')) {
+        return { rowCount: 1, rows: [{ id: SESSION_ID }] }
+      }
+      throw schemaError('42703')
+    })
+
+    const response = await invoke(POST, {
+      request: createRequest('http://localhost/api/session/snapshots', {
+        sessionId: SESSION_ID,
+        snapshots: [{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }],
+      }),
+    })
+
+    expect(response.status).toBe(410)
+    expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
+    expect(mockQuery.mock.calls.at(-1)?.[0]).toBe('ROLLBACK')
+  })
+
+  it('returns the documented 410 exclusion when session_milestones is absent', async () => {
+    mockQuery
+      .mockResolvedValueOnce({
+        rowCount: 1,
+        rows: [{ progress_snapshots: [] }],
+      })
+      .mockRejectedValueOnce(schemaError('42P01'))
+
+    const response = await invoke(GET, {
+      request: createRequest(
+        `http://localhost/api/session/snapshots?sessionId=${SESSION_ID}`,
+      ),
+    })
+
+    expect(response.status).toBe(410)
+    expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
+  })
+
+  it('still surfaces genuine infrastructure errors as 500', async () => {
+    mockQuery.mockRejectedValue(schemaError('08006'))
+
+    const response = await invoke(GET, {
+      request: createRequest(
+        `http://localhost/api/session/snapshots?sessionId=${SESSION_ID}`,
+      ),
+    })
+
+    expect(response.status).toBe(500)
   })
 })
