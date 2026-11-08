@@ -57,6 +57,7 @@ type SentryShim = {
       options?: { attributes?: Record<string, unknown>; unit?: string },
     ) => void
   }
+  flush?: () => Promise<void>
 }
 
 function getSentry(): SentryShim | null {
@@ -66,7 +67,7 @@ function getSentry(): SentryShim | null {
     typeof (SentrySDK as Record<string, unknown>).captureException ===
       'function'
   ) {
-    return SentrySDK as unknown as SentryShim
+    return SentrySDK
   }
   // Fallback: window.Sentry global (for pages that load Sentry via script tag)
   try {
@@ -535,7 +536,7 @@ export const sessionMetrics = {
  */
 export async function flushMetrics(): Promise<void> {
   try {
-    const client = getSentry() as SentryShim | null
+    const client = getSentry()
     if (client && typeof client.flush === 'function') {
       await client.flush()
     }

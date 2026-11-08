@@ -105,11 +105,14 @@ export function resolveSentryDsn(): string | undefined {
     (value): value is string => typeof value === 'string' && value.length > 0,
   )
 
-  if (
-    import.meta.env.DEV ||
-    (typeof process !== 'undefined' &&
-      (process.env['NODE_ENV'] !== 'production' || process.env['SENTRY_DEBUG']))
-  ) {
+  // Only surface the resolved DSN when debugging is explicitly requested.
+  // Even a truncated DSN exposes the Sentry project key, and this runs at
+  // module scope — so it must never fire in a normal dev or test run (both
+  // set import.meta.env.DEV). Opt in with SENTRY_DEBUG.
+  const sentryDebug =
+    env['SENTRY_DEBUG'] === '1' ||
+    (typeof process !== 'undefined' && procEnv['SENTRY_DEBUG'] === '1')
+  if (sentryDebug) {
     logger.info(
       `[Sentry Config] Resolved DSN: ${dsn ? dsn.substring(0, 20) + '...' : 'MISSING'}`,
     )
