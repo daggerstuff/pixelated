@@ -1,0 +1,25 @@
+# Sourcery configuration for Pixelated Empathy
+ignore:
+  - "dist/**"
+  - "dist-ssr/**"
+  - "worktrees/**"
+  - "docs/Books/**"
+  - "ai/docs/Books/**"
+  - "**/pnpm-lock.yaml"
+  - "**/package-lock.json"
+  - "**/uv.lock"
+  - "**/*.min.js"
+  - "**/*.map"
+  - "**/*.svg"
+  - "**/*.csv"
+  - "**/*.jsonl"
+  - "submodules/**"
+
+metrics:
+  quality_threshold: 60.0
+
+rule_settings:
+  python_version: "3.14"
+
+github:
+  request_review: false

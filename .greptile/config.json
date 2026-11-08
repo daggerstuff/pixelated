@@ -1,0 +1,7 @@
+{
+  "strictness": 2,
+  "commentTypes": ["logic", "syntax"],
+  "autoReview": ["open", "push"],
+  "effort": "auto",
+  "ignorePatterns": "node_modules/\ndist/\ndist-ssr/\nworktrees/\n.git/\n*.lock\n*.min.js\n*.map\n*.csv\n*.jsonl\n**/Books/**\n**/*.svg\nsubmodules/**"
+}
