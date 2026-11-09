@@ -59,10 +59,7 @@ interface FakeKv {
 
 function createFakeKv(expiresAt: number): FakeKv {
   const values = new Map<string, string>([
-    [
-      `csrf:${CSRF_TOKEN}`,
-      JSON.stringify({ token: CSRF_TOKEN, expiresAt }),
-    ],
+    [`csrf:${CSRF_TOKEN}`, JSON.stringify({ token: CSRF_TOKEN, expiresAt })],
   ])
   return {
     async get(key: string) {
@@ -80,20 +77,17 @@ function callSignin(
 ): Promise<Response> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    Origin: 'https://pixelatedempathy.com',
+    'Origin': 'https://pixelatedempathy.com',
   }
   if (options.csrfToken !== undefined) {
     headers['X-CSRF-Token'] = options.csrfToken
   }
 
-  const request = new Request(
-    'https://pixelatedempathy.com/api/auth/signin',
-    {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body),
-    },
-  )
+  const request = new Request('https://pixelatedempathy.com/api/auth/signin', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
+  })
 
   const locals = options.locals ?? {
     runtime: {
@@ -146,9 +140,7 @@ describe('POST /api/auth/signin', () => {
   })
 
   it('returns 401 Invalid credentials for a wrong password', async () => {
-    signInMock.mockRejectedValueOnce(
-      new Error('Invalid credentials'),
-    )
+    signInMock.mockRejectedValueOnce(new Error('Invalid credentials'))
 
     const response = await callSignin(
       {

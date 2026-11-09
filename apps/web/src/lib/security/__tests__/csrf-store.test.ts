@@ -23,10 +23,7 @@ interface FakeKv extends CsrfKvNamespace {
 }
 
 function createFakeKv(clock: () => number): FakeKv {
-  const entries = new Map<
-    string,
-    { value: string; expiresAt: number | null }
-  >()
+  const entries = new Map<string, { value: string; expiresAt: number | null }>()
   const puts: Array<{ key: string; value: string; expirationTtl?: number }> = []
 
   return {
@@ -94,7 +91,10 @@ describe('csrf-store', () => {
       const now = 1_700_000_000_000
       const kv = createFakeKv(() => now)
       const store = createCsrfStore({ kv })
-      const record: CsrfTokenRecord = { token: 'a'.repeat(64), expiresAt: now + 3_600_000 }
+      const record: CsrfTokenRecord = {
+        token: 'a'.repeat(64),
+        expiresAt: now + 3_600_000,
+      }
 
       expect(store.kind).toBe('kv')
       await expect(store.store(record.token, record)).resolves.toBe(true)
@@ -113,7 +113,10 @@ describe('csrf-store', () => {
       let now = 1_700_000_000_000
       const kv = createFakeKv(() => now)
       const store = createCsrfStore({ kv })
-      const record: CsrfTokenRecord = { token: 'b'.repeat(64), expiresAt: now + 3_600_000 }
+      const record: CsrfTokenRecord = {
+        token: 'b'.repeat(64),
+        expiresAt: now + 3_600_000,
+      }
 
       await store.store(record.token, record, CSRF_TOKEN_TTL_SECONDS)
       await expect(store.load(record.token)).resolves.toEqual(record)
@@ -150,7 +153,10 @@ describe('csrf-store', () => {
     it('uses the existing cache helpers when no KV binding is present', async () => {
       const cache = createFakeCache()
       const store = createCsrfStore({ kv: null, cache })
-      const record: CsrfTokenRecord = { token: 'd'.repeat(64), expiresAt: 1_700_000_000_000 }
+      const record: CsrfTokenRecord = {
+        token: 'd'.repeat(64),
+        expiresAt: 1_700_000_000_000,
+      }
 
       expect(store.kind).toBe('redis')
       await expect(store.store(record.token, record)).resolves.toBe(true)

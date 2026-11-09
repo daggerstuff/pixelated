@@ -69,7 +69,9 @@ function csrfKey(token: string): string {
 function isCsrfTokenRecord(value: unknown): value is CsrfTokenRecord {
   if (!value || typeof value !== 'object') return false
   const record = value as Partial<CsrfTokenRecord>
-  return typeof record.token === 'string' && typeof record.expiresAt === 'number'
+  return (
+    typeof record.token === 'string' && typeof record.expiresAt === 'number'
+  )
 }
 
 function createKvCsrfStore(kv: CsrfKvNamespace): CsrfStore {
