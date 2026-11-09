@@ -18,7 +18,7 @@ interface JwtPayload {
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-import { redisClient, setInCache } from '../redis'
+import { getFromCache, redisClient, setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 import { retry } from './utils'
@@ -429,6 +429,93 @@ function extractRoleFromPayload(payload: Auth0TokenClaims): UserRole {
 }
 
 /**
+ * Role-cache bounds.
+ *
+ * `validateToken` runs on every authenticated request, and the password grant
+ * issues access tokens with no role claim — so without a cache every request
+ * would call the Auth0 Management API. Management API rate limits are per
+ * client, and a throttled lookup silently collapses the caller to `guest`.
+ * Roles change rarely, so a short TTL keeps the lookup off the hot path.
+ */
+const ROLE_CACHE_TTL_SECONDS = 5 * 60
+
+/**
+ * Negative results (a user with no role metadata, or an unknown subject) are
+ * cached briefly: long enough to keep the hot path off the Management API,
+ * short enough that a role granted moments later is picked up.
+ */
+const ROLE_CACHE_NEGATIVE_TTL_SECONDS = 60
+
+/**
+ * Upper bound on a role-cache read or write. The cache sits on the request
+ * path, so a stalled Redis must never hold token validation open.
+ */
+const ROLE_CACHE_DEADLINE_MS = 750
+
+class RoleCacheDeadlineExceededError extends Error {
+  constructor(phase: 'read' | 'write', deadlineMs: number) {
+    super(`Role cache ${phase} exceeded its ${deadlineMs}ms deadline`)
+    this.name = 'RoleCacheDeadlineExceededError'
+  }
+}
+
+const withRoleCacheDeadline = async <T>(
+  work: Promise<T>,
+  phase: 'read' | 'write',
+  deadlineMs: number,
+): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new RoleCacheDeadlineExceededError(phase, deadlineMs)),
+      deadlineMs,
+    )
+  })
+  try {
+    return await Promise.race([work, deadline])
+  } finally {
+    if (timer !== undefined) clearTimeout(timer)
+  }
+}
+
+function roleCacheKey(userId: string): string {
+  // Prefix keeps Redis key-space organised; the sub is opaque, no PII
+  return `auth0:role:${userId}`
+}
+
+async function readCachedRole(userId: string): Promise<UserRole | null> {
+  try {
+    const cached = await withRoleCacheDeadline(
+      getFromCache<unknown>(roleCacheKey(userId)),
+      'read',
+      ROLE_CACHE_DEADLINE_MS,
+    )
+    if (typeof cached === 'string' && cached.length > 0) {
+      return mapToUserRole(cached)
+    }
+  } catch {
+    // Cache miss, timeout, or malformed entry — fall through to the API
+  }
+  return null
+}
+
+async function writeCachedRole(
+  userId: string,
+  role: UserRole,
+  ttlSeconds: number,
+): Promise<void> {
+  try {
+    await withRoleCacheDeadline(
+      setInCache(roleCacheKey(userId), role, ttlSeconds),
+      'write',
+      ROLE_CACHE_DEADLINE_MS,
+    )
+  } catch {
+    // Cache writes are best-effort; the API remains the source of truth
+  }
+}
+
+/**
  * Resolve a role from the Auth0 Management API when the access token carries no
  * role claim.
  *
@@ -447,10 +534,18 @@ function extractRoleFromPayload(payload: Auth0TokenClaims): UserRole {
 async function resolveRoleFromManagementApi(
   userId: string,
 ): Promise<UserRole | null> {
+  const cached = await readCachedRole(userId)
+  if (cached !== null) {
+    return cached
+  }
+
   try {
     const { auth0UserService } = await import('../services/auth0.service')
     const enriched = await auth0UserService.getUserById(userId)
     if (!enriched) {
+      // The subject is unknown to the Management API: remember the negative
+      // result briefly rather than asking again on the next request.
+      await writeCachedRole(userId, 'guest', ROLE_CACHE_NEGATIVE_TTL_SECONDS)
       return null
     }
 
@@ -463,6 +558,7 @@ async function resolveRoleFromManagementApi(
         if (typeof candidate === 'string') {
           const mapped = mapToUserRole(candidate)
           if (mapped !== 'guest') {
+            await writeCachedRole(userId, mapped, ROLE_CACHE_TTL_SECONDS)
             return mapped
           }
         }
@@ -479,12 +575,19 @@ async function resolveRoleFromManagementApi(
     ) {
       const mapped = mapToUserRole(enriched.role)
       if (mapped !== 'guest') {
+        await writeCachedRole(userId, mapped, ROLE_CACHE_TTL_SECONDS)
         return mapped
       }
     }
+
+    // The lookup succeeded and the identity carries no role: remember that so
+    // the next request does not repeat the Management API call.
+    await writeCachedRole(userId, 'guest', ROLE_CACHE_NEGATIVE_TTL_SECONDS)
   } catch {
     // Management enrichment is best-effort; the token-derived role is the
-    // fallback (`guest` when the token carried no role claim).
+    // fallback (`guest` when the token carried no role claim). Failures are not
+    // cached — a throttled or unavailable API must not pin the identity to
+    // `guest`.
   }
 
   return null
