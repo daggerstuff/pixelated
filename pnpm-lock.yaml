@@ -307,6 +307,7 @@ overrides:
 patchedDependencies:
   '@astrojs/internal-helpers': 585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3
   '@astrojs/internal-helpers@0.13.0': ebdd1966ecd34c914d725ce2525d1ab4e759c3335374079650f9e3b4ebabc706
+  '@astrojs/internal-helpers@0.13.1': ebdd1966ecd34c914d725ce2525d1ab4e759c3335374079650f9e3b4ebabc706
   '@astrojs/vercel': 98dab2aa3e8f14d981e78922cb973a7f1646e6894b56dc058447a3ea212c6c3b
   astro: 74950e75e5c1b6b481917ab76bdc51751e1359ee6e6c5618fa69037bad96d2a5
 

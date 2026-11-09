@@ -425,5 +425,6 @@ patchedDependencies:
   # to tabs so it needs its own patch file and pinned key.
   '@astrojs/internal-helpers': patches/@astrojs__internal-helpers@0.10.0.patch
   '@astrojs/internal-helpers@0.13.0': patches/@astrojs__internal-helpers@0.13.0.patch
+  '@astrojs/internal-helpers@0.13.1': patches/@astrojs__internal-helpers@0.13.0.patch
   '@astrojs/vercel': patches/@astrojs__vercel.patch
   astro: patches/astro.patch
