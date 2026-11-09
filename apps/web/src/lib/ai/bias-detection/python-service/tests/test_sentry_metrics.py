@@ -53,3 +53,39 @@ def test_before_send_event_logentry_fallback() -> None:
     event = {"logentry": {"formatted": "Test: KeyError via logentry", "message": "KeyError via logentry"}}
 
     assert before_send_event(event, None) is None
+
+
+def test_before_send_event_drops_werkzeug_client_error_log() -> None:
+    event = {
+        "message": "96.126.104.20 - - [08/Nov/2026 22:11:05] code 400, message Bad request version ('À\\x13À')",
+        "tags": {"logger": "werkzeug"},
+    }
+
+    assert before_send_event(event, None) is None
+
+
+def test_before_send_event_drops_werkzeug_client_error_log_with_serialized_tags() -> None:
+    event = {
+        "message": "127.0.0.1 - - [08/Nov/2026 22:11:05] code 404, message Not Found",
+        "tags": [{"key": "logger", "value": "werkzeug"}],
+    }
+
+    assert before_send_event(event, None) is None
+
+
+def test_before_send_event_keeps_werkzeug_server_error_log() -> None:
+    event = {
+        "message": "127.0.0.1 - - [08/Nov/2026 22:11:05] code 500, message Internal Server Error",
+        "tags": {"logger": "werkzeug"},
+    }
+
+    assert before_send_event(event, None) == event
+
+
+def test_before_send_event_keeps_non_werkzeug_client_error_log() -> None:
+    event = {
+        "message": "96.126.104.20 - - [08/Nov/2026 22:11:05] code 400, message Bad request version ('À\\x13À')",
+        "tags": {"logger": "bias_detection.services.cache_service"},
+    }
+
+    assert before_send_event(event, None) == event

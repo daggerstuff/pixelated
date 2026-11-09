@@ -126,4 +126,56 @@ describe('beforeSend (server-side, no window)', () => {
     })
     expect(beforeSend(event)).toBeNull()
   })
+
+  it('drops development write EPIPE events', () => {
+    const event = makeEvent({
+      tags: { environment: 'development' },
+      exception: {
+        values: [{ type: 'Error', value: 'write EPIPE' }],
+      },
+    })
+    expect(beforeSend(event)).toBeNull()
+  })
+
+  it('drops development Astro manifest ENOENT events', () => {
+    const event = makeEvent({
+      tags: { environment: 'development' },
+      exception: {
+        values: [
+          {
+            type: 'Error',
+            value: 'ENOENT: no such file or directory, open',
+            stacktrace: {
+              frames: [
+                {
+                  filename:
+                    '/repo/node_modules/astro/dist/core/routing/create-manifest.js',
+                  function: 'createInjectedRoutes',
+                },
+              ],
+            },
+          },
+        ],
+      },
+    })
+    expect(beforeSend(event)).toBeNull()
+  })
+
+  it('keeps ENOENT events outside the Astro manifest path', () => {
+    const event = makeEvent({
+      tags: { environment: 'development' },
+      exception: {
+        values: [
+          {
+            type: 'Error',
+            value: 'ENOENT: no such file or directory, open',
+            stacktrace: {
+              frames: [{ filename: '/repo/apps/web/src/pages/missing.astro' }],
+            },
+          },
+        ],
+      },
+    })
+    expect(beforeSend(event)).toBe(event)
+  })
 })
