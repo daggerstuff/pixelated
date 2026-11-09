@@ -8,6 +8,7 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { getFromCache, setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security'
+import { type CsrfStore, resolveCsrfStore } from '../security/csrf-store'
 import { auth0UserService } from '../services/auth0.service'
 import { auth0AdaptiveMFAService } from './auth0-adaptive-mfa-service'
 import { validateToken } from './auth0-jwt-service'
@@ -284,8 +285,15 @@ export async function rateLimitMiddleware(
 
 /**
  * CSRF protection middleware
+ *
+ * `options.csrfStore` is resolved by the caller from the adapter runtime env
+ * (KV binding first, Redis cache otherwise). Callers that pass nothing keep
+ * the previous behaviour: the store is resolved here.
  */
-export async function csrfProtection(request: Request): Promise<{
+export async function csrfProtection(
+  request: Request,
+  options: { csrfStore?: CsrfStore; locals?: unknown } = {},
+): Promise<{
   success: boolean
   request?: Request
   response?: Response
@@ -324,15 +332,10 @@ export async function csrfProtection(request: Request): Promise<{
     }
   }
 
-  interface CSRFTokenData {
-    token: string
-    expiresAt: number
-  }
-
   // Validate the token against stored tokens
 
-  const tokenKey = `csrf:${csrfToken}`
-  const storedToken = await getFromCache<CSRFTokenData>(tokenKey)
+  const store = options.csrfStore ?? (await resolveCsrfStore(options.locals))
+  const storedToken = await store.load(csrfToken)
 
   if (!storedToken) {
     logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
