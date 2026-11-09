@@ -22,7 +22,7 @@ import { randomUUID } from 'crypto'
 import { PoolClient } from 'pg'
 
 import { transaction } from '../db/index'
-import { getFromCache, setInCache, removeFromCache } from '../redis'
+import { getFromCache, setInCache } from '../redis'
 import type { IdentityProvider } from './identity-provider'
 import { getIdentityProvider } from './identity-provider'
 
@@ -240,27 +240,4 @@ export async function resolveIdentity(
   await cacheIdentity(identity)
 
   return identity
-}
-
-/**
- * Invalidate the cached identity for a given provider sub.
- * Call this after role changes, deactivations, or account updates.
- */
-export async function invalidateIdentityCache(sub: string): Promise<void> {
-  try {
-    await removeFromCache(cacheKey(sub))
-  } catch {
-    // Best-effort cache invalidation — non-fatal
-  }
-}
-
-/**
- * Look up the provider sub for a given internal UUID.
- * Used when we need to call the provider's Management API by internal ID.
- */
-export async function resolveAuth0SubFromInternalId(
-  internalId: string,
-): Promise<string | null> {
-  const provider = getIdentityProvider()
-  return provider.findSubByInternalId(internalId)
 }
