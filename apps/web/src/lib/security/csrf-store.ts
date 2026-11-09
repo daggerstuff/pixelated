@@ -21,7 +21,7 @@ export const CSRF_KV_BINDING = 'CSRF_TOKENS'
 export const CSRF_TOKEN_TTL_SECONDS = 60 * 60
 
 /** Key prefix `csrfProtection` has always validated against. */
-export const CSRF_TOKEN_KEY_PREFIX = 'csrf:'
+const CSRF_TOKEN_KEY_PREFIX = 'csrf:'
 
 export interface CsrfTokenRecord {
   token: string
@@ -48,7 +48,7 @@ export interface CsrfCacheBackend {
   set(key: string, value: unknown, ttlSeconds?: number): Promise<boolean>
 }
 
-export type CsrfStoreKind = 'kv' | 'redis' | 'unavailable'
+type CsrfStoreKind = 'kv' | 'redis' | 'unavailable'
 
 export interface CsrfStore {
   readonly kind: CsrfStoreKind
@@ -123,7 +123,7 @@ const unavailableCsrfStore: CsrfStore = {
 }
 
 /** The existing Redis cache, used when no KV binding is present. */
-export const redisCsrfCacheBackend: CsrfCacheBackend = {
+const redisCsrfCacheBackend: CsrfCacheBackend = {
   get: <T>(key: string) => getFromCache<T>(key),
   set: (key, value, ttlSeconds) => setInCache(key, value, ttlSeconds),
 }
@@ -198,7 +198,7 @@ async function bindingFromWorkerRuntime(): Promise<CsrfKvNamespace | null> {
 }
 
 /** Resolve the KV binding from the adapter runtime env, if one is bound. */
-export async function resolveCsrfKvBinding(
+async function resolveCsrfKvBinding(
   locals?: unknown,
 ): Promise<CsrfKvNamespace | null> {
   return bindingFromLocals(locals) ?? (await bindingFromWorkerRuntime())
