@@ -206,6 +206,8 @@ describe('role resolution via the Auth0 Management API', () => {
 
     expect(result.valid).toBe(true)
     expect(result.role).toBe('guest')
+    // `null` is also what a failed lookup returns, so it must not be cached.
+    expect(mockRedis.setInCache).not.toHaveBeenCalled()
   })
 
   it('falls back to guest when the Management API lookup throws', async () => {
