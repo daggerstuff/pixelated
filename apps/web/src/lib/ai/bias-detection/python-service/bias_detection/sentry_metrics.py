@@ -9,8 +9,10 @@ Requires sentry-sdk >= 2.44.0
 """
 
 import asyncio
+import importlib
 import logging
 import os
+import re
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -37,9 +39,7 @@ def _get_sentry_sdk() -> Any | None:
 @cache
 def _import_sentry_sdk() -> Any | None:
     try:
-        import sentry_sdk
-
-        return sentry_sdk
+        return importlib.import_module("sentry_sdk")
     except Exception:
         return None
 
@@ -128,8 +128,29 @@ def _event_titles(event: dict[str, Any]) -> list[str]:
     return titles
 
 
+def _tag_value(event: dict[str, Any], key: str) -> Any:
+    tags = event.get("tags")
+    if isinstance(tags, dict):
+        return tags.get(key)
+    if isinstance(tags, list):
+        for tag in tags:
+            if isinstance(tag, dict) and tag.get("key") == key:
+                return tag.get("value")
+            if isinstance(tag, (list, tuple)) and len(tag) >= 2 and tag[0] == key:
+                return tag[1]
+    return None
+
+
+def _is_werkzeug_client_error_log(event: dict[str, Any]) -> bool:
+    if _tag_value(event, "logger") != "werkzeug":
+        return False
+    return any(re.search(r"\bcode\s+4\d\d\b", title) for title in _event_titles(event))
+
+
 def before_send_event(event: dict[str, Any], _hint: Any) -> dict[str, Any] | None:
-    """Drop synthetic Sentry smoke-test events before they reach production."""
+    """Drop synthetic and access-log noise before events reach Sentry."""
+    if _is_werkzeug_client_error_log(event):
+        return None
     if any(title.lower().startswith("test:") for title in _event_titles(event)):
         return None
 

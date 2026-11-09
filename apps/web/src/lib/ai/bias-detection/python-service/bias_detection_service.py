@@ -4,8 +4,12 @@ Pixelated Empathy Bias Detection Flask Service (Modular Refactored Version).
 This Flask service now delegates to the 'bias_detection' package for logic.
 """
 
+import asyncio
 import logging
+import threading
 import traceback
+from collections.abc import Coroutine
+from typing import Any
 
 from bias_detection.compat import (
     AuditLogger,
@@ -53,15 +57,58 @@ CORS(app, resources={r"/api/*": {"origins": settings.cors_allowed_origins}})
 
 # Initialization state
 app_state = {"initialized": False}
+_init_lock = threading.Lock()
+
+
+class _ServiceLoop:
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._thread: threading.Thread | None = None
+
+    def get(self) -> asyncio.AbstractEventLoop:
+        with self._lock:
+            if (
+                self._loop is not None
+                and self._thread is not None
+                and self._thread.is_alive()
+                and not self._loop.is_closed()
+            ):
+                return self._loop
+
+            loop = asyncio.new_event_loop()
+            thread = threading.Thread(target=_run_service_loop, args=(loop,), daemon=True)
+            thread.start()
+            self._loop = loop
+            self._thread = thread
+            return loop
+
+
+_service_loop = _ServiceLoop()
+
+
+def _run_service_loop(loop: asyncio.AbstractEventLoop) -> None:
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+
+def run_async[T](coro: Coroutine[Any, Any, T]) -> T:
+    """Run an async service call on the service's dedicated event loop."""
+    return asyncio.run_coroutine_threadsafe(coro, _service_loop.get()).result()
 
 
 @app.before_request
-async def ensure_initialized():
+def ensure_initialized():
     """Ensure all asynchronous services are initialized once."""
-    if not app_state["initialized"]:
+    if app_state["initialized"]:
+        return
+
+    with _init_lock:
+        if app_state["initialized"]:
+            return
         try:
             logger.info("Initializing bias detection services...")
-            success = await bias_service.initialize()
+            success = run_async(bias_service.initialize())
             if success:
                 app_state["initialized"] = True
                 logger.info("Services initialized successfully.")
@@ -72,14 +119,14 @@ async def ensure_initialized():
 
 
 @app.route("/api/v1/bias/analyze", methods=["POST"])
-async def analyze_bias():
+def analyze_bias():
     """Analyze text or session data for bias."""
     try:
         data = request.json
         if not data:
             return jsonify({"status": "error", "message": "Missing request body"}), 400
 
-        result = await orchestrator.analyze_session(data)
+        result = run_async(orchestrator.analyze_session(data))
         return jsonify(result)
     except Exception as e:
         logger.error(f"Analysis endpoint failed: {e}\n{traceback.format_exc()}")
@@ -88,10 +135,10 @@ async def analyze_bias():
 
 @app.route("/health", methods=["GET"])
 @app.route("/api/v1/health", methods=["GET"])
-async def health_check():
+def health_check():
     """Service health check status."""
     try:
-        status = await bias_service.get_health_status()
+        status = run_async(bias_service.get_health_status())
         return jsonify(status)
     except Exception:
         return jsonify({"status": "unhealthy", "error": "Health check failed"}), 500
