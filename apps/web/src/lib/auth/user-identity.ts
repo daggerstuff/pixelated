@@ -73,26 +73,35 @@ const CACHE_TTL_SECONDS = 60 * 60 // 1 hour
  */
 export const IDENTITY_CACHE_READ_DEADLINE_MS = 750
 
-class IdentityCacheReadDeadlineExceededError extends Error {
-  constructor(deadlineMs: number) {
-    super(`Identity cache read exceeded its ${deadlineMs}ms deadline`)
-    this.name = 'IdentityCacheReadDeadlineExceededError'
+/**
+ * Upper bound on the identity cache write that follows the SQL lookup.
+ *
+ * The write only populates the cache for later requests: once the identity is
+ * resolved, a Redis write that stalls must not hold the request open.
+ */
+export const IDENTITY_CACHE_WRITE_DEADLINE_MS = 1_000
+
+class IdentityCacheDeadlineExceededError extends Error {
+  constructor(phase: 'read' | 'write', deadlineMs: number) {
+    super(`Identity cache ${phase} exceeded its ${deadlineMs}ms deadline`)
+    this.name = 'IdentityCacheDeadlineExceededError'
   }
 }
 
-const readCacheWithDeadline = async <T>(
-  read: Promise<T>,
+const withCacheDeadline = async <T>(
+  work: Promise<T>,
+  phase: 'read' | 'write',
   deadlineMs: number,
 ): Promise<T> => {
   let timer: ReturnType<typeof setTimeout> | undefined
   const deadline = new Promise<never>((_, reject) => {
     timer = setTimeout(
-      () => reject(new IdentityCacheReadDeadlineExceededError(deadlineMs)),
+      () => reject(new IdentityCacheDeadlineExceededError(phase, deadlineMs)),
       deadlineMs,
     )
   })
   try {
-    return await Promise.race([read, deadline])
+    return await Promise.race([work, deadline])
   } finally {
     if (timer !== undefined) clearTimeout(timer)
   }
@@ -111,8 +120,9 @@ async function getCachedIdentity(
   sub: string,
 ): Promise<ResolvedIdentity | null> {
   try {
-    const cached = await readCacheWithDeadline(
+    const cached = await withCacheDeadline(
       getFromCache(cacheKey(sub)),
+      'read',
       IDENTITY_CACHE_READ_DEADLINE_MS,
     )
     if (cached && typeof cached === 'object' && 'internalId' in cached) {
@@ -126,9 +136,13 @@ async function getCachedIdentity(
 
 async function cacheIdentity(identity: ResolvedIdentity): Promise<void> {
   try {
-    await setInCache(cacheKey(identity.auth0Sub), identity, CACHE_TTL_SECONDS)
+    await withCacheDeadline(
+      setInCache(cacheKey(identity.auth0Sub), identity, CACHE_TTL_SECONDS),
+      'write',
+      IDENTITY_CACHE_WRITE_DEADLINE_MS,
+    )
   } catch {
-    // Cache write failure is not fatal — DB remains source of truth
+    // Cache write failure or timeout is not fatal — DB remains source of truth
   }
 }
 
