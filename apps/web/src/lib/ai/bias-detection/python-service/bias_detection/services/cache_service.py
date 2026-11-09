@@ -6,6 +6,7 @@ import asyncio
 import json
 import time
 from typing import Any
+from urllib.parse import urlsplit
 
 import redis.asyncio as redis
 import structlog
@@ -20,6 +21,19 @@ from bias_detection.config import settings
 logger = structlog.get_logger(__name__)
 
 
+def _redis_url_without_credentials(url: str) -> str:
+    try:
+        parsed = urlsplit(url)
+        hostname = parsed.hostname
+        port = parsed.port
+    except ValueError:
+        return "<invalid redis url>"
+    if not hostname:
+        return "<invalid redis url>"
+    host = f"{hostname}:{port}" if port else hostname
+    return f"{parsed.scheme}://{host}" if parsed.scheme else host
+
+
 class CacheService:
     """Redis cache service for bias detection service"""
 
@@ -32,7 +46,7 @@ class CacheService:
     async def connect(self) -> bool:
         """Connect to Redis"""
         try:
-            logger.info("Connecting to Redis", redis_url=settings.redis_url)
+            logger.info("Connecting to Redis", redis_url=_redis_url_without_credentials(str(settings.redis_url)))
 
             self.redis_client = redis.Redis.from_url(
                 str(settings.redis_url),
@@ -56,9 +70,9 @@ class CacheService:
             return True
 
         except Exception as e:
-            logger.error(
-                f"Failed to connect to Redis: {e!s}",
-                redis_url=str(settings.redis_url),
+            logger.warning(
+                f"Redis connection unavailable; continuing without cache: {e!s}",
+                redis_url=_redis_url_without_credentials(str(settings.redis_url)),
                 error=str(e),
             )
             self.is_connected = False
