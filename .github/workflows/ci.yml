@@ -104,6 +104,27 @@ jobs:
           echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
           docker build --pull --no-cache -f infra/Dockerfile -t "pixelatedempathy/api:$IMAGE_TAG" .
 
+      - name: Install Trivy (retrying)
+        run: |
+          set -euo pipefail
+          TRIVY_VERSION="0.70.0"
+          BASE="https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}"
+          for attempt in 1 2 3 4 5; do
+            if curl -fsSL --retry 5 --retry-delay 5 --retry-all-errors -o /tmp/trivy.tar.gz "${BASE}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" \
+               && curl -fsSL --retry 5 --retry-delay 5 --retry-all-errors -o /tmp/trivy-checksums.txt "${BASE}/trivy_${TRIVY_VERSION}_checksums.txt"; then
+              break
+            fi
+            echo "Trivy download attempt ${attempt} failed; retrying..."
+            sleep 15
+          done
+          test -s /tmp/trivy.tar.gz
+          want="$(grep "trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" /tmp/trivy-checksums.txt | awk '{print $1}')"
+          got="$(sha256sum /tmp/trivy.tar.gz | awk '{print $1}')"
+          test -n "$want" && test "$want" = "$got"
+          tar -xzf /tmp/trivy.tar.gz -C /tmp trivy
+          sudo install -m 0755 /tmp/trivy /usr/local/bin/trivy
+          trivy --version
+
       - name: Security scan
         id: trivy_scan
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
@@ -112,6 +133,7 @@ jobs:
             ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
             || '--no-deprecation' }}
         with:
+          skip-setup-trivy: 'true'
           image-ref: pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
