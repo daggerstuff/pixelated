@@ -18,10 +18,51 @@ type TrainingSessionContext = {
   difficultyLevel?: string | number
 }
 
-const jsonResponse = (body: unknown, status: number): Response =>
+/**
+ * Upper bound on the training data load.
+ *
+ * The identity-bridge repair put an identity-resolution await in front of the
+ * Postgres pool. When that await (or the pool read after it) never settles, the
+ * runtime cancels the request and the page fails with Cloudflare Error 1101.
+ * The deadline makes the route fail fast with a retryable 503 instead.
+ */
+export const TRAINING_DATA_DEADLINE_MS = 8_000
+
+const RETRY_AFTER_SECONDS = '1'
+
+class TrainingDataDeadlineExceededError extends Error {
+  constructor(deadlineMs: number) {
+    super(`Training data load exceeded its ${deadlineMs}ms deadline`)
+    this.name = 'TrainingDataDeadlineExceededError'
+  }
+}
+
+const withDeadline = async <T>(
+  work: Promise<T>,
+  deadlineMs: number,
+): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new TrainingDataDeadlineExceededError(deadlineMs)),
+      deadlineMs,
+    )
+  })
+  try {
+    return await Promise.race([work, deadline])
+  } finally {
+    if (timer !== undefined) clearTimeout(timer)
+  }
+}
+
+const jsonResponse = (
+  body: unknown,
+  status: number,
+  headers: Record<string, string> = {},
+): Response =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...headers },
   })
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -74,7 +115,7 @@ const toTrainingResponse = (
   }
 }
 
-export const getTrainingSessionResponse = async (
+const loadTrainingSession = async (
   request: Request,
   sessionId: string | undefined,
 ): Promise<Response> => {
@@ -133,5 +174,26 @@ export const getTrainingSessionResponse = async (
   } catch (error: unknown) {
     console.error('Error fetching training session:', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
+  }
+}
+
+export const getTrainingSessionResponse = async (
+  request: Request,
+  sessionId: string | undefined,
+): Promise<Response> => {
+  try {
+    return await withDeadline(
+      loadTrainingSession(request, sessionId),
+      TRAINING_DATA_DEADLINE_MS,
+    )
+  } catch (error: unknown) {
+    if (error instanceof TrainingDataDeadlineExceededError) {
+      console.error('Training session load deadline exceeded:', error.message)
+      return jsonResponse({ error: 'Session temporarily unavailable' }, 503, {
+        'Retry-After': RETRY_AFTER_SECONDS,
+      })
+    }
+    // Anything else keeps its previous behaviour (the handler rejects).
+    throw error
   }
 }

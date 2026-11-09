@@ -41,13 +41,47 @@ const service = new RedisService(config)
 let connected = false
 let connecting: Promise<void> | null = null
 
+/**
+ * Upper bound on a single Redis connect attempt.
+ *
+ * ioredis's own `connectTimeout` (5s) is not a guarantee on every runtime, and
+ * a connect that never settles must not become a memoized promise every later
+ * request awaits forever.
+ */
+export const REDIS_CONNECT_DEADLINE_MS = 3_000
+
+class RedisConnectDeadlineExceededError extends Error {
+  constructor(deadlineMs: number) {
+    super(`Redis connect exceeded its ${deadlineMs}ms deadline`)
+    this.name = 'RedisConnectDeadlineExceededError'
+  }
+}
+
+const connectWithDeadline = (deadlineMs: number): Promise<void> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new RedisConnectDeadlineExceededError(deadlineMs)),
+      deadlineMs,
+    )
+  })
+  return Promise.race([service.connect(), deadline]).finally(() => {
+    if (timer !== undefined) clearTimeout(timer)
+  })
+}
+
 async function ensureConnected(): Promise<void> {
   if (connected) return
   if (connecting) return connecting
-  connecting = service.connect().then(() => {
-    connected = true
-    connecting = null
-  })
+  // Clear the memo on success, failure, and timeout so a later call retries
+  // instead of awaiting a promise that already rejected or never settles.
+  connecting = connectWithDeadline(REDIS_CONNECT_DEADLINE_MS)
+    .then(() => {
+      connected = true
+    })
+    .finally(() => {
+      connecting = null
+    })
   return connecting
 }
 
