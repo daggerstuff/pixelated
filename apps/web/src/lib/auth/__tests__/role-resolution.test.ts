@@ -119,6 +119,8 @@ describe('role resolution via the Auth0 Management API', () => {
     process.env.AUTH0_AUDIENCE = 'test-audience'
 
     vi.clearAllMocks()
+    mockRedis.getFromCache.mockReset()
+    mockRedis.setInCache.mockReset()
     mockUserInfoClient.getUserInfo.mockReset()
     mockUserInfoClient.getProfile.mockReset()
     mockGetUserById.mockReset()
@@ -236,5 +238,54 @@ describe('role resolution via the Auth0 Management API', () => {
 
     expect(result.role).toBe('admin')
     expect(mockGetUserById).not.toHaveBeenCalled()
+  })
+
+  it('reuses a cached role without consulting the Management API', async () => {
+    const sub = 'auth0|cached-role'
+    mockUserInfoClient.getUserInfo.mockResolvedValue({
+      data: withStandardClaims({ sub }),
+    })
+    mockRedis.getFromCache.mockResolvedValue('therapist')
+
+    const result = await validateToken(tokenWithoutRoleClaim(sub), 'access')
+
+    expect(result.valid).toBe(true)
+    expect(result.role).toBe('therapist')
+    expect(mockGetUserById).not.toHaveBeenCalled()
+  })
+
+  it('caches a role resolved from the Management API', async () => {
+    const sub = 'auth0|role-cached-after-lookup'
+    mockUserInfoClient.getUserInfo.mockResolvedValue({
+      data: withStandardClaims({ sub }),
+    })
+    mockGetUserById.mockResolvedValue({
+      id: sub,
+      role: 'user',
+      appMetadata: { roles: ['therapist'] },
+    })
+
+    const result = await validateToken(tokenWithoutRoleClaim(sub), 'access')
+
+    expect(result.role).toBe('therapist')
+    expect(mockRedis.setInCache).toHaveBeenCalledWith(
+      `auth0:role:${sub}`,
+      'therapist',
+      expect.any(Number),
+    )
+  })
+
+  it('does not cache a guest downgrade when the Management API fails', async () => {
+    const sub = 'auth0|throttled-management'
+    mockUserInfoClient.getUserInfo.mockResolvedValue({
+      data: withStandardClaims({ sub }),
+    })
+    mockGetUserById.mockRejectedValue(new Error('rate limited'))
+
+    const result = await validateToken(tokenWithoutRoleClaim(sub), 'access')
+
+    expect(result.valid).toBe(true)
+    expect(result.role).toBe('guest')
+    expect(mockRedis.setInCache).not.toHaveBeenCalled()
   })
 })
