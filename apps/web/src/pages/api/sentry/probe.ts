@@ -4,6 +4,17 @@ import { Sentry } from '../../../../../../config/instrument.mjs'
 
 type ProbeMode = 'message' | 'error'
 
+/**
+ * The slice of the Sentry scope the probe touches. All methods are optional
+ * because the scope can be a no-op stub when the SDK is not available, so the
+ * probe degrades gracefully instead of throwing.
+ */
+type ProbeScope = {
+  setTag?: (key: string, value: string) => void
+  setFingerprint?: (fingerprint: string[]) => void
+  setExtra?: (key: string, value: unknown) => void
+}
+
 const resolveSentryDsn = () =>
   process.env['SENTRY_DSN'] ??
   process.env['PUBLIC_SENTRY_DSN'] ??
@@ -26,12 +37,18 @@ const resolveSentryRelease = () =>
 // on Astro's build-time PROD flag to detect production.
 // Guard import.meta.env access: it can be undefined in some SSR/preview runtimes.
 const isProductionRuntime = () =>
-  import.meta.env?.PROD === true || process.env['NODE_ENV'] === 'production'
+  import.meta.env?.PROD || process.env['NODE_ENV'] === 'production'
 
 // Treat empty or whitespace-only values as absent so fallbacks still apply.
+// This must return `undefined` (not `''`) for an empty result: `??` only falls
+// through on null/undefined, so returning `''` would stop a fallback chain such
+// as `nonEmpty(A) ?? nonEmpty(B)` from ever evaluating B.
 const nonEmpty = (value: string | null | undefined): string | undefined => {
   const trimmed = value?.trim()
-  return trimmed ? trimmed : undefined
+  if (!trimmed) {
+    return undefined
+  }
+  return trimmed
 }
 
 const hasValidProbeToken = (request: Request) => {
@@ -61,7 +78,7 @@ const redactDsn = (dsn?: string): string | null =>
 
 const emitProbeEvent = (mode: ProbeMode, message: string) => {
   let eventId: unknown
-  Sentry.withScope((scope: any) => {
+  Sentry.withScope((scope: ProbeScope) => {
     // Mark probe events so they group separately and can be excluded from
     // alerting on real application errors.
     scope?.setTag?.('probe', 'true')
@@ -89,7 +106,7 @@ const readProbeBody = async (
     return {}
   }
   try {
-    const parsed = JSON.parse(text)
+    const parsed: unknown = JSON.parse(text)
     if (parsed && typeof parsed === 'object') {
       return parsed as Record<string, unknown>
     }

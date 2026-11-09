@@ -1,0 +1,39 @@
+[openai]
+api_base = "http://127.0.0.1:20128/v1"
+
+[pr_reviewer]
+extra_instructions = """
+You are reviewing code for Pixelated Empathy.
+1. HIPAA Compliance: Never allow clinical notes, PHI, or user identifiers in logs, error payloads, or insecure stores.
+2. Anti-Suppression Policy: Flag any @ts-ignore, @ts-expect-error, @ts-nocheck, # noqa, or # type: ignore.
+3. Concurrency & Async: Check for unhandled Promise rejections and race conditions.
+4. Keep the review concise, high-signal, and actionable. Do not comment on style or formatting.
+"""
+enable_inline_comments = true
+inline_code_comments = true
+
+[config]
+ignore_pr_title = ["\\[WIP\\]", "^\\[Draft\\]", "^WIP", "^Draft"]
+ignore_bot_pr = true
+
+[pr_description]
+publish_description_as_comment = false
+enable_pr_type = true
+
+[ignore]
+glob = [
+  "**/pnpm-lock.yaml",
+  "**/package-lock.json",
+  "**/uv.lock",
+  "**/dist/**",
+  "**/dist-ssr/**",
+  "**/worktrees/**",
+  "**/*.min.js",
+  "**/*.map",
+  "**/*.svg",
+  "**/*.csv",
+  "**/*.jsonl",
+  "docs/Books/**",
+  "ai/docs/Books/**",
+  "submodules/**"
+]

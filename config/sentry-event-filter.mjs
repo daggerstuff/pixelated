@@ -70,17 +70,17 @@ export const isSyntheticSentryTestEvent = (event) =>
  */
 export const isLocalDevelopmentRun = (options = {}) => {
   const env = options.env ?? process.env
-  if (String(env.SENTRY_ALLOW_LOCAL_EVENTS ?? '') === '1') {
+  if ((env.SENTRY_ALLOW_LOCAL_EVENTS ?? '') === '1') {
     return false
   }
 
-  if (String(env.KUBERNETES_SERVICE_HOST ?? '').trim() !== '') {
+  if ((env.KUBERNETES_SERVICE_HOST ?? '').trim() !== '') {
     return false
   }
-  if (String(env.VERCEL ?? '').trim() !== '') {
+  if ((env.VERCEL ?? '').trim() !== '') {
     return false
   }
-  if (String(env.DOCKER_BUILD ?? '').trim() !== '') {
+  if ((env.DOCKER_BUILD ?? '').trim() !== '') {
     return false
   }
 
