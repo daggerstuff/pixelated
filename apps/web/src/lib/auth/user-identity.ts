@@ -22,7 +22,7 @@ import { randomUUID } from 'crypto'
 import { PoolClient } from 'pg'
 
 import { transaction } from '../db/index'
-import { getFromCache, setInCache, removeFromCache } from '../redis'
+import { getFromCache, setInCache } from '../redis'
 import type { IdentityProvider } from './identity-provider'
 import { getIdentityProvider } from './identity-provider'
 
@@ -64,6 +64,40 @@ export interface ResolvedIdentity {
 
 const CACHE_TTL_SECONDS = 60 * 60 // 1 hour
 
+/**
+ * Upper bound on the identity cache read that precedes all SQL.
+ *
+ * Redis is unreachable from the Worker, so this read must never block identity
+ * resolution: after this deadline the resolver treats the cache as a miss and
+ * falls through to the database lookup.
+ */
+export const IDENTITY_CACHE_READ_DEADLINE_MS = 750
+
+class IdentityCacheReadDeadlineExceededError extends Error {
+  constructor(deadlineMs: number) {
+    super(`Identity cache read exceeded its ${deadlineMs}ms deadline`)
+    this.name = 'IdentityCacheReadDeadlineExceededError'
+  }
+}
+
+const readCacheWithDeadline = async <T>(
+  read: Promise<T>,
+  deadlineMs: number,
+): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new IdentityCacheReadDeadlineExceededError(deadlineMs)),
+      deadlineMs,
+    )
+  })
+  try {
+    return await Promise.race([read, deadline])
+  } finally {
+    if (timer !== undefined) clearTimeout(timer)
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Cache helpers
 // ---------------------------------------------------------------------------
@@ -77,12 +111,15 @@ async function getCachedIdentity(
   sub: string,
 ): Promise<ResolvedIdentity | null> {
   try {
-    const cached = await getFromCache(cacheKey(sub))
+    const cached = await readCacheWithDeadline(
+      getFromCache(cacheKey(sub)),
+      IDENTITY_CACHE_READ_DEADLINE_MS,
+    )
     if (cached && typeof cached === 'object' && 'internalId' in cached) {
       return cached as ResolvedIdentity
     }
   } catch {
-    // Cache miss is not fatal — fall through to DB lookup
+    // Cache miss or timeout is not fatal — fall through to DB lookup
   }
   return null
 }
@@ -203,27 +240,4 @@ export async function resolveIdentity(
   await cacheIdentity(identity)
 
   return identity
-}
-
-/**
- * Invalidate the cached identity for a given provider sub.
- * Call this after role changes, deactivations, or account updates.
- */
-export async function invalidateIdentityCache(sub: string): Promise<void> {
-  try {
-    await removeFromCache(cacheKey(sub))
-  } catch {
-    // Best-effort cache invalidation — non-fatal
-  }
-}
-
-/**
- * Look up the provider sub for a given internal UUID.
- * Used when we need to call the provider's Management API by internal ID.
- */
-export async function resolveAuth0SubFromInternalId(
-  internalId: string,
-): Promise<string | null> {
-  const provider = getIdentityProvider()
-  return provider.findSubByInternalId(internalId)
 }
