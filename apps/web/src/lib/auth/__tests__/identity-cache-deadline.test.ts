@@ -1,11 +1,13 @@
 /**
- * Regression coverage for the identity cache read.
+ * Regression coverage for the identity cache read and write.
  *
  * `resolveIdentity()` reads the Redis identity cache before any SQL. Redis is
  * unreachable from the Worker, and a stalled connect made that read an
  * unbounded await in front of the database — the pre-pool hang. The cache read
  * is now bounded, so an unreachable cache cannot block identity resolution: the
- * resolver falls through to the database lookup.
+ * resolver falls through to the database lookup. The cache write that follows
+ * the SQL lookup is bounded the same way, so populating the cache cannot hold
+ * the resolved request open either.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -99,5 +101,26 @@ describe('identity cache read deadline', () => {
     expect(identity.internalId).toBe(INTERNAL_UUID)
     expect(identity.isNewUser).toBe(false)
     expect(mockProvider.findInternalIdBySub).not.toHaveBeenCalled()
+  })
+})
+
+describe('identity cache write deadline', () => {
+  it('exposes the configured cache write deadline', () => {
+    expect(userIdentity.IDENTITY_CACHE_WRITE_DEADLINE_MS).toBe(1_000)
+  })
+
+  it('resolves the identity when the cache write never settles', async () => {
+    vi.useFakeTimers()
+    mockGetFromCache.mockResolvedValue(null)
+    mockSetInCache.mockReturnValue(new Promise(() => {}))
+
+    const pending = userIdentity.resolveIdentity(profile())
+    await vi.advanceTimersByTimeAsync(
+      userIdentity.IDENTITY_CACHE_WRITE_DEADLINE_MS,
+    )
+    const identity = await pending
+
+    expect(identity.internalId).toBe(INTERNAL_UUID)
+    expect(mockSetInCache).toHaveBeenCalledTimes(1)
   })
 })

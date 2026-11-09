@@ -83,6 +83,7 @@ export class RedisService extends EventEmitter implements IRedisService {
   }
 
   async connect(): Promise<void> {
+    let rawClient: Redis | null = null
     try {
       if (this.client) {
         return
@@ -120,9 +121,8 @@ export class RedisService extends EventEmitter implements IRedisService {
         redisOptions['connectTimeout'] = this.config.connectTimeout
       }
 
-      const rawClient = new Redis(this.config.url, redisOptions)
+      rawClient = new Redis(this.config.url, redisOptions)
       const commandClient = this.createCommandClient(rawClient)
-      this.client = commandClient
 
       // Set up event handlers
       rawClient.on('error', (error: unknown) => {
@@ -139,6 +139,12 @@ export class RedisService extends EventEmitter implements IRedisService {
 
       await rawClient.connect()
 
+      // Publish the client only once the connection is established. A connect
+      // abandoned by a caller's deadline (see `redis.ts` `connectWithDeadline`)
+      // must not leave a half-open client behind: the next `connect()` would
+      // otherwise return early and callers would treat it as live.
+      this.client = commandClient
+
       // Start health checks
       this.startHealthCheck()
     } catch (error: unknown) {
@@ -147,7 +153,9 @@ export class RedisService extends EventEmitter implements IRedisService {
         this.healthCheckInterval = null
       }
 
-      await this.client?.quit().catch(() => undefined)
+      // Tear down any half-open client without waiting on a QUIT round-trip:
+      // this path is reached precisely when the connection did not establish.
+      rawClient?.disconnect()
       this.client = null
 
       // In development, we can continue without Redis
