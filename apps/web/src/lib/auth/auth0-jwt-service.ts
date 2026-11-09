@@ -440,9 +440,10 @@ function extractRoleFromPayload(payload: Auth0TokenClaims): UserRole {
 const ROLE_CACHE_TTL_SECONDS = 5 * 60
 
 /**
- * Negative results (a user with no role metadata, or an unknown subject) are
- * cached briefly: long enough to keep the hot path off the Management API,
- * short enough that a role granted moments later is picked up.
+ * A user the Management API returned with no role metadata is cached briefly:
+ * long enough to keep the hot path off the API, short enough that a role
+ * granted moments later is picked up. Failures and unresolved subjects are
+ * never cached (see `resolveRoleFromManagementApi`).
  */
 const ROLE_CACHE_NEGATIVE_TTL_SECONDS = 60
 
@@ -543,9 +544,10 @@ async function resolveRoleFromManagementApi(
     const { auth0UserService } = await import('../services/auth0.service')
     const enriched = await auth0UserService.getUserById(userId)
     if (!enriched) {
-      // The subject is unknown to the Management API: remember the negative
-      // result briefly rather than asking again on the next request.
-      await writeCachedRole(userId, 'guest', ROLE_CACHE_NEGATIVE_TTL_SECONDS)
+      // `getUserById` collapses "no such user" and "the Management API call
+      // failed" into the same `null`, so this is not a definitive answer.
+      // Do not cache it: a transient outage must not pin the identity to
+      // `guest` for the length of the negative TTL.
       return null
     }
 
