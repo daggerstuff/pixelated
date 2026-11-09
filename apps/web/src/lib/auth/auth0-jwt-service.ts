@@ -429,6 +429,68 @@ function extractRoleFromPayload(payload: Auth0TokenClaims): UserRole {
 }
 
 /**
+ * Resolve a role from the Auth0 Management API when the access token carries no
+ * role claim.
+ *
+ * The password grant issues an access token with only the standard claims
+ * (`aud, azp, exp, gty, iat, iss, scope, sub`) — no namespaced
+ * `https://pixelated.empathy/app_metadata` claim — so `extractRoleFromPayload`
+ * alone collapses every identity to `guest`. This reuses the same Management
+ * API lookup the page middleware already performs in
+ * `middleware.ts` `resolveCookieSession`, reading the raw `app_metadata.roles`
+ * from the returned user object.
+ *
+ * Best-effort by design: a missing Management client, an unavailable API, or a
+ * user with no role metadata all return `null`, leaving the token-derived role
+ * (which is `guest`) in place.
+ */
+async function resolveRoleFromManagementApi(
+  userId: string,
+): Promise<UserRole | null> {
+  try {
+    const { auth0UserService } = await import('../services/auth0.service')
+    const enriched = await auth0UserService.getUserById(userId)
+    if (!enriched) {
+      return null
+    }
+
+    // Read the raw app_metadata roles exactly as `extractRoleFromPayload` would
+    // if the token had carried them. `mapToUserRole` is case-insensitive, so
+    // Auth0's `Therapist` and the synthetic identities' `therapist` both map.
+    const roles = enriched.appMetadata?.['roles']
+    if (Array.isArray(roles)) {
+      for (const candidate of roles) {
+        if (typeof candidate === 'string') {
+          const mapped = mapToUserRole(candidate)
+          if (mapped !== 'guest') {
+            return mapped
+          }
+        }
+      }
+    }
+
+    // Fall back to the service-normalized role, but ignore its `user` default:
+    // `extractRoleFromUser` returns `user` when no role metadata is present, and
+    // that must not be mistaken for a resolved role.
+    if (
+      typeof enriched.role === 'string' &&
+      enriched.role !== 'user' &&
+      enriched.role !== 'guest'
+    ) {
+      const mapped = mapToUserRole(enriched.role)
+      if (mapped !== 'guest') {
+        return mapped
+      }
+    }
+  } catch {
+    // Management enrichment is best-effort; the token-derived role is the
+    // fallback (`guest` when the token carried no role claim).
+  }
+
+  return null
+}
+
+/**
  * Validate and decode Auth0 JWT token
  */
 export async function validateToken(
@@ -505,7 +567,16 @@ export async function validateToken(
     if (!userId) {
       throw new AuthenticationError('Token missing subject claim')
     }
-    const role = extractRoleFromPayload(tokenPayload)
+    let role = extractRoleFromPayload(tokenPayload)
+    if (role === 'guest') {
+      // The access token carries no role claim, so enrich from the Management
+      // API the same way the page middleware does. A role claim on the token,
+      // when one exists, always wins.
+      const managedRole = await resolveRoleFromManagementApi(userId)
+      if (managedRole) {
+        role = managedRole
+      }
+    }
     const tokenId = payload.jti ?? ''
     const sessionId = payload.sid
 
