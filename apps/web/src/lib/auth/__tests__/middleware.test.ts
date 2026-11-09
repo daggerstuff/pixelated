@@ -600,6 +600,57 @@ describe('Authentication Middleware', () => {
       expect(result.request).toBe(postRequest)
     })
 
+    it('should read the token from the KV-backed store when one is passed', async () => {
+      const { createCsrfStore } = await import('../../security/csrf-store')
+      const stored = new Map<string, string>([
+        [
+          `csrf:${DUMMY_VALID_CSRF_TOKEN}`,
+          JSON.stringify({
+            token: DUMMY_VALID_CSRF_TOKEN,
+            expiresAt: Date.now() + 3600000,
+          }),
+        ],
+      ])
+      const csrfStore = createCsrfStore({
+        kv: {
+          get: async (key) => stored.get(key) ?? null,
+          put: async (key, value) => {
+            stored.set(key, value)
+          },
+        },
+      })
+      const postRequest = new Request('https://example.com/api/test', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-Token': DUMMY_VALID_CSRF_TOKEN,
+        },
+      })
+
+      const result = await csrfProtection(postRequest, { csrfStore })
+
+      expect(csrfStore.kind).toBe('kv')
+      expect(result.success).toBe(true)
+      expect(result.request).toBe(postRequest)
+    })
+
+    it('should reject when no CSRF store is available', async () => {
+      const { createCsrfStore } = await import('../../security/csrf-store')
+      const postRequest = new Request('https://example.com/api/test', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-Token': DUMMY_VALID_CSRF_TOKEN,
+        },
+      })
+
+      const result = await csrfProtection(postRequest, {
+        csrfStore: createCsrfStore({ kv: null, cache: null }),
+      })
+
+      expect(result.success).toBe(false)
+      expect(result.response?.status).toBe(403)
+      expect(result.error).toContain('Invalid CSRF token')
+    })
+
     it('should reject POST requests without CSRF token', async () => {
       const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',

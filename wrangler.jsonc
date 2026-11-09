@@ -24,6 +24,15 @@
 		"not_found_handling": "none"
 	},
 	"workers_dev": true,
+	"kv_namespaces": [
+		// CSRF token store (one-hour TTL). Redis is unreachable from the Worker,
+		// so tokens are written here; see apps/web/src/lib/security/csrf-store.ts.
+		// Non-secret identifier only — no credential material in this file.
+		{
+			"binding": "CSRF_TOKENS",
+			"id": "1643bc8555e74fb7bb0eac0d7c1cb1e0"
+		}
+	],
 	"routes": [
 		// Zone route: the zone's apex records are already Cloudflare-proxied (to
 		// the Vercel standby), so a Workers route takes the traffic with no DNS

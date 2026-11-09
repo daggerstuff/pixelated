@@ -8,6 +8,7 @@ import {
 } from '../../../lib/auth/middleware'
 import { sanitizeInput } from '../../../lib/auth/utils'
 import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
+import { resolveCsrfStore } from '../../../lib/security/csrf-store'
 import { auth0UserService } from '../../../lib/services/auth0.service'
 import { validateRequestBody } from '../../../lib/validation/validateRequestBody'
 
@@ -23,9 +24,11 @@ const signinSchema = z.object({
 export const POST = async ({
   request,
   clientAddress,
+  locals,
 }: {
   request: Request
   clientAddress: string
+  locals?: unknown
 }) => {
   // E2E test-auth bypass — ONLY active when E2E_TEST_AUTH=1 (set exclusively
   // in the bias-detection CI workflow). Accepts the seeded test credentials
@@ -90,8 +93,11 @@ export const POST = async ({
       deviceId,
     }
 
-    // Apply CSRF protection
-    const csrfResult = await csrfProtection(request)
+    // Apply CSRF protection. The store is resolved from the adapter runtime
+    // env here (KV binding first, Redis cache otherwise) and handed to the
+    // middleware, so both halves of the token round-trip agree.
+    const csrfStore = await resolveCsrfStore(locals)
+    const csrfResult = await csrfProtection(request, { csrfStore })
     if (!csrfResult.success) {
       return csrfResult.response!
     }
