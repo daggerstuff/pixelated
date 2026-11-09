@@ -1,5 +1,7 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-const logger = createBuildSafeLogger('utils') /**
+const logger = createBuildSafeLogger('utils')
+
+/**
  * Sentry Utilities for Manual Error Reporting and Metrics
  *
  * This file provides utilities for manually capturing errors,
@@ -25,14 +27,6 @@ const ENV_MODE = import.meta?.env
 type SentryShim = {
   captureException: (error: unknown) => void
   captureMessage: (message: string) => void
-  setUser: (user: Record<string, unknown>) => void
-  addBreadcrumb: (crumb: {
-    message: string
-    category?: string
-    data?: Record<string, unknown>
-    timestamp?: number
-    level?: 'info' | 'error' | 'warning' | 'debug'
-  }) => void
   withScope: (
     cb: (scope: {
       setContext: (key: string, value: Record<string, unknown>) => void
@@ -46,18 +40,12 @@ type SentryShim = {
       value: number,
       options?: { attributes?: Record<string, unknown> },
     ) => void
-    gauge: (
-      name: string,
-      value: number,
-      options?: { attributes?: Record<string, unknown>; unit?: string },
-    ) => void
     distribution: (
       name: string,
       value: number,
       options?: { attributes?: Record<string, unknown>; unit?: string },
     ) => void
   }
-  flush?: () => Promise<void>
 }
 
 function getSentry(): SentryShim | null {
@@ -127,61 +115,6 @@ export function captureMessage(
 }
 
 /**
- * Set user context for Sentry
- */
-export function setUserContext(user: {
-  id?: string
-  email?: string
-  username?: string
-  [key: string]: unknown
-}) {
-  const Sentry = getSentry()
-  if (!Sentry) return
-  Sentry.setUser(user)
-}
-
-/**
- * Add breadcrumb for user action tracking
- */
-export function addBreadcrumb(
-  message: string,
-  category: string,
-  data?: Record<string, unknown>,
-) {
-  const Sentry = getSentry()
-  if (!Sentry) return
-  Sentry.addBreadcrumb({
-    message,
-    category,
-    ...(data ? { data } : {}),
-    timestamp: Date.now() / 1000,
-    level: 'info',
-  })
-}
-
-/**
- * Start a performance transaction
- *
- * @deprecated Sentry Astro does not support manual transactions. This is a no-op.
- */
-export function startTransaction(
-  _name: string,
-  _operation: string,
-): { setData: () => void; finish: () => void } {
-  // Sentry Astro does not support manual transactions.
-  // This function is a no-op for compatibility.
-  if (IS_DEV) {
-    logger.warn(
-      '[Sentry] startTransaction is not supported in @sentry/astro and will be ignored.',
-    )
-  }
-  return {
-    setData: () => {},
-    finish: () => {},
-  }
-}
-
-/**
  * Test Sentry integration
  */
 export function testSentryIntegration() {
@@ -204,49 +137,6 @@ export function testSentryIntegration() {
       timestamp: new Date().toISOString(),
     },
   })
-}
-
-/**
- * Performance monitoring utilities
- *
- * @deprecated Sentry Astro does not support manual performance transactions.
- * These methods are no-ops and kept for compatibility.
- */
-export const performance = {
-  /**
-   * Measure page load performance (no-op)
-   */
-  measurePageLoad: (
-    _pageName: string,
-  ): { setData: () => void; finish: () => void } => {
-    if (IS_DEV) {
-      logger.warn(
-        '[Sentry] measurePageLoad is not supported in @sentry/astro and will be ignored.',
-      )
-    }
-    return {
-      setData: () => {},
-      finish: () => {},
-    }
-  },
-
-  /**
-   * Measure API call performance (no-op)
-   */
-  measureApiCall: (
-    _endpoint: string,
-    _method: string = 'GET',
-  ): { setData: () => void; finish: () => void } => {
-    if (IS_DEV) {
-      logger.warn(
-        '[Sentry] measureApiCall is not supported in @sentry/astro and will be ignored.',
-      )
-    }
-    return {
-      setData: () => {},
-      finish: () => {},
-    }
-  },
 }
 
 // ============================================
@@ -297,41 +187,11 @@ export function countMetric(
 }
 
 /**
- * Gauge metric - track values that can go up and down
- * Use for: queue depths, memory usage, active sessions, concurrent users
- *
- * @example
- * ```ts
- * // Track active sessions
- * gaugeMetric('active_sessions', 42, { region: 'us-west' })
- *
- * // Track queue depth
- * gaugeMetric('bias_analysis_queue', 15, { priority: 'high' })
- *
- * // Track memory usage in MB
- * gaugeMetric('memory_usage', 512, { unit: 'megabyte', service: 'main' })
- * ```
- */
-export function gaugeMetric(
-  name: string,
-  value: number,
-  attributes?: MetricAttributes,
-  unit?: string,
-): void {
-  try {
-    const Sentry = getSentry()
-    if (!Sentry) return
-    Sentry.metrics.gauge(name, value, { attributes, unit })
-  } catch (error: unknown) {
-    if (IS_DEV) {
-      logger.warn('[Sentry Metrics] Failed to emit gauge metric:', error)
-    }
-  }
-}
-
-/**
  * Distribution metric - track value distributions (percentiles: p50, p90, p99)
  * Use for: response times, request sizes, processing durations
+ *
+ * Internal helper: consumers should use the domain helpers below
+ * (`emotionMetrics`, `apiMetrics`) rather than calling this directly.
  *
  * @example
  * ```ts
@@ -353,7 +213,7 @@ export function gaugeMetric(
  * })
  * ```
  */
-export function distributionMetric(
+function distributionMetric(
   name: string,
   value: number,
   options?: {
@@ -419,51 +279,6 @@ export const emotionMetrics = {
 }
 
 /**
- * Track bias detection metrics
- */
-export const biasMetrics = {
-  /**
-   * Track when a bias analysis is performed
-   */
-  analysisPerformed(attributes: {
-    layer: string
-    sessionId?: string
-    success?: boolean
-  }): void {
-    countMetric('bias.analysis_performed', 1, {
-      layer: attributes.layer,
-      success: attributes.success ?? true,
-    })
-  },
-
-  /**
-   * Track bias analysis latency
-   */
-  analysisLatency(durationMs: number, layer: string): void {
-    distributionMetric('bias.analysis_latency', durationMs, {
-      attributes: { layer },
-      unit: 'millisecond',
-    })
-  },
-
-  /**
-   * Track bias score distribution
-   */
-  scoreDistribution(biasType: string, score: number): void {
-    distributionMetric('bias.score', score, {
-      attributes: { bias_type: biasType },
-    })
-  },
-
-  /**
-   * Track bias alert levels
-   */
-  alertTriggered(level: 'low' | 'warning' | 'high' | 'critical'): void {
-    countMetric('bias.alert_triggered', 1, { alert_level: level })
-  },
-}
-
-/**
  * Track API performance metrics
  */
 export const apiMetrics = {
@@ -498,57 +313,4 @@ export const apiMetrics = {
   error(endpoint: string, errorType: string): void {
     countMetric('api.error', 1, { endpoint, error_type: errorType })
   },
-}
-
-/**
- * Track therapeutic session metrics
- */
-export const sessionMetrics = {
-  /**
-   * Track session started
-   */
-  started(sessionType: string): void {
-    countMetric('session.started', 1, { session_type: sessionType })
-  },
-
-  /**
-   * Track session completed
-   */
-  completed(sessionType: string, durationMinutes: number): void {
-    countMetric('session.completed', 1, { session_type: sessionType })
-    distributionMetric('session.duration', durationMinutes, {
-      attributes: { session_type: sessionType },
-      unit: 'minute',
-    })
-  },
-
-  /**
-   * Track active sessions gauge
-   */
-  activeSessions(count: number): void {
-    gaugeMetric('session.active_count', count)
-  },
-}
-
-/**
- * Flush all pending metrics to Sentry
- * Call this before process exit or page unload if needed
- */
-export async function flushMetrics(): Promise<void> {
-  try {
-    const client = getSentry()
-    if (client && typeof client.flush === 'function') {
-      await client.flush()
-    }
-  } catch (error: unknown) {
-    if (IS_DEV) {
-      logger.warn('[Sentry Metrics] Failed to flush metrics:', error)
-    }
-  }
-}
-
-// Re-export wrappers that perform safe checking
-export {
-  captureError as captureException,
-  captureMessage as sentryCaptureMessage,
 }
