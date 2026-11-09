@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://cubic.dev/schema/cubic-repository-config.schema.json
+
+version: 1
+reviews:
+  enabled: true
+  sensitivity: medium
+  incremental_commits: true
+  check_drafts: false
+  architecture_diagrams: false
+  merge_confidence_summary: true
+
+  ignore:
+    pr_labels:
+      - "dependencies"
+      - "automated"
+    max_changed_lines: 5000
+    files:
+      - "pnpm-lock.yaml"
+      - "package-lock.json"
+      - "uv.lock"
+      - "**/dist/**"
+      - "**/dist-ssr/**"
+      - "**/worktrees/**"
+      - "**/*.min.js"
+      - "**/*.map"
+      - "**/*.svg"
+      - "**/*.csv"
+      - "**/*.jsonl"
+      - "docs/Books/**"
+      - "ai/docs/Books/**"
+      - "submodules/**"
+
+instructions: |
+  Focus on high-severity issues:
+  1. HIPAA compliance: flag any exposed PHI or unencrypted clinical identifiers in logs, requests, or database fields.
+  2. Zero-suppression policy: flag any @ts-ignore, @ts-expect-error, # noqa, or # type: ignore.
+  3. Ensure async operations handle error cases and reject unhandled Promise rejections.
+  4. Disregard code styling, whitespace, and formatting (handled by oxlint and ruff).
