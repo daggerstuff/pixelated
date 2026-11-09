@@ -199,6 +199,38 @@ export function isLocalDevServerEvent(event: Event): boolean {
   return false
 }
 
+function isDevelopmentNoiseEvent(event: Event): boolean {
+  return import.meta.env.DEV || event.tags?.['environment'] === 'development'
+}
+
+function isWriteEpipeEvent(event: Event): boolean {
+  if (!isDevelopmentNoiseEvent(event)) {
+    return false
+  }
+  return (
+    event.exception?.values?.some((exception) =>
+      exception.value?.includes('write EPIPE'),
+    ) ?? false
+  )
+}
+
+function isAstroManifestEnoentEvent(event: Event): boolean {
+  if (!isDevelopmentNoiseEvent(event)) {
+    return false
+  }
+  return (
+    event.exception?.values?.some(
+      (exception) =>
+        exception.value?.startsWith('ENOENT:') &&
+        exception.stacktrace?.frames?.some((frame) =>
+          frame.filename?.includes(
+            'astro/dist/core/routing/create-manifest.js',
+          ),
+        ),
+    ) ?? false
+  )
+}
+
 export function beforeSend(event: Event): Event | null {
   if (import.meta.env.DEV) {
     logger.info('Sentry event:', event)
@@ -219,6 +251,10 @@ export function beforeSend(event: Event): Event | null {
     if (isLocalDevServerEvent(event)) {
       return null
     }
+  }
+
+  if (isWriteEpipeEvent(event) || isAstroManifestEnoentEvent(event)) {
+    return null
   }
 
   // Drop synthetic test events whose title begins with "Test:" to prevent
