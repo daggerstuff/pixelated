@@ -40,9 +40,15 @@ const isProductionRuntime = () =>
   import.meta.env?.PROD || process.env['NODE_ENV'] === 'production'
 
 // Treat empty or whitespace-only values as absent so fallbacks still apply.
+// This must return `undefined` (not `''`) for an empty result: `??` only falls
+// through on null/undefined, so returning `''` would stop a fallback chain such
+// as `nonEmpty(A) ?? nonEmpty(B)` from ever evaluating B.
 const nonEmpty = (value: string | null | undefined): string | undefined => {
   const trimmed = value?.trim()
-  return trimmed ?? undefined
+  if (!trimmed) {
+    return undefined
+  }
+  return trimmed
 }
 
 const hasValidProbeToken = (request: Request) => {
