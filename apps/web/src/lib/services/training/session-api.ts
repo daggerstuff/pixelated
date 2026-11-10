@@ -34,14 +34,21 @@ export const TRAINING_DATA_DEADLINE_MS = 8_000
 
 const RETRY_AFTER_SECONDS = '1'
 
-class TrainingDataDeadlineExceededError extends Error {
+export class TrainingDataDeadlineExceededError extends Error {
   constructor(deadlineMs: number) {
     super(`Training data load exceeded its ${deadlineMs}ms deadline`)
     this.name = 'TrainingDataDeadlineExceededError'
   }
 }
 
-const withDeadline = async <T>(
+/**
+ * Race `work` against a deadline.
+ *
+ * Exported so the message-POST route reuses this exact bound instead of
+ * building a second deadline mechanism. The caller maps
+ * `TrainingDataDeadlineExceededError` to its own retryable response.
+ */
+export const withDeadline = async <T>(
   work: Promise<T>,
   deadlineMs: number,
 ): Promise<T> => {

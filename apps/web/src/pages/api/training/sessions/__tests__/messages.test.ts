@@ -1,16 +1,23 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockQuery, mockGetSession } = vi.hoisted(() => ({
-  mockQuery: vi.fn(),
-  mockGetSession: vi.fn(),
-}))
+const { mockQuery, mockGetSession, mockResolveInternalUserId } = vi.hoisted(
+  () => ({
+    mockQuery: vi.fn(),
+    mockGetSession: vi.fn(),
+    mockResolveInternalUserId: vi.fn(),
+  }),
+)
 
 vi.mock('@/lib/auth/session', () => ({ getSession: mockGetSession }))
 vi.mock('@/lib/auth/internal-identity', () => ({
-  resolveInternalUserId: async (principal: { id?: string } | null) =>
-    principal?.id ?? null,
+  resolveInternalUserId: mockResolveInternalUserId,
 }))
-vi.mock('@/lib/db', () => ({ getPool: () => ({ query: mockQuery }) }))
+vi.mock('@/lib/db', () => ({
+  getPool: () => ({ query: mockQuery }),
+  query: mockQuery,
+  isDatabaseUnavailableError: (error: unknown) =>
+    (error as { code?: string } | null)?.code === 'DB_UNAVAILABLE',
+}))
 
 import { POST } from '../[sessionId]/messages'
 
@@ -33,6 +40,7 @@ const request = (body: unknown) =>
 beforeEach(() => {
   vi.clearAllMocks()
   mockGetSession.mockResolvedValue({ user: { id: USER_ID } })
+  mockResolveInternalUserId.mockResolvedValue(USER_ID)
 })
 
 describe('POST /api/training/sessions/:sessionId/messages', () => {
@@ -78,6 +86,37 @@ describe('POST /api/training/sessions/:sessionId/messages', () => {
       USER_ID,
       'Practice response',
     ])
+  })
+
+  it('denies an unresolvable identity without reaching the database', async () => {
+    mockResolveInternalUserId.mockResolvedValue(null)
+
+    const response = await invoke({
+      request: request({ content: 'Practice response' }),
+      params: { sessionId: SESSION_ID },
+    })
+
+    expect(response.status).toBe(403)
+    expect(await response.json()).toEqual({
+      error: 'User identity not resolved',
+    })
+    expect(mockQuery).not.toHaveBeenCalled()
+  })
+
+  it('answers 404 when the session is not owned by the caller', async () => {
+    // The ownership predicate lives in the INSERT ... SELECT, so a non-owner
+    // (or a non-training / non-synthetic session) returns no row.
+    mockQuery.mockResolvedValueOnce({ rows: [] })
+
+    const response = await invoke({
+      request: request({ content: 'Practice response' }),
+      params: { sessionId: SESSION_ID },
+    })
+
+    expect(response.status).toBe(404)
+    expect(await response.json()).toEqual({
+      error: 'Training session not found',
+    })
   })
 
   it('rejects empty and oversized messages', async () => {
