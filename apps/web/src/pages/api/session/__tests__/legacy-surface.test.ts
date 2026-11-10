@@ -16,6 +16,14 @@ vi.mock('../../../../lib/auth/internal-identity', () => ({
 vi.mock('../../../../lib/db', () => ({
   getPool: () => ({ connect: async () => state }),
   acquireClient: async () => state,
+  isDatabaseUnavailableError: (error: unknown) =>
+    error instanceof Error &&
+    (/query read timeout|database statement exceeded|database statement could not complete within/i.test(
+      error.message,
+    ) ||
+      ['08006', '08003', '57P01', 'ECONNREFUSED', 'ECONNRESET'].includes(
+        (error as { code?: string }).code ?? '',
+      )),
 }))
 
 import * as analytics from '../analytics'
@@ -76,6 +84,8 @@ describe('legacy /api/session/* routes on absent schema', () => {
 
     expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
+    expect(state.query).toHaveBeenCalledWith('ROLLBACK')
+    expect(state.release).toHaveBeenCalledWith()
   })
 
   it('progress GET reports 410 instead of 500 when progress columns are absent', async () => {
@@ -253,5 +263,269 @@ describe('legacy /api/session/* routes on absent schema', () => {
     ])
     expect(mockResolveInternalUserId).not.toHaveBeenCalled()
     expect(state.query).not.toHaveBeenCalled()
+  })
+})
+
+describe('legacy /api/session/* routes when a statement hits the query bound', () => {
+  /**
+   * The shape pg raises when the pool-level `query_timeout` abandons a
+   * statement: a bare `Error` with this message and no `code`. Measured on
+   * `249c558c4` / Worker `7542a5d3` as the cause of the 500 regression.
+   */
+  const queryReadTimeout = () => new Error('Query read timeout')
+
+  /**
+   * The shape pg raises when a statement is abandoned because the connection
+   * was destroyed by the client-side bound — what the route's own `ROLLBACK`
+   * then hits. It is not a query timeout, so it must never mask the original.
+   */
+  const destroyedConnection = () =>
+    new Error('Client has encountered a connection error and is not queryable')
+
+  const RETRYABLE_CODE = 'LEGACY_SESSION_API_TEMPORARILY_UNAVAILABLE'
+
+  const expectRetryable = async (
+    response: Response,
+    options: { advertiseRetry?: boolean } = {},
+  ) => {
+    expect(response.status).toBe(503)
+    if (options.advertiseRetry === false) {
+      expect(response.headers.get('Retry-After')).toBeNull()
+    } else {
+      expect(response.headers.get('Retry-After')).toBe('1')
+    }
+    expect(await response.json()).toEqual({
+      error: 'Legacy session analytics are temporarily unavailable',
+      code: RETRYABLE_CODE,
+    })
+  }
+
+  it('progress GET answers the retryable status instead of 500', async () => {
+    state.query.mockRejectedValue(queryReadTimeout())
+
+    const response = await invoke(
+      progress.GET as Handler,
+      get(`/api/session/progress?sessionId=${SESSION_ID}`),
+    )
+
+    await expectRetryable(response)
+  })
+
+  it('progress POST answers the retryable status without inviting a duplicate write', async () => {
+    state.query.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN') return ok()
+      if (sql.includes('FOR UPDATE')) throw queryReadTimeout()
+      throw new Error(`unexpected statement: ${sql}`)
+    })
+
+    const response = await invoke(
+      progress.POST as Handler,
+      post('/api/session/progress', {
+        sessionId: SESSION_ID,
+        progressMetrics: { totalMessages: 1, progress: 50 },
+      }),
+    )
+
+    await expectRetryable(response, { advertiseRetry: false })
+    expect(state.query).not.toHaveBeenCalledWith('ROLLBACK')
+    expect(state.release).toHaveBeenCalledWith(true)
+  })
+
+  it('destroys the client when the rollback itself fails', async () => {
+    state.query.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN') return ok()
+      if (sql === 'ROLLBACK') throw destroyedConnection()
+      if (sql.includes('FOR UPDATE')) return ok([{ id: SESSION_ID }])
+      throw schemaError('42703')
+    })
+
+    const response = await invoke(
+      progress.POST as Handler,
+      post('/api/session/progress', {
+        sessionId: SESSION_ID,
+        progressMetrics: { totalMessages: 1, progress: 50 },
+      }),
+    )
+
+    expect(response.status).toBe(410)
+    expect(state.query).toHaveBeenCalledWith('ROLLBACK')
+    expect(state.release).toHaveBeenCalledWith(true)
+  })
+
+  it('answers 503 instead of 500 when the identity lookup loses the connection', async () => {
+    mockResolveInternalUserId.mockRejectedValue(
+      Object.assign(new Error('connect ECONNREFUSED 127.0.0.1:5432'), {
+        code: '08006',
+      }),
+    )
+
+    const response = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+
+    await expectRetryable(response)
+  })
+
+  it('answers 503 instead of 403 when the identity lookup hits the bound', async () => {
+    mockResolveInternalUserId.mockRejectedValue(queryReadTimeout())
+
+    const getResponse = await invoke(
+      progress.GET as Handler,
+      get(`/api/session/progress?sessionId=${SESSION_ID}`),
+    )
+    const postResponse = await invoke(
+      progress.POST as Handler,
+      post('/api/session/progress', {
+        sessionId: SESSION_ID,
+        progressMetrics: { totalMessages: 1, progress: 50 },
+      }),
+    )
+
+    await expectRetryable(getResponse)
+    await expectRetryable(postResponse)
+    expect(mockResolveInternalUserId).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'auth0|legacy-caller' }),
+      { propagateDatabaseErrors: true },
+    )
+  })
+
+  it('skills GET answers the retryable status instead of 500', async () => {
+    state.query.mockRejectedValue(queryReadTimeout())
+
+    const response = await invoke(
+      skills.GET as Handler,
+      get(`/api/session/skills?therapistId=me`),
+    )
+
+    await expectRetryable(response)
+  })
+
+  it('skills POST answers the retryable status instead of 500', async () => {
+    state.query.mockRejectedValue(queryReadTimeout())
+
+    const response = await invoke(
+      skills.POST as Handler,
+      post('/api/session/skills', {
+        sessionId: SESSION_ID,
+        skillScores: { 'Active Listening': 80 },
+      }),
+    )
+
+    await expectRetryable(response, { advertiseRetry: false })
+  })
+
+  it('comparison GET answers the retryable status instead of 500', async () => {
+    state.query.mockRejectedValue(queryReadTimeout())
+
+    const response = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+
+    await expectRetryable(response)
+  })
+
+  it('comparison POST answers the retryable status instead of 500', async () => {
+    state.query.mockRejectedValue(queryReadTimeout())
+
+    const response = await invoke(
+      comparison.POST as Handler,
+      post('/api/session/comparison', {
+        currentSessionId: SESSION_ID,
+        improvementScore: 10,
+        metrics: { empathy: 1 },
+      }),
+    )
+
+    await expectRetryable(response, { advertiseRetry: false })
+  })
+
+  it('analytics GET answers the retryable status instead of 500', async () => {
+    state.query.mockRejectedValue(queryReadTimeout())
+
+    const response = await invoke(
+      analytics.GET as Handler,
+      get(`/api/session/analytics?sessionId=${SESSION_ID}`),
+    )
+
+    await expectRetryable(response)
+  })
+
+  it('analytics POST answers the retryable status instead of 500', async () => {
+    state.query.mockRejectedValue(queryReadTimeout())
+
+    const response = await invoke(
+      analytics.POST as Handler,
+      post('/api/session/analytics', {
+        sessionId: SESSION_ID,
+        analyticsData: {
+          sessionMetrics: [{ metricName: 'duration', metricValue: 42 }],
+          skillProgress: [],
+        },
+      }),
+    )
+
+    await expectRetryable(response, { advertiseRetry: false })
+  })
+
+  it('maps a server-side statement timeout (57014) the same way', async () => {
+    state.query.mockRejectedValue(
+      Object.assign(new Error('canceling statement due to statement timeout'), {
+        code: '57014',
+      }),
+    )
+
+    const response = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+
+    await expectRetryable(response)
+  })
+
+  it('keeps the retryable body free of pg codes, statement text and table names', async () => {
+    state.query.mockRejectedValue(
+      Object.assign(new Error('Query read timeout'), {
+        detail: 'SELECT * FROM evaluations WHERE session_id = $1',
+      }),
+    )
+
+    const response = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+
+    const body = JSON.stringify(await response.json())
+    expect(response.status).toBe(503)
+    for (const leak of [
+      'Query read timeout',
+      'timeout',
+      '57014',
+      '42P01',
+      '42703',
+      'SELECT',
+      'evaluations',
+      'session_comparisons',
+      'sessions',
+    ]) {
+      expect(body.toLowerCase()).not.toContain(leak.toLowerCase())
+    }
+  })
+
+  it('still answers 410 for absent schema and 500 for a non-timeout infrastructure error', async () => {
+    state.query.mockRejectedValue(schemaError('42P01'))
+    const schemaResponse = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+    expect(schemaResponse.status).toBe(410)
+
+    state.query.mockRejectedValue(schemaError('08006'))
+    const infrastructureResponse = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+    expect(infrastructureResponse.status).toBe(500)
   })
 })

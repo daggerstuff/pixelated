@@ -1,11 +1,13 @@
 import type { APIRoute } from 'astro'
 
-import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
 import { getPool } from '../../../lib/db'
 import {
   isMissingLegacySchema,
+  isQueryTimeout,
+  legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
+  resolveLegacyTherapistId,
 } from './_legacy-surface'
 
 type SessionMetricPayload = {
@@ -152,7 +154,8 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const therapistId = await resolveInternalUserId(session.user)
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
@@ -250,6 +253,10 @@ export const POST: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
+    if (isQueryTimeout(error))
+      return legacySessionRetryableResponse({
+        advertiseRetry: false,
+      })
     console.error('Error saving session analytics:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -269,7 +276,8 @@ export const GET: APIRoute = async ({ request }) => {
       )
     }
 
-    const therapistId = await resolveInternalUserId(session.user)
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
@@ -376,6 +384,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
+    if (isQueryTimeout(error)) return legacySessionRetryableResponse()
     console.error('Error fetching session analytics:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

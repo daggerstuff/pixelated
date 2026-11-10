@@ -20,6 +20,14 @@ vi.mock('@/lib/auth/internal-identity', () => ({
 }))
 vi.mock('@/lib/db', () => ({
   getPool: () => ({ connect: mockConnect }),
+  isDatabaseUnavailableError: (error: unknown) =>
+    error instanceof Error &&
+    (/query read timeout|database statement exceeded|database statement could not complete within/i.test(
+      error.message,
+    ) ||
+      ['08006', '08003', '57P01', 'ECONNREFUSED', 'ECONNRESET'].includes(
+        (error as { code?: string }).code ?? '',
+      )),
 }))
 
 import { GET, POST } from '../snapshots'
@@ -126,6 +134,7 @@ describe('session snapshots authorization', () => {
     expect(response.status).toBe(200)
     expect(mockResolveInternalUserId).toHaveBeenCalledWith(
       authenticatedSession.user,
+      { propagateDatabaseErrors: true },
     )
     expect(mockQuery.mock.calls[1]?.[0]).toContain(
       'id = $1 AND therapist_id = $2 FOR UPDATE',
@@ -252,5 +261,122 @@ describe('session snapshots on absent schema', () => {
     })
 
     expect(response.status).toBe(500)
+  })
+})
+
+describe('session snapshots when a statement hits the query bound', () => {
+  /** The bare `Error` pg raises from the pool-level `query_timeout`. */
+  const queryReadTimeout = () => new Error('Query read timeout')
+  const RETRYABLE_CODE = 'LEGACY_SESSION_API_TEMPORARILY_UNAVAILABLE'
+
+  const expectRetryable = async (
+    response: Response,
+    options: { advertiseRetry?: boolean } = {},
+  ) => {
+    expect(response.status).toBe(503)
+    if (options.advertiseRetry === false) {
+      expect(response.headers.get('Retry-After')).toBeNull()
+    } else {
+      expect(response.headers.get('Retry-After')).toBe('1')
+    }
+    expect(await response.json()).toEqual({
+      error: 'Legacy session analytics are temporarily unavailable',
+      code: RETRYABLE_CODE,
+    })
+  }
+
+  it('GET answers the retryable status instead of 500', async () => {
+    mockQuery.mockRejectedValue(queryReadTimeout())
+
+    const response = await invoke(GET, {
+      request: createRequest(
+        `http://localhost/api/session/snapshots?sessionId=${SESSION_ID}`,
+      ),
+    })
+
+    await expectRetryable(response)
+  })
+
+  it('POST answers the retryable status without inviting a duplicate write', async () => {
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN') return { rowCount: 0, rows: [] }
+      if (sql.includes('FOR UPDATE')) throw queryReadTimeout()
+      throw new Error(`unexpected statement: ${sql}`)
+    })
+
+    const response = await invoke(POST, {
+      request: createRequest('http://localhost/api/session/snapshots', {
+        sessionId: SESSION_ID,
+        snapshots: [{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }],
+      }),
+    })
+
+    await expectRetryable(response, { advertiseRetry: false })
+    expect(mockQuery).not.toHaveBeenCalledWith('ROLLBACK')
+    expect(mockRelease).toHaveBeenCalledWith(true)
+  })
+
+  it('answers 503 instead of 500 when the identity lookup loses the connection', async () => {
+    mockResolveInternalUserId.mockRejectedValue(
+      Object.assign(new Error('connect ECONNREFUSED 127.0.0.1:5432'), {
+        code: '08006',
+      }),
+    )
+
+    const response = await invoke(GET, {
+      request: createRequest(
+        `http://localhost/api/session/snapshots?sessionId=${SESSION_ID}`,
+      ),
+    })
+
+    await expectRetryable(response)
+  })
+
+  it('answers 503 instead of 403 when the identity lookup hits the bound', async () => {
+    mockResolveInternalUserId.mockRejectedValue(queryReadTimeout())
+
+    const getResponse = await invoke(GET, {
+      request: createRequest(
+        `http://localhost/api/session/snapshots?sessionId=${SESSION_ID}`,
+      ),
+    })
+    const postResponse = await invoke(POST, {
+      request: createRequest('http://localhost/api/session/snapshots', {
+        sessionId: SESSION_ID,
+        snapshots: [{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }],
+      }),
+    })
+
+    await expectRetryable(getResponse)
+    await expectRetryable(postResponse)
+    expect(mockResolveInternalUserId).toHaveBeenCalledWith(
+      expect.objectContaining({ id: AUTH0_SUB }),
+      { propagateDatabaseErrors: true },
+    )
+  })
+
+  it('POST keeps 410 for absent schema even when the rollback fails', async () => {
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN') return { rowCount: 0, rows: [] }
+      if (sql === 'ROLLBACK') {
+        throw new Error(
+          'Client has encountered a connection error and is not queryable',
+        )
+      }
+      if (sql.includes('FOR UPDATE')) return { rowCount: 1, rows: [] }
+      throw schemaError('42703')
+    })
+
+    const response = await invoke(POST, {
+      request: createRequest('http://localhost/api/session/snapshots', {
+        sessionId: SESSION_ID,
+        snapshots: [{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }],
+      }),
+    })
+
+    expect(response.status).toBe(410)
+    expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
+    expect(mockQuery).toHaveBeenCalledWith('ROLLBACK')
+    expect(mockRelease).toHaveBeenCalledWith(true)
   })
 })
