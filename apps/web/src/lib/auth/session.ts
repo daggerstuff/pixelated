@@ -49,6 +49,21 @@ export interface Session {
 export type SessionData = Session
 
 /**
+ * The verdict one token validation produces.
+ *
+ * `provider-unavailable` is deliberately not a denial: the token could not be
+ * checked because Auth0 was throttled, erroring, or too slow. Callers must
+ * answer a retryable failure (`503` + `Retry-After`), never a logout.
+ */
+export interface SessionValidation {
+  status: 'valid' | 'invalid' | 'provider-unavailable'
+  /** The validated session. Present only when `status` is `'valid'`. */
+  session?: Session
+  /** `Retry-After` seconds to surface when the provider could not answer. */
+  retryAfterSeconds?: number
+}
+
+/**
  * Session cache constants.
  *
  * SESSION_CACHE_EVICT_BUFFER_MS: Re-validate this early before token expiry.
@@ -394,30 +409,82 @@ export function hasWorkspaceAccess(
  *
  * @param request - The incoming Web API Request
  * @returns A Session or null when unauthenticated
+ *
+ * Callers that must distinguish "the provider could not answer" from "the
+ * token is invalid" use `validateSessionToken`, which returns that verdict
+ * instead of only a Session.
  */
 export async function getSession(request: Request): Promise<Session | null> {
   const token = extractTokenFromRequest(request)
   if (!token) return null
 
-  // --- L1 / L2 cache check ---
-  const cached = await lookupCachedSession(token)
-  if (cached) return cached.session
+  const resolution = await validateSessionToken(token)
+  return resolution.status === 'valid' ? (resolution.session ?? null) : null
+}
 
-  // --- Cache miss: authoritative Auth0 round-trip ---
+/**
+ * Validate a token once and return the verdict the caller needs.
+ *
+ * This is the cache-aware entry point for callers that must distinguish "the
+ * token is invalid" from "the provider could not answer" — the middleware's
+ * cookie-session resolution in particular. Reading the cache through
+ * `getSession` and then classifying with a second `validateToken` made every
+ * cold request that could not be verified pay two `/userinfo` calls: 5 001 ms
+ * at two 2 500 ms deadlines on `8397bdff6` / Worker `7ea1640e`, and two of the
+ * ten requests Auth0's `/userinfo` bucket allows. One round trip now yields
+ * the verdict.
+ *
+ * Contract, unchanged from `getSession`:
+ *  - a cache hit costs no provider call and returns the cached `Session`
+ *  - a valid token is stored in the existing cache and returns that same
+ *    `Session`
+ *  - an invalid token is `invalid` and is never cached
+ *  - a provider failure is `provider-unavailable` with the provider's
+ *    `Retry-After`, and is never cached — so it is retried, not remembered
+ */
+export async function validateSessionToken(
+  token: string,
+): Promise<SessionValidation> {
+  // --- L1 / L2 cache check ---
+  let cached: TokenCacheEntry | null = null
+  try {
+    cached = await lookupCachedSession(token)
+  } catch {
+    // The cache is an optimisation: an unreachable or misbehaving backend
+    // costs a fast miss and the authoritative validation runs below. It must
+    // never become an authentication verdict, in either direction.
+    cached = null
+  }
+  if (cached) return { status: 'valid', session: cached.session }
+
+  // --- Cache miss: the single authoritative Auth0 round-trip ---
   try {
     const result = await validateToken(token, 'access')
-    if (!result.valid || !result.userId) return null
+    if (!result.valid || !result.userId) {
+      if (result.providerUnavailable) {
+        return {
+          status: 'provider-unavailable',
+          retryAfterSeconds: result.retryAfterSeconds,
+        }
+      }
+      return { status: 'invalid' }
+    }
 
     const evictAt = computeEvictAt(result)
     const session = buildSession(result, evictAt)
-    if (!session) return null
+    if (!session) return { status: 'invalid' }
 
-    await storeSession(token, { session, evictAt })
+    try {
+      await storeSession(token, { session, evictAt })
+    } catch {
+      // A cache write failure must not turn a verified token into a denial;
+      // the next request simply validates again.
+    }
 
-    return session
+    return { status: 'valid', session }
   } catch {
     // Any validation error (network, key mismatch, expiry) is treated as
     // unauthenticated — do not leak error details to the caller
-    return null
+    return { status: 'invalid' }
   }
 }
