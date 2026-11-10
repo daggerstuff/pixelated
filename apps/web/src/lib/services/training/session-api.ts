@@ -135,8 +135,11 @@ const loadTrainingSession = async (
     // Identity resolution runs inside the try because it performs the first
     // Postgres round-trip (`resolveIdentity` → `transaction` → `acquireClient`),
     // which is the stage diagnosis D3 measured stalling for ~8 s. A bounded
-    // acquisition failure here must surface as the retryable 503 below.
-    const therapistId = await resolveInternalUserId(session.user)
+    // acquisition failure here must surface as the retryable 503 below, so it
+    // is propagated rather than reported as an unresolved principal (403).
+    const therapistId = await resolveInternalUserId(session.user, {
+      propagateDatabaseErrors: true,
+    })
     if (!therapistId) {
       return jsonResponse({ error: 'User identity not resolved' }, 403)
     }

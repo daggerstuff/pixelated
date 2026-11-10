@@ -120,6 +120,32 @@ function resolveDefaultConfig(): DatabaseConfig {
     return Number.isFinite(parsed) ? parsed : fallback
   }
 
+  // Numeric knobs ride in `fromEnv` so the final spread applies them after
+  // `fromUrl`: an explicit DB_* variable outranks the same option in
+  // DATABASE_URL, which is the documented precedence. A variable that is set
+  // but empty keeps the default (never NaN, which pg reads as "no timeout").
+  if (env['DB_MAX_CONNECTIONS'] !== undefined)
+    fromEnv.max = envInt('DB_MAX_CONNECTIONS', 20)
+  if (env['DB_IDLE_TIMEOUT'] !== undefined)
+    fromEnv.idleTimeoutMillis = envInt('DB_IDLE_TIMEOUT', 30000)
+  if (env['DB_CONNECTION_TIMEOUT'] !== undefined) {
+    fromEnv.connectionTimeoutMillis = envInt(
+      'DB_CONNECTION_TIMEOUT',
+      DB_CONNECTION_TIMEOUT_MS,
+    )
+  }
+  if (env['DB_ACQUIRE_TIMEOUT'] !== undefined)
+    fromEnv.acquireTimeoutMillis = envInt(
+      'DB_ACQUIRE_TIMEOUT',
+      DB_ACQUIRE_TIMEOUT_MS,
+    )
+  if (env['DB_STATEMENT_TIMEOUT'] !== undefined) {
+    fromEnv.statementTimeoutMillis = envInt(
+      'DB_STATEMENT_TIMEOUT',
+      DB_STATEMENT_TIMEOUT_MS,
+    )
+  }
+
   const isLocalHost = (host?: string) =>
     !host || host === 'localhost' || host === '127.0.0.1' || host === '::1'
   const effectiveHost: string | undefined = fromEnv.host ?? fromUrl.host
@@ -130,17 +156,11 @@ function resolveDefaultConfig(): DatabaseConfig {
     database: 'pixelated',
     user: 'postgres',
     password: '',
-    max: envInt('DB_MAX_CONNECTIONS', 20),
-    idleTimeoutMillis: envInt('DB_IDLE_TIMEOUT', 30000),
-    connectionTimeoutMillis: envInt(
-      'DB_CONNECTION_TIMEOUT',
-      DB_CONNECTION_TIMEOUT_MS,
-    ),
-    acquireTimeoutMillis: envInt('DB_ACQUIRE_TIMEOUT', DB_ACQUIRE_TIMEOUT_MS),
-    statementTimeoutMillis: envInt(
-      'DB_STATEMENT_TIMEOUT',
-      DB_STATEMENT_TIMEOUT_MS,
-    ),
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: DB_CONNECTION_TIMEOUT_MS,
+    acquireTimeoutMillis: DB_ACQUIRE_TIMEOUT_MS,
+    statementTimeoutMillis: DB_STATEMENT_TIMEOUT_MS,
     // Verify server certificates in production by default for remote hosts.
     // Localhost never uses SSL, even in production — the local Postgres does
     // not support TLS and would throw "The server does not support SSL connections".
