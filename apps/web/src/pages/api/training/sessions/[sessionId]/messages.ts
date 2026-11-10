@@ -44,7 +44,10 @@ const isUuid = (value: string): boolean =>
     value,
   )
 
-const handleMessagePost: APIRoute = async ({ request, params }) => {
+const handleMessagePost = async (
+  context: Parameters<APIRoute>[0],
+): Promise<Response> => {
+  const { request, params } = context
   const session = await getSession(request)
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
