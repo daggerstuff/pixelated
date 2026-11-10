@@ -72,12 +72,8 @@ describe('local cache fallback for the dead Redis host', () => {
     await setInCache('rate_limit:signin:1.2.3.4', { count: 1 }, 3_600)
     await setInCache('session_binding:uuid-a:sid', { ip: '1.2.3.4' }, 86_400)
 
-    await expect(
-      getFromCache('rate_limit:signin:1.2.3.4'),
-    ).resolves.toBeNull()
-    await expect(
-      getFromCache('session_binding:uuid-a:sid'),
-    ).resolves.toBeNull()
+    await expect(getFromCache('rate_limit:signin:1.2.3.4')).resolves.toBeNull()
+    await expect(getFromCache('session_binding:uuid-a:sid')).resolves.toBeNull()
   })
 
   it('prefers Redis when it is reachable', async () => {
@@ -85,9 +81,7 @@ describe('local cache fallback for the dead Redis host', () => {
     const { getFromCache, setInCache } = await import('./redis')
 
     await setInCache('identity:sub:org-a', 'local-value', 60)
-    await expect(getFromCache('identity:sub:org-a')).resolves.toBe(
-      'from-redis',
-    )
+    await expect(getFromCache('identity:sub:org-a')).resolves.toBe('from-redis')
   })
 
   it('expires a local entry after its TTL', async () => {
@@ -106,9 +100,8 @@ describe('local cache fallback for the dead Redis host', () => {
 
   it('drops a local entry when the key is removed', async () => {
     mockGet.mockRejectedValue(new Error('Redis connection closed'))
-    const { getFromCache, removeFromCache, setInCache } = await import(
-      './redis'
-    )
+    const { getFromCache, removeFromCache, setInCache } =
+      await import('./redis')
 
     await setInCache('identity:sub:org-a', 'local-value', 60)
     await removeFromCache('identity:sub:org-a')

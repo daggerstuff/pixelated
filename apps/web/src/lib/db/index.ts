@@ -366,7 +366,10 @@ class AcquireTimeoutError extends Error {
  * checked-out slot that nothing ever releases — the leak that poisons the pool
  * for later requests.
  */
-function acquireWithDeadline(pool: Pool, timeoutMs: number): Promise<PoolClient> {
+function acquireWithDeadline(
+  pool: Pool,
+  timeoutMs: number,
+): Promise<PoolClient> {
   const attempt = pool.connect()
   let timedOut = false
   let timer: ReturnType<typeof setTimeout> | undefined
