@@ -12,7 +12,9 @@ vi.mock('@/lib/auth/session', () => ({ getSession: mockGetSession }))
 vi.mock('@/lib/db', () => ({
   getPool: () => ({ query: mockQuery }),
   query: mockQuery,
-  isDatabaseUnavailableError: () => false,
+  // Mirrors the real predicate so the route's 503 mapping is exercised.
+  isDatabaseUnavailableError: (error: unknown) =>
+    (error as { code?: string } | null)?.code === 'DB_UNAVAILABLE',
 }))
 vi.mock('@/lib/auth/internal-identity', () => ({
   resolveInternalUserId: mockResolveInternalUserId,
@@ -89,9 +91,29 @@ describe('identity bridge — training session read', () => {
     expect(body.sessionId).toBe(SESSION_A)
     expect(mockResolveInternalUserId).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'auth0|org-a' }),
+      { propagateDatabaseErrors: true },
     )
     expect(mockQuery.mock.calls[0]?.[1]).toEqual([SESSION_A, ORG_A_UUID])
     expect(mockQuery.mock.calls[0]?.[1]).not.toContain('auth0|org-a')
+  })
+
+  it('answers a retryable 503 when identity resolution stalls on the database', async () => {
+    // D3: the first Postgres round-trip is the acquisition. It must reach the
+    // client as a retryable failure, not as a denial or a deadline expiry.
+    mockResolveInternalUserId.mockRejectedValue(
+      Object.assign(new Error('Database connection could not be acquired'), {
+        code: 'DB_UNAVAILABLE',
+      }),
+    )
+
+    const response = await invokeGet(SESSION_A)
+
+    expect(response.status).toBe(503)
+    expect(response.headers.get('Retry-After')).toBe('1')
+    expect(await response.json()).toEqual({
+      error: 'Session temporarily unavailable',
+    })
+    expect(mockQuery).not.toHaveBeenCalled()
   })
 
   it('denies a resolved principal whose session belongs to another organization (A to B)', async () => {
