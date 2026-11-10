@@ -67,7 +67,13 @@ const mockClient: MockClient = {
 }
 
 const { mockConnect } = vi.hoisted(() => ({
-  mockConnect: vi.fn(async (): Promise<MockClient> => mockClient),
+  // A fresh object per connect keeps lib/db's pooled-client liveness probe out
+  // of these handler assertions: it only probes a client the pool has already
+  // handed out, and the shared query/release spies are what the assertions read.
+  mockConnect: vi.fn(async (): Promise<MockClient> => ({
+    query: mockClient.query,
+    release: mockClient.release,
+  })),
 }))
 
 vi.mock('pg', () => ({

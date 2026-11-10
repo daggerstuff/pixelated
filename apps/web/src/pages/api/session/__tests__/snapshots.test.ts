@@ -19,7 +19,9 @@ vi.mock('@/lib/auth/internal-identity', () => ({
   resolveInternalUserId: mockResolveInternalUserId,
 }))
 vi.mock('@/lib/db', () => ({
-  getPool: () => ({ connect: mockConnect }),
+  // The route must acquire through acquireClient(); mocking getPool() instead
+  // would let a reverted direct borrow pass this suite unnoticed.
+  acquireClient: mockConnect,
   isDatabaseUnavailableError: (error: unknown) =>
     error instanceof Error &&
     (/query read timeout|database statement exceeded|database statement could not complete within/i.test(

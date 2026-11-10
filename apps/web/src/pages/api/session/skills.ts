@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 
 import { getSession } from '../../../lib/auth/session'
-import { getPool } from '../../../lib/db'
+import { acquireClient } from '../../../lib/db'
 import { getSkillCategory } from '../../../lib/skillCategories'
 import {
   isMissingLegacySchema,
@@ -59,7 +59,7 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const client = await getPool().connect()
+    const client = await acquireClient()
     try {
       // Update session with skill scores
       const sessionQuery = `
@@ -204,7 +204,7 @@ export const GET: APIRoute = async ({ request }) => {
     const sessionId = url.searchParams.get('sessionId')
     const requestedTherapistId = url.searchParams.get('therapistId')
 
-    const client = await getPool().connect()
+    const client = await acquireClient()
     try {
       if (sessionId) {
         // Get skill scores from specific session

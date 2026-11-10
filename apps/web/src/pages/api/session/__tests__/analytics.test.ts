@@ -15,7 +15,9 @@ vi.mock('../../../../lib/auth/internal-identity', () => ({
     principal?.id ?? null,
 }))
 vi.mock('../../../../lib/db', () => ({
-  getPool: () => ({ connect: async () => state }),
+  // The route must acquire through acquireClient(); mocking getPool() instead
+  // would let a reverted direct borrow pass this suite unnoticed.
+  acquireClient: async () => state,
 }))
 vi.mock('pg', () => ({
   Pool: class {

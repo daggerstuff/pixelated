@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 
 import { getSession } from '../../../lib/auth/session'
-import { getPool } from '../../../lib/db'
+import { acquireClient } from '../../../lib/db'
 import {
   isMissingLegacySchema,
   isQueryTimeout,
@@ -47,7 +47,7 @@ export const POST: APIRoute = async ({ request }) => {
       return jsonResponse({ error: 'No progress or feedback supplied' }, 400)
     }
 
-    const client = await getPool().connect()
+    const client = await acquireClient()
     let destroyClient = false
     try {
       await client.query('BEGIN')
@@ -117,7 +117,7 @@ export const GET: APIRoute = async ({ request }) => {
       return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
     }
 
-    const client = await getPool().connect()
+    const client = await acquireClient()
     try {
       const result = await client.query(
         `SELECT progress_metrics, progress_snapshots, skill_scores
