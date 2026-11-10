@@ -24,12 +24,17 @@ export const POST: APIRoute = async ({ request }) => {
   const session = await getSession(request)
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
-  const therapistId = await resolveInternalUserId(session.user)
-  if (!therapistId) {
-    return jsonResponse({ error: 'User identity not resolved' }, 403)
-  }
-
   try {
+    // A database-availability failure during resolution is rethrown so the
+    // handler's catch maps it to the retryable `503` instead of denying an
+    // authenticated caller with `403`.
+    const therapistId = await resolveInternalUserId(session.user, {
+      propagateDatabaseErrors: true,
+    })
+    if (!therapistId) {
+      return jsonResponse({ error: 'User identity not resolved' }, 403)
+    }
+
     const payload: unknown = await request.json()
     if (!isRecord(payload) || typeof payload['sessionId'] !== 'string') {
       return jsonResponse({ error: 'Missing required field: sessionId' }, 400)
@@ -47,6 +52,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const client = await getPool().connect()
+    let destroyClient = false
     try {
       await client.query('BEGIN')
       const ownership = await client.query(
@@ -81,14 +87,18 @@ export const POST: APIRoute = async ({ request }) => {
       await client.query('COMMIT')
       return jsonResponse({ success: true, sessionId }, 200)
     } catch (error: unknown) {
-      await rollbackQuietly(client)
+      destroyClient = await rollbackQuietly(client, error)
       throw error
     } finally {
-      client.release()
+      if (destroyClient) client.release(true)
+      else client.release()
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
-    if (isQueryTimeout(error)) return legacySessionRetryableResponse()
+    if (isQueryTimeout(error))
+      return legacySessionRetryableResponse({
+        advertiseRetry: false,
+      })
     console.error('Error saving session progress:', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
@@ -98,18 +108,20 @@ export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request)
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
-  const therapistId = await resolveInternalUserId(session.user)
-  if (!therapistId) {
-    return jsonResponse({ error: 'User identity not resolved' }, 403)
-  }
-
-  const url = new URL(request.url)
-  const sessionId = url.searchParams.get('sessionId')
-  if (!sessionId) {
-    return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
-  }
-
   try {
+    const therapistId = await resolveInternalUserId(session.user, {
+      propagateDatabaseErrors: true,
+    })
+    if (!therapistId) {
+      return jsonResponse({ error: 'User identity not resolved' }, 403)
+    }
+
+    const url = new URL(request.url)
+    const sessionId = url.searchParams.get('sessionId')
+    if (!sessionId) {
+      return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
+    }
+
     const client = await getPool().connect()
     try {
       const result = await client.query(

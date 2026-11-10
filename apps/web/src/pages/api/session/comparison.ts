@@ -26,7 +26,9 @@ export const POST: APIRoute = async ({ request }) => {
         },
       )
     }
-    const therapistId = await resolveInternalUserId(session.user)
+    const therapistId = await resolveInternalUserId(session.user, {
+      propagateDatabaseErrors: true,
+    })
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
@@ -108,7 +110,10 @@ export const POST: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
-    if (isQueryTimeout(error)) return legacySessionRetryableResponse()
+    if (isQueryTimeout(error))
+      return legacySessionRetryableResponse({
+        advertiseRetry: false,
+      })
     console.error('Error saving session comparison:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -129,7 +134,9 @@ export const GET: APIRoute = async ({ request }) => {
         },
       )
     }
-    const therapistId = await resolveInternalUserId(session.user)
+    const therapistId = await resolveInternalUserId(session.user, {
+      propagateDatabaseErrors: true,
+    })
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),

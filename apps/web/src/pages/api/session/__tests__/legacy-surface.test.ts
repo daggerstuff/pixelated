@@ -16,6 +16,11 @@ vi.mock('../../../../lib/auth/internal-identity', () => ({
 vi.mock('../../../../lib/db', () => ({
   getPool: () => ({ connect: async () => state }),
   acquireClient: async () => state,
+  isDatabaseUnavailableError: (error: unknown) =>
+    error instanceof Error &&
+    /query read timeout|database statement exceeded|database statement could not complete within/i.test(
+      error.message,
+    ),
 }))
 
 import * as analytics from '../analytics'
@@ -76,6 +81,8 @@ describe('legacy /api/session/* routes on absent schema', () => {
 
     expect(response.status).toBe(410)
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
+    expect(state.query).toHaveBeenCalledWith('ROLLBACK')
+    expect(state.release).toHaveBeenCalledWith()
   })
 
   it('progress GET reports 410 instead of 500 when progress columns are absent', async () => {
@@ -274,9 +281,16 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
 
   const RETRYABLE_CODE = 'LEGACY_SESSION_API_TEMPORARILY_UNAVAILABLE'
 
-  const expectRetryable = async (response: Response) => {
+  const expectRetryable = async (
+    response: Response,
+    options: { advertiseRetry?: boolean } = {},
+  ) => {
     expect(response.status).toBe(503)
-    expect(response.headers.get('Retry-After')).toBe('1')
+    if (options.advertiseRetry === false) {
+      expect(response.headers.get('Retry-After')).toBeNull()
+    } else {
+      expect(response.headers.get('Retry-After')).toBe('1')
+    }
     expect(await response.json()).toEqual({
       error: 'Legacy session analytics are temporarily unavailable',
       code: RETRYABLE_CODE,
@@ -294,10 +308,9 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
     await expectRetryable(response)
   })
 
-  it('progress POST answers the retryable status instead of 500', async () => {
+  it('progress POST answers the retryable status without inviting a duplicate write', async () => {
     state.query.mockImplementation(async (sql: string) => {
       if (sql === 'BEGIN') return ok()
-      if (sql === 'ROLLBACK') throw destroyedConnection()
       if (sql.includes('FOR UPDATE')) throw queryReadTimeout()
       throw new Error(`unexpected statement: ${sql}`)
     })
@@ -310,7 +323,53 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
       }),
     )
 
-    await expectRetryable(response)
+    await expectRetryable(response, { advertiseRetry: false })
+    expect(state.query).not.toHaveBeenCalledWith('ROLLBACK')
+    expect(state.release).toHaveBeenCalledWith(true)
+  })
+
+  it('destroys the client when the rollback itself fails', async () => {
+    state.query.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN') return ok()
+      if (sql === 'ROLLBACK') throw destroyedConnection()
+      if (sql.includes('FOR UPDATE')) return ok([{ id: SESSION_ID }])
+      throw schemaError('42703')
+    })
+
+    const response = await invoke(
+      progress.POST as Handler,
+      post('/api/session/progress', {
+        sessionId: SESSION_ID,
+        progressMetrics: { totalMessages: 1, progress: 50 },
+      }),
+    )
+
+    expect(response.status).toBe(410)
+    expect(state.query).toHaveBeenCalledWith('ROLLBACK')
+    expect(state.release).toHaveBeenCalledWith(true)
+  })
+
+  it('answers 503 instead of 403 when the identity lookup hits the bound', async () => {
+    mockResolveInternalUserId.mockRejectedValue(queryReadTimeout())
+
+    const getResponse = await invoke(
+      progress.GET as Handler,
+      get(`/api/session/progress?sessionId=${SESSION_ID}`),
+    )
+    const postResponse = await invoke(
+      progress.POST as Handler,
+      post('/api/session/progress', {
+        sessionId: SESSION_ID,
+        progressMetrics: { totalMessages: 1, progress: 50 },
+      }),
+    )
+
+    await expectRetryable(getResponse)
+    await expectRetryable(postResponse, { advertiseRetry: false })
+    expect(mockResolveInternalUserId).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'auth0|legacy-caller' }),
+      { propagateDatabaseErrors: true },
+    )
   })
 
   it('skills GET answers the retryable status instead of 500', async () => {
@@ -335,7 +394,7 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
       }),
     )
 
-    await expectRetryable(response)
+    await expectRetryable(response, { advertiseRetry: false })
   })
 
   it('comparison GET answers the retryable status instead of 500', async () => {
@@ -361,7 +420,7 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
       }),
     )
 
-    await expectRetryable(response)
+    await expectRetryable(response, { advertiseRetry: false })
   })
 
   it('analytics GET answers the retryable status instead of 500', async () => {
@@ -389,7 +448,7 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
       }),
     )
 
-    await expectRetryable(response)
+    await expectRetryable(response, { advertiseRetry: false })
   })
 
   it('maps a server-side statement timeout (57014) the same way', async () => {

@@ -31,6 +31,8 @@
  * `503` + `Retry-After` shape the rest of the application uses.
  */
 
+import { isDatabaseUnavailableError } from '../../../lib/db'
+
 const LEGACY_SCHEMA_ERROR_CODES = new Set(['42P01', '42703'])
 
 /**
@@ -141,45 +143,68 @@ export function legacySessionSurfaceResponse(): Response {
   )
 }
 
+export interface LegacyRetryableOptions {
+  /**
+   * Advertise a retry through `Retry-After`.
+   *
+   * Reads are safe to retry. A POST's write may have committed before its
+   * bound tripped, so the route withholds the advertisement instead of inviting
+   * a retry that could insert the same evaluation, milestone, comparison or
+   * analytics row twice. The `503` itself is unchanged: a temporary failure is
+   * never reported as a `500`.
+   */
+  advertiseRetry?: boolean
+}
+
 /**
- * `503` + `Retry-After` for a route whose statement hit the client-side bound.
+ * `503` for a route whose statement hit the client-side bound.
  *
  * The database may be reachable on the next request, so this is the retryable
  * shape the training routes already use. The body is stable and deliberately
  * carries no pg error code, statement text, or table name.
  */
-export function legacySessionRetryableResponse(): Response {
+export function legacySessionRetryableResponse(
+  options: LegacyRetryableOptions = {},
+): Response {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Deprecation': 'true',
+  }
+  if (options.advertiseRetry !== false) headers['Retry-After'] = '1'
   return new Response(
     JSON.stringify({
       error: 'Legacy session analytics are temporarily unavailable',
       code: LEGACY_SESSION_RETRYABLE_CODE,
     }),
-    {
-      status: 503,
-      headers: {
-        'Content-Type': 'application/json',
-        'Retry-After': '1',
-        'Deprecation': 'true',
-      },
-    },
+    { status: 503, headers },
   )
 }
 
 /**
- * Roll back without masking the failure that caused the rollback.
+ * Roll back without masking the failure that caused the rollback, and report
+ * whether the client must be destroyed instead of returned to the pool.
  *
- * A statement abandoned by the client-side bound destroys the connection, and
- * pg then rejects the `ROLLBACK` with `Client has encountered a connection
- * error and is not queryable`. Letting that replace the original error would
- * turn a mapped `503` (or a mapped `410`) back into an unmapped `500`, so the
- * original is preserved and only the rollback failure is logged.
+ * A statement abandoned by the client-side bound leaves a half-consumed
+ * protocol stream behind, and a lost connection has no socket left; pg then
+ * rejects the `ROLLBACK` with `Client has encountered a connection error and is
+ * not queryable`. Letting that replace the original error would turn a mapped
+ * `503` (or a mapped `410`) back into an unmapped `500`, so the original is
+ * preserved. Those clients are destroyed by the caller (`release(true)`), which
+ * is how `lib/db`'s own `transaction()` treats them; a `ROLLBACK` on them would
+ * only wait out the same bound again.
+ *
+ * @returns true when the caller must release the client with `release(true)`
  */
-export async function rollbackQuietly(client: {
-  query: (text: string) => Promise<unknown>
-}): Promise<void> {
+export async function rollbackQuietly(
+  client: { query: (text: string) => Promise<unknown> },
+  error: unknown,
+): Promise<boolean> {
+  if (isDatabaseUnavailableError(error)) return true
   try {
     await client.query('ROLLBACK')
-  } catch (error: unknown) {
-    console.error('Legacy session route rollback failed:', error)
+    return false
+  } catch (rollbackError: unknown) {
+    console.error('Legacy session route rollback failed:', rollbackError)
+    return true
   }
 }
