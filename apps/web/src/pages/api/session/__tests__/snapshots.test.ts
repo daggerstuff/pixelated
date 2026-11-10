@@ -254,3 +254,75 @@ describe('session snapshots on absent schema', () => {
     expect(response.status).toBe(500)
   })
 })
+
+describe('session snapshots when a statement hits the query bound', () => {
+  /** The bare `Error` pg raises from the pool-level `query_timeout`. */
+  const queryReadTimeout = () => new Error('Query read timeout')
+  const RETRYABLE_CODE = 'LEGACY_SESSION_API_TEMPORARILY_UNAVAILABLE'
+
+  const expectRetryable = async (response: Response) => {
+    expect(response.status).toBe(503)
+    expect(response.headers.get('Retry-After')).toBe('1')
+    expect(await response.json()).toEqual({
+      error: 'Legacy session analytics are temporarily unavailable',
+      code: RETRYABLE_CODE,
+    })
+  }
+
+  it('GET answers the retryable status instead of 500', async () => {
+    mockQuery.mockRejectedValue(queryReadTimeout())
+
+    const response = await invoke(GET, {
+      request: createRequest(
+        `http://localhost/api/session/snapshots?sessionId=${SESSION_ID}`,
+      ),
+    })
+
+    await expectRetryable(response)
+  })
+
+  it('POST answers the retryable status instead of 500', async () => {
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN') return { rowCount: 0, rows: [] }
+      if (sql === 'ROLLBACK') {
+        throw new Error(
+          'Client has encountered a connection error and is not queryable',
+        )
+      }
+      if (sql.includes('FOR UPDATE')) throw queryReadTimeout()
+      throw new Error(`unexpected statement: ${sql}`)
+    })
+
+    const response = await invoke(POST, {
+      request: createRequest('http://localhost/api/session/snapshots', {
+        sessionId: SESSION_ID,
+        snapshots: [{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }],
+      }),
+    })
+
+    await expectRetryable(response)
+  })
+
+  it('POST keeps 410 for absent schema even when the rollback fails', async () => {
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN') return { rowCount: 0, rows: [] }
+      if (sql === 'ROLLBACK') {
+        throw new Error(
+          'Client has encountered a connection error and is not queryable',
+        )
+      }
+      if (sql.includes('FOR UPDATE')) return { rowCount: 1, rows: [] }
+      throw schemaError('42703')
+    })
+
+    const response = await invoke(POST, {
+      request: createRequest('http://localhost/api/session/snapshots', {
+        sessionId: SESSION_ID,
+        snapshots: [{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }],
+      }),
+    })
+
+    expect(response.status).toBe(410)
+    expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
+  })
+})

@@ -5,7 +5,10 @@ import { getSession } from '../../../lib/auth/session'
 import { getPool } from '../../../lib/db'
 import {
   isMissingLegacySchema,
+  isQueryTimeout,
+  legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
+  rollbackQuietly,
 } from './_legacy-surface'
 
 type ProgressSnapshot = {
@@ -117,13 +120,14 @@ export const POST: APIRoute = async ({ request }) => {
       await client.query('COMMIT')
       return jsonResponse({ success: true, sessionId }, 200)
     } catch (error: unknown) {
-      await client.query('ROLLBACK')
+      await rollbackQuietly(client)
       throw error
     } finally {
       client.release()
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
+    if (isQueryTimeout(error)) return legacySessionRetryableResponse()
     console.error('Error handling POST /api/session/snapshots', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
@@ -179,6 +183,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
+    if (isQueryTimeout(error)) return legacySessionRetryableResponse()
     console.error('Error handling GET /api/session/snapshots', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }

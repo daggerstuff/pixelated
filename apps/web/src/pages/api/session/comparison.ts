@@ -6,6 +6,8 @@ import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
 import {
   isMissingLegacySchema,
+  isQueryTimeout,
+  legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
 } from './_legacy-surface'
 
@@ -106,6 +108,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
+    if (isQueryTimeout(error)) return legacySessionRetryableResponse()
     console.error('Error saving session comparison:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
@@ -255,6 +258,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
+    if (isQueryTimeout(error)) return legacySessionRetryableResponse()
     console.error('Error fetching session comparisons:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
