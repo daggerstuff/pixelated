@@ -1085,7 +1085,7 @@ importers:
         version: 0.50.0(supports-color@10.2.2)
       mcp-remote:
         specifier: ^0.16.1
-        version: 0.16.5(supports-color@10.2.2)
+        version: 0.16.4(supports-color@10.2.2)
       mdast-util-directive:
         specifier: ^3.2.0
         version: 3.2.0(supports-color@10.2.2)
@@ -11656,8 +11656,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mcp-remote@0.16.5:
-    resolution: {integrity: sha512-HOvAySIYs9hojTHDWUJtKpx1RFi9OHLdJewdkwtOPuybq0uNmYrfeWGBH4mZ1rrIxwkFLJ+7823/96+KbC/4Og==}
+  mcp-remote@0.16.4:
+    resolution: {integrity: sha512-0SEmhyLkV8qgDc1li1rpWtUaV0jn3D8+ykg/DY7CRwb2J8fMLursxMXOVay7eb7A51wPQJTDtUefkvPajzIhFA==}
     hasBin: true
 
   mdast-util-directive@3.2.0:
@@ -25785,7 +25785,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mcp-remote@0.16.5(supports-color@10.2.2):
+  mcp-remote@0.16.4(supports-color@10.2.2):
     dependencies:
       express: 5.3.0(supports-color@10.2.2)
       open: 10.2.0
