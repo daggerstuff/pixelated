@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 
 import { ResponseGenerationService } from "@/lib/ai/services/response-generation";
 import { createLLMService } from "@/lib/ai/services/llm-provider";
+import { sanitizeTherapyRegister } from "@/lib/ai/safety/registerGuard";
 import { DEFAULT_LLM_MODEL, NEON_ENABLED_MODELS } from "@/lib/ai/constants";
 import type {
   AIService,
@@ -337,6 +338,13 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const latencyMs = Date.now() - startTime;
+
+    // Enforce the clinical register at the boundary: training cannot outvote a
+    // sympathy-opener frame that appears thousands of times in the corpus.
+    const guarded = sanitizeTherapyRegister(result?.content ?? "");
+    if (guarded.altered) {
+      result = { ...result, content: guarded.content };
+    }
 
     // Track metrics
     trackApiRequest(endpoint, "POST", 200, latencyMs);
