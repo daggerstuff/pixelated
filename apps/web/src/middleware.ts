@@ -7,6 +7,7 @@ import {
   extractTokenFromRequest,
   type AuthOptions,
 } from './lib/auth/auth0-middleware'
+import { getSession, type Session } from './lib/auth/session'
 import { agentDiscoveryMiddleware } from './lib/middleware/agent-discovery'
 import { apiVersioningMiddleware } from './lib/middleware/api-versioning'
 import { corsMiddleware } from './lib/middleware/cors'
@@ -226,6 +227,23 @@ type CookieSessionResolution =
   | { status: 'provider-unavailable'; retryAfterSeconds: number }
 
 /**
+ * Read the validated-session cache, treating any backend failure as a miss.
+ *
+ * The cache is an optimisation: an unreachable or misbehaving backend must cost
+ * a fast miss and let the authoritative validation run, never fail the request.
+ * `getSession` only throws when its cache backend throws — its own validation
+ * path already swallows errors — so this guard is what keeps the middleware
+ * from turning a cache outage into a 500.
+ */
+async function readCachedSession(request: Request): Promise<Session | null> {
+  try {
+    return await getSession(request)
+  } catch {
+    return null
+  }
+}
+
+/**
  * Resolve a cookie-based session for a page route and populate
  * `context.locals.user` / `context.locals.session`.
  *
@@ -239,6 +257,18 @@ type CookieSessionResolution =
  * `/userinfo` 429, a 5xx, or a timeout means the token could not be checked,
  * not that it is invalid. That is returned as `provider-unavailable` so the
  * caller can answer a retryable 503 rather than a logout.
+ *
+ * The session is read from the validated-session cache that every other
+ * authenticated surface already uses (`lib/auth/session.ts`: an in-process Map
+ * keyed by the token, with a 5-minute ceiling). This function used to call
+ * `validateToken` directly, which bypassed that cache and paid one `/userinfo`
+ * round trip on every authenticated request — including the twentieth
+ * navigation of the same token in the same isolate. Against Auth0's
+ * 10-request bucket that fan-out produced the dominant 5xx on the measured
+ * release (8 of the matrix's 11, evidence
+ * `availability-remeasure-2026-11-10.md` §4). Only a cache miss reaches the
+ * provider, and that miss is also the only place that can tell a provider
+ * outage from an invalid token.
  */
 async function resolveCookieSession(context: {
   request: Request
@@ -249,6 +279,33 @@ async function resolveCookieSession(context: {
     return { status: 'none' }
   }
 
+  // Cache hit: the token was already verified in this isolate, so no provider
+  // call is needed. The cached session carries the id, email, role and name
+  // that validation resolved — including the role resolved through the
+  // Management API, which validation performs once and caches per subject.
+  const cached = await readCachedSession(context.request)
+  if (cached) {
+    context.locals.user = {
+      id: cached.user.id,
+      email: cached.user.email ?? '',
+      // The validated-session cache does not carry the `email_verified` claim.
+      // No consumer in the application reads this field from `locals.user`.
+      emailVerified: false,
+      role: cached.user.role,
+      fullName: cached.user.name,
+    }
+    context.locals.session = {
+      id: `sess-${cached.user.id}`,
+      userId: cached.user.id,
+      // The cache entry evicts at or before the token's own expiry
+      // (`computeEvictAt`), so this never overstates the session lifetime.
+      expiresAt: new Date(cached.expires),
+    }
+    return { status: 'resolved' }
+  }
+
+  // Cache miss: authoritative validation, and the only branch that can
+  // distinguish "the provider could not answer" from "the token is invalid".
   const validation = await validateToken(token, 'access')
   if (!validation.valid || !validation.userId) {
     if (validation.providerUnavailable) {
