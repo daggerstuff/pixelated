@@ -1,16 +1,18 @@
 /** @vitest-environment node */
 
 /**
- * A cache backend failure must degrade to the authoritative validation.
+ * The middleware's session resolution is a single, bounded provider trip.
  *
- * The validated-session cache is an optimisation on the request path. If its
- * backend throws, the middleware must treat the read as a miss and validate the
- * token, never fail the request. `getSession` itself only throws from its cache
- * backend, so this guard is the difference between a cache outage and a 500.
+ * `resolveCookieSession` asks `lib/auth/session.ts` for a verdict — valid,
+ * invalid, or provider-unavailable — and that entry point performs at most one
+ * `/userinfo` verification per request. The middleware no longer reads the
+ * cache and then re-validates to classify a miss, so an unverifiable cold
+ * request costs one provider call instead of two.
  *
- * The hit-path mapping is also pinned here, independently of the real cache:
- * a `Session` must produce the same `locals` identity fields the validation
- * path produces, without a provider call.
+ * These cases pin the middleware's side of that contract independently of the
+ * real cache: a cached session maps to `locals` without a provider call, a
+ * provider outage stays a retryable 503, and an unexpected resolver failure is
+ * a miss rather than a 500.
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -30,41 +32,27 @@ vi.mock('astro:middleware', () => ({
   defineMiddleware: (fn: any) => fn,
 }))
 
-const mockValidateToken = vi.hoisted(() => vi.fn())
-const mockGetUserById = vi.hoisted(() => vi.fn())
-const mockGetSession = vi.hoisted(() => vi.fn())
+const mockValidateSessionToken = vi.hoisted(() => vi.fn())
 
-vi.mock('../auth0-jwt-service', () => ({
-  validateToken: mockValidateToken,
-}))
-
-vi.mock('../../services/auth0.service', () => ({
-  auth0UserService: {
-    getUserById: mockGetUserById,
-  },
+vi.mock('../session', () => ({
+  validateSessionToken: mockValidateSessionToken,
 }))
 
 vi.mock('../../middleware/rate-limit', () => ({
   rateLimitMiddleware: (_context: unknown, next: () => unknown) => next(),
 }))
 
-vi.mock('../session', () => ({
-  getSession: mockGetSession,
-}))
-
 import { onRequest } from '../../../middleware'
 
-const validValidation = () => ({
-  valid: true,
-  userId: 'auth0|pilot-beta',
-  role: 'therapist',
-  tokenId: 'jti-beta',
-  expiresAt: Math.floor(Date.now() / 1000) + 3600,
-  payload: {
+const validSession = () => ({
+  user: {
+    id: 'auth0|pilot-beta',
     email: 'beta@example.test',
+    role: 'therapist',
+    roles: ['therapist'],
     name: 'Beta Pilot',
-    email_verified: true,
   },
+  expires: new Date(Date.now() + 120_000).toISOString(),
 })
 
 const invoke = async (path: string, token = 'failure-mode-token') => {
@@ -87,35 +75,30 @@ const invoke = async (path: string, token = 'failure-mode-token') => {
   return { response, nextCalled, context }
 }
 
-describe('validated-session cache failures', () => {
+describe('validated-session resolution failures', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockValidateToken.mockReset()
-    mockGetUserById.mockReset()
-    mockGetSession.mockReset()
+    mockValidateSessionToken.mockReset()
   })
 
-  it('falls back to validation when the cache backend throws', async () => {
-    mockGetSession.mockRejectedValue(new Error('cache backend unreachable'))
-    mockValidateToken.mockResolvedValue(validValidation())
-    mockGetUserById.mockResolvedValue({ role: 'therapist' })
+  it('treats an unexpected resolver failure as unauthenticated, not a 500', async () => {
+    mockValidateSessionToken.mockRejectedValue(
+      new Error('cache backend unreachable'),
+    )
 
     const { response, nextCalled, context } = await invoke('/training')
 
     expect(response.status).toBe(200)
     expect(nextCalled).toBe(true)
-    expect(mockValidateToken).toHaveBeenCalledTimes(1)
-    expect(context.locals.user?.id).toBe('auth0|pilot-beta')
-    expect(context.locals.user?.role).toBe('therapist')
+    expect(mockValidateSessionToken).toHaveBeenCalledTimes(1)
+    expect(context.locals.user).toBeUndefined()
+    expect(context.locals.session).toBeUndefined()
   })
 
-  it('still answers 503 when the cache throws and the provider cannot verify', async () => {
-    mockGetSession.mockRejectedValue(new Error('cache backend unreachable'))
-    mockValidateToken.mockResolvedValue({
-      valid: false,
-      providerUnavailable: true,
+  it('still answers 503 when the resolver reports a provider outage', async () => {
+    mockValidateSessionToken.mockResolvedValue({
+      status: 'provider-unavailable',
       retryAfterSeconds: 112,
-      error: 'Too Many Requests',
     })
 
     const { response, nextCalled } = await invoke('/training')
@@ -125,23 +108,19 @@ describe('validated-session cache failures', () => {
     expect(response.headers.get('retry-after')).toBe('112')
   })
 
-  it('maps a cached session to locals without a provider call', async () => {
-    mockGetSession.mockResolvedValue({
-      user: {
-        id: 'auth0|pilot-beta',
-        email: 'beta@example.test',
-        role: 'therapist',
-        roles: ['therapist'],
-        name: 'Beta Pilot',
-      },
-      expires: new Date(Date.now() + 120_000).toISOString(),
+  it('maps a resolved session to locals without a provider call', async () => {
+    mockValidateSessionToken.mockResolvedValue({
+      status: 'valid',
+      session: validSession(),
     })
 
     const { nextCalled, context } = await invoke('/training')
 
     expect(nextCalled).toBe(true)
-    expect(mockValidateToken).not.toHaveBeenCalled()
-    expect(mockGetUserById).not.toHaveBeenCalled()
+    // Exactly one resolution for the request; the middleware never validates
+    // the token a second time.
+    expect(mockValidateSessionToken).toHaveBeenCalledTimes(1)
+    expect(mockValidateSessionToken).toHaveBeenCalledWith('failure-mode-token')
     expect(context.locals.user).toEqual({
       id: 'auth0|pilot-beta',
       email: 'beta@example.test',

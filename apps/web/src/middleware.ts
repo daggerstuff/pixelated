@@ -1,13 +1,15 @@
 import type { MiddlewareHandler } from 'astro'
 import { sequence, defineMiddleware } from 'astro:middleware'
 
-import { validateToken } from './lib/auth/auth0-jwt-service'
 import {
   authenticateRequest,
   extractTokenFromRequest,
   type AuthOptions,
 } from './lib/auth/auth0-middleware'
-import { getSession, type Session } from './lib/auth/session'
+import {
+  validateSessionToken,
+  type SessionValidation,
+} from './lib/auth/session'
 import { agentDiscoveryMiddleware } from './lib/middleware/agent-discovery'
 import { apiVersioningMiddleware } from './lib/middleware/api-versioning'
 import { corsMiddleware } from './lib/middleware/cors'
@@ -121,14 +123,6 @@ function getRouteConfig(request: Request): RouteConfig | null {
   }
 }
 
-/**
- * Upper bound on the Management API enrichment below. Measured 34–272 ms
- * (diagnosis §4.1.4); it carried no timeout, and it runs after token
- * validation on every authenticated request, so a throttled Management API
- * could hold the request open before `next()`.
- */
-const MANAGEMENT_ENRICHMENT_DEADLINE_MS = 1_500
-
 /** Fallback `Retry-After` when the provider sent no usable value. */
 const PROVIDER_RETRY_AFTER_DEFAULT_SECONDS = 30
 
@@ -206,40 +200,24 @@ function providerUnavailableResponse(
   )
 }
 
-async function withManagementDeadline<T>(work: Promise<T>): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined
-  const deadline = new Promise<never>((_, reject) => {
-    timer = setTimeout(
-      () => reject(new Error('Management enrichment deadline exceeded')),
-      MANAGEMENT_ENRICHMENT_DEADLINE_MS,
-    )
-  })
-  try {
-    return await Promise.race([work, deadline])
-  } finally {
-    if (timer !== undefined) clearTimeout(timer)
-  }
-}
-
 type CookieSessionResolution =
   | { status: 'none' }
   | { status: 'resolved' }
   | { status: 'provider-unavailable'; retryAfterSeconds: number }
 
 /**
- * Read the validated-session cache, treating any backend failure as a miss.
+ * Resolve a token to its verdict, treating an unexpected failure as a miss.
  *
- * The cache is an optimisation: an unreachable or misbehaving backend must cost
- * a fast miss and let the authoritative validation run, never fail the request.
- * `getSession` only throws when its cache backend throws — its own validation
- * path already swallows errors — so this guard is what keeps the middleware
- * from turning a cache outage into a 500.
+ * `validateSessionToken` already folds provider and cache errors into a
+ * verdict; this guard only protects the middleware's documented best-effort
+ * contract — any failure leaves `locals` untouched and the request continues
+ * unauthenticated — from an unforeseen throw.
  */
-async function readCachedSession(request: Request): Promise<Session | null> {
+async function readSessionVerdict(token: string): Promise<SessionValidation> {
   try {
-    return await getSession(request)
+    return await validateSessionToken(token)
   } catch {
-    return null
+    return { status: 'invalid' }
   }
 }
 
@@ -258,17 +236,16 @@ async function readCachedSession(request: Request): Promise<Session | null> {
  * not that it is invalid. That is returned as `provider-unavailable` so the
  * caller can answer a retryable 503 rather than a logout.
  *
- * The session is read from the validated-session cache that every other
- * authenticated surface already uses (`lib/auth/session.ts`: an in-process Map
- * keyed by the token, with a 5-minute ceiling). This function used to call
- * `validateToken` directly, which bypassed that cache and paid one `/userinfo`
- * round trip on every authenticated request — including the twentieth
- * navigation of the same token in the same isolate. Against Auth0's
- * 10-request bucket that fan-out produced the dominant 5xx on the measured
- * release (8 of the matrix's 11, evidence
- * `availability-remeasure-2026-11-10.md` §4). Only a cache miss reaches the
- * provider, and that miss is also the only place that can tell a provider
- * outage from an invalid token.
+ * One provider round-trip decides the request. The validated-session cache
+ * that every other authenticated surface already uses (`lib/auth/session.ts`:
+ * an in-process Map keyed by the token, with a 5-minute ceiling) is read first;
+ * only a miss reaches Auth0, and that miss *classifies* — valid, invalid, or
+ * provider-unavailable. This used to be two calls: a cache read through
+ * `getSession` and then a second validation to classify the miss. Every cold
+ * request that could not be verified therefore paid two `/userinfo` calls —
+ * 5 001 ms at two 2 500 ms deadlines on `8397bdff6` / Worker `7ea1640e`, and
+ * two of the ten requests Auth0's `/userinfo` bucket allows. That is the
+ * mechanism behind the residual `VAL-HANG-001` failure.
  */
 async function resolveCookieSession(context: {
   request: Request
@@ -279,83 +256,39 @@ async function resolveCookieSession(context: {
     return { status: 'none' }
   }
 
-  // Cache hit: the token was already verified in this isolate, so no provider
-  // call is needed. The cached session carries the id, email, role and name
-  // that validation resolved — including the role resolved through the
-  // Management API, which validation performs once and caches per subject.
-  const cached = await readCachedSession(context.request)
-  if (cached) {
-    context.locals.user = {
-      id: cached.user.id,
-      email: cached.user.email ?? '',
-      // The validated-session cache does not carry the `email_verified` claim.
-      // No consumer in the application reads this field from `locals.user`.
-      emailVerified: false,
-      role: cached.user.role,
-      fullName: cached.user.name,
-    }
-    context.locals.session = {
-      id: `sess-${cached.user.id}`,
-      userId: cached.user.id,
-      // The cache entry evicts at or before the token's own expiry
-      // (`computeEvictAt`), so this never overstates the session lifetime.
-      expiresAt: new Date(cached.expires),
-    }
-    return { status: 'resolved' }
-  }
+  const resolution = await readSessionVerdict(token)
 
-  // Cache miss: authoritative validation, and the only branch that can
-  // distinguish "the provider could not answer" from "the token is invalid".
-  const validation = await validateToken(token, 'access')
-  if (!validation.valid || !validation.userId) {
-    if (validation.providerUnavailable) {
-      return {
-        status: 'provider-unavailable',
-        retryAfterSeconds:
-          validation.retryAfterSeconds ?? PROVIDER_RETRY_AFTER_DEFAULT_SECONDS,
-      }
+  if (resolution.status === 'provider-unavailable') {
+    return {
+      status: 'provider-unavailable',
+      retryAfterSeconds:
+        resolution.retryAfterSeconds ?? PROVIDER_RETRY_AFTER_DEFAULT_SECONDS,
     }
+  }
+  if (resolution.status !== 'valid' || !resolution.session) {
     return { status: 'none' }
   }
 
-  const payload = validation.payload
-  // The access token lacks role metadata (no app_metadata custom claim), so
-  // enrich the role via the Auth0 Management API, falling back to the
-  // token-derived role when the lookup fails.
-  let role: string = validation.role ?? 'guest'
-  let fullName: string | undefined =
-    typeof payload?.['name'] === 'string' ? payload['name'] : undefined
-  let avatarUrl: string | undefined =
-    typeof payload?.['picture'] === 'string' ? payload['picture'] : undefined
-
-  try {
-    const { auth0UserService } = await import('./lib/services/auth0.service')
-    const enriched = await withManagementDeadline(
-      auth0UserService.getUserById(validation.userId),
-    )
-    if (enriched) {
-      role = enriched.role
-      fullName = enriched.fullName ?? fullName
-      avatarUrl = enriched.avatarUrl ?? avatarUrl
-    }
-  } catch {
-    // Management enrichment is best-effort; token role is the fallback
-  }
-
+  // A valid token — from the cache or from this request's single validation.
+  // The session carries the id, email, role and name that validation resolved,
+  // including the role resolved through the Management API, which validation
+  // performs once and caches per subject.
+  const session = resolution.session
   context.locals.user = {
-    id: validation.userId,
-    email: typeof payload?.['email'] === 'string' ? payload['email'] : '',
-    emailVerified: payload?.['email_verified'] === true,
-    role,
-    fullName,
-    avatarUrl,
+    id: session.user.id,
+    email: session.user.email ?? '',
+    // The validated-session cache does not carry the `email_verified` claim.
+    // No consumer in the application reads this field from `locals.user`.
+    emailVerified: false,
+    role: session.user.role,
+    fullName: session.user.name,
   }
   context.locals.session = {
-    id: validation.tokenId ?? `sess-${validation.userId}`,
-    userId: validation.userId,
-    expiresAt: new Date(
-      (validation.expiresAt ?? Date.now() / 1000 + 3600) * 1000,
-    ),
+    id: `sess-${session.user.id}`,
+    userId: session.user.id,
+    // The cache entry evicts at or before the token's own expiry
+    // (`computeEvictAt`), so this never overstates the session lifetime.
+    expiresAt: new Date(session.expires),
   }
 
   return { status: 'resolved' }

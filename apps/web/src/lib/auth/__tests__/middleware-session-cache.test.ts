@@ -243,15 +243,92 @@ describe('middleware reuses the validated-session cache', () => {
   })
 })
 
+/**
+ * One provider round-trip must yield the verdict, including on the failure
+ * paths. Reading the cache and then classifying the same token with a second
+ * validation made every unverifiable cold request pay two `/userinfo` calls:
+ * 5 001 ms at two 2 500 ms deadlines on `8397bdff6` / Worker `7ea1640e`, and
+ * two of the ten requests Auth0's bucket allows. That is the mechanism behind
+ * the residual `VAL-HANG-001` failure.
+ */
+describe('one provider round-trip classifies a cold request', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockValidateToken.mockReset()
+    mockGetUserById.mockReset()
+  })
+
+  it('performs exactly one validation when a cold token cannot be verified', async () => {
+    mockValidateToken.mockResolvedValue({
+      valid: false,
+      providerUnavailable: true,
+      retryAfterSeconds: 112,
+      error: 'Too Many Requests',
+    })
+
+    const { response, nextCalled } = await invoke(
+      '/training',
+      tokenFor('single-call-outage'),
+    )
+
+    expect(mockValidateToken).toHaveBeenCalledTimes(1)
+    expect(nextCalled).toBe(false)
+    expect(response.status).toBe(503)
+    expect(response.headers.get('retry-after')).toBe('112')
+  })
+
+  it('performs exactly one validation when a cold token is invalid', async () => {
+    mockValidateToken.mockResolvedValue({
+      valid: false,
+      error: 'Invalid audience',
+    })
+
+    const { response, nextCalled, context } = await invoke(
+      '/training',
+      tokenFor('single-call-invalid'),
+    )
+
+    expect(mockValidateToken).toHaveBeenCalledTimes(1)
+    expect(nextCalled).toBe(true)
+    expect(response.status).toBe(200)
+    expect(context.locals.user).toBeUndefined()
+    expect(context.locals.session).toBeUndefined()
+  })
+
+  it('costs one validation per request while the provider is down', async () => {
+    // A provider verdict is never cached, so the next request must re-validate
+    // — once, not twice. This also proves the collapse added no cache.
+    mockValidateToken.mockResolvedValue({
+      valid: false,
+      providerUnavailable: true,
+      retryAfterSeconds: 30,
+      error: 'Too Many Requests',
+    })
+    const token = tokenFor('single-call-outage-series')
+
+    await invoke('/training', token)
+    await invoke('/training', token)
+
+    expect(mockValidateToken).toHaveBeenCalledTimes(2)
+  })
+})
+
 describe('no second cache was introduced', () => {
   const source = readFileSync(
     new URL('../../../middleware.ts', import.meta.url),
     'utf8',
   )
 
-  it('reuses the shipped session cache', () => {
-    expect(source).toMatch(/getSession/)
+  it('reuses the shipped session cache through its verdict-returning entry point', () => {
+    expect(source).toMatch(/validateSessionToken/)
     expect(source).toMatch(/from '\.\/lib\/auth\/session'/)
+  })
+
+  it('never validates the same token a second time to classify it', () => {
+    // `validateToken` is the only `/userinfo` caller. The middleware must reach
+    // it only through `session.ts`, so a cache miss is classified by the one
+    // call that was already made.
+    expect(source).not.toMatch(/\bvalidateToken\s*\(/)
   })
 
   it('declares no cache of its own and no TTL', () => {
