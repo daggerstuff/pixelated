@@ -6,16 +6,31 @@ import Button from '@/components/ui/Button.astro'
 import Card from '@/components/ui/Card.astro'
 import { readinessEnhancements } from '@/data/readiness-enhancements'
 import Layout from '@/layouts/Layout.astro'
-import { getCurrentUser, isAuthenticated } from '@/lib/auth'
+import { getCurrentUser } from '@/lib/auth'
 
-// Check if user is authenticated using the available auth functions
-const isUserAuthenticated = await isAuthenticated(Astro.request)
-if (!isUserAuthenticated) {
-  return Astro.redirect('/login?redirect=/training')
-}
-
+// One token validation per load (diagnosis D7). `isAuthenticated` was a
+// second `validateToken` of the same token in the same request, on top of the
+// middleware's — three `/userinfo` calls against a 10-request bucket. The
+// page's own first two calls exhausted the budget its third call needed, and
+// the failure sent an authenticated user to /login.
 const userSession = await getCurrentUser(Astro.request)
 if (!userSession) {
+  // The middleware already resolved this token for this request, so a failure
+  // here means the provider could not verify it (a /userinfo 429, a timeout) —
+  // a temporary outage, not a logout.
+  if (Astro.locals.user) {
+    return new Response(
+      'Authentication is temporarily unavailable. Please retry shortly.\n',
+      {
+        status: 503,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Retry-After': '30',
+          'Cache-Control': 'no-store',
+        },
+      },
+    )
+  }
   return Astro.redirect('/login?redirect=/training')
 }
 

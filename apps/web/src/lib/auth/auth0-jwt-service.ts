@@ -155,6 +155,15 @@ export interface TokenValidationResult {
   error?: string
   accountId?: string
   workspaceId?: string
+  /**
+   * The token could not be verified because the provider was unavailable
+   * (HTTP 429, a 5xx, a timeout, or a network failure) — not because it is
+   * invalid. Callers must answer a retryable failure (`503` + `Retry-After`)
+   * instead of treating the request as unauthenticated. Never a silent pass.
+   */
+  providerUnavailable?: boolean
+  /** `Retry-After` in seconds to hand back when `providerUnavailable` is set. */
+  retryAfterSeconds?: number
 }
 
 type UnknownRecord = Record<string, unknown>
@@ -168,6 +177,113 @@ function isRecord(value: unknown): value is UnknownRecord {
 
 function toOptionalString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined
+}
+
+/**
+ * Upper bound on one `/userinfo` verification.
+ *
+ * Healthy calls return in 76–393 ms; the measured tail is 8 973 ms, and a
+ * stalled call was observed holding a message POST for 50–66 s until the
+ * Workers runtime cancelled it (diagnosis §3.3, `message-post-bounding`). An
+ * unbounded provider call outlives every deadline on the request path, so it
+ * is bounded here rather than in each caller.
+ */
+const USERINFO_DEADLINE_MS = 2_500
+
+/**
+ * Upper bound on one Management API `getUserById` role lookup. Measured
+ * 34–272 ms; the lookup carries no timeout of its own, and the role cache that
+ * would absorb it sat on the dead Redis host, so every validation paid it
+ * (diagnosis D4).
+ */
+const MANAGEMENT_DEADLINE_MS = 1_500
+
+/** Fallback `Retry-After` when the provider sent no usable header. */
+const PROVIDER_RETRY_AFTER_DEFAULT_SECONDS = 30
+
+/**
+ * Statuses `/userinfo` uses to reject a token. Every other non-2xx outcome —
+ * 429, 5xx, 408, a network failure — means the provider could not answer.
+ */
+const AUTHENTICATION_FAILURE_STATUSES = new Set([400, 401, 403])
+
+class ProviderDeadlineExceededError extends Error {
+  constructor(label: string, deadlineMs: number) {
+    super(`${label} exceeded its ${deadlineMs}ms deadline`)
+    this.name = 'ProviderDeadlineExceededError'
+  }
+}
+
+/**
+ * The Auth0 dependency could not verify the request. Deliberately distinct
+ * from an authentication failure: the token may be perfectly valid, the
+ * provider simply cannot say so right now.
+ */
+class AuthProviderUnavailableError extends Error {
+  constructor(
+    message: string,
+    public retryAfterSeconds: number,
+  ) {
+    super(message)
+    this.name = 'AuthProviderUnavailableError'
+  }
+}
+
+async function withProviderDeadline<T>(
+  work: Promise<T>,
+  label: string,
+  deadlineMs: number,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new ProviderDeadlineExceededError(label, deadlineMs)),
+      deadlineMs,
+    )
+  })
+  try {
+    return await Promise.race([work, deadline])
+  } finally {
+    if (timer !== undefined) clearTimeout(timer)
+  }
+}
+
+function providerStatusCode(error: unknown): number | undefined {
+  const statusCode = (error as { statusCode?: unknown } | null)?.statusCode
+  return typeof statusCode === 'number' ? statusCode : undefined
+}
+
+function isAuthenticationFailure(error: unknown): boolean {
+  const statusCode = providerStatusCode(error)
+  return (
+    statusCode !== undefined && AUTHENTICATION_FAILURE_STATUSES.has(statusCode)
+  )
+}
+
+/**
+ * Read the provider's `Retry-After` when it sent one (`auth0-legacy`'s
+ * `UserInfoError` carries the response headers). Measured 112–114 s while the
+ * 10-request bucket drains.
+ */
+function providerRetryAfterSeconds(error: unknown): number {
+  const headers = (error as { headers?: unknown } | null)?.headers
+  if (headers instanceof Headers) {
+    const raw = headers.get('retry-after')
+    if (raw) {
+      const seconds = Number(raw)
+      if (Number.isFinite(seconds) && seconds > 0) {
+        return Math.ceil(seconds)
+      }
+      const retryAt = Date.parse(raw)
+      if (Number.isFinite(retryAt)) {
+        const delta = Math.ceil((retryAt - Date.now()) / 1000)
+        if (delta > 0) {
+          return delta
+        }
+      }
+    }
+  }
+  return PROVIDER_RETRY_AFTER_DEFAULT_SECONDS
 }
 
 async function getAuth0UserInfo(
@@ -192,7 +308,30 @@ async function getAuth0UserInfo(
     )
   }
 
-  return await retry(fetchUserInfo, 2, 500)
+  try {
+    return await withProviderDeadline(
+      retry(fetchUserInfo, 2, 500),
+      'Auth0 /userinfo',
+      USERINFO_DEADLINE_MS,
+    )
+  } catch (error: unknown) {
+    if (error instanceof AuthenticationError) {
+      throw error
+    }
+    if (isAuthenticationFailure(error)) {
+      // The provider answered and rejected this token.
+      throw new AuthenticationError(
+        `Auth0 /userinfo rejected the token (${providerStatusCode(error)})`,
+      )
+    }
+    // 429, a 5xx, a timeout, or a network failure: the provider cannot verify
+    // the token right now. This is not an invalid-token verdict — folding it
+    // into one is what sent authenticated users to `/login` (diagnosis D1).
+    throw new AuthProviderUnavailableError(
+      error instanceof Error ? error.message : 'Auth0 /userinfo unavailable',
+      providerRetryAfterSeconds(error),
+    )
+  }
 }
 
 export interface IdTokenPayload {
@@ -453,31 +592,11 @@ const ROLE_CACHE_NEGATIVE_TTL_SECONDS = 60
  */
 const ROLE_CACHE_DEADLINE_MS = 750
 
-class RoleCacheDeadlineExceededError extends Error {
-  constructor(phase: 'read' | 'write', deadlineMs: number) {
-    super(`Role cache ${phase} exceeded its ${deadlineMs}ms deadline`)
-    this.name = 'RoleCacheDeadlineExceededError'
-  }
-}
-
-const withRoleCacheDeadline = async <T>(
+const withRoleCacheDeadline = <T>(
   work: Promise<T>,
   phase: 'read' | 'write',
   deadlineMs: number,
-): Promise<T> => {
-  let timer: ReturnType<typeof setTimeout> | undefined
-  const deadline = new Promise<never>((_, reject) => {
-    timer = setTimeout(
-      () => reject(new RoleCacheDeadlineExceededError(phase, deadlineMs)),
-      deadlineMs,
-    )
-  })
-  try {
-    return await Promise.race([work, deadline])
-  } finally {
-    if (timer !== undefined) clearTimeout(timer)
-  }
-}
+): Promise<T> => withProviderDeadline(work, `Role cache ${phase}`, deadlineMs)
 
 function roleCacheKey(userId: string): string {
   // Prefix keeps Redis key-space organised; the sub is opaque, no PII
@@ -517,6 +636,15 @@ async function writeCachedRole(
 }
 
 /**
+ * One in-flight role resolution per subject, shared by every concurrent
+ * validation of that subject. The Management lookup is the expensive half of a
+ * validation and a request path validates the same token more than once
+ * (middleware + page/route), so without this each validation pays its own
+ * round-trip against a rate-limited API (diagnosis D4).
+ */
+const roleResolutionInFlight = new Map<string, Promise<UserRole | null>>()
+
+/**
  * Resolve a role from the Auth0 Management API when the access token carries no
  * role claim.
  *
@@ -528,9 +656,11 @@ async function writeCachedRole(
  * `middleware.ts` `resolveCookieSession`, reading the raw `app_metadata.roles`
  * from the returned user object.
  *
- * Best-effort by design: a missing Management client, an unavailable API, or a
- * user with no role metadata all return `null`, leaving the token-derived role
- * (which is `guest`) in place.
+ * Best-effort by design: a missing Management client, an unavailable API, a
+ * timeout, or a user with no role metadata all return `null`, leaving the
+ * token-derived role (which is `guest`) in place. The lookup is bounded and
+ * single-flighted so a slow or throttled Management API cannot consume the
+ * request budget.
  */
 async function resolveRoleFromManagementApi(
   userId: string,
@@ -540,9 +670,30 @@ async function resolveRoleFromManagementApi(
     return cached
   }
 
+  const inFlight = roleResolutionInFlight.get(userId)
+  if (inFlight) {
+    return await inFlight
+  }
+
+  const resolution = resolveRoleFromManagementApiOnce(userId)
+  roleResolutionInFlight.set(userId, resolution)
+  try {
+    return await resolution
+  } finally {
+    roleResolutionInFlight.delete(userId)
+  }
+}
+
+async function resolveRoleFromManagementApiOnce(
+  userId: string,
+): Promise<UserRole | null> {
   try {
     const { auth0UserService } = await import('../services/auth0.service')
-    const enriched = await auth0UserService.getUserById(userId)
+    const enriched = await withProviderDeadline(
+      auth0UserService.getUserById(userId),
+      'Auth0 Management API role lookup',
+      MANAGEMENT_DEADLINE_MS,
+    )
     if (!enriched) {
       // `getUserById` collapses "no such user" and "the Management API call
       // failed" into the same `null`, so this is not a definitive answer.
@@ -732,6 +883,9 @@ export async function validateToken(
       workspaceId,
     }
   } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Token validation failed'
+
     // Log validation failure
     logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, null, {
       userId: null,
@@ -739,9 +893,21 @@ export async function validateToken(
       tokenType: tokenType,
     })
 
+    if (error instanceof AuthProviderUnavailableError) {
+      // The provider could not verify the token. Report that separately so a
+      // caller can answer a retryable `503` + `Retry-After` instead of
+      // treating an authenticated user as logged out (diagnosis D1).
+      return {
+        valid: false,
+        providerUnavailable: true,
+        retryAfterSeconds: error.retryAfterSeconds,
+        error: message,
+      }
+    }
+
     return {
       valid: false,
-      error: error instanceof Error ? error.message : 'Token validation failed',
+      error: message,
     }
   }
 }

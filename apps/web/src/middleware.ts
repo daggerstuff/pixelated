@@ -121,6 +121,96 @@ function getRouteConfig(request: Request): RouteConfig | null {
 }
 
 /**
+ * Upper bound on the Management API enrichment below. Measured 34–272 ms
+ * (diagnosis §4.1.4); it carried no timeout, and it runs after token
+ * validation on every authenticated request, so a throttled Management API
+ * could hold the request open before `next()`.
+ */
+const MANAGEMENT_ENRICHMENT_DEADLINE_MS = 1_500
+
+/** Fallback `Retry-After` when the provider sent no usable value. */
+const PROVIDER_RETRY_AFTER_DEFAULT_SECONDS = 30
+
+/**
+ * Page prefixes whose own guard treats "no session" as "send the user to
+ * `/login`". A provider outage must not be rendered as a logout on these
+ * surfaces (diagnosis D1).
+ */
+function isSessionRequiredPage(pathname: string): boolean {
+  return (
+    pathname.startsWith('/admin') ||
+    pathname === '/training' ||
+    pathname.startsWith('/training/')
+  )
+}
+
+/**
+ * API routes whose authentication depends on the provider. `/api/auth/*` and
+ * health checks are deliberately excluded: a signed-in browser carrying a
+ * cookie must not turn the sign-in endpoint or a health probe into a 503.
+ */
+function isProviderBackedApiRoute(pathname: string): boolean {
+  if (!pathname.startsWith('/api/')) return false
+  if (pathname.startsWith('/api/auth/')) return false
+  if (pathname.includes('/health')) return false
+  return true
+}
+
+function providerUnavailableResponse(
+  pathname: string,
+  retryAfterSeconds: number,
+): Response {
+  const retryAfter = String(Math.max(1, Math.ceil(retryAfterSeconds)))
+  if (pathname.startsWith('/api/')) {
+    return new Response(
+      JSON.stringify({
+        error: 'Authentication provider temporarily unavailable',
+        retryAfterSeconds: Number(retryAfter),
+      }),
+      {
+        status: 503,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': retryAfter,
+          'Cache-Control': 'no-store',
+        },
+      },
+    )
+  }
+  return new Response(
+    'Authentication is temporarily unavailable. Please retry shortly.\n',
+    {
+      status: 503,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Retry-After': retryAfter,
+        'Cache-Control': 'no-store',
+      },
+    },
+  )
+}
+
+async function withManagementDeadline<T>(work: Promise<T>): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new Error('Management enrichment deadline exceeded')),
+      MANAGEMENT_ENRICHMENT_DEADLINE_MS,
+    )
+  })
+  try {
+    return await Promise.race([work, deadline])
+  } finally {
+    if (timer !== undefined) clearTimeout(timer)
+  }
+}
+
+type CookieSessionResolution =
+  | { status: 'none' }
+  | { status: 'resolved' }
+  | { status: 'provider-unavailable'; retryAfterSeconds: number }
+
+/**
  * Resolve a cookie-based session for a page route and populate
  * `context.locals.user` / `context.locals.session`.
  *
@@ -129,19 +219,31 @@ function getRouteConfig(request: Request): RouteConfig | null {
  * `auth-token` cookie set by `/api/auth/signin` would always be bounced to
  * `/login`. Best-effort: any failure leaves `locals` untouched and the request
  * continues unauthenticated.
+ *
+ * The one failure that is *not* "unauthenticated" is a provider outage: a
+ * `/userinfo` 429, a 5xx, or a timeout means the token could not be checked,
+ * not that it is invalid. That is returned as `provider-unavailable` so the
+ * caller can answer a retryable 503 rather than a logout.
  */
 async function resolveCookieSession(context: {
   request: Request
   locals: App.Locals
-}): Promise<void> {
+}): Promise<CookieSessionResolution> {
   const token = extractTokenFromRequest(context.request)
   if (!token) {
-    return
+    return { status: 'none' }
   }
 
   const validation = await validateToken(token, 'access')
   if (!validation.valid || !validation.userId) {
-    return
+    if (validation.providerUnavailable) {
+      return {
+        status: 'provider-unavailable',
+        retryAfterSeconds:
+          validation.retryAfterSeconds ?? PROVIDER_RETRY_AFTER_DEFAULT_SECONDS,
+      }
+    }
+    return { status: 'none' }
   }
 
   const payload = validation.payload
@@ -156,7 +258,9 @@ async function resolveCookieSession(context: {
 
   try {
     const { auth0UserService } = await import('./lib/services/auth0.service')
-    const enriched = await auth0UserService.getUserById(validation.userId)
+    const enriched = await withManagementDeadline(
+      auth0UserService.getUserById(validation.userId),
+    )
     if (enriched) {
       role = enriched.role
       fullName = enriched.fullName ?? fullName
@@ -181,6 +285,8 @@ async function resolveCookieSession(context: {
       (validation.expiresAt ?? Date.now() / 1000 + 3600) * 1000,
     ),
   }
+
+  return { status: 'resolved' }
 }
 
 /**
@@ -229,13 +335,27 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
     // handled by routeAuthConfig above; page routes are guarded by the page
     // component itself, which reads Astro.locals.session/user.
     if (!routeConfig) {
-      await resolveCookieSession(context)
+      const resolution = await resolveCookieSession(context)
+      const pathname = context.url.pathname
+
+      // A provider outage is not a logout. On a surface that requires a
+      // session, answer a bounded, retryable 503 + Retry-After instead of
+      // leaving `locals` empty so the page redirects to /login (diagnosis D1).
+      if (
+        resolution.status === 'provider-unavailable' &&
+        (isSessionRequiredPage(pathname) || isProviderBackedApiRoute(pathname))
+      ) {
+        return providerUnavailableResponse(
+          pathname,
+          resolution.retryAfterSeconds,
+        )
+      }
+
       // Guard /admin pages at middleware layer to prevent ResponseSentError
       // from AdminLayout (which cannot safely return Astro.redirect from a layout).
       // Middleware runs before any component rendering, so a redirect here avoids
       // the "Response has already been sent" crash seen in PIXEL-ASTRO-S.
       try {
-        const pathname = context.url.pathname
         if (pathname.startsWith('/admin')) {
           const sessionUser = context.locals.user
           const sessionData = context.locals.session
