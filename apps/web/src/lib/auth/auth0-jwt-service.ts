@@ -675,7 +675,24 @@ async function resolveRoleFromManagementApi(
 
   const inFlight = roleResolutionInFlight.get(userId)
   if (inFlight) {
-    return await inFlight
+    // Followers get their own bound: if the leader's request was cancelled
+    // before its promise settled, the entry never clears on its own and an
+    // unbounded await would hang this request until the worker limit. A
+    // timed-out follower drops the stale entry so the next request starts a
+    // fresh resolution, and falls back to the token-derived role like any
+    // other Management API failure.
+    try {
+      return await withProviderDeadline(
+        inFlight,
+        'Auth0 Management API role lookup (shared)',
+        MANAGEMENT_DEADLINE_MS,
+      )
+    } catch {
+      if (roleResolutionInFlight.get(userId) === inFlight) {
+        roleResolutionInFlight.delete(userId)
+      }
+      return null
+    }
   }
 
   const resolution = resolveRoleFromManagementApiOnce(userId)

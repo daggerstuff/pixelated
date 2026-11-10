@@ -132,6 +132,18 @@ describe('provider-unavailable session resolution', () => {
     })
   })
 
+  it('leaves a public API route alone during a provider outage', async () => {
+    // Only the namespaces whose handlers resolve a session may turn an outage
+    // into a 503. A public endpoint must not fail because the browser happened
+    // to carry a cookie.
+    mockValidateToken.mockResolvedValue(providerUnavailable)
+
+    const { response, nextCalled } = await invoke('/api/analytics/dashboard')
+
+    expect(nextCalled).toBe(true)
+    expect(response.status).toBe(200)
+  })
+
   it('does not turn a genuinely invalid token into a 503', async () => {
     mockValidateToken.mockResolvedValue(invalidToken)
 

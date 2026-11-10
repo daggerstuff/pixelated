@@ -145,15 +145,30 @@ function isSessionRequiredPage(pathname: string): boolean {
 }
 
 /**
- * API routes whose authentication depends on the provider. `/api/auth/*` and
- * health checks are deliberately excluded: a signed-in browser carrying a
- * cookie must not turn the sign-in endpoint or a health probe into a 503.
+ * API namespaces whose handlers resolve the cookie session themselves.
+ *
+ * Only these may answer a provider outage with a 503: the handler would
+ * otherwise see an empty session and report a 401, which the client renders as
+ * a logout (diagnosis D1). Every other `/api/*` route is public, covered by
+ * `routeAuthConfig`, or authenticated by an API key, so a provider outage must
+ * not turn it into a 503 for a browser that happens to carry a cookie.
  */
-function isProviderBackedApiRoute(pathname: string): boolean {
-  if (!pathname.startsWith('/api/')) return false
-  if (pathname.startsWith('/api/auth/')) return false
-  if (pathname.includes('/health')) return false
-  return true
+const SESSION_BEARING_API_PREFIXES = [
+  '/api/ai/',
+  '/api/crisis/',
+  '/api/export/',
+  '/api/patient-rights/',
+  '/api/training/',
+  '/api/ws/',
+] as const
+
+function isSessionBearingApiRoute(pathname: string): boolean {
+  if (pathname === '/api/session' || pathname.startsWith('/api/session/')) {
+    return true
+  }
+  return SESSION_BEARING_API_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix),
+  )
 }
 
 function providerUnavailableResponse(
@@ -343,7 +358,7 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
       // leaving `locals` empty so the page redirects to /login (diagnosis D1).
       if (
         resolution.status === 'provider-unavailable' &&
-        (isSessionRequiredPage(pathname) || isProviderBackedApiRoute(pathname))
+        (isSessionRequiredPage(pathname) || isSessionBearingApiRoute(pathname))
       ) {
         return providerUnavailableResponse(
           pathname,
