@@ -43,6 +43,10 @@ export interface DatabaseConfig {
   connectionTimeoutMillis: number
   acquireTimeoutMillis: number
   statementTimeoutMillis: number
+  queryTimeoutMillis: number
+  clientLifetimeSeconds: number
+  keepAlive: boolean
+  keepAliveInitialDelayMillis: number
   ssl?: boolean | object
 }
 
@@ -84,6 +88,64 @@ export const DB_STATEMENT_TIMEOUT_MS = 5_000
  * `acquireClient`. Override with `DB_CONNECTION_TIMEOUT`.
  */
 export const DB_CONNECTION_TIMEOUT_MS = 3_000
+
+/**
+ * Upper bound on a single statement, enforced client-side.
+ *
+ * Measured on `a24ab11d9` / Worker `e9aed1a4`: 35 of 35 successful session
+ * loads opened a new Postgres connection, 38 of 38 deadline legs opened none,
+ * and on a deadline leg nothing logged an acquisition failure, a
+ * `DatabaseUnavailableError`, an idle-client error or an exception. The request
+ * therefore held a *reused* pooled client whose socket never answered. The pool
+ * set `connectionTimeoutMillis` and `idleTimeoutMillis` but no `query_timeout`,
+ * and the session path never set `statement_timeout`, so a statement on such a
+ * socket had no bound at all — the route's 8 s deadline was the only thing that
+ * ended it.
+ *
+ * This is set on the pool (`query_timeout`), so it covers every caller
+ * including statements issued directly on a client, and it is also enforced by
+ * this module's own `query()`/`transaction()` so it holds even when pg's timer
+ * never fires. A trip raises `DatabaseUnavailableError`, which the routes
+ * already answer with the retryable `503` + `Retry-After`.
+ *
+ * It sits well inside the 8 s request deadline and well above a healthy
+ * statement (measured: first query 94–263 ms after connect, 1 188 ms worst-case
+ * connect). Override with `DB_QUERY_TIMEOUT`.
+ */
+export const DB_QUERY_TIMEOUT_MS = 4_000
+
+/**
+ * Maximum age of a pooled client before it is recycled.
+ *
+ * A Cloudflare isolate can freeze with clients in the pool; a peer (Neon, or a
+ * middlebox) can close those sockets while the isolate is idle, and pg then
+ * hands a dead socket to the next request. `idleTimeoutMillis` alone does not
+ * cover that, because its timer does not run while the isolate is frozen.
+ *
+ * pg-pool has its own `maxLifetimeSeconds`, but its implementation calls
+ * `.unref()` on the timer unconditionally, and `setTimeout` returns a number in
+ * the Workers runtime — enabling it throws on every new client. The bound is
+ * therefore enforced by `acquireClient`, which destroys a client that is
+ * already past it instead of handing it to a statement. Override with
+ * `DB_MAX_LIFETIME_SECONDS`; `0` disables the bound.
+ */
+export const DB_MAX_LIFETIME_SECONDS = 60
+
+/**
+ * Initial delay before the first TCP keepalive probe. Node honours this;
+ * `pg-cloudflare` implements `setKeepAlive()` as a no-op, so on the Worker the
+ * keepalive is declarative and the lifetime bound above is what actually
+ * recycles a stale socket.
+ */
+const DB_KEEPALIVE_INITIAL_DELAY_MS = 10_000
+
+/**
+ * How many clients already past their lifetime one acquisition may recycle
+ * before giving up and using the one it holds. The pool is capped at `max`
+ * clients (20 by default), so a full pool of stale sockets is drained in one
+ * pass and the next client the pool creates is fresh.
+ */
+const DB_CLIENT_RECYCLE_LIMIT = 20
 
 /**
  * Resolve the database configuration from the environment.
@@ -145,6 +207,14 @@ function resolveDefaultConfig(): DatabaseConfig {
       DB_STATEMENT_TIMEOUT_MS,
     )
   }
+  if (env['DB_QUERY_TIMEOUT'] !== undefined)
+    fromEnv.queryTimeoutMillis = envInt('DB_QUERY_TIMEOUT', DB_QUERY_TIMEOUT_MS)
+  if (env['DB_MAX_LIFETIME_SECONDS'] !== undefined) {
+    fromEnv.clientLifetimeSeconds = envInt(
+      'DB_MAX_LIFETIME_SECONDS',
+      DB_MAX_LIFETIME_SECONDS,
+    )
+  }
 
   const isLocalHost = (host?: string) =>
     !host || host === 'localhost' || host === '127.0.0.1' || host === '::1'
@@ -161,6 +231,10 @@ function resolveDefaultConfig(): DatabaseConfig {
     connectionTimeoutMillis: DB_CONNECTION_TIMEOUT_MS,
     acquireTimeoutMillis: DB_ACQUIRE_TIMEOUT_MS,
     statementTimeoutMillis: DB_STATEMENT_TIMEOUT_MS,
+    queryTimeoutMillis: DB_QUERY_TIMEOUT_MS,
+    clientLifetimeSeconds: DB_MAX_LIFETIME_SECONDS,
+    keepAlive: true,
+    keepAliveInitialDelayMillis: DB_KEEPALIVE_INITIAL_DELAY_MS,
     // Verify server certificates in production by default for remote hosts.
     // Localhost never uses SSL, even in production — the local Postgres does
     // not support TLS and would throw "The server does not support SSL connections".
@@ -180,6 +254,14 @@ let lastConfig: Partial<DatabaseConfig> = {}
 // The effective configuration of the live pool (defaults + caller config), so
 // acquireClient can read its own bound without re-resolving the environment.
 let activeConfig: DatabaseConfig | null = null
+
+// When each pooled client connected. Used to recycle a client that has outlived
+// `clientLifetimeSeconds` before it is handed to a statement.
+const clientConnectedAt = new WeakMap<PoolClient, number>()
+
+// Clients that have already been checked out at least once, so the acquire log
+// can say whether this request opened a connection or reused a pooled one.
+const checkedOutClients = new WeakSet<PoolClient>()
 
 /**
  * Initialize database connection pool
@@ -210,6 +292,15 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
     // Server-enforced per-statement bound. Without it a stuck first statement
     // occupies the request until the route deadline fires.
     statement_timeout: finalConfig.statementTimeoutMillis,
+    // Client-enforced per-statement bound. `statement_timeout` never reaches a
+    // statement written to a socket the server is not reading, so a reused
+    // pooled client whose peer has gone silent has no bound without this.
+    query_timeout: finalConfig.queryTimeoutMillis,
+    // Declarative keepalive on the socket. Node honours it; pg-cloudflare
+    // implements setKeepAlive() as a no-op, so on the Worker this documents the
+    // intent and the client-lifetime bound below is the mechanism that acts.
+    keepAlive: finalConfig.keepAlive,
+    keepAliveInitialDelayMillis: finalConfig.keepAliveInitialDelayMillis,
   })
   pool = newPool
 
@@ -230,7 +321,10 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   // 'connect' is not in Pool's type definition but pool does emit it at runtime
   ;(newPool as unknown as PoolWithConnectEvent).on(
     'connect',
-    (_client: PoolClient) => {
+    (client: PoolClient) => {
+      // Record the connection time so acquireClient can refuse to hand out a
+      // client that has outlived the recycle bound.
+      clientConnectedAt.set(client, Date.now())
       logger.info('New client connected to database')
     },
   )
@@ -357,12 +451,14 @@ export class DatabaseUnavailableError extends Error {
 /**
  * True when `error` is a retryable database-availability failure.
  *
- * Covers the acquisition timeout (`DatabaseUnavailableError`) and a transient
- * connection error raised by pg on the final attempt, so both surface as the
- * same retryable status.
+ * Covers the acquisition timeout (`DatabaseUnavailableError`), a statement
+ * abandoned by the client-side query bound (this module's own deadline or pg's
+ * `query_timeout`), and a transient connection error raised by pg on the final
+ * attempt, so all of them surface as the same retryable status.
  */
 export function isDatabaseUnavailableError(error: unknown): boolean {
   if (error instanceof DatabaseUnavailableError) return true
+  if (isQueryTimeoutError(error)) return true
   const carriesCode =
     typeof error === 'object' &&
     error !== null &&
@@ -420,6 +516,62 @@ function resolveAcquireTimeoutMs(): number {
   )
 }
 
+function resolveQueryTimeoutMs(): number {
+  return (
+    activeConfig?.queryTimeoutMillis ??
+    lastConfig.queryTimeoutMillis ??
+    DB_QUERY_TIMEOUT_MS
+  )
+}
+
+function resolveMaxLifetimeMs(): number {
+  const seconds =
+    activeConfig?.clientLifetimeSeconds ??
+    lastConfig.clientLifetimeSeconds ??
+    DB_MAX_LIFETIME_SECONDS
+  return seconds * 1000
+}
+
+/**
+ * True when `client` has outlived the recycle bound.
+ *
+ * Clients created before the pool registered its `connect` listener (and any
+ * fake in a test) have no recorded age and are treated as fresh.
+ */
+function isClientPastLifetime(client: PoolClient): boolean {
+  const maxLifetimeMs = resolveMaxLifetimeMs()
+  if (maxLifetimeMs <= 0) return false
+  const connectedAt = clientConnectedAt.get(client)
+  if (connectedAt === undefined) return false
+  return Date.now() - connectedAt >= maxLifetimeMs
+}
+
+/**
+ * Check out a client, replacing one that has outlived the recycle bound.
+ *
+ * A client older than `clientLifetimeSeconds` may already have been closed by
+ * the peer while the isolate was frozen; handing it to a statement is exactly
+ * the silent hang this module now bounds. Destroy it and take the next one. The
+ * loop is capped at the pool's own client count, so a pool full of stale
+ * sockets drains in one pass and the next client pg creates is fresh.
+ */
+async function checkoutClient(
+  pool: Pool,
+  timeoutMs: number,
+): Promise<PoolClient> {
+  let client = await acquireWithDeadline(pool, timeoutMs)
+  for (
+    let recycled = 0;
+    recycled < DB_CLIENT_RECYCLE_LIMIT && isClientPastLifetime(client);
+    recycled++
+  ) {
+    logger.info('Recycling a pooled database client past its lifetime bound')
+    client.release(true)
+    client = await acquireWithDeadline(pool, timeoutMs)
+  }
+  return client
+}
+
 /**
  * Acquire a client, bounded and rebuilt-once.
  *
@@ -429,6 +581,9 @@ function resolveAcquireTimeoutMs(): number {
  * holding a half-open socket, or a slot nobody will release) and retries once
  * on a fresh one. If both attempts fail, the failure is either the original
  * raised error or a `DatabaseUnavailableError` for a pure timeout.
+ *
+ * The success path logs whether the client was new or reused, so a future tail
+ * can tell a queued `connect()` from a hung statement on a pooled client.
  *
  * Routes that manage their own multi-statement or transactional work against
  * pg directly should acquire clients through this instead of
@@ -442,7 +597,11 @@ export async function acquireClient(): Promise<PoolClient> {
   for (let attempt = 1; attempt <= DB_ACQUIRE_ATTEMPTS; attempt++) {
     const activePool = getPool()
     try {
-      return await acquireWithDeadline(activePool, timeoutMs)
+      const client = await checkoutClient(activePool, timeoutMs)
+      const isNew = !checkedOutClients.has(client)
+      checkedOutClients.add(client)
+      logger.info(`Acquired database client: ${isNew ? 'new' : 'reused'}`)
+      return client
     } catch (error: unknown) {
       lastError = error
       const timedOut = error instanceof AcquireTimeoutError
@@ -466,6 +625,81 @@ export async function acquireClient(): Promise<PoolClient> {
   throw lastError
 }
 
+/** Raised internally when one statement exceeds its client-side bound. */
+class QueryTimeoutError extends Error {
+  constructor(timeoutMs: number) {
+    super(`Database statement exceeded its ${timeoutMs}ms bound`)
+    this.name = 'QueryTimeoutError'
+  }
+}
+
+/**
+ * True when a statement was abandoned by the client-side bound: either this
+ * module's own deadline or pg's `query_timeout` (message `Query read timeout`)
+ * for a statement a caller issued directly on the client.
+ */
+function isQueryTimeoutError(error: unknown): boolean {
+  if (error instanceof QueryTimeoutError) return true
+  if (!error || typeof error !== 'object') return false
+  const message =
+    typeof (error as { message?: unknown }).message === 'string'
+      ? (error as { message: string }).message.toLowerCase()
+      : ''
+  return message.includes('query read timeout')
+}
+
+/**
+ * True when the client must be destroyed rather than returned to the pool.
+ *
+ * A timed-out statement leaves a half-consumed protocol stream behind, and a
+ * connection-level failure has already lost the socket. Releasing either one
+ * back to the idle list is how a poisoned client gets handed to the next
+ * request.
+ */
+function isUnusableClientError(error: unknown): boolean {
+  return isQueryTimeoutError(error) || isTransientConnectionError(error)
+}
+
+/**
+ * Bound one statement on `client`.
+ *
+ * pg's `query_timeout` is the pool-level bound that covers every caller; this
+ * race enforces the same bound for the statements this module issues, so the
+ * limit holds even when pg's timer never fires. A late rejection after the
+ * race has settled is swallowed so it can never become an unhandled rejection.
+ */
+function queryWithDeadline<T>(
+  client: PoolClient,
+  text: string,
+  params: unknown[] | undefined,
+  timeoutMs: number,
+): Promise<T> {
+  const attempt = client.query<T>(text, params) as unknown as Promise<T>
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new QueryTimeoutError(timeoutMs)),
+      timeoutMs,
+    )
+  })
+  attempt.catch(() => undefined)
+  return Promise.race([attempt, deadline]).finally(() => {
+    if (timer !== undefined) clearTimeout(timer)
+  })
+}
+
+/** Map a statement failure onto the retryable availability error. */
+function toDatabaseUnavailable(error: unknown, timeoutMs: number): unknown {
+  if (error instanceof DatabaseUnavailableError) return error
+  if (isQueryTimeoutError(error)) {
+    return new DatabaseUnavailableError(
+      `Database statement could not complete within ${timeoutMs}ms`,
+      error,
+    )
+  }
+  return error
+}
+
 /**
  * Execute a query with automatic connection management
  */
@@ -474,11 +708,22 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
   params?: unknown[],
 ): Promise<DbQueryResult<T>> {
   recordQuery(text)
+  const timeoutMs = resolveQueryTimeoutMs()
   const client = await acquireClient()
+  let destroy = false
   try {
-    return (await client.query<T>(text, params)) as unknown as DbQueryResult<T>
+    return await queryWithDeadline<DbQueryResult<T>>(
+      client,
+      text,
+      params,
+      timeoutMs,
+    )
+  } catch (error: unknown) {
+    destroy = isUnusableClientError(error)
+    throw toDatabaseUnavailable(error, timeoutMs)
   } finally {
-    client.release()
+    if (destroy) client.release(true)
+    else client.release()
   }
 }
 
@@ -488,21 +733,28 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
 export async function transaction<T>(
   callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
+  const timeoutMs = resolveQueryTimeoutMs()
   const client = await acquireClient()
+  let destroy = false
   try {
     recordQuery('BEGIN')
-    await client.query('BEGIN')
+    await queryWithDeadline(client, 'BEGIN', undefined, timeoutMs)
     const result = await callback(client)
     recordQuery('COMMIT')
-    await client.query('COMMIT')
+    await queryWithDeadline(client, 'COMMIT', undefined, timeoutMs)
     return result
   } catch (error: unknown) {
-    // A dead connection has already rolled back server-side; do not let a
-    // failed ROLLBACK mask the original error.
-    await client.query('ROLLBACK').catch(() => undefined)
-    throw error
+    // A dead or timed-out connection has already lost its server-side state,
+    // and a ROLLBACK on it would just wait for the same bound again. Destroy
+    // it instead; do not let a failed ROLLBACK mask the original error.
+    destroy = isUnusableClientError(error)
+    if (!destroy) {
+      await client.query('ROLLBACK').catch(() => undefined)
+    }
+    throw toDatabaseUnavailable(error, timeoutMs)
   } finally {
-    client.release()
+    if (destroy) client.release(true)
+    else client.release()
   }
 }
 
