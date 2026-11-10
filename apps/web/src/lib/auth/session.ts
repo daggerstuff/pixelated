@@ -11,12 +11,9 @@
  * backends so the migration is zero-downtime.
  */
 
-import { userManager } from '../db'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getFromCache, setInCache, removeFromCache } from '../redis'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
-const logger = createBuildSafeLogger('session')
 
 /**
  * Lightweight session shape returned by getSession and consumed by middleware
@@ -44,9 +41,6 @@ export interface Session {
   /** ISO-8601 timestamp when the session expires */
   expires: string
 }
-
-// Type alias for SessionData - compatibility with various imports
-export type SessionData = Session
 
 /**
  * The verdict one token validation produces.
@@ -276,56 +270,6 @@ export function isSessionValid(session: Session): boolean {
   const EXPIRY_BUFFER_MS = 5 * 60 * 1000 // 5-minute safety buffer for in-flight requests
   const expiresDate = new Date(session.expires)
   return Date.now() < expiresDate.getTime() - EXPIRY_BUFFER_MS
-}
-
-/**
- * Get user profile from database using user ID
- * @param userId User ID from session
- * @returns User profile or null
- */
-export async function getUserProfile(userId: string) {
-  try {
-    const user = (await userManager.getUserById(userId)) as Record<
-      string,
-      unknown
-    > | null
-
-    if (!user) {
-      logger.error('User not found:', userId)
-      return null
-    }
-
-    return {
-      id: user['id'] as string,
-      email: user['email'] as string,
-      fullName: `${user['first_name'] as string} ${user['last_name'] as string}`,
-      avatarUrl: user['avatar_url'] as string,
-      role: user['role'] as string,
-    }
-  } catch (error: unknown) {
-    logger.error('Error in getUserProfile:', error)
-    return null
-  }
-}
-
-/**
- * Get user role for permission checks
- * @param session Session object
- * @returns User role string or null
- */
-export function getUserRole(session: Session): string | null {
-  return session?.user?.role ?? null
-}
-
-/**
- * Check if user has a specific permission/role
- * @param session Session object
- * @param requiredRole Role that's required
- * @returns boolean indicating if user has required role
- */
-export function hasRole(session: Session, requiredRole: string): boolean {
-  const userRole = getUserRole(session)
-  return userRole === requiredRole
 }
 
 /**
