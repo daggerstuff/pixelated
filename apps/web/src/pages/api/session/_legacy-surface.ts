@@ -61,7 +61,8 @@ export const LEGACY_SESSION_SURFACE_CODE = 'LEGACY_SESSION_API_UNAVAILABLE'
 
 /**
  * Stable code for the retryable shape. Distinct from the `410` code so a caller
- * (or an evidence run) can tell "this surface is gone" from "try again".
+ * (or an evidence run) can tell that the surface is gone apart from a
+ * temporary failure.
  */
 export const LEGACY_SESSION_RETRYABLE_CODE =
   'LEGACY_SESSION_API_TEMPORARILY_UNAVAILABLE'
