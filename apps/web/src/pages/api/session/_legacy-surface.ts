@@ -29,6 +29,15 @@
  * measured on `249c558c4` / Worker `7542a5d3`) and must never be answered as
  * `410` (which would claim the surface is gone). It answers the retryable
  * `503` + `Retry-After` shape the rest of the application uses.
+ *
+ * A third class joins them on the same surface. These routes acquire their
+ * client through `acquireClient()`, which raises `DatabaseUnavailableError`
+ * when it cannot hand out a usable client: two consecutive reused clients fail
+ * the liveness probe, or both acquisition attempts exceed their bound. That is
+ * the same temporary condition as a bound trip, one stage earlier, so every
+ * handler maps `isDatabaseUnavailableError()` alongside `isQueryTimeout()`.
+ * Leaving it unmapped answered `500 Internal server error` — the worst possible
+ * answer on a surface the availability matrix counts hard failures on.
  */
 
 import {
@@ -87,10 +96,10 @@ export function isMissingLegacySchema(error: unknown): boolean {
  * True when the statement was abandoned by a bound rather than by a malformed
  * request or a missing surface.
  *
- * Deliberately narrow. A connection-level failure (`08006`), an acquisition
- * timeout and any other infrastructure error keep their existing `500`, because
- * this feature maps only the query-timeout class that the client-side bound
- * introduced.
+ * Deliberately narrow: it classifies the statement bound only. The client
+ * acquisition class is classified by `isDatabaseUnavailableError()` in
+ * `lib/db` and mapped beside this one in every handler; a genuine
+ * non-availability infrastructure error still answers `500`.
  */
 export function isQueryTimeout(error: unknown): boolean {
   return matchesQueryTimeout(error, 0)

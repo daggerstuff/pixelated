@@ -253,8 +253,10 @@ describe('session snapshots on absent schema', () => {
     expect(await response.json()).toMatchObject({ code: LEGACY_SURFACE_CODE })
   })
 
-  it('still surfaces genuine infrastructure errors as 500', async () => {
-    mockQuery.mockRejectedValue(schemaError('08006'))
+  it('still surfaces genuine non-availability infrastructure errors as 500', async () => {
+    // `08006` is a connection loss, which the availability mapping answers as
+    // retryable. A PostgreSQL internal error is not retryable and stays 500.
+    mockQuery.mockRejectedValue(schemaError('XX000'))
 
     const response = await invoke(GET, {
       request: createRequest(
