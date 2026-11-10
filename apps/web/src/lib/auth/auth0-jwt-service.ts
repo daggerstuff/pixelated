@@ -319,9 +319,12 @@ async function getAuth0UserInfo(
       throw error
     }
     if (isAuthenticationFailure(error)) {
-      // The provider answered and rejected this token.
+      // The provider answered and rejected this token. Keep the provider's own
+      // message so the diagnostic text is unchanged.
       throw new AuthenticationError(
-        `Auth0 /userinfo rejected the token (${providerStatusCode(error)})`,
+        error instanceof Error
+          ? error.message
+          : `Auth0 /userinfo rejected the token (${providerStatusCode(error)})`,
       )
     }
     // 429, a 5xx, a timeout, or a network failure: the provider cannot verify
