@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
 
 import { getSession } from '../../../lib/auth/session'
-import { getPool } from '../../../lib/db'
+import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
   isMissingLegacySchema,
   isQueryTimeout,
@@ -173,7 +173,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { sessionId, analyticsData } = requestBody
 
-    const client = await getPool().connect()
+    const client = await acquireClient()
     try {
       const sessionQuery = `
         SELECT therapist_id FROM sessions WHERE id = $1 AND therapist_id = $2
@@ -253,7 +253,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
-    if (isQueryTimeout(error))
+    if (isQueryTimeout(error) || isDatabaseUnavailableError(error))
       return legacySessionRetryableResponse({
         advertiseRetry: false,
       })
@@ -296,7 +296,7 @@ export const GET: APIRoute = async ({ request }) => {
       )
     }
 
-    const client = await getPool().connect()
+    const client = await acquireClient()
     try {
       const sessionQuery = `
         SELECT therapist_id FROM sessions WHERE id = $1 AND therapist_id = $2
@@ -384,7 +384,8 @@ export const GET: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
-    if (isQueryTimeout(error)) return legacySessionRetryableResponse()
+    if (isQueryTimeout(error) || isDatabaseUnavailableError(error))
+      return legacySessionRetryableResponse()
     console.error('Error fetching session analytics:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,

@@ -212,8 +212,10 @@ describe('legacy /api/session/* routes on absent schema', () => {
     })
   })
 
-  it('still surfaces genuine infrastructure errors as 500', async () => {
-    state.query.mockRejectedValue(schemaError('08006'))
+  it('still surfaces genuine non-availability infrastructure errors as 500', async () => {
+    // `08006` is a connection loss, which the availability mapping answers as
+    // retryable. A PostgreSQL internal error is not retryable and stays 500.
+    state.query.mockRejectedValue(schemaError('XX000'))
 
     const response = await invoke(
       comparison.GET as Handler,
@@ -513,7 +515,7 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
     }
   })
 
-  it('still answers 410 for absent schema and 500 for a non-timeout infrastructure error', async () => {
+  it('still answers 410 for absent schema and 500 for a non-availability infrastructure error', async () => {
     state.query.mockRejectedValue(schemaError('42P01'))
     const schemaResponse = await invoke(
       comparison.GET as Handler,
@@ -521,7 +523,7 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
     )
     expect(schemaResponse.status).toBe(410)
 
-    state.query.mockRejectedValue(schemaError('08006'))
+    state.query.mockRejectedValue(schemaError('XX000'))
     const infrastructureResponse = await invoke(
       comparison.GET as Handler,
       get(`/api/session/comparison?sessionId=${SESSION_ID}`),

@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 
-import { acquireClient } from '@/lib/db'
+import { acquireClient, isDatabaseUnavailableError } from '@/lib/db'
 
 import { getSession } from '../../../lib/auth/session'
 import {
@@ -109,7 +109,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
-    if (isQueryTimeout(error))
+    if (isQueryTimeout(error) || isDatabaseUnavailableError(error))
       return legacySessionRetryableResponse({
         advertiseRetry: false,
       })
@@ -263,7 +263,8 @@ export const GET: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
-    if (isQueryTimeout(error)) return legacySessionRetryableResponse()
+    if (isQueryTimeout(error) || isDatabaseUnavailableError(error))
+      return legacySessionRetryableResponse()
     console.error('Error fetching session comparisons:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
