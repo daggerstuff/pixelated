@@ -44,6 +44,7 @@ export interface DatabaseConfig {
   acquireTimeoutMillis: number
   statementTimeoutMillis: number
   queryTimeoutMillis: number
+  livenessProbeTimeoutMillis: number
   clientLifetimeSeconds: number
   keepAlive: boolean
   keepAliveInitialDelayMillis: number
@@ -132,6 +133,51 @@ export const DB_QUERY_TIMEOUT_MS = 4_000
 export const DB_MAX_LIFETIME_SECONDS = 60
 
 /**
+ * Upper bound on the liveness probe a borrowed pooled client must pass before
+ * it is handed to a caller.
+ *
+ * Measured on `249c558c4` / Worker `7542a5d3` (evidence
+ * `availability-remeasure-249c558c4-2026-11-10.md` §6): every failing request
+ * was served by a **reused** pooled client whose socket never answered, and
+ * every success was served by one the pool had just opened. A socket can die
+ * well inside `DB_MAX_LIFETIME_SECONDS`, so the lifetime recycle cannot catch
+ * it, and the 4 000 ms statement bound only turns the dead socket into a
+ * bounded failure after the caller has already issued its statement.
+ *
+ * A trivial `SELECT 1` on the borrowed client, bounded by this short deadline,
+ * proves the socket answers *before* the caller's statement runs. A failure
+ * destroys the client and replaces it; the caller never sees the probe. It is
+ * deliberately a fraction of `DB_QUERY_TIMEOUT_MS`, so a healthy reused
+ * acquire pays one round trip and a dead one costs a few hundred milliseconds,
+ * not the statement bound.
+ *
+ * Measured cost of that round trip on a healthy acquire (host-side, against the
+ * same Neon database, 50 samples): p50 13.2 ms, p95 13.4 ms, max 14.2 ms. A
+ * fresh connect costs p50 153 ms, and it is not probed. The bound is therefore
+ * ~22x the measured p95: a healthy client never trips it, and a dead socket
+ * costs a fraction of the 4 000 ms statement bound.
+ *
+ * Override with `DB_LIVENESS_PROBE_TIMEOUT`; `0` disables the probe.
+ */
+export const DB_LIVENESS_PROBE_TIMEOUT_MS = 300
+
+/**
+ * The probe statement. Trivial, side-effect free, and valid on every
+ * PostgreSQL version the deployment targets.
+ */
+const DB_LIVENESS_PROBE_STATEMENT = 'SELECT 1'
+
+/**
+ * How many reused clients one acquisition may destroy after a failed probe
+ * before giving up with a retryable failure. The first failure is followed by
+ * one replacement acquisition; if that replacement is itself a reused client
+ * and also fails its probe, the pool is discarded and the caller receives a
+ * `DatabaseUnavailableError` (a retryable 503) instead of a client that cannot
+ * answer.
+ */
+const DB_LIVENESS_PROBE_TRIPS = 2
+
+/**
  * Initial delay before the first TCP keepalive probe. Node honours this;
  * `pg-cloudflare` implements `setKeepAlive()` as a no-op, so on the Worker the
  * keepalive is declarative and the lifetime bound above is what actually
@@ -209,6 +255,12 @@ function resolveDefaultConfig(): DatabaseConfig {
   }
   if (env['DB_QUERY_TIMEOUT'] !== undefined)
     fromEnv.queryTimeoutMillis = envInt('DB_QUERY_TIMEOUT', DB_QUERY_TIMEOUT_MS)
+  if (env['DB_LIVENESS_PROBE_TIMEOUT'] !== undefined) {
+    fromEnv.livenessProbeTimeoutMillis = envInt(
+      'DB_LIVENESS_PROBE_TIMEOUT',
+      DB_LIVENESS_PROBE_TIMEOUT_MS,
+    )
+  }
   if (env['DB_MAX_LIFETIME_SECONDS'] !== undefined) {
     fromEnv.clientLifetimeSeconds = envInt(
       'DB_MAX_LIFETIME_SECONDS',
@@ -232,6 +284,7 @@ function resolveDefaultConfig(): DatabaseConfig {
     acquireTimeoutMillis: DB_ACQUIRE_TIMEOUT_MS,
     statementTimeoutMillis: DB_STATEMENT_TIMEOUT_MS,
     queryTimeoutMillis: DB_QUERY_TIMEOUT_MS,
+    livenessProbeTimeoutMillis: DB_LIVENESS_PROBE_TIMEOUT_MS,
     clientLifetimeSeconds: DB_MAX_LIFETIME_SECONDS,
     keepAlive: true,
     keepAliveInitialDelayMillis: DB_KEEPALIVE_INITIAL_DELAY_MS,
@@ -532,6 +585,14 @@ function resolveMaxLifetimeMs(): number {
   return seconds * 1000
 }
 
+function resolveLivenessProbeTimeoutMs(): number {
+  return (
+    activeConfig?.livenessProbeTimeoutMillis ??
+    lastConfig.livenessProbeTimeoutMillis ??
+    DB_LIVENESS_PROBE_TIMEOUT_MS
+  )
+}
+
 /**
  * True when `client` has outlived the recycle bound.
  *
@@ -573,6 +634,36 @@ async function checkoutClient(
 }
 
 /**
+ * Prove a borrowed client answers before a caller issues a statement on it.
+ *
+ * `SELECT 1` on the client itself, bounded by the probe's own short deadline,
+ * so a socket the peer closed while the isolate was idle fails fast instead of
+ * waiting for `DB_QUERY_TIMEOUT_MS`. A raised error and a timeout are the same
+ * verdict here: the client must not be handed out.
+ *
+ * The probe statement is deliberately not passed through `recordQuery`: it is
+ * this module's health check, not a caller query, and counting it would skew
+ * the query metrics for every request.
+ */
+async function probeClientLiveness(
+  client: PoolClient,
+  timeoutMs: number,
+): Promise<boolean> {
+  if (timeoutMs <= 0) return true
+  try {
+    await queryWithDeadline(
+      client,
+      DB_LIVENESS_PROBE_STATEMENT,
+      undefined,
+      timeoutMs,
+    )
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
  * Acquire a client, bounded and rebuilt-once.
  *
  * Every attempt is bounded by `acquireTimeoutMillis`, so a `connect()` that
@@ -582,8 +673,18 @@ async function checkoutClient(
  * on a fresh one. If both attempts fail, the failure is either the original
  * raised error or a `DatabaseUnavailableError` for a pure timeout.
  *
+ * A client the pool has handed out before is probed before it is returned: a
+ * reused socket may already be dead, and the caller must not be the one to
+ * discover that with its own statement. A failed probe destroys that client and
+ * takes a replacement, so the caller only ever sees a client that answered. The
+ * probe is skipped for a client the pool just created — a successful connect is
+ * its own proof of liveness, and a healthy acquire must not pay a round trip it
+ * does not need.
+ *
  * The success path logs whether the client was new or reused, so a future tail
- * can tell a queued `connect()` from a hung statement on a pooled client.
+ * can tell a queued `connect()` from a hung statement on a pooled client. A
+ * probe trip logs its own line, distinct from the recycle and from the acquire
+ * line, so the two can be counted separately.
  *
  * Routes that manage their own multi-statement or transactional work against
  * pg directly should acquire clients through this instead of
@@ -592,12 +693,30 @@ async function checkoutClient(
  */
 export async function acquireClient(): Promise<PoolClient> {
   const timeoutMs = resolveAcquireTimeoutMs()
+  const probeTimeoutMs = resolveLivenessProbeTimeoutMs()
   let lastError: unknown
 
   for (let attempt = 1; attempt <= DB_ACQUIRE_ATTEMPTS; attempt++) {
     const activePool = getPool()
     try {
-      const client = await checkoutClient(activePool, timeoutMs)
+      let client = await checkoutClient(activePool, timeoutMs)
+      for (let trips = 0; checkedOutClients.has(client); trips++) {
+        if (await probeClientLiveness(client, probeTimeoutMs)) break
+        client.release(true)
+        if (trips + 1 >= DB_LIVENESS_PROBE_TRIPS) {
+          // The pool keeps handing out sockets that cannot answer. Discard it
+          // so the next request starts from a fresh set, and give this caller
+          // the retryable failure the routes already map to a 503.
+          invalidatePoolIfCurrent(activePool)
+          throw new DatabaseUnavailableError(
+            `Pooled database clients failed their ${probeTimeoutMs}ms liveness probe (${DB_LIVENESS_PROBE_TRIPS} attempts)`,
+          )
+        }
+        client = await checkoutClient(activePool, timeoutMs)
+        logger.warn(
+          `Pooled database client failed its liveness probe (${probeTimeoutMs}ms bound); destroyed it and acquired a replacement`,
+        )
+      }
       const isNew = !checkedOutClients.has(client)
       checkedOutClients.add(client)
       logger.info(`Acquired database client: ${isNew ? 'new' : 'reused'}`)
