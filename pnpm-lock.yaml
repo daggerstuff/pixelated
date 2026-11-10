@@ -483,8 +483,8 @@ importers:
         specifier: ^5.4.1
         version: 5.4.1(rollup@4.68.0)(supports-color@10.2.2)
       '@tanstack/react-query':
-        specifier: ^5.106.1
-        version: 5.106.1(@types/react@19.3.0)(react@19.3.1)
+        specifier: ^5.107.1
+        version: 5.107.1(@types/react@19.3.0)(react@19.3.1)
       '@tensorflow/tfjs':
         specifier: ^4.22.0
         version: 4.22.0(seedrandom@3.0.5)
@@ -651,8 +651,8 @@ importers:
         specifier: '>=0.4.6'
         version: 0.10.13(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.219.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(openai@6.37.0(ws@8.22.1(utf-8-validate@6.0.6))(zod@4.6.7))(ws@8.22.1(utf-8-validate@6.0.6))
       lucide-react:
-        specifier: ^1.69.0
-        version: 1.69.0(@types/react@19.3.0)(react@19.3.1)
+        specifier: ^1.70.0
+        version: 1.70.0(@types/react@19.3.0)(react@19.3.1)
       markdown-table-prettify:
         specifier: ^4.1.0
         version: 4.1.0
@@ -774,8 +774,8 @@ importers:
         specifier: ^7.2.5
         version: 7.2.5
       twilio:
-        specifier: ^6.1.2
-        version: 6.2.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
+        specifier: ^6.3.0
+        version: 6.3.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       uuid:
         specifier: ^14.0.3
         version: 14.0.3
@@ -789,8 +789,8 @@ importers:
         specifier: ^4.3.2
         version: 4.6.7
       zustand:
-        specifier: ^5.0.16
-        version: 5.0.16(@types/react@19.3.0)(immer@11.1.21)(react@19.3.1)(use-sync-external-store@1.7.0(react@19.3.1))
+        specifier: ^5.1.0
+        version: 5.1.0(@types/react@19.3.0)(immer@11.1.21)(react@19.3.1)(use-sync-external-store@1.7.0(react@19.3.1))
     devDependencies:
       '@ai-sdk/harness':
         specifier: ^1.0.87
@@ -1085,7 +1085,7 @@ importers:
         version: 0.50.0(supports-color@10.2.2)
       mcp-remote:
         specifier: ^0.16.1
-        version: 0.16.5(supports-color@10.2.2)
+        version: 0.16.4(supports-color@10.2.2)
       mdast-util-directive:
         specifier: ^3.2.0
         version: 3.2.0(supports-color@10.2.2)
@@ -7233,11 +7233,11 @@ packages:
   '@swc/helpers@0.5.23':
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
 
-  '@tanstack/query-core@5.106.1':
-    resolution: {integrity: sha512-erYv/UACddcdgjOL2ixmFdK6tO/AVBeUcTCOtX2N51yZpDQ2U7KJ+xgB/bCNfsF3uoCDTqGHEEbDiFsIO9YUmQ==}
+  '@tanstack/query-core@5.107.1':
+    resolution: {integrity: sha512-PSyAik11oQBEVOiVy5hjZWHmoUqOXqK1WYy4v55mcxozEfKaQgpUMsgnXhWjuESzSht8JfzqMS1m6M/9CpNgvg==}
 
-  '@tanstack/react-query@5.106.1':
-    resolution: {integrity: sha512-ORDvJG/DSfmlFL9lQ8GDkE0VjtQbLeRDY7BL8xjKkQFGLfjFGfNWNuteWgPqA2gPJgLLuWfQ7IX0FlsHCJriyg==}
+  '@tanstack/react-query@5.107.1':
+    resolution: {integrity: sha512-udCOOLp3ZAheUrIHLCe+ZZge6nr2ZUrGMSWcCuXsjY1Bf2JeeE09oxst97PILiCY6N8xo/7bIo3Hvz13zh06FA==}
     peerDependencies:
       '@types/react': ^18 || ^19
       react: ^19.2.4
@@ -11580,8 +11580,8 @@ packages:
     resolution: {integrity: sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==}
     engines: {node: '>=12'}
 
-  lucide-react@1.69.0:
-    resolution: {integrity: sha512-UTFECm4yEgkgMN0kfLuxWcmlk+4u02Jrqehgk3ZXRx/Ud68OpP7hjkp67bvkBHmIpMaZCIveF1QDYeupO7XmYQ==}
+  lucide-react@1.70.0:
+    resolution: {integrity: sha512-gCTPPN1MlQUBtUgdsUv+0CAUj+X8hifRUiRBw4E5v7lvDIOIpx0EZezdGQMSimS8pKA6esvullJub4GYr0mCHA==}
     peerDependencies:
       '@types/react': '*'
       react: ^19.2.4
@@ -11656,8 +11656,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mcp-remote@0.16.5:
-    resolution: {integrity: sha512-HOvAySIYs9hojTHDWUJtKpx1RFi9OHLdJewdkwtOPuybq0uNmYrfeWGBH4mZ1rrIxwkFLJ+7823/96+KbC/4Og==}
+  mcp-remote@0.16.4:
+    resolution: {integrity: sha512-0SEmhyLkV8qgDc1li1rpWtUaV0jn3D8+ykg/DY7CRwb2J8fMLursxMXOVay7eb7A51wPQJTDtUefkvPajzIhFA==}
     hasBin: true
 
   mdast-util-directive@3.2.0:
@@ -14067,8 +14067,8 @@ packages:
   tweetnacl@1.0.3:
     resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
-  twilio@6.2.0:
-    resolution: {integrity: sha512-zuwVhRa8gGIvaTjXIkRNcf7cPPQCeghMukMcG9WnhWmm7SLnregVpdIoYOSrOvlqMUYf6xP9A2ivsJNf6URoSg==}
+  twilio@6.3.0:
+    resolution: {integrity: sha512-F7/jJQ3dh060ByUV1sWPhVJLxIaezuIXydksdZkmPbMI/jnRxX256CL+knxGcFBuu908qbH22JLK/sK1L+1SMg==}
     engines: {node: '>=20.0.0'}
 
   type-check@0.4.0:
@@ -14922,8 +14922,8 @@ packages:
   zod@4.6.7:
     resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
 
-  zustand@5.0.16:
-    resolution: {integrity: sha512-Uv7e327ihlCfayfja3hDc0M64Upev1LWBKpRobdK4NyovDDPeeX4imWXc/wzC1yc6fkYPoAY/ncKVPAs2jrtQw==}
+  zustand@5.1.0:
+    resolution: {integrity: sha512-ciJZlP48M1PTQbVQq81CGVFxHTLpZNrFjKqwjtCU34AWuXTZT/jrF3p9+fI84Cf1eSCMLapxqBy/SNTfwOBuqA==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
       '@types/react': '>=18.0.0'
@@ -20917,11 +20917,11 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@tanstack/query-core@5.106.1': {}
+  '@tanstack/query-core@5.107.1': {}
 
-  '@tanstack/react-query@5.106.1(@types/react@19.3.0)(react@19.3.1)':
+  '@tanstack/react-query@5.107.1(@types/react@19.3.0)(react@19.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.106.1
+      '@tanstack/query-core': 5.107.1
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
@@ -25692,7 +25692,7 @@ snapshots:
 
   lru-cache@7.18.3: {}
 
-  lucide-react@1.69.0(@types/react@19.3.0)(react@19.3.1):
+  lucide-react@1.70.0(@types/react@19.3.0)(react@19.3.1):
     dependencies:
       react: 19.3.1
     optionalDependencies:
@@ -25785,7 +25785,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mcp-remote@0.16.5(supports-color@10.2.2):
+  mcp-remote@0.16.4(supports-color@10.2.2):
     dependencies:
       express: 5.3.0(supports-color@10.2.2)
       open: 10.2.0
@@ -28759,7 +28759,7 @@ snapshots:
 
   tweetnacl@1.0.3: {}
 
-  twilio@6.2.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
+  twilio@6.3.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       axios: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       dayjs: 1.11.23
@@ -29727,7 +29727,7 @@ snapshots:
 
   zod@4.6.7: {}
 
-  zustand@5.0.16(@types/react@19.3.0)(immer@11.1.21)(react@19.3.1)(use-sync-external-store@1.7.0(react@19.3.1)):
+  zustand@5.1.0(@types/react@19.3.0)(immer@11.1.21)(react@19.3.1)(use-sync-external-store@1.7.0(react@19.3.1)):
     optionalDependencies:
       '@types/react': 19.3.0
       immer: 11.1.21
@@ -29970,7 +29970,6 @@ time:
   tsup@8.5.1: '2025-11-12T21:21:42.746Z'
   tsx@4.23.15: '2026-09-20T07:22:17.792Z'
   tw-animate-css@1.4.0: '2025-09-24T05:25:53.055Z'
-  twilio@6.2.0: '2026-10-12T16:12:20.048Z'
   typescript-eslint@8.71.2: '2026-10-12T17:10:00.963Z'
   typescript@5.7.3: '2025-01-08T19:05:34.766Z'
   typescript@5.8.3: '2025-04-05T00:17:37.851Z'
@@ -29988,4 +29987,3 @@ time:
   workers-ai-provider@4.0.1: '2026-10-20T15:24:00.030Z'
   yaml@2.8.4: '2026-05-02T09:09:40.093Z'
   zod@4.6.7: '2026-10-12T16:29:37.778Z'
-  zustand@5.0.16: '2026-10-22T04:32:02.337Z'
