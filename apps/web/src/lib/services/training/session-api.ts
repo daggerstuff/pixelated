@@ -1,6 +1,6 @@
 import { resolveInternalUserId } from '@/lib/auth/internal-identity'
 import { getSession } from '@/lib/auth/session'
-import { getPool } from '@/lib/db'
+import { isDatabaseUnavailableError, query } from '@/lib/db'
 
 type TrainingClientProfile = {
   name: string
@@ -25,6 +25,10 @@ type TrainingSessionContext = {
  * Postgres pool. When that await (or the pool read after it) never settles, the
  * runtime cancels the request and the page fails with Cloudflare Error 1101.
  * The deadline makes the route fail fast with a retryable 503 instead.
+ *
+ * The deadline is the outer guard. Client acquisition is bounded separately in
+ * `lib/db` (`DB_ACQUIRE_TIMEOUT_MS` × `DB_ACQUIRE_ATTEMPTS`), so a hung
+ * `connect()` fails fast inside this deadline instead of consuming all of it.
  */
 export const TRAINING_DATA_DEADLINE_MS = 8_000
 
@@ -127,13 +131,20 @@ const loadTrainingSession = async (
 
   // getSession() surfaces the Auth0 `sub` as user.id; sessions.therapist_id is
   // a uuid column, so resolve through the auth_accounts bridge first.
-  const therapistId = await resolveInternalUserId(session.user)
-  if (!therapistId) {
-    return jsonResponse({ error: 'User identity not resolved' }, 403)
-  }
-
   try {
-    const result = await getPool().query<{ id: string; context: unknown }>(
+    // Identity resolution runs inside the try because it performs the first
+    // Postgres round-trip (`resolveIdentity` → `transaction` → `acquireClient`),
+    // which is the stage diagnosis D3 measured stalling for ~8 s. A bounded
+    // acquisition failure here must surface as the retryable 503 below, so it
+    // is propagated rather than reported as an unresolved principal (403).
+    const therapistId = await resolveInternalUserId(session.user, {
+      propagateDatabaseErrors: true,
+    })
+    if (!therapistId) {
+      return jsonResponse({ error: 'User identity not resolved' }, 403)
+    }
+
+    const result = await query<{ id: string; context: unknown }>(
       `SELECT id, context
        FROM sessions
        WHERE id = $1 AND therapist_id = $2 AND session_type = 'training'`,
@@ -147,7 +158,7 @@ const loadTrainingSession = async (
     if (!trainingData) {
       return jsonResponse({ error: 'Training session not found' }, 404)
     }
-    const messages = await getPool().query<{
+    const messages = await query<{
       id: string
       content: string
       created_at: Date
@@ -172,6 +183,15 @@ const loadTrainingSession = async (
       200,
     )
   } catch (error: unknown) {
+    // The acquisition bound in lib/db turns a hung pool connect into this
+    // retryable failure well inside the deadline; surface it as the same 503
+    // shape instead of a 500, because the next request may succeed.
+    if (isDatabaseUnavailableError(error)) {
+      console.error('Training session database unavailable:', error)
+      return jsonResponse({ error: 'Session temporarily unavailable' }, 503, {
+        'Retry-After': RETRY_AFTER_SECONDS,
+      })
+    }
     console.error('Error fetching training session:', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }

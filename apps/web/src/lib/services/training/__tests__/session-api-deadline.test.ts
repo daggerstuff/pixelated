@@ -19,7 +19,12 @@ const { mockQuery, mockGetSession, mockResolveInternalUserId } = vi.hoisted(
 )
 
 vi.mock('@/lib/auth/session', () => ({ getSession: mockGetSession }))
-vi.mock('@/lib/db', () => ({ getPool: () => ({ query: mockQuery }) }))
+vi.mock('@/lib/db', () => ({
+  getPool: () => ({ query: mockQuery }),
+  query: mockQuery,
+  isDatabaseUnavailableError: (error: unknown) =>
+    (error as { code?: string } | null)?.code === 'DB_UNAVAILABLE',
+}))
 vi.mock('@/lib/auth/internal-identity', () => ({
   resolveInternalUserId: mockResolveInternalUserId,
 }))
@@ -96,6 +101,48 @@ describe('training data load deadline', () => {
 
     expect(response.status).toBe(503)
     expect(response.headers.get('retry-after')).toBe('1')
+  })
+
+  it('returns 503 with Retry-After when the database is unavailable', async () => {
+    // The acquisition bound (db/index.ts) turns a hung pool connect into a
+    // typed retryable failure well inside the deadline. It must surface as the
+    // same 503 + Retry-After shape, not as an unbounded hang or a 500.
+    mockQuery.mockRejectedValue(
+      Object.assign(new Error('Database connection could not be acquired'), {
+        code: 'DB_UNAVAILABLE',
+      }),
+    )
+
+    const response = await sessionApi.getTrainingSessionResponse(
+      request(),
+      SESSION_ID,
+    )
+
+    expect(response.status).toBe(503)
+    expect(response.headers.get('retry-after')).toBe('1')
+    await expect(response.json()).resolves.toEqual({
+      error: 'Session temporarily unavailable',
+    })
+  })
+
+  it('returns 503 when identity resolution cannot acquire a database client', async () => {
+    // D3's stall sits in the first Postgres round-trip, which happens inside
+    // resolveInternalUserId. It must map to the retryable 503, not reject out
+    // of the handler as a 500.
+    mockResolveInternalUserId.mockRejectedValue(
+      Object.assign(new Error('Database connection could not be acquired'), {
+        code: 'DB_UNAVAILABLE',
+      }),
+    )
+
+    const response = await sessionApi.getTrainingSessionResponse(
+      request(),
+      SESSION_ID,
+    )
+
+    expect(response.status).toBe(503)
+    expect(response.headers.get('retry-after')).toBe('1')
+    expect(mockQuery).not.toHaveBeenCalled()
   })
 
   it('returns the session when the load settles inside the deadline', async () => {

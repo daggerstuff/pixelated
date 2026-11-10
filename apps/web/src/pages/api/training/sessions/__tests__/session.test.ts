@@ -12,6 +12,8 @@ vi.mock('@/lib/auth/internal-identity', () => ({
 }))
 vi.mock('@/lib/db', () => ({
   getPool: () => ({ query: mockQuery }),
+  query: mockQuery,
+  isDatabaseUnavailableError: () => false,
 }))
 
 import { GET } from '../[sessionId]'
