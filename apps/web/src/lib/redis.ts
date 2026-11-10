@@ -85,6 +85,43 @@ async function ensureConnected(): Promise<void> {
   return connecting
 }
 
+/**
+ * Upper bound on a single cache command (`get`, `set`, `del`).
+ *
+ * Bounding the connect is not enough: on a reconnecting ioredis client the
+ * command that follows queues in the offline queue until the reconnect
+ * resolves, so a fast `ensureConnected()` still leaves the read waiting. Racing
+ * the command against this deadline makes a dead Redis cost milliseconds
+ * instead of the route's 8 s deadline — a timed-out read is treated as a cache
+ * miss (the in-process fallback below serves it) and a timed-out write as a
+ * failed shared write. A reachable Redis answers in single-digit milliseconds,
+ * so it never reaches this deadline and its behaviour is unchanged.
+ */
+export const REDIS_COMMAND_DEADLINE_MS = 250
+
+class RedisCommandDeadlineExceededError extends Error {
+  constructor(deadlineMs: number) {
+    super(`Redis command exceeded its ${deadlineMs}ms deadline`)
+    this.name = 'RedisCommandDeadlineExceededError'
+  }
+}
+
+const commandWithDeadline = <T>(
+  command: Promise<T>,
+  deadlineMs: number,
+): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new RedisCommandDeadlineExceededError(deadlineMs)),
+      deadlineMs,
+    )
+  })
+  return Promise.race([command, deadline]).finally(() => {
+    if (timer !== undefined) clearTimeout(timer)
+  })
+}
+
 // ---------------------------------------------------------------------------
 // Backward-compatible redis client (the exported singleton)
 //
@@ -580,7 +617,10 @@ export async function getFromCache<T = unknown>(
 ): Promise<T | null> {
   try {
     await ensureConnected()
-    const raw = await service.get(key)
+    const raw = await commandWithDeadline(
+      service.get(key),
+      REDIS_COMMAND_DEADLINE_MS,
+    )
     if (raw === null) return readLocalCache(key) as T | null
     // Attempt JSON parse; return raw string if it fails
     try {
@@ -609,11 +649,12 @@ export async function setInCache(
   try {
     await ensureConnected()
     const serialized = typeof value === 'string' ? value : JSON.stringify(value)
-    if (expirationSeconds) {
-      await service.set(key, serialized, expirationSeconds * 1000)
-    } else {
-      await service.set(key, serialized)
-    }
+    await commandWithDeadline(
+      expirationSeconds
+        ? service.set(key, serialized, expirationSeconds * 1000)
+        : service.set(key, serialized),
+      REDIS_COMMAND_DEADLINE_MS,
+    )
     return true
   } catch {
     return false
@@ -627,7 +668,7 @@ export async function removeFromCache(key: string): Promise<boolean> {
   localCache.delete(key)
   try {
     await ensureConnected()
-    await service.del(key)
+    await commandWithDeadline(service.del(key), REDIS_COMMAND_DEADLINE_MS)
     return true
   } catch {
     return false
