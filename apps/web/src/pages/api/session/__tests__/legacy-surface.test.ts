@@ -18,9 +18,12 @@ vi.mock('../../../../lib/db', () => ({
   acquireClient: async () => state,
   isDatabaseUnavailableError: (error: unknown) =>
     error instanceof Error &&
-    /query read timeout|database statement exceeded|database statement could not complete within/i.test(
+    (/query read timeout|database statement exceeded|database statement could not complete within/i.test(
       error.message,
-    ),
+    ) ||
+      ['08006', '08003', '57P01', 'ECONNREFUSED', 'ECONNRESET'].includes(
+        (error as { code?: string }).code ?? '',
+      )),
 }))
 
 import * as analytics from '../analytics'
@@ -349,6 +352,21 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
     expect(state.release).toHaveBeenCalledWith(true)
   })
 
+  it('answers 503 instead of 500 when the identity lookup loses the connection', async () => {
+    mockResolveInternalUserId.mockRejectedValue(
+      Object.assign(new Error('connect ECONNREFUSED 127.0.0.1:5432'), {
+        code: '08006',
+      }),
+    )
+
+    const response = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+
+    await expectRetryable(response)
+  })
+
   it('answers 503 instead of 403 when the identity lookup hits the bound', async () => {
     mockResolveInternalUserId.mockRejectedValue(queryReadTimeout())
 
@@ -365,7 +383,7 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
     )
 
     await expectRetryable(getResponse)
-    await expectRetryable(postResponse, { advertiseRetry: false })
+    await expectRetryable(postResponse)
     expect(mockResolveInternalUserId).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'auth0|legacy-caller' }),
       { propagateDatabaseErrors: true },

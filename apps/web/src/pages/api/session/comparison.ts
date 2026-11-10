@@ -2,13 +2,13 @@ import type { APIRoute } from 'astro'
 
 import { acquireClient } from '@/lib/db'
 
-import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
 import {
   isMissingLegacySchema,
   isQueryTimeout,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
+  resolveLegacyTherapistId,
 } from './_legacy-surface'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -26,9 +26,8 @@ export const POST: APIRoute = async ({ request }) => {
         },
       )
     }
-    const therapistId = await resolveInternalUserId(session.user, {
-      propagateDatabaseErrors: true,
-    })
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
@@ -134,9 +133,8 @@ export const GET: APIRoute = async ({ request }) => {
         },
       )
     }
-    const therapistId = await resolveInternalUserId(session.user, {
-      propagateDatabaseErrors: true,
-    })
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),

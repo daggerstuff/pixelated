@@ -31,6 +31,10 @@
  * `503` + `Retry-After` shape the rest of the application uses.
  */
 
+import {
+  resolveInternalUserId,
+  type SessionPrincipal,
+} from '../../../lib/auth/internal-identity'
 import { isDatabaseUnavailableError } from '../../../lib/db'
 
 const LEGACY_SCHEMA_ERROR_CODES = new Set(['42P01', '42703'])
@@ -178,6 +182,35 @@ export function legacySessionRetryableResponse(
     }),
     { status: 503, headers },
   )
+}
+
+/**
+ * Resolve the caller's internal `users.id`, mapping a retryable
+ * database-availability failure to the route's `503` instead of denying an
+ * authenticated caller with `403`.
+ *
+ * `propagateDatabaseErrors` makes an acquisition stall, a bound trip and a
+ * transient connection error throw instead of reporting an unresolved
+ * identity. All of them are retryable, so they answer the same `503` the
+ * statement path uses; any other failure keeps the `null` contract, which the
+ * caller answers as `403`.
+ *
+ * @returns the internal UUID, `null` when the identity cannot be resolved, or
+ *   the `503` response to return as-is
+ */
+export async function resolveLegacyTherapistId(
+  principal: SessionPrincipal | null | undefined,
+): Promise<string | null | Response> {
+  try {
+    return await resolveInternalUserId(principal, {
+      propagateDatabaseErrors: true,
+    })
+  } catch (error: unknown) {
+    if (isDatabaseUnavailableError(error)) {
+      return legacySessionRetryableResponse()
+    }
+    throw error
+  }
 }
 
 /**

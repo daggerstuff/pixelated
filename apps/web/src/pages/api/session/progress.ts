@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro'
 
-import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
 import { getPool } from '../../../lib/db'
 import {
@@ -8,6 +7,7 @@ import {
   isQueryTimeout,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
+  resolveLegacyTherapistId,
   rollbackQuietly,
 } from './_legacy-surface'
 
@@ -25,12 +25,8 @@ export const POST: APIRoute = async ({ request }) => {
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
   try {
-    // A database-availability failure during resolution is rethrown so the
-    // handler's catch maps it to the retryable `503` instead of denying an
-    // authenticated caller with `403`.
-    const therapistId = await resolveInternalUserId(session.user, {
-      propagateDatabaseErrors: true,
-    })
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return jsonResponse({ error: 'User identity not resolved' }, 403)
     }
@@ -109,9 +105,8 @@ export const GET: APIRoute = async ({ request }) => {
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
   try {
-    const therapistId = await resolveInternalUserId(session.user, {
-      propagateDatabaseErrors: true,
-    })
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return jsonResponse({ error: 'User identity not resolved' }, 403)
     }

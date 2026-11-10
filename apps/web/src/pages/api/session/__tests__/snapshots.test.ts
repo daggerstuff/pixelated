@@ -22,9 +22,12 @@ vi.mock('@/lib/db', () => ({
   getPool: () => ({ connect: mockConnect }),
   isDatabaseUnavailableError: (error: unknown) =>
     error instanceof Error &&
-    /query read timeout|database statement exceeded|database statement could not complete within/i.test(
+    (/query read timeout|database statement exceeded|database statement could not complete within/i.test(
       error.message,
-    ),
+    ) ||
+      ['08006', '08003', '57P01', 'ECONNREFUSED', 'ECONNRESET'].includes(
+        (error as { code?: string }).code ?? '',
+      )),
 }))
 
 import { GET, POST } from '../snapshots'
@@ -313,6 +316,22 @@ describe('session snapshots when a statement hits the query bound', () => {
     expect(mockRelease).toHaveBeenCalledWith(true)
   })
 
+  it('answers 503 instead of 500 when the identity lookup loses the connection', async () => {
+    mockResolveInternalUserId.mockRejectedValue(
+      Object.assign(new Error('connect ECONNREFUSED 127.0.0.1:5432'), {
+        code: '08006',
+      }),
+    )
+
+    const response = await invoke(GET, {
+      request: createRequest(
+        `http://localhost/api/session/snapshots?sessionId=${SESSION_ID}`,
+      ),
+    })
+
+    await expectRetryable(response)
+  })
+
   it('answers 503 instead of 403 when the identity lookup hits the bound', async () => {
     mockResolveInternalUserId.mockRejectedValue(queryReadTimeout())
 
@@ -329,7 +348,7 @@ describe('session snapshots when a statement hits the query bound', () => {
     })
 
     await expectRetryable(getResponse)
-    await expectRetryable(postResponse, { advertiseRetry: false })
+    await expectRetryable(postResponse)
     expect(mockResolveInternalUserId).toHaveBeenCalledWith(
       expect.objectContaining({ id: AUTH0_SUB }),
       { propagateDatabaseErrors: true },

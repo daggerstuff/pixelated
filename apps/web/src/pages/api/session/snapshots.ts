@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro'
 
-import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
 import { getPool } from '../../../lib/db'
 import {
@@ -8,6 +7,7 @@ import {
   isQueryTimeout,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
+  resolveLegacyTherapistId,
   rollbackQuietly,
 } from './_legacy-surface'
 
@@ -47,12 +47,9 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     // `session.user.id` is the provider subject (`auth0|…`); `therapist_id` is
     // a uuid column, so the principal must be resolved to the internal users.id
-    // before any ownership comparison. A database-availability failure here is
-    // rethrown so the catch maps it to the retryable `503` instead of denying
-    // an authenticated caller with `403`.
-    const therapistId = await resolveInternalUserId(session.user, {
-      propagateDatabaseErrors: true,
-    })
+    // before any ownership comparison.
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return jsonResponse({ error: 'User identity not resolved' }, 403)
     }
@@ -148,9 +145,8 @@ export const GET: APIRoute = async ({ request }) => {
 
   try {
     // Same identity bridge as POST: resolve before the ownership predicate.
-    const therapistId = await resolveInternalUserId(session.user, {
-      propagateDatabaseErrors: true,
-    })
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return jsonResponse({ error: 'User identity not resolved' }, 403)
     }
