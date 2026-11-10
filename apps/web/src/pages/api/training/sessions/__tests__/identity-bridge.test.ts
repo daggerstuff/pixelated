@@ -9,7 +9,11 @@ const { mockQuery, mockGetSession, mockResolveInternalUserId } = vi.hoisted(
 )
 
 vi.mock('@/lib/auth/session', () => ({ getSession: mockGetSession }))
-vi.mock('@/lib/db', () => ({ getPool: () => ({ query: mockQuery }) }))
+vi.mock('@/lib/db', () => ({
+  getPool: () => ({ query: mockQuery }),
+  query: mockQuery,
+  isDatabaseUnavailableError: () => false,
+}))
 vi.mock('@/lib/auth/internal-identity', () => ({
   resolveInternalUserId: mockResolveInternalUserId,
 }))

@@ -41,8 +41,49 @@ export interface DatabaseConfig {
   max: number
   idleTimeoutMillis: number
   connectionTimeoutMillis: number
+  acquireTimeoutMillis: number
+  statementTimeoutMillis: number
   ssl?: boolean | object
 }
+
+/**
+ * Upper bound on a single Postgres client-acquisition attempt.
+ *
+ * pg's `connectionTimeoutMillis` used to be the only bound on
+ * `getPool().connect()` — 15 000 ms, 1.875x the training route's 8 s deadline —
+ * and `acquireClient` retried only on a *raised* transient error, so a
+ * `connect()` that never settled was neither bounded nor retried. The measured
+ * read-path stall sat in exactly that stage for 7 974–7 999 ms (diagnosis D3).
+ * This bound is enforced by `acquireClient` itself, so it holds even when pg's
+ * own timer never fires.
+ */
+export const DB_ACQUIRE_TIMEOUT_MS = 2_500
+
+/**
+ * Acquisition attempts. One retry, on a freshly rebuilt pool, so a stale
+ * socket self-heals instead of failing the request.
+ *
+ * `DB_ACQUIRE_TIMEOUT_MS * DB_ACQUIRE_ATTEMPTS` (5 000 ms) must stay below the
+ * request deadline (`TRAINING_DATA_DEADLINE_MS`, 8 000 ms), so a hung
+ * acquisition becomes a fast, retryable failure rather than the deadline's 503.
+ */
+export const DB_ACQUIRE_ATTEMPTS = 2
+
+/**
+ * Upper bound on a single statement, enforced by the server
+ * (`statement_timeout`). It is shorter than the request deadline so a stuck
+ * first statement cannot occupy the same silence an unbounded connect did.
+ * Override with `DB_STATEMENT_TIMEOUT`; `0` disables it for long maintenance
+ * statements.
+ */
+export const DB_STATEMENT_TIMEOUT_MS = 5_000
+
+/**
+ * Upper bound on one pool connect/checkout (`connectionTimeoutMillis`). It also
+ * bounds callers that use `getPool().query()` directly, which bypass
+ * `acquireClient`. Override with `DB_CONNECTION_TIMEOUT`.
+ */
+export const DB_CONNECTION_TIMEOUT_MS = 3_000
 
 /**
  * Resolve the database configuration from the environment.
@@ -69,8 +110,14 @@ function resolveDefaultConfig(): DatabaseConfig {
   if (env['DB_NAME']) fromEnv.database = env['DB_NAME']
   if (env['DB_USER']) fromEnv.user = env['DB_USER']
   if (env['DB_PASSWORD'] !== undefined) fromEnv.password = env['DB_PASSWORD']
-  if (env['DB_CONNECTION_TIMEOUT']) {
-    fromEnv.connectionTimeoutMillis = parseInt(env['DB_CONNECTION_TIMEOUT'], 10)
+
+  // A variable that is set but empty falls back to the default rather than
+  // resolving to NaN (which pg would treat as "no timeout").
+  const envInt = (name: string, fallback: number): number => {
+    const raw = env[name]
+    if (raw === undefined || raw === '') return fallback
+    const parsed = parseInt(raw, 10)
+    return Number.isFinite(parsed) ? parsed : fallback
   }
 
   const isLocalHost = (host?: string) =>
@@ -83,9 +130,17 @@ function resolveDefaultConfig(): DatabaseConfig {
     database: 'pixelated',
     user: 'postgres',
     password: '',
-    max: parseInt(env['DB_MAX_CONNECTIONS'] ?? '20', 10),
-    idleTimeoutMillis: parseInt(env['DB_IDLE_TIMEOUT'] ?? '30000', 10),
-    connectionTimeoutMillis: 15000,
+    max: envInt('DB_MAX_CONNECTIONS', 20),
+    idleTimeoutMillis: envInt('DB_IDLE_TIMEOUT', 30000),
+    connectionTimeoutMillis: envInt(
+      'DB_CONNECTION_TIMEOUT',
+      DB_CONNECTION_TIMEOUT_MS,
+    ),
+    acquireTimeoutMillis: envInt('DB_ACQUIRE_TIMEOUT', DB_ACQUIRE_TIMEOUT_MS),
+    statementTimeoutMillis: envInt(
+      'DB_STATEMENT_TIMEOUT',
+      DB_STATEMENT_TIMEOUT_MS,
+    ),
     // Verify server certificates in production by default for remote hosts.
     // Localhost never uses SSL, even in production — the local Postgres does
     // not support TLS and would throw "The server does not support SSL connections".
@@ -102,6 +157,9 @@ function resolveDefaultConfig(): DatabaseConfig {
 // Connection pool
 let pool: Pool | null = null
 let lastConfig: Partial<DatabaseConfig> = {}
+// The effective configuration of the live pool (defaults + caller config), so
+// acquireClient can read its own bound without re-resolving the environment.
+let activeConfig: DatabaseConfig | null = null
 
 /**
  * Initialize database connection pool
@@ -126,7 +184,13 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
 
   lastConfig = config
   const finalConfig = { ...resolveDefaultConfig(), ...config }
-  const newPool = new Pool(finalConfig)
+  activeConfig = finalConfig
+  const newPool = new Pool({
+    ...finalConfig,
+    // Server-enforced per-statement bound. Without it a stuck first statement
+    // occupies the request until the route deadline fires.
+    statement_timeout: finalConfig.statementTimeoutMillis,
+  })
   pool = newPool
 
   // Idle-client error: the server (or the runtime) dropped a pooled socket.
@@ -171,15 +235,14 @@ function discardPool(stale: Pool): Promise<void> {
 }
 
 /**
- * Discard the current pool (fire-and-forget teardown). A new pool is created
- * on demand by getPool()/query()/transaction().
+ * Discard `target` only if it is still the live pool. A concurrent request may
+ * already have rebuilt it; tearing the replacement down would poison the pool
+ * for everyone else.
  */
-function invalidatePool(): void {
-  const stale = pool
+function invalidatePoolIfCurrent(target: Pool): void {
+  if (pool !== target) return
   pool = null
-  if (stale) {
-    void discardPool(stale)
-  }
+  void discardPool(target)
 }
 
 /**
@@ -212,6 +275,7 @@ const TRANSIENT_CONNECTION_CODES = new Set([
 
 const TRANSIENT_CONNECTION_MESSAGES = [
   'connection timeout expired',
+  'timeout exceeded when trying to connect',
   'connection terminated unexpectedly',
   'the server closed the connection unexpectedly',
   'could not connect to server',
@@ -254,9 +318,94 @@ export function getPool(): Pool {
 }
 
 /**
- * Acquire a client, rebuilding the pool exactly once when the failure is a
- * transient connection error (e.g. the pool's sockets went stale across a
- * Workers isolate freeze/thaw). If the retry fails it is re-thrown as-is.
+ * A connection-level failure the caller may retry: the acquisition bound
+ * expired, or the pool raised a transient connection error on every attempt.
+ *
+ * Routes map this to their retryable `503` + `Retry-After` shape instead of a
+ * `500`, because the database may be reachable on the next request.
+ */
+export class DatabaseUnavailableError extends Error {
+  readonly code = 'DB_UNAVAILABLE'
+
+  constructor(message: string, cause?: unknown) {
+    super(message)
+    this.name = 'DatabaseUnavailableError'
+    if (cause !== undefined) this.cause = cause
+  }
+}
+
+/**
+ * True when `error` is a retryable database-availability failure.
+ *
+ * Covers the acquisition timeout (`DatabaseUnavailableError`) and a transient
+ * connection error raised by pg on the final attempt, so both surface as the
+ * same retryable status.
+ */
+export function isDatabaseUnavailableError(error: unknown): boolean {
+  if (error instanceof DatabaseUnavailableError) return true
+  const carriesCode =
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { code?: unknown }).code === 'DB_UNAVAILABLE'
+  return carriesCode || isTransientConnectionError(error)
+}
+
+/** Raised internally when one acquisition attempt exceeds its bound. */
+class AcquireTimeoutError extends Error {
+  constructor(timeoutMs: number) {
+    super(`Database client acquisition exceeded its ${timeoutMs}ms bound`)
+    this.name = 'AcquireTimeoutError'
+  }
+}
+
+/**
+ * Bound one `pool.connect()` call.
+ *
+ * A client that arrives *after* the bound is destroyed rather than released:
+ * the pool has already been discarded, and returning it would leave a
+ * checked-out slot that nothing ever releases — the leak that poisons the pool
+ * for later requests.
+ */
+function acquireWithDeadline(pool: Pool, timeoutMs: number): Promise<PoolClient> {
+  const attempt = pool.connect()
+  let timedOut = false
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      timedOut = true
+      reject(new AcquireTimeoutError(timeoutMs))
+    }, timeoutMs)
+  })
+  // Attach a handler to the attempt itself so a late rejection is never an
+  // unhandled rejection once the race has already settled.
+  attempt.then(
+    (client) => {
+      if (timedOut) client.release(true)
+    },
+    () => undefined,
+  )
+  return Promise.race([attempt, deadline]).finally(() => {
+    if (timer !== undefined) clearTimeout(timer)
+  })
+}
+
+function resolveAcquireTimeoutMs(): number {
+  return (
+    activeConfig?.acquireTimeoutMillis ??
+    lastConfig.acquireTimeoutMillis ??
+    DB_ACQUIRE_TIMEOUT_MS
+  )
+}
+
+/**
+ * Acquire a client, bounded and rebuilt-once.
+ *
+ * Every attempt is bounded by `acquireTimeoutMillis`, so a `connect()` that
+ * never settles fails fast instead of stalling until the request deadline. A
+ * timed-out or transiently failed attempt discards the pool (which may be
+ * holding a half-open socket, or a slot nobody will release) and retries once
+ * on a fresh one. If both attempts fail, the failure is either the original
+ * raised error or a `DatabaseUnavailableError` for a pure timeout.
  *
  * Routes that manage their own multi-statement or transactional work against
  * pg directly should acquire clients through this instead of
@@ -264,17 +413,34 @@ export function getPool(): Pool {
  * request.
  */
 export async function acquireClient(): Promise<PoolClient> {
-  try {
-    return await getPool().connect()
-  } catch (error: unknown) {
-    if (!isTransientConnectionError(error)) throw error
-    logger.warn(
-      'Failed to acquire a database connection; rebuilding the pool and retrying once',
-      error,
-    )
-    invalidatePool()
-    return getPool().connect()
+  const timeoutMs = resolveAcquireTimeoutMs()
+  let lastError: unknown
+
+  for (let attempt = 1; attempt <= DB_ACQUIRE_ATTEMPTS; attempt++) {
+    const activePool = getPool()
+    try {
+      return await acquireWithDeadline(activePool, timeoutMs)
+    } catch (error: unknown) {
+      lastError = error
+      const timedOut = error instanceof AcquireTimeoutError
+      if (!timedOut && !isTransientConnectionError(error)) throw error
+      invalidatePoolIfCurrent(activePool)
+      if (attempt < DB_ACQUIRE_ATTEMPTS) {
+        logger.warn(
+          'Failed to acquire a database connection; rebuilding the pool and retrying once',
+          error,
+        )
+      }
+    }
   }
+
+  if (lastError instanceof AcquireTimeoutError) {
+    throw new DatabaseUnavailableError(
+      `Database connection could not be acquired within ${timeoutMs}ms per attempt (${DB_ACQUIRE_ATTEMPTS} attempts)`,
+      lastError,
+    )
+  }
+  throw lastError
 }
 
 /**
