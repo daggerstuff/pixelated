@@ -270,14 +270,37 @@ second deliberate send of identical text persists a second row. The first half
 alone was already true before this change, which is why the pair is reported
 together.
 
-**The v1 → v2 namespace cost did not occur in this window.** `MESSAGE_KEY_NAMESPACE`
-bumped from `training-message:v1` to `v2`, so a send attempted *before* the
-deploy and retried *after* it derives a `v2` key while its `v1` row already
-exists, and that single in-flight retry can write a second row. The window is
-bounded by the deploy itself and keeping `v1` would reintroduce the silent
-collision the bump exists to prevent, so this is a documented cost, not a
-defect. This feature's measurement window opened at 10:40Z, after the deploy, so
-no straddling-window duplicate exists to explain and none is reported.
+**The v1 → v2 namespace bump cost nothing in production.** `MESSAGE_KEY_NAMESPACE`
+was introduced inside PR #6710 and bumped to `v2` on that branch: `1cfd9d96f`
+rewrites `'training-message:v1'` to `'training-message:v2'` (the branch's other
+named commit, `225a4e6f8`, only tidies the identity-bridge test assertions). The
+PR landed on staging as one **squash commit**, `ee449b20f`, with a single parent
+(`928ad7af3`) that contains no `training-message` literal at all — the squash
+diff therefore adds the constant already at `v2`. Staging received `v2` only,
+and the branch was never deployed to production, so there was never a live `v1`
+to straddle: no send could be retried across a scheme change and the bump cannot
+have produced a duplicate row. This corrects an earlier revision of this
+section, which described the deploy as bounding a straddling-window duplicate;
+that could not happen. Verified on `origin/staging`:
+
+```console
+$ git log -S "MESSAGE_KEY_NAMESPACE = 'training-message:v1'" --oneline origin/staging
+$ # empty output — no commit on staging ever assigned a v1 namespace
+$ git show ee449b20f^:apps/web/src/pages/api/training/sessions/'[sessionId]'/messages.ts | grep -c MESSAGE_KEY_NAMESPACE
+0
+$ git show 1cfd9d96f -- apps/web/src/pages/api/training/sessions/'[sessionId]'/messages.ts | grep -E "^[-+]const MESSAGE_KEY_NAMESPACE"
+-const MESSAGE_KEY_NAMESPACE = 'training-message:v1'
++const MESSAGE_KEY_NAMESPACE = 'training-message:v2'
+$ git log -S "training-message:v1" --oneline origin/staging -- apps/web
+ee449b20f fix(training): make the message POST idempotent so a retry cannot double-write (#6710)
+```
+
+The last query returns exactly one commit — the squash commit that introduced
+the idempotency helper and the `v2` constant together. The path filter is part
+of the command because the unscoped form also matches the evidence documents
+that quote the old string; it never matches a commit that shipped a `v1`
+namespace. The bump is still worth keeping: a key derived under any future
+scheme cannot collide with one derived here.
 
 ### VAL-UX-002 — The send control's click point is the send control — **PASS (live, pointer only)**
 
@@ -412,7 +435,9 @@ so this record does not delete them.
 - It does not claim a live `Retry-After` value for the provider outage; the
   header is proven at test level only.
 - It does not claim a straddling-window `v1`/`v2` duplicate for
-  `VAL-POST-004`; the window opened after the deploy.
+  `VAL-POST-004`; `training-message:v1` existed only on the PR #6710 branch and
+  never on `staging`, so it never reached production (see the namespace section
+  above) and there was no straddle to duplicate.
 - It does not claim `/sessions` as a rendered page; no such page exists.
 - It does not claim a fix for the Auth0 `/userinfo` ceiling; that is the owner's
   action and the tenant was not touched.

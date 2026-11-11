@@ -29,6 +29,7 @@ import { randomUUID } from 'crypto'
 import { PoolClient } from 'pg'
 
 import { transaction } from '../db/index'
+import { DEFAULT_WORKSPACE_SLUG } from '../db/workspace'
 import { getFromCache, setInCache } from '../redis'
 import type { IdentityProvider } from './identity-provider'
 import { getIdentityProvider } from './identity-provider'
@@ -95,9 +96,10 @@ const CACHE_TTL_SECONDS = 60 * 60 // 1 hour
  * pre-existing user onto it; it is the platform's existing default for a user
  * with no organisation assignment. Provisioning reuses that row rather than
  * inventing a workspace, and fails explicitly when it is absent instead of
- * writing a `users` row that violates `workspace_id NOT NULL`.
+ * writing a `users` row that violates `workspace_id NOT NULL`. The slug is
+ * shared with `UserManager.createUser()` (registration), which needs the same
+ * resolution.
  */
-const DEFAULT_WORKSPACE_SLUG = 'personal'
 
 class IdentityProvisioningError extends Error {
   constructor(message: string) {

@@ -320,18 +320,6 @@ class TrainingSession {
     }
   }
 
-  handleSessionUpdate(data) {
-    // Update skill meters
-    if (data.skillFeedback) {
-      this.updateSkillMeters(data.skillFeedback)
-    }
-
-    // Update session state
-    if (data.sessionState) {
-      this.updateSessionState(data.sessionState)
-    }
-  }
-
   handleCrisisAlert(data) {
     this.showCrisisAlert(data.message, data.severity)
 
