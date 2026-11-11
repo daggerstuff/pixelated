@@ -11,7 +11,10 @@
 deploy-cloudflare.yml builds the Worker bundle after green staging CI, syncs
 the production runtime env from the `CF_WORKER_*` repository secrets, and
 routes pixelatedempathy.com to the Worker via a Workers zone route. Vercel stays warm as
-the standby origin (its `*.vercel.app` URL and the `www` redirect). App/agent
+the standby origin (its `*.vercel.app` URL). The Worker also claims
+`www.pixelatedempathy.com/*` and 301s it to the apex, so `www` does not depend
+on the standby: when the Vercel account was billing-blocked, `www` answered 402
+`DEPLOYMENT_DISABLED`. App/agent
 images publish to Docker Hub from green staging CI. The former AWS EKS
 deployment has been retired.** `staging` is the main branch.
 
