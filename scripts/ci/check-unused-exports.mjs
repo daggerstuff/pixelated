@@ -51,7 +51,6 @@ const SCAN_IGNORE = [
   "**/*.d.ts",
   "apps/web/src/lib/governance/policy-engine.ts",
   "apps/web/src/lib/audit.ts",
-  "apps/web/src/lib/middleware/csrf.ts",
   "apps/web/src/lib/research/services/*.ts",
   "apps/web/src/lib/ai/bias-detection/BiasDetectionEngine.ts",
   "apps/web/src/lib/ai/services/*.ts",
