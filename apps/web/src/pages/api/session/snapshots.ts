@@ -3,8 +3,10 @@ import type { APIRoute } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
+  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
   resolveLegacyTherapistId,
@@ -48,13 +50,25 @@ export const POST: APIRoute = async ({ request }) => {
     // `session.user.id` is the provider subject (`auth0|…`); `therapist_id` is
     // a uuid column, so the principal must be resolved to the internal users.id
     // before any ownership comparison.
-    const therapistId = await resolveLegacyTherapistId(session.user)
+    const therapistId = await resolveLegacyTherapistId(session.user, {
+      // A POST may have written before its bound tripped, so this branch must
+      // not advertise a retry the handler-level mapping withholds.
+      advertiseRetry: false,
+    })
     if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return jsonResponse({ error: 'User identity not resolved' }, 403)
     }
 
-    const payload: unknown = await request.json()
+    let payload: unknown
+    try {
+      payload = await request.json()
+    } catch {
+      // A body that cannot be parsed is a malformed request, not a server
+      // fault. `request.json()` throws a `SyntaxError` for invalid JSON, which
+      // used to fall through to the `500` mapping.
+      return legacySessionInvalidRequestResponse('Invalid JSON body')
+    }
     if (
       typeof payload !== 'object' ||
       payload === null ||
@@ -77,6 +91,14 @@ export const POST: APIRoute = async ({ request }) => {
             'Invalid payload: require sessionId and up to 500 snapshots of {timestamp,value:number}',
         },
         400,
+      )
+    }
+    // `sessions.id` is a uuid column. Anything else raises `22P02` inside the
+    // statement below and surfaced as a `500`, so the shape is checked before
+    // any SQL runs.
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionInvalidRequestResponse(
+        'Invalid sessionId: expected a UUID',
       )
     }
 
@@ -154,6 +176,12 @@ export const GET: APIRoute = async ({ request }) => {
     const sessionId = new URL(request.url).searchParams.get('sessionId')
     if (!sessionId) {
       return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
+    }
+    // Same guard as POST: reject a non-UUID before it reaches the statement.
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionInvalidRequestResponse(
+        'Invalid sessionId: expected a UUID',
+      )
     }
 
     const client = await acquireClient()

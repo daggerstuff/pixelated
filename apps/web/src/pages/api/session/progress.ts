@@ -5,6 +5,7 @@ import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
   resolveLegacyTherapistId,
@@ -25,13 +26,22 @@ export const POST: APIRoute = async ({ request }) => {
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
   try {
-    const therapistId = await resolveLegacyTherapistId(session.user)
+    const therapistId = await resolveLegacyTherapistId(session.user, {
+      advertiseRetry: false,
+    })
     if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return jsonResponse({ error: 'User identity not resolved' }, 403)
     }
 
-    const payload: unknown = await request.json()
+    let payload: unknown
+    try {
+      payload = await request.json()
+    } catch {
+      // A body that cannot be parsed is a malformed request, not a server
+      // fault: `request.json()` throws a `SyntaxError` for invalid JSON.
+      return legacySessionInvalidRequestResponse('Invalid JSON body')
+    }
     if (!isRecord(payload) || typeof payload['sessionId'] !== 'string') {
       return jsonResponse({ error: 'Missing required field: sessionId' }, 400)
     }

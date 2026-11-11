@@ -6,6 +6,7 @@ import { getSkillCategory } from '../../../lib/skillCategories'
 import {
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
   resolveLegacyTherapistId,
@@ -26,16 +27,28 @@ export const POST: APIRoute = async ({ request }) => {
         },
       )
     }
-    const therapistId = await resolveLegacyTherapistId(session.user)
+    const therapistId = await resolveLegacyTherapistId(session.user, {
+      advertiseRetry: false,
+    })
     if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
-    const body: unknown = await request.json()
+    let body: unknown
+    try {
+      body = await request.json()
+    } catch {
+      // A body that cannot be parsed is a malformed request, not a server
+      // fault: `request.json()` throws a `SyntaxError` for invalid JSON.
+      return legacySessionInvalidRequestResponse('Invalid JSON body')
+    }
     if (!isRecord(body)) {
       return new Response(JSON.stringify({ error: 'Invalid payload' }), {
         status: 400,
@@ -160,7 +173,10 @@ export const POST: APIRoute = async ({ request }) => {
 
       return new Response(
         JSON.stringify({ success: true, sessionId, therapistId }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     } finally {
       client.release()
@@ -196,7 +212,10 @@ export const GET: APIRoute = async ({ request }) => {
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 

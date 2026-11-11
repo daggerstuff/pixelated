@@ -5,6 +5,7 @@ import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
   resolveLegacyTherapistId,
@@ -150,20 +151,35 @@ export const POST: APIRoute = async ({ request }) => {
     if (!session) {
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
-    const therapistId = await resolveLegacyTherapistId(session.user)
+    const therapistId = await resolveLegacyTherapistId(session.user, {
+      advertiseRetry: false,
+    })
     if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
-    const requestBody: unknown = await request.json()
+    let requestBody: unknown
+    try {
+      requestBody = await request.json()
+    } catch {
+      // A body that cannot be parsed is a malformed request, not a server
+      // fault: `request.json()` throws a `SyntaxError` for invalid JSON.
+      return legacySessionInvalidRequestResponse('Invalid JSON body')
+    }
     if (!isSaveAnalyticsPayload(requestBody)) {
       return new Response(JSON.stringify({ error: 'Invalid payload' }), {
         status: 400,
@@ -272,7 +288,10 @@ export const GET: APIRoute = async ({ request }) => {
     if (!session) {
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
@@ -281,7 +300,10 @@ export const GET: APIRoute = async ({ request }) => {
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
@@ -292,7 +314,10 @@ export const GET: APIRoute = async ({ request }) => {
     if (!sessionId) {
       return new Response(
         JSON.stringify({ error: 'Missing sessionId parameter' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 

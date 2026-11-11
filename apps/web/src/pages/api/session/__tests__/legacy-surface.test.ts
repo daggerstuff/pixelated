@@ -385,7 +385,9 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
     )
 
     await expectRetryable(getResponse)
-    await expectRetryable(postResponse)
+    // The identity-resolution branch and the handler-level branch must agree:
+    // a POST may have written, so neither advertises a retry delay.
+    await expectRetryable(postResponse, { advertiseRetry: false })
     expect(mockResolveInternalUserId).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'auth0|legacy-caller' }),
       { propagateDatabaseErrors: true },
@@ -529,5 +531,126 @@ describe('legacy /api/session/* routes when a statement hits the query bound', (
       get(`/api/session/comparison?sessionId=${SESSION_ID}`),
     )
     expect(infrastructureResponse.status).toBe(500)
+  })
+})
+
+describe('legacy /api/session/* POST withholds the retry advertisement on identity resolution', () => {
+  /**
+   * `resolveLegacyTherapistId()` answers the same retryable `503` the handlers
+   * map in their own `catch`. A GET may advertise `Retry-After` there; a POST
+   * must not, because the write may have committed before the failure. Before
+   * this repair the identity branch used the helper's default and advertised
+   * it, so the two branches disagreed on exactly the same status.
+   */
+  const identityBound = () => new Error('Query read timeout')
+
+  const RETRYABLE_CODE = 'LEGACY_SESSION_API_TEMPORARILY_UNAVAILABLE'
+
+  const expectWithheld = async (response: Response) => {
+    expect(response.status).toBe(503)
+    expect(response.headers.get('Retry-After')).toBeNull()
+    expect(await response.json()).toEqual({
+      error: 'Legacy session analytics are temporarily unavailable',
+      code: RETRYABLE_CODE,
+    })
+  }
+
+  beforeEach(() => {
+    mockResolveInternalUserId.mockRejectedValue(identityBound())
+  })
+
+  it('progress POST carries no Retry-After when identity resolution fails', async () => {
+    const response = await invoke(
+      progress.POST as Handler,
+      post('/api/session/progress', {
+        sessionId: SESSION_ID,
+        progressMetrics: { totalMessages: 1, progress: 50 },
+      }),
+    )
+
+    await expectWithheld(response)
+  })
+
+  it('skills POST carries no Retry-After when identity resolution fails', async () => {
+    const response = await invoke(
+      skills.POST as Handler,
+      post('/api/session/skills', {
+        sessionId: SESSION_ID,
+        skillScores: { 'Active Listening': 80 },
+      }),
+    )
+
+    await expectWithheld(response)
+  })
+
+  it('comparison POST carries no Retry-After when identity resolution fails', async () => {
+    const response = await invoke(
+      comparison.POST as Handler,
+      post('/api/session/comparison', {
+        currentSessionId: SESSION_ID,
+        improvementScore: 10,
+        metrics: { empathy: 1 },
+      }),
+    )
+
+    await expectWithheld(response)
+  })
+
+  it('analytics POST carries no Retry-After when identity resolution fails', async () => {
+    const response = await invoke(
+      analytics.POST as Handler,
+      post('/api/session/analytics', {
+        sessionId: SESSION_ID,
+        analyticsData: {
+          sessionMetrics: [{ metricName: 'duration', metricValue: 42 }],
+          skillProgress: [],
+        },
+      }),
+    )
+
+    await expectWithheld(response)
+  })
+
+  it('a GET on the same surface still advertises the retry delay', async () => {
+    const response = await invoke(
+      progress.GET as Handler,
+      get(`/api/session/progress?sessionId=${SESSION_ID}`),
+    )
+
+    expect(response.status).toBe(503)
+    expect(response.headers.get('Retry-After')).toBe('1')
+    expect(await response.json()).toMatchObject({ code: RETRYABLE_CODE })
+  })
+
+  it('makes the identity branch and the handler branch produce the same POST headers', async () => {
+    const identityResponse = await invoke(
+      progress.POST as Handler,
+      post('/api/session/progress', {
+        sessionId: SESSION_ID,
+        progressMetrics: { totalMessages: 1, progress: 50 },
+      }),
+    )
+
+    // The same route failing later, in its own statement, is the branch the
+    // handler already mapped with `advertiseRetry: false`.
+    mockResolveInternalUserId.mockResolvedValue(USER_UUID)
+    state.query.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN') return ok()
+      if (sql.includes('FOR UPDATE')) throw identityBound()
+      throw new Error(`unexpected statement: ${sql}`)
+    })
+    const handlerResponse = await invoke(
+      progress.POST as Handler,
+      post('/api/session/progress', {
+        sessionId: SESSION_ID,
+        progressMetrics: { totalMessages: 1, progress: 50 },
+      }),
+    )
+
+    await expectWithheld(identityResponse)
+    await expectWithheld(handlerResponse)
+    expect([...identityResponse.headers.keys()].sort()).toEqual(
+      [...handlerResponse.headers.keys()].sort(),
+    )
   })
 })
