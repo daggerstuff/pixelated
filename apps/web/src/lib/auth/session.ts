@@ -150,7 +150,7 @@ async function resolveDeveloperFromApiKey(
 }
 
 /** What a page component needs to know about the current request's session. */
-export interface PageSessionResolution {
+interface PageSessionResolution {
   /** The validated session, or `null` when the request is not authenticated. */
   session: Session | null
   /**

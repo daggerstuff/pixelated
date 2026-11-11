@@ -53,12 +53,17 @@ describe('training page auth', () => {
     // The middleware already resolved this token for the request. If the
     // page's own validation now fails, that is a transient provider failure,
     // not a logout.
-    // The 503 must sit inside the outage branch: an unconditional response
-    // would also satisfy a bare search for the status.
-    expect(source).toMatch(
-      /if \(providerUnavailable\) \{[\s\S]{0,500}?status: 503/,
+    // Read the branch body itself: a file-wide search would pass a call that
+    // sits outside the outage branch or a response that is thrown away.
+    const outageBranch =
+      source.match(/if \(providerUnavailable\) \{([\s\S]*?)\n  \}/)?.[1] ?? ''
+
+    expect(outageBranch).toContain(
+      'return providerUnavailableResponse(Astro.url.pathname)',
     )
-    expect(source).toMatch(/Retry-After/)
+    expect(outageBranch).not.toMatch(/redirect/)
+    expect(source).not.toMatch(/status:\s*503/)
+    // The other unauthenticated path is the login redirect, outside the branch.
     expect(source).toMatch(
       /return Astro\.redirect\('\/login\?redirect=\/training'\)/,
     )
