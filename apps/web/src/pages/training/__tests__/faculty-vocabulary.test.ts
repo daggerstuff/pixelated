@@ -91,3 +91,28 @@ describe('dead supervisor handler', () => {
     expect(trainingScript).not.toMatch(/showSupervisorMessage/)
   })
 })
+
+describe('dead session-update handler', () => {
+  // The same class of defect as the supervisor handler: a handler the script
+  // never calls, whose body calls a method the script never defines. `this.`
+  // is matched too, because a call site without it (a bare `updateSessionState`)
+  // would still be an undefined function at runtime.
+  it('no longer defines `handleSessionUpdate`', () => {
+    expect(trainingScript).not.toMatch(/handleSessionUpdate/)
+  })
+
+  it('no longer calls the undefined `updateSessionState`', () => {
+    expect(trainingScript).not.toMatch(/\bupdateSessionState\b/)
+  })
+
+  it('keeps the handlers that only call defined methods', () => {
+    // Removing the dead handler must not take its live neighbours with it.
+    for (const handler of [
+      'handleClientResponse',
+      'handleCrisisAlert',
+      'handleFeedbackUpdate',
+    ]) {
+      expect(trainingScript).toContain(`${handler}(data) {`)
+    }
+  })
+})

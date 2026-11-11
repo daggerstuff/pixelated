@@ -242,7 +242,7 @@ const isSupervisor = userRole === 'admin'
           {isTrainee && (
             <div class="flex-1 flex">
               {/* $1 */}
-              <aside class="w-80 bg-card border-r border-border flex flex-col">
+              <aside class="w-80 bg-card border-r border-border flex flex-col session-aside">
                 {/* $1 */}
                 <div class="p-6 border-b border-border">
                   <h2 class="text-lg font-semibold text-foreground mb-4">
@@ -512,7 +512,7 @@ const isSupervisor = userRole === 'admin'
               </div>
 
               {/* $1 */}
-              <aside class="w-80 bg-card border-l border-border flex flex-col">
+              <aside class="w-80 bg-card border-l border-border flex flex-col session-aside">
                 {/* $1 */}
                 <div class="p-6 border-b border-border">
                   <h2 class="text-lg font-semibold text-foreground mb-4">
@@ -687,6 +687,19 @@ const isSupervisor = userRole === 'admin'
     .session-panes {
       min-height: 0;
       overflow: clip;
+    }
+
+    /* Each trainee aside is its own scroll container (VAL-UX-003).
+       `clip` on the row above deliberately removes the focus-scroll path that
+       `overflow: hidden` would still provide, and both asides are taller than
+       the row at 1440x900 — the focusable `#session-notes` textarea sits
+       entirely below the clip line, so a keyboard user could tab to a field
+       that is never painted. An aside is a sibling of the transcript column,
+       so scrolling it cannot move the composer the way scrolling the row
+       could; the row stays clipped. */
+    .session-aside {
+      min-height: 0;
+      overflow-y: auto;
     }
 
     .session-column,

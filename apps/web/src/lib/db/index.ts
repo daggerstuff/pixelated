@@ -12,6 +12,7 @@ import { Pool, PoolClient } from 'pg'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { parseDatabaseUrl } from './parse-database-url'
 import { recordQuery } from './query-counting'
+import { DEFAULT_WORKSPACE_SLUG, WorkspaceResolutionError } from './workspace'
 const logger = createBuildSafeLogger('index')
 
 // pg does not export these types; define locally
@@ -1290,6 +1291,30 @@ export class DatabaseMigration {
 export const migrations = new DatabaseMigration()
 
 /**
+ * Resolve the workspace a newly created user belongs to.
+ *
+ * `users.workspace_id` is `NOT NULL` with no default (migration 011), so every
+ * insert must name it. The seeded `personal` workspace is the platform's
+ * existing default for a user with no organisation assignment; when it is
+ * absent, creating the user is refused explicitly instead of writing a row the
+ * constraint rejects. This is the same resolution `createUserWithLink()` in
+ * `lib/auth/user-identity.ts` performs, sharing its slug.
+ */
+async function resolveDefaultWorkspaceId(): Promise<string> {
+  const result = await query<{ id: string }>(
+    `SELECT id FROM workspaces WHERE slug = $1 LIMIT 1`,
+    [DEFAULT_WORKSPACE_SLUG],
+  )
+  const workspaceId = result.rows[0]?.id
+  if (!workspaceId) {
+    throw new WorkspaceResolutionError(
+      `Cannot provision user: no '${DEFAULT_WORKSPACE_SLUG}' workspace exists to assign`,
+    )
+  }
+  return workspaceId
+}
+
+/**
  * User management utilities
  */
 class UserManager {
@@ -1305,13 +1330,15 @@ class UserManager {
     institution?: string
     licenseNumber?: string
   }): Promise<string> {
+    const workspaceId = await resolveDefaultWorkspaceId()
+
     const result = await query(
       `
       INSERT INTO users (
         email, password_hash, first_name, last_name,
-        role, institution, license_number
+        role, institution, license_number, workspace_id
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING id
     `,
       [
@@ -1322,6 +1349,7 @@ class UserManager {
         userData.role ?? 'therapist',
         userData.institution,
         userData.licenseNumber,
+        workspaceId,
       ],
     )
 
