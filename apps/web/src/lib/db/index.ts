@@ -61,6 +61,20 @@ export interface DatabaseConfig {
  * read-path stall sat in exactly that stage for 7 974–7 999 ms (diagnosis D3).
  * This bound is enforced by `acquireClient` itself, so it holds even when pg's
  * own timer never fires.
+ *
+ * Override with `DB_ACQUIRE_TIMEOUT`; `0` (or any non-positive value) disables
+ * this bound, as it does for the liveness-probe, client-lifetime and statement
+ * bounds. Without that guard `setTimeout(…, 0)` fired before `connect()` could
+ * settle, so `DB_ACQUIRE_TIMEOUT=0` made every acquisition fail immediately
+ * instead of disabling the bound — the same trap `DB_QUERY_TIMEOUT` had, one
+ * layer down. A negative value means the same thing, because `setTimeout`
+ * clamps a negative delay to `0`. A non-numeric value keeps this default rather
+ * than disabling the bound.
+ *
+ * Disabling it leaves pg's own `connectionTimeoutMillis`
+ * (`DB_CONNECTION_TIMEOUT`, 3 000 ms by default) as the acquisition bound, so a
+ * caller still cannot hang indefinitely; it only removes this module's tighter
+ * race and its pool rebuild.
  */
 export const DB_ACQUIRE_TIMEOUT_MS = 2_500
 
@@ -548,6 +562,12 @@ function acquireWithDeadline(
   pool: Pool,
   timeoutMs: number,
 ): Promise<PoolClient> {
+  // A non-positive bound disables the deadline, matching pg's own
+  // `connectionTimeoutMillis` and the liveness-probe, client-lifetime and
+  // statement guards. Without this guard `setTimeout(…, 0)` fires before
+  // `connect()` can settle, so `DB_ACQUIRE_TIMEOUT=0` made every acquisition
+  // fail immediately instead of disabling the bound.
+  if (timeoutMs <= 0) return pool.connect()
   const attempt = pool.connect()
   let timedOut = false
   let timer: ReturnType<typeof setTimeout> | undefined

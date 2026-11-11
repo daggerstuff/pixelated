@@ -210,3 +210,75 @@ describe('Postgres client acquisition bound', () => {
     expect(options.connectionTimeoutMillis).toBe(DB_CONNECTION_TIMEOUT_MS)
   })
 })
+
+/**
+ * A non-positive `DB_ACQUIRE_TIMEOUT` disables the acquisition bound.
+ *
+ * `acquireWithDeadline` scheduled `setTimeout(…, timeoutMs)` with no guard, so
+ * `0` — pg's own "no timeout" value, and the value the sibling knobs treat as
+ * "disabled" — fired the deadline on the next timer turn and every acquisition
+ * failed with `AcquireTimeoutError`. Two attempts later the caller received a
+ * `DatabaseUnavailableError`, so the knob made every request fail instead of
+ * removing the bound. A negative value behaved the same way, because
+ * `setTimeout` clamps a negative delay to `0`.
+ *
+ * These cases drive a `connect()` that settles *after* the timer turn, which is
+ * what separates "disabled" from "wins the microtask race": a `0`-bound
+ * deadline would still lose to an already-resolved `connect()` promise, so a
+ * microtask-resolved fake would pass on the broken code and prove nothing.
+ */
+describe('a non-positive DB_ACQUIRE_TIMEOUT disables the acquisition bound', () => {
+  it('does not fail every acquisition when DB_ACQUIRE_TIMEOUT=0', async () => {
+    vi.stubEnv('DB_ACQUIRE_TIMEOUT', '0')
+    initializeDatabase()
+    hooks.behaviours = [
+      { kind: 'resolveAfter', ms: 20 },
+      { kind: 'resolveAfter', ms: 20 },
+    ]
+
+    const outcome = await settle(acquireClient())
+
+    expect(outcome.kind).toBe('resolved')
+  })
+
+  it('treats a negative DB_ACQUIRE_TIMEOUT as disabled, not as an immediate timeout', async () => {
+    vi.stubEnv('DB_ACQUIRE_TIMEOUT', '-100')
+    initializeDatabase()
+    // Both attempts are slow, so the retry cannot hide an immediate timeout:
+    // `setTimeout` clamps a negative delay to 0, which used to fire before
+    // either connect settled.
+    hooks.behaviours = [
+      { kind: 'resolveAfter', ms: 20 },
+      { kind: 'resolveAfter', ms: 20 },
+    ]
+
+    const outcome = await settle(acquireClient())
+
+    expect(outcome.kind).toBe('resolved')
+    // One attempt, no pool rebuild: the bound is gone, not merely survived.
+    expect(FakePool.instances).toHaveLength(1)
+  })
+
+  it('does not discard the pool when the bound is disabled', async () => {
+    initializeDatabase({ acquireTimeoutMillis: 0 })
+    hooks.behaviours = [{ kind: 'resolveAfter', ms: 20 }]
+
+    const client = await acquireClient()
+    client.release()
+
+    expect(FakePool.instances).toHaveLength(1)
+    expect(FakePool.instances[0]?.ended).toBe(false)
+  })
+
+  it('keeps the 2 500 ms default when DB_ACQUIRE_TIMEOUT is not a number', () => {
+    vi.stubEnv('DB_ACQUIRE_TIMEOUT', 'not-a-number')
+    initializeDatabase()
+
+    expect(FakePool.instances[0]?.options.acquireTimeoutMillis).toBe(
+      DB_ACQUIRE_TIMEOUT_MS,
+    )
+    // The positive default is unchanged: this guard removes the zero/negative
+    // trap, it does not relax the bound.
+    expect(DB_ACQUIRE_TIMEOUT_MS).toBe(2_500)
+  })
+})
