@@ -340,34 +340,27 @@ export const prerender = false
           <span class="confidence-boost">METRICS</span>
         </h2>
         <p class="text-lg text-foreground">
-          Illustrative values from a sample run. Not live telemetry.
+          What this demo shows. No accuracy, uptime or session figures are
+          claimed.
         </p>
       </div>
 
       <div class="dashboard-grid">
         <div class="metric-card">
-          <div class="metric-value" id="response-time">
-            0.8s
-          </div>
-          <div class="metric-label">Avg Response Time</div>
+          <div class="metric-value">Streaming</div>
+          <div class="metric-label">Response Mode</div>
         </div>
         <div class="metric-card">
-          <div class="metric-value" id="accuracy-rate">
-            94.7%
-          </div>
-          <div class="metric-label">Sentiment Accuracy</div>
+          <div class="metric-value">Sample</div>
+          <div class="metric-label">Sentiment Analysis</div>
         </div>
         <div class="metric-card">
-          <div class="metric-value" id="uptime">
-            99.9%
-          </div>
-          <div class="metric-label">System Uptime</div>
+          <div class="metric-value">Demo</div>
+          <div class="metric-label">Environment</div>
         </div>
         <div class="metric-card">
-          <div class="metric-value" id="active-sessions">
-            247
-          </div>
-          <div class="metric-label">Active Sessions</div>
+          <div class="metric-value">1</div>
+          <div class="metric-label">Sample Session</div>
         </div>
       </div>
     </div>
@@ -409,7 +402,6 @@ export const prerender = false
   class ChatDemoInterface {
     constructor() {
       this.initializeSampleButtons()
-      this.startMetricsUpdate()
     }
 
     initializeSampleButtons() {
@@ -449,40 +441,6 @@ export const prerender = false
         // Trigger input event to notify the component
         const event = new Event('input', { bubbles: true })
         chatInput.dispatchEvent(event)
-      }
-    }
-
-    startMetricsUpdate() {
-      // Simulate real-time metrics updates
-      setInterval(() => {
-        this.updateMetrics()
-      }, 5000)
-    }
-
-    updateMetrics() {
-      const responseTime = document.getElementById('response-time')
-      const accuracyRate = document.getElementById('accuracy-rate')
-      const uptime = document.getElementById('uptime')
-      const activeSessions = document.getElementById('active-sessions')
-
-      if (responseTime) {
-        const time = (0.6 + Math.random() * 0.4).toFixed(1)
-        responseTime.textContent = time + 's'
-      }
-
-      if (accuracyRate) {
-        const accuracy = (94.0 + Math.random() * 2).toFixed(1)
-        accuracyRate.textContent = accuracy + '%'
-      }
-
-      if (uptime) {
-        const up = (99.8 + Math.random() * 0.2).toFixed(1)
-        uptime.textContent = up + '%'
-      }
-
-      if (activeSessions) {
-        const sessions = Math.floor(240 + Math.random() * 20)
-        activeSessions.textContent = sessions.toString()
       }
     }
   }
