@@ -1,4 +1,4 @@
-export const CANONICAL_HOST = 'pixelatedempathy.com'
+const CANONICAL_HOST = 'pixelatedempathy.com'
 
 export function canonicalHostRedirect(url: URL): URL | null {
   if (!url.hostname.startsWith('www.')) {
