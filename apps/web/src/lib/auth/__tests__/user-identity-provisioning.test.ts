@@ -18,6 +18,10 @@
  *    UNIQUE, so two distinct subs collapse onto one internal user. An absent or
  *    empty email must never reach that INSERT; the resolver returns its
  *    unresolvable-identity outcome (`internalId: null`) instead.
+ *
+ * The token-validation path strips email from the validated payload, so a real
+ * first login arrives without one. The provider is asked for the email only
+ * when a link is missing, and that lookup is bounded.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -182,10 +186,12 @@ beforeEach(() => {
   mockGetFromCache.mockResolvedValue(null)
   mockSetInCache.mockResolvedValue(true)
   mockProvider.linkSubToInternalId.mockResolvedValue(undefined)
+  mockProvider.getUserById.mockResolvedValue(null)
 })
 
 afterEach(() => {
   vi.resetAllMocks()
+  vi.useRealTimers()
 })
 
 describe('first-login provisioning assigns a workspace', () => {
@@ -207,10 +213,41 @@ describe('first-login provisioning assigns a workspace', () => {
     expect(database.inserts[0].values['workspace_id']).toBe(
       PERSONAL_WORKSPACE_ID,
     )
+    expect(mockProvider.getUserById).not.toHaveBeenCalled()
     expect(mockProvider.linkSubToInternalId).toHaveBeenCalledWith(
       'auth0|new-therapist',
       identity.internalId,
       database.client,
+    )
+  })
+
+  it('provisions from the provider email when the token carries none', async () => {
+    const database = createFakeDatabase({ enforceWorkspaceNotNull: true })
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    mockProvider.getUserById.mockResolvedValue({
+      id: 'auth0|token-without-email',
+      email: 'from-provider@example.test',
+      role: 'therapist',
+    })
+
+    const identity = await userIdentity.resolveIdentity({
+      sub: 'auth0|token-without-email',
+      email: '',
+      emailVerified: false,
+    })
+
+    expect(identity.internalId).toBeTruthy()
+    expect(identity.email).toBe('from-provider@example.test')
+    expect(mockProvider.getUserById).toHaveBeenCalledWith(
+      'auth0|token-without-email',
+    )
+    expect(database.inserts).toHaveLength(1)
+    expect(database.inserts[0].values['email']).toBe(
+      'from-provider@example.test',
+    )
+    expect(database.inserts[0].values['workspace_id']).toBe(
+      PERSONAL_WORKSPACE_ID,
     )
   })
 
@@ -314,6 +351,38 @@ describe('an absent or empty email claim never reaches the unique insert', () =>
     })
 
     expect(identity.internalId).toBe(EXISTING_INTERNAL_UUID)
+    expect(database.inserts).toHaveLength(0)
+    expect(mockProvider.getUserById).not.toHaveBeenCalled()
+  })
+})
+
+describe('the provider lookup used for a missing email is bounded', () => {
+  it('pins the provider profile deadline at 1.5s', () => {
+    expect(userIdentity.PROVIDER_PROFILE_DEADLINE_MS).toBe(1_500)
+  })
+
+  it('does not hold the request open when the provider never answers', async () => {
+    vi.useFakeTimers()
+    const database = createFakeDatabase()
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    mockProvider.getUserById.mockReturnValue(new Promise(() => {}))
+
+    let settled: unknown
+    const pending = userIdentity
+      .resolveIdentity({
+        sub: 'auth0|stalled-provider',
+        email: '',
+        emailVerified: false,
+      })
+      .catch((error: unknown) => {
+        settled = error
+      })
+    await vi.advanceTimersByTimeAsync(userIdentity.PROVIDER_PROFILE_DEADLINE_MS)
+    await pending
+
+    expect(settled).toBeInstanceOf(Error)
+    expect((settled as Error).message).toMatch(/deadline/i)
     expect(database.inserts).toHaveLength(0)
   })
 })
