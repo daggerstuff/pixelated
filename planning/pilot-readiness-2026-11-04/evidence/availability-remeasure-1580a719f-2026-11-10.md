@@ -188,7 +188,9 @@ decision records rather than in the verdict cell.
 class.** The first matrix invocation at 22:44:16Z returned `OPEN` with **6 hard
 failures**, every one a `503
 {"error":"Authentication provider temporarily unavailable","retryAfterSeconds":30}`
-— five on the legacy `/api/session/*` routes and one on the cross-organization
+— five legacy legs across three routes (`/api/session/skills`,
+`/api/session/comparison`, `/api/session/snapshots`: three base legs plus two
+spoofed-parameter variants) and one on the cross-organization
 message POST. Those routes are session-bearing, so the middleware answered the
 provider outage with the documented `503` before any handler ran; the legacy
 `410` mapping was not involved. The condition was this worker's own load: the
@@ -276,8 +278,9 @@ navigation now has one bounded call to fail in rather than two.
 
 Run last, deliberately, because it spends the `/userinfo` budget:
 `tools/auth0-stage-timing.mjs --n 10` at 22:50:58.282Z – 22:51:32.448Z (the
-artifact's `startedAt`/`finishedAt`; the file name `…T2258Z.json` encodes an
-earlier read time and is not renamed retroactively).
+artifact's `startedAt`/`finishedAt`; the file name `…T2258Z.json` encodes a
+later time than the artifact's own `startedAt` — 22:58Z against 22:50:58.282Z —
+and is not renamed retroactively).
 
 | Stage                                  | Samples | Result                                                             |
 | -------------------------------------- | ------- | ------------------------------------------------------------------ |
