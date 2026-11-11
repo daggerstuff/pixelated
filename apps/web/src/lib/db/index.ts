@@ -111,7 +111,11 @@ export const DB_CONNECTION_TIMEOUT_MS = 3_000
  *
  * It sits well inside the 8 s request deadline and well above a healthy
  * statement (measured: first query 94–263 ms after connect, 1 188 ms worst-case
- * connect). Override with `DB_QUERY_TIMEOUT`.
+ * connect). Override with `DB_QUERY_TIMEOUT`; `0` (or any non-positive value)
+ * disables the bound, as it does for the liveness-probe and client-lifetime
+ * bounds. A negative value is normalised to `0` before it reaches pg, which
+ * would otherwise schedule an immediate timeout and reintroduce the defect one
+ * layer down.
  */
 export const DB_QUERY_TIMEOUT_MS = 4_000
 
@@ -348,7 +352,12 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
     // Client-enforced per-statement bound. `statement_timeout` never reaches a
     // statement written to a socket the server is not reading, so a reused
     // pooled client whose peer has gone silent has no bound without this.
-    query_timeout: finalConfig.queryTimeoutMillis,
+    // `0` is pg's "no timeout", so a non-positive override disables the bound;
+    // a negative value must be normalised first, because pg's
+    // `if (readTimeout)` is truthy for it and `setTimeout` would fire
+    // immediately.
+    query_timeout:
+      finalConfig.queryTimeoutMillis > 0 ? finalConfig.queryTimeoutMillis : 0,
     // Declarative keepalive on the socket. Node honours it; pg-cloudflare
     // implements setKeepAlive() as a no-op, so on the Worker this documents the
     // intent and the client-lifetime bound below is the mechanism that acts.
@@ -794,6 +803,12 @@ function queryWithDeadline<T>(
   timeoutMs: number,
 ): Promise<T> {
   const attempt = client.query<T>(text, params) as unknown as Promise<T>
+  // A non-positive bound disables the deadline, matching pg's `query_timeout`
+  // and the liveness-probe and client-lifetime guards. Without this guard
+  // `setTimeout(…, 0)` fires before any statement can settle, so
+  // `DB_QUERY_TIMEOUT=0` made every query fail immediately instead of
+  // disabling the bound.
+  if (timeoutMs <= 0) return attempt
   let timer: ReturnType<typeof setTimeout> | undefined
   const deadline = new Promise<never>((_, reject) => {
     timer = setTimeout(
