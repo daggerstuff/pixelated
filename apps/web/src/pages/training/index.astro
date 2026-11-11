@@ -6,27 +6,25 @@ import Button from '@/components/ui/Button.astro'
 import Card from '@/components/ui/Card.astro'
 import { readinessEnhancements } from '@/data/readiness-enhancements'
 import Layout from '@/layouts/Layout.astro'
-import { getCurrentUser } from '@/lib/auth'
-import { readSessionVerdictFromLocals } from '@/lib/auth/session'
+import { resolvePageSession } from '@/lib/auth/session'
 
 // One token validation per request, across the middleware and this page.
 //
 // The middleware has already validated the token for this request and
-// published its verdict on `Astro.locals`. Passing that verdict in means the
-// page derives the user from the verdict instead of validating the same token
-// again: a cold `/training` used to cost middleware 1 + page 1 `/userinfo`
-// calls because `getCurrentUser` called `validateToken` directly and never
-// consulted the validated-session cache. `isAuthenticated` was removed earlier
-// for the same reason (diagnosis D7).
-const authVerdict = readSessionVerdictFromLocals(Astro.locals)
-const userSession = await getCurrentUser(Astro.request, {
-  verdict: authVerdict,
-})
-if (!userSession) {
+// published its verdict on `Astro.locals`; `resolvePageSession` reads that
+// verdict instead of validating the same token again. A cold `/training` used
+// to cost middleware 1 + page 1 `/userinfo` calls, and `isAuthenticated` added
+// a third (diagnosis D7). The session page resolves the same way, so both
+// training pages share one path.
+const { session, providerUnavailable } = await resolvePageSession(
+  Astro.request,
+  Astro.locals,
+)
+if (!session) {
   // The middleware already resolved this token for this request, so a failure
   // here means the provider could not verify it (a /userinfo 429, a timeout) —
   // a temporary outage, not a logout.
-  if (authVerdict?.status === 'provider-unavailable' || Astro.locals.user) {
+  if (providerUnavailable) {
     return new Response(
       'Authentication is temporarily unavailable. Please retry shortly.\n',
       {
@@ -46,7 +44,7 @@ if (!userSession) {
 // `session.user.role` is an `AuthRole` (`admin | staff | therapist | user |
 // guest`, `src/config/auth.config.ts`), so a `supervisor` gate could never
 // match. The auth role mapping itself is unchanged.
-const userRole = userSession.role
+const userRole = session.user.role ?? 'guest'
 
 // The session page redirects here only for a genuine absence (a 404, or a
 // refusal such as 403). It used to redirect on any non-ok response, including

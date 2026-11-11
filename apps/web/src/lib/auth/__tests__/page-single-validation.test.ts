@@ -135,17 +135,17 @@ describe('a cold /training load validates once across middleware and page', () =
     // The middleware's single validation is the request's provider round trip.
     expect(mockValidateToken).toHaveBeenCalledTimes(1)
 
-    const verdict = readSessionVerdictFromLocals(context.locals)
-    const user = await getCurrentUser(request, { verdict })
+    const page = await resolvePageSession(request, context.locals)
 
     // The page-level read must not reach the provider again.
     expect(mockValidateToken).toHaveBeenCalledTimes(1)
-    expect(user).toEqual({
+    expect(page.providerUnavailable).toBe(false)
+    expect(page.session?.user).toMatchObject({
       id: 'auth0|pilot-delta',
       role: 'therapist',
-      accountId: 'acct-delta',
-      workspaceId: 'ws-delta',
     })
+    expect(page.session?.accountId).toBe('acct-delta')
+    expect(page.session?.workspaceId).toBe('ws-delta')
   })
 
   it('preserves the accountId contract from the same single validation', async () => {
@@ -156,16 +156,11 @@ describe('a cold /training load validates once across middleware and page', () =
       '/training',
       tokenFor('account-id-contract'),
     )
-    const user = await getCurrentUser(request, {
-      verdict: readSessionVerdictFromLocals(context.locals),
-    })
+    const page = await resolvePageSession(request, context.locals)
 
     // `accountId` is not on the Session's user object; it is carried on the
     // cached session from the validation result that produced it.
-    expect(user?.accountId).toBe('acct-delta')
-    // The JWT path never populated `scopes` before this change either; only
-    // the API-key path does. Assert the shape did not silently change.
-    expect(user?.scopes).toBeUndefined()
+    expect(page.session?.accountId).toBe('acct-delta')
   })
 
   it('performs zero further validations on a warm request', async () => {
@@ -174,15 +169,11 @@ describe('a cold /training load validates once across middleware and page', () =
     const token = tokenFor('warm-training')
 
     const cold = await invoke('/training', token)
-    await getCurrentUser(cold.request, {
-      verdict: readSessionVerdictFromLocals(cold.context.locals),
-    })
+    await resolvePageSession(cold.request, cold.context.locals)
     expect(mockValidateToken).toHaveBeenCalledTimes(1)
 
     const warm = await invoke('/training', token)
-    await getCurrentUser(warm.request, {
-      verdict: readSessionVerdictFromLocals(warm.context.locals),
-    })
+    await resolvePageSession(warm.request, warm.context.locals)
 
     // Warm: the middleware reads the cache and the page reads the verdict.
     expect(mockValidateToken).toHaveBeenCalledTimes(1)
@@ -243,12 +234,10 @@ describe('page-level reads never re-validate what the middleware classified', ()
       '/training',
       tokenFor('invalid-training-page'),
     )
-    const user = await getCurrentUser(request, {
-      verdict: readSessionVerdictFromLocals(context.locals),
-    })
+    const page = await resolvePageSession(request, context.locals)
 
     expect(mockValidateToken).toHaveBeenCalledTimes(1)
-    expect(user).toBeNull()
+    expect(page.session).toBeNull()
   })
 
   it('reports a provider outage from the verdict without another call', async () => {
@@ -343,18 +332,12 @@ describe('the pages use the verdict instead of re-reading the token', () => {
     'utf8',
   )
 
-  it('passes the middleware verdict into the /training user read', () => {
+  it('reads both training pages through the shared page-session helper', () => {
     expect(trainingPage).toMatch(
-      /readSessionVerdictFromLocals\(Astro\.locals\)/,
+      /resolvePageSession\(\s*Astro\.request,\s*Astro\.locals,?\s*\)/,
     )
-    expect(trainingPage).toMatch(
-      /getCurrentUser\(Astro\.request,\s*\{\s*verdict/,
-    )
-  })
-
-  it('reads the session page through the shared page-session helper', () => {
     expect(sessionPage).toMatch(
-      /resolvePageSession\(Astro\.request,\s*Astro\.locals\)/,
+      /resolvePageSession\(\s*Astro\.request,\s*Astro\.locals,?\s*\)/,
     )
   })
 
