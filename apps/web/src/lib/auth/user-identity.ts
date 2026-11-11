@@ -14,6 +14,10 @@
  * - The resolved mapping is cached in Redis (TTL: 1 hour) to avoid repeated DB reads
  * - On first login, we upsert both the `users` row and the `auth_accounts` link
  *   inside a single transaction so we never end up with orphaned accounts
+ * - First-login provisioning is all-or-nothing: the `users` row is created
+ *   against the platform's existing default workspace, and a profile whose
+ *   email claim is absent or empty is reported as unresolvable instead of
+ *   being upserted onto the UNIQUE `users.email` column
  * - No PII is stored in Redis — only the opaque (sub → uuid) mapping
  */
 
@@ -58,11 +62,45 @@ export interface ResolvedIdentity {
   isActive?: boolean
 }
 
+/**
+ * Outcome of the provisioning transaction.
+ *
+ * `unresolvable` is an explicit result, not an error: the caller denies the
+ * request instead of receiving an account that was coalesced on an empty
+ * email claim.
+ */
+type ProvisioningOutcome =
+  | {
+      status: 'resolved'
+      internalId: string
+      role: string
+      isNewUser: boolean
+    }
+  | { status: 'unresolvable' }
+
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 const CACHE_TTL_SECONDS = 60 * 60 // 1 hour
+
+/**
+ * Workspace assigned to a user provisioned on first login.
+ *
+ * Migration 010 seeds this workspace and migration 011 backfills every
+ * pre-existing user onto it; it is the platform's existing default for a user
+ * with no organisation assignment. Provisioning reuses that row rather than
+ * inventing a workspace, and fails explicitly when it is absent instead of
+ * writing a `users` row that violates `workspace_id NOT NULL`.
+ */
+const DEFAULT_WORKSPACE_SLUG = 'personal'
+
+class IdentityProvisioningError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'IdentityProvisioningError'
+  }
+}
 
 /**
  * Upper bound on the identity cache read that precedes all SQL.
@@ -150,38 +188,86 @@ async function cacheIdentity(identity: ResolvedIdentity): Promise<void> {
 // DB helpers (run inside a transaction)
 // ---------------------------------------------------------------------------
 
+/**
+ * Normalise the provider's email claim.
+ *
+ * A token can arrive without the claim at all, and a provider can send an
+ * empty or whitespace-only value. `users.email` is UNIQUE, so writing `''`
+ * would make every such sub share one row.
+ */
+function normalizeEmail(email: string | undefined | null): string {
+  return typeof email === 'string' ? email.trim() : ''
+}
+
+/**
+ * Resolve the workspace a newly provisioned user belongs to.
+ *
+ * Uses the seeded default workspace (see `DEFAULT_WORKSPACE_SLUG`) through the
+ * same `workspaces` row the migrations use. Throws when no such workspace can
+ * be determined: creating the user without one is not an option, because
+ * `users.workspace_id` is `NOT NULL` and a row that violates it makes every
+ * later request for that identity fail.
+ */
+async function resolveProvisioningWorkspaceId(
+  client: PoolClient,
+): Promise<string> {
+  const result = await client.query<{ id: string }>(
+    `SELECT id FROM workspaces WHERE slug = $1 LIMIT 1`,
+    [DEFAULT_WORKSPACE_SLUG],
+  )
+  const workspaceId = result.rows[0]?.id
+  if (!workspaceId) {
+    throw new IdentityProvisioningError(
+      `Cannot provision user: no '${DEFAULT_WORKSPACE_SLUG}' workspace exists to assign`,
+    )
+  }
+  return workspaceId
+}
+
 async function createUserWithLink(
   client: PoolClient,
   profile: Auth0UserProfile,
   provider: IdentityProvider,
+  email: string,
 ): Promise<{ internalId: string; role: string }> {
   const internalId = randomUUID()
   const role = profile.role ?? 'therapist'
+
+  // Provisioning refuses an absent email before this point; guard here too so
+  // the UNIQUE column can never receive an empty string through this path.
+  if (!email) {
+    throw new IdentityProvisioningError(
+      'Cannot provision user: the profile carries no email claim',
+    )
+  }
+
+  const workspaceId = await resolveProvisioningWorkspaceId(client)
 
   // 1. Insert into users (our schema — provider-agnostic)
   await client.query(
     `INSERT INTO users (
        id, email, email_verified, name, role,
-       password_hash, created_at, updated_at
+       password_hash, workspace_id, created_at, updated_at
      )
-     VALUES ($1, $2, $3, $4, $5, '', NOW(), NOW())
+     VALUES ($1, $2, $3, $4, $5, '', $6, NOW(), NOW())
      ON CONFLICT (email) DO UPDATE
        SET email_verified = EXCLUDED.email_verified,
            name           = COALESCE(EXCLUDED.name, users.name),
            updated_at     = NOW()`,
     [
       internalId,
-      profile.email,
+      email,
       profile.emailVerified,
       profile.name ?? null,
       role,
+      workspaceId,
     ],
   )
 
   // Fetch the actual id in case ON CONFLICT hit an existing row
   const upsertResult = await client.query<{ id: string; role: string }>(
     `SELECT id, role FROM users WHERE email = $1 LIMIT 1`,
-    [profile.email],
+    [email],
   )
   const actualId = upsertResult.rows[0].id
   const actualRole = upsertResult.rows[0].role
@@ -213,6 +299,7 @@ export async function resolveIdentity(
 ): Promise<ResolvedIdentity> {
   const { sub } = profile
   const provider = getIdentityProvider()
+  const email = normalizeEmail(profile.email)
 
   // --- Fast path: Redis cache ---
   const cached = await getCachedIdentity(sub)
@@ -221,33 +308,60 @@ export async function resolveIdentity(
   }
 
   // --- Slow path: Postgres transaction ---
-  let internalId: string
-  let role: string
-  let isNewUser = false
+  const outcome = await transaction(
+    async (client: PoolClient): Promise<ProvisioningOutcome> => {
+      const existing = await provider.findInternalIdBySub(sub, client)
 
-  await transaction(async (client: PoolClient) => {
-    const existing = await provider.findInternalIdBySub(sub, client)
+      if (existing) {
+        return {
+          status: 'resolved',
+          internalId: existing.internalId,
+          role: existing.role,
+          isNewUser: false,
+        }
+      }
 
-    if (existing) {
-      internalId = existing.internalId
-      role = existing.role
-    } else {
-      const created = await createUserWithLink(client, profile, provider)
-      internalId = created.internalId
-      role = created.role
-      isNewUser = true
+      // No `auth_accounts` link and no usable email: never upsert. The users
+      // row is keyed on `email`, which is UNIQUE, so an empty claim would make
+      // two distinct subs collapse onto one internal user.
+      if (!email) {
+        return { status: 'unresolvable' }
+      }
+
+      const created = await createUserWithLink(client, profile, provider, email)
+      return {
+        status: 'resolved',
+        internalId: created.internalId,
+        role: created.role,
+        isNewUser: true,
+      }
+    },
+  )
+
+  if (outcome.status === 'unresolvable') {
+    // The explicit unresolvable-identity outcome: callers deny the request
+    // (401/403/404) instead of receiving a coalesced or broken account.
+    return {
+      internalId: null,
+      auth0Sub: sub,
+      email: '',
+      emailVerified: profile.emailVerified,
+      name: profile.name,
+      picture: profile.picture,
+      role: profile.role ?? 'guest',
+      isNewUser: false,
     }
-  })
+  }
 
   const identity: ResolvedIdentity = {
-    internalId: internalId!,
+    internalId: outcome.internalId,
     auth0Sub: sub,
-    email: profile.email,
+    email,
     emailVerified: profile.emailVerified,
     name: profile.name,
     picture: profile.picture,
-    role: role!,
-    isNewUser,
+    role: outcome.role,
+    isNewUser: outcome.isNewUser,
   }
 
   // Populate cache for subsequent requests
