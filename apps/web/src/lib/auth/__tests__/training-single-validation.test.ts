@@ -36,21 +36,31 @@ describe('training page auth', () => {
     expect(source).not.toMatch(/\bisAuthenticated\s*\(/)
   })
 
+  it('serves a developer key when the request carries no token', () => {
+    expect(source).toMatch(/developer\?\.role/)
+  })
+
   it('derives the authenticated state from the single result', () => {
     // The redirect must be driven by the one page-session result, not by a
     // second helper that validates the token again.
     expect(source).toMatch(
-      /const \{ session, providerUnavailable \} =\s*await resolvePageSession\(/,
+      /const \{ session, providerUnavailable, developer \} =\s*await resolvePageSession\(/,
     )
-    expect(source).toMatch(/if \(!session\)/)
+    expect(source).toMatch(/if \(!userRole\)/)
   })
 
   it('answers a retryable 503 rather than a /login redirect when the provider cannot verify', () => {
     // The middleware already resolved this token for the request. If the
     // page's own validation now fails, that is a transient provider failure,
     // not a logout.
-    expect(source).toMatch(/if \(providerUnavailable\)/)
-    expect(source).toMatch(/status:\s*503/)
+    // The 503 must sit inside the outage branch: an unconditional response
+    // would also satisfy a bare search for the status.
+    expect(source).toMatch(
+      /if \(providerUnavailable\) \{[\s\S]{0,500}?status: 503/,
+    )
     expect(source).toMatch(/Retry-After/)
+    expect(source).toMatch(
+      /return Astro\.redirect\('\/login\?redirect=\/training'\)/,
+    )
   })
 })

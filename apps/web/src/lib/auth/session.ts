@@ -108,6 +108,39 @@ export function readSessionVerdictFromLocals(
   return isSessionVerdict(value) ? value : null
 }
 
+/** A developer resolved from an `X-API-Key` header. */
+export interface DeveloperIdentity {
+  id: string
+  role: string
+  scopes: string[]
+}
+
+/**
+ * Resolve an `X-API-Key` caller to its developer identity.
+ *
+ * A page that accepted a developer key before the verdict channel existed keeps
+ * accepting it: a key is not a token, so the middleware publishes a `none`
+ * verdict for it and the page would otherwise redirect a caller it used to
+ * serve.
+ */
+async function resolveDeveloperFromApiKey(
+  request: Request,
+): Promise<DeveloperIdentity | null> {
+  const apiKey = request.headers.get('X-API-Key')
+  if (!apiKey) return null
+
+  const { developerApiKeyManager } = await import('@/lib/db/developer-api-keys')
+  const validation = await developerApiKeyManager.validateApiKey(apiKey)
+  const record = validation.api_key
+  if (!validation.valid || !record) return null
+
+  return {
+    id: record.user_id,
+    role: record.scopes.includes('admin') ? 'admin' : 'developer',
+    scopes: record.scopes,
+  }
+}
+
 /** What a page component needs to know about the current request's session. */
 export interface PageSessionResolution {
   /** The validated session, or `null` when the request is not authenticated. */
@@ -117,6 +150,11 @@ export interface PageSessionResolution {
    * a logout and not an absent session.
    */
   providerUnavailable: boolean
+  /**
+   * The developer an `X-API-Key` resolved to, or `null`. A page that serves
+   * developer-key callers uses it when `session` is absent.
+   */
+  developer: DeveloperIdentity | null
 }
 
 /**
@@ -144,16 +182,25 @@ export async function resolvePageSession(
       locals && typeof locals === 'object'
         ? (locals as Record<string, unknown>)['user']
         : undefined
-    return { session, providerUnavailable: !session && Boolean(localsUser) }
+    return {
+      session,
+      providerUnavailable: !session && Boolean(localsUser),
+      developer: session ? null : await resolveDeveloperFromApiKey(request),
+    }
   }
 
-  if (verdict.status === 'valid') {
-    return { session: verdict.session ?? null, providerUnavailable: false }
+  if (verdict.status === 'valid' && verdict.session) {
+    return {
+      session: verdict.session,
+      providerUnavailable: false,
+      developer: null,
+    }
   }
 
   return {
     session: null,
     providerUnavailable: verdict.status === 'provider-unavailable',
+    developer: await resolveDeveloperFromApiKey(request),
   }
 }
 

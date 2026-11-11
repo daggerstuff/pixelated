@@ -16,11 +16,16 @@ import { resolvePageSession } from '@/lib/auth/session'
 // to cost middleware 1 + page 1 `/userinfo` calls, and `isAuthenticated` added
 // a third (diagnosis D7). The session page resolves the same way, so both
 // training pages share one path.
-const { session, providerUnavailable } = await resolvePageSession(
+const { session, providerUnavailable, developer } = await resolvePageSession(
   Astro.request,
   Astro.locals,
 )
-if (!session) {
+// A developer key is not a token, so it arrives as a `none` verdict with a
+// developer identity alongside it; the page has always served that caller.
+const userRole = session
+  ? (session.user.role ?? 'guest')
+  : (developer?.role ?? null)
+if (!userRole) {
   // The middleware already resolved this token for this request, so a failure
   // here means the provider could not verify it (a /userinfo 429, a timeout) —
   // a temporary outage, not a logout.
@@ -41,10 +46,9 @@ if (!session) {
 }
 
 // Faculty access uses `admin`, the role the session page also checks.
-// `session.user.role` is an `AuthRole` (`admin | staff | therapist | user |
-// guest`, `src/config/auth.config.ts`), so a `supervisor` gate could never
-// match. The auth role mapping itself is unchanged.
-const userRole = session.user.role ?? 'guest'
+// A session role is an `AuthRole` (`admin | staff | therapist | user | guest`,
+// `src/config/auth.config.ts`), so a `supervisor` gate could never match. The
+// auth role mapping itself is unchanged.
 
 // The session page redirects here only for a genuine absence (a 404, or a
 // refusal such as 403). It used to redirect on any non-ok response, including

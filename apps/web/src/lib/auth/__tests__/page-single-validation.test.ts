@@ -240,6 +240,29 @@ describe('page-level reads never re-validate what the middleware classified', ()
     expect(page.session).toBeNull()
   })
 
+  it('resolves an X-API-Key developer when the request carries no token', async () => {
+    mockValidateApiKey.mockResolvedValue({
+      valid: true,
+      api_key: { user_id: 'dev-1', scopes: ['api:read'] },
+    })
+
+    // A key is not a token, so the middleware publishes a `none` verdict.
+    const { context } = await invoke('/training')
+    const request = new Request('http://localhost:5173/training', {
+      headers: { 'X-API-Key': 'test-api-key' },
+    })
+
+    const page = await resolvePageSession(request, context.locals)
+
+    expect(mockValidateToken).not.toHaveBeenCalled()
+    expect(page.session).toBeNull()
+    expect(page.developer).toEqual({
+      id: 'dev-1',
+      role: 'developer',
+      scopes: ['api:read'],
+    })
+  })
+
   it('reports a provider outage from the verdict without another call', async () => {
     mockValidateToken.mockResolvedValue({
       valid: false,
