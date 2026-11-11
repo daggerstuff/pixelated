@@ -16,6 +16,7 @@ import {
   AUTH0_ROLE_DEFINITIONS as ROLE_DEFINITIONS,
   UserRole,
 } from './auth0-rbac-service'
+import { providerUnavailableResponse } from './provider-unavailable'
 import { type AuthStrategy } from './route-config'
 import type { ApiKeyScope } from './scopes'
 const logger = createBuildSafeLogger('auth0-middleware')
@@ -664,9 +665,33 @@ export async function authenticateRequest(
     const validation = await validateToken(token, 'access')
 
     if (!validation.valid) {
+      const pathname = new URL(request.url).pathname
+
+      // A provider outage is not a denial: the token could not be checked
+      // because Auth0 was throttled, erroring, or too slow. Answer the same
+      // retryable 503 + Retry-After the middleware already uses for the
+      // session-required pages, so a client does not conclude the user is
+      // signed out (GAP-34). Only a genuinely invalid token is a 401.
+      if (validation.providerUnavailable) {
+        logSecurityEvent(SecurityEventType.TOKEN_VALIDATION_FAILED, null, {
+          error: validation.error ?? 'Authentication provider unavailable',
+          providerUnavailable: true,
+          endpoint: pathname,
+        })
+
+        return {
+          success: false,
+          response: providerUnavailableResponse(
+            pathname,
+            validation.retryAfterSeconds,
+          ),
+          error: validation.error ?? 'Authentication provider unavailable',
+        }
+      }
+
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: validation.error ?? 'Invalid token',
-        endpoint: new URL(request.url).pathname,
+        endpoint: pathname,
       })
 
       return {

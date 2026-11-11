@@ -7,6 +7,10 @@ import {
   type AuthOptions,
 } from './lib/auth/auth0-middleware'
 import {
+  PROVIDER_RETRY_AFTER_DEFAULT_SECONDS,
+  providerUnavailableResponse,
+} from './lib/auth/provider-unavailable'
+import {
   SESSION_VERDICT_LOCALS_KEY,
   validateSessionToken,
   type SessionValidation,
@@ -175,19 +179,20 @@ function getRouteConfig(request: Request): RouteConfig | null {
   }
 }
 
-/** Fallback `Retry-After` when the provider sent no usable value. */
-const PROVIDER_RETRY_AFTER_DEFAULT_SECONDS = 30
-
 /**
  * Page prefixes whose own guard treats "no session" as "send the user to
- * `/login`". A provider outage must not be rendered as a logout on these
- * surfaces (diagnosis D1).
+ * `/login`" or renders them signed out. A provider outage must not be rendered
+ * as a logout on these surfaces (diagnosis D1, GAP-34).
  */
 function isSessionRequiredPage(pathname: string): boolean {
   return (
     pathname.startsWith('/admin') ||
     pathname === '/training' ||
-    pathname.startsWith('/training/')
+    pathname.startsWith('/training/') ||
+    pathname === '/dashboard' ||
+    pathname.startsWith('/dashboard/') ||
+    pathname === '/sessions' ||
+    pathname.startsWith('/sessions/')
   )
 }
 
@@ -215,40 +220,6 @@ function isSessionBearingApiRoute(pathname: string): boolean {
   }
   return SESSION_BEARING_API_PREFIXES.some((prefix) =>
     pathname.startsWith(prefix),
-  )
-}
-
-function providerUnavailableResponse(
-  pathname: string,
-  retryAfterSeconds: number,
-): Response {
-  const retryAfter = String(Math.max(1, Math.ceil(retryAfterSeconds)))
-  if (pathname.startsWith('/api/')) {
-    return new Response(
-      JSON.stringify({
-        error: 'Authentication provider temporarily unavailable',
-        retryAfterSeconds: Number(retryAfter),
-      }),
-      {
-        status: 503,
-        headers: {
-          'Content-Type': 'application/json',
-          'Retry-After': retryAfter,
-          'Cache-Control': 'no-store',
-        },
-      },
-    )
-  }
-  return new Response(
-    'Authentication is temporarily unavailable. Please retry shortly.\n',
-    {
-      status: 503,
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Retry-After': retryAfter,
-        'Cache-Control': 'no-store',
-      },
-    },
   )
 }
 
