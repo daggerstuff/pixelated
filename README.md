@@ -185,6 +185,29 @@ pnpm submodules:sync                      # Re-sync after pull
 
 ---
 
+## Deployment
+
+Production is served from the Cloudflare Worker `pixelated-empathy` at
+[pixelatedempathy.com](https://pixelatedempathy.com); `/api/health` on the apex
+answers `200`. Vercel is the standby origin, and that standby is currently
+**unavailable**: the Vercel team has an unpaid invoice
+(`softBlock: UNPAID_INVOICE`), so `https://www.pixelatedempathy.com` answers
+`402` with `x-vercel-error: DEPLOYMENT_DISABLED`. Only the Cloudflare apex
+serves traffic.
+
+The launch decision and its evidence live in the pilot-readiness record: the
+gate register is
+[`planning/pilot-readiness-2026-11-04/LAUNCH_DECISIONS.md`](planning/pilot-readiness-2026-11-04/LAUNCH_DECISIONS.md),
+and the current decision is
+[`planning/pilot-readiness-2026-11-04/evidence/mission-decision-2026-11-10.md`](planning/pilot-readiness-2026-11-04/evidence/mission-decision-2026-11-10.md).
+That decision is **NO-GO**: the trainee-to-faculty journey steps are not built
+(they were deferred by owner decision, and the scenario catalog and clinical
+content remain an owner blocker), the standby origin is offline, and the
+evaluation/release bundle and owner approvals are open. Enrollment and customer
+launch are not authorized.
+
+---
+
 ## Tech Stack
 
 | Layer           | Technology                                       |
