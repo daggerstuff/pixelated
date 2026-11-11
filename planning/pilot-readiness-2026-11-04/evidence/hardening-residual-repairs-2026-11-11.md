@@ -209,11 +209,13 @@ handlers that only call defined methods are kept).
 
 `planning/pilot-readiness-2026-11-04/evidence/hardening-release-a2f06cc38-2026-11-11.md`
 claimed the `MESSAGE_KEY_NAMESPACE` `v1`→`v2` bump could produce a
-straddling-window duplicate bounded by the deploy. It could not: PR #6710
-carried the helper (`225a4e6f8`) and the bump (`1cfd9d96f`) on one branch and
-landed as a single squash merge (`ee449b20f`), so staging received `v2` only.
-The paragraph now says the bump cost nothing and cites the commands that prove
-it (reproduced in §4 of that document). The rest of the record is unchanged.
+straddling-window duplicate bounded by the deploy. It could not: the namespace
+was introduced and bumped to `v2` on the PR #6710 branch (`1cfd9d96f` rewrites
+`'training-message:v1'` to `'training-message:v2'`), and the PR landed as a
+single squash commit (`ee449b20f`) whose parent contains no `training-message`
+literal at all, so staging received `v2` only. The paragraph now says the bump
+cost nothing and cites the commands that prove it (reproduced in §4 of that
+document). The rest of the record is unchanged.
 
 ## 5. What this record does not claim
 
