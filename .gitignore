@@ -320,6 +320,8 @@ wandb_hist.csv
 wandb_ver.txt
 zthgquiz_history.json
 ai/data/
+# Generated bias-detection model outputs (hundreds of MB; retrain locally)
+apps/web/src/lib/ai/bias-detection/python-service/models/
 
 # === TERRAFORM & INFRA ===
 **/.terraform/
