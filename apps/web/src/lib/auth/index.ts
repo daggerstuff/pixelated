@@ -62,9 +62,7 @@ function userFromValidatedSession(session: Session): {
  * middleware already classified resolves its session through
  * `resolvePageSession` instead of calling this directly.
  */
-export async function getCurrentUser(
-  context: Request | AstroCookies,
-): Promise<{
+export async function getCurrentUser(context: Request | AstroCookies): Promise<{
   id: string
   role: string
   accountId?: string

@@ -33,19 +33,19 @@ const {
   mockSetInCache,
   mockProvider,
 } = vi.hoisted(() => ({
-    mockTransaction: vi.fn(),
-    mockAcquireClient: vi.fn(),
-    mockGetFromCache: vi.fn(),
-    mockSetInCache: vi.fn(),
-    mockProvider: {
-      name: 'auth0',
-      validateToken: vi.fn(),
-      getUserById: vi.fn(),
-      findInternalIdBySub: vi.fn(),
-      linkSubToInternalId: vi.fn(),
-      findSubByInternalId: vi.fn(),
-    },
-  }))
+  mockTransaction: vi.fn(),
+  mockAcquireClient: vi.fn(),
+  mockGetFromCache: vi.fn(),
+  mockSetInCache: vi.fn(),
+  mockProvider: {
+    name: 'auth0',
+    validateToken: vi.fn(),
+    getUserById: vi.fn(),
+    findInternalIdBySub: vi.fn(),
+    linkSubToInternalId: vi.fn(),
+    findSubByInternalId: vi.fn(),
+  },
+}))
 
 vi.mock('../../db/index', () => ({
   transaction: mockTransaction,

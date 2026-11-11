@@ -27,7 +27,14 @@ const { mockTransaction, mockGetFromCache, mockSetInCache, mockProvider } =
     },
   }))
 
-vi.mock('../../db/index', () => ({ transaction: mockTransaction }))
+vi.mock('../../db/index', () => ({
+  transaction: mockTransaction,
+  // The link lookup runs on a pooled client before the transaction opens.
+  acquireClient: async () => ({
+    query: async () => ({ rows: [], rowCount: 0 }),
+    release: () => {},
+  }),
+}))
 vi.mock('../../redis', () => ({
   getFromCache: mockGetFromCache,
   setInCache: mockSetInCache,
