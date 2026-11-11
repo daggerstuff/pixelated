@@ -8,10 +8,10 @@ pubDate: '2026-05-09'
 
 # Welcome to Pixelated Empathy
 
-Pixelated Empathy is a comprehensive healthcare platform that combines advanced
-AI capabilities with secure, HIPAA-compliant infrastructure to deliver
-innovative therapy solutions. Our platform empowers healthcare providers with
-cutting-edge tools while ensuring the highest standards of security and privacy.
+Pixelated Empathy is a training platform for synthetic clinical simulation. It
+combines AI capability with a practice workflow for trainees and supervisors.
+It is not a clinical service, it does not accept real client records, and no
+HIPAA business-associate service is offered.
 
 ## Quick Navigation
 
@@ -30,7 +30,7 @@ cutting-edge tools while ensuring the highest standards of security and privacy.
 - End-to-end encryption for all sensitive data
 - Zero-knowledge proof system for session data
 - Quantum-resistant encryption algorithms
-- HIPAA-compliant audit logging
+- Audit logging with PHI-scoped fields
 - Secure multi-party computation protocols
 
 ### Advanced AI Capabilities

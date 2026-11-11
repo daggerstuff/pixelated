@@ -88,9 +88,9 @@ The service uses Redis for data storage and queuing:
 
 ## Security
 
-1. **HIPAA Compliance**
-   - All data is stored in a HIPAA-compliant manner
-   - PII is properly handled and protected
+1. **Data Scope**
+   - The analytics store is scoped to synthetic practice data, not PHI
+   - Identifiers are minimised in stored records
    - Access is controlled and audited
 
 2. **Authentication**

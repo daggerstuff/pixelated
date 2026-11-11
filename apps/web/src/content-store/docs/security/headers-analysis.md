@@ -23,4 +23,5 @@ title: Security Headers Analysis
 
 ## All Required Headers Found
 
-All security headers required for HIPAA compliance are properly configured.
+The security headers checked above are configured. That is a hardening baseline,
+not a HIPAA compliance determination: no compliance assessment has been made.

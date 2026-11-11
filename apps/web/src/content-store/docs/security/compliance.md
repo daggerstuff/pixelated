@@ -132,12 +132,13 @@ Update compliance documentation ### Training Staff training and certification
 
 ### Certifications
 
-| Standard      | Status    | Last Audit | Next Audit |
-| ------------- | --------- | ---------- | ---------- |
-| SOC 2 Type II | Certified | 2024-01    | 2024-07    |
-| ISO 27001     | Certified | 2023-12    | 2024-12    |
-| HITRUST       | Certified | 2024-02    | 2025-02    |
-| NIST CSF      | Compliant | 2024-01    | 2024-07    |
+No third-party security certification or audit has been completed for this
+platform. There is no SOC 2 report, ISO 27001 certificate, HITRUST assessment,
+or NIST CSF attestation. This section previously listed those standards as
+certified; the table was removed because the claims were not true.
+
+If a certification is completed, its report and audit window will be published
+here before it is referenced anywhere else.
 
 ### Framework Implementation
 

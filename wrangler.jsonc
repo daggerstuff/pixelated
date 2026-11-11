@@ -48,6 +48,9 @@
 		// time by Vite; secrets come from the CF_WORKER_* repo secrets via the
 		// deploy workflow's `wrangler secret bulk` step.
 		"DEPLOY_TARGET": "cloudflare",
-		"NODE_ENV": "production"
+		"NODE_ENV": "production",
+		// Excludes EHR, scheduling, payer and FHIR routes/pages from this release.
+		// See planning/pilot-readiness-2026-11-04/evidence/l09-excluded-tools-release.md
+		"PILOT_EXCLUDED_SURFACE": "1"
 	}
 }

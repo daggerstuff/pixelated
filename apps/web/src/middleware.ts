@@ -13,6 +13,12 @@ import { corsMiddleware } from './lib/middleware/cors'
 import { generateCspNonce } from './lib/middleware/csp'
 import { rateLimitMiddleware } from './lib/middleware/rate-limit'
 import { securityHeaders } from './lib/middleware/securityHeaders'
+import {
+  excludedApiRefusal,
+  isExcludedSurface,
+  readRuntimeEnv,
+  resolveExcludedSurfaceFlag,
+} from './lib/pilot/excludedSurface'
 import { tracingMiddleware } from './lib/tracing/middleware'
 import { markSpanError } from './lib/tracing/utils'
 import { normalizeRequestHeaders } from './lib/utils/request-headers'
@@ -61,6 +67,36 @@ const normalizeRequestHeadersMiddleware: MiddlewareHandler = defineMiddleware(
   (context, next) => {
     normalizeRequestHeaders(context.request as unknown as { headers?: unknown })
     return next()
+  },
+)
+
+// Sits before auth so an excluded route never spends the provider validation
+// budget; inert unless PILOT_EXCLUDED_SURFACE opts a release in.
+function excludedSurfaceEnabledFor(locals: unknown): boolean {
+  return resolveExcludedSurfaceFlag({
+    processEnv: typeof process === 'undefined' ? undefined : process.env,
+    buildEnv: import.meta.env as unknown as Record<string, unknown>,
+    runtimeEnv: readRuntimeEnv(locals),
+  })
+}
+
+const pilotSurfaceGate: MiddlewareHandler = defineMiddleware(
+  (context, next) => {
+    const { pathname } = context.url
+    if (!isExcludedSurface(pathname)) {
+      return next()
+    }
+    if (!excludedSurfaceEnabledFor(context.locals)) {
+      return next()
+    }
+    const refusal = excludedApiRefusal(pathname)
+    if (refusal) {
+      return new Response(refusal.body, {
+        status: refusal.status,
+        headers: refusal.headers,
+      })
+    }
+    return next('/404')
   },
 )
 
@@ -312,6 +348,7 @@ export const onRequest = sequence(
   securityHeaders,
   corsMiddleware,
   internalRouteGate,
+  pilotSurfaceGate,
   projectAuthMiddleware,
   rateLimitMiddleware,
   apiVersioningMiddleware,

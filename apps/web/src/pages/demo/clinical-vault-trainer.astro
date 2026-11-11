@@ -10,22 +10,22 @@ export const prerender = false // Enable SSR for A/B testing
 // A/B Testing Variants
 const variants = {
   A: {
-    headline: 'HIPAA-Impossible Training Made Possible',
+    headline: 'Rehearse the Conversations That Matter',
     subheadline:
-      "Practice crisis interventions safely with AI clients who can't be harmed",
-    cta: 'Start Safe Training Now',
+      "Practice crisis interventions with synthetic AI clients who can't be harmed",
+    cta: 'Open the Demo',
   },
   B: {
     headline: 'Train Without Fear, Heal With Confidence',
     subheadline:
-      'Master difficult cases through AI simulation before facing real clients',
-    cta: 'Begin Confident Practice',
+      'Rehearse difficult cases through AI simulation before facing real clients',
+    cta: 'Open the Demo',
   },
   C: {
-    headline: 'The Training That Was Impossible Before HIPAA',
+    headline: 'Practice What Textbooks Cannot Teach',
     subheadline:
-      "Revolutionary AI clients let you practice what textbooks can't teach",
-    cta: 'Access Breakthrough Training',
+      "Synthetic AI clients let you rehearse what a textbook can't demonstrate",
+    cta: 'Open the Demo',
   },
 }
 
@@ -35,30 +35,30 @@ const currentVariant = (variants as any)?.[variantKey]
 
 const technicalSpecs = [
   {
-    metric: 'Crisis Detection Speed',
-    value: '2.3 seconds',
-    comparison: 'vs 47 seconds traditional',
+    metric: 'Crisis Response',
+    value: 'Rehearsal',
+    comparison: 'Practice a high-risk moment before it is real',
   },
   {
-    metric: 'Intervention Accuracy',
-    value: '94.7%',
-    comparison: 'vs 67% traditional methods',
+    metric: 'Multi-Session',
+    value: 'Personas',
+    comparison: 'Follow one synthetic client across a series',
   },
   {
-    metric: 'Rare Case Exposure',
-    value: '100% students',
-    comparison: 'vs 12% traditional programs',
+    metric: 'Turn-Level',
+    value: 'Feedback',
+    comparison: 'Supervisor review grounded in the transcript',
   },
   {
-    metric: 'Practice Hours Available',
-    value: '200+ hours',
-    comparison: 'vs 3-5 hours traditional',
+    metric: 'Repeatable',
+    value: 'Retries',
+    comparison: 'Rerun any moment as often as you need',
   },
 ]
 
 const impossibleScenarios = [
   {
-    title: 'Persistent AI Patients Across 20+ Sessions',
+    title: 'Persistent AI Patients Across Sessions',
     description:
       "AI patient 'Marcus' remembers being abandoned, tests boundaries consistently across sessions",
     icon: '🧠',
@@ -67,7 +67,7 @@ const impossibleScenarios = [
   {
     title: 'Crisis Training Without Consequences',
     description:
-      'Students practice suicidal ideation scenarios 50+ times until intervention is automatic',
+      'Students rehearse suicidal ideation scenarios repeatedly until the response is deliberate rather than panicked',
     icon: '🚨',
     accent: 'red',
   },
@@ -86,32 +86,11 @@ const impossibleScenarios = [
     accent: 'red',
   },
 ]
-
-const universityResults = [
-  {
-    university: 'Major Research University',
-    result: '85% reduction in first-year therapy mistakes',
-    detail:
-      'Students who trained with ClinicalVault showed dramatically fewer errors in real sessions',
-  },
-  {
-    university: 'Leading Medical School',
-    result: '300% increase in crisis intervention confidence',
-    detail:
-      "Residents reported feeling 'actually ready' for difficult cases after AI training",
-  },
-  {
-    university: 'Elite Clinical Training Program',
-    result: 'Zero patient harm incidents in training cohort',
-    detail:
-      'First cohort in program history with no training-related patient safety concerns',
-  },
-]
 ---
 
 <BaseLayout
-  title="ClinicalVault Trainer - HIPAA-Impossible Training Made Possible"
-  description="Practice crisis interventions and complex therapy scenarios with AI clients. Safe, private, and impossible before HIPAA compliance."
+  title="ClinicalVault Trainer - Synthetic Clinical Simulation"
+  description="Rehearse crisis interventions and complex therapy scenarios with synthetic AI clients. Illustrative demo, not a clinical service."
 >
   <!-- Hero Section -->
   <section class="brutalist-section">
@@ -119,7 +98,7 @@ const universityResults = [
       <div class="text-center mb-12">
         <div class="status-indicator status-indicator--warning inline-flex mb-6">
           <div class="pulse-dot pulse-dot--blue"></div>
-          <span class="font-bold">CRISIS TRAINING ACTIVE</span>
+          <span class="font-bold">CRISIS TRAINING DEMO</span>
         </div>
 
         <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
@@ -264,40 +243,6 @@ const universityResults = [
     </div>
   </section>
 
-  <!-- University Results -->
-  <section class="brutalist-section">
-    <div class="brutalist-container">
-      <div class="text-center mb-12">
-        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
-          REAL RESULTS FROM
-          <br />
-          <span class="confidence-boost">LEADING UNIVERSITIES</span>
-        </h2>
-        <p class="text-lg text-foreground max-w-4xl mx-auto">
-          Universities using ClinicalVault report unprecedented improvements in
-          training outcomes
-        </p>
-      </div>
-
-      <div class="brutalist-grid brutalist-grid--3">
-        {universityResults.map((result) => (
-          <BrutalistCard hover={true}>
-            <div class="text-center space-y-4">
-              <div class="text-5xl">🏛️</div>
-              <h3 class="brutalist-subheading text-lg">{result.university}</h3>
-              <div class="text-2xl font-bold text-foreground">
-                {result.result}
-              </div>
-              <p class="text-foreground text-sm leading-relaxed">
-                {result.detail}
-              </p>
-            </div>
-          </BrutalistCard>
-        ))}
-      </div>
-    </div>
-  </section>
-
   <!-- Security Guarantee -->
   <section class="brutalist-section bg-card">
     <div class="brutalist-container">
@@ -305,26 +250,25 @@ const universityResults = [
         <div class="text-center space-y-6">
           <div class="text-6xl">🛡️</div>
           <h3 class="brutalist-subheading text-2xl">
-            BEYOND HIPAA. BEYOND COMPLIANCE.
+            SYNTHETIC DATA BY DESIGN
           </h3>
           <p class="text-lg text-foreground leading-relaxed">
-            Your training sessions are protected by military-grade encryption.
-            We use Fully Homomorphic Encryption (FHE) - our AI analyzes your
-            sessions while they stay completely encrypted. Even we can't see
-            your training conversations.
+            This demo runs on synthetic personas. No client records, protected
+            health information, or real patient material is processed, so there
+            is nothing sensitive to expose in a rehearsal.
           </p>
           <div class="flex flex-wrap justify-center gap-6">
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 bg-primary rounded-full"></span>
-              <span class="font-medium">Zero-Knowledge Processing</span>
+              <span class="font-medium">Synthetic Personas</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 bg-primary rounded-full"></span>
-              <span class="font-medium">Military-Grade Encryption</span>
+              <span class="font-medium">No Client Records</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 bg-primary rounded-full"></span>
-              <span class="font-medium">No Data Retention</span>
+              <span class="font-medium">Illustrative Demo</span>
             </div>
           </div>
         </div>
@@ -342,7 +286,7 @@ const universityResults = [
 
         <div class="status-indicator status-indicator--warning inline-flex mb-6">
           <div class="pulse-dot pulse-dot--blue"></div>
-          <span class="font-bold">LIMITED BETA ACCESS AVAILABLE</span>
+          <span class="font-bold">PROPOSED TRAINING CONCEPT</span>
         </div>
 
         <h2 class="brutalist-heading text-3xl md:text-5xl mb-8">
@@ -352,8 +296,8 @@ const universityResults = [
         </h2>
 
         <p class="text-xl text-foreground mb-8 leading-relaxed">
-          Join the universities already using ClinicalVault to train more
-          confident, competent therapists.
+          Bring synthetic clinical rehearsal to your program's next practicum
+          semester.
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
@@ -372,7 +316,7 @@ const universityResults = [
             size="lg"
             data-demo-cta="secondary"
           >
-            SCHEDULE UNIVERSITY DEMO
+            EXPLORE OTHER DEMOS
           </BrutalistButton>
         </div>
 
@@ -384,7 +328,7 @@ const universityResults = [
             🔒 YOUR DATA STAYS PRIVATE
           </div>
           <div class="brutalist-badge brutalist-badge--success">
-            💛 LOVED BY THERAPY PROGRAMS
+            💛 BUILT FOR TRAINING PROGRAMS
           </div>
         </div>
       </div>

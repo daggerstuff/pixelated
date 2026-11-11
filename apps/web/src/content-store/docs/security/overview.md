@@ -112,13 +112,16 @@ graph TD
 ## Compliance Framework
 
 <AccordionGroup>
-  <Accordion title="HIPAA Compliance">
-    - Business Associate Agreements - Privacy Rule compliance - Security Rule
-    implementation - Breach notification procedures
+  <Accordion title="HIPAA Scope">
+    - No Business Associate Agreement is in force - No third-party HIPAA audit has
+    been performed - The training product is scoped to synthetic data and does
+    not accept PHI - Breach notification procedures are documented as a design
+    requirement, not a certified control
   </Accordion>
   <Accordion title="Security Standards">
-    - SOC 2 Type II certified - NIST Cybersecurity Framework - ISO 27001
-    compliance - GDPR compliance
+    - No SOC 2 report, ISO 27001 certificate, or NIST attestation exists - No
+    GDPR readiness assessment has been performed - Framework mapping is
+    documented as intent, not certification
   </Accordion>
   <Accordion title="Risk Management">
     - Regular risk assessments - Incident response plans - Business continuity -

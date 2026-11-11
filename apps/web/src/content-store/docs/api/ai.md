@@ -401,8 +401,9 @@ X-RateLimit-Reset: 1625097600
 All API endpoints require authentication. See the
 [Authentication API](/api/auth) for details on how to authenticate requests.
 
-## HIPAA Compliance
+## HIPAA Scope
 
-All API endpoints are HIPAA compliant and include comprehensive audit logging.
-See the [Trust & Compliance](/trust) documentation for details on HIPAA
-compliance measures.
+No API endpoint is offered as a HIPAA business-associate service. The training
+product is scoped to synthetic scenario data and does not accept PHI or real
+client records. See the [Trust & Compliance](/trust) documentation for the
+current scope statement.
