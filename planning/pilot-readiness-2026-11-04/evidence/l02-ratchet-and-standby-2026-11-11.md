@@ -67,6 +67,24 @@ URL remains as a separately-deployed origin nobody routes to. L02 should stop
 describing Vercel as a fallback until the account is cleared and the route is
 deliberately removed.
 
+## 2.1 Verified on the deployed release
+
+| Check                                                                          | Result                                                                                           |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `Quality` on `d54b8162b` (the current `staging` tip, a descendant of this fix) | **9 of 9 jobs success**, including `ai submodule strict ratchet`                                 |
+| Worker route list                                                              | `pixelatedempathy.com/*` **and** `www.pixelatedempathy.com/*` → `pixelated-empathy`              |
+| `https://www.pixelatedempathy.com/`                                            | **301** → `https://pixelatedempathy.com/`, no `x-vercel-id` — answered by the Worker, not Vercel |
+| `https://www.pixelatedempathy.com/training?x=1`                                | **301** → `https://pixelatedempathy.com/training?x=1` (path and query preserved)                 |
+| Following `www` to `/demo/chat`                                                | final **200** at the apex URL                                                                    |
+| `https://www.pixelatedempathy.com/api/health`                                  | **301** → apex                                                                                   |
+| Excluded surface on the apex                                                   | `/api/fhir/r4/metadata` **404**, `/portal/scheduling` **404**, `/api/health` **200**             |
+
+Worker version `f7d84c7c-3846-4322-97a7-fb102a8eface`, deployed 2026-11-11T04:53:45Z.
+
+The Vercel project still answers 404 on `pixelatedempathy.vercel.app`; it holds a
+domain redirect and nothing else. With `www` on the Worker route, the redirect it
+serves is no longer in the path at all.
+
 ## 3. What is still open
 
 - A rollback rehearsal that crosses a database migration, when a release ships
