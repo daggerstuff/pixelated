@@ -3,8 +3,10 @@ import type { APIRoute } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
+  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionExcludedInvalidIdResponse,
   legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
@@ -180,6 +182,19 @@ export const POST: APIRoute = async ({ request }) => {
       // fault: `request.json()` throws a `SyntaxError` for invalid JSON.
       return legacySessionInvalidRequestResponse('Invalid JSON body')
     }
+    // `sessions.id` is a uuid column. A present-but-malformed identifier can
+    // never name a session, so it is classified before the rest of the payload
+    // is judged: an unvalidated one raises `22P02` inside the ownership SELECT
+    // below, before parse analysis resolves the absent legacy relation, and
+    // used to surface as a `500`. The route is excluded from the pilot surface
+    // regardless of body shape, so this is answered with the route's existing
+    // `410`.
+    const rawSessionId = isRecord(requestBody)
+      ? requestBody['sessionId']
+      : undefined
+    if (typeof rawSessionId === 'string' && !isLegacySessionId(rawSessionId)) {
+      return legacySessionExcludedInvalidIdResponse()
+    }
     if (!isSaveAnalyticsPayload(requestBody)) {
       return new Response(JSON.stringify({ error: 'Invalid payload' }), {
         status: 400,
@@ -319,6 +334,11 @@ export const GET: APIRoute = async ({ request }) => {
           headers: { 'Content-Type': 'application/json' },
         },
       )
+    }
+
+    // Same guard as POST: the identifier must never reach the uuid column.
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionExcludedInvalidIdResponse()
     }
 
     const client = await acquireClient()

@@ -248,6 +248,25 @@ export function legacySessionInvalidRequestResponse(message: string): Response {
 }
 
 /**
+ * `410` for a malformed identifier on one of the routes excluded from the
+ * pilot surface.
+ *
+ * `progress`, `comparison` and `analytics` are excluded regardless of body
+ * shape, so a malformed identifier takes the same `410` path a well-formed one
+ * takes rather than introducing a `400` the exclusion contract does not have.
+ * The guard exists because PostgreSQL raises `22P02` on the uuid cast while the
+ * first ownership statement is analysed, before that statement can resolve the
+ * absent legacy relation, which used to surface as a `500`.
+ *
+ * The response is identical to `legacySessionSurfaceResponse()`: the caller
+ * learns that the surface is gone, never what the database said about the
+ * identifier. No pg error code, statement fragment or table name is included.
+ */
+export function legacySessionExcludedInvalidIdResponse(): Response {
+  return legacySessionSurfaceResponse()
+}
+
+/**
  * Resolve the caller's internal `users.id`, mapping a retryable
  * database-availability failure to the route's `503` instead of denying an
  * authenticated caller with `403`.

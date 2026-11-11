@@ -3,8 +3,10 @@ import type { APIRoute } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
+  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionExcludedInvalidIdResponse,
   legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
@@ -47,6 +49,14 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const sessionId = payload['sessionId']
+    // `sessions.id` is a uuid column. An unvalidated identifier raises `22P02`
+    // inside the ownership SELECT below, before parse analysis resolves the
+    // absent legacy columns, and used to surface as a `500`. The route is
+    // excluded from the pilot surface regardless of body shape, so the shape is
+    // checked here and answered with the route's existing `410`.
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionExcludedInvalidIdResponse()
+    }
     const progressMetrics = payload['progressMetrics']
     const evaluationFeedback = payload['evaluationFeedback']
     if (
@@ -125,6 +135,10 @@ export const GET: APIRoute = async ({ request }) => {
     const sessionId = url.searchParams.get('sessionId')
     if (!sessionId) {
       return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
+    }
+    // Same guard as POST: the identifier must never reach the uuid column.
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionExcludedInvalidIdResponse()
     }
 
     const client = await acquireClient()

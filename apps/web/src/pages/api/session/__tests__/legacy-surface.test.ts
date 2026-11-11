@@ -654,3 +654,150 @@ describe('legacy /api/session/* POST withholds the retry advertisement on identi
     )
   })
 })
+
+describe('legacy /api/session/* routes with a malformed identifier', () => {
+  /**
+   * These routes are excluded from the pilot surface regardless of body shape,
+   * so a malformed identifier takes the route's existing `410` path instead of
+   * introducing a `400` the exclusion contract does not have.
+   *
+   * Before this repair the identifier reached the ownership statement, where
+   * PostgreSQL raised `22P02` (`invalid input syntax for type uuid`) before
+   * parse analysis ever resolved the absent relation. The catch-all mapped that
+   * to `500`, so a malformed request answered a server error on a surface whose
+   * whole contract is "gone, not broken".
+   */
+  const MALFORMED_ID = 'not-a-uuid'
+
+  const expectExcluded = async (response: Response) => {
+    expect(response.status).toBe(410)
+    // A POST never advertises a retry on any failure branch, and this one is a
+    // new branch: the write cannot have happened, but the rule is per method,
+    // not per branch.
+    expect(response.headers.get('Retry-After')).toBeNull()
+    expect(await response.json()).toEqual({
+      error: 'Legacy session analytics are not available',
+      code: LEGACY_SURFACE_CODE,
+    })
+    // The guard runs before the client is acquired, which is what proves the
+    // value never reaches a statement.
+    expect(state.query).not.toHaveBeenCalled()
+    expect(state.release).not.toHaveBeenCalled()
+  }
+
+  it('progress POST answers 410 for a non-UUID sessionId', async () => {
+    const response = await invoke(
+      progress.POST as Handler,
+      post('/api/session/progress', {
+        sessionId: MALFORMED_ID,
+        progressMetrics: { totalMessages: 1, progress: 50 },
+      }),
+    )
+
+    await expectExcluded(response)
+  })
+
+  it('progress GET answers 410 for a non-UUID sessionId', async () => {
+    const response = await invoke(
+      progress.GET as Handler,
+      get(`/api/session/progress?sessionId=${MALFORMED_ID}`),
+    )
+
+    await expectExcluded(response)
+  })
+
+  it('comparison POST answers 410 for a non-UUID currentSessionId', async () => {
+    const response = await invoke(
+      comparison.POST as Handler,
+      post('/api/session/comparison', {
+        currentSessionId: MALFORMED_ID,
+        improvementScore: 10,
+        metrics: { empathy: 1 },
+      }),
+    )
+
+    await expectExcluded(response)
+  })
+
+  it('comparison POST answers 410 for a non-UUID previousSessionId', async () => {
+    const response = await invoke(
+      comparison.POST as Handler,
+      post('/api/session/comparison', {
+        currentSessionId: SESSION_ID,
+        previousSessionId: MALFORMED_ID,
+        improvementScore: 10,
+        metrics: { empathy: 1 },
+      }),
+    )
+
+    await expectExcluded(response)
+  })
+
+  it('comparison GET answers 410 for a non-UUID sessionId', async () => {
+    const response = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${MALFORMED_ID}`),
+    )
+
+    await expectExcluded(response)
+  })
+
+  it('analytics POST answers 410 for a non-UUID sessionId', async () => {
+    const response = await invoke(
+      analytics.POST as Handler,
+      post('/api/session/analytics', {
+        sessionId: MALFORMED_ID,
+        analyticsData: {
+          sessionMetrics: [{ metricName: 'duration', metricValue: 42 }],
+          skillProgress: [],
+        },
+      }),
+    )
+
+    await expectExcluded(response)
+  })
+
+  it('analytics GET answers 410 for a non-UUID sessionId', async () => {
+    const response = await invoke(
+      analytics.GET as Handler,
+      get(`/api/session/analytics?sessionId=${MALFORMED_ID}`),
+    )
+
+    await expectExcluded(response)
+  })
+
+  it('never leaks a pg code, statement fragment or table name', async () => {
+    const response = await invoke(
+      analytics.GET as Handler,
+      get(`/api/session/analytics?sessionId=${MALFORMED_ID}`),
+    )
+
+    const body = JSON.stringify(await response.json())
+    expect(response.status).toBe(410)
+    for (const leak of [
+      '22P02',
+      'invalid input syntax',
+      'SELECT',
+      'therapist_id',
+      'session_analytics',
+      'progress_metrics',
+      'session_comparisons',
+    ]) {
+      expect(body.toLowerCase()).not.toContain(leak.toLowerCase())
+    }
+  })
+
+  it('still runs a well-formed identifier through the route', async () => {
+    // The guard is shape-only: a UUID must reach the ownership statement and
+    // keep the route's existing 410 mapping for the absent schema.
+    state.query.mockRejectedValue(schemaError('42P01'))
+
+    const response = await invoke(
+      comparison.GET as Handler,
+      get(`/api/session/comparison?sessionId=${SESSION_ID}`),
+    )
+
+    expect(response.status).toBe(410)
+    expect(state.query).toHaveBeenCalled()
+  })
+})
