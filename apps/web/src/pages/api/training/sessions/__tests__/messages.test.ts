@@ -81,11 +81,17 @@ describe('POST /api/training/sessions/:sessionId/messages', () => {
     expect(mockQuery.mock.calls[0]?.[0]).toContain(
       "context->>'synthetic' = 'true'",
     )
-    expect(mockQuery.mock.calls[0]?.[1]).toEqual([
-      SESSION_ID,
-      USER_ID,
-      'Practice response',
-    ])
+    // The row's primary key is the submission's deterministic key, and the
+    // insert refuses a duplicate instead of stacking a second row.
+    expect(mockQuery.mock.calls[0]?.[0]).toContain(
+      'ON CONFLICT (id) DO NOTHING',
+    )
+    const params = mockQuery.mock.calls[0]?.[1] as unknown[]
+    expect(params).toHaveLength(4)
+    expect(params[0]).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-8[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+    )
+    expect(params.slice(1)).toEqual([SESSION_ID, USER_ID, 'Practice response'])
   })
 
   it('denies an unresolvable identity without reaching the database', async () => {
@@ -105,8 +111,11 @@ describe('POST /api/training/sessions/:sessionId/messages', () => {
 
   it('answers 404 when the session is not owned by the caller', async () => {
     // The ownership predicate lives in the INSERT ... SELECT, so a non-owner
-    // (or a non-training / non-synthetic session) returns no row.
-    mockQuery.mockResolvedValueOnce({ rows: [] })
+    // (or a non-training / non-synthetic session) returns no row. The replay
+    // lookup that follows a conflict also finds nothing.
+    mockQuery
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
 
     const response = await invoke({
       request: request({ content: 'Practice response' }),
