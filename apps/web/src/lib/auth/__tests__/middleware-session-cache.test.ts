@@ -233,17 +233,13 @@ describe('middleware reuses the validated-session cache', () => {
     expect(response.status).toBe(200)
     expect(context.locals.user).toBeUndefined()
     expect(context.locals.session).toBeUndefined()
-    // The verdict is published so a page component can decide from it rather
-    // than validating the same token again.
-    expect(context.locals['sessionValidation']).toEqual({ status: 'invalid' })
   })
 
   it('never consults the provider or the cache without a token', async () => {
-    const { nextCalled, context } = await invoke('/training')
+    const { nextCalled } = await invoke('/training')
 
     expect(nextCalled).toBe(true)
     expect(mockValidateToken).not.toHaveBeenCalled()
-    expect(context.locals['sessionValidation']).toEqual({ status: 'none' })
   })
 })
 

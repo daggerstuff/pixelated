@@ -36,13 +36,6 @@ export interface Session {
     permissions?: string[]
     appMetadata?: Record<string, unknown>
   }
-  /**
-   * Auth0 account identifier resolved during the same validation that produced
-   * this session. Carried here so `getCurrentUser` can honour its `accountId`
-   * contract from the validated-session cache instead of paying a second
-   * `/userinfo` round trip. Additive: absent when the token carried none.
-   */
-  accountId?: string
   /** Active workspace context. Absent for system-level / cross-workspace sessions. */
   workspaceId?: string
   /** ISO-8601 timestamp when the session expires */
@@ -62,99 +55,6 @@ export interface SessionValidation {
   session?: Session
   /** `Retry-After` seconds to surface when the provider could not answer. */
   retryAfterSeconds?: number
-}
-
-/**
- * The middleware's verdict for a page request, published on `Astro.locals`.
- *
- * `none` means the request carried no token at all — distinct from `invalid`,
- * which means a token was presented and rejected. Page components read this
- * instead of re-validating a token the middleware already classified, so a
- * page never pays a second `/userinfo` round trip for the same request.
- */
-export type SessionVerdict = SessionValidation | { status: 'none' }
-
-/**
- * `Astro.locals` key the middleware writes its verdict to.
- *
- * `App.Locals` carries a `[key: string]: unknown` index signature, so no
- * shared type declaration is required for this key.
- */
-export const SESSION_VERDICT_LOCALS_KEY = 'sessionValidation'
-
-function isSessionVerdict(value: unknown): value is SessionVerdict {
-  if (!value || typeof value !== 'object') return false
-  const status = (value as { status?: unknown }).status
-  return (
-    status === 'none' ||
-    status === 'invalid' ||
-    status === 'provider-unavailable' ||
-    status === 'valid'
-  )
-}
-
-/**
- * Read the middleware's verdict from `Astro.locals`.
- *
- * Returns `null` when the middleware did not run for this request (unit tests,
- * an E2E bypass, a statically rendered route), so callers can fall back to the
- * cache-aware read rather than treating "no verdict" as "unauthenticated".
- */
-export function readSessionVerdictFromLocals(
-  locals: unknown,
-): SessionVerdict | null {
-  if (!locals || typeof locals !== 'object') return null
-  const value = (locals as Record<string, unknown>)[SESSION_VERDICT_LOCALS_KEY]
-  return isSessionVerdict(value) ? value : null
-}
-
-/** What a page component needs to know about the current request's session. */
-export interface PageSessionResolution {
-  /** The validated session, or `null` when the request is not authenticated. */
-  session: Session | null
-  /**
-   * The provider could not verify the token. This is a retryable failure, not
-   * a logout and not an absent session.
-   */
-  providerUnavailable: boolean
-}
-
-/**
- * Resolve the session a page component should use.
- *
- * The middleware has already validated the token for this request and
- * published its verdict on `Astro.locals`; this reads that verdict instead of
- * validating again. That closes the last duplicate provider call on the
- * training pages: an invalid token on `/training/session/<id>` used to cost
- * the middleware's validation plus the page's own `getSession` re-check (two
- * `/userinfo` calls) because the middleware declines to redirect and lets the
- * page decide.
- *
- * Falls back to the cache-aware `getSession` only when no verdict exists, which
- * means the middleware did not run for this request.
- */
-export async function resolvePageSession(
-  request: Request,
-  locals: unknown,
-): Promise<PageSessionResolution> {
-  const verdict = readSessionVerdictFromLocals(locals)
-  if (!verdict) {
-    const session = await getSession(request)
-    const localsUser =
-      locals && typeof locals === 'object'
-        ? (locals as Record<string, unknown>)['user']
-        : undefined
-    return { session, providerUnavailable: !session && Boolean(localsUser) }
-  }
-
-  if (verdict.status === 'valid') {
-    return { session: verdict.session ?? null, providerUnavailable: false }
-  }
-
-  return {
-    session: null,
-    providerUnavailable: verdict.status === 'provider-unavailable',
-  }
 }
 
 /**
@@ -325,11 +225,7 @@ export function getSessionFromToken(result: TokenPayload): Session | null {
       roles: extractRolesFromToken(result),
       name: result.payload?.['name'] as string | undefined,
     },
-    ...(result.accountId ? { accountId: result.accountId } : {}),
-    // `validateToken` resolves the workspace from the `/userinfo` body, its
-    // `user_metadata` and its `app_metadata`; fall back to the token payload
-    // for callers that build a payload without the validation result.
-    workspaceId: result.workspaceId ?? extractWorkspaceIdFromToken(result),
+    workspaceId: extractWorkspaceIdFromToken(result),
     expires: expiresAt,
   }
 }

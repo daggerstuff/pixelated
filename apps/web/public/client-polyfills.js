@@ -11,7 +11,9 @@ if (typeof window.process === 'undefined') {
   window.process = {
     env: {},
     nextTick: function (fn) {
-      setTimeout(fn, 0)
+      setTimeout(() => {
+        if (typeof fn === 'function') fn()
+      }, 0)
     },
     cwd: function () {
       return '/'

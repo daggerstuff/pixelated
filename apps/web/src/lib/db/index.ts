@@ -62,20 +62,6 @@ export interface DatabaseConfig {
  * read-path stall sat in exactly that stage for 7 974–7 999 ms (diagnosis D3).
  * This bound is enforced by `acquireClient` itself, so it holds even when pg's
  * own timer never fires.
- *
- * Override with `DB_ACQUIRE_TIMEOUT`; `0` (or any non-positive value) disables
- * this bound, as it does for the liveness-probe, client-lifetime and statement
- * bounds. Without that guard `setTimeout(…, 0)` fired before `connect()` could
- * settle, so `DB_ACQUIRE_TIMEOUT=0` made every acquisition fail immediately
- * instead of disabling the bound — the same trap `DB_QUERY_TIMEOUT` had, one
- * layer down. A negative value means the same thing, because `setTimeout`
- * clamps a negative delay to `0`. A non-numeric value keeps this default rather
- * than disabling the bound.
- *
- * Disabling it leaves pg's own `connectionTimeoutMillis`
- * (`DB_CONNECTION_TIMEOUT`, 3 000 ms by default) as the acquisition bound, so a
- * caller still cannot hang indefinitely; it only removes this module's tighter
- * race and its pool rebuild.
  */
 export const DB_ACQUIRE_TIMEOUT_MS = 2_500
 
@@ -93,28 +79,15 @@ export const DB_ACQUIRE_ATTEMPTS = 2
  * Upper bound on a single statement, enforced by the server
  * (`statement_timeout`). It is shorter than the request deadline so a stuck
  * first statement cannot occupy the same silence an unbounded connect did.
- *
- * Override with `DB_STATEMENT_TIMEOUT`. `0` (or any non-positive value)
- * disables the bound for long maintenance statements. A negative value is
- * normalised to `0` before the pool is built, because pg forwards
- * `statement_timeout` verbatim as a startup parameter (`if
- * (params.statement_timeout)` is truthy for a negative) and PostgreSQL refuses
- * the connection. A non-numeric value keeps this default.
+ * Override with `DB_STATEMENT_TIMEOUT`; `0` disables it for long maintenance
+ * statements.
  */
 export const DB_STATEMENT_TIMEOUT_MS = 5_000
 
 /**
  * Upper bound on one pool connect/checkout (`connectionTimeoutMillis`). It also
  * bounds callers that use `getPool().query()` directly, which bypass
- * `acquireClient`.
- *
- * Override with `DB_CONNECTION_TIMEOUT`. `0` (or any non-positive value)
- * disables the bound. pg-pool tests the option for truthiness
- * (`if (!this.options.connectionTimeoutMillis)`), so a negative value would
- * schedule `setTimeout(…, -N)` and destroy every connecting or queued client,
- * and pg derives the libpq `connect_timeout` from it, which PostgreSQL rejects
- * when negative. A negative value is therefore normalised to `0` before the
- * pool is built. A non-numeric value keeps this default.
+ * `acquireClient`. Override with `DB_CONNECTION_TIMEOUT`.
  */
 export const DB_CONNECTION_TIMEOUT_MS = 3_000
 
@@ -139,11 +112,7 @@ export const DB_CONNECTION_TIMEOUT_MS = 3_000
  *
  * It sits well inside the 8 s request deadline and well above a healthy
  * statement (measured: first query 94–263 ms after connect, 1 188 ms worst-case
- * connect). Override with `DB_QUERY_TIMEOUT`; `0` (or any non-positive value)
- * disables the bound, as it does for the liveness-probe and client-lifetime
- * bounds. A negative value is normalised to `0` before it reaches pg, which
- * would otherwise schedule an immediate timeout and reintroduce the defect one
- * layer down.
+ * connect). Override with `DB_QUERY_TIMEOUT`.
  */
 export const DB_QUERY_TIMEOUT_MS = 4_000
 
@@ -226,30 +195,6 @@ const DB_KEEPALIVE_INITIAL_DELAY_MS = 10_000
 const DB_CLIENT_RECYCLE_LIMIT = 20
 
 /**
- * Documented default idle-client timeout (`DB_IDLE_TIMEOUT`, 30 000 ms).
- *
- * `0` (or any non-positive value) disables pg-pool's idle eviction. A negative
- * value is normalised to `0` before the pool is built, because pg-pool's
- * `if (this.options.idleTimeoutMillis)` is a truthiness test: a negative value
- * is truthy and schedules `setTimeout(…, -N)`, which evicts every client the
- * moment it is released and makes the pool reconnect per query. A non-numeric
- * value keeps this default.
- */
-const DB_IDLE_TIMEOUT_MS_DEFAULT = 30_000
-
-/**
- * Documented default pool size (`DB_MAX_CONNECTIONS`, 20).
- *
- * The pool size has no disabling value: pg-pool does
- * `max || poolSize || 10`, so `0` silently becomes 10 rather than meaning
- * anything, and a negative `max` makes `_isFull()` true forever, so every
- * `connect()` queues and then dies on the connection timeout. A non-positive
- * or non-finite value is therefore normalised back to this default instead of
- * being passed through. A non-numeric value keeps it too.
- */
-const DB_MAX_CONNECTIONS_DEFAULT = 20
-
-/**
  * Resolve the database configuration from the environment.
  *
  * Precedence (lowest to highest):
@@ -270,17 +215,7 @@ function resolveDefaultConfig(): DatabaseConfig {
 
   const fromEnv: Partial<DatabaseConfig> = {}
   if (env['DB_HOST']) fromEnv.host = env['DB_HOST']
-  // DB_PORT is the one numeric knob that cannot ride through `envInt`: its
-  // fallback is the port DATABASE_URL carries, which `envInt` cannot see. A
-  // bare `parseInt` resolved a non-numeric value to `NaN`, which pg forwards as
-  // the port so every connection fails with an unhelpful error; `0` and
-  // out-of-range values are no better. An unusable value is rejected here, so
-  // the URL's port (or the 5432 default) applies instead of a port pg cannot
-  // dial.
-  const port = Number(env['DB_PORT'])
-  if (Number.isInteger(port) && port > 0 && port <= 65_535) {
-    fromEnv.port = port
-  }
+  if (env['DB_PORT']) fromEnv.port = parseInt(env['DB_PORT'], 10)
   if (env['DB_NAME']) fromEnv.database = env['DB_NAME']
   if (env['DB_USER']) fromEnv.user = env['DB_USER']
   if (env['DB_PASSWORD'] !== undefined) fromEnv.password = env['DB_PASSWORD']
@@ -299,12 +234,9 @@ function resolveDefaultConfig(): DatabaseConfig {
   // DATABASE_URL, which is the documented precedence. A variable that is set
   // but empty keeps the default (never NaN, which pg reads as "no timeout").
   if (env['DB_MAX_CONNECTIONS'] !== undefined)
-    fromEnv.max = envInt('DB_MAX_CONNECTIONS', DB_MAX_CONNECTIONS_DEFAULT)
+    fromEnv.max = envInt('DB_MAX_CONNECTIONS', 20)
   if (env['DB_IDLE_TIMEOUT'] !== undefined)
-    fromEnv.idleTimeoutMillis = envInt(
-      'DB_IDLE_TIMEOUT',
-      DB_IDLE_TIMEOUT_MS_DEFAULT,
-    )
+    fromEnv.idleTimeoutMillis = envInt('DB_IDLE_TIMEOUT', 30000)
   if (env['DB_CONNECTION_TIMEOUT'] !== undefined) {
     fromEnv.connectionTimeoutMillis = envInt(
       'DB_CONNECTION_TIMEOUT',
@@ -347,8 +279,8 @@ function resolveDefaultConfig(): DatabaseConfig {
     database: 'pixelated',
     user: 'postgres',
     password: '',
-    max: DB_MAX_CONNECTIONS_DEFAULT,
-    idleTimeoutMillis: DB_IDLE_TIMEOUT_MS_DEFAULT,
+    max: 20,
+    idleTimeoutMillis: 30000,
     connectionTimeoutMillis: DB_CONNECTION_TIMEOUT_MS,
     acquireTimeoutMillis: DB_ACQUIRE_TIMEOUT_MS,
     statementTimeoutMillis: DB_STATEMENT_TIMEOUT_MS,
@@ -386,36 +318,6 @@ const clientConnectedAt = new WeakMap<PoolClient, number>()
 const checkedOutClients = new WeakSet<PoolClient>()
 
 /**
- * Clamp a pool-option bound to the range pg reads as intended.
- *
- * `0` is pg's documented "no timeout" for `statement_timeout`, `query_timeout`,
- * `connectionTimeoutMillis` and `idleTimeoutMillis`. A negative value is *not*
- * read the same way: pg forwards `statement_timeout` verbatim as a startup
- * parameter and PostgreSQL refuses the connection, while pg-pool's
- * `if (options.connectionTimeoutMillis)` / `if (options.idleTimeoutMillis)`
- * truthiness tests schedule `setTimeout(…, -N)`, which fires on the next turn
- * and destroys or evicts every client. A non-finite value is no better.
- * Anything that is not a positive finite number therefore becomes `0`, which
- * disables the bound instead of inverting it.
- */
-function normalisePoolBound(value: number): number {
-  return Number.isFinite(value) && value > 0 ? value : 0
-}
-
-/**
- * Resolve the pool size, which has no "disabled" value.
- *
- * pg-pool does `max || poolSize || 10`, so `0` silently becomes 10 and a
- * negative `max` makes `_isFull()` true forever. A non-positive or non-finite
- * value is normalised to the documented default so the pool can still serve a
- * request.
- */
-function normalisePoolSize(value: number): number {
-  if (!Number.isFinite(value) || value < 1) return DB_MAX_CONNECTIONS_DEFAULT
-  return Math.floor(value)
-}
-
-/**
  * Initialize database connection pool
  */
 export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
@@ -442,33 +344,12 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   const newPool = new Pool({
     ...finalConfig,
     // Server-enforced per-statement bound. Without it a stuck first statement
-    // occupies the request until the route deadline fires. `0` disables it;
-    // a non-positive value must be normalised before pg turns it into an
-    // invalid startup parameter.
-    statement_timeout: normalisePoolBound(finalConfig.statementTimeoutMillis),
+    // occupies the request until the route deadline fires.
+    statement_timeout: finalConfig.statementTimeoutMillis,
     // Client-enforced per-statement bound. `statement_timeout` never reaches a
     // statement written to a socket the server is not reading, so a reused
     // pooled client whose peer has gone silent has no bound without this.
-    // `0` is pg's "no timeout", so a non-positive override disables the bound;
-    // a negative value must be normalised first, because pg's
-    // `if (readTimeout)` is truthy for it and `setTimeout` would fire
-    // immediately.
-    query_timeout: normalisePoolBound(finalConfig.queryTimeoutMillis),
-    // pg-pool's checkout timer is a truthiness test, so `0` disables it but a
-    // negative value is truthy and schedules `setTimeout(…, -N)`, which fires
-    // on the next turn and destroys every connecting or queued client. pg also
-    // derives the libpq `connect_timeout` from this value, and PostgreSQL
-    // rejects a negative one. Normalise non-positive to `0` (disabled).
-    connectionTimeoutMillis: normalisePoolBound(
-      finalConfig.connectionTimeoutMillis,
-    ),
-    // Same truthiness trap in pg-pool's idle timer: a negative value evicts
-    // every client the moment it is released, so the pool reconnects per
-    // query. Normalise non-positive to `0` (disabled).
-    idleTimeoutMillis: normalisePoolBound(finalConfig.idleTimeoutMillis),
-    // `max || poolSize || 10` turns `0` into 10 and a negative `max` into a
-    // permanently full pool. Normalise non-positive to the documented default.
-    max: normalisePoolSize(finalConfig.max),
+    query_timeout: finalConfig.queryTimeoutMillis,
     // Declarative keepalive on the socket. Node honours it; pg-cloudflare
     // implements setKeepAlive() as a no-op, so on the Worker this documents the
     // intent and the client-lifetime bound below is the mechanism that acts.
@@ -659,12 +540,6 @@ function acquireWithDeadline(
   pool: Pool,
   timeoutMs: number,
 ): Promise<PoolClient> {
-  // A non-positive bound disables the deadline, matching pg's own
-  // `connectionTimeoutMillis` and the liveness-probe, client-lifetime and
-  // statement guards. Without this guard `setTimeout(…, 0)` fires before
-  // `connect()` can settle, so `DB_ACQUIRE_TIMEOUT=0` made every acquisition
-  // fail immediately instead of disabling the bound.
-  if (timeoutMs <= 0) return pool.connect()
   const attempt = pool.connect()
   let timedOut = false
   let timer: ReturnType<typeof setTimeout> | undefined
@@ -920,12 +795,6 @@ function queryWithDeadline<T>(
   timeoutMs: number,
 ): Promise<T> {
   const attempt = client.query<T>(text, params) as unknown as Promise<T>
-  // A non-positive bound disables the deadline, matching pg's `query_timeout`
-  // and the liveness-probe and client-lifetime guards. Without this guard
-  // `setTimeout(…, 0)` fires before any statement can settle, so
-  // `DB_QUERY_TIMEOUT=0` made every query fail immediately instead of
-  // disabling the bound.
-  if (timeoutMs <= 0) return attempt
   let timer: ReturnType<typeof setTimeout> | undefined
   const deadline = new Promise<never>((_, reject) => {
     timer = setTimeout(

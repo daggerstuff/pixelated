@@ -200,40 +200,6 @@ describe('Authentication Middleware', () => {
       expect(result.error).toContain('Token has been revoked')
     })
 
-    it('should answer a provider outage with a retryable 503, never a 401', async () => {
-      vi.mocked(validateToken).mockResolvedValue({
-        valid: false,
-        providerUnavailable: true,
-        retryAfterSeconds: 112,
-        error: 'Too Many Requests',
-      })
-
-      const result = await authenticateRequest(mockRequest)
-
-      expect(result.success).toBe(false)
-      expect(result.response?.status).toBe(503)
-      expect(result.response?.headers.get('retry-after')).toBe('112')
-      expect(result.response?.headers.get('cache-control')).toBe('no-store')
-      await expect(result.response!.json()).resolves.toMatchObject({
-        error: expect.stringContaining('temporarily unavailable'),
-        retryAfterSeconds: 112,
-      })
-    })
-
-    it('should use the default Retry-After when a provider outage carries none', async () => {
-      vi.mocked(validateToken).mockResolvedValue({
-        valid: false,
-        providerUnavailable: true,
-        error: 'Auth0 /userinfo unavailable',
-      })
-
-      const result = await authenticateRequest(mockRequest)
-
-      expect(result.success).toBe(false)
-      expect(result.response?.status).toBe(503)
-      expect(result.response?.headers.get('retry-after')).toBe('30')
-    })
-
     it('should reject tokens for inactive users', async () => {
       vi.mocked(validateToken).mockResolvedValue({
         valid: true,

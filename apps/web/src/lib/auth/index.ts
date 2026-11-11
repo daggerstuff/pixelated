@@ -8,12 +8,8 @@ import type { AstroCookies } from 'astro'
 import { authConfig } from '../../config/auth.config'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getUserById as getAuth0UserById } from '../services/auth0.service'
+import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
-import {
-  validateSessionToken,
-  type Session,
-  type SessionVerdict,
-} from './session'
 const logger = createBuildSafeLogger('index')
 
 // Re-export session for compatibility
@@ -35,43 +31,10 @@ function isWebRequest(context: Request | AstroCookies): context is Request {
 }
 
 /**
- * Map a validated session to the user shape `getCurrentUser` has always
- * returned.
- *
- * `accountId` is carried on the cached session because the same `/userinfo`
- * response that produced the session is the only source for it; `scopes` is
- * deliberately absent here, exactly as on the previous JWT path — only the
- * API-key path populates it.
- */
-function userFromValidatedSession(session: Session): {
-  id: string
-  role: string
-  accountId?: string
-  workspaceId?: string
-} {
-  return {
-    id: session.user.id,
-    role: session.user.role ?? 'guest',
-    accountId: session.accountId,
-    workspaceId: session.workspaceId,
-  }
-}
-
-/**
  * Get the current user from the request or cookies
  * Supports both JWT (users) and API keys (developers)
- *
- * `options.verdict` is the verdict the middleware already computed for this
- * request (published on `Astro.locals`). When present, the user is derived
- * from it with **no** provider call, so a page never re-validates a token the
- * middleware classified. Without it the JWT path reads the validated-session
- * cache first and only a miss reaches Auth0 — the same one-validation-per-
- * request contract the middleware uses.
  */
-export async function getCurrentUser(
-  context: Request | AstroCookies,
-  options: { verdict?: SessionVerdict | null } = {},
-): Promise<{
+export async function getCurrentUser(context: Request | AstroCookies): Promise<{
   id: string
   role: string
   accountId?: string
@@ -112,18 +75,21 @@ export async function getCurrentUser(
   }
 
   // If we had an API key but it was invalid, we already returned null above
-  // If we have a JWT token, use the middleware's verdict when it exists.
+  // If we have a JWT token, validate it
   if (token) {
-    if (options.verdict) {
-      return options.verdict.status === 'valid' && options.verdict.session
-        ? userFromValidatedSession(options.verdict.session)
-        : null
+    try {
+      const result = await validateToken(token, 'access')
+      if (result.valid && result.userId) {
+        return {
+          id: result.userId,
+          role: result.role ?? 'guest',
+          accountId: result.accountId,
+          workspaceId: result.workspaceId,
+        }
+      }
+    } catch {
+      // Token validation failed
     }
-
-    const resolution = await validateSessionToken(token)
-    return resolution.status === 'valid' && resolution.session
-      ? userFromValidatedSession(resolution.session)
-      : null
   }
 
   return null
