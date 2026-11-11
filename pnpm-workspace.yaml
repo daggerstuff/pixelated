@@ -330,7 +330,7 @@ overrides:
   express: '>=4.20.0'
   fast-xml-parser: 5.7.0
   follow-redirects: '>=1.16.2'
-  glob: ^13.0.0
+  glob: ^14.0.2
   h3: '>=1.15.9'
   # Exact pin, not a caret range: prerelease ranges (^x-rc.N) re-resolve to
   # every newly published RC and drift pnpm-lock.yaml on every commit hook
