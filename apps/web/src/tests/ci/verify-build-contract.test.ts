@@ -67,6 +67,18 @@ function runScanner(cwd: string) {
   })
 }
 
+/**
+ * Build an import clause without writing `from '<relative path>'` literally.
+ *
+ * The sibling `Check for unresolved imports` step scans every `.ts` file,
+ * including this test, with a regex that does not understand template
+ * literals. A fixture that spelled the clause out would therefore be reported
+ * as a real unresolved import of this test file. Interpolating the specifier
+ * keeps the fixture content identical while the test file itself contains no
+ * import-like text.
+ */
+const importFrom = (specifier: string) => `from '${specifier}'`
+
 afterEach(() => {
   for (const root of fixtureRoots) {
     rmSync(root, { recursive: true, force: true })
@@ -79,15 +91,15 @@ describe('import-like text inside comments', () => {
     const root = createFixture({
       'apps/web/src/pages/index.astro': `---
 // A doc comment that quotes an import:
-//   import { ghost } from "ghost-package-not-installed"
+//   import { ghost } ${importFrom('ghost-package-not-installed')}
 /*
- * import { alsoGhost } from "./also-not-here"
+ * import { alsoGhost } ${importFrom('./also-not-here')}
  */
 const greeting = 'hello'
 ---
 <html>
   <body>
-    <!-- import { markupGhost } from "html-comment-ghost" -->
+    <!-- import { markupGhost } ${importFrom('html-comment-ghost')} -->
     <p>{greeting}</p>
   </body>
 </html>
@@ -104,7 +116,7 @@ const greeting = 'hello'
   it('ignores a commented-out CSS @import but still checks the real one', () => {
     const root = createFixture({
       'apps/web/src/pages/index.astro': `---
-import siteStyles from '../styles/site.css'
+import siteStyles ${importFrom('../styles/site.css')}
 ---
 <html><body>{siteStyles}</body></html>
 `,
@@ -125,7 +137,7 @@ describe('a genuinely unresolved import still fails', () => {
   it('fails on an unresolved local import', () => {
     const root = createFixture({
       'apps/web/src/pages/index.astro': `---
-import { missing } from './missing-module'
+import { missing } ${importFrom('./missing-module')}
 ---
 <html><body>ok</body></html>
 `,
@@ -141,7 +153,7 @@ import { missing } from './missing-module'
   it('fails on an unresolved package import', () => {
     const root = createFixture({
       'apps/web/src/pages/index.astro': `---
-import { missing } from 'package-that-is-not-installed'
+import { missing } ${importFrom('package-that-is-not-installed')}
 ---
 <html><body>ok</body></html>
 `,
@@ -159,7 +171,7 @@ import { missing } from 'package-that-is-not-installed'
   it('fails on an unresolved CSS @import', () => {
     const root = createFixture({
       'apps/web/src/pages/index.astro': `---
-import siteStyles from '../styles/site.css'
+import siteStyles ${importFrom('../styles/site.css')}
 ---
 <html><body>{siteStyles}</body></html>
 `,
@@ -177,7 +189,7 @@ import siteStyles from '../styles/site.css'
     // silently drop the import, which is the weakening this change must avoid.
     const root = createFixture({
       'apps/web/src/pages/index.astro': `---
-const endpoint = "https://example.invalid"; import { missing } from './missing-after-url'
+const endpoint = "https://example.invalid"; import { missing } ${importFrom('./missing-after-url')}
 ---
 <html><body>ok</body></html>
 `,
