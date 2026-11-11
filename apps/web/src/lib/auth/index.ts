@@ -9,11 +9,7 @@ import { authConfig } from '../../config/auth.config'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getUserById as getAuth0UserById } from '../services/auth0.service'
 import { extractTokenFromRequest } from './auth0-middleware'
-import {
-  validateSessionToken,
-  type Session,
-  type SessionVerdict,
-} from './session'
+import { validateSessionToken, type Session } from './session'
 const logger = createBuildSafeLogger('index')
 
 // Re-export session for compatibility
@@ -61,17 +57,12 @@ function userFromValidatedSession(session: Session): {
  * Get the current user from the request or cookies
  * Supports both JWT (users) and API keys (developers)
  *
- * `options.verdict` is the verdict the middleware already computed for this
- * request (published on `Astro.locals`). When present, the user is derived
- * from it with **no** provider call, so a page never re-validates a token the
- * middleware classified. Without it the JWT path reads the validated-session
- * cache first and only a miss reaches Auth0 — the same one-validation-per-
- * request contract the middleware uses.
+ * The JWT path reads the validated-session cache first and only a miss
+ * reaches Auth0. A page component that must not re-validate a token the
+ * middleware already classified resolves its session through
+ * `resolvePageSession` instead of calling this directly.
  */
-export async function getCurrentUser(
-  context: Request | AstroCookies,
-  options: { verdict?: SessionVerdict | null } = {},
-): Promise<{
+export async function getCurrentUser(context: Request | AstroCookies): Promise<{
   id: string
   role: string
   accountId?: string
@@ -112,14 +103,7 @@ export async function getCurrentUser(
   }
 
   // If we had an API key but it was invalid, we already returned null above
-  // If we have a JWT token, use the middleware's verdict when it exists.
   if (token) {
-    if (options.verdict) {
-      return options.verdict.status === 'valid' && options.verdict.session
-        ? userFromValidatedSession(options.verdict.session)
-        : null
-    }
-
     const resolution = await validateSessionToken(token)
     return resolution.status === 'valid' && resolution.session
       ? userFromValidatedSession(resolution.session)

@@ -26,22 +26,31 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockTransaction, mockGetFromCache, mockSetInCache, mockProvider } =
-  vi.hoisted(() => ({
-    mockTransaction: vi.fn(),
-    mockGetFromCache: vi.fn(),
-    mockSetInCache: vi.fn(),
-    mockProvider: {
-      name: 'auth0',
-      validateToken: vi.fn(),
-      getUserById: vi.fn(),
-      findInternalIdBySub: vi.fn(),
-      linkSubToInternalId: vi.fn(),
-      findSubByInternalId: vi.fn(),
-    },
-  }))
+const {
+  mockTransaction,
+  mockAcquireClient,
+  mockGetFromCache,
+  mockSetInCache,
+  mockProvider,
+} = vi.hoisted(() => ({
+  mockTransaction: vi.fn(),
+  mockAcquireClient: vi.fn(),
+  mockGetFromCache: vi.fn(),
+  mockSetInCache: vi.fn(),
+  mockProvider: {
+    name: 'auth0',
+    validateToken: vi.fn(),
+    getUserById: vi.fn(),
+    findInternalIdBySub: vi.fn(),
+    linkSubToInternalId: vi.fn(),
+    findSubByInternalId: vi.fn(),
+  },
+}))
 
-vi.mock('../../db/index', () => ({ transaction: mockTransaction }))
+vi.mock('../../db/index', () => ({
+  transaction: mockTransaction,
+  acquireClient: mockAcquireClient,
+}))
 vi.mock('../../redis', () => ({
   getFromCache: mockGetFromCache,
   setInCache: mockSetInCache,
@@ -175,6 +184,12 @@ function createFakeDatabase(
 }
 
 function useDatabase(database: FakeDatabase): void {
+  // The link lookup runs on a pooled client before the transaction opens, so
+  // both paths are served by the same fake database.
+  mockAcquireClient.mockResolvedValue({
+    query: database.client.query,
+    release: () => {},
+  })
   mockTransaction.mockImplementation(
     async (callback: (client: unknown) => Promise<unknown>) =>
       callback(database.client),
@@ -183,6 +198,10 @@ function useDatabase(database: FakeDatabase): void {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockAcquireClient.mockResolvedValue({
+    query: async () => ({ rows: [], rowCount: 0 }),
+    release: () => {},
+  })
   mockGetFromCache.mockResolvedValue(null)
   mockSetInCache.mockResolvedValue(true)
   mockProvider.linkSubToInternalId.mockResolvedValue(undefined)

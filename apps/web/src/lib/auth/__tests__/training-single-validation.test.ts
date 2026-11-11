@@ -26,28 +26,41 @@ const source = readFileSync(pagePath, 'utf8')
 
 describe('training page auth', () => {
   it('validates the token once instead of twice', () => {
-    const getUserCalls = source.match(/getCurrentUser\s*\(/g) ?? []
+    // One page-level read, through the helper that consumes the middleware's
+    // verdict; neither `getCurrentUser` nor `isAuthenticated` re-validates.
+    const helperCalls = source.match(/resolvePageSession\s*\(/g) ?? []
 
-    expect(getUserCalls).toHaveLength(1)
+    expect(helperCalls).toHaveLength(1)
+    expect(source).not.toMatch(/\bgetCurrentUser\s*\(/)
     // The removed second validation was `isAuthenticated(request)`.
     expect(source).not.toMatch(/\bisAuthenticated\s*\(/)
   })
 
+  it('serves a developer key when the request carries no token', () => {
+    expect(source).toMatch(/developer\?\.role/)
+  })
+
   it('derives the authenticated state from the single result', () => {
-    // The redirect must be driven by the one `getCurrentUser` result, not by a
+    // The redirect must be driven by the one page-session result, not by a
     // second helper that validates the token again.
     expect(source).toMatch(
-      /const userSession = await getCurrentUser\(Astro\.request,\s*\{\s*verdict: authVerdict,?\s*\}\)/,
+      /const \{ session, providerUnavailable, developer \} =\s*await resolvePageSession\(/,
     )
-    expect(source).toMatch(/if \(!userSession\)/)
+    expect(source).toMatch(/if \(!userRole\)/)
   })
 
   it('answers a retryable 503 rather than a /login redirect when the provider cannot verify', () => {
     // The middleware already resolved this token for the request. If the
     // page's own validation now fails, that is a transient provider failure,
     // not a logout.
-    expect(source).toMatch(/Astro\.locals\.user/)
-    expect(source).toMatch(/status:\s*503/)
+    // The 503 must sit inside the outage branch: an unconditional response
+    // would also satisfy a bare search for the status.
+    expect(source).toMatch(
+      /if \(providerUnavailable\) \{[\s\S]{0,500}?status: 503/,
+    )
     expect(source).toMatch(/Retry-After/)
+    expect(source).toMatch(
+      /return Astro\.redirect\('\/login\?redirect=\/training'\)/,
+    )
   })
 })

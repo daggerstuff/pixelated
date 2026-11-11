@@ -28,7 +28,7 @@ import { randomUUID } from 'crypto'
 
 import { PoolClient } from 'pg'
 
-import { transaction } from '../db/index'
+import { acquireClient, transaction } from '../db/index'
 import { DEFAULT_WORKSPACE_SLUG } from '../db/workspace'
 import { getFromCache, setInCache } from '../redis'
 import type { IdentityProvider } from './identity-provider'
@@ -352,51 +352,75 @@ export async function resolveIdentity(
     return { ...cached, isNewUser: false }
   }
 
-  // --- Slow path: Postgres transaction ---
-  const outcome = await transaction(
-    async (client: PoolClient): Promise<ProvisioningOutcome> => {
-      const existing = await provider.findInternalIdBySub(sub, client)
+  // --- Slow path: existing link, then Postgres transaction ---
+  //
+  // The link lookup and the provider profile lookup both run before the
+  // transaction opens. A first login with no email claim asks the identity
+  // provider for one, and that request must not hold a pooled client and an
+  // open transaction for its whole deadline: a slow or throttled provider
+  // would pin a connection, and its failure would surface as a provisioning
+  // error rather than as the retryable outage it is.
+  const lookupClient = await acquireClient()
+  let existing: Awaited<ReturnType<IdentityProvider['findInternalIdBySub']>>
+  try {
+    existing = await provider.findInternalIdBySub(sub, lookupClient)
+  } finally {
+    lookupClient.release()
+  }
 
-      if (existing) {
-        return {
-          status: 'resolved',
-          internalId: existing.internalId,
-          role: existing.role,
-          isNewUser: false,
-          email,
-        }
-      }
+  let outcome: ProvisioningOutcome
+  if (existing) {
+    outcome = {
+      status: 'resolved',
+      internalId: existing.internalId,
+      role: existing.role,
+      isNewUser: false,
+      email,
+    }
+  } else {
+    // First login. The token payload may not carry an email (the validation
+    // path strips it), so ask the provider before deciding whether this
+    // identity can be provisioned at all.
+    const provisioningEmail = await resolveProvisioningEmail(profile, provider)
 
-      // First login. The token payload may not carry an email (the validation
-      // path strips it), so ask the provider before deciding whether this
-      // identity can be provisioned at all.
-      const provisioningEmail = await resolveProvisioningEmail(
-        profile,
-        provider,
+    // No `auth_accounts` link and no email from either source: never upsert.
+    // The users row is keyed on `email`, which is UNIQUE, so an empty claim
+    // would make two distinct subs collapse onto one internal user.
+    if (!provisioningEmail) {
+      outcome = { status: 'unresolvable' }
+    } else {
+      outcome = await transaction(
+        async (client: PoolClient): Promise<ProvisioningOutcome> => {
+          // Re-check inside the transaction: a concurrent first login can
+          // provision this sub between the lookup above and this block.
+          const recheck = await provider.findInternalIdBySub(sub, client)
+          if (recheck) {
+            return {
+              status: 'resolved',
+              internalId: recheck.internalId,
+              role: recheck.role,
+              isNewUser: false,
+              email,
+            }
+          }
+
+          const created = await createUserWithLink(
+            client,
+            profile,
+            provider,
+            provisioningEmail,
+          )
+          return {
+            status: 'resolved',
+            internalId: created.internalId,
+            role: created.role,
+            isNewUser: true,
+            email: provisioningEmail,
+          }
+        },
       )
-
-      // No `auth_accounts` link and no email from either source: never upsert.
-      // The users row is keyed on `email`, which is UNIQUE, so an empty claim
-      // would make two distinct subs collapse onto one internal user.
-      if (!provisioningEmail) {
-        return { status: 'unresolvable' }
-      }
-
-      const created = await createUserWithLink(
-        client,
-        profile,
-        provider,
-        provisioningEmail,
-      )
-      return {
-        status: 'resolved',
-        internalId: created.internalId,
-        role: created.role,
-        isNewUser: true,
-        email: provisioningEmail,
-      }
-    },
-  )
+    }
+  }
 
   if (outcome.status === 'unresolvable') {
     // The explicit unresolvable-identity outcome: callers deny the request
