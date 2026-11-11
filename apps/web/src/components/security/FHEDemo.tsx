@@ -515,8 +515,8 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
             therapists can collaborate on insights
           </li>
           <li>
-            • <strong>Regulatory Compliance:</strong> HIPAA-compliant processing
-            of sensitive health data
+            • <strong>Data Minimisation:</strong> compute over encrypted input
+            without exposing the plaintext to the processor
           </li>
           <li>
             • <strong>Research Applications:</strong> Enable large-scale studies
