@@ -61,3 +61,4 @@ jobs:
             exit "$rc"
           fi
           echo "✅ All workflow files passed actionlint"
+# scope probe
