@@ -161,6 +161,9 @@ beforeEach(() => {
   vi.stubEnv('DB_ACQUIRE_TIMEOUT', '')
   vi.stubEnv('DB_STATEMENT_TIMEOUT', '')
   vi.stubEnv('DB_QUERY_TIMEOUT', '')
+  vi.stubEnv('DB_IDLE_TIMEOUT', '')
+  vi.stubEnv('DB_MAX_CONNECTIONS', '')
+  vi.stubEnv('DB_PORT', '')
 })
 
 afterEach(async () => {
@@ -401,5 +404,96 @@ describe('the pool is configured with the client-side bounds', () => {
     initializeDatabase()
 
     expect(FakePool.instances[0]?.options.query_timeout).toBe(1_500)
+  })
+})
+
+/**
+ * The sibling knobs reach pg through the pool literal, not through `envInt`
+ * alone. `envInt` keeps a non-numeric value at the default; these cases pin
+ * what a zero or negative one resolves to before pg sees it.
+ *
+ * `statement_timeout` is a startup parameter: pg forwards a negative value
+ * verbatim (`if (params.statement_timeout)` is truthy) and PostgreSQL refuses
+ * the connection. pg-pool tests `connectionTimeoutMillis` and
+ * `idleTimeoutMillis` for truthiness, so a negative value is truthy and
+ * schedules an immediate timer that destroys or evicts clients. `max` goes
+ * through `max || poolSize || 10`, so `0` becomes 10 and a negative value makes
+ * the pool permanently full. Each of those is normalised to its documented
+ * disabling value, and the positive defaults are unchanged.
+ */
+describe('a non-positive sibling knob is normalised before pg sees it', () => {
+  it('passes statement_timeout 0 when DB_STATEMENT_TIMEOUT is 0', () => {
+    vi.stubEnv('DB_STATEMENT_TIMEOUT', '0')
+    initializeDatabase()
+
+    expect(FakePool.instances[0]?.options.statement_timeout).toBe(0)
+  })
+
+  it('normalises a negative DB_STATEMENT_TIMEOUT to 0', () => {
+    vi.stubEnv('DB_STATEMENT_TIMEOUT', '-5000')
+    initializeDatabase()
+
+    expect(FakePool.instances[0]?.options.statement_timeout).toBe(0)
+  })
+
+  it('normalises a negative DB_CONNECTION_TIMEOUT to 0', () => {
+    vi.stubEnv('DB_CONNECTION_TIMEOUT', '-1')
+    initializeDatabase()
+
+    expect(FakePool.instances[0]?.options.connectionTimeoutMillis).toBe(0)
+  })
+
+  it('normalises a negative DB_IDLE_TIMEOUT to 0', () => {
+    vi.stubEnv('DB_IDLE_TIMEOUT', '-1')
+    initializeDatabase()
+
+    expect(FakePool.instances[0]?.options.idleTimeoutMillis).toBe(0)
+  })
+
+  it('normalises a non-positive DB_MAX_CONNECTIONS to the documented default', async () => {
+    vi.stubEnv('DB_MAX_CONNECTIONS', '0')
+    initializeDatabase()
+    expect(FakePool.instances[0]?.options.max).toBe(20)
+
+    await closeDatabase()
+    FakePool.instances = []
+    vi.stubEnv('DB_MAX_CONNECTIONS', '-4')
+    initializeDatabase()
+    expect(FakePool.instances[0]?.options.max).toBe(20)
+  })
+
+  it('rejects a non-numeric DB_PORT instead of connecting to port NaN', () => {
+    vi.stubEnv('DB_PORT', 'abc')
+    initializeDatabase()
+
+    expect(FakePool.instances[0]?.options.port).toBe(5432)
+  })
+
+  it('rejects an out-of-range DB_PORT instead of passing it to pg', async () => {
+    for (const value of ['-1', '0', '70000']) {
+      await closeDatabase()
+      FakePool.instances = []
+      vi.stubEnv('DB_PORT', value)
+      initializeDatabase()
+      expect(FakePool.instances[0]?.options.port).toBe(5432)
+    }
+  })
+
+  it('honours a valid DB_PORT', () => {
+    vi.stubEnv('DB_PORT', '6543')
+    initializeDatabase()
+
+    expect(FakePool.instances[0]?.options.port).toBe(6543)
+  })
+
+  it('does not let an unusable DB_PORT override the port in DATABASE_URL', () => {
+    vi.stubEnv(
+      'DATABASE_URL',
+      'postgres://user:pass@db.example.com:6543/pixelated',
+    )
+    vi.stubEnv('DB_PORT', 'abc')
+    initializeDatabase()
+
+    expect(FakePool.instances[0]?.options.port).toBe(6543)
   })
 })

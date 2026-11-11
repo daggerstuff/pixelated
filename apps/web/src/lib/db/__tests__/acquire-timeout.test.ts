@@ -130,6 +130,10 @@ beforeEach(() => {
   vi.stubEnv('DB_CONNECTION_TIMEOUT', '')
   vi.stubEnv('DB_ACQUIRE_TIMEOUT', '')
   vi.stubEnv('DB_STATEMENT_TIMEOUT', '')
+  vi.stubEnv('DB_QUERY_TIMEOUT', '')
+  vi.stubEnv('DB_IDLE_TIMEOUT', '')
+  vi.stubEnv('DB_MAX_CONNECTIONS', '')
+  vi.stubEnv('DB_PORT', '')
 })
 
 afterEach(async () => {
@@ -280,5 +284,69 @@ describe('a non-positive DB_ACQUIRE_TIMEOUT disables the acquisition bound', () 
     // The positive default is unchanged: this guard removes the zero/negative
     // trap, it does not relax the bound.
     expect(DB_ACQUIRE_TIMEOUT_MS).toBe(2_500)
+  })
+})
+
+/**
+ * The remaining pool options are guarded at the `new Pool({...})` literal.
+ *
+ * Four knobs reached pg through the bare `...finalConfig` spread (and
+ * `statement_timeout` through a bare pass-through) with no sign check, so a
+ * negative value was forwarded verbatim:
+ *
+ *   - `statement_timeout` is sent as a startup parameter (`pg/lib/client.js`
+ *     `if (params.statement_timeout)` is truthy for a negative), and
+ *     PostgreSQL refuses the connection.
+ *   - pg-pool tests `connectionTimeoutMillis` and `idleTimeoutMillis` for
+ *     truthiness, so a negative value schedules `setTimeout(…, -N)`, which
+ *     fires on the next turn and destroys every connecting or queued client
+ *     (or evicts every client on release).
+ *   - pg-pool does `max || poolSize || 10`, so `0` silently becomes 10 and a
+ *     negative value makes `_isFull()` true forever.
+ *
+ * These cases pass the value through `initializeDatabase(config)` rather than
+ * the environment, which is the caller a guard in `envInt` cannot cover.
+ */
+describe('the pool options normalise a non-positive config value', () => {
+  it('normalises a negative statementTimeoutMillis to 0 (disabled)', () => {
+    initializeDatabase({ statementTimeoutMillis: -1 })
+
+    expect(FakePool.instances[0]?.options.statement_timeout).toBe(0)
+  })
+
+  it('normalises a negative connectionTimeoutMillis to 0 (disabled)', () => {
+    initializeDatabase({ connectionTimeoutMillis: -1 })
+
+    expect(FakePool.instances[0]?.options.connectionTimeoutMillis).toBe(0)
+  })
+
+  it('normalises a negative idleTimeoutMillis to 0 (disabled)', () => {
+    initializeDatabase({ idleTimeoutMillis: -1 })
+
+    expect(FakePool.instances[0]?.options.idleTimeoutMillis).toBe(0)
+  })
+
+  it('normalises a non-positive max to the documented default', async () => {
+    initializeDatabase({ max: 0 })
+    expect(FakePool.instances[0]?.options.max).toBe(20)
+
+    await closeDatabase()
+    FakePool.instances = []
+    initializeDatabase({ max: -1 })
+    expect(FakePool.instances[0]?.options.max).toBe(20)
+  })
+
+  it('leaves every positive default exactly as it is', () => {
+    initializeDatabase()
+
+    const options = FakePool.instances[0]?.options ?? {}
+    expect(options.statement_timeout).toBe(DB_STATEMENT_TIMEOUT_MS)
+    expect(options.statement_timeout).toBe(5_000)
+    expect(options.connectionTimeoutMillis).toBe(DB_CONNECTION_TIMEOUT_MS)
+    expect(options.connectionTimeoutMillis).toBe(3_000)
+    expect(options.idleTimeoutMillis).toBe(30_000)
+    expect(options.max).toBe(20)
+    // The 4 000 ms query bound is an owner condition on this file: never widen.
+    expect(options.query_timeout).toBe(4_000)
   })
 })
