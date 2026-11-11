@@ -15,6 +15,12 @@
  *
  * They fail against the pinned handler for the right reason: it inserts with a
  * server-generated id, so the two attempts are two rows.
+ *
+ * A payload-derived key cannot tell a retry from a deliberate repeat, so the
+ * composer also sends one submission identity per send action. The identity is
+ * folded into the same derived key: a retry of one action reuses it and lands on
+ * one row, a second deliberate send mints a new one and lands on a second row,
+ * and a request that carries no identity keeps the payload-derived behaviour.
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -141,21 +147,52 @@ const createTable = () => {
   }
 }
 
-const request = (content: string, sessionId = SESSION_ID) =>
+/** The header the composer mints one value per send action into. */
+const SUBMISSION_HEADER = 'X-Message-Submission-Id'
+
+const request = (
+  content: string,
+  sessionId = SESSION_ID,
+  submissionId?: string,
+) =>
   new Request(`http://localhost/api/training/sessions/${sessionId}/messages`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Origin': 'http://localhost',
+      ...(submissionId ? { [SUBMISSION_HEADER]: submissionId } : {}),
     },
     body: JSON.stringify({ content }),
   })
 
-const invoke = (content: string, sessionId = SESSION_ID) =>
+const invoke = (
+  content: string,
+  sessionId = SESSION_ID,
+  submissionId?: string,
+) =>
   (POST as unknown as (value: object) => Promise<Response>)({
-    request: request(content, sessionId),
+    request: request(content, sessionId, submissionId),
     params: { sessionId },
   })
+
+/**
+ * The key derivation that shipped with the first idempotency change
+ * (`training-message:v1`). Reproduced here so a case can prove that a row
+ * written under the old scheme is not mistaken for a row under the new one.
+ */
+const deriveLegacyKey = async (content: string): Promise<string> => {
+  const input = new TextEncoder().encode(
+    `training-message:v1\n${SESSION_ID}\n${USER_ID}\n${content}`,
+  )
+  const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', input))
+  const hex = Array.from(digest, (byte) =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('')
+  const variant = ((Number.parseInt(hex.charAt(16), 16) & 0x3) | 0x8).toString(
+    16,
+  )
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-8${hex.slice(13, 16)}-${variant}${hex.slice(17, 20)}-${hex.slice(20, 32)}`
+}
 
 const flush = async () => {
   for (let index = 0; index < 5; index += 1) {
@@ -302,5 +339,140 @@ describe('trainee message POST idempotency', () => {
 
     expect(retry.status).toBe(201)
     expect(table.rows).toHaveLength(1)
+  })
+})
+
+describe('trainee message POST submission identity', () => {
+  const FIRST_SUBMISSION = '3f1a5c2e-8b7d-4f6a-9c1e-2d4b6a8c0e13'
+  const SECOND_SUBMISSION = 'c4d2e6f8-1a3b-4c5d-8e7f-9a0b1c2d3e4f'
+
+  it('persists two rows for two deliberate sends of identical content', async () => {
+    const table = createTable()
+    mockQuery.mockImplementation(table.query)
+
+    const first = await invoke(
+      'Practice response',
+      SESSION_ID,
+      FIRST_SUBMISSION,
+    )
+    const second = await invoke(
+      'Practice response',
+      SESSION_ID,
+      SECOND_SUBMISSION,
+    )
+
+    expect(first.status).toBe(201)
+    expect(second.status).toBe(201)
+    const firstBody = (await first.json()) as { id: string }
+    const secondBody = (await second.json()) as { id: string }
+    // Two send actions, two submissions: the second bubble the trainee saw must
+    // still exist after a reload.
+    expect(secondBody.id).not.toBe(firstBody.id)
+    expect(table.rows).toHaveLength(2)
+    expect(table.rows.map((row) => row.content)).toEqual([
+      'Practice response',
+      'Practice response',
+    ])
+  })
+
+  it('persists one row when a retry reuses the send action identity', async () => {
+    const table = createTable()
+    mockQuery.mockImplementation(table.query)
+
+    const first = await invoke(
+      'Practice response',
+      SESSION_ID,
+      FIRST_SUBMISSION,
+    )
+    const retry = await invoke(
+      'Practice response',
+      SESSION_ID,
+      FIRST_SUBMISSION,
+    )
+
+    expect(first.status).toBe(201)
+    expect(retry.status).toBe(201)
+    const firstBody = (await first.json()) as { id: string; createdAt: string }
+    const retryBody = (await retry.json()) as { id: string; createdAt: string }
+    expect(retryBody.id).toBe(firstBody.id)
+    expect(retryBody.createdAt).toBe(firstBody.createdAt)
+    expect(table.rows).toHaveLength(1)
+  })
+
+  it('keeps the payload-derived key when the request carries no identity', async () => {
+    const table = createTable()
+    mockQuery.mockImplementation(table.query)
+
+    expect((await invoke('Practice response')).status).toBe(201)
+    expect((await invoke('Practice response')).status).toBe(201)
+
+    // Clients that send nothing keep the dedupe the first idempotency change
+    // established: identical payloads resolve to one row.
+    expect(table.rows).toHaveLength(1)
+  })
+
+  it('derives a key that cannot collide with the previous namespace', async () => {
+    const table = createTable()
+    mockQuery.mockImplementation(table.query)
+
+    const legacyId = await deriveLegacyKey('Practice response')
+    table.rows.push({
+      id: legacyId,
+      session_id: SESSION_ID,
+      therapist_id: USER_ID,
+      content: 'Practice response',
+      created_at: new Date(),
+    })
+
+    const response = await invoke('Practice response')
+
+    expect(response.status).toBe(201)
+    const body = (await response.json()) as { id: string }
+    expect(body.id).not.toBe(legacyId)
+    expect(table.rows).toHaveLength(2)
+  })
+
+  it('ignores a malformed identity and keeps the payload-derived key', async () => {
+    const table = createTable()
+    mockQuery.mockImplementation(table.query)
+
+    const first = await invoke('Practice response', SESSION_ID, 'not-a-uuid')
+    const second = await invoke('Practice response', SESSION_ID, 'not-a-uuid')
+
+    expect(first.status).toBe(201)
+    expect(second.status).toBe(201)
+    expect(table.rows).toHaveLength(1)
+  })
+
+  it('cannot be steered into another submission by the message text', async () => {
+    const table = createTable()
+    mockQuery.mockImplementation(table.query)
+
+    expect(
+      (await invoke('Practice response', SESSION_ID, FIRST_SUBMISSION)).status,
+    ).toBe(201)
+
+    // Text that imitates the key inputs must not resolve to the row a different
+    // submission wrote: the identity is a uuid ahead of the free-text content,
+    // so the content cannot forge it.
+    const forged = `Practice response\nsubmission:${FIRST_SUBMISSION}`
+    expect((await invoke(forged)).status).toBe(201)
+
+    expect(table.rows).toHaveLength(2)
+  })
+
+  it('keeps the happy path to a single statement when an identity is sent', async () => {
+    const table = createTable()
+    mockQuery.mockImplementation(table.query)
+
+    const response = await invoke(
+      'Practice response',
+      SESSION_ID,
+      FIRST_SUBMISSION,
+    )
+
+    expect(response.status).toBe(201)
+    expect(table.insertCalls()).toBe(1)
+    expect(mockQuery).toHaveBeenCalledTimes(1)
   })
 })

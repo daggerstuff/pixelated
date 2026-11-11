@@ -36,12 +36,24 @@ type MessageRow = {
 }
 
 /**
+ * Header carrying the composer's submission identity, one value per send
+ * action.
+ *
+ * It is optional: a client that sends nothing keeps the payload-derived key, so
+ * the dedupe the first idempotency change established still holds.
+ */
+const MESSAGE_SUBMISSION_HEADER = 'x-message-submission-id'
+
+/**
  * Namespace for the deterministic message key.
  *
- * Bump the version suffix only if the key inputs change: an existing row's id
- * would otherwise stop matching and a retry would write a second row.
+ * Bump the version suffix whenever the key inputs change. `v2` adds the
+ * client-supplied submission identity, so ids derived under `v1` (payload only)
+ * can never collide with ids derived under this scheme: a v1 row is a different
+ * submission from a v2 send of the same text, and reusing its id would silently
+ * swallow the new message.
  */
-const MESSAGE_KEY_NAMESPACE = 'training-message:v1'
+const MESSAGE_KEY_NAMESPACE = 'training-message:v2'
 
 /**
  * Deterministic primary key for one logical submission.
@@ -53,15 +65,20 @@ const MESSAGE_KEY_NAMESPACE = 'training-message:v1'
  * took 18 641 ms against the bound.
  *
  * A logical submission is identified by its payload — the session, the author
- * and the content. Deriving the row's primary key from that payload means the
- * first attempt and its retry contend for the same row: whichever reaches
- * Postgres first inserts it, the other takes the conflict. No new column, no
- * new table, no migration.
+ * and the content — plus, when the client sends one, the submission identity
+ * its composer minted for the send action. Deriving the row's primary key from
+ * those inputs means the first attempt and its retry contend for the same row:
+ * whichever reaches Postgres first inserts it, the other takes the conflict. No
+ * new column, no new table, no migration.
  *
- * The key is self-verifying: a conflict can only arise from an identical
- * payload, so replaying the existing row is always the same submission. Two
- * identical messages sent deliberately in one session are therefore one
- * submission; that is the deliberate cost of closing the double-write.
+ * The payload alone cannot tell a retry from a deliberate repeat, so two
+ * identical messages sent on purpose in one session used to resolve to one
+ * submission and the second was never persisted. The identity separates them:
+ * a retry of one send action reuses the identity and lands on one row, a second
+ * deliberate send mints a new one and lands on a second row. A request that
+ * carries no identity keeps the payload-derived key, which is self-verifying:
+ * a conflict can only arise from an identical payload, so replaying the
+ * existing row is always the same submission.
  *
  * The result is an RFC 9562 version-8 (custom) UUID so it stays a valid value
  * for the `uuid` primary key.
@@ -70,9 +87,14 @@ const messageSubmissionId = async (
   sessionId: string,
   therapistId: string,
   content: string,
+  submissionId?: string,
 ): Promise<string> => {
+  // The identity is placed ahead of the free-text content: every field before it
+  // is a uuid (or the empty string), so content can never forge an input that
+  // concatenates to the same bytes as a different submission.
+  const identity = submissionId ?? ''
   const input = new TextEncoder().encode(
-    `${MESSAGE_KEY_NAMESPACE}\n${sessionId}\n${therapistId}\n${content}`,
+    `${MESSAGE_KEY_NAMESPACE}\n${identity}\n${sessionId}\n${therapistId}\n${content}`,
   )
   const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', input))
   const hex = Array.from(digest, (byte) =>
@@ -148,7 +170,21 @@ const handleMessagePost = async (
       )
     }
 
-    const messageId = await messageSubmissionId(sessionId, therapistId, content)
+    // One submission identity per send action. A retry of that action reuses
+    // it, so both attempts derive the same row; a second deliberate send mints
+    // a new one and derives a second row. A request that carries no identity, or
+    // a value that is not a uuid, falls back to the payload-derived key so the
+    // dedupe for clients that send nothing is unchanged.
+    const submittedId = request.headers.get(MESSAGE_SUBMISSION_HEADER)?.trim()
+    const submissionId =
+      submittedId && isUuid(submittedId) ? submittedId.toLowerCase() : undefined
+
+    const messageId = await messageSubmissionId(
+      sessionId,
+      therapistId,
+      content,
+      submissionId,
+    )
 
     const result = await query<MessageRow>(
       `INSERT INTO training_session_messages (id, session_id, therapist_id, content)
