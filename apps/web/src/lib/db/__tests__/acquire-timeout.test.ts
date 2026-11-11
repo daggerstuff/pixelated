@@ -130,6 +130,10 @@ beforeEach(() => {
   vi.stubEnv('DB_CONNECTION_TIMEOUT', '')
   vi.stubEnv('DB_ACQUIRE_TIMEOUT', '')
   vi.stubEnv('DB_STATEMENT_TIMEOUT', '')
+  vi.stubEnv('DB_QUERY_TIMEOUT', '')
+  vi.stubEnv('DB_IDLE_TIMEOUT', '')
+  vi.stubEnv('DB_MAX_CONNECTIONS', '')
+  vi.stubEnv('DB_PORT', '')
 })
 
 afterEach(async () => {
@@ -208,5 +212,141 @@ describe('Postgres client acquisition bound', () => {
     const options = FakePool.instances[0]?.options ?? {}
     expect(options.statement_timeout).toBe(DB_STATEMENT_TIMEOUT_MS)
     expect(options.connectionTimeoutMillis).toBe(DB_CONNECTION_TIMEOUT_MS)
+  })
+})
+
+/**
+ * A non-positive `DB_ACQUIRE_TIMEOUT` disables the acquisition bound.
+ *
+ * `acquireWithDeadline` scheduled `setTimeout(…, timeoutMs)` with no guard, so
+ * `0` — pg's own "no timeout" value, and the value the sibling knobs treat as
+ * "disabled" — fired the deadline on the next timer turn and every acquisition
+ * failed with `AcquireTimeoutError`. Two attempts later the caller received a
+ * `DatabaseUnavailableError`, so the knob made every request fail instead of
+ * removing the bound. A negative value behaved the same way, because
+ * `setTimeout` clamps a negative delay to `0`.
+ *
+ * These cases drive a `connect()` that settles *after* the timer turn, which is
+ * what separates "disabled" from "wins the microtask race": a `0`-bound
+ * deadline would still lose to an already-resolved `connect()` promise, so a
+ * microtask-resolved fake would pass on the broken code and prove nothing.
+ */
+describe('a non-positive DB_ACQUIRE_TIMEOUT disables the acquisition bound', () => {
+  it('does not fail every acquisition when DB_ACQUIRE_TIMEOUT=0', async () => {
+    vi.stubEnv('DB_ACQUIRE_TIMEOUT', '0')
+    initializeDatabase()
+    hooks.behaviours = [
+      { kind: 'resolveAfter', ms: 20 },
+      { kind: 'resolveAfter', ms: 20 },
+    ]
+
+    const outcome = await settle(acquireClient())
+
+    expect(outcome.kind).toBe('resolved')
+  })
+
+  it('treats a negative DB_ACQUIRE_TIMEOUT as disabled, not as an immediate timeout', async () => {
+    vi.stubEnv('DB_ACQUIRE_TIMEOUT', '-100')
+    initializeDatabase()
+    // Both attempts are slow, so the retry cannot hide an immediate timeout:
+    // `setTimeout` clamps a negative delay to 0, which used to fire before
+    // either connect settled.
+    hooks.behaviours = [
+      { kind: 'resolveAfter', ms: 20 },
+      { kind: 'resolveAfter', ms: 20 },
+    ]
+
+    const outcome = await settle(acquireClient())
+
+    expect(outcome.kind).toBe('resolved')
+    // One attempt, no pool rebuild: the bound is gone, not merely survived.
+    expect(FakePool.instances).toHaveLength(1)
+  })
+
+  it('does not discard the pool when the bound is disabled', async () => {
+    initializeDatabase({ acquireTimeoutMillis: 0 })
+    hooks.behaviours = [{ kind: 'resolveAfter', ms: 20 }]
+
+    const client = await acquireClient()
+    client.release()
+
+    expect(FakePool.instances).toHaveLength(1)
+    expect(FakePool.instances[0]?.ended).toBe(false)
+  })
+
+  it('keeps the 2 500 ms default when DB_ACQUIRE_TIMEOUT is not a number', () => {
+    vi.stubEnv('DB_ACQUIRE_TIMEOUT', 'not-a-number')
+    initializeDatabase()
+
+    expect(FakePool.instances[0]?.options.acquireTimeoutMillis).toBe(
+      DB_ACQUIRE_TIMEOUT_MS,
+    )
+    // The positive default is unchanged: this guard removes the zero/negative
+    // trap, it does not relax the bound.
+    expect(DB_ACQUIRE_TIMEOUT_MS).toBe(2_500)
+  })
+})
+
+/**
+ * The remaining pool options are guarded at the `new Pool({...})` literal.
+ *
+ * Four knobs reached pg through the bare `...finalConfig` spread (and
+ * `statement_timeout` through a bare pass-through) with no sign check, so a
+ * negative value was forwarded verbatim:
+ *
+ *   - `statement_timeout` is sent as a startup parameter (`pg/lib/client.js`
+ *     `if (params.statement_timeout)` is truthy for a negative), and
+ *     PostgreSQL refuses the connection.
+ *   - pg-pool tests `connectionTimeoutMillis` and `idleTimeoutMillis` for
+ *     truthiness, so a negative value schedules `setTimeout(…, -N)`, which
+ *     fires on the next turn and destroys every connecting or queued client
+ *     (or evicts every client on release).
+ *   - pg-pool does `max || poolSize || 10`, so `0` silently becomes 10 and a
+ *     negative value makes `_isFull()` true forever.
+ *
+ * These cases pass the value through `initializeDatabase(config)` rather than
+ * the environment, which is the caller a guard in `envInt` cannot cover.
+ */
+describe('the pool options normalise a non-positive config value', () => {
+  it('normalises a negative statementTimeoutMillis to 0 (disabled)', () => {
+    initializeDatabase({ statementTimeoutMillis: -1 })
+
+    expect(FakePool.instances[0]?.options.statement_timeout).toBe(0)
+  })
+
+  it('normalises a negative connectionTimeoutMillis to 0 (disabled)', () => {
+    initializeDatabase({ connectionTimeoutMillis: -1 })
+
+    expect(FakePool.instances[0]?.options.connectionTimeoutMillis).toBe(0)
+  })
+
+  it('normalises a negative idleTimeoutMillis to 0 (disabled)', () => {
+    initializeDatabase({ idleTimeoutMillis: -1 })
+
+    expect(FakePool.instances[0]?.options.idleTimeoutMillis).toBe(0)
+  })
+
+  it('normalises a non-positive max to the documented default', async () => {
+    initializeDatabase({ max: 0 })
+    expect(FakePool.instances[0]?.options.max).toBe(20)
+
+    await closeDatabase()
+    FakePool.instances = []
+    initializeDatabase({ max: -1 })
+    expect(FakePool.instances[0]?.options.max).toBe(20)
+  })
+
+  it('leaves every positive default exactly as it is', () => {
+    initializeDatabase()
+
+    const options = FakePool.instances[0]?.options ?? {}
+    expect(options.statement_timeout).toBe(DB_STATEMENT_TIMEOUT_MS)
+    expect(options.statement_timeout).toBe(5_000)
+    expect(options.connectionTimeoutMillis).toBe(DB_CONNECTION_TIMEOUT_MS)
+    expect(options.connectionTimeoutMillis).toBe(3_000)
+    expect(options.idleTimeoutMillis).toBe(30_000)
+    expect(options.max).toBe(20)
+    // The 4 000 ms query bound is an owner condition on this file: never widen.
+    expect(options.query_timeout).toBe(4_000)
   })
 })

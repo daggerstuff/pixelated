@@ -67,8 +67,12 @@ const requestWithCookie = (path: string): Request =>
     headers: { cookie: 'auth-token=test-token' },
   })
 
-const invoke = async (path: string) => {
-  const request = requestWithCookie(path)
+const requestWithBearer = (path: string): Request =>
+  new Request(`http://localhost:5173${path}`, {
+    headers: { authorization: 'Bearer test-token' },
+  })
+
+const invokeRequest = async (request: Request) => {
   const context: any = {
     request,
     url: new URL(request.url),
@@ -84,6 +88,11 @@ const invoke = async (path: string) => {
   const response = await onRequest(context, next)
   return { response, nextCalled, context }
 }
+
+const invoke = (path: string) => invokeRequest(requestWithCookie(path))
+
+const invokeWithBearer = (path: string) =>
+  invokeRequest(requestWithBearer(path))
 
 describe('provider-unavailable session resolution', () => {
   beforeEach(() => {
@@ -166,6 +175,115 @@ describe('provider-unavailable session resolution', () => {
     mockValidateToken.mockResolvedValue(providerUnavailable)
 
     const { response, nextCalled } = await invoke('/api/auth/signin')
+
+    expect(nextCalled).toBe(true)
+    expect(response.status).toBe(200)
+  })
+})
+
+/**
+ * GAP-34: the `routeAuthConfig` class is authenticated by `authenticateRequest`,
+ * which used to fold "the provider could not answer" into "the token is bad" and
+ * answer 401. One condition must have one status contract per route class.
+ */
+describe('provider-unavailable on routeAuthConfig routes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockValidateToken.mockReset()
+    mockGetUserById.mockReset()
+  })
+
+  it('answers a retryable JSON 503 on an authenticated API route, never a 401', async () => {
+    mockValidateToken.mockResolvedValue(providerUnavailable)
+
+    const { response, nextCalled } =
+      await invokeWithBearer('/api/chat/messages')
+
+    expect(nextCalled).toBe(false)
+    expect(response.status).toBe(503)
+    expect(response.headers.get('retry-after')).toBe('112')
+    expect(response.headers.get('cache-control')).toBe('no-store')
+    expect(response.headers.get('content-type')).toContain('application/json')
+    await expect(response.json()).resolves.toMatchObject({
+      error: expect.stringContaining('temporarily unavailable'),
+      retryAfterSeconds: 112,
+    })
+  })
+
+  it('answers a retryable text 503 on a page route in routeAuthConfig', async () => {
+    mockValidateToken.mockResolvedValue(providerUnavailable)
+
+    const { response, nextCalled } = await invokeWithBearer(
+      '/journal-research/sessions',
+    )
+
+    expect(nextCalled).toBe(false)
+    expect(response.status).toBe(503)
+    expect(response.headers.get('retry-after')).toBe('112')
+    expect(response.headers.get('content-type')).toContain('text/plain')
+  })
+
+  it('keeps a genuinely invalid token a 401 on a routeAuthConfig route', async () => {
+    mockValidateToken.mockResolvedValue(invalidToken)
+
+    const { response, nextCalled } =
+      await invokeWithBearer('/api/chat/messages')
+
+    expect(nextCalled).toBe(false)
+    expect(response.status).toBe(401)
+    await expect(response.json()).resolves.toMatchObject({
+      error: 'Invalid audience',
+    })
+  })
+})
+
+/**
+ * GAP-34, page half: `/dashboard` and `/sessions` are session-required pages
+ * that the outage classifier did not cover, so an outage left `locals` empty
+ * and the surface treated the user as signed out.
+ */
+describe('provider-unavailable on the other session-required pages', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockValidateToken.mockReset()
+    mockGetUserById.mockReset()
+  })
+
+  it('answers 503 + Retry-After on /dashboard', async () => {
+    mockValidateToken.mockResolvedValue(providerUnavailable)
+
+    const { response, nextCalled } = await invoke('/dashboard')
+
+    expect(nextCalled).toBe(false)
+    expect(response.status).toBe(503)
+    expect(response.headers.get('retry-after')).toBe('112')
+    expect(response.headers.get('cache-control')).toBe('no-store')
+  })
+
+  it('answers 503 + Retry-After on a /dashboard sub-page', async () => {
+    mockValidateToken.mockResolvedValue(providerUnavailable)
+
+    const { response, nextCalled } = await invoke('/dashboard/session-progress')
+
+    expect(nextCalled).toBe(false)
+    expect(response.status).toBe(503)
+    expect(response.headers.get('retry-after')).toBe('112')
+  })
+
+  it('answers 503 + Retry-After on /sessions', async () => {
+    mockValidateToken.mockResolvedValue(providerUnavailable)
+
+    const { response, nextCalled } = await invoke('/sessions')
+
+    expect(nextCalled).toBe(false)
+    expect(response.status).toBe(503)
+    expect(response.headers.get('retry-after')).toBe('112')
+  })
+
+  it('keeps a genuinely invalid token unauthenticated on /dashboard', async () => {
+    mockValidateToken.mockResolvedValue(invalidToken)
+
+    const { response, nextCalled } = await invoke('/dashboard')
 
     expect(nextCalled).toBe(true)
     expect(response.status).toBe(200)

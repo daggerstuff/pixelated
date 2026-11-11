@@ -10,6 +10,9 @@ class TrainingSession {
     this.sessionTimer = null
     this.startTime = null
     this.isConnected = false
+    // The submission identity of the send action in flight, kept so a retry of
+    // that action reuses it. Cleared once the send succeeds.
+    this.pendingSubmission = null
 
     this.init()
   }
@@ -189,6 +192,59 @@ class TrainingSession {
     }
   }
 
+  /**
+   * One submission identity per send action.
+   *
+   * The route derives the row's primary key from the payload, which cannot tell
+   * a retry of a send action from a second deliberate send of the same text:
+   * without an identity the second send answers 201 with the first row's id and
+   * writes nothing, so the bubble the trainee saw disappears on reload.
+   *
+   * The text still in the box after a failed send is the same action being
+   * retried, so it keeps its identity. Text typed again after a successful send
+   * is a new action and mints a new identity. An edit after a failure is also a
+   * new action, because the content no longer matches.
+   */
+  resolveSubmission(content) {
+    if (this.pendingSubmission?.content === content) {
+      return this.pendingSubmission
+    }
+
+    const submission = { content, id: this.createSubmissionId() }
+    this.pendingSubmission = submission
+    return submission
+  }
+
+  // RFC 4122 version-4 uuid. `randomUUID` is available in every browser this
+  // page targets; the fallbacks keep the identity well-formed elsewhere.
+  createSubmissionId() {
+    if (
+      typeof crypto !== 'undefined' &&
+      typeof crypto.randomUUID === 'function'
+    ) {
+      return crypto.randomUUID()
+    }
+
+    const bytes = new Uint8Array(16)
+    if (
+      typeof crypto !== 'undefined' &&
+      typeof crypto.getRandomValues === 'function'
+    ) {
+      crypto.getRandomValues(bytes)
+    } else {
+      for (let index = 0; index < bytes.length; index += 1) {
+        bytes[index] = Math.floor(Math.random() * 256)
+      }
+    }
+    bytes[6] = (bytes[6] & 0x0f) | 0x40
+    bytes[8] = (bytes[8] & 0x3f) | 0x80
+
+    const hex = Array.from(bytes, (byte) =>
+      byte.toString(16).padStart(2, '0'),
+    ).join('')
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+  }
+
   async sendMessage() {
     const messageInput = document.getElementById('message-input')
     const interventionSelect = document.getElementById('intervention-type')
@@ -202,6 +258,8 @@ class TrainingSession {
       return
     }
 
+    const submission = this.resolveSubmission(content)
+
     this.isConnected = false
     this.updateSendButton()
     try {
@@ -210,7 +268,10 @@ class TrainingSession {
         {
           method: 'POST',
           credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Message-Submission-Id': submission.id,
+          },
           body: JSON.stringify({ content }),
         },
       )
@@ -221,6 +282,9 @@ class TrainingSession {
         timestamp: new Date(result.createdAt),
         interventionType: interventionSelect?.value ?? 'reflection',
       })
+      // The action is complete. The next send — even of identical text — is a
+      // new submission with its own identity.
+      this.pendingSubmission = null
       messageInput.value = ''
       this.updateCharacterCount()
       this.showConnectionStatus(true)
@@ -276,10 +340,6 @@ class TrainingSession {
     if (data.skillRatings) {
       this.updateSkillMeters(data.skillRatings)
     }
-  }
-
-  handleSupervisorIntervention(data) {
-    this.showSupervisorMessage(data.message, data.type)
   }
 
   addMessage(sender, content, metadata = {}) {

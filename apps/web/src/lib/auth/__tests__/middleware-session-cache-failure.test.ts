@@ -35,6 +35,7 @@ vi.mock('astro:middleware', () => ({
 const mockValidateSessionToken = vi.hoisted(() => vi.fn())
 
 vi.mock('../session', () => ({
+  SESSION_VERDICT_LOCALS_KEY: 'sessionValidation',
   validateSessionToken: mockValidateSessionToken,
 }))
 
@@ -130,5 +131,9 @@ describe('validated-session resolution failures', () => {
     })
     expect(context.locals.session?.userId).toBe('auth0|pilot-beta')
     expect(context.locals.session?.id).toBe('sess-auth0|pilot-beta')
+    // The verdict is published for page-level reads.
+    expect(context.locals['sessionValidation']).toMatchObject({
+      status: 'valid',
+    })
   })
 })

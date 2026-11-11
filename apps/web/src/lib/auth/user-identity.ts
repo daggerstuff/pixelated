@@ -18,6 +18,9 @@
  *   against the platform's existing default workspace, and a profile whose
  *   email claim is absent or empty is reported as unresolvable instead of
  *   being upserted onto the UNIQUE `users.email` column
+ * - The validated token payload has PII stripped, so a first login resolves
+ *   its email from the identity provider (bounded) before deciding whether the
+ *   identity can be provisioned at all
  * - No PII is stored in Redis — only the opaque (sub → uuid) mapping
  */
 
@@ -76,6 +79,7 @@ type ProvisioningOutcome =
       internalId: string
       role: string
       isNewUser: boolean
+      email: string
     }
   | { status: 'unresolvable' }
 
@@ -121,22 +125,34 @@ export const IDENTITY_CACHE_READ_DEADLINE_MS = 750
  */
 export const IDENTITY_CACHE_WRITE_DEADLINE_MS = 1_000
 
-class IdentityCacheDeadlineExceededError extends Error {
-  constructor(phase: 'read' | 'write', deadlineMs: number) {
-    super(`Identity cache ${phase} exceeded its ${deadlineMs}ms deadline`)
-    this.name = 'IdentityCacheDeadlineExceededError'
+/**
+ * Upper bound on the identity-provider profile lookup used to obtain the email
+ * for a first-login provision.
+ *
+ * `validateToken()` deliberately strips email and the other PII fields from the
+ * validated payload, so a first-login profile can legitimately arrive without
+ * an email. The provider is the only remaining source, and an unbounded
+ * provider call on the provisioning path would reintroduce the pre-pool stall
+ * that the cache reads here are already bounded against.
+ */
+export const PROVIDER_PROFILE_DEADLINE_MS = 1_500
+
+class DeadlineExceededError extends Error {
+  constructor(label: string, deadlineMs: number) {
+    super(`${label} exceeded its ${deadlineMs}ms deadline`)
+    this.name = 'DeadlineExceededError'
   }
 }
 
-const withCacheDeadline = async <T>(
+const withDeadline = async <T>(
   work: Promise<T>,
-  phase: 'read' | 'write',
+  label: string,
   deadlineMs: number,
 ): Promise<T> => {
   let timer: ReturnType<typeof setTimeout> | undefined
   const deadline = new Promise<never>((_, reject) => {
     timer = setTimeout(
-      () => reject(new IdentityCacheDeadlineExceededError(phase, deadlineMs)),
+      () => reject(new DeadlineExceededError(label, deadlineMs)),
       deadlineMs,
     )
   })
@@ -160,9 +176,9 @@ async function getCachedIdentity(
   sub: string,
 ): Promise<ResolvedIdentity | null> {
   try {
-    const cached = await withCacheDeadline(
+    const cached = await withDeadline(
       getFromCache(cacheKey(sub)),
-      'read',
+      'Identity cache read',
       IDENTITY_CACHE_READ_DEADLINE_MS,
     )
     if (cached && typeof cached === 'object' && 'internalId' in cached) {
@@ -176,9 +192,9 @@ async function getCachedIdentity(
 
 async function cacheIdentity(identity: ResolvedIdentity): Promise<void> {
   try {
-    await withCacheDeadline(
+    await withDeadline(
       setInCache(cacheKey(identity.auth0Sub), identity, CACHE_TTL_SECONDS),
-      'write',
+      'Identity cache write',
       IDENTITY_CACHE_WRITE_DEADLINE_MS,
     )
   } catch {
@@ -199,6 +215,33 @@ async function cacheIdentity(identity: ResolvedIdentity): Promise<void> {
  */
 function normalizeEmail(email: string | undefined | null): string {
   return typeof email === 'string' ? email.trim() : ''
+}
+
+/**
+ * Resolve the email a first-login provision should use.
+ *
+ * The profile's own claim wins when it carries one. Otherwise the identity
+ * provider is asked: the token-validation path strips email from the validated
+ * payload, so the middleware and route-level callers legitimately pass an
+ * empty value even for a real account.
+ *
+ * Returns an empty string when no email can be established. The caller turns
+ * that into the unresolvable-identity outcome — it must never become an
+ * `INSERT` of `''` into the UNIQUE `users.email` column.
+ */
+async function resolveProvisioningEmail(
+  profile: Auth0UserProfile,
+  provider: IdentityProvider,
+): Promise<string> {
+  const fromProfile = normalizeEmail(profile.email)
+  if (fromProfile) return fromProfile
+
+  const providerUser = await withDeadline(
+    provider.getUserById(profile.sub),
+    'Identity provider profile lookup',
+    PROVIDER_PROFILE_DEADLINE_MS,
+  )
+  return normalizeEmail(providerUser?.email)
 }
 
 /**
@@ -320,22 +363,37 @@ export async function resolveIdentity(
           internalId: existing.internalId,
           role: existing.role,
           isNewUser: false,
+          email,
         }
       }
 
-      // No `auth_accounts` link and no usable email: never upsert. The users
-      // row is keyed on `email`, which is UNIQUE, so an empty claim would make
-      // two distinct subs collapse onto one internal user.
-      if (!email) {
+      // First login. The token payload may not carry an email (the validation
+      // path strips it), so ask the provider before deciding whether this
+      // identity can be provisioned at all.
+      const provisioningEmail = await resolveProvisioningEmail(
+        profile,
+        provider,
+      )
+
+      // No `auth_accounts` link and no email from either source: never upsert.
+      // The users row is keyed on `email`, which is UNIQUE, so an empty claim
+      // would make two distinct subs collapse onto one internal user.
+      if (!provisioningEmail) {
         return { status: 'unresolvable' }
       }
 
-      const created = await createUserWithLink(client, profile, provider, email)
+      const created = await createUserWithLink(
+        client,
+        profile,
+        provider,
+        provisioningEmail,
+      )
       return {
         status: 'resolved',
         internalId: created.internalId,
         role: created.role,
         isNewUser: true,
+        email: provisioningEmail,
       }
     },
   )
@@ -358,7 +416,7 @@ export async function resolveIdentity(
   const identity: ResolvedIdentity = {
     internalId: outcome.internalId,
     auth0Sub: sub,
-    email,
+    email: outcome.email,
     emailVerified: profile.emailVerified,
     name: profile.name,
     picture: profile.picture,
