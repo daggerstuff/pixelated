@@ -60,6 +60,107 @@ const LOCAL_IGNORE_FILES = [
 ];
 const LOCAL_IGNORE_PREFIXES = ["apps/web/src/lib/", "apps/web/src/components/", "apps/web/src/lib/services/"];
 
+/**
+ * Blank a comment body while keeping its newlines, so the rest of the file
+ * keeps the same line structure.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+function blankComment(text) {
+  return text.replace(/[^\n]/g, " ");
+}
+
+/**
+ * Remove CSS block comments. CSS has no line comments, and `//` can appear
+ * inside a `url(//…)`, so only block comments are stripped.
+ *
+ * @param {string} source
+ * @returns {string}
+ */
+function stripCssComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//g, blankComment);
+}
+
+/**
+ * Remove Astro/HTML comments from the template half of an `.astro` file.
+ *
+ * @param {string} source
+ * @returns {string}
+ */
+function stripHtmlComments(source) {
+  return source.replace(/<!--[\s\S]*?-->/g, blankComment);
+}
+
+/**
+ * Remove JS/TS comments before the import regexes run.
+ *
+ * The regexes match `import … from "…"` anywhere in a file, so a doc comment
+ * that quotes an import used to fail the CI `Build Docker image` step while the
+ * sibling `Check for unresolved imports` step (which strips comments) passed.
+ * Observed on PR #6671: one red CI round, about 20 minutes.
+ *
+ * String-aware on purpose. A plain `//`-to-end-of-line replacement treats the
+ * `//` in `"https://…"` as a comment and blanks the rest of that line,
+ * including a real import that follows it — which would weaken the check.
+ * Quoted strings and template literals are therefore copied verbatim, and only
+ * comment syntax found outside them is blanked.
+ *
+ * @param {string} source
+ * @returns {string}
+ */
+function stripJsComments(source) {
+  let result = "";
+  let index = 0;
+
+  while (index < source.length) {
+    const character = source[index];
+    const next = source[index + 1];
+
+    if (character === "/" && next === "/") {
+      const start = index;
+      while (index < source.length && source[index] !== "\n") index++;
+      result += blankComment(source.slice(start, index));
+      continue;
+    }
+
+    if (character === "/" && next === "*") {
+      const start = index;
+      index += 2;
+      while (index < source.length && !(source[index] === "*" && source[index + 1] === "/")) {
+        index++;
+      }
+      index = Math.min(index + 2, source.length);
+      result += blankComment(source.slice(start, index));
+      continue;
+    }
+
+    if (character === '"' || character === "'" || character === "`") {
+      const quote = character;
+      const start = index;
+      index++;
+      while (index < source.length) {
+        if (source[index] === "\\") {
+          index += 2;
+          continue;
+        }
+        if (source[index] === quote) {
+          index++;
+          break;
+        }
+        index++;
+      }
+      result += source.slice(start, index);
+      continue;
+    }
+
+    result += character;
+    index++;
+  }
+
+  return result;
+}
+
 /** @type {Set<string>} */
 const unresolved = new Set();
 /** @type {Set<string>} */
@@ -365,17 +466,26 @@ function recordUnresolvedPackageImport(specifier) {
 function scanFile(filePath, discoveredImports) {
   const content = fs.readFileSync(filePath, "utf8");
   const fromDir = path.dirname(filePath);
+  const extension = path.extname(filePath);
+  // Comments are blanked before matching: an import quoted in a doc comment is
+  // not an import. See stripJsComments for why quoted strings are tracked.
+  const scanContent =
+    extension === ".css"
+      ? stripCssComments(content)
+      : extension === ".astro"
+        ? stripJsComments(stripHtmlComments(content))
+        : stripJsComments(content);
 
-  if (filePath.endsWith(".css")) {
-    for (const match of content.matchAll(STYLE_IMPORT_REGEXP)) {
+  if (extension === ".css") {
+    for (const match of scanContent.matchAll(STYLE_IMPORT_REGEXP)) {
       const matchGroup = match;
       const specifier = matchGroup[1] || matchGroup[2] || matchGroup[3];
       if (specifier) checkImport(specifier, fromDir, filePath);
     }
   }
 
-  if (TS_IMPORT_EXTENSIONS.has(path.extname(filePath))) {
-    for (const match of content.matchAll(IMPORT_REGEXP)) {
+  if (TS_IMPORT_EXTENSIONS.has(extension)) {
+    for (const match of scanContent.matchAll(IMPORT_REGEXP)) {
       const importMatch = match;
       const specifier = importMatch[1] || importMatch[2] || importMatch[3];
       if (!specifier) continue;
