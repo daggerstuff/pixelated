@@ -189,11 +189,8 @@ describe('identity bridge — training message write', () => {
     expect(response.status).toBe(404)
     expect(body).toEqual({ error: 'Training session not found' })
     expect(mockQuery.mock.calls[0]?.[0]).toContain('therapist_id = $3')
-    expect((mockQuery.mock.calls[0]?.[1] as unknown[]).slice(1)).toEqual([
-      SESSION_B,
-      ORG_A_UUID,
-      'foreign write',
-    ])
+    const params = (mockQuery.mock.calls[0]?.[1] ?? []) as unknown[]
+    expect(params.slice(1)).toEqual([SESSION_B, ORG_A_UUID, 'foreign write'])
   })
 
   it('denies a cross-owner write and creates no row (B to A)', async () => {
@@ -206,11 +203,8 @@ describe('identity bridge — training message write', () => {
     const response = await invokePost(SESSION_A, 'foreign write')
 
     expect(response.status).toBe(404)
-    expect((mockQuery.mock.calls[0]?.[1] as unknown[]).slice(1)).toEqual([
-      SESSION_A,
-      ORG_B_UUID,
-      'foreign write',
-    ])
+    const params = (mockQuery.mock.calls[0]?.[1] ?? []) as unknown[]
+    expect(params.slice(1)).toEqual([SESSION_A, ORG_B_UUID, 'foreign write'])
   })
 
   it('denies an unmapped principal without writing or returning 5xx', async () => {
