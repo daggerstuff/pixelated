@@ -9,7 +9,7 @@ in `library/release-pin.md` §0.19 and §0.20 rather than assumed away.
 | --- | --- |
 | Pin at feature start (live read) | `99b44142783a985f4ed08579dceaf93a389ab25f` / Worker `1f1c7586-12a0-49f6-8418-f757e3500e49` (§0.20, the concurrent session's second intermediate pin) |
 | **Pin this feature produced** | **`a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` / Worker `a6028a07-9534-4bcd-a9b8-47dc602d1dbc`** (§0.21) |
-| `origin/staging` HEAD at final read | `a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` |
+| `origin/staging` HEAD at final read | `a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` (this document was pushed on top of it as `e597fe6da`, docs-only, and did **not** redeploy the Worker) |
 | Worker traffic | **100%** |
 | Worker version created | 2026-11-11T10:38:56.888Z |
 | Deployment created | 2026-11-11T10:38:58.508Z |
