@@ -189,6 +189,26 @@ The blog content store was swept too: 93 files, one hit ("has proven beneficial
 for many individuals" about support groups in a mental-health resource list) —
 not a product claim, left as written.
 
+### 7.1 The component sweep the page audit missed
+
+Section 1 walked `apps/web/src/pages`. Components were not covered, and the
+single worst claim on the site was in one of them:
+
+| Component                                               | Claim                                                                                                                                                                                                                                            | Action                                                                                                                 |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `marketing/LogoWall.astro`                              | Harvard, Johns Hopkins, Mayo Clinic, VA Health, Kaiser Permanente and NIMH logos under "Trusted by forward‑thinking institutions" / "Select partners and collaborators"                                                                          | **Deleted.** It is imported by nothing; it existed only as a fabricated endorsement wall.                              |
+| `landing/SimulationWorkstation.astro` (rendered on `/`) | Per-scenario "PROVENANCE RECORD // GOLD DPO MATRIX" with a fake `Accreditation Hash … (Zero PHI Verified)`, "Backend: Local vLLM Engine", LangSmith trace IDs, and "Exported to Institutional Gold DPO Corpus · CACREP/APA/CSWE Standard Mapped" | Replaced with an "ILLUSTRATIVE DEMO // SYNTHETIC SCENARIO" record: sample values, synthetic persona, nothing exported. |
+| `marketing/SessionPreview.astro`                        | "LIVE PREVIEW" + "HIPAA SECURE"                                                                                                                                                                                                                  | "SAMPLE PREVIEW" + "SYNTHETIC DATA"                                                                                    |
+| `ProfessionalHero.astro`                                | "HIPAA-ready" badge                                                                                                                                                                                                                              | "Synthetic data"                                                                                                       |
+| `ui/FeaturesSection.astro`                              | "HIPAA Compliant … 100% secure"                                                                                                                                                                                                                  | "Synthetic By Design … No client records"                                                                              |
+| `security/FHEDemo.tsx`                                  | "Regulatory Compliance: HIPAA-compliant processing"                                                                                                                                                                                              | Data minimisation                                                                                                      |
+| `pages/demo/chat.astro`                                 | A five-second interval inventing accuracy (94.0 + random), uptime (99.8 + random), session count (240 + random) and response time, rendered as live telemetry                                                                                    | Interval and method removed; the cards describe the demo instead of claiming numbers                                   |
+
+A component sweep over all 30 claim-bearing components was then run: the
+remaining hits are `admin/*` (authenticated, out of the public surface),
+descriptive "evidence-based" about therapeutic frameworks, and correct boundary
+statements such as "No Real Patient Data Used".
+
 ## 8. What remains after the copy pass
 
 - **Deployment.** Every change in section 7 is in the working tree. Production

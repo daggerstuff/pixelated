@@ -149,9 +149,11 @@ session, and assert the portal pages are not served. Those tests do not exist
 today and cannot be written against the current release because the expected
 result would fail.
 
-## 5. Gate implemented, default off
+## 5. Gate implemented and enabled on the release
 
-The mechanism from §4 step 1 now exists in the tree:
+The mechanism from §4 step 1 exists in the tree, is enabled in
+`wrangler.jsonc` (`PILOT_EXCLUDED_SURFACE: "1"`, verified present in the
+generated `dist/server/wrangler.json`), and is measured on production below:
 
 | Piece    | Path                                                       | Behaviour                                                                                                                                                                                                                                                                          |
 | -------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -171,6 +173,28 @@ production. Enabling it is an owner decision and a routing change, and the FHIR
 CapabilityStatement question in §4 step 2 is still open — an enabled gate makes
 `/api/fhir/r4/metadata` answer 404, which is a deliberate loss of the FHIR
 discovery endpoint for the pilot release.
+
+### 5.1 Production measurement, release `7ce104894`
+
+Worker version deployed from that release. Probes taken from this host against
+`https://pixelatedempathy.com`, no credentials:
+
+| Route                                               | Before the gate                                                            | After the gate       |
+| --------------------------------------------------- | -------------------------------------------------------------------------- | -------------------- |
+| `/api/fhir/r4/metadata`                             | 200, `CapabilityStatement` advertising `Appointment` and `Claim` as active | **404**              |
+| `/api/ehr/v1/patients`                              | 401 (authenticated route answering)                                        | **404**              |
+| `/portal/scheduling`                                | 200, scheduling shell rendered                                             | **404**              |
+| `/api/health`                                       | 200                                                                        | 200                  |
+| `/`, `/training`, `/demo-hub`, `/privacy`, `/terms` | 200 / 302 / 200 / 200 / 200                                                | unchanged            |
+| `/api/training/sessions/<id>/messages`              | 404 on GET (POST-only route)                                               | unchanged 404 on GET |
+
+The last row is the control against over-blocking: that route exports only
+`POST`, so a GET 404 is the route's own behaviour and not the gate. The pilot
+journey surface answers exactly as before.
+
+The mechanism was proven before the deploy, not after it: the built bundle was
+run under `wrangler dev` against the same config, and the three excluded routes
+returned 404 there while the pilot routes did not.
 
 ## 6. What this document does not establish
 
