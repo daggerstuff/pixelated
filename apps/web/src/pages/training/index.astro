@@ -34,7 +34,11 @@ if (!userSession) {
   return Astro.redirect('/login?redirect=/training')
 }
 
-const userRole = userSession.role // 'trainee', 'supervisor', 'admin'
+// Faculty access uses `admin`, the role the session page also checks.
+// `session.user.role` is an `AuthRole` (`admin | staff | therapist | user |
+// guest`, `src/config/auth.config.ts`), so a `supervisor` gate could never
+// match. The auth role mapping itself is unchanged.
+const userRole = userSession.role
 
 // The session page redirects here only for a genuine absence (a 404, or a
 // refusal such as 403). It used to redirect on any non-ok response, including
@@ -94,7 +98,7 @@ const trainingPrograms: any[] = []
               No training sessions are available. Pilot enrollment is not open.
             </p>
           )}
-          {userRole === 'supervisor' && (
+          {userRole === 'admin' && (
             <Button
               href="/dashboard"
               size="lg"
@@ -169,7 +173,7 @@ const trainingPrograms: any[] = []
                 class="w-full"
                 size="sm"
               >
-                {userRole === 'supervisor'
+                {userRole === 'admin'
                   ? '👀 Monitor Session'
                   : '🎭 Continue Training'}
               </Button>
