@@ -199,8 +199,14 @@ describe('Auth0 JWT Service', () => {
     })
 
     it('should handle validation errors gracefully', async () => {
+      // `auth0-legacy` throws `UserInfoError` with the response `statusCode`;
+      // 401 means the provider answered and rejected the token.
       mockUserInfoClient.getUserInfo.mockRejectedValue(
-        new Error('Invalid token signature'),
+        Object.assign(new Error('Invalid token signature'), {
+          name: 'UserInfoError',
+          statusCode: 401,
+          headers: new Headers(),
+        }),
       )
       const token = createMockJwt({
         iss: 'https://test-domain.auth0.com/',
@@ -213,6 +219,25 @@ describe('Auth0 JWT Service', () => {
         valid: false,
         error: 'Invalid token signature',
       })
+    })
+
+    it('reports a transport failure as provider-unavailable, not as an invalid token', async () => {
+      // No `statusCode`: the request never reached the provider (fetch
+      // rejected, or the bounded deadline fired). The token may be valid, so
+      // this must not be reported as an authentication failure.
+      mockUserInfoClient.getUserInfo.mockRejectedValue(
+        new TypeError('fetch failed'),
+      )
+      const token = createMockJwt({
+        iss: 'https://test-domain.auth0.com/',
+        aud: 'test-audience',
+      })
+
+      const result = await auth0JwtService.validateToken(token, 'access')
+
+      expect(result.valid).toBe(false)
+      expect(result.providerUnavailable).toBe(true)
+      expect(result.retryAfterSeconds).toBe(30)
     })
   })
 

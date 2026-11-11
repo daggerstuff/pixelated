@@ -15,7 +15,11 @@ const { mockTransaction, mockGetFromCache, mockSetInCache, mockProvider } =
     },
   }))
 
-vi.mock('../../db/index', () => ({ transaction: mockTransaction }))
+vi.mock('../../db/index', () => ({
+  transaction: mockTransaction,
+  isDatabaseUnavailableError: (error: unknown) =>
+    (error as { code?: string } | null)?.code === 'DB_UNAVAILABLE',
+}))
 vi.mock('../../redis', () => ({
   getFromCache: mockGetFromCache,
   setInCache: mockSetInCache,
@@ -71,6 +75,34 @@ describe('resolveInternalUserId — sub to platform UUID bridge', () => {
 
     await expect(
       resolveInternalUserId({ id: LINKED_SUB, email: 'linked@example.test' }),
+    ).resolves.toBeNull()
+  })
+
+  it('propagates a retryable database failure when the caller opts in', async () => {
+    // The training route answers 503 + Retry-After for this class; swallowing
+    // it would turn a retryable stall into a non-retryable 403.
+    mockProvider.findInternalIdBySub.mockRejectedValue(
+      Object.assign(new Error('Database connection could not be acquired'), {
+        code: 'DB_UNAVAILABLE',
+      }),
+    )
+
+    await expect(
+      resolveInternalUserId(
+        { id: LINKED_SUB, email: 'linked@example.test' },
+        { propagateDatabaseErrors: true },
+      ),
+    ).rejects.toMatchObject({ code: 'DB_UNAVAILABLE' })
+  })
+
+  it('still reports non-database failures as null when the caller opts in', async () => {
+    mockProvider.findInternalIdBySub.mockRejectedValue(new Error('boom'))
+
+    await expect(
+      resolveInternalUserId(
+        { id: LINKED_SUB, email: 'linked@example.test' },
+        { propagateDatabaseErrors: true },
+      ),
     ).resolves.toBeNull()
   })
 

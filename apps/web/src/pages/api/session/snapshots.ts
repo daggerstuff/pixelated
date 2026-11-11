@@ -1,11 +1,14 @@
 import type { APIRoute } from 'astro'
 
-import { resolveInternalUserId } from '../../../lib/auth/internal-identity'
 import { getSession } from '../../../lib/auth/session'
-import { getPool } from '../../../lib/db'
+import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
   isMissingLegacySchema,
+  isQueryTimeout,
+  legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
+  resolveLegacyTherapistId,
+  rollbackQuietly,
 } from './_legacy-surface'
 
 type ProgressSnapshot = {
@@ -41,15 +44,16 @@ export const POST: APIRoute = async ({ request }) => {
   const session = await getSession(request)
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
-  // `session.user.id` is the provider subject (`auth0|…`); `therapist_id` is a
-  // uuid column, so the principal must be resolved to the internal users.id
-  // before any ownership comparison.
-  const therapistId = await resolveInternalUserId(session.user)
-  if (!therapistId) {
-    return jsonResponse({ error: 'User identity not resolved' }, 403)
-  }
-
   try {
+    // `session.user.id` is the provider subject (`auth0|…`); `therapist_id` is
+    // a uuid column, so the principal must be resolved to the internal users.id
+    // before any ownership comparison.
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
+    if (!therapistId) {
+      return jsonResponse({ error: 'User identity not resolved' }, 403)
+    }
+
     const payload: unknown = await request.json()
     if (
       typeof payload !== 'object' ||
@@ -76,7 +80,8 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const client = await getPool().connect()
+    const client = await acquireClient()
+    let destroyClient = false
     try {
       await client.query('BEGIN')
       const ownership = await client.query(
@@ -117,13 +122,18 @@ export const POST: APIRoute = async ({ request }) => {
       await client.query('COMMIT')
       return jsonResponse({ success: true, sessionId }, 200)
     } catch (error: unknown) {
-      await client.query('ROLLBACK')
+      destroyClient = await rollbackQuietly(client, error)
       throw error
     } finally {
-      client.release()
+      if (destroyClient) client.release(true)
+      else client.release()
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
+    if (isQueryTimeout(error) || isDatabaseUnavailableError(error))
+      return legacySessionRetryableResponse({
+        advertiseRetry: false,
+      })
     console.error('Error handling POST /api/session/snapshots', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }
@@ -133,19 +143,20 @@ export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request)
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
-  // Same identity bridge as POST: resolve before the ownership predicate.
-  const therapistId = await resolveInternalUserId(session.user)
-  if (!therapistId) {
-    return jsonResponse({ error: 'User identity not resolved' }, 403)
-  }
-
-  const sessionId = new URL(request.url).searchParams.get('sessionId')
-  if (!sessionId) {
-    return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
-  }
-
   try {
-    const client = await getPool().connect()
+    // Same identity bridge as POST: resolve before the ownership predicate.
+    const therapistId = await resolveLegacyTherapistId(session.user)
+    if (therapistId instanceof Response) return therapistId
+    if (!therapistId) {
+      return jsonResponse({ error: 'User identity not resolved' }, 403)
+    }
+
+    const sessionId = new URL(request.url).searchParams.get('sessionId')
+    if (!sessionId) {
+      return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
+    }
+
+    const client = await acquireClient()
     try {
       const sessionResult = await client.query(
         'SELECT progress_snapshots FROM sessions WHERE id = $1 AND therapist_id = $2',
@@ -179,6 +190,8 @@ export const GET: APIRoute = async ({ request }) => {
     }
   } catch (error: unknown) {
     if (isMissingLegacySchema(error)) return legacySessionSurfaceResponse()
+    if (isQueryTimeout(error) || isDatabaseUnavailableError(error))
+      return legacySessionRetryableResponse()
     console.error('Error handling GET /api/session/snapshots', error)
     return jsonResponse({ error: 'Internal server error' }, 500)
   }

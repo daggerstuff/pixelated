@@ -1,12 +1,15 @@
 import type { MiddlewareHandler } from 'astro'
 import { sequence, defineMiddleware } from 'astro:middleware'
 
-import { validateToken } from './lib/auth/auth0-jwt-service'
 import {
   authenticateRequest,
   extractTokenFromRequest,
   type AuthOptions,
 } from './lib/auth/auth0-middleware'
+import {
+  validateSessionToken,
+  type SessionValidation,
+} from './lib/auth/session'
 import { agentDiscoveryMiddleware } from './lib/middleware/agent-discovery'
 import { apiVersioningMiddleware } from './lib/middleware/api-versioning'
 import { corsMiddleware } from './lib/middleware/cors'
@@ -156,6 +159,104 @@ function getRouteConfig(request: Request): RouteConfig | null {
   }
 }
 
+/** Fallback `Retry-After` when the provider sent no usable value. */
+const PROVIDER_RETRY_AFTER_DEFAULT_SECONDS = 30
+
+/**
+ * Page prefixes whose own guard treats "no session" as "send the user to
+ * `/login`". A provider outage must not be rendered as a logout on these
+ * surfaces (diagnosis D1).
+ */
+function isSessionRequiredPage(pathname: string): boolean {
+  return (
+    pathname.startsWith('/admin') ||
+    pathname === '/training' ||
+    pathname.startsWith('/training/')
+  )
+}
+
+/**
+ * API namespaces whose handlers resolve the cookie session themselves.
+ *
+ * Only these may answer a provider outage with a 503: the handler would
+ * otherwise see an empty session and report a 401, which the client renders as
+ * a logout (diagnosis D1). Every other `/api/*` route is public, covered by
+ * `routeAuthConfig`, or authenticated by an API key, so a provider outage must
+ * not turn it into a 503 for a browser that happens to carry a cookie.
+ */
+const SESSION_BEARING_API_PREFIXES = [
+  '/api/ai/',
+  '/api/crisis/',
+  '/api/export/',
+  '/api/patient-rights/',
+  '/api/training/',
+  '/api/ws/',
+] as const
+
+function isSessionBearingApiRoute(pathname: string): boolean {
+  if (pathname === '/api/session' || pathname.startsWith('/api/session/')) {
+    return true
+  }
+  return SESSION_BEARING_API_PREFIXES.some((prefix) =>
+    pathname.startsWith(prefix),
+  )
+}
+
+function providerUnavailableResponse(
+  pathname: string,
+  retryAfterSeconds: number,
+): Response {
+  const retryAfter = String(Math.max(1, Math.ceil(retryAfterSeconds)))
+  if (pathname.startsWith('/api/')) {
+    return new Response(
+      JSON.stringify({
+        error: 'Authentication provider temporarily unavailable',
+        retryAfterSeconds: Number(retryAfter),
+      }),
+      {
+        status: 503,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': retryAfter,
+          'Cache-Control': 'no-store',
+        },
+      },
+    )
+  }
+  return new Response(
+    'Authentication is temporarily unavailable. Please retry shortly.\n',
+    {
+      status: 503,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Retry-After': retryAfter,
+        'Cache-Control': 'no-store',
+      },
+    },
+  )
+}
+
+type CookieSessionResolution =
+  | { status: 'none' }
+  | { status: 'resolved' }
+  | { status: 'provider-unavailable'; retryAfterSeconds: number }
+
+/**
+ * Resolve a token to its verdict, treating an unexpected failure as a miss.
+ *
+ * `validateSessionToken` already folds provider and cache errors into a
+ * verdict; this guard only protects the middleware's documented best-effort
+ * contract — any failure leaves `locals` untouched and the request continues
+ * unauthenticated — from an unforeseen throw.
+ */
+async function readSessionVerdict(token: string): Promise<SessionValidation> {
+  try {
+    return await validateSessionToken(token)
+  } catch {
+    return { status: 'invalid' }
+  }
+}
+
 /**
  * Resolve a cookie-based session for a page route and populate
  * `context.locals.user` / `context.locals.session`.
@@ -165,58 +266,68 @@ function getRouteConfig(request: Request): RouteConfig | null {
  * `auth-token` cookie set by `/api/auth/signin` would always be bounced to
  * `/login`. Best-effort: any failure leaves `locals` untouched and the request
  * continues unauthenticated.
+ *
+ * The one failure that is *not* "unauthenticated" is a provider outage: a
+ * `/userinfo` 429, a 5xx, or a timeout means the token could not be checked,
+ * not that it is invalid. That is returned as `provider-unavailable` so the
+ * caller can answer a retryable 503 rather than a logout.
+ *
+ * One provider round-trip decides the request. The validated-session cache
+ * that every other authenticated surface already uses (`lib/auth/session.ts`:
+ * an in-process Map keyed by the token, with a 5-minute ceiling) is read first;
+ * only a miss reaches Auth0, and that miss *classifies* — valid, invalid, or
+ * provider-unavailable. This used to be two calls: a cache read through
+ * `getSession` and then a second validation to classify the miss. Every cold
+ * request that could not be verified therefore paid two `/userinfo` calls —
+ * 5 001 ms at two 2 500 ms deadlines on `8397bdff6` / Worker `7ea1640e`, and
+ * two of the ten requests Auth0's `/userinfo` bucket allows. That is the
+ * mechanism behind the residual `VAL-HANG-001` failure.
  */
 async function resolveCookieSession(context: {
   request: Request
   locals: App.Locals
-}): Promise<void> {
+}): Promise<CookieSessionResolution> {
   const token = extractTokenFromRequest(context.request)
   if (!token) {
-    return
+    return { status: 'none' }
   }
 
-  const validation = await validateToken(token, 'access')
-  if (!validation.valid || !validation.userId) {
-    return
-  }
+  const resolution = await readSessionVerdict(token)
 
-  const payload = validation.payload
-  // The access token lacks role metadata (no app_metadata custom claim), so
-  // enrich the role via the Auth0 Management API, falling back to the
-  // token-derived role when the lookup fails.
-  let role: string = validation.role ?? 'guest'
-  let fullName: string | undefined =
-    typeof payload?.['name'] === 'string' ? payload['name'] : undefined
-  let avatarUrl: string | undefined =
-    typeof payload?.['picture'] === 'string' ? payload['picture'] : undefined
-
-  try {
-    const { auth0UserService } = await import('./lib/services/auth0.service')
-    const enriched = await auth0UserService.getUserById(validation.userId)
-    if (enriched) {
-      role = enriched.role
-      fullName = enriched.fullName ?? fullName
-      avatarUrl = enriched.avatarUrl ?? avatarUrl
+  if (resolution.status === 'provider-unavailable') {
+    return {
+      status: 'provider-unavailable',
+      retryAfterSeconds:
+        resolution.retryAfterSeconds ?? PROVIDER_RETRY_AFTER_DEFAULT_SECONDS,
     }
-  } catch {
-    // Management enrichment is best-effort; token role is the fallback
+  }
+  if (resolution.status !== 'valid' || !resolution.session) {
+    return { status: 'none' }
   }
 
+  // A valid token — from the cache or from this request's single validation.
+  // The session carries the id, email, role and name that validation resolved,
+  // including the role resolved through the Management API, which validation
+  // performs once and caches per subject.
+  const session = resolution.session
   context.locals.user = {
-    id: validation.userId,
-    email: typeof payload?.['email'] === 'string' ? payload['email'] : '',
-    emailVerified: payload?.['email_verified'] === true,
-    role,
-    fullName,
-    avatarUrl,
+    id: session.user.id,
+    email: session.user.email ?? '',
+    // The validated-session cache does not carry the `email_verified` claim.
+    // No consumer in the application reads this field from `locals.user`.
+    emailVerified: false,
+    role: session.user.role,
+    fullName: session.user.name,
   }
   context.locals.session = {
-    id: validation.tokenId ?? `sess-${validation.userId}`,
-    userId: validation.userId,
-    expiresAt: new Date(
-      (validation.expiresAt ?? Date.now() / 1000 + 3600) * 1000,
-    ),
+    id: `sess-${session.user.id}`,
+    userId: session.user.id,
+    // The cache entry evicts at or before the token's own expiry
+    // (`computeEvictAt`), so this never overstates the session lifetime.
+    expiresAt: new Date(session.expires),
   }
+
+  return { status: 'resolved' }
 }
 
 /**
@@ -265,13 +376,27 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
     // handled by routeAuthConfig above; page routes are guarded by the page
     // component itself, which reads Astro.locals.session/user.
     if (!routeConfig) {
-      await resolveCookieSession(context)
+      const resolution = await resolveCookieSession(context)
+      const pathname = context.url.pathname
+
+      // A provider outage is not a logout. On a surface that requires a
+      // session, answer a bounded, retryable 503 + Retry-After instead of
+      // leaving `locals` empty so the page redirects to /login (diagnosis D1).
+      if (
+        resolution.status === 'provider-unavailable' &&
+        (isSessionRequiredPage(pathname) || isSessionBearingApiRoute(pathname))
+      ) {
+        return providerUnavailableResponse(
+          pathname,
+          resolution.retryAfterSeconds,
+        )
+      }
+
       // Guard /admin pages at middleware layer to prevent ResponseSentError
       // from AdminLayout (which cannot safely return Astro.redirect from a layout).
       // Middleware runs before any component rendering, so a redirect here avoids
       // the "Response has already been sent" crash seen in PIXEL-ASTRO-S.
       try {
-        const pathname = context.url.pathname
         if (pathname.startsWith('/admin')) {
           const sessionUser = context.locals.user
           const sessionData = context.locals.session

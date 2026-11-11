@@ -85,6 +85,43 @@ async function ensureConnected(): Promise<void> {
   return connecting
 }
 
+/**
+ * Upper bound on a single cache command (`get`, `set`, `del`).
+ *
+ * Bounding the connect is not enough: on a reconnecting ioredis client the
+ * command that follows queues in the offline queue until the reconnect
+ * resolves, so a fast `ensureConnected()` still leaves the read waiting. Racing
+ * the command against this deadline makes a dead Redis cost milliseconds
+ * instead of the route's 8 s deadline — a timed-out read is treated as a cache
+ * miss (the in-process fallback below serves it) and a timed-out write as a
+ * failed shared write. A reachable Redis answers in single-digit milliseconds,
+ * so it never reaches this deadline and its behaviour is unchanged.
+ */
+export const REDIS_COMMAND_DEADLINE_MS = 250
+
+class RedisCommandDeadlineExceededError extends Error {
+  constructor(deadlineMs: number) {
+    super(`Redis command exceeded its ${deadlineMs}ms deadline`)
+    this.name = 'RedisCommandDeadlineExceededError'
+  }
+}
+
+const commandWithDeadline = <T>(
+  command: Promise<T>,
+  deadlineMs: number,
+): Promise<T> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(
+      () => reject(new RedisCommandDeadlineExceededError(deadlineMs)),
+      deadlineMs,
+    )
+  })
+  return Promise.race([command, deadline]).finally(() => {
+    if (timer !== undefined) clearTimeout(timer)
+  })
+}
+
 // ---------------------------------------------------------------------------
 // Backward-compatible redis client (the exported singleton)
 //
@@ -501,16 +538,90 @@ export const redisClient: LegacyRedisClient = {
  */
 export const redis: LegacyRedisClient = redisClient
 
+// ---------------------------------------------------------------------------
+// In-process fallback for the session, identity, and role caches
+// ---------------------------------------------------------------------------
+
+/**
+ * Key prefixes whose values may also live in this isolate's memory.
+ *
+ * The configured Redis host is unreachable (NXDOMAIN), so every read of these
+ * keys is a guaranteed miss that still pays a connect attempt (~10 ms typical,
+ * ~1.5 s worst case; diagnosis D2). Keeping a small per-isolate copy makes them
+ * hits within the isolate, which also stops every token validation from paying
+ * a Management API round-trip for the role. This is a latency cleanup only: it
+ * does not move the 503 count, and Redis stays the first source whenever it is
+ * reachable.
+ *
+ * Deliberately excluded: `rate_limit:` and `session_binding:`. Caching those
+ * locally would change their behaviour (the limiter would start counting
+ * per-isolate), which is outside this cleanup.
+ */
+const LOCAL_CACHE_KEY_PREFIXES = [
+  'session:token:',
+  'identity:sub:',
+  'auth0:role:',
+] as const
+
+/** Cap so an isolate's fallback cache cannot grow without bound. */
+const LOCAL_CACHE_MAX_ENTRIES = 500
+
+interface LocalCacheEntry {
+  value: unknown
+  expiresAt: number
+}
+
+const localCache = new Map<string, LocalCacheEntry>()
+
+function isLocallyCacheable(key: string): boolean {
+  return LOCAL_CACHE_KEY_PREFIXES.some((prefix) => key.startsWith(prefix))
+}
+
+function readLocalCache(key: string): unknown {
+  const entry = localCache.get(key)
+  if (!entry) return null
+  if (entry.expiresAt <= Date.now()) {
+    localCache.delete(key)
+    return null
+  }
+  return entry.value
+}
+
+function writeLocalCache(
+  key: string,
+  value: unknown,
+  expirationSeconds?: number,
+): void {
+  if (!isLocallyCacheable(key)) return
+  if (!localCache.has(key) && localCache.size >= LOCAL_CACHE_MAX_ENTRIES) {
+    // Drop the oldest insertion (Map preserves insertion order).
+    const oldest = localCache.keys().next().value
+    if (oldest !== undefined) localCache.delete(oldest)
+  }
+  localCache.set(key, {
+    value,
+    expiresAt: expirationSeconds
+      ? Date.now() + expirationSeconds * 1000
+      : Number.POSITIVE_INFINITY,
+  })
+}
+
 /**
  * JSON-deserialising get wrapper. Returns `null` on miss/error.
+ *
+ * Falls back to the isolate's local copy for the prefixes above when Redis
+ * misses or is unreachable.
  */
 export async function getFromCache<T = unknown>(
   key: string,
 ): Promise<T | null> {
   try {
     await ensureConnected()
-    const raw = await service.get(key)
-    if (raw === null) return null
+    const raw = await commandWithDeadline(
+      service.get(key),
+      REDIS_COMMAND_DEADLINE_MS,
+    )
+    if (raw === null) return readLocalCache(key) as T | null
     // Attempt JSON parse; return raw string if it fails
     try {
       return JSON.parse(raw) as T
@@ -518,26 +629,32 @@ export async function getFromCache<T = unknown>(
       return raw as unknown as T
     }
   } catch {
-    return null
+    return readLocalCache(key) as T | null
   }
 }
 
 /**
  * JSON-serialising set wrapper.
+ *
+ * The isolate's local copy is written first for the prefixes above; the Redis
+ * result is still the return value, so callers that treat `false` as "the
+ * shared cache did not take the write" keep that meaning.
  */
 export async function setInCache(
   key: string,
   value: unknown,
   expirationSeconds?: number,
 ): Promise<boolean> {
+  writeLocalCache(key, value, expirationSeconds)
   try {
     await ensureConnected()
     const serialized = typeof value === 'string' ? value : JSON.stringify(value)
-    if (expirationSeconds) {
-      await service.set(key, serialized, expirationSeconds * 1000)
-    } else {
-      await service.set(key, serialized)
-    }
+    await commandWithDeadline(
+      expirationSeconds
+        ? service.set(key, serialized, expirationSeconds * 1000)
+        : service.set(key, serialized),
+      REDIS_COMMAND_DEADLINE_MS,
+    )
     return true
   } catch {
     return false
@@ -548,9 +665,10 @@ export async function setInCache(
  * Delete a key. Returns true if the key existed.
  */
 export async function removeFromCache(key: string): Promise<boolean> {
+  localCache.delete(key)
   try {
     await ensureConnected()
-    await service.del(key)
+    await commandWithDeadline(service.del(key), REDIS_COMMAND_DEADLINE_MS)
     return true
   } catch {
     return false

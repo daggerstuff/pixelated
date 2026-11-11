@@ -12,7 +12,6 @@ import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
 const logger = createBuildSafeLogger('index')
 
-export type { SessionData } from './session'
 // Re-export session for compatibility
 export { getSession } from './session'
 
