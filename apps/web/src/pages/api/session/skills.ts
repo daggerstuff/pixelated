@@ -4,8 +4,10 @@ import { getSession } from '../../../lib/auth/session'
 import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import { getSkillCategory } from '../../../lib/skillCategories'
 import {
+  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
   resolveLegacyTherapistId,
@@ -37,7 +39,14 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const body: unknown = await request.json()
+    let body: unknown
+    try {
+      body = await request.json()
+    } catch {
+      // A body that cannot be parsed is a malformed request, not a server
+      // fault: `request.json()` throws a `SyntaxError` for invalid JSON.
+      return legacySessionInvalidRequestResponse('Invalid JSON body')
+    }
     if (!isRecord(body)) {
       return new Response(JSON.stringify({ error: 'Invalid payload' }), {
         status: 400,
@@ -58,6 +67,11 @@ export const POST: APIRoute = async ({ request }) => {
           error: 'Missing required fields: sessionId, skillScores',
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionInvalidRequestResponse(
+        'Invalid sessionId: expected a UUID',
       )
     }
 
@@ -205,6 +219,12 @@ export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url)
     const sessionId = url.searchParams.get('sessionId')
     const requestedTherapistId = url.searchParams.get('therapistId')
+
+    if (sessionId != null && !isLegacySessionId(sessionId)) {
+      return legacySessionInvalidRequestResponse(
+        'Invalid sessionId: expected a UUID',
+      )
+    }
 
     const client = await acquireClient()
     try {

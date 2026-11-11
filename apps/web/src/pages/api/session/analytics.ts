@@ -3,8 +3,10 @@ import type { APIRoute } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
+  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
   resolveLegacyTherapistId,
@@ -165,7 +167,14 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const requestBody: unknown = await request.json()
+    let requestBody: unknown
+    try {
+      requestBody = await request.json()
+    } catch {
+      // A body that cannot be parsed is a malformed request, not a server
+      // fault: `request.json()` throws a `SyntaxError` for invalid JSON.
+      return legacySessionInvalidRequestResponse('Invalid JSON body')
+    }
     if (!isSaveAnalyticsPayload(requestBody)) {
       return new Response(JSON.stringify({ error: 'Invalid payload' }), {
         status: 400,
@@ -174,6 +183,12 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const { sessionId, analyticsData } = requestBody
+
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionInvalidRequestResponse(
+        'Invalid sessionId: expected a UUID',
+      )
+    }
 
     const client = await acquireClient()
     try {
@@ -295,6 +310,11 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({ error: 'Missing sessionId parameter' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionInvalidRequestResponse(
+        'Invalid sessionId: expected a UUID',
       )
     }
 

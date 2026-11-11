@@ -3,8 +3,10 @@ import type { APIRoute } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
+  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
   resolveLegacyTherapistId,
@@ -33,12 +35,26 @@ export const POST: APIRoute = async ({ request }) => {
       return jsonResponse({ error: 'User identity not resolved' }, 403)
     }
 
-    const payload: unknown = await request.json()
+    let payload: unknown
+    try {
+      payload = await request.json()
+    } catch {
+      // A body that cannot be parsed is a malformed request, not a server
+      // fault: `request.json()` throws a `SyntaxError` for invalid JSON.
+      return legacySessionInvalidRequestResponse('Invalid JSON body')
+    }
     if (!isRecord(payload) || typeof payload['sessionId'] !== 'string') {
       return jsonResponse({ error: 'Missing required field: sessionId' }, 400)
     }
 
     const sessionId = payload['sessionId']
+    // `sessions.id` is a uuid column: a non-UUID raises `22P02` inside the
+    // statement and used to surface as a `500`.
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionInvalidRequestResponse(
+        'Invalid sessionId: expected a UUID',
+      )
+    }
     const progressMetrics = payload['progressMetrics']
     const evaluationFeedback = payload['evaluationFeedback']
     if (
@@ -117,6 +133,11 @@ export const GET: APIRoute = async ({ request }) => {
     const sessionId = url.searchParams.get('sessionId')
     if (!sessionId) {
       return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
+    }
+    if (!isLegacySessionId(sessionId)) {
+      return legacySessionInvalidRequestResponse(
+        'Invalid sessionId: expected a UUID',
+      )
     }
 
     const client = await acquireClient()
