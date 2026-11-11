@@ -14,6 +14,17 @@ vi.mock('../../../lib/auth/internal-identity', () => ({
 
 import { getSession } from '../../../lib/auth/session'
 
+/**
+ * `sessions.id` is a uuid column and the route now validates the shape before
+ * any statement runs, so a fixture whose id must pass the guard has to be a
+ * real UUID. The previous sentinel strings (`test-session-123`,
+ * `non-existent-session`) are kept as the malformed-identifier group at the
+ * bottom of this file, where they assert the new `410` expectation.
+ */
+const SESSION_ID = '7a62430b-a01a-4eaf-8eb8-517e70ffb20d'
+const MISSING_SESSION_ID = 'f1c0d0d4-6f0a-4e2c-9c56-2d5b1a0e7c11'
+const MALFORMED_SESSION_ID = 'test-session-123'
+
 type QueryResultStub = {
   rowCount: number
   rows: unknown[]
@@ -218,7 +229,7 @@ describe('Session Progress API', () => {
   describe('POST /api/session/progress', () => {
     it('should save session progress metrics', async () => {
       const mockRequest = createPostRequest({
-        sessionId: 'test-session-123',
+        sessionId: SESSION_ID,
         progressMetrics: { totalMessages: 10, progress: 50 },
         therapistId: 'therapist-123',
         evaluationFeedback: 'Good session',
@@ -227,7 +238,7 @@ describe('Session Progress API', () => {
       const mockPoolClient = await mockConnect()
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(1))
       mockPoolClient.query.mockResolvedValueOnce(
-        createMockQueryResult(1, [{ id: 'test-session-123' }]),
+        createMockQueryResult(1, [{ id: SESSION_ID }]),
       )
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(1))
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(1))
@@ -241,19 +252,19 @@ describe('Session Progress API', () => {
 
       expect(response.status).toBe(200)
       expect(responseBody.success).toBe(true)
-      expect(responseBody.sessionId).toBe('test-session-123')
+      expect(responseBody.sessionId).toBe(SESSION_ID)
       expect(mockPoolClient.query.mock.calls[1]?.[0]).toContain(
         'id = $1 AND therapist_id = $2 FOR UPDATE',
       )
       expect(mockPoolClient.query.mock.calls[1]?.[1]).toEqual([
-        'test-session-123',
+        SESSION_ID,
         'therapist-123',
       ])
       expect(mockPoolClient.query.mock.calls[3]?.[0]).toContain(
         'INSERT INTO evaluations',
       )
       expect(mockPoolClient.query.mock.calls[3]?.[1]).toEqual([
-        'test-session-123',
+        SESSION_ID,
         'therapist-123',
         'Good session',
       ])
@@ -276,7 +287,7 @@ describe('Session Progress API', () => {
 
     it('should return 404 for session not found', async () => {
       const mockRequest = createPostRequest({
-        sessionId: 'non-existent-session',
+        sessionId: MISSING_SESSION_ID,
         progressMetrics: { totalMessages: 10, progress: 50 },
       })
 
@@ -296,7 +307,7 @@ describe('Session Progress API', () => {
 
     it('should handle database errors', async () => {
       const mockRequest = createPostRequest({
-        sessionId: 'test-session-123',
+        sessionId: SESSION_ID,
         progressMetrics: { totalMessages: 10, progress: 50 },
       })
 
@@ -318,7 +329,7 @@ describe('Session Progress API', () => {
   describe('GET /api/session/progress', () => {
     it('should retrieve session progress data', async () => {
       const mockRequest = createGetRequest(
-        'http://localhost:3000/api/session/progress?sessionId=test-session-123&includeFeedback=true',
+        `http://localhost:3000/api/session/progress?sessionId=${SESSION_ID}&includeFeedback=true`,
       )
 
       const mockPoolClient = await mockConnect()
@@ -347,14 +358,14 @@ describe('Session Progress API', () => {
       const responseBody = await parseResponseBody(response, hasSuccessGetShape)
 
       expect(response.status).toBe(200)
-      expect(responseBody.sessionId).toBe('test-session-123')
+      expect(responseBody.sessionId).toBe(SESSION_ID)
       expect(responseBody.progressMetrics).toBeDefined()
       expect(responseBody.feedback).toHaveLength(1)
       expect(mockPoolClient.query.mock.calls[0]?.[0]).toContain(
         'id = $1 AND therapist_id = $2',
       )
       expect(mockPoolClient.query.mock.calls[0]?.[1]).toEqual([
-        'test-session-123',
+        SESSION_ID,
         'therapist-123',
       ])
     })
@@ -376,7 +387,7 @@ describe('Session Progress API', () => {
 
     it('should return 404 for session not found', async () => {
       const mockRequest = createGetRequest(
-        'http://localhost:3000/api/session/progress?sessionId=non-existent-session',
+        `http://localhost:3000/api/session/progress?sessionId=${MISSING_SESSION_ID}`,
       )
 
       const mockPoolClient = await mockConnect()
@@ -394,7 +405,7 @@ describe('Session Progress API', () => {
 
     it('should handle database errors', async () => {
       const mockRequest = createGetRequest(
-        'http://localhost:3000/api/session/progress?sessionId=test-session-123',
+        `http://localhost:3000/api/session/progress?sessionId=${SESSION_ID}`,
       )
 
       const mockPoolClient = await mockConnect()
@@ -415,16 +426,67 @@ describe('Session Progress API', () => {
     vi.mocked(getSession).mockResolvedValue(null)
 
     const postResponse = await POST(
-      createPostRequest({ sessionId: 'test-session-123' }) as never,
+      createPostRequest({ sessionId: SESSION_ID }) as never,
     )
     const getResponse = await GET(
       createGetRequest(
-        'http://localhost:3000/api/session/progress?sessionId=test-session-123',
+        `http://localhost:3000/api/session/progress?sessionId=${SESSION_ID}`,
       ) as never,
     )
 
     expect(postResponse.status).toBe(401)
     expect(getResponse.status).toBe(401)
     expect(mockConnect).not.toHaveBeenCalled()
+  })
+
+  describe('malformed identifier', () => {
+    /**
+     * `sessions.id` is a uuid column, so the old sentinel fixture reached the
+     * ownership statement and PostgreSQL raised `22P02`, which the catch-all
+     * answered as `500`. These routes are excluded from the pilot surface
+     * regardless of body shape, so the malformed identifier takes the existing
+     * `410` path instead.
+     */
+    const expectExcluded = async (response: Response) => {
+      expect(response.status).toBe(410)
+      expect(response.headers.get('Retry-After')).toBeNull()
+      expect(await response.json()).toMatchObject({
+        code: 'LEGACY_SESSION_API_UNAVAILABLE',
+      })
+      // The shape is checked before the client is acquired, which is what
+      // proves the value never reaches a statement.
+      expect(mockConnect).not.toHaveBeenCalled()
+    }
+
+    it('answers 410 for a non-UUID sessionId on POST', async () => {
+      const response = await POST(
+        createPostRequest({
+          sessionId: MALFORMED_SESSION_ID,
+          progressMetrics: { totalMessages: 10, progress: 50 },
+        }) as never,
+      )
+
+      await expectExcluded(response)
+    })
+
+    it('answers 410 for a non-UUID sessionId on GET', async () => {
+      const response = await GET(
+        createGetRequest(
+          `http://localhost:3000/api/session/progress?sessionId=${MALFORMED_SESSION_ID}`,
+        ) as never,
+      )
+
+      await expectExcluded(response)
+    })
+
+    it('answers 410 for a malformed id even when no metrics are supplied', async () => {
+      // The route is excluded regardless of body shape, so the identifier is
+      // classified before the progress/feedback check.
+      const response = await POST(
+        createPostRequest({ sessionId: MALFORMED_SESSION_ID }) as never,
+      )
+
+      await expectExcluded(response)
+    })
   })
 })

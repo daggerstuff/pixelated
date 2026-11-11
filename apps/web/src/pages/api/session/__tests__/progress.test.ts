@@ -82,6 +82,8 @@ describe('session progress with a body that is not JSON', () => {
     })
 
     expect(response.status).toBe(400)
+    // A POST withholds the retry advertisement on every failure branch.
+    expect(response.headers.get('Retry-After')).toBeNull()
     expect(await response.json()).toEqual({
       error: 'Invalid JSON body',
       code: INVALID_REQUEST_CODE,
@@ -98,6 +100,7 @@ describe('session progress with a body that is not JSON', () => {
     })
 
     expect(response.status).toBe(400)
+    expect(response.headers.get('Retry-After')).toBeNull()
     expect(await response.json()).toEqual({
       error: 'Invalid JSON body',
       code: INVALID_REQUEST_CODE,

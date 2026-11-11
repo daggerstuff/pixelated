@@ -4,8 +4,10 @@ import { acquireClient, isDatabaseUnavailableError } from '@/lib/db'
 
 import { getSession } from '../../../lib/auth/session'
 import {
+  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
+  legacySessionExcludedInvalidIdResponse,
   legacySessionInvalidRequestResponse,
   legacySessionRetryableResponse,
   legacySessionSurfaceResponse,
@@ -58,6 +60,21 @@ export const POST: APIRoute = async ({ request }) => {
     const { currentSessionId, previousSessionId, improvementScore, metrics } =
       body
 
+    // A present-but-malformed identifier can never name a session, so it is
+    // classified before the rest of the payload is judged. Both values reach a
+    // uuid column: an unvalidated one raises `22P02` inside the ownership
+    // SELECT below, before parse analysis resolves the absent legacy relation,
+    // and used to surface as a `500`. The route is excluded from the pilot
+    // surface regardless of body shape, so this is answered with the existing
+    // `410`. An empty string is left to the required-field check below, except
+    // for `previousSessionId`, which means "none" when absent but reaches the
+    // uuid column when empty — the second guard below covers that.
+    for (const id of [currentSessionId, previousSessionId]) {
+      if (typeof id === 'string' && id !== '' && !isLegacySessionId(id)) {
+        return legacySessionExcludedInvalidIdResponse()
+      }
+    }
+
     if (
       typeof currentSessionId !== 'string' ||
       !currentSessionId ||
@@ -73,6 +90,10 @@ export const POST: APIRoute = async ({ request }) => {
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
+    }
+
+    if (previousSessionId != null && !isLegacySessionId(previousSessionId)) {
+      return legacySessionExcludedInvalidIdResponse()
     }
 
     const client = await acquireClient()
@@ -171,6 +192,13 @@ export const GET: APIRoute = async ({ request }) => {
           headers: { 'Content-Type': 'application/json' },
         },
       )
+    }
+
+    // An empty `sessionId` means "no session filter" and must keep falling
+    // through to the therapist branch; only a present, malformed id is
+    // rejected.
+    if (sessionId && !isLegacySessionId(sessionId)) {
+      return legacySessionExcludedInvalidIdResponse()
     }
 
     const client = await acquireClient()
