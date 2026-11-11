@@ -16,6 +16,43 @@ export default function DatasetSearch() {
   const [minTurns, setMinTurns] = useState(1)
   const [minQuality, setMinQuality] = useState(0.0)
 
+  const handleSearch = React.useCallback(
+    async (e?: SyntheticEvent) => {
+      if (e) e.preventDefault()
+
+      setLoading(true)
+      setHasSearched(true)
+      setError(null)
+
+      try {
+        // Track search event
+        void researchAPI.trackEvent('search_datasets', {
+          query,
+          min_turns: minTurns,
+          min_quality: minQuality,
+        })
+
+        const data = await researchAPI.searchDatasets({
+          q: query,
+          min_turns: minTurns,
+          min_quality: minQuality,
+          limit: 20,
+        })
+
+        setResults(data.results || [])
+      } catch (err: unknown) {
+        console.error('Dataset search error:', err)
+        setError(
+          (err instanceof Error ? err.message : null) ??
+            'Failed to fetch datasets. Please ensure the backend services are running.',
+        )
+      } finally {
+        setLoading(false)
+      }
+    },
+    [query, minTurns, minQuality],
+  )
+
   // Automatically search when filters change
   React.useEffect(() => {
     if (!hasSearched) {
@@ -27,41 +64,7 @@ export default function DatasetSearch() {
       })
     }, 250)
     return () => clearTimeout(timer)
-  }, [hasSearched, minTurns, minQuality])
-
-  async function handleSearch(e?: SyntheticEvent) {
-    if (e) e.preventDefault()
-
-    setLoading(true)
-    setHasSearched(true)
-    setError(null)
-
-    try {
-      // Track search event
-      void researchAPI.trackEvent('search_datasets', {
-        query,
-        min_turns: minTurns,
-        min_quality: minQuality,
-      })
-
-      const data = await researchAPI.searchDatasets({
-        q: query,
-        min_turns: minTurns,
-        min_quality: minQuality,
-        limit: 20,
-      })
-
-      setResults(data.results || [])
-    } catch (err: any) {
-      console.error('Dataset search error:', err)
-      setError(
-        err.message ??
-          'Failed to fetch datasets. Please ensure the backend services are running.',
-      )
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [hasSearched, handleSearch])
 
   return (
     <div className="mx-auto w-full max-w-6xl p-4" role="main">
