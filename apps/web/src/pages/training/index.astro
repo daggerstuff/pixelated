@@ -36,6 +36,14 @@ if (!userSession) {
 
 const userRole = userSession.role // 'trainee', 'supervisor', 'admin'
 
+// The session page redirects here only for a genuine absence (a 404, or a
+// refusal such as 403). It used to redirect on any non-ok response, including
+// the data load's deadline 503, which made an outage look like a missing
+// session. The temporary-unavailable case is rendered by the session page
+// itself, so this parameter never carries an outage.
+const errorParam = Astro.url.searchParams.get('error')
+const sessionNotFound = errorParam === 'session-not-found'
+
 // Mock data for now - in a real implementation, you'd fetch from API
 const activeTrainingSessions: any[] = []
 const trainingPrograms: any[] = []
@@ -66,6 +74,16 @@ const trainingPrograms: any[] = []
           scenarios, session creation, and supervisor review are not yet
           available in this portal.
         </p>
+
+        {sessionNotFound && (
+          <p
+            class="max-w-2xl mx-auto mt-6 rounded-none border border-border bg-background px-4 py-3 text-sm text-foreground"
+            role="status"
+          >
+            That training session could not be found. It may have been removed,
+            or it may belong to another account.
+          </p>
+        )}
 
         <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           {userRole === 'trainee' && (
