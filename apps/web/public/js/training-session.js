@@ -354,10 +354,6 @@ class TrainingSession {
     }
   }
 
-  handleSupervisorIntervention(data) {
-    this.showSupervisorMessage(data.message, data.type)
-  }
-
   addMessage(sender, content, metadata = {}) {
     const messagesContainer = document.getElementById('messages-container')
     if (!messagesContainer) return
