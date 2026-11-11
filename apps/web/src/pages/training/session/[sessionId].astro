@@ -131,7 +131,7 @@ const isSupervisor = userRole === 'admin'
   }
 >
   {!sessionData ? (
-    <main class="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6">
+    <main class="min-h-full bg-background px-4 py-16 text-foreground sm:px-6">
       <section class="mx-auto max-w-2xl">
         <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
           Training session
@@ -159,7 +159,7 @@ const isSupervisor = userRole === 'admin'
     <>
       {/* $1 */}
       <script is:inline src="/js/training-session.js" type="module"></script>
-      <main class="h-screen flex flex-col bg-background">
+      <main class="session-shell flex flex-col bg-background">
         {/* $1 */}
         <header class="bg-card border-b border-border px-6 py-4 flex-shrink-0">
           <div class="flex items-center justify-between">
@@ -234,7 +234,7 @@ const isSupervisor = userRole === 'admin'
         </header>
 
         {/* $1 */}
-        <div class="flex-1 flex overflow-hidden">
+        <div class="flex-1 flex session-panes">
           {isTrainee && (
             <div class="flex-1 flex">
               {/* $1 */}
@@ -408,13 +408,13 @@ const isSupervisor = userRole === 'admin'
               </aside>
 
               {/* $1 */}
-              <div class="flex-1 flex flex-col">
+              <div class="flex-1 flex flex-col session-column">
                 {/* $1 */}
-                <div class="flex-1 flex flex-col bg-card">
+                <div class="flex-1 flex flex-col bg-card session-transcript">
                   {/* $1 */}
                   <div
                     id="messages-container"
-                    class="flex-1 overflow-y-auto p-6 space-y-4"
+                    class="flex-1 overflow-y-auto p-6 space-y-4 session-messages"
                   >
                     {/* $1 */}
                     <div class="text-center text-muted-foreground py-8">
@@ -621,6 +621,69 @@ const isSupervisor = userRole === 'admin'
 </Layout>
 
 <style>
+  /* ===== Session shell (VAL-UX-002) =====
+
+     The send control must be the element a pointer lands on. It was not: the
+     shell was `h-screen`, so it was 100vh tall inside a document that also
+     carries the site header and the site footer. The composer's bottom edge
+     therefore sat exactly on the footer's top edge, and because the transcript
+     did not scroll (every flex column in the chain kept its automatic
+     `min-height: auto`, so `#messages-container` expanded to the full
+     transcript height instead of scrolling) each new message pushed the
+     composer further down inside a clipping container — under the footer, out
+     of the viewport, and unreachable by a pointer.
+
+     Desktop: the shell owns the space between the header and the footer, and
+     the transcript scrolls inside it. Mobile: the panes stack and the document
+     scrolls, so the composer stays reachable at 320px. */
+  .session-shell {
+    height: auto;
+  }
+
+  .session-panes {
+    overflow: hidden;
+  }
+
+  @media (min-width: 769px) {
+    :global(body) {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      min-height: 0;
+    }
+
+    :global(main#main-content) {
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .session-shell {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    /* A clipping container that is not a scroll container: no programmatic
+       scroll (focus, scrollIntoView) can move the composer out of place. */
+    .session-panes {
+      min-height: 0;
+      overflow: clip;
+    }
+
+    .session-column,
+    .session-transcript,
+    .session-messages {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .session-panes {
+      overflow: visible;
+    }
+  }
+
   /* Custom styles for training session */
   .message-bubble {
     max-width: 80%;
