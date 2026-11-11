@@ -459,7 +459,7 @@
     "eslint-plugin-n": "^18.5.0",
     "espree": "^11.2.0",
     "events": "^3.3.0",
-    "glob": "^14.0.4",
+    "glob": "^14.0.2",
     "hastscript": "^9.0.3",
     "headroom-ai": "^0.43.1",
     "html-entities": "^2.3.3",
