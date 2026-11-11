@@ -25,7 +25,9 @@ export const POST: APIRoute = async ({ request }) => {
   if (!session) return jsonResponse({ error: 'Authentication required' }, 401)
 
   try {
-    const therapistId = await resolveLegacyTherapistId(session.user)
+    const therapistId = await resolveLegacyTherapistId(session.user, {
+      advertiseRetry: false,
+    })
     if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return jsonResponse({ error: 'User identity not resolved' }, 403)

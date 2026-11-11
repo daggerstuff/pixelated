@@ -195,6 +195,118 @@ describe('session snapshots authorization', () => {
   })
 })
 
+describe('session snapshots with malformed input', () => {
+  /**
+   * Stable shape for a request that cannot be understood. Distinct from the
+   * `410` exclusion code and from the retryable `503` code, so a caller can
+   * tell malformed input apart from a gone surface and from a retryable failure.
+   */
+  const INVALID_REQUEST_CODE = 'LEGACY_SESSION_INVALID_REQUEST'
+
+  /**
+   * The tokens PostgreSQL puts in its `22P02` message. None of them, nor a
+   * statement fragment or a table name, may reach the client.
+   */
+  const LEAKS = [
+    '22P02',
+    'invalid input syntax',
+    'select',
+    'sessions',
+    'therapist_id',
+    'progress_snapshots',
+  ]
+
+  const expectInvalidRequest = async (response: Response, message: string) => {
+    expect(response.status).toBe(400)
+    const body: unknown = await response.json()
+    expect(body).toEqual({ error: message, code: INVALID_REQUEST_CODE })
+    const serialised = JSON.stringify(body).toLowerCase()
+    for (const leak of LEAKS) {
+      expect(serialised).not.toContain(leak)
+    }
+  }
+
+  /** A POST whose body is not JSON at all, so `request.json()` throws. */
+  const createRawRequest = (url: string, body: string): Request =>
+    new Request(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    })
+
+  it('rejects a non-UUID sessionId on GET before any statement runs', async () => {
+    const response = await invoke(GET, {
+      request: createRequest(
+        'http://localhost/api/session/snapshots?sessionId=not-a-uuid',
+      ),
+    })
+
+    await expectInvalidRequest(response, 'Invalid sessionId: expected a UUID')
+    // `22P02` is raised by the statement, so the guard must run before the
+    // client is acquired at all.
+    expect(mockConnect).not.toHaveBeenCalled()
+    expect(mockQuery).not.toHaveBeenCalled()
+  })
+
+  it('rejects a non-UUID sessionId on POST before any statement runs', async () => {
+    const response = await invoke(POST, {
+      request: createRequest('http://localhost/api/session/snapshots', {
+        sessionId: 'not-a-uuid',
+        snapshots: [{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }],
+      }),
+    })
+
+    await expectInvalidRequest(response, 'Invalid sessionId: expected a UUID')
+    expect(mockConnect).not.toHaveBeenCalled()
+    expect(mockQuery).not.toHaveBeenCalled()
+  })
+
+  it('answers 400 for a body that is not valid JSON', async () => {
+    const response = await invoke(POST, {
+      request: createRawRequest(
+        'http://localhost/api/session/snapshots',
+        '{"sessionId": "bb682d68-2338-48f0-8ac5-e0243b1346d2", "snapshots": [',
+      ),
+    })
+
+    await expectInvalidRequest(response, 'Invalid JSON body')
+    expect(mockConnect).not.toHaveBeenCalled()
+  })
+
+  it('answers 400 for an empty body', async () => {
+    const response = await invoke(POST, {
+      request: createRawRequest('http://localhost/api/session/snapshots', ''),
+    })
+
+    await expectInvalidRequest(response, 'Invalid JSON body')
+    expect(mockConnect).not.toHaveBeenCalled()
+  })
+
+  it('keeps 500 for a genuine infrastructure failure on the write path', async () => {
+    // A PostgreSQL internal error is not a malformed request and is not
+    // retryable, so it must stay a 5xx rather than being folded into the new
+    // 400 mapping.
+    mockQuery.mockImplementation(async (sql: string) => {
+      if (sql === 'BEGIN' || sql === 'ROLLBACK')
+        return { rowCount: 0, rows: [] }
+      if (sql.includes('FOR UPDATE')) {
+        throw schemaError('XX000')
+      }
+      throw new Error(`unexpected statement: ${sql}`)
+    })
+
+    const response = await invoke(POST, {
+      request: createRequest('http://localhost/api/session/snapshots', {
+        sessionId: SESSION_ID,
+        snapshots: [{ timestamp: '2026-11-04T00:00:00.000Z', value: 25 }],
+      }),
+    })
+
+    expect(response.status).toBe(500)
+    expect(await response.json()).toEqual({ error: 'Internal server error' })
+  })
+})
+
 describe('session snapshots on absent schema', () => {
   it('returns the documented 410 exclusion when sessions.progress_snapshots is absent', async () => {
     mockQuery.mockRejectedValue(schemaError('42703'))
@@ -351,8 +463,10 @@ describe('session snapshots when a statement hits the query bound', () => {
       }),
     })
 
+    // The identity-resolution branch and the handler-level branch must agree:
+    // a POST may have written, so neither advertises a retry delay.
     await expectRetryable(getResponse)
-    await expectRetryable(postResponse)
+    await expectRetryable(postResponse, { advertiseRetry: false })
     expect(mockResolveInternalUserId).toHaveBeenCalledWith(
       expect.objectContaining({ id: AUTH0_SUB }),
       { propagateDatabaseErrors: true },

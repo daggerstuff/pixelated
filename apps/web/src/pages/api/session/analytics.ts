@@ -154,7 +154,9 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const therapistId = await resolveLegacyTherapistId(session.user)
+    const therapistId = await resolveLegacyTherapistId(session.user, {
+      advertiseRetry: false,
+    })
     if (therapistId instanceof Response) return therapistId
     if (!therapistId) {
       return new Response(

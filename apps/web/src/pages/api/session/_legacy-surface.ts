@@ -38,6 +38,13 @@
  * handler maps `isDatabaseUnavailableError()` alongside `isQueryTimeout()`.
  * Leaving it unmapped answered `500 Internal server error` — the worst possible
  * answer on a surface the availability matrix counts hard failures on.
+ *
+ * A fourth class is not a database condition at all. A request whose body is
+ * not JSON, or whose session identifier is not a UUID, used to reach the
+ * statement and come back as `500` (`22P02` for the identifier, a thrown
+ * `SyntaxError` for the body). Those are malformed requests, so they answer
+ * `400` with a stable body before any SQL runs. A genuine infrastructure
+ * failure keeps its `500`.
  */
 
 import {
@@ -194,6 +201,53 @@ export function legacySessionRetryableResponse(
 }
 
 /**
+ * Stable code for a request the surface cannot understand: a body that is not
+ * JSON, or a session identifier that is not a UUID. Distinct from the `410`
+ * exclusion code and from the retryable `503` code, so a caller can tell
+ * malformed input apart from a gone surface and apart from a retryable failure.
+ */
+export const LEGACY_SESSION_INVALID_REQUEST_CODE =
+  'LEGACY_SESSION_INVALID_REQUEST'
+
+/**
+ * Canonical UUID shape, plus the hyphen-less 32-hex form PostgreSQL also
+ * accepts. Both cast cleanly against `sessions.id`; anything else raises
+ * `22P02` (`invalid input syntax for type uuid`) inside the statement, which is
+ * what this guard exists to prevent.
+ */
+const LEGACY_SESSION_ID_PATTERN =
+  /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9a-f]{32})$/i
+
+/**
+ * True when `value` is a shape PostgreSQL will cast to `uuid` without raising.
+ */
+export function isLegacySessionId(value: unknown): value is string {
+  return typeof value === 'string' && LEGACY_SESSION_ID_PATTERN.test(value)
+}
+
+/**
+ * `400` for a request that is malformed rather than unauthorized or
+ * temporarily failing.
+ *
+ * The body is stable and carries no pg error code, statement text, or table
+ * name: the caller is told what shape was expected, never what the database
+ * said. A genuine infrastructure failure keeps the handler's `500` path; this
+ * response is only for input the surface can classify itself.
+ */
+export function legacySessionInvalidRequestResponse(message: string): Response {
+  return new Response(
+    JSON.stringify({
+      error: message,
+      code: LEGACY_SESSION_INVALID_REQUEST_CODE,
+    }),
+    {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    },
+  )
+}
+
+/**
  * Resolve the caller's internal `users.id`, mapping a retryable
  * database-availability failure to the route's `503` instead of denying an
  * authenticated caller with `403`.
@@ -204,11 +258,17 @@ export function legacySessionRetryableResponse(
  * statement path uses; any other failure keeps the `null` contract, which the
  * caller answers as `403`.
  *
+ * `advertiseRetry` is forwarded to `legacySessionRetryableResponse()`. A POST
+ * handler passes `false` so this branch and the handler's own `catch` agree: a
+ * POST may have written, so neither advertises a retry delay. A GET leaves it
+ * at the default and keeps advertising one.
+ *
  * @returns the internal UUID, `null` when the identity cannot be resolved, or
  *   the `503` response to return as-is
  */
 export async function resolveLegacyTherapistId(
   principal: SessionPrincipal | null | undefined,
+  options: LegacyRetryableOptions = {},
 ): Promise<string | null | Response> {
   try {
     return await resolveInternalUserId(principal, {
@@ -216,7 +276,9 @@ export async function resolveLegacyTherapistId(
     })
   } catch (error: unknown) {
     if (isDatabaseUnavailableError(error)) {
-      return legacySessionRetryableResponse()
+      return legacySessionRetryableResponse({
+        advertiseRetry: options.advertiseRetry,
+      })
     }
     throw error
   }
