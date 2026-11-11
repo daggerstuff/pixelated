@@ -263,6 +263,20 @@ describe('page-level reads never re-validate what the middleware classified', ()
     })
   })
 
+  it('treats a failing key validation as no developer', async () => {
+    mockValidateApiKey.mockRejectedValue(new Error('pool exhausted'))
+
+    const { context } = await invoke('/training')
+    const request = new Request('http://localhost:5173/training', {
+      headers: { 'X-API-Key': 'test-api-key' },
+    })
+
+    const page = await resolvePageSession(request, context.locals)
+
+    expect(page.session).toBeNull()
+    expect(page.developer).toBeNull()
+  })
+
   it('reports a provider outage from the verdict without another call', async () => {
     mockValidateToken.mockResolvedValue({
       valid: false,

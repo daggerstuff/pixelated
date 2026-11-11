@@ -129,15 +129,23 @@ async function resolveDeveloperFromApiKey(
   const apiKey = request.headers.get('X-API-Key')
   if (!apiKey) return null
 
-  const { developerApiKeyManager } = await import('@/lib/db/developer-api-keys')
-  const validation = await developerApiKeyManager.validateApiKey(apiKey)
-  const record = validation.api_key
-  if (!validation.valid || !record) return null
+  try {
+    const { developerApiKeyManager } =
+      await import('@/lib/db/developer-api-keys')
+    const validation = await developerApiKeyManager.validateApiKey(apiKey)
+    const record = validation.api_key
+    if (!validation.valid || !record) return null
 
-  return {
-    id: record.user_id,
-    role: record.scopes.includes('admin') ? 'admin' : 'developer',
-    scopes: record.scopes,
+    return {
+      id: record.user_id,
+      role: record.scopes.includes('admin') ? 'admin' : 'developer',
+      scopes: record.scopes,
+    }
+  } catch {
+    // A key that cannot be validated is no key: the caller falls through to
+    // the page's normal unauthenticated path rather than answering a 500 for
+    // a database or import failure.
+    return null
   }
 }
 
