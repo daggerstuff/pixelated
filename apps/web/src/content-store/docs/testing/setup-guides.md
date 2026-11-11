@@ -147,7 +147,7 @@ jobs:
           node-version: '18'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v6.0.6
+        uses: pnpm/action-setup@v6.1.1
         with:
           version: 11.12.0
 

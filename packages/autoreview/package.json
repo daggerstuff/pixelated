@@ -15,16 +15,16 @@
     "validate": "tsx src/validate-main.ts"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.46",
-    "@ai-sdk/openai": "^4.0.47",
-    "ai": "^7.0.58",
+    "@ai-sdk/anthropic": "^4.0.102",
+    "@ai-sdk/openai": "^4.0.114",
+    "ai": "^7.0.169",
     "yaml": "^2.8.4",
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@types/node": "^26.3.0",
+    "@types/node": "^26.6.6",
     "tsx": "^4.23.12",
     "typescript": "~5.7.3",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.12"
   }
 }

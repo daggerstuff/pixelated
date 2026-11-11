@@ -36,7 +36,7 @@ if [ "$MISSING" -eq 1 ]; then
   echo ""
   echo "❌ Prerequisites missing. Install them before continuing."
   echo "   Node.js >= 24: https://nodejs.org"
-  echo "   pnpm 11.24.0:  npm install -g pnpm@11.24.0"
+  echo "   pnpm 12.18.0:  npm install -g pnpm@12.18.0"
   echo "   Python 3.12+:  https://python.org"
   echo "   uv:            curl -LsSf https://astral.sh/uv/install.sh | sh"
   exit 1

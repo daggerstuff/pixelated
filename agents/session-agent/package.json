@@ -22,7 +22,7 @@
     "@opentelemetry/resources": "2.8.0",
     "@opentelemetry/sdk-node": "0.219.0",
     "@opentelemetry/sdk-trace-base": "2.8.0",
-    "@opentelemetry/semantic-conventions": "^1.29.0",
+    "@opentelemetry/semantic-conventions": "^1.45.0",
     "@vercel/connect": "2.9.0",
     "ai": "7.0.141",
     "eve": "^0.91.0",
@@ -31,13 +31,13 @@
     "zod": "4.6.6"
   },
   "devDependencies": {
-    "@types/express": "5.x",
-    "@types/node": "24.x",
+    "@types/express": "~5.0.6",
+    "@types/node": "~24.19.2",
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitest/coverage-v8": "^4.1.12",
     "express": "5.x",
     "just-bash": "^3.6.0",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.12"
   },
   "peerDependencies": {
     "express": "5.x"

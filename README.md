@@ -43,7 +43,7 @@ unlock new paradigms for training, healing, and connection.
 | Requirement | Version | Check                 |
 | ----------- | ------- | --------------------- |
 | Node.js     | >= 24   | `node --version`      |
-| pnpm        | 12.16.1 | `pnpm --version`      |
+| pnpm        | 12.18.0 | `pnpm --version`      |
 | Python      | 3.14    | `python3 --version`   |
 | uv          | latest  | `uv --version`        |
 | PostgreSQL  | 17+     | `psql --version`      |
@@ -217,7 +217,7 @@ launch are not authorized.
 | Database        | PostgreSQL 17 + pgvector                         |
 | Caching         | Redis                                            |
 | State           | Zustand                                          |
-| Package Manager | pnpm 12.16.1                                     |
+| Package Manager | pnpm 12.18.0                                     |
 | Runtime         | Node.js >= 24                                    |
 
 ---

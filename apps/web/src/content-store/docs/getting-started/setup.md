@@ -17,7 +17,7 @@ environment for the Pixelated Empathy project.
 ## Prerequisites
 
 - **Node.js:** v18.x or later (v22.x recommended)
-- **Package Manager:** pnpm 10.11.0+ (required)
+- **Package Manager:** pnpm 12.18.0+ (required)
 - **Git:** Latest version
 
 ## Initial Setup

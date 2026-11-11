@@ -208,7 +208,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6.0.2
-      - uses: pnpm/action-setup@v6.0.6
+      - uses: pnpm/action-setup@v6.1.1
         with:
           version: 11.12.0
       - uses: actions/setup-node@v6.4.0
