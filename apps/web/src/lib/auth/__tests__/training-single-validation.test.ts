@@ -37,7 +37,7 @@ describe('training page auth', () => {
     // The redirect must be driven by the one `getCurrentUser` result, not by a
     // second helper that validates the token again.
     expect(source).toMatch(
-      /const userSession = await getCurrentUser\(Astro\.request\)/,
+      /const userSession = await getCurrentUser\(Astro\.request,\s*\{\s*verdict: authVerdict,?\s*\}\)/,
     )
     expect(source).toMatch(/if \(!userSession\)/)
   })

@@ -3,7 +3,7 @@
 // Integrates with existing Astro architecture for immersive training experience
 
 import Layout from '@/layouts/Layout.astro'
-import { getSession } from '@/lib/auth'
+import { resolvePageSession } from '@/lib/auth/session'
 import { getTrainingSessionResponse } from '@/lib/services/training/session-api'
 import VitalsMonitorIsland from '@/components/simulation/VitalsMonitorIsland.tsx'
 import { classifyTrainingSessionLoad } from '../_session-load-state'
@@ -44,14 +44,18 @@ const isTrainingSessionResponse = (
 }
 
 const { sessionId } = Astro.params
-const session = await getSession(Astro.request)
 
-// A provider outage is not a logout (diagnosis D1). The middleware already
-// resolved this token for the request, so `Astro.locals.user` being set while
-// this page's own validation returns nothing means the provider could not
-// verify the token right now — a temporary outage, not an absent session and
-// not a sign-out. `training/index.astro` received the same treatment.
-const authUnavailable = !session && Boolean(Astro.locals.user)
+// Read the verdict the middleware already computed for this request. Calling
+// `getSession` here re-validated the same token: on an invalid token the
+// middleware resolves once and declines to redirect, then this page validated
+// it a second time to reach the same conclusion — two `/userinfo` calls.
+const { session, providerUnavailable: authUnavailable } =
+  await resolvePageSession(Astro.request, Astro.locals)
+
+// A provider outage is not a logout (diagnosis D1). With the middleware's
+// verdict available we know directly that the token could not be verified —
+// a temporary outage, not an absent session and not a sign-out.
+// `training/index.astro` received the same treatment.
 
 if (!session && !authUnavailable) {
   return Astro.redirect(

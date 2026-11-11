@@ -119,9 +119,15 @@ describe('training session page: status-driven error surface', () => {
   })
 
   it('treats a provider outage on its own session read as unavailable, not a logout', () => {
-    // The middleware already resolved the token, so a null here is a provider
-    // failure. The genuine no-session case keeps its /login redirect.
-    expect(sessionPage).toMatch(/Astro\.locals\.user/)
+    // The middleware already resolved the token and publishes its verdict on
+    // `Astro.locals`; the page reads that verdict instead of re-validating.
+    // A provider-unavailable verdict is the unavailable surface. The genuine
+    // no-session case keeps its /login redirect.
+    expect(sessionPage).toMatch(
+      /resolvePageSession\(Astro\.request,\s*Astro\.locals\)/,
+    )
+    expect(sessionPage).toMatch(/providerUnavailable/)
+    expect(sessionPage).toMatch(/if \(!session && !authUnavailable\)/)
     expect(sessionPage).toMatch(/\/login\?redirect=/)
   })
 

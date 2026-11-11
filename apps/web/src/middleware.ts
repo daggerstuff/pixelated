@@ -7,6 +7,7 @@ import {
   type AuthOptions,
 } from './lib/auth/auth0-middleware'
 import {
+  SESSION_VERDICT_LOCALS_KEY,
   validateSessionToken,
   type SessionValidation,
 } from './lib/auth/session'
@@ -304,10 +305,19 @@ async function resolveCookieSession(context: {
 }): Promise<CookieSessionResolution> {
   const token = extractTokenFromRequest(context.request)
   if (!token) {
+    // Publish the verdict so a page component can distinguish "no token" from
+    // "middleware did not run" without validating anything.
+    context.locals[SESSION_VERDICT_LOCALS_KEY] = { status: 'none' }
     return { status: 'none' }
   }
 
   const resolution = await readSessionVerdict(token)
+
+  // Publish the verdict the middleware computed. Page-level reads use it
+  // instead of re-validating the same token, so one request never pays two
+  // `/userinfo` round trips (a cold `/training` cost middleware 1 + page 1,
+  // and an invalid token on `/training/session/<id>` cost 2).
+  context.locals[SESSION_VERDICT_LOCALS_KEY] = resolution
 
   if (resolution.status === 'provider-unavailable') {
     return {
