@@ -169,43 +169,42 @@ describe('identity bridge — training message write', () => {
 
     expect(response.status).toBe(201)
     expect(body.content).toBe('Trainee reply')
-    expect(mockQuery.mock.calls[0]?.[1]).toEqual([
-      SESSION_A,
-      ORG_A_UUID,
-      'Trainee reply',
-    ])
-    expect(mockQuery.mock.calls[0]?.[1]).not.toContain('auth0|org-a')
+    const params = mockQuery.mock.calls[0]?.[1] as unknown[]
+    expect(params).toHaveLength(4)
+    expect(params[0]).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-8[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
+    )
+    expect(params.slice(1)).toEqual([SESSION_A, ORG_A_UUID, 'Trainee reply'])
+    expect(params).not.toContain('auth0|org-a')
   })
 
   it('denies a cross-owner write and creates no row (A to B)', async () => {
-    mockQuery.mockResolvedValueOnce({ rows: [] })
+    mockQuery
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
 
     const response = await invokePost(SESSION_B, 'foreign write')
     const body = await response.json()
 
     expect(response.status).toBe(404)
     expect(body).toEqual({ error: 'Training session not found' })
-    expect(mockQuery.mock.calls[0]?.[0]).toContain('therapist_id = $2')
-    expect(mockQuery.mock.calls[0]?.[1]).toEqual([
-      SESSION_B,
-      ORG_A_UUID,
-      'foreign write',
-    ])
+    expect(mockQuery.mock.calls[0]?.[0]).toContain('therapist_id = $3')
+    const params = (mockQuery.mock.calls[0]?.[1] ?? []) as unknown[]
+    expect(params.slice(1)).toEqual([SESSION_B, ORG_A_UUID, 'foreign write'])
   })
 
   it('denies a cross-owner write and creates no row (B to A)', async () => {
     mockGetSession.mockResolvedValue(principal('auth0|org-b'))
     mockResolveInternalUserId.mockResolvedValue(ORG_B_UUID)
-    mockQuery.mockResolvedValueOnce({ rows: [] })
+    mockQuery
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
 
     const response = await invokePost(SESSION_A, 'foreign write')
 
     expect(response.status).toBe(404)
-    expect(mockQuery.mock.calls[0]?.[1]).toEqual([
-      SESSION_A,
-      ORG_B_UUID,
-      'foreign write',
-    ])
+    const params = (mockQuery.mock.calls[0]?.[1] ?? []) as unknown[]
+    expect(params.slice(1)).toEqual([SESSION_A, ORG_B_UUID, 'foreign write'])
   })
 
   it('denies an unmapped principal without writing or returning 5xx', async () => {
