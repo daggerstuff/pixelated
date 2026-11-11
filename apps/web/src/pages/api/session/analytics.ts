@@ -3,7 +3,6 @@ import type { APIRoute } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
-  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
   legacySessionInvalidRequestResponse,
@@ -152,7 +151,10 @@ export const POST: APIRoute = async ({ request }) => {
     if (!session) {
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
@@ -163,7 +165,10 @@ export const POST: APIRoute = async ({ request }) => {
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
@@ -183,12 +188,6 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const { sessionId, analyticsData } = requestBody
-
-    if (!isLegacySessionId(sessionId)) {
-      return legacySessionInvalidRequestResponse(
-        'Invalid sessionId: expected a UUID',
-      )
-    }
 
     const client = await acquireClient()
     try {
@@ -289,7 +288,10 @@ export const GET: APIRoute = async ({ request }) => {
     if (!session) {
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
@@ -298,7 +300,10 @@ export const GET: APIRoute = async ({ request }) => {
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
@@ -309,12 +314,10 @@ export const GET: APIRoute = async ({ request }) => {
     if (!sessionId) {
       return new Response(
         JSON.stringify({ error: 'Missing sessionId parameter' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
-    }
-    if (!isLegacySessionId(sessionId)) {
-      return legacySessionInvalidRequestResponse(
-        'Invalid sessionId: expected a UUID',
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 

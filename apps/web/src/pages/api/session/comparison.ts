@@ -4,7 +4,6 @@ import { acquireClient, isDatabaseUnavailableError } from '@/lib/db'
 
 import { getSession } from '../../../lib/auth/session'
 import {
-  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
   legacySessionInvalidRequestResponse,
@@ -35,7 +34,10 @@ export const POST: APIRoute = async ({ request }) => {
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
@@ -70,14 +72,6 @@ export const POST: APIRoute = async ({ request }) => {
             'Missing required fields: currentSessionId, improvementScore, metrics',
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
-    }
-    if (
-      !isLegacySessionId(currentSessionId) ||
-      (previousSessionId != null && !isLegacySessionId(previousSessionId))
-    ) {
-      return legacySessionInvalidRequestResponse(
-        'Invalid sessionId: expected a UUID',
       )
     }
 
@@ -157,7 +151,10 @@ export const GET: APIRoute = async ({ request }) => {
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
@@ -169,12 +166,10 @@ export const GET: APIRoute = async ({ request }) => {
     if (!requestedTherapistId && !sessionId) {
       return new Response(
         JSON.stringify({ error: 'Missing therapistId or sessionId parameter' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
-    }
-    if (sessionId != null && !isLegacySessionId(sessionId)) {
-      return legacySessionInvalidRequestResponse(
-        'Invalid sessionId: expected a UUID',
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 

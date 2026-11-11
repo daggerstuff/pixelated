@@ -3,7 +3,6 @@ import type { APIRoute } from 'astro'
 import { getSession } from '../../../lib/auth/session'
 import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import {
-  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
   legacySessionInvalidRequestResponse,
@@ -48,13 +47,6 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const sessionId = payload['sessionId']
-    // `sessions.id` is a uuid column: a non-UUID raises `22P02` inside the
-    // statement and used to surface as a `500`.
-    if (!isLegacySessionId(sessionId)) {
-      return legacySessionInvalidRequestResponse(
-        'Invalid sessionId: expected a UUID',
-      )
-    }
     const progressMetrics = payload['progressMetrics']
     const evaluationFeedback = payload['evaluationFeedback']
     if (
@@ -133,11 +125,6 @@ export const GET: APIRoute = async ({ request }) => {
     const sessionId = url.searchParams.get('sessionId')
     if (!sessionId) {
       return jsonResponse({ error: 'Missing sessionId parameter' }, 400)
-    }
-    if (!isLegacySessionId(sessionId)) {
-      return legacySessionInvalidRequestResponse(
-        'Invalid sessionId: expected a UUID',
-      )
     }
 
     const client = await acquireClient()

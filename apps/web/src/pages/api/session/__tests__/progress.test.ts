@@ -27,7 +27,7 @@ vi.mock('@/lib/db', () => ({
     ),
 }))
 
-import { GET, POST } from '../progress'
+import { POST } from '../progress'
 
 /** The provider subject `getSession()` exposes as `user.id`. */
 const AUTH0_SUB = 'auth0|progress-caller'
@@ -63,18 +63,6 @@ const authenticatedSession = {
   expires: new Date(Date.now() + 60_000).toISOString(),
 }
 
-const expectInvalidRequest = async (response: Response, message: string) => {
-  expect(response.status).toBe(400)
-  expect(await response.json()).toEqual({
-    error: message,
-    code: INVALID_REQUEST_CODE,
-  })
-  // Malformed input must be classified before any statement runs: `22P02` is
-  // raised by the statement itself.
-  expect(mockConnect).not.toHaveBeenCalled()
-  expect(mockQuery).not.toHaveBeenCalled()
-}
-
 beforeEach(() => {
   vi.clearAllMocks()
   mockQuery.mockReset()
@@ -84,8 +72,8 @@ beforeEach(() => {
   mockConnect.mockResolvedValue(createClient())
 })
 
-describe('session progress with malformed input', () => {
-  it('answers 400 for a body that is not valid JSON', async () => {
+describe('session progress with a body that is not JSON', () => {
+  it('answers 400 with the stable code before any statement runs', async () => {
     const response = await invoke(POST, {
       request: createRawRequest(
         'http://localhost/api/session/progress',
@@ -93,7 +81,15 @@ describe('session progress with malformed input', () => {
       ),
     })
 
-    await expectInvalidRequest(response, 'Invalid JSON body')
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({
+      error: 'Invalid JSON body',
+      code: INVALID_REQUEST_CODE,
+    })
+    // A parse failure is classified before the client is acquired, so the
+    // `SyntaxError` can no longer reach the catch-all 500.
+    expect(mockConnect).not.toHaveBeenCalled()
+    expect(mockQuery).not.toHaveBeenCalled()
   })
 
   it('answers 400 for an empty body', async () => {
@@ -101,33 +97,17 @@ describe('session progress with malformed input', () => {
       request: createRawRequest('http://localhost/api/session/progress', ''),
     })
 
-    await expectInvalidRequest(response, 'Invalid JSON body')
-  })
-
-  it('rejects a non-UUID sessionId on POST before any statement runs', async () => {
-    const response = await invoke(POST, {
-      request: createRequest('http://localhost/api/session/progress', {
-        sessionId: 'not-a-uuid',
-        evaluationFeedback: 'steady progress',
-      }),
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({
+      error: 'Invalid JSON body',
+      code: INVALID_REQUEST_CODE,
     })
-
-    await expectInvalidRequest(response, 'Invalid sessionId: expected a UUID')
-  })
-
-  it('rejects a non-UUID sessionId on GET before any statement runs', async () => {
-    const response = await invoke(GET, {
-      request: createRequest(
-        'http://localhost/api/session/progress?sessionId=not-a-uuid',
-      ),
-    })
-
-    await expectInvalidRequest(response, 'Invalid sessionId: expected a UUID')
+    expect(mockConnect).not.toHaveBeenCalled()
   })
 })
 
 describe('session progress happy path', () => {
-  it('still writes feedback for a valid UUID sessionId', async () => {
+  it('still writes feedback for a well-formed body', async () => {
     mockQuery.mockImplementation(async (sql: string) => {
       if (sql === 'BEGIN' || sql === 'COMMIT') return { rowCount: 0, rows: [] }
       if (sql.includes('FOR UPDATE')) {

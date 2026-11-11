@@ -4,7 +4,6 @@ import { getSession } from '../../../lib/auth/session'
 import { acquireClient, isDatabaseUnavailableError } from '../../../lib/db'
 import { getSkillCategory } from '../../../lib/skillCategories'
 import {
-  isLegacySessionId,
   isMissingLegacySchema,
   isQueryTimeout,
   legacySessionInvalidRequestResponse,
@@ -35,7 +34,10 @@ export const POST: APIRoute = async ({ request }) => {
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
@@ -67,11 +69,6 @@ export const POST: APIRoute = async ({ request }) => {
           error: 'Missing required fields: sessionId, skillScores',
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
-      )
-    }
-    if (!isLegacySessionId(sessionId)) {
-      return legacySessionInvalidRequestResponse(
-        'Invalid sessionId: expected a UUID',
       )
     }
 
@@ -176,7 +173,10 @@ export const POST: APIRoute = async ({ request }) => {
 
       return new Response(
         JSON.stringify({ success: true, sessionId, therapistId }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     } finally {
       client.release()
@@ -212,19 +212,16 @@ export const GET: APIRoute = async ({ request }) => {
     if (!therapistId) {
       return new Response(
         JSON.stringify({ error: 'User identity not resolved' }),
-        { status: 403, headers: { 'Content-Type': 'application/json' } },
+        {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' },
+        },
       )
     }
 
     const url = new URL(request.url)
     const sessionId = url.searchParams.get('sessionId')
     const requestedTherapistId = url.searchParams.get('therapistId')
-
-    if (sessionId != null && !isLegacySessionId(sessionId)) {
-      return legacySessionInvalidRequestResponse(
-        'Invalid sessionId: expected a UUID',
-      )
-    }
 
     const client = await acquireClient()
     try {
