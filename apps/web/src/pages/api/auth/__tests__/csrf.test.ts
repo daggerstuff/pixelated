@@ -5,6 +5,10 @@
  * The response contract is unchanged: 200 `{csrfToken, expiresAt}` when the
  * token is stored, 503 `{error}` when no store is available.
  */
+import { existsSync, readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { GET } from '../csrf'
@@ -110,5 +114,32 @@ describe('GET /api/auth/csrf', () => {
 
     expect(response.status).toBe(503)
     expect(body).toEqual({ error: 'CSRF token could not be issued' })
+  })
+})
+
+/**
+ * The store-backed `X-CSRF-Token` path above is the only CSRF mechanism.
+ *
+ * A cookie double-submit middleware used to live in
+ * `apps/web/src/lib/middleware/csrf.ts` with zero importers. It was deleted as
+ * dead code superseded by the store; this guard fails if it, or any other
+ * unwired CSRF middleware, is wired back into the request pipeline.
+ */
+describe('CSRF mechanism ownership', () => {
+  const repoRoot = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../../../../../../..',
+  )
+
+  it('has no second, unwired cookie double-submit middleware', () => {
+    expect(
+      existsSync(path.join(repoRoot, 'apps/web/src/lib/middleware/csrf.ts')),
+    ).toBe(false)
+
+    const middleware = readFileSync(
+      path.join(repoRoot, 'apps/web/src/middleware.ts'),
+      'utf8',
+    )
+    expect(middleware).not.toMatch(/lib\/middleware\/csrf|csrfMiddleware/)
   })
 })
