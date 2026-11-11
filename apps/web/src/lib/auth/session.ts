@@ -109,7 +109,7 @@ export function readSessionVerdictFromLocals(
 }
 
 /** A developer resolved from an `X-API-Key` header. */
-export interface DeveloperIdentity {
+interface DeveloperIdentity {
   id: string
   role: string
   scopes: string[]
