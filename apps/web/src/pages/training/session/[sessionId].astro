@@ -3,7 +3,7 @@
 // Integrates with existing Astro architecture for immersive training experience
 
 import Layout from '@/layouts/Layout.astro'
-import { getSession } from '@/lib/auth'
+import { resolvePageSession } from '@/lib/auth/session'
 import { getTrainingSessionResponse } from '@/lib/services/training/session-api'
 import VitalsMonitorIsland from '@/components/simulation/VitalsMonitorIsland.tsx'
 import { classifyTrainingSessionLoad } from '../_session-load-state'
@@ -44,14 +44,18 @@ const isTrainingSessionResponse = (
 }
 
 const { sessionId } = Astro.params
-const session = await getSession(Astro.request)
 
-// A provider outage is not a logout (diagnosis D1). The middleware already
-// resolved this token for the request, so `Astro.locals.user` being set while
-// this page's own validation returns nothing means the provider could not
-// verify the token right now — a temporary outage, not an absent session and
-// not a sign-out. `training/index.astro` received the same treatment.
-const authUnavailable = !session && Boolean(Astro.locals.user)
+// Read the verdict the middleware already computed for this request. Calling
+// `getSession` here re-validated the same token: on an invalid token the
+// middleware resolves once and declines to redirect, then this page validated
+// it a second time to reach the same conclusion — two `/userinfo` calls.
+const { session, providerUnavailable: authUnavailable } =
+  await resolvePageSession(Astro.request, Astro.locals)
+
+// A provider outage is not a logout (diagnosis D1). With the middleware's
+// verdict available we know directly that the token could not be verified —
+// a temporary outage, not an absent session and not a sign-out.
+// `training/index.astro` received the same treatment.
 
 if (!session && !authUnavailable) {
   return Astro.redirect(
@@ -131,7 +135,7 @@ const isSupervisor = userRole === 'admin'
   }
 >
   {!sessionData ? (
-    <main class="min-h-screen bg-background px-4 py-16 text-foreground sm:px-6">
+    <main class="min-h-full bg-background px-4 py-16 text-foreground sm:px-6">
       <section class="mx-auto max-w-2xl">
         <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
           Training session
@@ -159,7 +163,7 @@ const isSupervisor = userRole === 'admin'
     <>
       {/* $1 */}
       <script is:inline src="/js/training-session.js" type="module"></script>
-      <main class="h-screen flex flex-col bg-background">
+      <main class="session-shell flex flex-col bg-background">
         {/* $1 */}
         <header class="bg-card border-b border-border px-6 py-4 flex-shrink-0">
           <div class="flex items-center justify-between">
@@ -234,7 +238,7 @@ const isSupervisor = userRole === 'admin'
         </header>
 
         {/* $1 */}
-        <div class="flex-1 flex overflow-hidden">
+        <div class="flex-1 flex session-panes">
           {isTrainee && (
             <div class="flex-1 flex">
               {/* $1 */}
@@ -408,13 +412,13 @@ const isSupervisor = userRole === 'admin'
               </aside>
 
               {/* $1 */}
-              <div class="flex-1 flex flex-col">
+              <div class="flex-1 flex flex-col session-column">
                 {/* $1 */}
-                <div class="flex-1 flex flex-col bg-card">
+                <div class="flex-1 flex flex-col bg-card session-transcript">
                   {/* $1 */}
                   <div
                     id="messages-container"
-                    class="flex-1 overflow-y-auto p-6 space-y-4"
+                    class="flex-1 overflow-y-auto p-6 space-y-4 session-messages"
                   >
                     {/* $1 */}
                     <div class="text-center text-muted-foreground py-8">
@@ -601,9 +605,23 @@ const isSupervisor = userRole === 'admin'
 
           {/* $1 */}
           {isSupervisor && (
-            <div class="flex-1">
-              {/* $1 */}
-              <div id="supervisor-dashboard" />
+            <div class="flex-1 px-4 py-12 sm:px-6">
+              <section class="mx-auto max-w-2xl">
+                <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                  Faculty review
+                </p>
+                <h2 class="mt-3 text-2xl font-semibold text-foreground">
+                  Faculty review is not available
+                </h2>
+                <p
+                  class="mt-4 text-sm leading-relaxed text-muted-foreground"
+                  role="status"
+                >
+                  Training sessions are not linked to a workspace, so a faculty
+                  member cannot be scoped to the sessions they may review.
+                  Faculty review stays disabled until that relation exists.
+                </p>
+              </section>
             </div>
           )}
         </div>
@@ -621,23 +639,22 @@ const isSupervisor = userRole === 'admin'
 </Layout>
 
 <style>
-  <<<<<<< Updated upstream
-    /* ===== Session shell (VAL-UX-002) =====
+  /* ===== Session shell (VAL-UX-002) =====
 
-       The send control must be the element a pointer lands on. It was not: the
-       shell was `h-screen`, so it was 100vh tall inside a document that also
-       carries the site header and the site footer. The composer's bottom edge
-       therefore sat exactly on the footer's top edge, and because the transcript
-       did not scroll (every flex column in the chain kept its automatic
-       `min-height: auto`, so `#messages-container` expanded to the full
-       transcript height instead of scrolling) each new message pushed the
-       composer further down inside a clipping container — under the footer, out
-       of the viewport, and unreachable by a pointer.
+     The send control must be the element a pointer lands on. It was not: the
+     shell was `h-screen`, so it was 100vh tall inside a document that also
+     carries the site header and the site footer. The composer's bottom edge
+     therefore sat exactly on the footer's top edge, and because the transcript
+     did not scroll (every flex column in the chain kept its automatic
+     `min-height: auto`, so `#messages-container` expanded to the full
+     transcript height instead of scrolling) each new message pushed the
+     composer further down inside a clipping container — under the footer, out
+     of the viewport, and unreachable by a pointer.
 
-       Desktop: the shell owns the space between the header and the footer, and
-       the transcript scrolls inside it. Mobile: the panes stack and the document
-       scrolls, so the composer stays reachable at 320px. */
-    .session-shell {
+     Desktop: the shell owns the space between the header and the footer, and
+     the transcript scrolls inside it. Mobile: the panes stack and the document
+     scrolls, so the composer stays reachable at 320px. */
+  .session-shell {
     height: auto;
   }
 
@@ -666,20 +683,20 @@ const isSupervisor = userRole === 'admin'
     }
 
     /* A clipping container that is not a scroll container: no programmatic
-         scroll (focus, scrollIntoView) can move the composer out of place. */
+       scroll (focus, scrollIntoView) can move the composer out of place. */
     .session-panes {
       min-height: 0;
       overflow: clip;
     }
 
     /* Each trainee aside is its own scroll container (VAL-UX-003).
-         `clip` on the row above deliberately removes the focus-scroll path that
-         `overflow: hidden` would still provide, and both asides are taller than
-         the row at 1440x900 — the focusable `#session-notes` textarea sits
-         entirely below the clip line, so a keyboard user could tab to a field
-         that is never painted. An aside is a sibling of the transcript column,
-         so scrolling it cannot move the composer the way scrolling the row
-         could; the row stays clipped. */
+       `clip` on the row above deliberately removes the focus-scroll path that
+       `overflow: hidden` would still provide, and both asides are taller than
+       the row at 1440x900 — the focusable `#session-notes` textarea sits
+       entirely below the clip line, so a keyboard user could tab to a field
+       that is never painted. An aside is a sibling of the transcript column,
+       so scrolling it cannot move the composer the way scrolling the row
+       could; the row stays clipped. */
     .session-aside {
       min-height: 0;
       overflow-y: auto;
@@ -698,10 +715,8 @@ const isSupervisor = userRole === 'admin'
     }
   }
 
-  =======
-  >>>>>>> Stashed changes
-    /* Custom styles for training session */
-    .message-bubble {
+  /* Custom styles for training session */
+  .message-bubble {
     max-width: 80%;
     padding: 12px 16px;
     border-radius: 18px;

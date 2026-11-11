@@ -44,6 +44,7 @@ vi.mock('@/lib/db/developer-api-keys', () => ({
 
 vi.mock('../session', () => ({
   getSession: vi.fn(),
+  validateSessionToken: vi.fn(),
 }))
 
 import { getCurrentUser } from '../index'
@@ -80,16 +81,21 @@ describe('getCurrentUser — AstroCookies vs Request (PIX-4245)', () => {
   })
 
   it('reads auth token from AstroCookies when not a Web Request', async () => {
-    const { validateToken } = await import('../auth0-jwt-service')
-    vi.mocked(validateToken).mockResolvedValueOnce({
-      valid: true,
-      userId: 'user-123',
-      role: 'therapist',
+    // `getCurrentUser` now reads the validated-session cache through
+    // `validateSessionToken`, so one request pays at most one provider call.
+    const { validateSessionToken } = await import('../session')
+    vi.mocked(validateSessionToken).mockResolvedValueOnce({
+      status: 'valid',
+      session: {
+        user: { id: 'user-123', role: 'therapist' },
+        expires: new Date(Date.now() + 60_000).toISOString(),
+      },
     })
 
     const cookies = createMockAstroCookies({ auth_token: 'jwt-token' })
     const user = await getCurrentUser(cookies)
 
+    expect(validateSessionToken).toHaveBeenCalledWith('jwt-token')
     expect(user).toEqual({
       id: 'user-123',
       role: 'therapist',
@@ -102,11 +108,13 @@ describe('getCurrentUser — AstroCookies vs Request (PIX-4245)', () => {
     const { extractTokenFromRequest } = await import('../auth0-middleware')
     vi.mocked(extractTokenFromRequest).mockReturnValueOnce('from-header')
 
-    const { validateToken } = await import('../auth0-jwt-service')
-    vi.mocked(validateToken).mockResolvedValueOnce({
-      valid: true,
-      userId: 'user-from-request',
-      role: 'patient',
+    const { validateSessionToken } = await import('../session')
+    vi.mocked(validateSessionToken).mockResolvedValueOnce({
+      status: 'valid',
+      session: {
+        user: { id: 'user-from-request', role: 'patient' },
+        expires: new Date(Date.now() + 60_000).toISOString(),
+      },
     })
 
     const request = new Request('https://example.com/register', {

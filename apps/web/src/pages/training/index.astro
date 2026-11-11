@@ -7,18 +7,26 @@ import Card from '@/components/ui/Card.astro'
 import { readinessEnhancements } from '@/data/readiness-enhancements'
 import Layout from '@/layouts/Layout.astro'
 import { getCurrentUser } from '@/lib/auth'
+import { readSessionVerdictFromLocals } from '@/lib/auth/session'
 
-// One token validation per load (diagnosis D7). `isAuthenticated` was a
-// second `validateToken` of the same token in the same request, on top of the
-// middleware's — three `/userinfo` calls against a 10-request bucket. The
-// page's own first two calls exhausted the budget its third call needed, and
-// the failure sent an authenticated user to /login.
-const userSession = await getCurrentUser(Astro.request)
+// One token validation per request, across the middleware and this page.
+//
+// The middleware has already validated the token for this request and
+// published its verdict on `Astro.locals`. Passing that verdict in means the
+// page derives the user from the verdict instead of validating the same token
+// again: a cold `/training` used to cost middleware 1 + page 1 `/userinfo`
+// calls because `getCurrentUser` called `validateToken` directly and never
+// consulted the validated-session cache. `isAuthenticated` was removed earlier
+// for the same reason (diagnosis D7).
+const authVerdict = readSessionVerdictFromLocals(Astro.locals)
+const userSession = await getCurrentUser(Astro.request, {
+  verdict: authVerdict,
+})
 if (!userSession) {
   // The middleware already resolved this token for this request, so a failure
   // here means the provider could not verify it (a /userinfo 429, a timeout) —
   // a temporary outage, not a logout.
-  if (Astro.locals.user) {
+  if (authVerdict?.status === 'provider-unavailable' || Astro.locals.user) {
     return new Response(
       'Authentication is temporarily unavailable. Please retry shortly.\n',
       {
@@ -34,7 +42,11 @@ if (!userSession) {
   return Astro.redirect('/login?redirect=/training')
 }
 
-const userRole = userSession.role // 'trainee', 'supervisor', 'admin'
+// Faculty access uses `admin`, the role the session page also checks.
+// `session.user.role` is an `AuthRole` (`admin | staff | therapist | user |
+// guest`, `src/config/auth.config.ts`), so a `supervisor` gate could never
+// match. The auth role mapping itself is unchanged.
+const userRole = userSession.role
 
 // The session page redirects here only for a genuine absence (a 404, or a
 // refusal such as 403). It used to redirect on any non-ok response, including
@@ -94,7 +106,7 @@ const trainingPrograms: any[] = []
               No training sessions are available. Pilot enrollment is not open.
             </p>
           )}
-          {userRole === 'supervisor' && (
+          {userRole === 'admin' && (
             <Button
               href="/dashboard"
               size="lg"
@@ -169,7 +181,7 @@ const trainingPrograms: any[] = []
                 class="w-full"
                 size="sm"
               >
-                {userRole === 'supervisor'
+                {userRole === 'admin'
                   ? '👀 Monitor Session'
                   : '🎭 Continue Training'}
               </Button>

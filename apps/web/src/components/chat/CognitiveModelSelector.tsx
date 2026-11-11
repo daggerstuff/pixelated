@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 
 import type {
   PatientResponseStyleConfig,
@@ -42,8 +42,86 @@ export function CognitiveModelSelector({
     challengeResponses: 'curious',
   })
 
+  // Fetch available patient models
+  useEffect(() => {
+    const fetchModels = async () => {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const kvStore = new KVStore('cognitive_models_', true)
+        const modelList = await kvStore.get<ModelIdentifier[]>(
+          'patient_models_list',
+        )
+
+        if (modelList && modelList.length > 0) {
+          setModels(modelList)
+
+          // Set the first model as selected if none is selected
+          if (!selectedModelId && onSelectModel && modelList[0]) {
+            onSelectModel(modelList[0].id)
+          }
+
+          // Load details for the selected model
+          if (selectedModelId) {
+            void loadModelDetails(selectedModelId)
+          }
+        } else {
+          // If no models found, set up some example data
+          setModels([
+            {
+              id: 'example-depression',
+              name: 'Sarah - Depression',
+              presentingIssues: [
+                'Depression',
+                'Low self-esteem',
+                'Work stress',
+              ],
+
+              diagnosisSummary: 'Major Depressive Disorder',
+            },
+            {
+              id: 'example-anxiety',
+              name: 'Mark - Anxiety',
+              presentingIssues: [
+                'Generalized anxiety',
+                'Panic attacks',
+                'Social avoidance',
+              ],
+
+              diagnosisSummary: 'Generalized Anxiety Disorder',
+            },
+            {
+              id: 'example-trauma',
+              name: 'Elena - Trauma',
+              presentingIssues: [
+                'PTSD symptoms',
+                'Nightmares',
+                'Hypervigilance',
+              ],
+
+              diagnosisSummary: 'Post-Traumatic Stress Disorder',
+            },
+          ])
+
+          // Set the first example model as selected if none is selected
+          if (!selectedModelId && onSelectModel) {
+            onSelectModel('example-depression')
+          }
+        }
+      } catch (err: unknown) {
+        console.error('Failed to fetch cognitive models:', err)
+        setError('Failed to load patient models. Please try again later.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    void fetchModels()
+  }, [selectedModelId, onSelectModel])
+
   // Load detailed information for the selected model
-  const loadModelDetails = useCallback(async (modelId: string) => {
+  async function loadModelDetails(modelId: string) {
     if (!modelId) {
       return
     }
@@ -265,85 +343,7 @@ export function CognitiveModelSelector({
     } catch (err: unknown) {
       console.error(`Failed to load model details for ${modelId}:`, err)
     }
-  }, [])
-
-  // Fetch available patient models
-  useEffect(() => {
-    const fetchModels = async () => {
-      setLoading(true)
-      setError(null)
-
-      try {
-        const kvStore = new KVStore('cognitive_models_', true)
-        const modelList = await kvStore.get<ModelIdentifier[]>(
-          'patient_models_list',
-        )
-
-        if (modelList && modelList.length > 0) {
-          setModels(modelList)
-
-          // Set the first model as selected if none is selected
-          if (!selectedModelId && onSelectModel && modelList[0]) {
-            onSelectModel(modelList[0].id)
-          }
-
-          // Load details for the selected model
-          if (selectedModelId) {
-            void loadModelDetails(selectedModelId)
-          }
-        } else {
-          // If no models found, set up some example data
-          setModels([
-            {
-              id: 'example-depression',
-              name: 'Sarah - Depression',
-              presentingIssues: [
-                'Depression',
-                'Low self-esteem',
-                'Work stress',
-              ],
-
-              diagnosisSummary: 'Major Depressive Disorder',
-            },
-            {
-              id: 'example-anxiety',
-              name: 'Mark - Anxiety',
-              presentingIssues: [
-                'Generalized anxiety',
-                'Panic attacks',
-                'Social avoidance',
-              ],
-
-              diagnosisSummary: 'Generalized Anxiety Disorder',
-            },
-            {
-              id: 'example-trauma',
-              name: 'Elena - Trauma',
-              presentingIssues: [
-                'PTSD symptoms',
-                'Nightmares',
-                'Hypervigilance',
-              ],
-
-              diagnosisSummary: 'Post-Traumatic Stress Disorder',
-            },
-          ])
-
-          // Set the first example model as selected if none is selected
-          if (!selectedModelId && onSelectModel) {
-            onSelectModel('example-depression')
-          }
-        }
-      } catch (err: unknown) {
-        console.error('Failed to fetch cognitive models:', err)
-        setError('Failed to load patient models. Please try again later.')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    void fetchModels()
-  }, [selectedModelId, onSelectModel, loadModelDetails])
+  }
 
   // Handle model selection
   const handleModelSelect = (modelId: string) => {

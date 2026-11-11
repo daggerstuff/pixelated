@@ -141,15 +141,8 @@ def _tag_value(event: dict[str, Any], key: str) -> Any:
     return None
 
 
-def _logger_name(event: dict[str, Any]) -> Any:
-    logger_val = event.get("logger")
-    if isinstance(logger_val, str):
-        return logger_val
-    return _tag_value(event, "logger")
-
-
 def _is_werkzeug_client_error_log(event: dict[str, Any]) -> bool:
-    if _logger_name(event) != "werkzeug":
+    if _tag_value(event, "logger") != "werkzeug":
         return False
     return any(re.search(r"\bcode\s+4\d\d\b", title) for title in _event_titles(event))
 
