@@ -10,6 +10,7 @@ import {
   validateSessionToken,
   type SessionValidation,
 } from './lib/auth/session'
+import { canonicalHostRedirect } from './lib/http/canonicalHost'
 import { agentDiscoveryMiddleware } from './lib/middleware/agent-discovery'
 import { apiVersioningMiddleware } from './lib/middleware/api-versioning'
 import { corsMiddleware } from './lib/middleware/cors'
@@ -72,6 +73,20 @@ const normalizeRequestHeadersMiddleware: MiddlewareHandler = defineMiddleware(
     return next()
   },
 )
+
+// The apex is canonical. www used to be served by the Vercel standby, which now
+// answers 402 DEPLOYMENT_DISABLED; the Worker route covers www so it redirects
+// here instead of failing at the origin.
+const wwwRedirect: MiddlewareHandler = defineMiddleware((context, next) => {
+  const target = canonicalHostRedirect(context.url)
+  if (!target) {
+    return next()
+  }
+  return new Response(null, {
+    status: 301,
+    headers: { Location: target.toString() },
+  })
+})
 
 // Sits before auth so an excluded route never spends the provider validation
 // budget; inert unless PILOT_EXCLUDED_SURFACE opts a release in.
@@ -467,6 +482,7 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
 // Tracing middleware is first to capture all requests
 // Rate limiting is placed after auth so we can use role-based limits
 export const onRequest = sequence(
+  wwwRedirect,
   normalizeRequestHeadersMiddleware,
   tracingMiddleware,
   generateCspNonce,

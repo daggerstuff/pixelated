@@ -34,12 +34,20 @@
 		}
 	],
 	"routes": [
-		// Zone route: the zone's apex records are already Cloudflare-proxied (to
-		// the Vercel standby), so a Workers route takes the traffic with no DNS
-		// change at all. To fail back to Vercel, remove this block and redeploy —
-		// the untouched records resume serving immediately.
+		// Zone routes: the zone's apex and www records are already
+		// Cloudflare-proxied (to the Vercel standby), so a Workers route takes
+		// the traffic with no DNS change at all. To fail back to Vercel, remove
+		// this block and redeploy — the untouched records resume serving
+		// immediately.
+		//
+		// www is routed here because the Vercel standby answers 402
+		// DEPLOYMENT_DISABLED; middleware redirects it to the apex.
 		{
 			"pattern": "pixelatedempathy.com/*",
+			"zone_name": "pixelatedempathy.com"
+		},
+		{
+			"pattern": "www.pixelatedempathy.com/*",
 			"zone_name": "pixelatedempathy.com"
 		}
 	],
