@@ -375,6 +375,25 @@ describe('an absent or empty email claim never reaches the unique insert', () =>
   })
 })
 
+describe('a provider outage during provisioning', () => {
+  it('reports a retryable identity error instead of a generic failure', async () => {
+    const database = createFakeDatabase()
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    mockProvider.getUserById.mockRejectedValue(
+      new Error('429 Too Many Requests'),
+    )
+
+    await expect(
+      userIdentity.resolveIdentity({
+        sub: 'auth0|first-login-outage',
+        email: '',
+        emailVerified: false,
+      }),
+    ).rejects.toBeInstanceOf(userIdentity.IdentityProviderUnavailableError)
+  })
+})
+
 describe('the provider lookup used for a missing email is bounded', () => {
   it('pins the provider profile deadline at 1.5s', () => {
     expect(userIdentity.PROVIDER_PROFILE_DEADLINE_MS).toBe(1_500)

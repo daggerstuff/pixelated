@@ -137,6 +137,20 @@ export const IDENTITY_CACHE_WRITE_DEADLINE_MS = 1_000
  */
 export const PROVIDER_PROFILE_DEADLINE_MS = 1_500
 
+/**
+ * The identity provider could not answer a lookup the provisioning path needs.
+ *
+ * Distinct from a database failure: the caller answers a retryable `503` with
+ * `Retry-After` instead of a `500`, because the next request may succeed.
+ */
+export class IdentityProviderUnavailableError extends Error {
+  constructor(message: string, cause?: unknown) {
+    super(message)
+    this.name = 'IdentityProviderUnavailableError'
+    if (cause !== undefined) this.cause = cause
+  }
+}
+
 class DeadlineExceededError extends Error {
   constructor(label: string, deadlineMs: number) {
     super(`${label} exceeded its ${deadlineMs}ms deadline`)
@@ -236,11 +250,20 @@ async function resolveProvisioningEmail(
   const fromProfile = normalizeEmail(profile.email)
   if (fromProfile) return fromProfile
 
-  const providerUser = await withDeadline(
-    provider.getUserById(profile.sub),
-    'Identity provider profile lookup',
-    PROVIDER_PROFILE_DEADLINE_MS,
-  )
+  let providerUser: Awaited<ReturnType<IdentityProvider['getUserById']>>
+  try {
+    providerUser = await withDeadline(
+      provider.getUserById(profile.sub),
+      'Identity provider profile lookup',
+      PROVIDER_PROFILE_DEADLINE_MS,
+    )
+  } catch (error: unknown) {
+    const detail = error instanceof Error ? error.message : String(error)
+    throw new IdentityProviderUnavailableError(
+      `Identity provider profile lookup failed during first-login provisioning: ${detail}`,
+      error,
+    )
+  }
   return normalizeEmail(providerUser?.email)
 }
 

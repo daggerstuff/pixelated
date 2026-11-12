@@ -756,7 +756,9 @@ export async function authenticateRequest(
         ? validation.payload['sid']
         : undefined
 
-    const { resolveIdentity } = await import('./user-identity')
+    const { resolveIdentity, IdentityProviderUnavailableError } = await import(
+      './user-identity'
+    )
 
     let identity: Awaited<ReturnType<typeof resolveIdentity>>
     try {
@@ -780,6 +782,19 @@ export async function authenticateRequest(
             ? resolveError.message
             : String(resolveError),
       })
+
+      // The provider could not answer a lookup the first login needs. That is
+      // an outage, not a broken identity: answer the same retryable 503 the
+      // token-validation path uses instead of a 500.
+      if (resolveError instanceof IdentityProviderUnavailableError) {
+        return {
+          success: false,
+          response: providerUnavailableResponse(
+            new URL(request.url).pathname,
+          ),
+          error: 'Identity provider unavailable',
+        }
+      }
 
       return {
         success: false,
