@@ -135,7 +135,19 @@ describe('the cached PostgreSQL pool', () => {
     await expect(disconnectPostgreSQL()).resolves.toBeUndefined()
   })
 
-  it('clears the connected state on disconnect', async () => {
+  it('keeps the pool available when the first connection test fails', async () => {
+    initializeDatabase()
+    const pool = FakePool.instances[0]
+    pool.connect = async () => {
+      throw new Error('connect ECONNREFUSED')
+    }
+
+    await expect(connectPostgreSQL()).rejects.toThrow(/ECONNREFUSED/)
+    // The pool was resolved; the database may be reachable on the next call.
+    expect(() => getPostgresPool()).not.toThrow()
+  })
+
+  it('clears the pool on disconnect', async () => {
     initializeDatabase()
     await connectPostgreSQL()
 

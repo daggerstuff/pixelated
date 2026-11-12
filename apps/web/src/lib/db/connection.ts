@@ -17,8 +17,6 @@ const logger = createBuildSafeLogger('connection')
 type MongoConnection = Connection
 let mongoConnection: MongoConnection | null = null
 let postgresPool: Pool | null = null
-/** Whether `connectPostgreSQL()` has completed at least once. */
-let postgresConnected = false
 /**
  * Whether the current pool was handed in by `setPostgresPool()` rather than
  * taken from the db module. An injected pool is not ours to replace.
@@ -96,7 +94,6 @@ export async function connectPostgreSQL(): Promise<Pool> {
     const result = await client.query('SELECT NOW()')
     logger.info('PostgreSQL connection test:', result.rows[0])
     client.release()
-    postgresConnected = true
     return sharedPool
   } catch (error: unknown) {
     logger.error('PostgreSQL connection failed:', error)
@@ -151,7 +148,6 @@ export async function connectRedis(): Promise<Redis> {
 
 export function setPostgresPool(pool: Pool | null): void {
   postgresPool = pool
-  postgresConnected = pool !== null
   postgresPoolInjected = pool !== null
 }
 
@@ -171,7 +167,10 @@ export function getMongoConnection(): MongoConnection {
 }
 
 export function getPostgresPool(): Pool {
-  if (!postgresConnected) {
+  // The guard is the pool itself, not a "connected" flag: a first connect
+  // whose test failed transiently still resolved a pool, and the database may
+  // be reachable on the next call.
+  if (!postgresPool) {
     throw new Error(
       'PostgreSQL pool not created. Call connectPostgreSQL() first.',
     )
@@ -209,7 +208,6 @@ export async function disconnectMongoDB(): Promise<void> {
 export async function disconnectPostgreSQL(): Promise<void> {
   const pool = postgresPool
   postgresPool = null
-  postgresConnected = false
   postgresPoolInjected = false
   if (!pool) return
 
