@@ -93,8 +93,7 @@ jobs:
           git push || echo "No changes to commit"
 
       - name: Publish to npm
-        if: (github.event_name == 'workflow_dispatch' && inputs.publish) ||
-          (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        if: github.event_name == 'workflow_dispatch' && inputs.publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: packages/sdk-typescript
@@ -104,8 +103,7 @@ jobs:
           npm publish --access public || echo "npm publish skipped (may already exist)"
 
       - name: Publish to PyPI
-        if: (github.event_name == 'workflow_dispatch' && inputs.publish) ||
-          (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        if: github.event_name == 'workflow_dispatch' && inputs.publish
         env:
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         working-directory: packages/sdk-python
