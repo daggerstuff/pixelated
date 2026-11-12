@@ -1,4 +1,10 @@
-import { defineConfig, presetUno, presetAttributify, presetIcons } from 'unocss'
+import {
+  defineConfig,
+  presetUno,
+  presetAttributify,
+  presetIcons,
+  transformerVariantGroup,
+} from 'unocss'
 
 export default defineConfig({
   content: {
@@ -15,6 +21,22 @@ export default defineConfig({
     },
   },
   theme: {
+    // `lgp` ("laptop") is the 1128px split the layout components were written
+    // against: Toc renders its sticky side nav at or above it and its floating
+    // button below, and TocButton / ToTopButton / SearchSwitch / GroupItem all
+    // tune themselves with `lt-lgp:`. UnoCSS has no `lgp` breakpoint, so every
+    // one of those rules compiled to nothing. A user-level `breakpoints` map
+    // REPLACES the preset's list instead of merging into it, so the preset's
+    // defaults are restated here — dropping one would silently disable every
+    // `sm:`/`md:`/`lg:`/`xl:`/`2xl:` utility on the site.
+    breakpoints: {
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'lgp': '1128px',
+      'xl': '1280px',
+      '2xl': '1536px',
+    },
     colors: {
       'foreground': 'var(--np-text)',
       'background': 'var(--np-bg)',
@@ -59,5 +81,11 @@ export default defineConfig({
       warn: false,
     }),
   ],
+  // Variant groups (`lt-lgp:(op-50 pointer-events-auto)`) are a *transformer*
+  // in UnoCSS, not part of presetUno, so without this every `prefix:(a b)`
+  // group in the codebase was extracted as two broken half-tokens and emitted
+  // no CSS at all. TocButton, NavBar, Categorizer and ToTopButton all size
+  // themselves that way.
+  transformers: [transformerVariantGroup()],
   shortcuts: {},
 })
