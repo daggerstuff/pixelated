@@ -1,24 +1,28 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 
-const title = '500 - Internal Server Error'
+// Mirror 404.astro: an error sheet is still a public sheet, so it carries the
+// same drafting chrome and gives the reader a way back instead of a dead end.
+Astro.response.status = 500
+
+const title = 'Server error'
 const description =
-  'Sorry, something went wrong on our end. Please try again later.'
+  'Something failed on our side. The request was not completed, and nothing you sent was saved.'
 ---
 
-<BaseLayout {title} {description}>
-  <div class="container mx-auto px-4 py-16 text-center">
-    <h1 class="text-4xl font-bold mb-4">500</h1>
-    <p class="text-xl mb-8">Internal Server Error</p>
-    <p>
-      We're experiencing some technical difficulties. Please try again later or
-      contact support if the issue persists.
-    </p>
-    <a
-      href="/"
-      class="inline-block bg-primary text-primary-foreground px-4 py-2 rounded-none mt-4 hover:bg-primary/90"
-    >
-      Return Home
-    </a>
-  </div>
+<BaseLayout {title} {description} register="public">
+  <MarketingPageHero
+    eyebrow="Status · 500"
+    title="This sheet did not render."
+    lede="The request reached us but the render failed. Nothing was saved, and retrying is safe."
+    primaryCTA={{ text: 'Try again', href: '/' }}
+    secondaryCTA={{ text: 'Contact support', href: '/contact' }}
+    note="If this keeps happening, the status page and support address below are the fastest route."
+    proof={{
+      label: 'What to do next',
+      body: `<ul class="marketing-list"><li><strong>Retry</strong> · reload the page; the failure is usually transient.</li><li><strong>Go back</strong> · <a href="/">the home sheet</a> is always reachable.</li><li><strong>Report it</strong> · email info@pixelatedempathy.com with the URL and time.</li></ul>`,
+      caption: 'No session data is written when a render fails.',
+    }}
+  />
 </BaseLayout>

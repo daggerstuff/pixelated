@@ -39,6 +39,8 @@ interface Props {
   showSettingsPanel?: boolean
   showAnalysisPanel?: boolean
   initialTab?: string
+  /** Drafting chrome register. Explicit-only: public sheets pass 'public'. */
+  register?: 'public' | 'product'
   [key: string]: any
 }
 
@@ -52,6 +54,7 @@ const {
   description = defaultDescription,
   ogType = 'website',
   image,
+  register = 'product',
 } = Astro.props
 
 const siteBase = Astro.site ?? new URL(Astro.url.origin)
@@ -142,7 +145,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
 ---
 
 <!doctype html>
-<html lang={SITE.lang || 'en'} data-theme="dark">
+<html lang={SITE.lang || 'en'} data-theme="dark" data-register={register}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
