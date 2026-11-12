@@ -85,26 +85,54 @@ export function isIdentityProviderUnavailable(error: unknown): boolean {
  * a configuration failure and must not become a retryable 503.
  */
 export function isTransientIdentityProviderFailure(error: unknown): boolean {
+  return isTransientProviderFailureAt(error, 0)
+}
+
+/** The transient names and network codes a wrapped failure may carry. */
+const TRANSIENT_ERROR_NAMES = new Set([
+  'DeadlineExceededError',
+  'ManagementTimeoutError',
+])
+const TRANSIENT_NETWORK_CODES = new Set([
+  'ECONNRESET',
+  'ETIMEDOUT',
+  'ECONNREFUSED',
+  'EAI_AGAIN',
+  'ENOTFOUND',
+])
+
+/**
+ * Walk one failure and its causes.
+ *
+ * The SDK and `fetch` wrap the interesting failure (`cause`) inside their own
+ * error, so a network or timeout condition can sit one or two levels down.
+ * Two levels is what those wrappers produce; a longer chain is a bug, not a
+ * transient failure.
+ */
+function isTransientProviderFailureAt(error: unknown, depth: number): boolean {
   if (!error || typeof error !== 'object') return false
   const candidate = error as {
     name?: unknown
     statusCode?: unknown
     code?: unknown
+    cause?: unknown
   }
-  if (candidate.name === 'DeadlineExceededError') return true
 
+  if (
+    typeof candidate.name === 'string' &&
+    TRANSIENT_ERROR_NAMES.has(candidate.name)
+  ) {
+    return true
+  }
   if (typeof candidate.statusCode === 'number') {
     return candidate.statusCode === 429 || candidate.statusCode >= 500
   }
-
-  return (
+  if (
     typeof candidate.code === 'string' &&
-    [
-      'ECONNRESET',
-      'ETIMEDOUT',
-      'ECONNREFUSED',
-      'EAI_AGAIN',
-      'ENOTFOUND',
-    ].includes(candidate.code)
-  )
+    TRANSIENT_NETWORK_CODES.has(candidate.code)
+  ) {
+    return true
+  }
+
+  return depth < 2 && isTransientProviderFailureAt(candidate.cause, depth + 1)
 }

@@ -410,6 +410,22 @@ describe('a provider outage during provisioning', () => {
     )
   })
 
+  it('sees a network failure wrapped in the SDK error cause', async () => {
+    const database = createFakeDatabase()
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    const wrapped = new Error('Request failed')
+    ;(wrapped as Error & { cause?: unknown }).cause = Object.assign(
+      new Error('socket hang up'),
+      { code: 'ECONNRESET' },
+    )
+    mockProvider.getUserById.mockRejectedValue(wrapped)
+
+    await expect(
+      userIdentity.resolveIdentity(profileWithoutEmail),
+    ).rejects.toBeInstanceOf(userIdentity.IdentityProviderUnavailableError)
+  })
+
   it('does not turn a configuration failure into a retryable outage', async () => {
     const database = createFakeDatabase()
     useDatabase(database)
