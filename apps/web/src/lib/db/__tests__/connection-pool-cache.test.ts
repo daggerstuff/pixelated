@@ -58,6 +58,7 @@ import {
   connectPostgreSQL,
   disconnectPostgreSQL,
   getPostgresPool,
+  setPostgresPool,
 } from '../connection'
 import { closeDatabase, initializeDatabase } from '../index'
 
@@ -107,6 +108,28 @@ describe('the cached PostgreSQL pool', () => {
 
     expect(replacement).toBe(FakePool.instances[1])
     expect(FakePool.instances).toHaveLength(2)
+  })
+
+  it('hands back a pool injected with setPostgresPool', async () => {
+    const injected = new FakePool({})
+    setPostgresPool(injected as never)
+    const builtBefore = FakePool.instances.length
+
+    expect(getPostgresPool()).toBe(injected)
+    // The db module's pool is never built for an injected one.
+    expect(FakePool.instances).toHaveLength(builtBefore)
+  })
+
+  it('does not reject when the cached pool was already closed', async () => {
+    initializeDatabase()
+    await connectPostgreSQL()
+    // The db module discarded its pool behind this module's back.
+    await closeDatabase()
+    FakePool.instances[0].end = vi.fn(async () => {
+      throw new Error('Called end on pool more than once')
+    })
+
+    await expect(disconnectPostgreSQL()).resolves.toBeUndefined()
   })
 
   it('clears the connected state on disconnect', async () => {

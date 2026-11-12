@@ -19,6 +19,11 @@ let mongoConnection: MongoConnection | null = null
 let postgresPool: Pool | null = null
 /** Whether `connectPostgreSQL()` has completed at least once. */
 let postgresConnected = false
+/**
+ * Whether the current pool was handed in by `setPostgresPool()` rather than
+ * taken from the db module. An injected pool is not ours to replace.
+ */
+let postgresPoolInjected = false
 let redisClient: Redis | null = null
 
 // ============================================================================
@@ -147,6 +152,7 @@ export async function connectRedis(): Promise<Redis> {
 export function setPostgresPool(pool: Pool | null): void {
   postgresPool = pool
   postgresConnected = pool !== null
+  postgresPoolInjected = pool !== null
 }
 
 export function setRedisClient(client: Redis | null): void {
@@ -170,8 +176,12 @@ export function getPostgresPool(): Pool {
       'PostgreSQL pool not created. Call connectPostgreSQL() first.',
     )
   }
-  // Hand out the pool the db module owns now: after a rebuild the cached
-  // reference is an ended instance, and ten consumers hold this getter.
+  // An injected pool is the caller's: hand it back untouched.
+  if (postgresPoolInjected) {
+    return postgresPool as Pool
+  }
+  // Otherwise hand out the pool the db module owns now: after a rebuild the
+  // cached reference is an ended instance, and ten consumers hold this getter.
   const sharedPool = getDbPool()
   postgresPool = sharedPool
   return sharedPool
@@ -200,10 +210,17 @@ export async function disconnectPostgreSQL(): Promise<void> {
   const pool = postgresPool
   postgresPool = null
   postgresConnected = false
-  if (pool) {
+  postgresPoolInjected = false
+  if (!pool) return
+
+  try {
     await pool.end()
-    logger.info('PostgreSQL pool closed')
+  } catch (error: unknown) {
+    // The db module may have discarded and rebuilt this pool already, and
+    // ending an ended pool rejects. Shutdown must not fail on that.
+    logger.warn('PostgreSQL pool was already closed', error)
   }
+  logger.info('PostgreSQL pool closed')
 }
 
 export async function disconnectRedis(): Promise<void> {
