@@ -145,6 +145,19 @@ def health_check():
 
 
 _LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
+_DEV_SERVER_DEFAULT_HOST = "127.0.0.1"
+
+
+def _dev_server_host() -> str:
+    """Host for the Werkzeug dev server.
+
+    The shared ``settings.host`` default (0.0.0.0) exists for containerised
+    deployments. When HOST is not explicitly configured, the dev server binds
+    to loopback instead so it is never exposed by accident.
+    """
+    if "host" in settings.model_fields_set:
+        return settings.host
+    return _DEV_SERVER_DEFAULT_HOST
 
 
 def _ensure_loopback_host(host: str) -> None:
@@ -167,5 +180,6 @@ def _ensure_loopback_host(host: str) -> None:
 if __name__ == "__main__":
     # Local development only. In production run under gunicorn
     # (see setup.sh / start_service.sh), behind the TLS reverse proxy.
-    _ensure_loopback_host(settings.host)
-    app.run(host=settings.host, port=settings.port, debug=settings.debug)
+    host = _dev_server_host()
+    _ensure_loopback_host(host)
+    app.run(host=host, port=settings.port, debug=settings.debug)
