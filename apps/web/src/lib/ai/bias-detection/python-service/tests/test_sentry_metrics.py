@@ -64,6 +64,18 @@ def test_before_send_event_drops_werkzeug_client_error_log() -> None:
     assert before_send_event(event, None) is None
 
 
+def test_before_send_event_drops_werkzeug_tls_client_hello_log() -> None:
+    event = {
+        "logger": "werkzeug",
+        "logentry": {
+            "formatted": "176.32.193.16 - - [09/Nov/2026 05:53:43] "
+            "code 400, message Bad request syntax ('\\x16\\x03\\x01')",
+        },
+    }
+
+    assert before_send_event(event, None) is None
+
+
 def test_before_send_event_drops_werkzeug_client_error_log_with_serialized_tags() -> None:
     event = {
         "message": "127.0.0.1 - - [08/Nov/2026 22:11:05] code 404, message Not Found",

@@ -141,8 +141,19 @@ def _tag_value(event: dict[str, Any], key: str) -> Any:
     return None
 
 
+def _event_logger_name(event: dict[str, Any]) -> str | None:
+    """Return the emitting logger name from a Sentry logging event."""
+    logger_name = event.get("logger")
+    if isinstance(logger_name, str) and logger_name.strip():
+        return logger_name.strip()
+    tag_logger = _tag_value(event, "logger")
+    if isinstance(tag_logger, str) and tag_logger.strip():
+        return tag_logger.strip()
+    return None
+
+
 def _is_werkzeug_client_error_log(event: dict[str, Any]) -> bool:
-    if _tag_value(event, "logger") != "werkzeug":
+    if _event_logger_name(event) != "werkzeug":
         return False
     return any(re.search(r"\bcode\s+4\d\d\b", title) for title in _event_titles(event))
 
@@ -189,6 +200,10 @@ def init_sentry(
     sentry_sdk = _get_sentry_sdk()
     if sentry_sdk is None:
         logger.warning("Sentry SDK import failed, skipping initialization")
+        return
+
+    if sentry_sdk.is_initialized():
+        logger.debug("Sentry already initialized, skipping duplicate init")
         return
 
     sentry_sdk.init(
