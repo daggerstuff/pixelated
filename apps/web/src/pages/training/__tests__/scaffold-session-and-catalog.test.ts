@@ -374,8 +374,9 @@ describe('the shipped VAL-UX-003 comment names the right element', () => {
       )?.[0] ?? ''
 
     expect(comment).not.toBe('')
-    expect(comment).toMatch(/\*\*left\*\*/)
+    expect(comment).toMatch(/left \(client-state\) aside/)
     expect(comment).toMatch(/Retry/)
+    expect(comment).toMatch(/293px below the 822\.6px clip\s+line/)
     // `#session-notes` lives in the right aside and fits; the comment says so
     // rather than blaming it for the clipped control.
     expect(comment).toMatch(/right aside and fits/)
