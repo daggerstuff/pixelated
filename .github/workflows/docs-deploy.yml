@@ -38,8 +38,6 @@ jobs:
         id: build
         run: pnpm build
         continue-on-error: true
-        env:
-          PUBLIC_SITE_URL: https://docs.pixelatedempathy.com
 
       - name: Validate OpenAPI spec
         run: |
