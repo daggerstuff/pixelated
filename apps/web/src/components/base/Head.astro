@@ -82,8 +82,13 @@ const webPageData = {
   'name': `${title || SITE.title}`,
   ...(description && { description: description }),
   'publisher': {
-    '@type': 'ProfilePage',
-    'name': `${SITE.author}'s Personal Website`,
+    '@type': 'Organization',
+    'name': 'Pixelated Empathy',
+    'url': SITE.website,
+    'logo': {
+      '@type': 'ImageObject',
+      'url': `${SITE.website}/android-chrome-512x512.png`,
+    },
   },
 }
 ---

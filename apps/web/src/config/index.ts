@@ -55,12 +55,12 @@ export const UI = {
   socialLinks: [
     {
       name: 'GitHub',
-      link: 'https://github.com/nochadisfaction',
+      link: 'https://github.com/daggerstuff',
       icon: 'i-uil:github',
     },
     {
       name: 'Twitter',
-      link: 'https://twitter.com/tweetpixelated',
+      link: 'https://x.com/tweetpixelated',
       icon: 'i-uil:twitter',
     },
   ],

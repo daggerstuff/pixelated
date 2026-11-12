@@ -289,7 +289,7 @@ See [docs/SECURITY.md](docs/SECURITY.md) and
   <b>Pixelated Empathy is proprietary software.</b><br><br>
   <a href="https://pixelatedempathy.com">Website</a> •
   <a href="https://pixelatedempathy.com/contact">Enterprise Access</a> •
-  <a href="https://pixelatedempathy.com/case-studies">Case Studies</a> •
+  <a href="https://pixelatedempathy.com/research">Research</a> •
   <a href="https://pixelatedempathy.com/team">Our Team</a>
 
 <br><br> <code>© 2026 Pixelated Empathy. All rights reserved.</code>

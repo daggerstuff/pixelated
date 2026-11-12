@@ -48,8 +48,8 @@ export const UI: Ui = {
       icon: 'i-uil-github-alt',
     },
     {
-      link: 'https://twitter.com/juggledaggers',
-      title: 'Pixelated Empathy on Twitter',
+      link: 'https://x.com/tweetpixelated',
+      title: 'Pixelated Empathy on X',
       displayMode: 'alwaysIcon',
       icon: 'i-ri-twitter-x-fill',
     },
