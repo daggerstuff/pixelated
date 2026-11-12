@@ -104,9 +104,9 @@ jobs:
                     echo "Aliasing $DEPLOYMENT_URL to pixelatedempathy.com..."
                     npx vercel alias set "$DEPLOYMENT_URL" pixelatedempathy.com \
                       --token ${{ secrets.VERCEL_TOKEN }} \
-                      --scope wutanglan || true
+                      --scope pixelthis || true
                     npx vercel alias set "$DEPLOYMENT_URL" www.pixelatedempathy.com \
                       --token ${{ secrets.VERCEL_TOKEN }} \
-                      --scope wutanglan || true
+                      --scope pixelthis || true
                   fi
               continue-on-error: true
