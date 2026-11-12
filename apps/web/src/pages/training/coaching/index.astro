@@ -1,0 +1,284 @@
+---
+// Session coaching (structure only).
+//
+// This is the surface that would present coaching grounded in a session
+// transcript, and the place where a synthetic client's reply would be generated
+// from one. Neither model exists: the coaching rubric, the competency framework,
+// the feedback wording, and the client persona are all owner decisions. The page
+// therefore renders the blockers those paths are waiting on, plus the real
+// transcript it read, and no coaching and no reply.
+//
+// `?sessionId=` names the session whose transcript would ground the coaching.
+// The read goes through the same service the session page uses
+// (`getTrainingSessionResponse`), so ownership, `session_type='training'`, the
+// synthetic marker, and the bounded deadline are all enforced by the one
+// existing path rather than re-implemented here.
+//
+// The decisions live in `../_reply-and-coaching.ts`; this page only renders
+// them. Nothing here scores a response, ranks a competency, or writes feedback.
+
+import Layout from '@/layouts/Layout.astro'
+import { providerUnavailableResponse } from '@/lib/auth/provider-unavailable'
+import { resolvePageSession } from '@/lib/auth/session'
+import { getTrainingSessionResponse } from '@/lib/services/training/session-api'
+import { classifyTrainingSessionLoad } from '../_session-load-state'
+import {
+  buildCoachingReport,
+  requestClientReply,
+  type TranscriptMessage,
+} from '../_reply-and-coaching'
+
+// One page-session read for this request, through the helper that consumes the
+// middleware's verdict. A second `getSession` / `isAuthenticated` /
+// `getCurrentUser` call would re-validate the same token (diagnosis D7).
+const { session, providerUnavailable, developer } = await resolvePageSession(
+  Astro.request,
+  Astro.locals,
+)
+
+const signedIn = Boolean(session ?? developer)
+if (!signedIn) {
+  // The middleware already resolved this token. A failure here is a provider
+  // outage, not a logout.
+  if (providerUnavailable) {
+    return providerUnavailableResponse(Astro.url.pathname)
+  }
+  return Astro.redirect(
+    `/login?redirect=${encodeURIComponent('/training/coaching')}`,
+  )
+}
+
+/**
+ * The messages the read path returned, or `null` when the body is not a
+ * transcript. Only the fields the summary reads are checked: this page needs
+ * counts and timestamps, not the client profile.
+ */
+const toTranscript = (value: unknown): TranscriptMessage[] | null => {
+  if (!value || typeof value !== 'object') return null
+  const messages = (value as Record<string, unknown>)['messages']
+  if (!Array.isArray(messages)) return null
+
+  const transcript: TranscriptMessage[] = []
+  for (const message of messages) {
+    if (!message || typeof message !== 'object') return null
+    const record = message as Record<string, unknown>
+    const id = record['id']
+    const content = record['content']
+    const createdAt = record['createdAt']
+    if (
+      typeof id !== 'string' ||
+      typeof content !== 'string' ||
+      typeof createdAt !== 'string'
+    ) {
+      return null
+    }
+    transcript.push({ id, content, createdAt })
+  }
+  return transcript
+}
+
+const requestedSessionId = Astro.url.searchParams.get('sessionId') ?? undefined
+let transcript: TranscriptMessage[] = []
+let loadState: 'no-session' | 'ready' | 'not-found' | 'unavailable' =
+  'no-session'
+
+if (requestedSessionId) {
+  try {
+    const response = await getTrainingSessionResponse(
+      Astro.request,
+      requestedSessionId,
+    )
+    const body = response.ok ? toTranscript(await response.json()) : null
+    loadState = classifyTrainingSessionLoad(response.status, body !== null)
+    if (loadState === 'ready' && body) transcript = body
+  } catch {
+    // A thrown load (a network failure, an unexpected rejection) is temporary.
+    loadState = 'unavailable'
+  }
+}
+
+if (loadState === 'unavailable') {
+  Astro.response.status = 503
+  Astro.response.headers.set('Retry-After', '1')
+}
+
+// Both seams are consulted, and both refuse. `status` is the only thing a
+// caller can branch on, so nothing below can accidentally render a reply or a
+// coaching sentence.
+const replyOutcome = await requestClientReply({
+  sessionId: requestedSessionId,
+  transcript,
+})
+const coachingOutcome = await buildCoachingReport({
+  sessionId: requestedSessionId,
+  transcript,
+})
+
+const coachingHref = requestedSessionId
+  ? `/training/coaching?sessionId=${encodeURIComponent(requestedSessionId)}`
+  : '/training/coaching'
+---
+
+<Layout
+  title="Session coaching | Pixelated Empathy"
+  description="Transcript-grounded coaching and synthetic-client replies. Structure only: awaiting the approved coaching model and the approved synthetic-client model."
+>
+  <div class="min-h-screen bg-background text-foreground">
+    <div class="px-4 py-12 mx-auto max-w-4xl sm:px-6">
+      <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        Training
+      </p>
+      <h1 class="mt-3 text-3xl font-semibold text-foreground">
+        Session coaching
+      </h1>
+      <p class="max-w-2xl mt-4 text-base leading-relaxed text-muted-foreground">
+        This surface would present coaching grounded in a session transcript,
+        and would generate a synthetic client’s reply to a trainee message. Both
+        are structure only: the models behind them are owner decisions and
+        neither has been approved, so this page shows the transcript it read and
+        the decisions it is waiting on — no coaching and no reply.
+      </p>
+
+      {loadState === 'unavailable' && (
+        <section
+          class="p-6 mt-8 border border-border bg-card"
+          aria-labelledby="coaching-unavailable-heading"
+        >
+          <h2
+            id="coaching-unavailable-heading"
+            class="text-xl font-semibold text-foreground"
+          >
+            This transcript is temporarily unavailable
+          </h2>
+          <p
+            class="mt-3 text-sm leading-relaxed text-muted-foreground"
+            role="status"
+          >
+            The session data could not be loaded in time. This is a temporary
+            problem, not a missing session: nothing has been deleted,
+            reassigned, or lost.
+          </p>
+          <a
+            href={coachingHref}
+            class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 mt-4 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+          >
+            Retry loading this transcript
+          </a>
+        </section>
+      )}
+
+      {loadState === 'not-found' && (
+        <section
+          class="p-6 mt-8 border border-border bg-card"
+          aria-labelledby="coaching-not-found-heading"
+        >
+          <h2
+            id="coaching-not-found-heading"
+            class="text-xl font-semibold text-foreground"
+          >
+            That training session could not be found
+          </h2>
+          <p
+            class="mt-3 text-sm leading-relaxed text-muted-foreground"
+            role="status"
+          >
+            It may have been removed, or it may belong to another account. Open
+            a training session and follow its coaching link.
+          </p>
+        </section>
+      )}
+
+      {loadState === 'no-session' && (
+        <p
+          class="p-6 mt-8 text-sm leading-relaxed border border-border bg-card text-muted-foreground"
+          role="status"
+        >
+          No session transcript is selected. Coaching is grounded in a session
+          transcript, so open a training session and follow its coaching link.
+        </p>
+      )}
+
+      <section
+        class="p-6 mt-8 border border-border bg-card"
+        aria-labelledby="reply-blocker-heading"
+      >
+        <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          Automated client replies
+        </p>
+        <h2
+          id="reply-blocker-heading"
+          class="mt-2 text-xl font-semibold text-foreground"
+        >
+          {replyOutcome.blocker.headline}
+        </h2>
+        <p
+          class="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground"
+          role="status"
+        >
+          {replyOutcome.blocker.detail}
+        </p>
+        <p class="mt-3 text-xs text-muted-foreground">
+          Owner: {replyOutcome.blocker.owner} · Blocker{' '}
+          <span class="font-mono">{replyOutcome.blocker.id}</span>
+        </p>
+        <p class="mt-1 text-xs text-muted-foreground">
+          {replyOutcome.transcript.messageCount}
+          {replyOutcome.transcript.messageCount === 1
+            ? 'message'
+            : 'messages'}{' '}
+          in the transcript · {replyOutcome.transcript.clientTurnCount} client
+          turns
+        </p>
+      </section>
+
+      <section
+        class="p-6 mt-6 border border-border bg-card"
+        aria-labelledby="coaching-blocker-heading"
+      >
+        <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+          Session coaching
+        </p>
+        <h2
+          id="coaching-blocker-heading"
+          class="mt-2 text-xl font-semibold text-foreground"
+        >
+          {coachingOutcome.blockers[0]?.headline}
+        </h2>
+
+        <ul class="mt-4 space-y-4">
+          {coachingOutcome.blockers.map((blocker) => (
+            <li class="pl-4 border-l border-border">
+              <p class="text-sm font-medium text-foreground">
+                {blocker.headline}
+              </p>
+              <p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {blocker.detail}
+              </p>
+              <p class="mt-1 text-xs text-muted-foreground">
+                Owner: {blocker.owner} · Blocker{' '}
+                <span class="font-mono">{blocker.id}</span>
+              </p>
+            </li>
+          ))}
+        </ul>
+
+        <p class="mt-4 text-xs text-muted-foreground">
+          {coachingOutcome.transcript.messageCount}
+          {coachingOutcome.transcript.messageCount === 1
+            ? 'message'
+            : 'messages'}{' '}
+          available to ground coaching
+        </p>
+      </section>
+
+      <nav class="pt-6 mt-10 border-t border-border">
+        <a
+          href="/training"
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+        >
+          Back to training
+        </a>
+      </nav>
+    </div>
+  </div>
+</Layout>

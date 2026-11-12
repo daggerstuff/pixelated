@@ -1,0 +1,72 @@
+---
+/**
+ * Session status and the transcript-grounded coaching surface, in the aside.
+ *
+ * The aside is 320px wide, so the coaching block carries the headline, the
+ * owner, and the transcript it would be grounded in, then links to the full
+ * surface at `/training/coaching`, which renders every blocker with its detail.
+ * Keeping the detail out of the aside is what stops the column from becoming a
+ * wall of disclaimer above the session notes.
+ *
+ * The status list above it is not coaching: it is where the composer reports
+ * whether the last message was saved (`showConnectionStatus` in
+ * `training-session.js`). It used to be titled "Live Feedback", which read as
+ * coaching output; the block below is the only coaching surface here.
+ *
+ * It renders no score, rating, rubric line, or feedback sentence, and cannot:
+ * `CoachingOutcome` has no variant that carries one (see
+ * `_reply-and-coaching.ts`).
+ */
+import {
+  buildCoachingReport,
+  type TranscriptMessage,
+} from './_reply-and-coaching'
+
+interface Props {
+  transcript: readonly TranscriptMessage[]
+  sessionId?: string
+}
+
+const { transcript, sessionId } = Astro.props
+const { blockers, transcript: summary } = await buildCoachingReport({
+  sessionId,
+  transcript,
+})
+const primary = blockers[0]
+const messageLabel = summary.messageCount === 1 ? 'message' : 'messages'
+const href = sessionId
+  ? `/training/coaching?sessionId=${encodeURIComponent(sessionId)}`
+  : '/training/coaching'
+---
+
+<div class="p-6 border-b border-border">
+  <h3 class="mb-4 text-md font-semibold text-foreground">Session status</h3>
+  <div id="feedback-messages" class="space-y-2 text-sm">
+    <p class="text-muted-foreground">No status updates.</p>
+  </div>
+</div>
+
+<div class="p-6 border-b border-border">
+  <h3 class="mb-2 text-md font-semibold text-foreground">Session coaching</h3>
+
+  {primary && (
+    <div>
+      <p class="text-sm font-medium text-foreground">{primary.headline}</p>
+      <p class="mt-1 text-xs text-muted-foreground">Owner: {primary.owner}</p>
+      <p class="mt-1 text-xs text-muted-foreground">
+        {summary.messageCount}
+        {messageLabel} in this transcript · {blockers.length} blockers
+      </p>
+      <p class="mt-1 font-mono text-[11px] text-muted-foreground">
+        Blocker {primary.id}
+      </p>
+    </div>
+  )}
+
+  <a
+    {href}
+    class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 mt-4 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+  >
+    Open coaching
+  </a>
+</div>
