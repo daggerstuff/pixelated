@@ -1,0 +1,5 @@
+{
+  "note": "There is no approved training-scenario catalog. This artefact records that absence. When the clinical content owner approves a catalog, replace it with the approved entries and their approval record; _scenario-catalog.ts validates both and fails closed on a malformed artefact.",
+  "approval": null,
+  "scenarios": []
+}

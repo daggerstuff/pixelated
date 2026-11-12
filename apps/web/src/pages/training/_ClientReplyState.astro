@@ -1,0 +1,52 @@
+---
+/**
+ * The synthetic-client reply state, rendered beside the composer.
+ *
+ * A trainee who sends a message expects a client to answer. Nothing answers,
+ * and that has to be visible at the point where the answer would appear — not
+ * in a footnote — or the silence reads as a bug. The panel asks the reply path
+ * for the current transcript and renders its refusal: the decision it is
+ * waiting on, the role that owns it, and the real transcript it would have been
+ * grounded in.
+ *
+ * It renders no reply, and cannot: `ClientReplyOutcome` has no variant that
+ * carries one (see `_reply-and-coaching.ts`).
+ */
+import {
+  requestClientReply,
+  type TranscriptMessage,
+} from './_reply-and-coaching'
+
+interface Props {
+  transcript: readonly TranscriptMessage[]
+  sessionId?: string
+}
+
+const { transcript, sessionId } = Astro.props
+const { blocker, transcript: summary } = await requestClientReply({
+  sessionId,
+  transcript,
+})
+const messageLabel = summary.messageCount === 1 ? 'message' : 'messages'
+---
+
+<div
+  id="client-reply-state"
+  class="px-3 py-2 mt-2 border border-border bg-secondary"
+  role="status"
+>
+  <p class="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+    Automated client replies
+  </p>
+  <p class="mt-1 text-sm font-medium text-foreground">{blocker.headline}</p>
+  <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
+    {blocker.detail}
+  </p>
+  <p class="mt-1 text-xs text-muted-foreground">
+    Owner: {blocker.owner} · {summary.messageCount}
+    {messageLabel} in this transcript
+  </p>
+  <p class="mt-1 font-mono text-[11px] text-muted-foreground">
+    Blocker {blocker.id}
+  </p>
+</div>

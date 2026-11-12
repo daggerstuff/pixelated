@@ -10,11 +10,14 @@
  * the trainee aside, which is a *sibling* of the transcript column and cannot
  * move the composer.
  *
- * At 1440x900 the aside measured ~660px of client height against ~1205px of
- * scroll height, and the focusable `#session-notes` textarea sits entirely below
- * the clip line. A keyboard user could tab to it and type into a field that was
- * never painted: WCAG 2.2 AA 2.4.11 (Focus Not Obscured). `overflow: hidden`
- * would have let the browser scroll it into view; `clip` removes that path.
+ * At 1440x900 the left (client-state) aside measured ~660px of client height
+ * against ~1205px of scroll height, and VitalsMonitor's Retry button sat 293px
+ * below the clip line with the aside's scrollTop stuck at 0. A keyboard user
+ * could tab to it and type into a control that was never painted: WCAG 2.2 AA
+ * 2.4.11 (Focus Not Obscured). `overflow: hidden` would have let the browser
+ * scroll it into view; `clip` removes that path. `#session-notes` lives in the
+ * right aside and fits at both viewports, so it is not the control this rule
+ * exists for.
  *
  * The repair gives the aside its own vertical scroll (`overflow-y: auto`) and
  * leaves the row clipped, so both properties hold at once: the aside reveals
@@ -102,8 +105,9 @@ describe('trainee aside: the focus target is a scroll container', () => {
   it('marks every trainee aside as a scroll container', () => {
     // The session page draws two trainee asides, both siblings of the
     // transcript column: the left client-state column (which holds the vitals
-    // monitor's reconnect control) and the right guidance column (which holds
-    // `#session-notes`). Both overflow the row at 1440x900.
+    // monitor's reconnect control and is the column that overflows at
+    // 1440x900) and the right guidance column (which holds `#session-notes`
+    // and fits at both viewports).
     expect(asideTags).toHaveLength(2)
     for (const tag of asideTags) {
       expect(tag).toMatch(/session-aside/)

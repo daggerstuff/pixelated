@@ -6,7 +6,9 @@ import Layout from '@/layouts/Layout.astro'
 import { resolvePageSession } from '@/lib/auth/session'
 import { getTrainingSessionResponse } from '@/lib/services/training/session-api'
 import VitalsMonitorIsland from '@/components/simulation/VitalsMonitorIsland.tsx'
+import ClientReplyState from '../_ClientReplyState.astro'
 import FacultyReviewPanel from '../_FacultyReviewPanel.astro'
+import SessionGuidancePanel from '../_SessionGuidancePanel.astro'
 import { classifyTrainingSessionLoad } from '../_session-load-state'
 
 type TrainingSessionResponse = {
@@ -114,6 +116,10 @@ if (unavailable) {
   Astro.response.status = 503
   Astro.response.headers.set('Retry-After', '1')
 }
+
+// The reply path and the coaching surface are structure only. Each surface
+// below asks its own path and renders the refusal (see `_reply-and-coaching.ts`).
+const transcript = sessionData?.messages ?? []
 
 // Map MongoDB roles to training context
 // In a real implementation, this would check specific training permissions
@@ -451,18 +457,6 @@ const isSupervisor = userRole === 'admin'
                             Therapeutic Confrontation
                           </option>
                         </select>
-
-                        <button
-                          id="suggestions-button"
-                          class="text-sm bg-secondary text-foreground px-3 py-1 rounded-none hover:bg-accent transition-colors"
-                        >
-                          <svg
-                            class="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          />{' '}
-                          Get Suggestions
-                        </button>
                       </div>
 
                       {/* $1 */}
@@ -477,14 +471,13 @@ const isSupervisor = userRole === 'admin'
 
                           {/* $1 */}
                           <div class="flex justify-between items-center mt-2 text-xs text-muted-foreground">
-                            <span>
-                              Quality:{' '}
-                              <span id="response-quality" class="font-medium">
-                                Good
-                              </span>
-                            </span>
                             <span id="character-count">0/1000</span>
                           </div>
+
+                          <ClientReplyState
+                            {transcript}
+                            sessionId={sessionData.sessionId}
+                          />
                         </div>
 
                         <button
@@ -567,16 +560,10 @@ const isSupervisor = userRole === 'admin'
                 </div>
 
                 {/* $1 */}
-                <div class="p-6 border-b border-border">
-                  <h3 class="text-md font-semibold text-foreground mb-4">
-                    Live Feedback
-                  </h3>
-                  <div id="feedback-messages" class="space-y-2 text-sm">
-                    <p class="text-muted-foreground">
-                      Feedback will appear here.
-                    </p>
-                  </div>
-                </div>
+                <SessionGuidancePanel
+                  {transcript}
+                  sessionId={sessionData.sessionId}
+                />
 
                 {/* $1 */}
                 <div
@@ -671,14 +658,14 @@ const isSupervisor = userRole === 'admin'
       overflow: clip;
     }
 
-    /* Each trainee aside is its own scroll container (VAL-UX-003).
-       `clip` on the row above deliberately removes the focus-scroll path that
-       `overflow: hidden` would still provide, and both asides are taller than
-       the row at 1440x900 — the focusable `#session-notes` textarea sits
-       entirely below the clip line, so a keyboard user could tab to a field
-       that is never painted. An aside is a sibling of the transcript column,
-       so scrolling it cannot move the composer the way scrolling the row
-       could; the row stays clipped. */
+    /* Each trainee aside is its own scroll container (VAL-UX-003). `clip` on
+       the row above removes the focus-scroll path `overflow: hidden` still
+       provided. The overflowing column is the left (client-state) aside: at
+       1440x900 VitalsMonitor's Retry button sat 293px below the 822.6px clip
+       line with scrollTop stuck at 0, so a keyboard user could focus a control
+       that was never painted. `#session-notes` is in the right aside and fits
+       at both viewports. An aside is a sibling of the transcript column, so
+       its scroll cannot move the composer; the row stays clipped. */
     .session-aside {
       min-height: 0;
       overflow-y: auto;
