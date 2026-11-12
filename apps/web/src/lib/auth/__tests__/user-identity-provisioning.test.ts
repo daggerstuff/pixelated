@@ -260,6 +260,7 @@ describe('first-login provisioning assigns a workspace', () => {
     expect(identity.email).toBe('from-provider@example.test')
     expect(mockProvider.getUserById).toHaveBeenCalledWith(
       'auth0|token-without-email',
+      { strict: true },
     )
     expect(database.inserts).toHaveLength(1)
     expect(database.inserts[0].values['email']).toBe(
@@ -376,21 +377,50 @@ describe('an absent or empty email claim never reaches the unique insert', () =>
 })
 
 describe('a provider outage during provisioning', () => {
-  it('reports a retryable identity error instead of a generic failure', async () => {
+  const profileWithoutEmail = {
+    sub: 'auth0|first-login-outage',
+    email: '',
+    emailVerified: false,
+  }
+
+  it('reports a retryable identity error for a throttled lookup', async () => {
     const database = createFakeDatabase()
     useDatabase(database)
     mockProvider.findInternalIdBySub.mockResolvedValue(null)
     mockProvider.getUserById.mockRejectedValue(
-      new Error('429 Too Many Requests'),
+      Object.assign(new Error('Too Many Requests'), { statusCode: 429 }),
     )
 
     await expect(
-      userIdentity.resolveIdentity({
-        sub: 'auth0|first-login-outage',
-        email: '',
-        emailVerified: false,
-      }),
+      userIdentity.resolveIdentity(profileWithoutEmail),
     ).rejects.toBeInstanceOf(userIdentity.IdentityProviderUnavailableError)
+  })
+
+  it('asks the provider for the error instead of a null it cannot classify', async () => {
+    const database = createFakeDatabase()
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    mockProvider.getUserById.mockResolvedValue(null)
+
+    await userIdentity.resolveIdentity(profileWithoutEmail)
+
+    expect(mockProvider.getUserById).toHaveBeenCalledWith(
+      'auth0|first-login-outage',
+      { strict: true },
+    )
+  })
+
+  it('does not turn a configuration failure into a retryable outage', async () => {
+    const database = createFakeDatabase()
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    mockProvider.getUserById.mockRejectedValue(
+      new Error('Auth0 management client not initialized'),
+    )
+
+    await expect(
+      userIdentity.resolveIdentity(profileWithoutEmail),
+    ).rejects.not.toBeInstanceOf(userIdentity.IdentityProviderUnavailableError)
   })
 })
 

@@ -74,3 +74,37 @@ export function isIdentityProviderUnavailable(error: unknown): boolean {
     (error as { code?: unknown }).code === IDENTITY_PROVIDER_UNAVAILABLE_CODE
   )
 }
+
+/**
+ * True when a failure from the identity provider is worth retrying.
+ *
+ * The provider service answers `null` for a lookup it could not complete, so
+ * the provisioning path asks for the error instead and classifies it here: a
+ * throttled or erroring Management API, a network failure, or a lookup that
+ * ran out its deadline is an outage. A missing client or a malformed request is
+ * a configuration failure and must not become a retryable 503.
+ */
+export function isTransientIdentityProviderFailure(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false
+  const candidate = error as {
+    name?: unknown
+    statusCode?: unknown
+    code?: unknown
+  }
+  if (candidate.name === 'DeadlineExceededError') return true
+
+  if (typeof candidate.statusCode === 'number') {
+    return candidate.statusCode === 429 || candidate.statusCode >= 500
+  }
+
+  return (
+    typeof candidate.code === 'string' &&
+    [
+      'ECONNRESET',
+      'ETIMEDOUT',
+      'ECONNREFUSED',
+      'EAI_AGAIN',
+      'ENOTFOUND',
+    ].includes(candidate.code)
+  )
+}

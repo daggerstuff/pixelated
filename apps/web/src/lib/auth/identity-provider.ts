@@ -70,7 +70,10 @@ export interface IdentityProvider {
    * Fetch a user record from the provider by their provider-specific ID
    * (the same value returned in `TokenValidationResult.userId`).
    */
-  getUserById(userId: string): Promise<IdentityProviderUser | null>
+  getUserById(
+    userId: string,
+    options?: { strict?: boolean },
+  ): Promise<IdentityProviderUser | null>
 
   /**
    * Look up the internal platform UUID for a given provider `sub`. The optional

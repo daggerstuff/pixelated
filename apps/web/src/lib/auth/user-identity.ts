@@ -33,7 +33,10 @@ import { DEFAULT_WORKSPACE_SLUG } from '../db/workspace'
 import { getFromCache, setInCache } from '../redis'
 import type { IdentityProvider } from './identity-provider'
 import { getIdentityProvider } from './identity-provider'
-import { IDENTITY_PROVIDER_UNAVAILABLE_CODE } from './provider-unavailable'
+import {
+  IDENTITY_PROVIDER_UNAVAILABLE_CODE,
+  isTransientIdentityProviderFailure,
+} from './provider-unavailable'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -255,12 +258,18 @@ async function resolveProvisioningEmail(
 
   let providerUser: Awaited<ReturnType<IdentityProvider['getUserById']>>
   try {
+    // `strict` makes the provider rethrow a throttled or erroring lookup
+    // instead of answering `null`, which would read as "no such user".
     providerUser = await withDeadline(
-      provider.getUserById(profile.sub),
+      provider.getUserById(profile.sub, { strict: true }),
       'Identity provider profile lookup',
       PROVIDER_PROFILE_DEADLINE_MS,
     )
   } catch (error: unknown) {
+    // A missing client or a malformed request is a configuration failure, not
+    // an outage: it must not become a retryable 503.
+    if (!isTransientIdentityProviderFailure(error)) throw error
+
     const detail = error instanceof Error ? error.message : String(error)
     throw new IdentityProviderUnavailableError(
       `Identity provider profile lookup failed during first-login provisioning: ${detail}`,
