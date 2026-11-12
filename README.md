@@ -189,22 +189,28 @@ pnpm submodules:sync                      # Re-sync after pull
 
 Production is served from the Cloudflare Worker `pixelated-empathy` at
 [pixelatedempathy.com](https://pixelatedempathy.com); `/api/health` on the apex
-answers `200`. Vercel is the standby origin, and that standby is currently
-**unavailable**: the Vercel team has an unpaid invoice
-(`softBlock: UNPAID_INVOICE`), so `https://www.pixelatedempathy.com` answers
-`402` with `x-vercel-error: DEPLOYMENT_DISABLED`. Only the Cloudflare apex
-serves traffic.
+answers `200`. Vercel remains the standby origin, and that standby is still
+**unavailable by cause**: the Vercel team has an unpaid invoice
+(`softBlock: UNPAID_INVOICE`) and holds zero deployments. `www` no longer
+depends on it — the Worker claims `www.pixelatedempathy.com/*` and `301`s it to
+the apex, so the earlier `402` `x-vercel-error: DEPLOYMENT_DISABLED` symptom is
+gone and only the Cloudflare edge serves traffic.
 
 The launch decision and its evidence live in the pilot-readiness record: the
 gate register is
 [`planning/pilot-readiness-2026-11-04/LAUNCH_DECISIONS.md`](planning/pilot-readiness-2026-11-04/LAUNCH_DECISIONS.md),
 and the current decision is
-[`planning/pilot-readiness-2026-11-04/evidence/mission-decision-2026-11-10.md`](planning/pilot-readiness-2026-11-04/evidence/mission-decision-2026-11-10.md).
-That decision is **NO-GO**: the trainee-to-faculty journey steps are not built
-(they were deferred by owner decision, and the scenario catalog and clinical
-content remain an owner blocker), the standby origin is offline, and the
-evaluation/release bundle and owner approvals are open. Enrollment and customer
-launch are not authorized.
+[`planning/pilot-readiness-2026-11-04/evidence/mission-decision-2026-11-12.md`](planning/pilot-readiness-2026-11-04/evidence/mission-decision-2026-11-12.md).
+That decision is **NO-GO**, and the journey is now blocked on **content, not
+structure**: the trainee-to-faculty journey scaffolds exist and fail closed,
+each naming an owner and a stable blocker id, at `/training/scenarios`,
+`/training/sessions/new`, `/training/coaching` and `/training/faculty-review`,
+plus inline on `/training/session/<id>`. What is still missing is approved
+content and the decisions behind it — the scenario catalog, client personas, the
+synthetic-client reply model, the coaching rubric, the competency framework, and
+the faculty-review session-to-workspace relation. The standby origin is offline,
+and the evaluation/release bundle and owner approvals remain open. Enrollment
+and customer launch are not authorized.
 
 ---
 
