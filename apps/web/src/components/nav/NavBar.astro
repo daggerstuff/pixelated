@@ -1,12 +1,11 @@
 ---
-import LogoButton from '@/components/widgets/LogoButton.astro'
 import Divider from '@/components/base/Divider.astro'
-import SearchSwitch from '@/components/widgets/SearchSwitch.astro'
-import ThemeSwitch from '@/components/widgets/ThemeSwitch.astro'
-import RssLink from '@/components/widgets/RssLink.astro'
 import NavItem from '@/components/nav/NavItem.astro'
 import NavSwitch from '@/components/nav/NavSwitch.astro'
-
+import LogoButton from '@/components/widgets/LogoButton.astro'
+import RssLink from '@/components/widgets/RssLink.astro'
+import SearchSwitch from '@/components/widgets/SearchSwitch.astro'
+import ThemeSwitch from '@/components/widgets/ThemeSwitch.astro'
 import { UI } from '@/config'
 
 const { navBarLayout, internalNavs, socialLinks } = UI
@@ -26,13 +25,12 @@ for (const item of new Set(left)) {
 >
   <LogoButton />
   <nav
-    class={`flex items-center gap-4.8 w-full lt-md:justify-end
-    ${left.length !== 0 ? (right.length !== 0 ? 'justify-between' : '') : 'justify-end'}`}
+    class={`gap-4.8 lt-md:justify-end flex w-full items-center ${left.length !== 0 ? (right.length !== 0 ? 'justify-between' : '') : 'justify-end'}`}
     aria-label="Main menu"
   >
     {left.length !== 0 && (
       <div
-        class={`grid grid-flow-col items-center gap-4.8 print:op-0 ${mergeOnMobile ? '' : 'lt-md:(gap-3)'}`}
+        class={`gap-4.8 print:op-0 grid grid-flow-col items-center ${mergeOnMobile ? '' : 'lt-md:(gap-3)'}`}
       >
         {left.map((key) =>
           String(key) === 'hr' ? (
@@ -57,9 +55,7 @@ for (const item of new Set(left)) {
     )}
     {right.length !== 0 && (
       <div
-        class={`grid grid-flow-col items-center gap-4.8 print:op-0
-              ${!right.includes('themeButton') && !right.includes('searchButton') && 'lt-md:hidden'}
-              ${mergeOnMobile ? '' : 'lt-md:(gap-3)'}`}
+        class={`gap-4.8 print:op-0 grid grid-flow-col items-center ${!right.includes('themeButton') && !right.includes('searchButton') && 'lt-md:hidden'} ${mergeOnMobile ? '' : 'lt-md:(gap-3)'}`}
       >
         {right.map((key) =>
           String(key) === 'hr' ? (

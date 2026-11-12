@@ -1,12 +1,13 @@
 ---
 export const prerender = false
-import BaseLayout from '@/layouts/BaseLayout.astro'
+import type { AstroGlobal } from 'astro'
+
+import { ConversionDashboard } from '@/components/analytics/ConversionDashboard'
 import { PrivacyDashboard } from '@/components/analytics/PrivacyDashboard'
 import AnalyticsDashboard from '@/components/chat/AnalyticsDashboardReact'
-import { ConversionDashboard } from '@/components/analytics/ConversionDashboard'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 import { requirePageAuth } from '@/lib/auth/serverAuth'
 import { PolicyEngine } from '@/lib/governance/policy-engine'
-import type { AstroGlobal } from 'astro'
 
 // Protect this route - only authenticated users can access analytics
 const authResponse = await requirePageAuth(Astro as AstroGlobal)
@@ -44,20 +45,20 @@ const defaultConfig = {
   description="View and manage analytics data"
 >
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-4xl font-bold mb-8">Analytics Dashboard</h1>
+    <h1 class="mb-8 text-4xl font-bold">Analytics Dashboard</h1>
 
     <div class="grid gap-8 md:grid-cols-[350px,1fr]">
       {/* Privacy Controls Sidebar */}
       <div class="space-y-4">
         <PrivacyDashboard client:load />
 
-        <div class="bg-card rounded-lg border p-4">
-          <h3 class="text-lg font-semibold mb-3">Analytics Sections</h3>
+        <div class="rounded-lg border bg-card p-4">
+          <h3 class="mb-3 text-lg font-semibold">Analytics Sections</h3>
           <ul class="space-y-2">
             <li>
               <a
                 href="/analytics"
-                class="flex items-center py-2 px-3 bg-primary/10 text-primary rounded-md"
+                class="bg-primary/10 flex items-center rounded-md px-3 py-2 text-primary"
               >
                 <span class="text-sm font-medium">Usage Analytics</span>
               </a>
@@ -65,7 +66,7 @@ const defaultConfig = {
             <li>
               <a
                 href="/analytics/conversions"
-                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+                class="hover:bg-primary/10 flex items-center rounded-md px-3 py-2 text-foreground transition-colors hover:text-primary"
               >
                 <span class="text-sm font-medium">Conversion Tracking</span>
               </a>
@@ -73,7 +74,7 @@ const defaultConfig = {
             <li>
               <a
                 href="/admin/performance-dashboard"
-                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+                class="hover:bg-primary/10 flex items-center rounded-md px-3 py-2 text-foreground transition-colors hover:text-primary"
               >
                 <span class="text-sm font-medium">Performance Metrics</span>
               </a>
@@ -84,8 +85,8 @@ const defaultConfig = {
 
       {/* Main Analytics Content */}
       <div class="space-y-8">
-        <div class="bg-card rounded-lg border p-6">
-          <h2 class="text-2xl font-semibold mb-4">Usage Analytics</h2>
+        <div class="rounded-lg border bg-card p-6">
+          <h2 class="mb-4 text-2xl font-semibold">Usage Analytics</h2>
           <AnalyticsDashboard
             client:load
             messages={[]}
@@ -95,9 +96,9 @@ const defaultConfig = {
           />
         </div>
 
-        <div class="bg-card rounded-lg border p-6">
-          <h2 class="text-2xl font-semibold mb-4">Conversion Overview</h2>
-          <p class="text-muted-foreground mb-4">
+        <div class="rounded-lg border bg-card p-6">
+          <h2 class="mb-4 text-2xl font-semibold">Conversion Overview</h2>
+          <p class="mb-4 text-muted-foreground">
             Quick summary of recent conversion metrics. For detailed analysis,
             visit the
             <a

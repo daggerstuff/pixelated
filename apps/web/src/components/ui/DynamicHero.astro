@@ -147,7 +147,7 @@ const descriptionClasses = `
 
   <!-- Animated Elements -->
   {animatedElements && (
-    <div class="absolute inset-0 pointer-events-none">
+    <div class="pointer-events-none absolute inset-0">
       <div class="floating-element element-1" />
       <div class="floating-element element-2" />
       <div class="floating-element element-3" />
@@ -166,12 +166,12 @@ const descriptionClasses = `
 
       <!-- CTA Buttons -->
       {(primaryCTA || secondaryCTA) && (
-        <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           {primaryCTA && (
             <a
               href={primaryCTA.href}
               class:list={[
-                'inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300',
+                'inline-flex items-center justify-center rounded-lg px-8 py-4 text-lg font-semibold transition-all duration-300',
                 ctaVariantClasses[primaryCTA.variant || 'primary'],
                 animatedElements
                   ? 'animate-fade-in-up animation-delay-600'
@@ -187,7 +187,7 @@ const descriptionClasses = `
             <a
               href={secondaryCTA.href}
               class:list={[
-                'inline-flex items-center justify-center px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300',
+                'inline-flex items-center justify-center rounded-lg px-8 py-4 text-lg font-semibold transition-all duration-300',
                 ctaVariantClasses[secondaryCTA.variant || 'outline'],
                 animatedElements
                   ? 'animate-fade-in-up animation-delay-700'
@@ -203,14 +203,14 @@ const descriptionClasses = `
 
       <!-- Stats -->
       {showStats && stats.length > 0 && (
-        <div class="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-8">
+        <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
           {stats.map((stat) => (
             <div class="text-center">
-              <div class="text-3xl sm:text-4xl font-bold text-primary">
+              <div class="text-3xl font-bold text-primary sm:text-4xl">
                 {stat.value}
                 {stat.suffix && <span class="text-xl">{stat.suffix}</span>}
               </div>
-              <div class="text-sm text-muted-foreground mt-1">{stat.label}</div>
+              <div class="mt-1 text-sm text-muted-foreground">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -220,17 +220,17 @@ const descriptionClasses = `
     <!-- Features (for split layout) -->
     {layout === 'split' && features.length > 0 && (
       <div class="mt-16 lg:mt-0">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {features.map((feature, index) => (
             <div
               class:list={[
-                'bg-secondary/50 backdrop-blur-sm rounded-xl p-6 border border-border-primary/50',
+                'bg-secondary/50 border-border-primary/50 rounded-xl border p-6 backdrop-blur-sm',
                 animatedElements ? 'animate-fade-in-right' : '',
                 `animation-delay-${index * 200}`,
               ]}
             >
-              <div class="text-3xl mb-4">{feature.icon}</div>
-              <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
+              <div class="mb-4 text-3xl">{feature.icon}</div>
+              <h3 class="mb-2 text-xl font-semibold">{feature.title}</h3>
               <p class="text-muted-foreground">{feature.description}</p>
             </div>
           ))}
@@ -240,7 +240,7 @@ const descriptionClasses = `
 
     <!-- Features (for centered layout) -->
     {layout === 'centered' && features.length > 0 && (
-      <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
         {features.map((feature, index) => (
           <div
             class:list={[
@@ -249,8 +249,8 @@ const descriptionClasses = `
               `animation-delay-${600 + index * 150}`,
             ]}
           >
-            <div class="text-4xl mb-4">{feature.icon}</div>
-            <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
+            <div class="mb-4 text-4xl">{feature.icon}</div>
+            <h3 class="mb-2 text-xl font-semibold">{feature.title}</h3>
             <p class="text-muted-foreground">{feature.description}</p>
           </div>
         ))}

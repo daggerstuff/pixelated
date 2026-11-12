@@ -9,32 +9,32 @@ interface Props {
 const { clientId, name, email, avatar } = Astro.props
 ---
 
-<div class="flex items-center justify-between bg-card border border-border rounded-none p-6 mb-6">
+<div class="mb-6 flex items-center justify-between rounded-none border border-border bg-card p-6">
   <div class="flex items-center">
     <img
       src={avatar}
       alt={name}
-      class="w-16 h-16 rounded-full object-cover mr-4"
+      class="mr-4 h-16 w-16 rounded-full object-cover"
     />
     <div>
       <h1 class="text-2xl font-bold">{name}</h1>
       <p class="text-muted-foreground">{email}</p>
-      <div class="flex mt-2">
+      <div class="mt-2 flex">
         <a
           href={`/client/${clientId}`}
-          class="text-sm text-foreground hover:underline mr-4"
+          class="mr-4 text-sm text-foreground hover:underline"
         >
           Overview
         </a>
         <a
           href={`/client/${clientId}/sessions`}
-          class="text-sm text-foreground hover:underline mr-4"
+          class="mr-4 text-sm text-foreground hover:underline"
         >
           Sessions
         </a>
         <a
           href={`/client/${clientId}/temporal-analysis`}
-          class="text-sm text-foreground hover:underline mr-4 font-semibold"
+          class="mr-4 text-sm font-semibold text-foreground hover:underline"
         >
           Temporal Analysis
         </a>
@@ -50,11 +50,11 @@ const { clientId, name, email, avatar } = Astro.props
   <div>
     <a
       href={`/client/${clientId}/notes`}
-      class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-none text-primary-foreground bg-primary hover:bg-primary/90"
+      class="border-transparent hover:bg-primary/90 inline-flex items-center justify-center rounded-none border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4 mr-1"
+        class="mr-1 h-4 w-4"
         viewBox="0 0 20 20"
         fill="currentColor"
       >

@@ -7,16 +7,16 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
   description="Monitor system health and API availability"
 >
   <div class="p-4">
-    <h1 class="text-3xl font-bold mb-6">System Health Dashboard</h1>
+    <h1 class="mb-6 text-3xl font-bold">System Health Dashboard</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
       <!-- API Health Status Card -->
-      <div class="card border rounded-none overflow-hidden">
-        <div class="card-header bg-secondary p-4 border border-b">
-          <h2 class="text-xl font-semibold flex items-center">
+      <div class="card overflow-hidden rounded-none border">
+        <div class="card-header border border-b bg-secondary p-4">
+          <h2 class="flex items-center text-xl font-semibold">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 mr-2"
+              class="mr-2 h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -32,8 +32,8 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           </h2>
         </div>
         <div class="card-body p-4">
-          <div id="api-status" class="flex items-center mb-2">
-            <div class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"></div>
+          <div id="api-status" class="mb-2 flex items-center">
+            <div class="status-indicator mr-2 h-4 w-4 rounded-none bg-secondary"></div>
             <span class="status-text">Checking API status...</span>
           </div>
           <div id="api-response-time" class="text-sm text-muted-foreground">
@@ -46,12 +46,12 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
       </div>
 
       <!-- Database Status Card -->
-      <div class="card border rounded-none overflow-hidden">
-        <div class="card-header bg-secondary p-4 border border-b">
-          <h2 class="text-xl font-semibold flex items-center">
+      <div class="card overflow-hidden rounded-none border">
+        <div class="card-header border border-b bg-secondary p-4">
+          <h2 class="flex items-center text-xl font-semibold">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 mr-2"
+              class="mr-2 h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -91,8 +91,8 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           </h2>
         </div>
         <div class="card-body p-4">
-          <div id="db-status" class="flex items-center mb-2">
-            <div class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"></div>
+          <div id="db-status" class="mb-2 flex items-center">
+            <div class="status-indicator mr-2 h-4 w-4 rounded-none bg-secondary"></div>
             <span class="status-text">Checking database status...</span>
           </div>
           <div id="db-details" class="text-sm text-muted-foreground">
@@ -102,14 +102,14 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
       <!-- Redis Status Card -->
-      <div class="card border rounded-none overflow-hidden">
-        <div class="card-header bg-secondary p-4 border border-b">
-          <h2 class="text-xl font-semibold flex items-center">
+      <div class="card overflow-hidden rounded-none border">
+        <div class="card-header border border-b bg-secondary p-4">
+          <h2 class="flex items-center text-xl font-semibold">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 mr-2"
+              class="mr-2 h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -125,8 +125,8 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           </h2>
         </div>
         <div class="card-body p-4">
-          <div id="redis-status" class="flex items-center mb-2">
-            <div class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"></div>
+          <div id="redis-status" class="mb-2 flex items-center">
+            <div class="status-indicator mr-2 h-4 w-4 rounded-none bg-secondary"></div>
             <span class="status-text">Checking Redis status...</span>
           </div>
           <div id="redis-details" class="text-sm text-muted-foreground">
@@ -136,12 +136,12 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
       </div>
 
       <!-- System Resources Card -->
-      <div class="card border rounded-none overflow-hidden">
-        <div class="card-header bg-secondary p-4 border border-b">
-          <h2 class="text-xl font-semibold flex items-center">
+      <div class="card overflow-hidden rounded-none border">
+        <div class="card-header border border-b bg-secondary p-4">
+          <h2 class="flex items-center text-xl font-semibold">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 mr-2"
+              class="mr-2 h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -158,24 +158,24 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
         </div>
         <div class="card-body p-4">
           <div class="mb-2">
-            <div class="flex justify-between mb-1">
+            <div class="mb-1 flex justify-between">
               <span class="text-sm font-medium">Memory Usage</span>
               <span id="memory-usage-percent" class="text-sm">
                 --%
               </span>
             </div>
-            <div class="w-full bg-secondary rounded-none h-2.5">
+            <div class="h-2.5 w-full rounded-none bg-secondary">
               <div
                 id="memory-usage-bar"
-                class="bg-primary h-2.5 rounded-none"
+                class="h-2.5 rounded-none bg-primary"
                 style="width: 0%"
               ></div>
             </div>
           </div>
-          <div id="memory-details" class="text-sm text-muted-foreground mb-4">
+          <div id="memory-details" class="mb-4 text-sm text-muted-foreground">
             Memory: -- / --
           </div>
-          <div id="cpu-info" class="text-sm text-muted-foreground mb-2">
+          <div id="cpu-info" class="mb-2 text-sm text-muted-foreground">
             CPU: --
           </div>
           <div id="load-average" class="text-sm text-muted-foreground">
@@ -186,12 +186,12 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
     </div>
 
     <!-- System Info Card -->
-    <div class="card border rounded-none overflow-hidden mb-8">
-      <div class="card-header bg-secondary p-4 border border-b">
-        <h2 class="text-xl font-semibold flex items-center">
+    <div class="card mb-8 overflow-hidden rounded-none border">
+      <div class="card-header border border-b bg-secondary p-4">
+        <h2 class="flex items-center text-xl font-semibold">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6 mr-2"
+            class="mr-2 h-6 w-6"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -207,10 +207,10 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
         </h2>
       </div>
       <div class="card-body p-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <h3 class="font-medium mb-2">Operating System</h3>
-            <div id="os-info" class="text-sm text-muted-foreground mb-4">
+            <h3 class="mb-2 font-medium">Operating System</h3>
+            <div id="os-info" class="mb-4 text-sm text-muted-foreground">
               Platform: --
               <br />
               Release: --
@@ -219,7 +219,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
             </div>
           </div>
           <div>
-            <h3 class="font-medium mb-2">Runtime</h3>
+            <h3 class="mb-2 font-medium">Runtime</h3>
             <div id="runtime-info" class="text-sm text-muted-foreground">
               Node.js: --
               <br />
@@ -233,13 +233,13 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
     </div>
 
     <!-- Raw Health Check Response Card -->
-    <div class="card border rounded-none overflow-hidden">
-      <div class="card-header bg-secondary p-4 border border-b">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold flex items-center">
+    <div class="card overflow-hidden rounded-none border">
+      <div class="card-header border border-b bg-secondary p-4">
+        <div class="flex items-center justify-between">
+          <h2 class="flex items-center text-xl font-semibold">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 mr-2"
+              class="mr-2 h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -255,11 +255,11 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           </h2>
           <button
             id="refresh-btn"
-            class="px-3 py-1 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors text-sm flex items-center"
+            class="flex items-center rounded-none bg-primary px-3 py-1 text-sm text-primary-foreground transition-colors hover:bg-accent"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="h-4 w-4 mr-1"
+              class="mr-1 h-4 w-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -278,7 +278,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
       <div class="card-body p-4">
         <pre
           id="raw-response"
-          class="bg-secondary p-4 rounded-none overflow-auto text-sm h-80 max-h-80"
+          class="h-80 max-h-80 overflow-auto rounded-none bg-secondary p-4 text-sm"
         >Loading health check data...</pre>
       </div>
     </div>

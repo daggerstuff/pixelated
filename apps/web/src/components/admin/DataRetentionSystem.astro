@@ -101,82 +101,82 @@ const archivingActions = [
 ]
 ---
 
-<div class="bg-card rounded-none -md overflow-hidden">
+<div class="-md overflow-hidden rounded-none bg-card">
   <div class="p-6">
-    <h2 class="text-2xl font-bold text-foreground mb-4">{title}</h2>
+    <h2 class="mb-4 text-2xl font-bold text-foreground">{title}</h2>
 
     <div class="mb-8">
-      <p class="text-muted-foreground mb-4">
+      <p class="mb-4 text-muted-foreground">
         Manage data retention policies in compliance with HIPAA regulations and
         state laws. Configure when data should be archived and when it should be
         securely destroyed.
       </p>
 
-      <div class="flex flex-wrap gap-4 mb-6">
-        <div class="bg-secondary border border-input p-3 rounded-none flex items-center">
-          <IconCalendar className="w-5 h-5 text-foreground mr-2" />
-          <span class="text-foreground font-medium font-medium text-sm">
+      <div class="mb-6 flex flex-wrap gap-4">
+        <div class="flex items-center rounded-none border border-input bg-secondary p-3">
+          <IconCalendar className="mr-2 h-5 w-5 text-foreground" />
+          <span class="text-sm font-medium text-foreground">
             Configurable retention periods
           </span>
         </div>
 
-        <div class="bg-secondary border border-input p-3 rounded-none flex items-center">
-          <IconArchive className="w-5 h-5 text-foreground mr-2" />
-          <span class="text-foreground font-medium text-sm">
+        <div class="flex items-center rounded-none border border-input bg-secondary p-3">
+          <IconArchive className="mr-2 h-5 w-5 text-foreground" />
+          <span class="text-sm font-medium text-foreground">
             Automated archiving
           </span>
         </div>
 
-        <div class="bg-secondary border border-input p-3 rounded-none flex items-center">
-          <IconTrash className="w-5 h-5 text-foreground mr-2" />
-          <span class="text-foreground text-sm">Secure destruction</span>
+        <div class="flex items-center rounded-none border border-input bg-secondary p-3">
+          <IconTrash className="mr-2 h-5 w-5 text-foreground" />
+          <span class="text-sm text-foreground">Secure destruction</span>
         </div>
       </div>
     </div>
 
     <!-- Data Retention Policies -->
     <div class="mb-8">
-      <div class="flex justify-between items-center mb-4">
+      <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-medium text-foreground">
           Data Category Retention Policies
         </h3>
         <button
           type="button"
-          class="px-3 py-1.5 bg-primary text-white text-sm rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
+          class="text-white flex items-center rounded-none bg-primary px-3 py-1.5 text-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <IconPlus className="w-4 h-4 mr-1" />
+          <IconPlus className="mr-1 h-4 w-4" />
           Add Policy
         </button>
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-muted-foreground">
-          <thead class="text-xs text-foreground uppercase bg-secondary">
+        <table class="w-full text-left text-sm text-muted-foreground">
+          <thead class="bg-secondary text-xs uppercase text-foreground">
             <tr>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Data Category
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Current Policy
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Legal Minimum
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Recommended
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Status
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody>
             {dataCategories.map((category) => (
-              <tr class="bg-card border-b hover:bg-secondary">
-                <td class="py-3 px-4 font-medium text-foreground">
+              <tr class="border-b bg-card hover:bg-secondary">
+                <td class="px-4 py-3 font-medium text-foreground">
                   <div>
                     <div>{category.name}</div>
                     <div class="text-xs text-muted-foreground">
@@ -184,32 +184,32 @@ const archivingActions = [
                     </div>
                   </div>
                 </td>
-                <td class="py-3 px-4">{category.currentPolicy}</td>
-                <td class="py-3 px-4">{category.legalMinimum}</td>
-                <td class="py-3 px-4">{category.recommendedPolicy}</td>
-                <td class="py-3 px-4">
+                <td class="px-4 py-3">{category.currentPolicy}</td>
+                <td class="px-4 py-3">{category.legalMinimum}</td>
+                <td class="px-4 py-3">{category.recommendedPolicy}</td>
+                <td class="px-4 py-3">
                   <span
-                    class={`px-2 py-1 rounded-none text-xs font-medium ${getStatusBadge(category.status)}`}
+                    class={`rounded-none px-2 py-1 text-xs font-medium ${getStatusBadge(category.status)}`}
                   >
                     {category.status.charAt(0).toUpperCase() +
                       category.status.slice(1)}
                   </span>
                 </td>
-                <td class="py-3 px-4">
+                <td class="px-4 py-3">
                   <div class="flex space-x-2">
                     <button
                       type="button"
                       class="font-medium text-foreground hover:underline"
                       aria-label={`Edit ${category.name} policy`}
                     >
-                      <IconPencil className="w-5 h-5" />
+                      <IconPencil className="h-5 w-5" />
                     </button>
                     <button
                       type="button"
                       class="font-medium text-muted-foreground hover:underline"
                       aria-label={`Archive ${category.name} now`}
                     >
-                      <IconArchive className="w-5 h-5" />
+                      <IconArchive className="h-5 w-5" />
                     </button>
                   </div>
                 </td>
@@ -222,35 +222,35 @@ const archivingActions = [
 
     <!-- Archiving and Destruction Actions -->
     <div class="mb-8">
-      <div class="flex justify-between items-center mb-4">
+      <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-medium text-foreground">
           Automated Retention Actions
         </h3>
         <button
           type="button"
-          class="px-3 py-1.5 bg-primary text-white text-sm rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
+          class="text-white flex items-center rounded-none bg-primary px-3 py-1.5 text-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <IconPlus className="w-4 h-4 mr-1" />
+          <IconPlus className="mr-1 h-4 w-4" />
           Schedule Action
         </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         {archivingActions.map((action) => (
-          <div class="bg-card border border-border rounded-none p-4">
-            <div class="flex justify-between items-start mb-3">
+          <div class="rounded-none border border-border bg-card p-4">
+            <div class="mb-3 flex items-start justify-between">
               <h4 class="font-medium text-foreground">{action.name}</h4>
               <span
-                class={`px-2 py-1 rounded-none text-xs font-medium ${
+                class={`rounded-none px-2 py-1 text-xs font-medium ${
                   action.status === 'active'
-                    ? 'bg-secondary border border-input text-foreground font-medium'
-                    : 'bg-secondary border border-ring text-foreground font-medium'
+                    ? 'border border-input bg-secondary font-medium text-foreground'
+                    : 'border border-ring bg-secondary font-medium text-foreground'
                 }`}
               >
                 {action.status.charAt(0).toUpperCase() + action.status.slice(1)}
               </span>
             </div>
-            <div class="text-sm text-muted-foreground mb-3">
+            <div class="mb-3 text-sm text-muted-foreground">
               <div class="flex items-center">
                 <span class="w-28">Last run:</span>
                 <span class="text-foreground">{action.lastRun}</span>
@@ -260,17 +260,17 @@ const archivingActions = [
                 <span class="text-foreground">{action.nextRun}</span>
               </div>
             </div>
-            <div class="flex space-x-2 mt-2">
+            <div class="mt-2 flex space-x-2">
               <button
                 type="button"
-                class="px-3 py-1 text-xs font-medium bg-primary text-white rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                class="text-white rounded-none bg-primary px-3 py-1 text-xs font-medium hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
                 aria-label={`Run ${action.name} now`}
               >
                 Run Now
               </button>
               <button
                 type="button"
-                class="px-3 py-1 text-xs font-medium bg-secondary text-foreground rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                class="rounded-none bg-secondary px-3 py-1 text-xs font-medium text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
                 aria-label={`Configure ${action.name}`}
               >
                 Configure
@@ -283,21 +283,21 @@ const archivingActions = [
 
     <!-- Data Destruction Configuration -->
     <div>
-      <h3 class="text-lg font-medium text-foreground mb-4">
+      <h3 class="mb-4 text-lg font-medium text-foreground">
         Secure Data Destruction Configuration
       </h3>
 
-      <div class="bg-secondary border border-border rounded-none p-5">
+      <div class="rounded-none border border-border bg-secondary p-5">
         <div class="mb-4">
           <label
             for="destruction-method"
-            class="block text-sm font-medium text-foreground mb-2"
+            class="mb-2 block text-sm font-medium text-foreground"
           >
             Destruction Method
           </label>
           <select
             id="destruction-method"
-            class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
+            class="w-full rounded-none border border-input p-2 focus:border-ring focus:ring-2 focus:ring-ring"
           >
             <option value="crypto-erase">
               Cryptographic Erasure (Default)
@@ -315,7 +315,7 @@ const archivingActions = [
         </div>
 
         <div class="mb-4">
-          <label class="block text-sm font-medium text-foreground mb-2">
+          <label class="mb-2 block text-sm font-medium text-foreground">
             Destruction Verification
           </label>
           <div class="flex items-center">
@@ -323,7 +323,7 @@ const archivingActions = [
               id="verification-checkbox"
               type="checkbox"
               checked
-              class="w-4 h-4 border border-input rounded-none bg-secondary focus:ring-3 focus:ring-ring border border-input"
+              class="focus:ring-3 h-4 w-4 rounded-none border border-input bg-secondary focus:ring-ring"
             />
             <label
               for="verification-checkbox"
@@ -338,13 +338,13 @@ const archivingActions = [
         <div class="mb-4">
           <label
             for="documentation-retention"
-            class="block text-sm font-medium text-foreground mb-2"
+            class="mb-2 block text-sm font-medium text-foreground"
           >
             Documentation Retention
           </label>
           <select
             id="documentation-retention"
-            class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
+            class="w-full rounded-none border border-input p-2 focus:border-ring focus:ring-2 focus:ring-ring"
           >
             <option value="3-years">3 Years</option>
             <option value="5-years">5 Years</option>
@@ -361,16 +361,16 @@ const archivingActions = [
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-3 mt-6">
+        <div class="mt-6 flex gap-3">
           <button
             type="button"
-            class="px-4 py-2 bg-primary text-white rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            class="text-white rounded-none bg-primary px-4 py-2 hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             Save Configuration
           </button>
           <button
             type="button"
-            class="px-4 py-2 border border-input text-foreground rounded-none hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
+            class="rounded-none border border-input px-4 py-2 text-foreground hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             Cancel
           </button>

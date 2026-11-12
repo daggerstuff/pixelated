@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+
 import MentalHealthChatDemo from '../components/MentalHealthChatDemo.astro'
 
 const title = 'Mental Health Analysis Demo'
@@ -8,18 +9,18 @@ const description =
 ---
 
 <BaseLayout {title} {description}>
-  <section class="container mx-auto py-8 px-4">
-    <div class="max-w-5xl mx-auto">
-      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">{title}</h1>
+  <section class="container mx-auto px-4 py-8">
+    <div class="mx-auto max-w-5xl">
+      <h1 class="mb-6 text-center text-3xl font-bold md:text-4xl">{title}</h1>
 
-      <div class="prose dark:prose-invert max-w-none mb-8">
-        <p class="text-xl text-center">
+      <div class="prose dark:prose-invert mb-8 max-w-none">
+        <p class="text-center text-xl">
           This demonstration showcases how our AI system can analyze text in
           real-time for mental health indicators while maintaining privacy and
           security.
         </p>
 
-        <div class="bg-secondary p-4 rounded-none border border-ring my-6">
+        <div class="my-6 rounded-none border border-ring bg-secondary p-4">
           <p class="font-medium text-foreground">
             <span class="font-bold">Demo Purpose:</span> This is for
             demonstration purposes only and is not intended to provide medical
@@ -37,7 +38,7 @@ const description =
         initialTab="analysis"
       />
 
-      <div class="mt-12 prose dark:prose-invert max-w-none">
+      <div class="prose dark:prose-invert mt-12 max-w-none">
         <h2 class="text-2xl font-bold">How It Works</h2>
         <p>
           Our system uses advanced natural language processing to analyze text
@@ -46,7 +47,7 @@ const description =
           Encryption (FHE) technology.
         </p>
 
-        <h3 class="text-xl font-semibold mt-6">Key Features</h3>
+        <h3 class="mt-6 text-xl font-semibold">Key Features</h3>
         <ul>
           <li>
             <strong>Privacy-First:</strong> All analysis is done with encrypted

@@ -12,23 +12,19 @@ const { maxGroupColumns } = UI.groupView
 ---
 
 <div
-  class={`grid gap-3 cols-[repeat(auto-fill,minmax(350px,1fr))]
-    py-8 mx-auto lt-lgp:max-w-[712px]! lt-md:max-w-[350px]!`}
+  class={`cols-[repeat(auto-fill,minmax(350px,1fr))] lt-lgp:max-w-[712px]! lt-md:max-w-[350px]! mx-auto grid gap-3 py-8`}
   style={`max-width: calc(350px * ${maxGroupColumns} + ${maxGroupColumns - 1} * 0.75rem);`}
 >
   {items.map((item: ProjectSchema) => (
     <Link
-      class={`link relative flex items-center
-          w-[350px] max-w-full px-3.5 pt-2 pb-3.5 rounded-md
-          bg-transparent hover:bg-secondary
-          text-4.4 transition-all duration-300`}
+      class={`link bg-transparent text-4.4 relative flex w-[350px] max-w-full items-center rounded-md px-3.5 pb-3.5 pt-2 transition-all duration-300 hover:bg-secondary`}
       href={item.link}
       aria-hidden={true}
       external={true}
     >
-      <div class="pt-2 pr-5">
+      <div class="pr-5 pt-2">
         <div
-          class={`icon op-50 saturate-0 leading-9 text-7.5 ${item.icon && item.icon.trim() && item.icon !== '-' ? item.icon.trim() : 'i-lucide-file'}`}
+          class={`icon op-50 text-7.5 leading-9 saturate-0 ${item.icon && item.icon.trim() && item.icon !== '-' ? item.icon.trim() : 'i-lucide-file'}`}
         />
       </div>
       <div class="flex-auto">

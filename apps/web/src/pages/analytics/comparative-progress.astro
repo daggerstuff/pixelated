@@ -1,7 +1,7 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
 import { ComparativeProgressDisplay } from '../../components/analytics/ComparativeProgressDisplay'
 import Alert from '../../components/ui/Alert.astro'
+import BaseLayout from '../../layouts/BaseLayout.astro'
 
 // Authentication check (replace with your actual auth logic)
 const isAuthenticated = Astro.cookies.get('auth-token') !== undefined
@@ -21,7 +21,7 @@ const description =
 <BaseLayout {title} {description} bgType="plum">
   <section class="brutalist-section">
     <div class="brutalist-container">
-      <div class="max-w-7xl mx-auto">
+      <div class="mx-auto max-w-7xl">
         <!-- Breadcrumbs -->
         <nav class="mb-6" aria-label="Breadcrumb">
           <ol class="flex space-x-2 text-sm text-muted-foreground">
@@ -65,17 +65,17 @@ const description =
         </Alert>
 
         <!-- Main content -->
-        <div class="bg-card border border-border rounded-none p-6">
+        <div class="rounded-none border border-border bg-card p-6">
           <ComparativeProgressDisplay {userId} client:load />
         </div>
 
         <!-- Additional information -->
-        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-card border border-border rounded-none p-6">
-            <h2 class="text-xl font-semibold mb-4">
+        <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div class="rounded-none border border-border bg-card p-6">
+            <h2 class="mb-4 text-xl font-semibold">
               Understanding Your Results
             </h2>
-            <p class="text-muted-foreground mb-4">
+            <p class="mb-4 text-muted-foreground">
               Comparative progress analysis helps you understand how your
               therapeutic journey compares to others with similar profiles. This
               can provide context for your progress and help identify areas
@@ -88,8 +88,8 @@ const description =
             </p>
           </div>
 
-          <div class="bg-card border border-border rounded-none p-6">
-            <h2 class="text-xl font-semibold mb-4">About the Metrics</h2>
+          <div class="rounded-none border border-border bg-card p-6">
+            <h2 class="mb-4 text-xl font-semibold">About the Metrics</h2>
             <ul class="space-y-3 text-muted-foreground">
               <li>
                 <strong>PHQ-9 Score:</strong> Measures depression severity

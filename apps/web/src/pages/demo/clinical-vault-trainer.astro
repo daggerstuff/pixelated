@@ -1,8 +1,9 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import BrutalistCard from '@/components/ui/BrutalistCard.astro'
-import BrutalistButton from '@/components/ui/BrutalistButton.astro'
 import { Target as TargetIcon } from 'lucide-react'
+
+import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+import BrutalistCard from '@/components/ui/BrutalistCard.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 // import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
 
 export const prerender = false // Enable SSR for A/B testing
@@ -95,19 +96,19 @@ const impossibleScenarios = [
   <!-- Hero Section -->
   <section class="brutalist-section">
     <div class="brutalist-container">
-      <div class="text-center mb-12">
-        <div class="status-indicator status-indicator--warning inline-flex mb-6">
+      <div class="mb-12 text-center">
+        <div class="status-indicator status-indicator--warning mb-6 inline-flex">
           <div class="pulse-dot pulse-dot--blue"></div>
           <span class="font-bold">CRISIS TRAINING DEMO</span>
         </div>
 
-        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
+        <h1 class="brutalist-heading mb-6 text-5xl md:text-7xl">
           {currentVariant.headline}
           <br />
           <span class="text-foreground">CLINICALVAULT</span>
         </h1>
 
-        <p class="text-xl text-foreground max-w-4xl mx-auto mb-8">
+        <p class="mx-auto mb-8 max-w-4xl text-xl text-foreground">
           {currentVariant.subheadline}
         </p>
       </div>
@@ -122,7 +123,7 @@ const impossibleScenarios = [
           <div class="metric-card hover-lift">
             <div class="metric-value text-foreground">{spec.value}</div>
             <div class="metric-label">{spec.metric}</div>
-            <div class="text-xs text-foreground mt-2">{spec.comparison}</div>
+            <div class="mt-2 text-xs text-foreground">{spec.comparison}</div>
           </div>
         ))}
       </div>
@@ -132,12 +133,12 @@ const impossibleScenarios = [
   <!-- Interactive Demo Section -->
   <section class="brutalist-section">
     <div class="brutalist-container">
-      <BrutalistCard variant="elevated" class="max-w-4xl mx-auto">
+      <BrutalistCard variant="elevated" class="mx-auto max-w-4xl">
         <div class="space-y-6">
           <div class="border-b border-border pb-4">
-            <div class="flex justify-between items-start">
+            <div class="flex items-start justify-between">
               <div>
-                <h3 class="brutalist-subheading text-2xl mb-2">
+                <h3 class="brutalist-subheading mb-2 text-2xl">
                   🚨 LIVE CRISIS INTERVENTION DEMO
                 </h3>
                 <p class="text-foreground">
@@ -155,14 +156,14 @@ const impossibleScenarios = [
           <div class="chat-container">
             <div class="chat-header">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
                   <span class="text-foreground">👤</span>
                 </div>
                 <div>
-                  <div class="text-foreground font-medium">
+                  <div class="font-medium text-foreground">
                     AI Patient: Sarah
                   </div>
-                  <div class="text-muted-foreground text-sm">
+                  <div class="text-sm text-muted-foreground">
                     Presenting with acute suicidal ideation
                   </div>
                 </div>
@@ -197,11 +198,11 @@ const impossibleScenarios = [
 
           <div class="flex flex-wrap gap-4 text-sm text-foreground">
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 bg-primary rounded-full"></span>
+              <span class="h-2 w-2 rounded-full bg-primary"></span>
               <span>Adapts in real-time</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 bg-primary rounded-full"></span>
+              <span class="h-2 w-2 rounded-full bg-primary"></span>
               <span>Completely private and safe</span>
             </div>
           </div>
@@ -213,12 +214,12 @@ const impossibleScenarios = [
   <!-- Impossible Before HIPAA Section -->
   <section class="brutalist-section bg-card">
     <div class="brutalist-container">
-      <div class="text-center mb-12">
-        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+      <div class="mb-12 text-center">
+        <h2 class="brutalist-heading mb-4 text-3xl md:text-5xl">
           TRAINING THAT WAS
           <span class="text-foreground">IMPOSSIBLE BEFORE</span>
         </h2>
-        <p class="text-lg text-foreground max-w-4xl mx-auto">
+        <p class="mx-auto max-w-4xl text-lg text-foreground">
           These scenarios were too dangerous, too rare, or too ethically complex
           to practice with real patients
         </p>
@@ -228,12 +229,12 @@ const impossibleScenarios = [
         {impossibleScenarios.map((scenario) => (
           <BrutalistCard hover={true}>
             <div class="space-y-4">
-              <div class="text-5xl text-center">{scenario.icon}</div>
+              <div class="text-center text-5xl">{scenario.icon}</div>
               <div class="brutalist-badge brutalist-badge--danger text-center">
                 PREVIOUSLY IMPOSSIBLE TO PRACTICE SAFELY
               </div>
               <h3 class="brutalist-subheading text-lg">{scenario.title}</h3>
-              <p class="text-foreground leading-relaxed">
+              <p class="leading-relaxed text-foreground">
                 {scenario.description}
               </p>
             </div>
@@ -246,28 +247,28 @@ const impossibleScenarios = [
   <!-- Security Guarantee -->
   <section class="brutalist-section bg-card">
     <div class="brutalist-container">
-      <BrutalistCard variant="security" class="max-w-4xl mx-auto">
-        <div class="text-center space-y-6">
+      <BrutalistCard variant="security" class="mx-auto max-w-4xl">
+        <div class="space-y-6 text-center">
           <div class="text-6xl">🛡️</div>
           <h3 class="brutalist-subheading text-2xl">
             SYNTHETIC DATA BY DESIGN
           </h3>
-          <p class="text-lg text-foreground leading-relaxed">
+          <p class="text-lg leading-relaxed text-foreground">
             This demo runs on synthetic personas. No client records, protected
             health information, or real patient material is processed, so there
             is nothing sensitive to expose in a rehearsal.
           </p>
           <div class="flex flex-wrap justify-center gap-6">
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 bg-primary rounded-full"></span>
+              <span class="h-3 w-3 rounded-full bg-primary"></span>
               <span class="font-medium">Synthetic Personas</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 bg-primary rounded-full"></span>
+              <span class="h-3 w-3 rounded-full bg-primary"></span>
               <span class="font-medium">No Client Records</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-3 h-3 bg-primary rounded-full"></span>
+              <span class="h-3 w-3 rounded-full bg-primary"></span>
               <span class="font-medium">Illustrative Demo</span>
             </div>
           </div>
@@ -279,28 +280,28 @@ const impossibleScenarios = [
   <!-- Final CTA -->
   <section class="brutalist-section">
     <div class="brutalist-container">
-      <div class="mental-health-safe max-w-4xl mx-auto text-center">
-        <div class="text-6xl mb-6">
-          <TargetIcon className="w-24 h-24" />
+      <div class="mental-health-safe mx-auto max-w-4xl text-center">
+        <div class="mb-6 text-6xl">
+          <TargetIcon className="h-24 w-24" />
         </div>
 
-        <div class="status-indicator status-indicator--warning inline-flex mb-6">
+        <div class="status-indicator status-indicator--warning mb-6 inline-flex">
           <div class="pulse-dot pulse-dot--blue"></div>
           <span class="font-bold">PROPOSED TRAINING CONCEPT</span>
         </div>
 
-        <h2 class="brutalist-heading text-3xl md:text-5xl mb-8">
+        <h2 class="brutalist-heading mb-8 text-3xl md:text-5xl">
           READY TO TRANSFORM YOUR
           <br />
           <span class="confidence-boost">TRAINING PROGRAM?</span>
         </h2>
 
-        <p class="text-xl text-foreground mb-8 leading-relaxed">
+        <p class="mb-8 text-xl leading-relaxed text-foreground">
           Bring synthetic clinical rehearsal to your program's next practicum
           semester.
         </p>
 
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+        <div class="mb-8 flex flex-col justify-center gap-4 sm:flex-row">
           <BrutalistButton
             href="/contact"
             variant="primary"

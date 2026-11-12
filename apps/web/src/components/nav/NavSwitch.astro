@@ -3,7 +3,7 @@
 
 <button
   id="nav-open-button"
-  class="inline-flex items-center justify-center md:hidden op-60 hover:op-100 op-transition"
+  class="op-60 hover:op-100 op-transition inline-flex items-center justify-center md:hidden"
   title="Navigation"
   aria-label="Navigation"
   aria-expanded="false"
@@ -15,15 +15,12 @@
 
 <div
   id="nav-panel"
-  class="hidden! z-200 fixed top-10% left-50% translate-x--50%
-    overflow-y-auto flex flex-col gap-5
-    w-90% max-h-80vh py-4 px-6 rounded-lg
-  bg-[var(--c-bg)] shadow-custom_0_0_10_0 text-[var(--c-text)]"
+  class="hidden! z-200 top-10% left-50% translate-x--50% w-90% max-h-80vh shadow-custom_0_0_10_0 fixed flex flex-col gap-5 overflow-y-auto rounded-lg bg-[var(--c-bg)] px-6 py-4 text-[var(--c-text)]"
 >
   <ul>
     <slot name="text" />
   </ul>
-  <div class="flex justify-center items-center gap-4">
+  <div class="flex items-center justify-center gap-4">
     <slot name="icon" />
   </div>
 </div>

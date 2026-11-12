@@ -1,6 +1,7 @@
 ---
-import { UI } from '@/config'
 import type { HTMLAttributes } from 'astro/types'
+
+import { UI } from '@/config'
 
 interface Props extends HTMLAttributes<'a'> {
   href?: string
@@ -43,7 +44,7 @@ const showIcon =
 
 <a
   class:list={[
-    'op-60 no-underline hover:op-100',
+    'op-60 hover:op-100 no-underline',
     { 'external-link-cursor': showCursor },
     className,
   ]}
@@ -54,30 +55,29 @@ const showIcon =
   target={targetAttr}
   {...rest}
 >
-  {
-    Astro.slots.has('default') && (
-      <>
-        <slot />{showIcon && (
-          <span
-            u-i-carbon-arrow-up-right
-            class="new-tab-icon ml-0!"
-            aria-hidden="true"
-          />
-        )}
-      </>
-    )
-  }{
-    Astro.slots.has('title') && (
-      <span class="text-lg leading-1.3em align-middle">
-        <slot name="title" />
-        {showIcon && (
-          <span
-            u-i-carbon-arrow-up-right
-            class="new-tab-icon ml--1! mb-1.8!"
-            aria-hidden="true"
-          />
-        )}
-      </span>
-    )
-  }<slot name="end" /></a
->
+  {Astro.slots.has('default') && (
+    <>
+      <slot />
+      {showIcon && (
+        <span
+          u-i-carbon-arrow-up-right
+          class="new-tab-icon ml-0!"
+          aria-hidden="true"
+        />
+      )}
+    </>
+  )}
+  {Astro.slots.has('title') && (
+    <span class="leading-1.3em align-middle text-lg">
+      <slot name="title" />
+      {showIcon && (
+        <span
+          u-i-carbon-arrow-up-right
+          class="new-tab-icon ml--1! mb-1.8!"
+          aria-hidden="true"
+        />
+      )}
+    </span>
+  )}
+  <slot name="end" />
+</a>

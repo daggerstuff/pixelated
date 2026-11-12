@@ -1,10 +1,12 @@
 ---
 export const prerender = false
 import type { AstroGlobal } from 'astro'
-import BaseLayout from '../../../layouts/BaseLayout.astro'
+
 import { DynamicEmotionTemporalAnalysisChart } from '@/lib/utils/dynamic-components'
+
 import ClientHeader from '../../../components/client/ClientHeader.astro'
 import SessionList from '../../../components/session/SessionList.astro'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
 import { requirePageAuth } from '../../../lib/auth/serverAuth'
 import { createLogger } from '../../../utils/logger'
 
@@ -93,18 +95,18 @@ const title = `Temporal Analysis - ${client.name}`
       avatar={client.avatar}
     />
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
       <div class="lg:col-span-2">
-        <h2 class="text-2xl font-semibold mb-4">
+        <h2 class="mb-4 text-2xl font-semibold">
           Emotional Patterns Over Time
         </h2>
-        <p class="text-muted-foreground mb-6">
+        <p class="mb-6 text-muted-foreground">
           Temporal analysis tracks emotional patterns across multiple sessions,
           helping identify trends, detect critical moments, and measure
           progress.
         </p>
 
-        <div class="bg-card border border-border rounded-none mb-8">
+        <div class="mb-8 rounded-none border border-border bg-card">
           <DynamicEmotionTemporalAnalysisChart
             client:load
             data={{ ...placeholderData, emotions: [] }}
@@ -113,39 +115,39 @@ const title = `Temporal Analysis - ${client.name}`
           />
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div class="bg-card border border-border rounded-none p-6">
-            <h3 class="text-lg font-semibold mb-3">
+        <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div class="rounded-none border border-border bg-card p-6">
+            <h3 class="mb-3 text-lg font-semibold">
               Intervention Effectiveness
             </h3>
-            <p class="text-muted-foreground mb-4">
+            <p class="mb-4 text-muted-foreground">
               Analysis of which therapeutic approaches have been most effective
               based on emotional response patterns.
             </p>
             <div class="flex flex-col space-y-2">
-              <div class="flex justify-between items-center">
+              <div class="flex items-center justify-between">
                 <span>Cognitive Behavioral Therapy</span>
-                <div class="h-2 bg-secondary rounded-none w-2/3">
+                <div class="h-2 w-2/3 rounded-none bg-secondary">
                   <div
-                    class="h-2 bg-primary rounded-none"
+                    class="h-2 rounded-none bg-primary"
                     style="width: 85%"
                   ></div>
                 </div>
               </div>
-              <div class="flex justify-between items-center">
+              <div class="flex items-center justify-between">
                 <span>Mindfulness Techniques</span>
-                <div class="h-2 bg-secondary rounded-none w-2/3">
+                <div class="h-2 w-2/3 rounded-none bg-secondary">
                   <div
-                    class="h-2 bg-primary rounded-none"
+                    class="h-2 rounded-none bg-primary"
                     style="width: 70%"
                   ></div>
                 </div>
               </div>
-              <div class="flex justify-between items-center">
+              <div class="flex items-center justify-between">
                 <span>Exposure Therapy</span>
-                <div class="h-2 bg-secondary rounded-none w-2/3">
+                <div class="h-2 w-2/3 rounded-none bg-secondary">
                   <div
-                    class="h-2 bg-primary rounded-none"
+                    class="h-2 rounded-none bg-primary"
                     style="width: 65%"
                   ></div>
                 </div>
@@ -153,11 +155,11 @@ const title = `Temporal Analysis - ${client.name}`
             </div>
           </div>
 
-          <div class="bg-card border border-border rounded-none p-6">
-            <h3 class="text-lg font-semibold mb-3">Key Insights</h3>
+          <div class="rounded-none border border-border bg-card p-6">
+            <h3 class="mb-3 text-lg font-semibold">Key Insights</h3>
             <ul class="space-y-3">
               <li class="flex items-start">
-                <span class="inline-flex items-center justify-center rounded-none bg-secondary text-foreground mr-3 p-1">
+                <span class="mr-3 inline-flex items-center justify-center rounded-none bg-secondary p-1 text-foreground">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-4 w-4"
@@ -177,7 +179,7 @@ const title = `Temporal Analysis - ${client.name}`
                 </span>
               </li>
               <li class="flex items-start">
-                <span class="inline-flex items-center justify-center rounded-none bg-secondary text-foreground mr-3 p-1">
+                <span class="mr-3 inline-flex items-center justify-center rounded-none bg-secondary p-1 text-foreground">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-4 w-4"
@@ -197,7 +199,7 @@ const title = `Temporal Analysis - ${client.name}`
                 </span>
               </li>
               <li class="flex items-start">
-                <span class="inline-flex items-center justify-center rounded-none bg-secondary text-foreground mr-3 p-1">
+                <span class="mr-3 inline-flex items-center justify-center rounded-none bg-secondary p-1 text-foreground">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     class="h-4 w-4"
@@ -219,12 +221,12 @@ const title = `Temporal Analysis - ${client.name}`
           </div>
         </div>
 
-        <h3 class="text-xl font-semibold mb-4">Recommendations</h3>
-        <div class="bg-card border border-border rounded-none p-6 mb-8">
+        <h3 class="mb-4 text-xl font-semibold">Recommendations</h3>
+        <div class="mb-8 rounded-none border border-border bg-card p-6">
           <p class="mb-4">Based on temporal analysis of emotional patterns:</p>
           <ul class="space-y-3">
             <li class="flex items-start">
-              <span class="inline-flex items-center justify-center rounded-none bg-secondary text-foreground mr-3 p-1">
+              <span class="mr-3 inline-flex items-center justify-center rounded-none bg-secondary p-1 text-foreground">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-4 w-4"
@@ -245,7 +247,7 @@ const title = `Temporal Analysis - ${client.name}`
               </span>
             </li>
             <li class="flex items-start">
-              <span class="inline-flex items-center justify-center rounded-none bg-secondary text-foreground mr-3 p-1">
+              <span class="mr-3 inline-flex items-center justify-center rounded-none bg-secondary p-1 text-foreground">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-4 w-4"
@@ -266,7 +268,7 @@ const title = `Temporal Analysis - ${client.name}`
               </span>
             </li>
             <li class="flex items-start">
-              <span class="inline-flex items-center justify-center rounded-none bg-secondary text-foreground mr-3 p-1">
+              <span class="mr-3 inline-flex items-center justify-center rounded-none bg-secondary p-1 text-foreground">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="h-4 w-4"
@@ -291,17 +293,17 @@ const title = `Temporal Analysis - ${client.name}`
       </div>
 
       <div class="lg:col-span-1">
-        <h3 class="text-xl font-semibold mb-4">Recent Sessions</h3>
+        <h3 class="mb-4 text-xl font-semibold">Recent Sessions</h3>
         <SessionList sessions={recentSessions} selectedSessionId="" />
 
-        <div class="bg-card border border-border rounded-none p-6 mt-6">
-          <h3 class="text-lg font-semibold mb-3">Analysis Settings</h3>
+        <div class="mt-6 rounded-none border border-border bg-card p-6">
+          <h3 class="mb-3 text-lg font-semibold">Analysis Settings</h3>
           <form class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-foreground mb-1">
+              <label class="mb-1 block text-sm font-medium text-foreground">
                 Time Window
               </label>
-              <select class="bg-secondary border border-input text-foreground text-sm rounded-none focus:ring-ring focus:border-ring block w-full p-2.5">
+              <select class="block w-full rounded-none border border-input bg-secondary p-2.5 text-sm text-foreground focus:border-ring focus:ring-ring">
                 <option value="30">Last 30 days</option>
                 <option value="90" selected>
                   Last 90 days
@@ -312,7 +314,7 @@ const title = `Temporal Analysis - ${client.name}`
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-foreground mb-1">
+              <label class="mb-1 block text-sm font-medium text-foreground">
                 Emotion Types
               </label>
               <div class="space-y-2">
@@ -321,7 +323,7 @@ const title = `Temporal Analysis - ${client.name}`
                     id="emotion-all"
                     type="checkbox"
                     checked
-                    class="w-4 h-4 accent-primary rounded focus:ring-ring"
+                    class="h-4 w-4 rounded accent-primary focus:ring-ring"
                   />
                   <label for="emotion-all" class="ml-2 text-sm text-foreground">
                     All Emotions
@@ -331,7 +333,7 @@ const title = `Temporal Analysis - ${client.name}`
                   <input
                     id="emotion-anxiety"
                     type="checkbox"
-                    class="w-4 h-4 accent-primary rounded focus:ring-ring"
+                    class="h-4 w-4 rounded accent-primary focus:ring-ring"
                   />
                   <label
                     for="emotion-anxiety"
@@ -344,7 +346,7 @@ const title = `Temporal Analysis - ${client.name}`
                   <input
                     id="emotion-sadness"
                     type="checkbox"
-                    class="w-4 h-4 accent-primary rounded focus:ring-ring"
+                    class="h-4 w-4 rounded accent-primary focus:ring-ring"
                   />
                   <label
                     for="emotion-sadness"
@@ -357,7 +359,7 @@ const title = `Temporal Analysis - ${client.name}`
                   <input
                     id="emotion-joy"
                     type="checkbox"
-                    class="w-4 h-4 accent-primary rounded focus:ring-ring"
+                    class="h-4 w-4 rounded accent-primary focus:ring-ring"
                   />
                   <label for="emotion-joy" class="ml-2 text-sm text-foreground">
                     Joy
@@ -367,7 +369,7 @@ const title = `Temporal Analysis - ${client.name}`
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-foreground mb-1">
+              <label class="mb-1 block text-sm font-medium text-foreground">
                 Analysis Features
               </label>
               <div class="space-y-2">
@@ -376,7 +378,7 @@ const title = `Temporal Analysis - ${client.name}`
                     id="patterns"
                     type="checkbox"
                     checked
-                    class="w-4 h-4 accent-primary rounded focus:ring-ring"
+                    class="h-4 w-4 rounded accent-primary focus:ring-ring"
                   />
                   <label for="patterns" class="ml-2 text-sm text-foreground">
                     Include Pattern Detection
@@ -387,7 +389,7 @@ const title = `Temporal Analysis - ${client.name}`
                     id="dimensions"
                     type="checkbox"
                     checked
-                    class="w-4 h-4 accent-primary rounded focus:ring-ring"
+                    class="h-4 w-4 rounded accent-primary focus:ring-ring"
                   />
                   <label for="dimensions" class="ml-2 text-sm text-foreground">
                     Dimensional Analysis
@@ -398,18 +400,18 @@ const title = `Temporal Analysis - ${client.name}`
 
             <button
               type="submit"
-              class="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2 px-4 rounded-none transition"
+              class="hover:bg-primary/90 w-full rounded-none bg-primary px-4 py-2 font-medium text-primary-foreground transition"
             >
               Update Analysis
             </button>
           </form>
         </div>
 
-        <div class="bg-secondary border border-border rounded-none p-4 mt-6">
-          <h3 class="text-md font-semibold text-foreground mb-2">
+        <div class="mt-6 rounded-none border border-border bg-secondary p-4">
+          <h3 class="text-md mb-2 font-semibold text-foreground">
             About Temporal Analysis
           </h3>
-          <p class="text-sm text-muted-foreground mb-2">
+          <p class="mb-2 text-sm text-muted-foreground">
             Temporal analysis helps identify emotional patterns, trends, and
             significant moments across multiple therapy sessions.
           </p>

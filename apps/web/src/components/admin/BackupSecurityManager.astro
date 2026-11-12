@@ -8,10 +8,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs.tsx'
-import BackupConfigurationTab from './backup/BackupConfigurationTab'
-import BackupStatusTab from './backup/BackupStatusTab'
-import BackupRecoveryTab from './backup/BackupRecoveryTab'
-import BackupReportTab from './backup/BackupReportTab'
 
 // Import all types from the backup-types.ts file
 import {
@@ -21,6 +17,10 @@ import {
   StorageLocation,
   TestEnvironmentType,
 } from '../../lib/security/backup/backup-types'
+import BackupConfigurationTab from './backup/BackupConfigurationTab'
+import BackupRecoveryTab from './backup/BackupRecoveryTab'
+import BackupReportTab from './backup/BackupReportTab'
+import BackupStatusTab from './backup/BackupStatusTab'
 
 // Don't import the BackupSecurityManager class as we're not using it now
 
@@ -296,7 +296,7 @@ const handleUpdateConfig = (config: BackupConfig): void => {
 ---
 
 <div class="container mx-auto p-0">
-  <div id="backup-alert" class="hidden mb-4"></div>
+  <div id="backup-alert" class="mb-4 hidden"></div>
 
   <Tabs defaultValue="status" client:load>
     <TabsList className="mb-4">

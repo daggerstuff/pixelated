@@ -1,8 +1,9 @@
 ---
-import PostCard from '@/components/blog/PostCard.astro'
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import type { CollectionEntry } from 'astro:content'
 import { getCollection } from 'astro:content'
+
+import PostCard from '@/components/blog/PostCard.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 
 // export const prerender = true;
 
@@ -62,14 +63,14 @@ const description = `Articles tagged with #${tag} - Explore insights and guides 
 ---
 
 <BaseLayout {title} {description}>
-  <div class="max-w-6xl mx-auto py-12 px-4">
-    <div class="text-center mb-12">
+  <div class="mx-auto max-w-6xl px-4 py-12">
+    <div class="mb-12 text-center">
       <h1 class="text-4xl font-bold text-foreground">Tagged: #{tag}</h1>
-      <p class="text-lg text-muted-foreground mt-2">
+      <p class="mt-2 text-lg text-muted-foreground">
         {posts.length} post{posts.length !== 1 ? 's' : ''} found
       </p>
     </div>
-    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <ul class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       {posts.map((post) => (
         <PostCard {post} />
       ))}
@@ -77,7 +78,7 @@ const description = `Articles tagged with #${tag} - Explore insights and guides 
     <div class="mt-12 text-center">
       <a
         href="/blog"
-        class="inline-block rounded-none bg-secondary px-5 py-3 text-sm font-medium text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+        class="inline-block rounded-none bg-secondary px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
       >
         Back to All Articles
       </a>

@@ -58,23 +58,23 @@ const trainingPrograms: any[] = []
   title="Pixelated Empathy - Therapeutic Training Platform"
   description="Advanced AI-powered therapeutic training simulation platform"
 >
-  <main class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+  <main class="from-blue-50 via-white to-purple-50 min-h-screen bg-gradient-to-br">
     <!-- Hero Section -->
-    <section class="relative px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <section class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div class="text-center">
-        <div class="flex items-center justify-center mb-6">
-          <div class="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-none flex items-center justify-center mr-4">
+        <div class="mb-6 flex items-center justify-center">
+          <div class="from-blue-600 to-purple-600 mr-4 flex h-16 w-16 items-center justify-center rounded-none bg-gradient-to-br">
             <span class="text-2xl">🎭</span>
           </div>
           <h1 class="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl">
             Pixelated{' '}
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+            <span class="text-transparent from-blue-600 to-purple-600 bg-gradient-to-r bg-clip-text">
               Empathy
             </span>
           </h1>
         </div>
 
-        <p class="max-w-3xl mx-auto text-xl text-muted-foreground sm:text-2xl">
+        <p class="mx-auto max-w-3xl text-xl text-muted-foreground sm:text-2xl">
           Proposed synthetic conversation practice for education. Training
           scenarios, session creation, session coaching, automated client
           replies, and supervisor review are not yet available in this portal.
@@ -82,7 +82,7 @@ const trainingPrograms: any[] = []
 
         {sessionNotFound && (
           <p
-            class="max-w-2xl mx-auto mt-6 rounded-none border border-border bg-background px-4 py-3 text-sm text-foreground"
+            class="mx-auto mt-6 max-w-2xl rounded-none border border-border bg-background px-4 py-3 text-sm text-foreground"
             role="status"
           >
             That training session could not be found. It may have been removed,
@@ -90,7 +90,7 @@ const trainingPrograms: any[] = []
           </p>
         )}
 
-        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
           {userRole === 'trainee' && (
             <p
               class="rounded-md border border-border bg-background px-4 py-3 text-sm text-muted-foreground"
@@ -103,7 +103,7 @@ const trainingPrograms: any[] = []
             <Button
               href="/dashboard"
               size="lg"
-              class="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+              class="from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 bg-gradient-to-r"
             >
               👨‍🏫 Supervisor Dashboard
             </Button>
@@ -112,9 +112,9 @@ const trainingPrograms: any[] = []
             href="/analytics"
             variant="outline"
             size="lg"
-            class="border-2 border-primary text-primary hover:bg-primary/10"
+            class="hover:bg-primary/10 border-2 border-primary text-primary"
           >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"></svg>{' '}
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"></svg>{' '}
             View Progress
           </Button>
         </div>
@@ -122,8 +122,8 @@ const trainingPrograms: any[] = []
     </section>
 
     <!-- Training journey scaffolding (structure only) -->
-    <section class="px-4 pb-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="p-6 border border-border bg-card">
+    <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+      <div class="border border-border bg-card p-6">
         <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
           Training journey
         </p>
@@ -131,7 +131,7 @@ const trainingPrograms: any[] = []
           Session creation and the scenario catalog
         </h2>
         <p
-          class="max-w-3xl mt-3 text-sm leading-relaxed text-muted-foreground"
+          class="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground"
           role="status"
         >
           Both surfaces are structure only. They are awaiting the approved
@@ -139,8 +139,8 @@ const trainingPrograms: any[] = []
           content owner, so the catalog lists no scenarios and session creation
           writes nothing.
         </p>
-        <ul class="grid gap-4 mt-6 sm:grid-cols-2">
-          <li class="p-4 border border-border bg-background">
+        <ul class="mt-6 grid gap-4 sm:grid-cols-2">
+          <li class="border border-border bg-background p-4">
             <h3 class="text-base font-semibold text-foreground">
               Scenario catalog
             </h3>
@@ -150,12 +150,12 @@ const trainingPrograms: any[] = []
             </p>
             <a
               href="/training/scenarios"
-              class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 mt-4 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+              class="mt-4 inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Open the scenario catalog
             </a>
           </li>
-          <li class="p-4 border border-border bg-background">
+          <li class="border border-border bg-background p-4">
             <h3 class="text-base font-semibold text-foreground">
               Create a training session
             </h3>
@@ -165,7 +165,7 @@ const trainingPrograms: any[] = []
             </p>
             <a
               href="/training/sessions/new"
-              class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 mt-4 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+              class="mt-4 inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Open session creation
             </a>
@@ -176,14 +176,14 @@ const trainingPrograms: any[] = []
 
     <!-- Active Sessions Section -->
     {activeTrainingSessions.length > 0 && (
-      <section class="px-4 py-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-foreground mb-8 text-center">
+      <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <h2 class="mb-8 text-center text-3xl font-bold text-foreground">
           Active Training Sessions
         </h2>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {activeTrainingSessions.map((session: any) => (
-            <Card class="p-6 border-l-4 border-l-ring">
-              <div class="flex items-start justify-between mb-4">
+            <Card class="border-l-4 border-l-ring p-6">
+              <div class="mb-4 flex items-start justify-between">
                 <div>
                   <h3 class="text-lg font-semibold text-foreground">
                     {session.clientProfile.name}
@@ -193,17 +193,17 @@ const trainingPrograms: any[] = []
                   </p>
                 </div>
                 <span
-                  class={`px-2 py-1 text-xs font-medium rounded-none ${
+                  class={`rounded-none px-2 py-1 text-xs font-medium ${
                     session.status === 'active'
                       ? 'bg-secondary text-foreground'
-                      : 'bg-secondary text-foreground border border-ring'
+                      : 'border border-ring bg-secondary text-foreground'
                   }`}
                 >
                   {session.status}
                 </span>
               </div>
 
-              <div class="space-y-2 mb-4">
+              <div class="mb-4 space-y-2">
                 <div class="flex justify-between text-sm">
                   <span class="text-muted-foreground">Duration:</span>
                   <span class="font-medium">{session.duration}</span>
@@ -238,24 +238,24 @@ const trainingPrograms: any[] = []
     )}
 
     <!-- Training Programs Section -->
-    <section class="px-4 py-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <h2 class="text-3xl font-bold text-foreground mb-8 text-center">
+    <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <h2 class="mb-8 text-center text-3xl font-bold text-foreground">
         Training Programs
       </h2>
       <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {trainingPrograms.map((program: any) => (
-          <Card class="p-8 transition-all duration-300 border-2 hover:border-ring">
-            <div class="text-center mb-6">
-              <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-none flex items-center justify-center mx-auto mb-4">
+          <Card class="border-2 p-8 transition-all duration-300 hover:border-ring">
+            <div class="mb-6 text-center">
+              <div class="from-purple-500 to-blue-500 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-none bg-gradient-to-br">
                 <span class="text-2xl">{program.icon || '🎓'}</span>
               </div>
-              <h3 class="text-xl font-bold text-foreground mb-2">
+              <h3 class="mb-2 text-xl font-bold text-foreground">
                 {program.name}
               </h3>
               <p class="text-muted-foreground">{program.description}</p>
             </div>
 
-            <div class="space-y-3 mb-6">
+            <div class="mb-6 space-y-3">
               <div class="flex justify-between text-sm">
                 <span class="text-muted-foreground">Target Level:</span>
                 <span class="font-medium capitalize">
@@ -273,12 +273,12 @@ const trainingPrograms: any[] = []
             </div>
 
             <div class="mb-6">
-              <h4 class="text-sm font-semibold text-foreground mb-2">
+              <h4 class="mb-2 text-sm font-semibold text-foreground">
                 Key Skills:
               </h4>
               <div class="flex flex-wrap gap-2">
                 {program.keySkills?.slice(0, 3).map((skill: string) => (
-                  <span class="px-2 py-1 text-xs bg-secondary text-foreground rounded-none">
+                  <span class="rounded-none bg-secondary px-2 py-1 text-xs text-foreground">
                     {skill}
                   </span>
                 ))}
@@ -300,8 +300,8 @@ const trainingPrograms: any[] = []
     <!-- Journey scaffolding: client replies and session coaching (structure
          only). Kept in its own delimited block so a sibling scaffold PR can be
          merged beside it without a conflict; the release keeps every link. -->
-    <section class="px-4 pb-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="p-6 border border-border bg-card">
+    <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+      <div class="border border-border bg-card p-6">
         <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
           Training journey
         </p>
@@ -309,7 +309,7 @@ const trainingPrograms: any[] = []
           Client replies and session coaching
         </h2>
         <p
-          class="max-w-3xl mt-3 text-sm leading-relaxed text-muted-foreground"
+          class="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground"
           role="status"
         >
           Structure only. A synthetic client reply cannot be told apart from a
@@ -319,7 +319,7 @@ const trainingPrograms: any[] = []
         </p>
         <a
           href="/training/coaching"
-          class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 mt-4 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+          class="mt-4 inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           Open session coaching
         </a>
@@ -328,35 +328,35 @@ const trainingPrograms: any[] = []
     <!-- /Journey scaffolding: client replies and session coaching -->
 
     <!-- Readiness Enhancements Section -->
-    <section class="px-4 py-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="text-center mb-10">
+    <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div class="mb-10 text-center">
         <h2 class="text-3xl font-bold text-foreground">
           Readiness &amp; Governance Enhancements
         </h2>
-        <p class="mt-3 text-lg text-muted-foreground max-w-3xl mx-auto">
+        <p class="mx-auto mt-3 max-w-3xl text-lg text-muted-foreground">
           Extend training into audit evidence, clinical safety stress testing,
           and executive-ready reporting without losing the learning loop.
         </p>
       </div>
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {readinessEnhancements.map((enhancement) => (
-          <Card class="p-6 border-l-4 border-l-neutral-500 flex flex-col">
+          <Card class="border-l-neutral-500 flex flex-col border-l-4 p-6">
             <div class="mb-4">
               <h3 class="text-lg font-semibold text-foreground">
                 {enhancement.title}
               </h3>
               <p class="text-sm text-muted-foreground">{enhancement.summary}</p>
             </div>
-            <div class="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Primary audience
             </div>
-            <div class="text-sm font-medium text-foreground mb-4">
+            <div class="mb-4 text-sm font-medium text-foreground">
               {enhancement.audience}
             </div>
-            <ul class="space-y-2 text-sm text-muted-foreground flex-1">
+            <ul class="flex-1 space-y-2 text-sm text-muted-foreground">
               {enhancement.outcomes.map((outcome) => (
                 <li class="flex items-start gap-2">
-                  <span class="text-primary mt-1">•</span>
+                  <span class="mt-1 text-primary">•</span>
                   <span>{outcome}</span>
                 </li>
               ))}
@@ -375,22 +375,22 @@ const trainingPrograms: any[] = []
     </section>
 
     <!-- Quick Stats Section -->
-    <section class="px-4 py-12 bg-secondary mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <section class="mx-auto max-w-7xl bg-secondary px-4 py-12 sm:px-6 lg:px-8">
       <div class="grid gap-8 md:grid-cols-4">
         <div class="text-center">
-          <div class="text-3xl font-bold text-primary mb-2">8,000+</div>
+          <div class="mb-2 text-3xl font-bold text-primary">8,000+</div>
           <div class="text-muted-foreground">Training Conversations</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-primary mb-2">6</div>
+          <div class="mb-2 text-3xl font-bold text-primary">6</div>
           <div class="text-muted-foreground">Difficult Client Types</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-foreground mb-2">5</div>
+          <div class="mb-2 text-3xl font-bold text-foreground">5</div>
           <div class="text-muted-foreground">Competency Levels</div>
         </div>
         <div class="text-center">
-          <div class="text-3xl font-bold text-foreground mb-2">98%</div>
+          <div class="mb-2 text-3xl font-bold text-foreground">98%</div>
           <div class="text-muted-foreground">Training Effectiveness</div>
         </div>
       </div>
@@ -399,8 +399,8 @@ const trainingPrograms: any[] = []
     <!-- Journey scaffolding: faculty review (structure only). Kept in its own
          delimited block so a sibling scaffold PR can be merged beside it
          without a conflict; the release keeps every link. -->
-    <section class="px-4 pb-12 mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="p-6 border border-border bg-card">
+    <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+      <div class="border border-border bg-card p-6">
         <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
           Training journey
         </p>
@@ -408,7 +408,7 @@ const trainingPrograms: any[] = []
           Faculty review
         </h2>
         <p
-          class="max-w-3xl mt-3 text-sm leading-relaxed text-muted-foreground"
+          class="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground"
           role="status"
         >
           Structure only. A faculty member cannot be scoped to the sessions they
@@ -418,7 +418,7 @@ const trainingPrograms: any[] = []
         </p>
         <a
           href="/training/faculty-review"
-          class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 mt-4 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+          class="mt-4 inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           Open faculty review
         </a>

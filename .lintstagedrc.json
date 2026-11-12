@@ -5,7 +5,9 @@
     "bash scripts/ci/oxlint-staged.sh -c .oxlintrc.json --ignore-pattern 'src/scripts/**'",
     "bash scripts/ci/check-no-suppressions.sh"
   ],
-  "*.astro": ["pnpm exec prettier --write"],
+  "*.astro": [
+    "pnpm exec oxfmt --write --ignore-path .gitignore --no-error-on-unmatched-pattern"
+  ],
   "*.{js,ts,jsx,tsx,mjs,cjs}": [
     "pnpm exec oxfmt --write --ignore-path .gitignore --no-error-on-unmatched-pattern"
   ],

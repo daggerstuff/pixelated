@@ -1,7 +1,7 @@
 ---
+import BrutalistChatDemo from '@/components/chat/BrutalistChatDemo'
 // Demo Hub - Showcase Platform Capabilities
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import BrutalistChatDemo from '@/components/chat/BrutalistChatDemo'
 
 const demos = [
   {
@@ -119,49 +119,49 @@ const liveDemo = {
   description="Try our AI-powered therapy training simulations. Practice crisis interventions, bias detection, and complex client scenarios safely."
 >
   <!-- Hero Section -->
-  <section class="relative overflow-hidden min-h-screen flex items-center py-24 px-4">
-    <div class="max-w-5xl mx-auto relative z-10 w-full text-center">
+  <section class="relative flex min-h-screen items-center overflow-hidden px-4 py-24">
+    <div class="relative z-10 mx-auto w-full max-w-5xl text-center">
       <!-- Status Bar -->
       <div
-        class="mb-8 inline-flex items-center gap-3 px-6 py-3 np-elevated"
+        class="np-elevated mb-8 inline-flex items-center gap-3 px-6 py-3"
         style="border: 1px solid var(--np-line);"
       >
         <span
-          class="inline-block w-2 h-2 np-mid"
+          class="np-mid inline-block h-2 w-2"
           style="background: var(--np-mid);"
           aria-hidden="true"
         ></span>
-        <span class="font-bold np-text tracking-wide">
+        <span class="np-text font-bold tracking-wide">
           DEMO LIBRARY AVAILABLE
         </span>
       </div>
 
       <!-- Headline -->
-      <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight np-text">
+      <h1 class="np-text mb-6 text-5xl font-bold leading-tight md:text-7xl">
         EXPLORE THE
         <br />
         PRODUCT SURFACES
       </h1>
 
       <!-- Description -->
-      <p class="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed np-muted mb-12">
+      <p class="np-muted mx-auto mb-12 max-w-3xl text-xl leading-relaxed md:text-2xl">
         Explore the product through focused demos covering simulation,
         analytics, privacy, and supporting workflow components. This page is
         meant to show what exists, not make inflated claims about what does not.
       </p>
 
       <!-- CTA -->
-      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+      <div class="mb-16 flex flex-col items-center justify-center gap-4 sm:flex-row">
         <button
           id="live-demo-btn"
-          class="px-8 py-4 font-bold np-cta np-ring"
+          class="np-cta np-ring px-8 py-4 font-bold"
           style="background: var(--np-elevated);"
         >
           LIVE DEMONSTRATION
         </button>
         <button
           id="modules-btn"
-          class="px-8 py-4 font-bold np-ring"
+          class="np-ring px-8 py-4 font-bold"
           style="background: var(--np-bg); color: var(--np-text); border: 1px solid var(--np-line);"
         >
           VIEW MODULES
@@ -169,7 +169,7 @@ const liveDemo = {
       </div>
 
       <!-- Scroll Hint -->
-      <p class="text-sm np-muted">Scroll to explore</p>
+      <p class="np-muted text-sm">Scroll to explore</p>
     </div>
   </section>
 
@@ -200,16 +200,16 @@ const liveDemo = {
     })
   </script>
   <!-- Live Demo Section -->
-  <section class="py-24 px-4" style="background: var(--np-surface);">
-    <div class="max-w-5xl mx-auto">
-      <div class="text-center mb-12">
-        <p class="font-bold np-mid mb-4 tracking-wide uppercase text-sm">
+  <section class="px-4 py-24" style="background: var(--np-surface);">
+    <div class="mx-auto max-w-5xl">
+      <div class="mb-12 text-center">
+        <p class="np-mid mb-4 text-sm font-bold uppercase tracking-wide">
           {liveDemo.status} Demonstration
         </p>
-        <h2 class="text-3xl md:text-5xl font-bold mb-4 np-text">
+        <h2 class="np-text mb-4 text-3xl font-bold md:text-5xl">
           {liveDemo.title}
         </h2>
-        <p class="text-lg max-w-3xl mx-auto mb-8 np-muted">
+        <p class="np-muted mx-auto mb-8 max-w-3xl text-lg">
           {liveDemo.description}
         </p>
       </div>
@@ -220,35 +220,35 @@ const liveDemo = {
   </section>
 
   <!-- Demo Grid Section -->
-  <section class="py-24 px-4">
-    <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-5xl font-bold mb-6 np-text">
+  <section class="px-4 py-24">
+    <div class="mx-auto max-w-6xl">
+      <div class="mb-12 text-center">
+        <h2 class="np-text mb-6 text-3xl font-bold md:text-5xl">
           SPECIALIZED TRAINING MODULES
         </h2>
-        <p class="text-lg max-w-3xl mx-auto np-muted">
+        <p class="np-muted mx-auto max-w-3xl text-lg">
           Each module targets specific therapeutic competencies with measurable
           outcomes.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {demos.map((demo) => (
           <div
-            class="p-6 flex flex-col"
+            class="flex flex-col p-6"
             style="background: var(--np-surface); border: 1px solid var(--np-line);"
           >
-            <div class="flex items-center justify-between mb-4">
+            <div class="mb-4 flex items-center justify-between">
               <div class="text-3xl">{demo.icon}</div>
               <div class="flex gap-2">
                 <div
-                  class="text-xs px-2 py-1 font-bold uppercase tracking-wide"
+                  class="px-2 py-1 text-xs font-bold uppercase tracking-wide"
                   style="background: var(--np-elevated); color: var(--np-text); border: 1px solid var(--np-line);"
                 >
                   {demo.status}
                 </div>
                 <div
-                  class="text-xs px-2 py-1 font-bold uppercase tracking-wide np-muted"
+                  class="np-muted px-2 py-1 text-xs font-bold uppercase tracking-wide"
                   style="border: 1px solid var(--np-line);"
                 >
                   {demo.difficulty}
@@ -256,16 +256,16 @@ const liveDemo = {
               </div>
             </div>
 
-            <h3 class="text-lg font-semibold mb-3 np-text">{demo.title}</h3>
-            <p class="np-muted text-sm mb-6 leading-relaxed flex-1">
+            <h3 class="np-text mb-3 text-lg font-semibold">{demo.title}</h3>
+            <p class="np-muted mb-6 flex-1 text-sm leading-relaxed">
               {demo.description}
             </p>
 
-            <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="mb-6 grid grid-cols-2 gap-4">
               {Object.entries(demo.stats).map(([key, value]) => (
                 <div class="text-center">
-                  <div class="text-lg font-bold np-text">{value}</div>
-                  <div class="text-xs uppercase tracking-wide np-muted">
+                  <div class="np-text text-lg font-bold">{value}</div>
+                  <div class="np-muted text-xs uppercase tracking-wide">
                     {key}
                   </div>
                 </div>
@@ -274,7 +274,7 @@ const liveDemo = {
 
             <a
               href={demo.href}
-              class="block w-full text-center py-3 font-bold np-cta"
+              class="np-cta block w-full py-3 text-center font-bold"
             >
               LAUNCH DEMO →
             </a>
@@ -285,65 +285,65 @@ const liveDemo = {
   </section>
 
   <!-- Metrics Section -->
-  <section class="py-24 px-4" style="background: var(--np-surface);">
-    <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-5xl font-bold mb-6 np-text">
+  <section class="px-4 py-24" style="background: var(--np-surface);">
+    <div class="mx-auto max-w-6xl">
+      <div class="mb-12 text-center">
+        <h2 class="np-text mb-6 text-3xl font-bold md:text-5xl">
           MEASURABLE OUTCOMES
         </h2>
-        <p class="text-lg max-w-3xl mx-auto np-muted">
+        <p class="np-muted mx-auto max-w-3xl text-lg">
           Every training session generates actionable data to track your
           progress.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <div class="p-6 text-center" style="background: var(--np-elevated);">
-          <div class="text-4xl font-bold np-text">85%</div>
-          <div class="mt-2 np-mid uppercase tracking-wide text-sm">
+          <div class="np-text text-4xl font-bold">85%</div>
+          <div class="np-mid mt-2 text-sm uppercase tracking-wide">
             Diagnostic Accuracy
           </div>
-          <div class="text-xs np-muted mt-2">Average improvement</div>
+          <div class="np-muted mt-2 text-xs">Average improvement</div>
         </div>
         <div class="p-6 text-center" style="background: var(--np-elevated);">
-          <div class="text-4xl font-bold np-text">300%</div>
-          <div class="mt-2 np-mid uppercase tracking-wide text-sm">
+          <div class="np-text text-4xl font-bold">300%</div>
+          <div class="np-mid mt-2 text-sm uppercase tracking-wide">
             Skill Acquisition
           </div>
-          <div class="text-xs np-muted mt-2">Faster than traditional</div>
+          <div class="np-muted mt-2 text-xs">Faster than traditional</div>
         </div>
         <div class="p-6 text-center" style="background: var(--np-elevated);">
-          <div class="text-4xl font-bold np-text">78%</div>
-          <div class="mt-2 np-mid uppercase tracking-wide text-sm">
+          <div class="np-text text-4xl font-bold">78%</div>
+          <div class="np-mid mt-2 text-sm uppercase tracking-wide">
             Bias Reduction
           </div>
-          <div class="text-xs np-muted mt-2">Cultural competency</div>
+          <div class="np-muted mt-2 text-xs">Cultural competency</div>
         </div>
         <div class="p-6 text-center" style="background: var(--np-elevated);">
-          <div class="text-4xl font-bold np-text">0</div>
-          <div class="mt-2 np-mid uppercase tracking-wide text-sm">
+          <div class="np-text text-4xl font-bold">0</div>
+          <div class="np-mid mt-2 text-sm uppercase tracking-wide">
             Patient Harm
           </div>
-          <div class="text-xs np-muted mt-2">Perfect safety record</div>
+          <div class="np-muted mt-2 text-xs">Perfect safety record</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- CTA Section -->
-  <section class="py-24 px-4">
-    <div class="max-w-4xl mx-auto text-center">
-      <h2 class="text-3xl md:text-5xl font-bold mb-6 np-text">
+  <section class="px-4 py-24">
+    <div class="mx-auto max-w-4xl text-center">
+      <h2 class="np-text mb-6 text-3xl font-bold md:text-5xl">
         READY TO REVIEW THE WORKFLOW?
       </h2>
-      <p class="text-xl np-muted mb-8">
+      <p class="np-muted mb-8 text-xl">
         Use the demos to see how the platform handles simulation, feedback, and
         supporting product surfaces before you talk to us.
       </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+      <div class="mb-8 flex flex-col justify-center gap-4 sm:flex-row">
         <a
           href="/contact"
-          class="px-8 py-4 text-lg font-bold np-cta"
+          class="np-cta px-8 py-4 text-lg font-bold"
           style="background: var(--np-elevated);"
         >
           TALK TO THE TEAM →
@@ -364,13 +364,13 @@ const liveDemo = {
           ✓ Product walkthroughs available
         </span>
         <span
-          class="px-3 py-1 font-semibold np-muted"
+          class="np-muted px-3 py-1 font-semibold"
           style="border: 1px solid var(--np-line);"
         >
           ✓ Full support
         </span>
         <span
-          class="px-3 py-1 font-semibold np-muted"
+          class="np-muted px-3 py-1 font-semibold"
           style="border: 1px solid var(--np-line);"
         >
           ✓ Custom integration

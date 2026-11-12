@@ -1,8 +1,8 @@
 ---
 import { getCollection } from 'astro:content'
-import CardItem from '@/components/views/CardItem.astro'
-
 import type { ContentCollectionKey, DataCollectionKey } from 'astro:content'
+
+import CardItem from '@/components/views/CardItem.astro'
 import type { CardItemData } from '@/components/views/CardItem.astro'
 
 interface Props {
@@ -28,14 +28,14 @@ const collectionItems = await getCollection(collectionType)
 
 {mode === 'masonry' && (
   <responsive-masonry
-    class="block relative w-full min-h-screen op-0 op-transition-500"
+    class="op-0 op-transition-500 relative block min-h-screen w-full"
     data-gap={gap}
     data-min-card-width={minCardWidth}
     data-max-card-width={maxCardWidth}
   >
     {collectionItems.map((item: unknown) => (
       <CardItem
-        class="card-masonry absolute top-0 left-0"
+        class="card-masonry absolute left-0 top-0"
         item={item as unknown as CardItemData}
       />
     ))}

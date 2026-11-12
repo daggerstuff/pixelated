@@ -31,21 +31,21 @@ const verificationHistory: Verification[] = []
 ---
 
 <AdminLayout>
-  <div class="max-w-5xl mx-auto py-8">
-    <h1 class="text-2xl font-bold mb-6">Vendor Document Verification</h1>
+  <div class="mx-auto max-w-5xl py-8">
+    <h1 class="mb-6 text-2xl font-bold">Vendor Document Verification</h1>
 
     <!-- Upload Document Form -->
     <form
       id="document-form"
-      class="bg-card rounded-none p-6 mb-8"
+      class="mb-8 rounded-none bg-card p-6"
       autocomplete="off"
     >
-      <h2 class="text-lg font-semibold mb-4">Upload Compliance Document</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <h2 class="mb-4 text-lg font-semibold">Upload Compliance Document</h2>
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <label
             for="documentDescription"
-            class="block text-sm font-medium text-foreground mb-1"
+            class="mb-1 block text-sm font-medium text-foreground"
           >
             Description
           </label>
@@ -53,14 +53,14 @@ const verificationHistory: Verification[] = []
             id="documentDescription"
             name="documentDescription"
             rows="2"
-            class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
+            class="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-ring"
             placeholder="Brief description of the document..."
           ></textarea>
         </div>
         <div>
           <label
             for="documentExpiryDate"
-            class="block text-sm font-medium text-foreground mb-1"
+            class="mb-1 block text-sm font-medium text-foreground"
           >
             Document Expiry Date
           </label>
@@ -68,13 +68,13 @@ const verificationHistory: Verification[] = []
             type="date"
             id="documentExpiryDate"
             name="documentExpiryDate"
-            class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
+            class="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-ring"
           />
         </div>
         <div class="md:col-span-2">
           <label
             for="documentFile"
-            class="block text-sm font-medium text-foreground mb-1"
+            class="mb-1 block text-sm font-medium text-foreground"
           >
             Upload Document<span class="text-foreground">*</span>
           </label>
@@ -84,7 +84,7 @@ const verificationHistory: Verification[] = []
             name="documentFile"
             required
             accept=".pdf,.doc,.docx,.xls,.xlsx"
-            class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
+            class="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-ring"
           />
           <p class="mt-1 text-xs text-muted-foreground">
             Accepted formats: PDF, DOC, DOCX, XLS, XLSX (max 10MB)
@@ -94,7 +94,7 @@ const verificationHistory: Verification[] = []
       <div class="flex justify-end pt-4">
         <button
           type="submit"
-          class="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-none text-primary-foreground bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+          class="border-transparent inline-flex justify-center rounded-none border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
           Upload Document
         </button>
@@ -102,49 +102,49 @@ const verificationHistory: Verification[] = []
     </form>
 
     <!-- Documents and Verification History -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
       <!-- Documents Section -->
-      <div class="bg-card rounded-none p-6">
-        <h2 class="text-lg font-semibold mb-4">Compliance Documents</h2>
+      <div class="rounded-none bg-card p-6">
+        <h2 class="mb-4 text-lg font-semibold">Compliance Documents</h2>
         {documents.length === 0 ? (
           <p class="text-muted-foreground">
             No documents have been uploaded for this vendor.
           </p>
         ) : (
-          <div class="overflow-y-auto max-h-96">
+          <div class="max-h-96 overflow-y-auto">
             <table class="min-w-full divide-y divide-border">
               <thead class="bg-secondary">
                 <tr>
                   <th
                     scope="col"
-                    class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                   >
                     Document
                   </th>
                   <th
                     scope="col"
-                    class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                   >
                     Type
                   </th>
                   <th
                     scope="col"
-                    class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                   >
                     Uploaded
                   </th>
                   <th
                     scope="col"
-                    class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                    class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                   >
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody class="bg-card divide-y divide-border">
+              <tbody class="divide-y divide-border bg-card">
                 {documents.map((doc) => (
                   <tr>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-foreground hover:underline">
+                    <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-foreground hover:underline">
                       <a
                         href={doc.documentUrl}
                         target="_blank"
@@ -153,15 +153,15 @@ const verificationHistory: Verification[] = []
                         {doc.name}
                       </a>
                       {doc.description && (
-                        <p class="text-xs text-muted-foreground truncate">
+                        <p class="truncate text-xs text-muted-foreground">
                           {doc.description}
                         </p>
                       )}
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground capitalize">
+                    <td class="whitespace-nowrap px-4 py-3 text-sm capitalize text-muted-foreground">
                       {doc.type.replace(/_/g, ' ')}
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
+                    <td class="whitespace-nowrap px-4 py-3 text-sm text-muted-foreground">
                       {new Date(doc.uploadDate).toLocaleDateString()}
                       {doc.expiryDate && (
                         <div class="text-xs text-muted-foreground">
@@ -170,13 +170,13 @@ const verificationHistory: Verification[] = []
                         </div>
                       )}
                     </td>
-                    <td class="px-4 py-3 whitespace-nowrap">
+                    <td class="whitespace-nowrap px-4 py-3">
                       {doc.isValid ? (
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                        <span class="inline-flex items-center rounded-none border border-input bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                           Valid
                         </span>
                       ) : (
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
+                        <span class="inline-flex items-center rounded-none bg-primary px-2.5 py-0.5 text-xs font-medium text-primary-foreground">
                           Invalid
                         </span>
                       )}
@@ -190,18 +190,18 @@ const verificationHistory: Verification[] = []
       </div>
 
       <!-- Verification History Section -->
-      <div class="bg-card rounded-none p-6">
-        <h2 class="text-lg font-semibold mb-4">Verification History</h2>
+      <div class="rounded-none bg-card p-6">
+        <h2 class="mb-4 text-lg font-semibold">Verification History</h2>
         {verificationHistory.length === 0 ? (
           <p class="text-muted-foreground">
             No verification history found for this vendor.
           </p>
         ) : (
-          <div class="overflow-y-auto max-h-96">
+          <div class="max-h-96 overflow-y-auto">
             <div class="space-y-4">
               {verificationHistory.map((verification) => (
-                <div class="border border-border rounded-none p-4">
-                  <div class="flex justify-between items-start">
+                <div class="rounded-none border border-border p-4">
+                  <div class="flex items-start justify-between">
                     <div>
                       <p class="text-sm font-medium">
                         {verification.complianceLevel
@@ -227,7 +227,7 @@ const verificationHistory: Verification[] = []
                     )}
                   </div>
                   {verification.notes && (
-                    <div class="mt-2 text-sm text-muted-foreground border-t border-border pt-2">
+                    <div class="mt-2 border-t border-border pt-2 text-sm text-muted-foreground">
                       {verification.notes}
                     </div>
                   )}
@@ -241,7 +241,7 @@ const verificationHistory: Verification[] = []
                           {verification.attachments.map((docId) => {
                             const doc = documents.find((d) => d.id === docId)
                             return doc ? (
-                              <li class="inline-block mr-2">
+                              <li class="mr-2 inline-block">
                                 <a
                                   href={doc.documentUrl}
                                   target="_blank"
@@ -281,12 +281,12 @@ const verificationHistory: Verification[] = []
   type="date"
   id="documentExpiryDate"
   name="documentExpiryDate"
-  class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
+  class="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-ring"
 />
 <div>
   <label
     for="documentFile"
-    class="block text-sm font-medium text-foreground mb-1"
+    class="mb-1 block text-sm font-medium text-foreground"
   >
     Upload Document*
   </label>
@@ -295,7 +295,7 @@ const verificationHistory: Verification[] = []
     id="documentFile"
     name="documentFile"
     required
-    class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
+    class="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-ring"
   />
   <p class="mt-1 text-xs text-muted-foreground">
     Accepted formats: PDF, DOC, DOCX, XLS, XLSX (max 10MB)
@@ -304,56 +304,56 @@ const verificationHistory: Verification[] = []
 <div class="flex justify-end pt-4">
   <button
     type="submit"
-    class="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-none text-primary-foreground bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+    class="border-transparent inline-flex justify-center rounded-none border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
   >
     Upload Document
   </button>
 </div>
 <!-- Documents and Verification History -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+<div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
   <!-- Documents Section -->
-  <div class="bg-card rounded-none p-6">
-    <h2 class="text-lg font-semibold mb-4">Compliance Documents</h2>
+  <div class="rounded-none bg-card p-6">
+    <h2 class="mb-4 text-lg font-semibold">Compliance Documents</h2>
 
     {documents.length === 0 ? (
       <p class="text-muted-foreground">
         No documents have been uploaded for this vendor.
       </p>
     ) : (
-      <div class="overflow-y-auto max-h-96">
+      <div class="max-h-96 overflow-y-auto">
         <table class="min-w-full divide-y divide-border">
           <thead class="bg-secondary">
             <tr>
               <th
                 scope="col"
-                class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Document
               </th>
               <th
                 scope="col"
-                class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Type
               </th>
               <th
                 scope="col"
-                class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Uploaded
               </th>
               <th
                 scope="col"
-                class="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Status
               </th>
             </tr>
           </thead>
-          <tbody class="bg-card divide-y divide-border">
+          <tbody class="divide-y divide-border bg-card">
             {documents.map((doc) => (
               <tr>
-                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-foreground hover:underline">
+                <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-foreground hover:underline">
                   <a
                     href={doc.documentUrl}
                     target="_blank"
@@ -362,15 +362,15 @@ const verificationHistory: Verification[] = []
                     {doc.name}
                   </a>
                   {doc.description && (
-                    <p class="text-xs text-muted-foreground truncate">
+                    <p class="truncate text-xs text-muted-foreground">
                       {doc.description}
                     </p>
                   )}
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground capitalize">
+                <td class="whitespace-nowrap px-4 py-3 text-sm capitalize text-muted-foreground">
                   {doc.type.replace(/_/g, ' ')}
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-muted-foreground">
+                <td class="whitespace-nowrap px-4 py-3 text-sm text-muted-foreground">
                   {new Date(doc.uploadDate).toLocaleDateString()}
                   {doc.expiryDate && (
                     <div class="text-xs text-muted-foreground">
@@ -378,13 +378,13 @@ const verificationHistory: Verification[] = []
                     </div>
                   )}
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap">
+                <td class="whitespace-nowrap px-4 py-3">
                   {doc.isValid ? (
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                    <span class="inline-flex items-center rounded-none border border-input bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                       Valid
                     </span>
                   ) : (
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
+                    <span class="inline-flex items-center rounded-none bg-primary px-2.5 py-0.5 text-xs font-medium text-primary-foreground">
                       Invalid
                     </span>
                   )}
@@ -398,19 +398,19 @@ const verificationHistory: Verification[] = []
   </div>
 
   <!-- Verification History Section -->
-  <div class="bg-card rounded-none p-6">
-    <h2 class="text-lg font-semibold mb-4">Verification History</h2>
+  <div class="rounded-none bg-card p-6">
+    <h2 class="mb-4 text-lg font-semibold">Verification History</h2>
 
     {verificationHistory.length === 0 ? (
       <p class="text-muted-foreground">
         No verification history found for this vendor.
       </p>
     ) : (
-      <div class="overflow-y-auto max-h-96">
+      <div class="max-h-96 overflow-y-auto">
         <div class="space-y-4">
           {verificationHistory.map((verification) => (
-            <div class="border border-border rounded-none p-4">
-              <div class="flex justify-between items-start">
+            <div class="rounded-none border border-border p-4">
+              <div class="flex items-start justify-between">
                 <div>
                   <p class="text-sm font-medium">
                     {verification.complianceLevel
@@ -437,7 +437,7 @@ const verificationHistory: Verification[] = []
               </div>
 
               {verification.notes && (
-                <div class="mt-2 text-sm text-muted-foreground border-t border-border pt-2">
+                <div class="mt-2 border-t border-border pt-2 text-sm text-muted-foreground">
                   {verification.notes}
                 </div>
               )}
@@ -452,7 +452,7 @@ const verificationHistory: Verification[] = []
                       {verification.attachments.map((docId) => {
                         const doc = documents.find((d) => d.id === docId)
                         return doc ? (
-                          <li class="inline-block mr-2">
+                          <li class="mr-2 inline-block">
                             <a
                               href={doc.documentUrl}
                               target="_blank"

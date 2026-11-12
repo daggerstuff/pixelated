@@ -29,20 +29,20 @@ const allTemplates = templateService.getAllTemplates()
   description="Manage HIPAA-compliant Business Associate Agreement templates"
 >
   <div class="px-6 py-8">
-    <div class="flex justify-between items-center mb-6">
+    <div class="mb-6 flex items-center justify-between">
       <h1 class="text-2xl font-bold text-foreground">
         BAA Template Management
       </h1>
       <button
         id="create-template"
-        class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
+        class="rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent"
       >
         Create New Template
       </button>
     </div>
 
-    <div class="bg-card rounded-none p-6 mb-8">
-      <h2 class="text-xl font-semibold mb-4">Templates</h2>
+    <div class="mb-8 rounded-none bg-card p-6">
+      <h2 class="mb-4 text-xl font-semibold">Templates</h2>
 
       {allTemplates.length === 0 ? (
         <p class="text-muted-foreground">
@@ -55,86 +55,86 @@ const allTemplates = templateService.getAllTemplates()
               <tr>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                 >
                   Name
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                 >
                   Version
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                 >
                   Last Updated
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                 >
                   Associate Types
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                 >
                   Default
                 </th>
                 <th
                   scope="col"
-                  class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
                 >
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody class="bg-card divide-y divide-border">
+            <tbody class="divide-y divide-border bg-card">
               {allTemplates.map((template) => (
                 <tr>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                  <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-foreground">
                     {template.name}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                     {template.version}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                     {template.lastUpdated.toLocaleDateString()}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                     {template.associateTypes.map((type) => (
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground mr-1">
+                      <span class="mr-1 inline-flex items-center rounded-none border border-input bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                         {type.replace('_', ' ')}
                       </span>
                     ))}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                  <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                     {template.isDefault ? (
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+                      <span class="inline-flex items-center rounded-none border border-input bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                         Default
                       </span>
                     ) : (
                       <span>-</span>
                     )}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td class="whitespace-nowrap px-6 py-4 text-sm font-medium">
                     <a
                       href={`/admin/security/baa/templates/${template.id}`}
-                      class="text-foreground hover:underline mr-3"
+                      class="mr-3 text-foreground hover:underline"
                     >
                       View
                     </a>
                     <a
                       href={`/admin/security/baa/templates/${template.id}/edit`}
-                      class="text-foreground hover:underline mr-3"
+                      class="mr-3 text-foreground hover:underline"
                     >
                       Edit
                     </a>
                     <button
                       data-template-id={template.id}
-                      class="delete-template text-foreground font-semibold hover:text-foreground font-semibold"
+                      class="delete-template font-semibold text-foreground hover:text-foreground"
                     >
                       Delete
                     </button>
@@ -147,15 +147,15 @@ const allTemplates = templateService.getAllTemplates()
       )}
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <div class="bg-card rounded-none p-6">
-        <h2 class="text-xl font-semibold mb-4">Template Creation Guide</h2>
+    <div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div class="rounded-none bg-card p-6">
+        <h2 class="mb-4 text-xl font-semibold">Template Creation Guide</h2>
         <div class="space-y-4">
           <p class="text-foreground">
             BAA templates help enforce HIPAA compliance with your business
             associates. Here's how to create an effective template:
           </p>
-          <ol class="list-decimal list-inside text-foreground space-y-2">
+          <ol class="list-inside list-decimal space-y-2 text-foreground">
             <li>Start with the standard HIPAA BAA template as a foundation</li>
             <li>
               Customize required sections to match your organization's policies
@@ -174,13 +174,13 @@ const allTemplates = templateService.getAllTemplates()
         </div>
       </div>
 
-      <div class="bg-card rounded-none p-6">
-        <h2 class="text-xl font-semibold mb-4">HIPAA Requirements</h2>
+      <div class="rounded-none bg-card p-6">
+        <h2 class="mb-4 text-xl font-semibold">HIPAA Requirements</h2>
         <div class="space-y-4">
           <p class="text-foreground">
             Business Associate Agreements must include provisions that:
           </p>
-          <ul class="list-disc list-inside text-foreground space-y-2">
+          <ul class="list-inside list-disc space-y-2 text-foreground">
             <li>
               Describe permitted and required uses of PHI by the business
               associate

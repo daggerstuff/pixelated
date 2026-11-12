@@ -1,7 +1,6 @@
 ---
 export const prerender = false
 
-import DashboardLayout from '../../layouts/DashboardLayout.astro'
 import Card from '@/components/ui/Card.astro'
 import {
   DynamicMultiSessionProgression,
@@ -9,6 +8,8 @@ import {
   DynamicDefenseMechanismAdaptation,
   DynamicGoalAttainmentScale,
 } from '@/lib/utils/dynamic-components'
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
 
 const { user } = Astro.props as { user: any }
 
@@ -20,14 +21,14 @@ const sessionId = Astro.url.searchParams.get('sessionId') || ''
   title="Session Progress | Pixelated Empathy Therapy"
   description="Multi-session progression tracking with belief changes, defense mechanisms, and goal attainment"
 >
-  <div class="container mx-auto py-6 space-y-6">
-    <div class="flex items-center justify-between mb-8">
+  <div class="container mx-auto space-y-6 py-6">
+    <div class="mb-8 flex items-center justify-between">
       <div>
-        <p class="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground mb-1">
+        <p class="mb-1 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
           Longitudinal tracking
         </p>
-        <h1 class="text-4xl font-bold tracking-tight mb-2">Session Progress</h1>
-        <p class="text-muted-foreground text-lg">
+        <h1 class="mb-2 text-4xl font-bold tracking-tight">Session Progress</h1>
+        <p class="text-lg text-muted-foreground">
           Multi-session progression metrics, belief changes, and therapeutic
           outcomes
         </p>
@@ -36,14 +37,14 @@ const sessionId = Astro.url.searchParams.get('sessionId') || ''
       <div class="flex items-center gap-2">
         <a
           href="/dashboard/enhanced?mode=analytics"
-          class="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-none hover:bg-secondary/80 transition-colors"
+          class="hover:bg-secondary/80 rounded-none bg-secondary px-4 py-2 text-sm text-secondary-foreground transition-colors"
         >
           Back to Analytics
         </a>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
       <Card>
         <div class="p-4">
           <p class="text-sm font-medium text-muted-foreground">Sessions</p>
@@ -80,7 +81,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') || ''
       </div>
     </Card>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
       <Card>
         <div class="p-6">
           <DynamicBeliefChangeTracker client:visible beliefs={[]} />
@@ -100,7 +101,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') || ''
       </div>
     </Card>
 
-    <div class="flex items-center justify-between pt-6 border-t border-border">
+    <div class="flex items-center justify-between border-t border-border pt-6">
       <div class="flex items-center gap-4 text-sm text-muted-foreground">
         <span>
           Therapist: <span class="font-medium">{therapistId || '—'}</span>
@@ -114,13 +115,13 @@ const sessionId = Astro.url.searchParams.get('sessionId') || ''
       <div class="flex items-center gap-2">
         <a
           href="/dashboard/enhanced?mode=analytics"
-          class="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-none hover:bg-secondary/80 transition-colors"
+          class="hover:bg-secondary/80 rounded-none bg-secondary px-4 py-2 text-sm text-secondary-foreground transition-colors"
         >
           Analytics Dashboard
         </a>
         <a
           href="/dashboard/enhanced"
-          class="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+          class="hover:bg-primary/90 rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors"
         >
           Enhanced Dashboard
         </a>

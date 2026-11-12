@@ -35,22 +35,22 @@ const currentPath = Astro.url.pathname
 ---
 
 <nav class={navClasses} transition:persist>
-  <div class="container mx-auto px-4 flex justify-between items-center">
+  <div class="container mx-auto flex items-center justify-between px-4">
     <a
       href="/"
-      class="text-xl font-bold flex items-center gap-2"
+      class="flex items-center gap-2 text-xl font-bold"
       transition:animate="slide"
     >
       <img
         src="/favicon.svg"
         alt="Logo"
-        class="w-8 h-8"
+        class="h-8 w-8"
         transition:name="logo"
       />
       <span transition:name="site-name">{SITE.name}</span>
     </a>
 
-    <div class="hidden md:flex items-center gap-6">
+    <div class="hidden items-center gap-6 md:flex">
       {menuItems.map((item) => {
         // Check if this is the current page
         const isActive =
@@ -62,7 +62,7 @@ const currentPath = Astro.url.pathname
             class:list={[
               'relative transition-colors',
               isActive
-                ? 'text-primary font-medium'
+                ? 'font-medium text-primary'
                 : 'text-muted-foreground hover:text-foreground',
             ]}
             transition:animate="slide"
@@ -70,7 +70,7 @@ const currentPath = Astro.url.pathname
           >
             {item.text}
             {isActive && (
-              <span class="absolute bottom-0 left-0 w-full h-0.5 bg-primary -mb-1.5" />
+              <span class="absolute bottom-0 left-0 -mb-1.5 h-0.5 w-full bg-primary" />
             )}
           </a>
         )
@@ -105,8 +105,8 @@ const currentPath = Astro.url.pathname
   </div>
 
   <!-- Mobile menu -->
-  <div id="mobile-menu" class="md:hidden hidden">
-    <div class="container mx-auto px-4 py-4 flex flex-col gap-4">
+  <div id="mobile-menu" class="hidden md:hidden">
+    <div class="container mx-auto flex flex-col gap-4 px-4 py-4">
       {menuItems.map((item) => {
         // Check if this is the current page
         const isActive =
@@ -118,7 +118,7 @@ const currentPath = Astro.url.pathname
             class:list={[
               'relative block py-2 transition-colors',
               isActive
-                ? 'text-primary font-medium pl-3 border-l-2 border-primary'
+                ? 'border-l-2 border-primary pl-3 font-medium text-primary'
                 : 'text-muted-foreground hover:text-foreground',
             ]}
             transition:animate="slide"

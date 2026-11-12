@@ -1,8 +1,9 @@
 ---
 export const prerender = false
 
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getCollection, type CollectionEntry } from 'astro:content'
+
+import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getContentSlug } from '@/utils/blog'
 function formatDate(dateInput: any, options: any = {}) {
   if (!dateInput) return '-'
@@ -53,19 +54,19 @@ const topTags = allTags
   title="Blog"
   description="Writing on therapy, technology, and digital empathy."
 >
-  <div class="max-w-4xl mx-auto px-4 py-12">
+  <div class="mx-auto max-w-4xl px-4 py-12">
     <!-- Hero Section -->
     <header class="mb-16">
-      <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+      <h1 class="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
         Writing on therapy, technology, and digital empathy.
       </h1>
-      <p class="text-lg text-muted-foreground mb-6">
+      <p class="mb-6 text-lg text-muted-foreground">
         Welcome to our corner of the internet. We're sharing thoughts on
         creating meaningful therapeutic experiences through technology.
       </p>
       <a
         href="/about"
-        class="text-foreground hover:text-foreground transition-colors font-medium"
+        class="font-medium text-foreground transition-colors hover:text-foreground"
       >
         More about us →
       </a>
@@ -73,11 +74,11 @@ const topTags = allTags
 
     <!-- Recent Posts -->
     <section class="mb-16">
-      <div class="flex items-center justify-between mb-8">
+      <div class="mb-8 flex items-center justify-between">
         <h2 class="text-2xl font-bold">Recent Posts</h2>
         <a
           href="/blog/page/1"
-          class="text-foreground hover:text-foreground transition-colors font-medium"
+          class="font-medium text-foreground transition-colors hover:text-foreground"
         >
           View all posts →
         </a>
@@ -86,22 +87,22 @@ const topTags = allTags
       <div class="space-y-8">
         {posts.map((post: BlogPost) => (
           <article class="group">
-            <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex flex-col gap-4 sm:flex-row">
               <div class="flex-shrink-0 text-sm text-muted-foreground sm:w-32">
                 {formatDate(new Date(post.data.pubDate))}
-                <span class="hidden sm:block mt-1">
+                <span class="mt-1 hidden sm:block">
                   {getReadingTime(post.body)}
                 </span>
               </div>
 
               <div class="flex-1">
-                <h3 class="text-xl font-bold mb-2 group-hover:text-foreground transition-colors">
+                <h3 class="mb-2 text-xl font-bold transition-colors group-hover:text-foreground">
                   <a href={`/blog/${getContentSlug(post)}`} class="block">
                     {post.data.title}
                   </a>
                 </h3>
 
-                <p class="text-foreground mb-3 leading-relaxed">
+                <p class="mb-3 leading-relaxed text-foreground">
                   {post.data.description}
                 </p>
 
@@ -110,7 +111,7 @@ const topTags = allTags
                     {post.data.tags.map((tag: string) => (
                       <a
                         href={`/blog/tags/${tag}`}
-                        class="text-xs text-foreground hover:text-foreground transition-colors"
+                        class="text-xs text-foreground transition-colors hover:text-foreground"
                       >
                         #{tag}
                       </a>
@@ -120,10 +121,10 @@ const topTags = allTags
 
                 <a
                   href={`/blog/${getContentSlug(post)}`}
-                  class="inline-flex items-center mt-3 text-sm text-muted-foreground hover:text-foreground transition-colors group-hover:text-foreground"
+                  class="mt-3 inline-flex items-center text-sm text-muted-foreground transition-colors hover:text-foreground group-hover:text-foreground"
                 >
                   Read article
-                  <span class="ml-1 group-hover:translate-x-1 transition-transform">
+                  <span class="ml-1 transition-transform group-hover:translate-x-1">
                     →
                   </span>
                 </a>
@@ -136,17 +137,17 @@ const topTags = allTags
 
     <!-- Explore Topics -->
     <section>
-      <div class="flex items-center justify-between mb-8">
+      <div class="mb-8 flex items-center justify-between">
         <h2 class="text-2xl font-bold">Explore Topics</h2>
         <a
           href="/blog/tags"
-          class="text-foreground hover:text-foreground transition-colors font-medium"
+          class="font-medium text-foreground transition-colors hover:text-foreground"
         >
           View all topics →
         </a>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {topTags.filter(Boolean).map((tag) => {
           const tagPosts = allPosts.filter((post: BlogPost) =>
             post.data.tags?.includes(tag),
@@ -154,10 +155,10 @@ const topTags = allTags
           return (
             <a
               href={`/blog/tags/${tag}`}
-              class="group block p-6 rounded-none border border-border bg-secondary hover:border-ring hover:bg-accent transition-all"
+              class="group block rounded-none border border-border bg-secondary p-6 transition-all hover:border-ring hover:bg-accent"
             >
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="font-bold text-lg group-hover:text-foreground transition-colors">
+              <div class="mb-2 flex items-center justify-between">
+                <h3 class="text-lg font-bold transition-colors group-hover:text-foreground">
                   #{tag}
                 </h3>
                 <span class="text-sm text-muted-foreground">

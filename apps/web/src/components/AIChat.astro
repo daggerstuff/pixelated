@@ -22,10 +22,10 @@ const {
 ---
 
 <section
-  class="w-full max-w-2xl mx-auto transition-colors duration-300"
+  class="mx-auto w-full max-w-2xl transition-colors duration-300"
   aria-label={title || 'AI Chat interface'}
 >
-  {title && <h2 class="text-2xl font-bold mb-4 text-foreground">{title}</h2>}
+  {title && <h2 class="mb-4 text-2xl font-bold text-foreground">{title}</h2>}
   {description && <p class="mb-6 text-muted-foreground">{description}</p>}
 
   {/* ⚡ Bolt: Changed client:load to client:visible to defer hydration until the component enters the viewport, improving initial page load performance. */}
@@ -44,7 +44,7 @@ const {
     >
       <div class="flex flex-col items-center gap-3">
         <div
-          class="h-8 w-8 animate-spin rounded-none border-4 border-ring border-t-transparent"
+          class="border-t-transparent h-8 w-8 animate-spin rounded-none border-4 border-ring"
           aria-hidden="true"
         ></div>
         <p class="font-medium text-muted-foreground">

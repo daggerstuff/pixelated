@@ -1,6 +1,6 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 ---
 
 <BaseLayout
@@ -10,37 +10,37 @@ import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo
   <main class="min-h-screen bg-background">
     <div class="container mx-auto px-4 py-12">
       <!-- Hero Section -->
-      <div class="text-center mb-12">
-        <div class="inline-flex items-center gap-2 bg-secondary border border-border rounded-full px-4 py-2 mb-6">
-          <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-          <span class="text-foreground font-medium text-sm">
+      <div class="mb-12 text-center">
+        <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-4 py-2">
+          <div class="h-2 w-2 animate-pulse rounded-full bg-primary"></div>
+          <span class="text-sm font-medium text-foreground">
             THERAPEUTIC FRAMEWORKS
           </span>
         </div>
 
-        <h1 class="text-4xl md:text-6xl font-bold text-foreground mb-6">
+        <h1 class="mb-6 text-4xl font-bold text-foreground md:text-6xl">
           Evidence-Based
-          <span class="text-foreground block">Therapeutic Frameworks</span>
+          <span class="block text-foreground">Therapeutic Frameworks</span>
         </h1>
 
-        <p class="text-xl text-foreground max-w-3xl mx-auto leading-relaxed mb-8">
+        <p class="mx-auto mb-8 max-w-3xl text-xl leading-relaxed text-foreground">
           Comprehensive interactive browser for evidence-based therapeutic
           frameworks and techniques. Explore detailed clinical information,
           research evidence, and practical applications for CBT, DBT, ACT, and
           more.
         </p>
 
-        <div class="flex flex-wrap justify-center gap-4 mb-8">
-          <div class="bg-secondary border border-border rounded-none px-4 py-2 text-foreground">
+        <div class="mb-8 flex flex-wrap justify-center gap-4">
+          <div class="rounded-none border border-border bg-secondary px-4 py-2 text-foreground">
             <span class="font-semibold">5+</span> Major Frameworks
           </div>
-          <div class="bg-secondary border border-border rounded-none px-4 py-2 text-foreground">
+          <div class="rounded-none border border-border bg-secondary px-4 py-2 text-foreground">
             <span class="font-semibold">200+</span> Techniques
           </div>
-          <div class="bg-secondary border border-border rounded-none px-4 py-2 text-foreground">
+          <div class="rounded-none border border-border bg-secondary px-4 py-2 text-foreground">
             <span class="font-semibold">Evidence</span> Levels
           </div>
-          <div class="bg-secondary border border-border rounded-none px-4 py-2 text-foreground">
+          <div class="rounded-none border border-border bg-secondary px-4 py-2 text-foreground">
             <span class="font-semibold">Clinical</span> Applications
           </div>
         </div>
@@ -50,18 +50,18 @@ import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo
       <PsychologyFrameworksDemo client:load />
 
       <!-- Framework Information -->
-      <div class="mt-16 max-w-6xl mx-auto">
-        <div class="bg-secondary border border-border rounded-none p-8">
-          <h2 class="text-2xl font-bold text-foreground mb-6 text-center">
+      <div class="mx-auto mt-16 max-w-6xl">
+        <div class="rounded-none border border-border bg-secondary p-8">
+          <h2 class="mb-6 text-center text-2xl font-bold text-foreground">
             Included Therapeutic Frameworks
           </h2>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="bg-card border border-border rounded-none p-6">
-              <h3 class="text-lg font-semibold text-foreground mb-3">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-none border border-border bg-card p-6">
+              <h3 class="mb-3 text-lg font-semibold text-foreground">
                 Cognitive Behavioral Therapy (CBT)
               </h3>
-              <p class="text-foreground text-sm mb-4">
+              <p class="mb-4 text-sm text-foreground">
                 Evidence-based approach focusing on identifying and changing
                 dysfunctional thought patterns and behaviors.
               </p>
@@ -71,11 +71,11 @@ import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo
               </div>
             </div>
 
-            <div class="bg-card border border-border rounded-none p-6">
-              <h3 class="text-lg font-semibold text-foreground mb-3">
+            <div class="rounded-none border border-border bg-card p-6">
+              <h3 class="mb-3 text-lg font-semibold text-foreground">
                 Dialectical Behavior Therapy (DBT)
               </h3>
-              <p class="text-foreground text-sm mb-4">
+              <p class="mb-4 text-sm text-foreground">
                 Comprehensive treatment incorporating mindfulness, distress
                 tolerance, emotion regulation, and interpersonal skills.
               </p>
@@ -86,11 +86,11 @@ import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo
               </div>
             </div>
 
-            <div class="bg-card border border-border rounded-none p-6">
-              <h3 class="text-lg font-semibold text-foreground mb-3">
+            <div class="rounded-none border border-border bg-card p-6">
+              <h3 class="mb-3 text-lg font-semibold text-foreground">
                 Acceptance & Commitment Therapy (ACT)
               </h3>
-              <p class="text-foreground text-sm mb-4">
+              <p class="mb-4 text-sm text-foreground">
                 Third-wave therapy focusing on psychological flexibility,
                 mindfulness, and values-based action.
               </p>
@@ -101,11 +101,11 @@ import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo
               </div>
             </div>
 
-            <div class="bg-card border border-border rounded-none p-6">
-              <h3 class="text-lg font-semibold text-foreground mb-3">
+            <div class="rounded-none border border-border bg-card p-6">
+              <h3 class="mb-3 text-lg font-semibold text-foreground">
                 Psychodynamic Therapy
               </h3>
-              <p class="text-foreground text-sm mb-4">
+              <p class="mb-4 text-sm text-foreground">
                 Insight-oriented approach exploring unconscious processes and
                 early life experiences.
               </p>
@@ -116,11 +116,11 @@ import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo
               </div>
             </div>
 
-            <div class="bg-card border border-border rounded-none p-6">
-              <h3 class="text-lg font-semibold text-foreground mb-3">
+            <div class="rounded-none border border-border bg-card p-6">
+              <h3 class="mb-3 text-lg font-semibold text-foreground">
                 Humanistic Therapy
               </h3>
-              <p class="text-foreground text-sm mb-4">
+              <p class="mb-4 text-sm text-foreground">
                 Client-centered approach emphasizing personal growth,
                 self-actualization, and therapeutic relationship.
               </p>
@@ -130,11 +130,11 @@ import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo
               </div>
             </div>
 
-            <div class="bg-card border border-border rounded-none p-6">
-              <h3 class="text-lg font-semibold text-foreground mb-3">
+            <div class="rounded-none border border-border bg-card p-6">
+              <h3 class="mb-3 text-lg font-semibold text-foreground">
                 Trauma-Informed Care
               </h3>
-              <p class="text-foreground text-sm mb-4">
+              <p class="mb-4 text-sm text-foreground">
                 Comprehensive approach recognizing and responding to the impact
                 of traumatic stress.
               </p>
@@ -146,8 +146,8 @@ import PsychologyFrameworksDemo from '@/components/demo/PsychologyFrameworksDemo
             </div>
           </div>
 
-          <div class="mt-8 p-6 bg-secondary border border-border rounded-none">
-            <p class="text-muted-foreground text-center">
+          <div class="mt-8 rounded-none border border-border bg-secondary p-6">
+            <p class="text-center text-muted-foreground">
               <strong>Educational Resource:</strong> This framework browser
               provides evidence-based information for educational and training
               purposes. All content is derived from peer-reviewed research and

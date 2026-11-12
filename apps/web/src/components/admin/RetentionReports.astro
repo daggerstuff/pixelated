@@ -115,56 +115,56 @@ const getStatusBadge = (status: string) => {
 }
 ---
 
-<div class="bg-card rounded-none -md overflow-hidden">
+<div class="-md overflow-hidden rounded-none bg-card">
   <div class="p-6">
-    <h2 class="text-2xl font-bold text-foreground mb-4">{title}</h2>
+    <h2 class="mb-4 text-2xl font-bold text-foreground">{title}</h2>
 
     <div class="mb-8">
-      <p class="text-muted-foreground mb-4">
+      <p class="mb-4 text-muted-foreground">
         Generate comprehensive reports for data retention compliance auditing
         and regulatory purposes. Schedule automated report generation and
         distribution to key stakeholders.
       </p>
 
-      <div class="flex flex-wrap gap-4 mb-6">
-        <div class="bg-secondary border border-input p-3 rounded-none flex items-center">
-          <Icon name="file-text" class="w-5 h-5 text-foreground mr-2" />
-          <span class="text-foreground font-medium font-medium text-sm">
+      <div class="mb-6 flex flex-wrap gap-4">
+        <div class="flex items-center rounded-none border border-input bg-secondary p-3">
+          <Icon name="file-text" class="mr-2 h-5 w-5 text-foreground" />
+          <span class="text-sm font-medium text-foreground">
             Customizable reports
           </span>
         </div>
 
-        <div class="bg-secondary border border-input p-3 rounded-none flex items-center">
-          <Icon name="calendar" class="w-5 h-5 text-foreground mr-2" />
-          <span class="text-foreground font-medium text-sm">
+        <div class="flex items-center rounded-none border border-input bg-secondary p-3">
+          <Icon name="calendar" class="mr-2 h-5 w-5 text-foreground" />
+          <span class="text-sm font-medium text-foreground">
             Automated scheduling
           </span>
         </div>
 
-        <div class="bg-secondary border border-input p-3 rounded-none flex items-center">
-          <Icon name="mail" class="w-5 h-5 text-foreground mr-2" />
-          <span class="text-foreground text-sm">Email distribution</span>
+        <div class="flex items-center rounded-none border border-input bg-secondary p-3">
+          <Icon name="mail" class="mr-2 h-5 w-5 text-foreground" />
+          <span class="text-sm text-foreground">Email distribution</span>
         </div>
       </div>
     </div>
 
     <!-- Report Generation Section -->
     <div class="mb-8">
-      <div class="flex justify-between items-center mb-4">
+      <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-medium text-foreground">Available Reports</h3>
         <button
           type="button"
-          class="px-3 py-1.5 bg-primary text-white text-sm rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
+          class="text-white flex items-center rounded-none bg-primary px-3 py-1.5 text-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <Icon name="plus" class="w-4 h-4 mr-1" />
+          <Icon name="plus" class="mr-1 h-4 w-4" />
           Create Custom Report
         </button>
       </div>
 
-      <div class="grid grid-cols-1 gap-4 mb-6">
+      <div class="mb-6 grid grid-cols-1 gap-4">
         {reportTypes.map((report) => (
-          <div class="bg-card border border-border rounded-none p-4">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div class="rounded-none border border-border bg-card p-4">
+            <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div class="flex-1">
                 <h4 class="text-base font-medium text-foreground">
                   {report.name}
@@ -172,10 +172,10 @@ const getStatusBadge = (status: string) => {
                 <p class="text-sm text-muted-foreground">
                   {report.description}
                 </p>
-                <div class="flex flex-wrap gap-1 mt-2">
+                <div class="mt-2 flex flex-wrap gap-1">
                   {report.format.map((format) => (
                     <span
-                      class={`px-2 py-0.5 rounded-none text-xs font-medium ${getFormatBadge(format)}`}
+                      class={`rounded-none px-2 py-0.5 text-xs font-medium ${getFormatBadge(format)}`}
                     >
                       {format}
                     </span>
@@ -184,9 +184,9 @@ const getStatusBadge = (status: string) => {
               </div>
 
               <div class="flex flex-col">
-                <div class="text-sm text-muted-foreground mb-2">
+                <div class="mb-2 text-sm text-muted-foreground">
                   <div class="flex items-center gap-1">
-                    <Icon name="calendar" class="w-4 h-4" />
+                    <Icon name="calendar" class="h-4 w-4" />
                     <span>
                       {report.frequency} | Last: {report.lastGenerated}
                     </span>
@@ -196,13 +196,13 @@ const getStatusBadge = (status: string) => {
                 <div class="flex gap-2">
                   <button
                     type="button"
-                    class="px-3 py-1 text-xs font-medium bg-primary text-white rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                    class="text-white rounded-none bg-primary px-3 py-1 text-xs font-medium hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     Generate Now
                   </button>
                   <button
                     type="button"
-                    class="px-3 py-1 text-xs font-medium bg-secondary text-foreground rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+                    class="rounded-none bg-secondary px-3 py-1 text-xs font-medium text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     Schedule
                   </button>
@@ -216,96 +216,96 @@ const getStatusBadge = (status: string) => {
 
     <!-- Scheduled Reports Section -->
     <div class="mb-8">
-      <div class="flex justify-between items-center mb-4">
+      <div class="mb-4 flex items-center justify-between">
         <h3 class="text-lg font-medium text-foreground">Scheduled Reports</h3>
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left text-muted-foreground">
-          <thead class="text-xs text-foreground uppercase bg-secondary">
+        <table class="w-full text-left text-sm text-muted-foreground">
+          <thead class="bg-secondary text-xs uppercase text-foreground">
             <tr>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Report Name
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Type
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Format
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Frequency
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Recipients
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Status
               </th>
-              <th scope="col" class="py-3 px-4">
+              <th scope="col" class="px-4 py-3">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody>
             {schedules.map((schedule) => (
-              <tr class="bg-card border-b hover:bg-secondary">
-                <td class="py-3 px-4 font-medium text-foreground">
+              <tr class="border-b bg-card hover:bg-secondary">
+                <td class="px-4 py-3 font-medium text-foreground">
                   {schedule.name}
                 </td>
-                <td class="py-3 px-4">
+                <td class="px-4 py-3">
                   {schedule.reportType
                     .replace(/-/g, ' ')
                     .replace(/\b\w/g, (l) => l.toUpperCase())}
                 </td>
-                <td class="py-3 px-4">
+                <td class="px-4 py-3">
                   <span
-                    class={`px-2 py-0.5 rounded-none text-xs font-medium ${getFormatBadge(schedule.format)}`}
+                    class={`rounded-none px-2 py-0.5 text-xs font-medium ${getFormatBadge(schedule.format)}`}
                   >
                     {schedule.format}
                   </span>
                 </td>
-                <td class="py-3 px-4">
+                <td class="px-4 py-3">
                   {schedule.frequency} ({schedule.day})
                 </td>
-                <td class="py-3 px-4">
+                <td class="px-4 py-3">
                   <div class="flex flex-wrap gap-1">
                     {schedule.recipients.map((recipient, index) =>
                       index < 2 ? (
-                        <span class="px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
+                        <span class="rounded-none bg-secondary px-2 py-0.5 text-xs font-medium text-foreground">
                           {recipient}
                         </span>
                       ) : index === 2 ? (
-                        <span class="px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-muted-foreground">
+                        <span class="rounded-none bg-secondary px-2 py-0.5 text-xs font-medium text-muted-foreground">
                           +{schedule.recipients.length - 2} more
                         </span>
                       ) : null,
                     )}
                   </div>
                 </td>
-                <td class="py-3 px-4">
+                <td class="px-4 py-3">
                   <span
-                    class={`px-2 py-0.5 rounded-none text-xs font-medium ${getStatusBadge(schedule.status)}`}
+                    class={`rounded-none px-2 py-0.5 text-xs font-medium ${getStatusBadge(schedule.status)}`}
                   >
                     {schedule.status.charAt(0).toUpperCase() +
                       schedule.status.slice(1)}
                   </span>
                 </td>
-                <td class="py-3 px-4">
+                <td class="px-4 py-3">
                   <div class="flex space-x-2">
                     <button
                       type="button"
                       class="text-foreground hover:underline"
                       aria-label="Edit schedule"
                     >
-                      <Icon name="pencil" class="w-5 h-5" />
+                      <Icon name="pencil" class="h-5 w-5" />
                     </button>
                     <button
                       type="button"
-                      class="text-foreground font-medium hover:underline"
+                      class="font-medium text-foreground hover:underline"
                       aria-label="Delete schedule"
                     >
-                      <Icon name="trash" class="w-5 h-5" />
+                      <Icon name="trash" class="h-5 w-5" />
                     </button>
                   </div>
                 </td>
@@ -318,31 +318,31 @@ const getStatusBadge = (status: string) => {
 
     <!-- Custom Report Generator -->
     <div>
-      <h3 class="text-lg font-medium text-foreground mb-4">
+      <h3 class="mb-4 text-lg font-medium text-foreground">
         Custom Report Generator
       </h3>
 
-      <div class="bg-secondary border border-border rounded-none p-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div class="rounded-none border border-border bg-secondary p-5">
+        <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div class="mb-4">
-            <label class="block text-sm font-medium text-foreground mb-2">
+            <label class="mb-2 block text-sm font-medium text-foreground">
               Report Title
             </label>
             <input
               type="text"
               id="report-title"
               placeholder="Enter report title"
-              class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
+              class="w-full rounded-none border border-input p-2 focus:border-ring focus:ring-2 focus:ring-ring"
             />
           </div>
 
           <div class="mb-4">
-            <label class="block text-sm font-medium text-foreground mb-2">
+            <label class="mb-2 block text-sm font-medium text-foreground">
               Report Type
             </label>
             <select
               id="report-type"
-              class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
+              class="w-full rounded-none border border-input p-2 focus:border-ring focus:ring-2 focus:ring-ring"
             >
               <option value="">Select a report type</option>
               <option value="compliance-summary">Compliance Summary</option>
@@ -357,30 +357,30 @@ const getStatusBadge = (status: string) => {
           </div>
 
           <div class="mb-4">
-            <label class="block text-sm font-medium text-foreground mb-2">
+            <label class="mb-2 block text-sm font-medium text-foreground">
               Date Range
             </label>
             <div class="flex space-x-2">
               <input
                 type="date"
                 id="date-from"
-                class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
+                class="w-full rounded-none border border-input p-2 focus:border-ring focus:ring-2 focus:ring-ring"
               />
               <input
                 type="date"
                 id="date-to"
-                class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
+                class="w-full rounded-none border border-input p-2 focus:border-ring focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
 
           <div class="mb-4">
-            <label class="block text-sm font-medium text-foreground mb-2">
+            <label class="mb-2 block text-sm font-medium text-foreground">
               Format
             </label>
             <select
               id="report-format"
-              class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
+              class="w-full rounded-none border border-input p-2 focus:border-ring focus:ring-2 focus:ring-ring"
             >
               <option value="pdf">PDF</option>
               <option value="csv">CSV</option>
@@ -390,7 +390,7 @@ const getStatusBadge = (status: string) => {
           </div>
 
           <div class="mb-4 md:col-span-2">
-            <label class="block text-sm font-medium text-foreground mb-2">
+            <label class="mb-2 block text-sm font-medium text-foreground">
               Data Categories to Include
             </label>
             <div class="flex flex-wrap gap-3">
@@ -399,7 +399,7 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-patient-records"
                   checked
-                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
+                  class="h-4 w-4 rounded-none border border-input text-foreground focus:ring-ring"
                 />
                 <label
                   for="include-patient-records"
@@ -414,7 +414,7 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-mental-health"
                   checked
-                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
+                  class="h-4 w-4 rounded-none border border-input text-foreground focus:ring-ring"
                 />
                 <label
                   for="include-mental-health"
@@ -429,7 +429,7 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-chat-logs"
                   checked
-                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
+                  class="h-4 w-4 rounded-none border border-input text-foreground focus:ring-ring"
                 />
                 <label
                   for="include-chat-logs"
@@ -444,7 +444,7 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-emotion-analysis"
                   checked
-                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
+                  class="h-4 w-4 rounded-none border border-input text-foreground focus:ring-ring"
                 />
                 <label
                   for="include-emotion-analysis"
@@ -459,7 +459,7 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-consent-records"
                   checked
-                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
+                  class="h-4 w-4 rounded-none border border-input text-foreground focus:ring-ring"
                 />
                 <label
                   for="include-consent-records"
@@ -473,17 +473,17 @@ const getStatusBadge = (status: string) => {
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-3 mt-6">
+        <div class="mt-6 flex gap-3">
           <button
             id="generate-report-btn"
             type="button"
-            class="px-4 py-2 bg-primary text-white rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            class="text-white rounded-none bg-primary px-4 py-2 hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             Generate Report
           </button>
           <button
             type="button"
-            class="px-4 py-2 border border-input text-foreground rounded-none hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
+            class="rounded-none border border-input px-4 py-2 text-foreground hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             Reset
           </button>

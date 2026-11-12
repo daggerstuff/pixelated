@@ -1,9 +1,10 @@
 ---
 export const prerender = false
 
+import BaseLayout from '../../layouts/BaseLayout.astro'
 // Only importing what we need
 import { requireAuth } from '../../lib/auth'
-import BaseLayout from '../../layouts/BaseLayout.astro'
+
 import '@/styles/settings-ai-preferences.css'
 
 // Check if user is authenticated
