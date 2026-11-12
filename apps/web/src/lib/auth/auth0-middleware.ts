@@ -16,7 +16,10 @@ import {
   AUTH0_ROLE_DEFINITIONS as ROLE_DEFINITIONS,
   UserRole,
 } from './auth0-rbac-service'
-import { providerUnavailableResponse } from './provider-unavailable'
+import {
+  isIdentityProviderUnavailable,
+  providerUnavailableResponse,
+} from './provider-unavailable'
 import { type AuthStrategy } from './route-config'
 import type { ApiKeyScope } from './scopes'
 const logger = createBuildSafeLogger('auth0-middleware')
@@ -756,9 +759,7 @@ export async function authenticateRequest(
         ? validation.payload['sid']
         : undefined
 
-    const { resolveIdentity, IdentityProviderUnavailableError } = await import(
-      './user-identity'
-    )
+    const { resolveIdentity } = await import('./user-identity')
 
     let identity: Awaited<ReturnType<typeof resolveIdentity>>
     try {
@@ -786,12 +787,10 @@ export async function authenticateRequest(
       // The provider could not answer a lookup the first login needs. That is
       // an outage, not a broken identity: answer the same retryable 503 the
       // token-validation path uses instead of a 500.
-      if (resolveError instanceof IdentityProviderUnavailableError) {
+      if (isIdentityProviderUnavailable(resolveError)) {
         return {
           success: false,
-          response: providerUnavailableResponse(
-            new URL(request.url).pathname,
-          ),
+          response: providerUnavailableResponse(new URL(request.url).pathname),
           error: 'Identity provider unavailable',
         }
       }

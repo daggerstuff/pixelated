@@ -54,3 +54,23 @@ export function providerUnavailableResponse(
     },
   )
 }
+
+/**
+ * The `code` an identity-provider outage carries out of first-login
+ * provisioning.
+ *
+ * Callers detect the condition by this code rather than by `instanceof`: the
+ * error crosses a dynamic `import()`, and a test that mocks the module without
+ * the class must still be able to exercise the mapping.
+ */
+export const IDENTITY_PROVIDER_UNAVAILABLE_CODE =
+  'IDENTITY_PROVIDER_UNAVAILABLE'
+
+/** True when `error` is an identity-provider outage from provisioning. */
+export function isIdentityProviderUnavailable(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { code?: unknown }).code === IDENTITY_PROVIDER_UNAVAILABLE_CODE
+  )
+}

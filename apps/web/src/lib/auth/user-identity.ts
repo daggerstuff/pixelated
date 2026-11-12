@@ -33,6 +33,7 @@ import { DEFAULT_WORKSPACE_SLUG } from '../db/workspace'
 import { getFromCache, setInCache } from '../redis'
 import type { IdentityProvider } from './identity-provider'
 import { getIdentityProvider } from './identity-provider'
+import { IDENTITY_PROVIDER_UNAVAILABLE_CODE } from './provider-unavailable'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -144,6 +145,8 @@ export const PROVIDER_PROFILE_DEADLINE_MS = 1_500
  * `Retry-After` instead of a `500`, because the next request may succeed.
  */
 export class IdentityProviderUnavailableError extends Error {
+  readonly code = IDENTITY_PROVIDER_UNAVAILABLE_CODE
+
   constructor(message: string, cause?: unknown) {
     super(message)
     this.name = 'IdentityProviderUnavailableError'

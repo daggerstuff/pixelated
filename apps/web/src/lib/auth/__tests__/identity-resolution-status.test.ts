@@ -15,6 +15,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const { mockValidateToken, mockResolveIdentity, ProviderError } = vi.hoisted(
   () => {
     class ProviderError extends Error {
+      readonly code = 'IDENTITY_PROVIDER_UNAVAILABLE'
+
       constructor() {
         super('Identity provider profile lookup failed')
         this.name = 'IdentityProviderUnavailableError'
@@ -30,16 +32,13 @@ const { mockValidateToken, mockResolveIdentity, ProviderError } = vi.hoisted(
 
 vi.mock('../auth0-jwt-service', () => ({ validateToken: mockValidateToken }))
 
-vi.mock('../user-identity', () => ({
-  resolveIdentity: mockResolveIdentity,
-  IdentityProviderUnavailableError: ProviderError,
-}))
+vi.mock('../user-identity', () => ({ resolveIdentity: mockResolveIdentity }))
 
 vi.mock('../../services/auth0.service', () => ({
   auth0UserService: { getUserById: vi.fn() },
 }))
 
-vi.mock('../redis', () => ({
+vi.mock('../../redis', () => ({
   getFromCache: vi.fn(),
   setInCache: vi.fn(),
   removeFromCache: vi.fn(),
