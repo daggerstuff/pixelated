@@ -341,6 +341,15 @@ const links = [
       display: inline-flex;
     }
   }
+
+  /* DashboardLayout does not load marketing.css, so this container name had
+     no rule here. Scoped, product register. */
+  .marketing-shell {
+    width: 100%;
+    max-width: var(--np-content);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
+  }
 </style>
 
 <script>

@@ -364,4 +364,92 @@ const { showTopCTA = true } = Astro.props
       font-size: 0.8rem;
     }
   }
+
+  /* === Product-register replacements for the public marketing classes ===
+     This footer renders inside DashboardLayout, which does not load
+     marketing.css, so `marketing-shell`, `marketing-eyebrow`,
+     `marketing-title`, `marketing-lede` and `marketing-button*` resolved to
+     nothing: the CTA block collapsed to unstyled text and two default-blue
+     anchors. They are re-stated here, scoped to this component, in the
+     product register — zero chroma, zero radius, no glow. */
+  .marketing-shell {
+    width: 100%;
+    max-width: var(--np-content);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
+  }
+
+  .marketing-eyebrow {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    font-family: var(--np-font-spec);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--np-dim);
+  }
+
+  .marketing-title {
+    margin: 0 0 0.75rem;
+    font-family: var(--np-font-display);
+    font-size: clamp(1.5rem, 3.2vw, 2.1rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--np-text);
+  }
+
+  .marketing-title--medium {
+    font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+  }
+
+  .marketing-lede {
+    margin: 0;
+    max-width: 52ch;
+    font-family: var(--np-font-body);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--np-mid);
+  }
+
+  .marketing-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.625rem 1.25rem;
+    border: 1px solid var(--np-line-strong);
+    border-radius: 0;
+    font-family: var(--np-font-label);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  .marketing-button--primary {
+    border-color: var(--np-text);
+    background: var(--np-text);
+    color: var(--np-bg);
+  }
+
+  .marketing-button--primary:hover {
+    border-color: var(--np-mid);
+    background: var(--np-mid);
+  }
+
+  .marketing-button--secondary {
+    background: transparent;
+    color: var(--np-text);
+  }
+
+  .marketing-button--secondary:hover {
+    border-color: var(--np-line-figure);
+    background: var(--np-hover);
+  }
 </style>

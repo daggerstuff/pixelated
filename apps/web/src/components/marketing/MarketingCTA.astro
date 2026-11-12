@@ -10,6 +10,7 @@ export interface Props {
 }
 
 const {
+  eyebrow,
   title,
   body,
   checklist = [],
@@ -23,6 +24,7 @@ const {
   <div class="marketing-shell">
     <div class="marketing-cta-band">
       <div>
+        <p class="marketing-eyebrow">{eyebrow}</p>
         <h2 class="marketing-title marketing-title--medium">{title}</h2>
         <p class="marketing-lede">{body}</p>
         <div class="marketing-actions">

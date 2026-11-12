@@ -10,6 +10,7 @@ import Header from '@/components/layout/Header.astro'
 import Sidebar from '@/components/layout/Sidebar.astro'
 import Footer from '@/components/mizu/Footer.astro'
 import { FEATURES } from '@/config'
+import { withBasePath } from '@/utils/path'
 
 // Style imports
 import '@unocss/reset/tailwind.css'
@@ -44,20 +45,32 @@ const {
 
 const { cspNonce } = Astro.locals
 const { nprogress, mediumZoom } = FEATURES
+
+// Matches BaseLayout: the metatag has to describe the ground the sheet is
+// actually painted on, not the retired #1a1a1a.
+const THEME_COLOR_DARK = '#0b0b0c'
+const THEME_COLOR_LIGHT = '#f6f5f0'
 const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 ---
 
 <!doctype html>
-<html lang="en" data-theme="dark" class="scroll-smooth">
-  <Head {title} {description} ogImage={metaImage} {cspNonce} />
-  <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#1a1a1a" />
+<html lang="en" data-theme="dark" data-register="product" class="scroll-smooth">
+  {/* The <head> element is load-bearing: without it Astro has nowhere to
+      inject the bundled stylesheet <link>, so every page rendered through
+      this layout shipped with no project CSS at all — no reset, no tokens,
+      no utility classes, no header chrome. */}
+  <head>
+    <Head {title} {description} ogImage={metaImage} {cspNonce} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content={THEME_COLOR_DARK} />
+    <link rel="stylesheet" href={withBasePath('/css/style.css')} />
 
-  <script src="/js/polyfill-detector.js" is:inline></script>
-  <script src="/js/module-loader.js" defer is:inline></script>
-  {(nprogress || mediumZoom) && (
-    <script src="/js/nprogress-and-zoom.js" type="module"></script>
-  )}
+    <script src="/js/polyfill-detector.js" is:inline></script>
+    <script src="/js/module-loader.js" defer is:inline></script>
+    {(nprogress || mediumZoom) && (
+      <script src="/js/nprogress-and-zoom.js" type="module"></script>
+    )}
+  </head>
   <body
     style="background: var(--np-bg); color: var(--np-text);"
     class="flex min-h-screen flex-col overflow-x-hidden font-sans"
