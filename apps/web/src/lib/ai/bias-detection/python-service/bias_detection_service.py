@@ -147,15 +147,25 @@ def health_check():
 _LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
 
 
+def _ensure_loopback_host(host: str) -> None:
+    """Refuse to run the Werkzeug dev server on a non-loopback address.
+
+    The dev server speaks plain HTTP only (and exposes the interactive
+    debugger when DEBUG is on), so it must never be reachable remotely,
+    regardless of debug mode.
+    """
+    if host not in _LOOPBACK_HOSTS:
+        logger.error(
+            "Refusing to start the Werkzeug development server on non-loopback "
+            "host %s. Use HOST=127.0.0.1 for local development; in production "
+            "run start_service.sh (gunicorn) behind the TLS reverse proxy.",
+            host,
+        )
+        raise SystemExit(1)
+
+
 if __name__ == "__main__":
     # Local development only. In production run under gunicorn
     # (see setup.sh / start_service.sh), behind the TLS reverse proxy.
-    if settings.host not in _LOOPBACK_HOSTS and not settings.debug:
-        logger.warning(
-            "Starting the Werkzeug development server on non-loopback host %s:%s. "
-            "It speaks plain HTTP only and should not be exposed publicly; "
-            "use gunicorn behind the reverse proxy instead.",
-            settings.host,
-            settings.port,
-        )
+    _ensure_loopback_host(settings.host)
     app.run(host=settings.host, port=settings.port, debug=settings.debug)
