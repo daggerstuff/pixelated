@@ -178,11 +178,13 @@ describe('lib/db pool recovery', () => {
     firstPool.getErrorListener()?.(new Error('unexpected idle client failure'))
 
     const replacement = getPool()
-    expect(replacement).not.toBe(pool)
     expect(firstPool.ended.called).toBe(true)
-    // The replacement stays in place for subsequent use.
-    expect(getPool()).toBe(replacement)
     expect(FakePool.instances).toHaveLength(2)
+    // The handle stays in place for subsequent use, and it reaches the
+    // replacement: ending it ends the second instance, not the discarded one.
+    expect(getPool()).toBe(replacement)
+    await replacement.end()
+    expect(FakePool.instances[1].ended.called).toBe(true)
   })
 
   it('does not call process.exit on an idle-client error', async () => {
@@ -194,7 +196,10 @@ describe('lib/db pool recovery', () => {
       const firstPool = FakePool.instances[0]
       firstPool.getErrorListener()?.(new Error('idle socket dropped'))
       expect(exitSpy).not.toHaveBeenCalled()
-      expect(getPool()).not.toBe(firstPool)
+      // The discarded instance is torn down and the handle serves the rebuild.
+      expect(firstPool.ended.called).toBe(true)
+      await getPool().end()
+      expect(FakePool.instances[1].ended.called).toBe(true)
     } finally {
       exitSpy.mockRestore()
     }

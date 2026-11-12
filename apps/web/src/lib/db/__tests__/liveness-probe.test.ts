@@ -120,6 +120,7 @@ import {
   DB_LIVENESS_PROBE_TIMEOUT_MS,
   DB_MAX_LIFETIME_SECONDS,
   DB_QUERY_TIMEOUT_MS,
+  getPool,
   initializeDatabase,
   isDatabaseUnavailableError,
   query,
@@ -333,5 +334,41 @@ describe('the existing bounds are unchanged', () => {
     // The probe has its own short bound; it never widens the statement bound.
     expect(DB_LIVENESS_PROBE_TIMEOUT_MS).toBeGreaterThan(0)
     expect(DB_LIVENESS_PROBE_TIMEOUT_MS).toBeLessThan(DB_QUERY_TIMEOUT_MS)
+  })
+})
+
+describe('the public pool handle', () => {
+  it('probes a reused client the way acquireClient does', async () => {
+    initializeDatabase({ livenessProbeTimeoutMillis: 40 })
+    const stale = await acquireThenRelease()
+
+    // The pooled socket is dead: nothing written to it ever answers.
+    stale.handler = () => neverSettles()
+
+    hooks.behaviours = [{ kind: 'reuse', client: stale }, { kind: 'resolve' }]
+
+    const client = (await getPool().connect()) as unknown as FakeClient
+
+    // A caller that manages its own statements still gets a socket that
+    // answered, and the dead one was destroyed rather than handed out.
+    expect(client).toBeDefined()
+    expect(stale.releasedWith).toContain(true)
+  })
+
+  it('routes query() through the bounded statement path', async () => {
+    initializeDatabase()
+    hooks.behaviours = [
+      {
+        kind: 'resolve',
+        queryHandler: async (text) => ({
+          rows: [{ statement: text }],
+          rowCount: 1,
+        }),
+      },
+    ]
+
+    const result = await getPool().query('SELECT id FROM sessions')
+
+    expect(result.rows[0]).toEqual({ statement: 'SELECT id FROM sessions' })
   })
 })

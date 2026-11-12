@@ -420,7 +420,7 @@ function normalisePoolSize(value: number): number {
  */
 export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   if (pool) {
-    return pool
+    return hardenPool(pool)
   }
 
   // In production, refuse to silently fall back to localhost defaults when no
@@ -589,6 +589,54 @@ function isTransientConnectionError(error: unknown): boolean {
 }
 
 /**
+ * The pool this module owns, created on demand.
+ *
+ * Internal callers use this rather than `getPool()`: the public handle routes
+ * `connect()` and `query()` back through `acquireClient()` and `query()`, so a
+ * call from inside those would recurse.
+ */
+function rawPool(): Pool {
+  if (!pool) {
+    return initializeDatabase(lastConfig)
+  }
+  return pool
+}
+
+const poolHandles = new WeakMap<Pool, Pool>()
+
+/**
+ * Wrap a pool so its `connect()` and `query()` take the same path as
+ * `acquireClient()` and `query()`.
+ *
+ * A caller that reached the pool directly used to get a raw socket with no
+ * liveness probe and no statement bound: a socket the peer closed while the
+ * isolate was idle failed the statement, and the route answered `500` instead
+ * of rebuilding the pool. Everything else — `end()`, the event listeners, the
+ * counters — stays the underlying pool's own method, bound to it. The promise
+ * form of both methods is what this codebase uses; the callback form is not
+ * supported through this handle.
+ */
+function hardenPool(target: Pool): Pool {
+  const existing = poolHandles.get(target)
+  if (existing) return existing
+
+  const handle = new Proxy(target, {
+    get(object, property) {
+      if (property === 'connect') {
+        return () => acquireClient()
+      }
+      if (property === 'query') {
+        return (text: string, params?: unknown[]) => query(text, params)
+      }
+      const value = Reflect.get(object, property)
+      return typeof value === 'function' ? value.bind(object) : value
+    },
+  }) as Pool
+  poolHandles.set(target, handle)
+  return handle
+}
+
+/**
  * Get database connection pool, creating it on demand.
  *
  * Callers may reach this without startup having run initializeDatabase
@@ -596,12 +644,13 @@ function isTransientConnectionError(error: unknown): boolean {
  * connection failure). Creating lazily is what makes the pool self-healing:
  * the previous instance is already torn down, and a fresh one with new
  * sockets is returned.
+ *
+ * The returned handle's `connect()` and `query()` are `acquireClient()` and
+ * `query()`, so a caller that manages its own statements still gets the
+ * liveness probe, the statement bound and the pool rebuild.
  */
 export function getPool(): Pool {
-  if (!pool) {
-    return initializeDatabase(lastConfig)
-  }
-  return pool
+  return hardenPool(rawPool())
 }
 
 /**
@@ -823,7 +872,7 @@ export async function acquireClient(): Promise<PoolClient> {
   let lastError: unknown
 
   for (let attempt = 1; attempt <= DB_ACQUIRE_ATTEMPTS; attempt++) {
-    const activePool = getPool()
+    const activePool = rawPool()
     try {
       let client = await checkoutClient(activePool, timeoutMs)
       for (let trips = 0; checkedOutClients.has(client); trips++) {
