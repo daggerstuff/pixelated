@@ -17,6 +17,8 @@ const logger = createBuildSafeLogger('connection')
 type MongoConnection = Connection
 let mongoConnection: MongoConnection | null = null
 let postgresPool: Pool | null = null
+/** Whether `connectPostgreSQL()` has completed at least once. */
+let postgresConnected = false
 let redisClient: Redis | null = null
 
 // ============================================================================
@@ -69,28 +71,28 @@ export async function connectMongoDB(): Promise<MongoConnection> {
 // ============================================================================
 
 export async function connectPostgreSQL(): Promise<Pool> {
-  if (postgresPool) {
-    return postgresPool
+  // Resolve the pool the db module owns right now. It discards and rebuilds
+  // its pool on a transient connection failure, so a reference cached at
+  // connect time can be an ended pool.
+  initializeDatabase()
+  const sharedPool = getDbPool()
+  if (postgresPool !== sharedPool) {
+    postgresPool = sharedPool
+    // Event listeners belong to the instance, not the module: a rebuilt pool
+    // needs its own.
+    sharedPool.on('error', (err) => {
+      logger.error('Unexpected error on idle client', err)
+    })
   }
 
   try {
-    // Initialize shared db pool from src/lib/db to avoid duplicate pools
-    initializeDatabase()
-    const sharedPool = getDbPool()
-    postgresPool = sharedPool
-
     // Test connection
-    const client = await postgresPool.connect()
+    const client = await sharedPool.connect()
     const result = await client.query('SELECT NOW()')
     logger.info('PostgreSQL connection test:', result.rows[0])
     client.release()
-
-    // Event listeners
-    postgresPool.on('error', (err) => {
-      logger.error('Unexpected error on idle client', err)
-    })
-
-    return postgresPool
+    postgresConnected = true
+    return sharedPool
   } catch (error: unknown) {
     logger.error('PostgreSQL connection failed:', error)
     throw error
@@ -144,6 +146,7 @@ export async function connectRedis(): Promise<Redis> {
 
 export function setPostgresPool(pool: Pool | null): void {
   postgresPool = pool
+  postgresConnected = pool !== null
 }
 
 export function setRedisClient(client: Redis | null): void {
@@ -162,12 +165,16 @@ export function getMongoConnection(): MongoConnection {
 }
 
 export function getPostgresPool(): Pool {
-  if (!postgresPool) {
+  if (!postgresConnected) {
     throw new Error(
       'PostgreSQL pool not created. Call connectPostgreSQL() first.',
     )
   }
-  return postgresPool
+  // Hand out the pool the db module owns now: after a rebuild the cached
+  // reference is an ended instance, and ten consumers hold this getter.
+  const sharedPool = getDbPool()
+  postgresPool = sharedPool
+  return sharedPool
 }
 
 export function getRedisClient(): Redis {
@@ -190,9 +197,11 @@ export async function disconnectMongoDB(): Promise<void> {
 }
 
 export async function disconnectPostgreSQL(): Promise<void> {
-  if (postgresPool) {
-    await postgresPool.end()
-    postgresPool = null
+  const pool = postgresPool
+  postgresPool = null
+  postgresConnected = false
+  if (pool) {
+    await pool.end()
     logger.info('PostgreSQL pool closed')
   }
 }
