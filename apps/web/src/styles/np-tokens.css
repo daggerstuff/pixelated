@@ -12,87 +12,108 @@
   --un-default-border-color: var(--np-line);
 
   /* =============================================
-     ZERO-CHROMA GRAYSCALE PALETTE (Dark — Primary)
-     All colors at oklch C = 0 (zero chroma)
-     ============================================= */
-  --np-bg: oklch(0.1 0 0); /* #1a1a1a — Primary canvas */
-  --np-surface: oklch(0.14 0 0); /* #242424 — Cards, containers */
-  --np-elevated: oklch(0.18 0 0); /* #2e2e2e — Modals, dropdowns */
-  --np-hover: oklch(0.22 0 0); /* #383838 — Hover states */
-  --np-active: oklch(0.16 0 0); /* #292929 — Active/pressed */
-  --np-text: oklch(0.93 0 0); /* #ededed — Body, headings */
-  /* Lightness floor set by contrast, not taste: 0.62 is the lowest value that
-     clears WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
-  --np-muted: oklch(0.62 0 0); /* Labels, captions */
-  --np-mid: oklch(0.7 0 0); /* #b3b3b3 — Enhanced muted */
-  --np-line: color-mix(
-    in srgb,
-    var(--ink, #fff) 6%,
-    transparent
-  ); /* Borders, dividers */
-  --np-line-strong: color-mix(in srgb, var(--ink, #fff) 12%, transparent);
+    DRAFTING PALETTE (Dark — Primary)
+    Ground, panel, and rule values come from the Supernova Recovery
+    drafting sheet: a dark room, not a black void. Neutral hue is capped
+    at C <= 0.006 so the ramp still reads as one material under the cyan
+    centerline and the amber signal.
+    ============================================= */
+  --np-bg: #0b0b0c; /* ground — page canvas */
+  --np-surface: #121214; /* panel — cards, containers */
+  --np-elevated: #18181b; /* raised panel — modals, dropdowns */
+  --np-hover: #1f1f24; /* Hover states */
+  --np-active: #232329; /* Active/pressed */
+  --np-text: #e8e6df; /* drafting white — Body, headings */
+  /* Lightness floor set by contrast, not taste: #8b8b94 is the lowest value
+     that clears WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
+  --np-muted: #8b8b94; /* Labels, captions */
+  --np-mid: #9a9aa3; /* Enhanced muted */
+  --np-dim: #7f7f88; /* Dimension text, passive annotations */
+  --np-void: #0e0e10; /* Recessed strips, code wells */
+  --np-line: #1c1c21; /* Hairline rule, inter-section */
+  --np-line-strong: #2a2a30; /* Panel border, dimension rule */
+  --np-line-figure: #3a3a42; /* Inputs, figure frames, crop marks */
   --np-overlay: rgba(0, 0, 0, 0.75);
-  --np-selection: color-mix(in srgb, var(--ink, #fff) 8%, transparent);
-  --np-selection-text: var(--ink, oklch(0.93 0 0));
+  --np-selection: color-mix(in srgb, var(--np-text) 12%, transparent);
+  --np-selection-text: var(--np-text);
 
   /* =============================================
-     TYPOGRAPHY — Technical brutalist & clinical editorial.
-     Space Grotesk carries the technical brutalist display/hero voice.
-     Instrument Sans Variable carries reading and interface text.
-     Spline Sans Mono and IBM Plex Mono remain restricted to app data,
-     telemetry, and code surfaces.
-     ============================================= */
+    TWO-SIGNAL ACCENT (sanctioned chromatic decision)
+    Cyan is structure: centerline, marks, hover, focus.
+    Amber is the single irreversible action. Nothing else carries hue.
+    ============================================= */
+  --np-cyan: #55d6e0;
+  --np-cyan-strong: #7fe3eb;
+  --np-cyan-line: rgba(85, 214, 224, 0.16);
+  --np-cyan-wash: rgba(85, 214, 224, 0.09);
+  --np-amber: #ffb000;
+  --np-amber-strong: #ffc233;
+  --np-amber-ink: #12100a; /* text on an amber plate */
+
+  /* =============================================
+    TYPOGRAPHY — Drafting sheet voice.
+    Big Shoulders Display carries the condensed, uppercase headline on
+    public surfaces. Instrument Sans Variable carries reading and app
+    interface text. IBM Plex Mono is the drafting spec voice — labels,
+    dimensions, ticks, and spec-sheet body copy. Spline Sans Mono stays
+    on app telemetry.
+    ============================================= */
   --np-font-display:
-    'Space Grotesk Variable', 'Space Grotesk', system-ui, -apple-system,
+    'Big Shoulders Display', 'Arial Narrow', 'Helvetica Neue', system-ui,
     sans-serif;
-  --np-font-hero:
-    'Space Grotesk Variable', 'Space Grotesk', system-ui, -apple-system,
-    sans-serif;
-  --np-font-headline:
-    'Space Grotesk Variable', 'Space Grotesk', system-ui, -apple-system,
-    sans-serif;
-  --np-font-condensed: var(--np-font-headline);
+  --np-font-hero: var(--np-font-display);
+  --np-font-headline: var(--np-font-display);
+  --np-font-condensed: var(--np-font-display);
   --np-font-poster: var(--np-font-display);
   --np-font-body: 'Instrument Sans Variable', system-ui, sans-serif;
   --np-font-label: 'Instrument Sans Variable', system-ui, sans-serif;
+  --np-font-spec:
+    'IBM Plex Mono', 'Spline Sans Mono Variable', ui-monospace, SFMono-Regular,
+    Menlo, monospace;
   --np-font-mono:
-    'Spline Sans Mono Variable', 'IBM Plex Mono', ui-monospace, monospace;
+    'IBM Plex Mono', 'Spline Sans Mono Variable', ui-monospace, Menlo, monospace;
 
-  /* Weights — weight carries hierarchy (The Content-is-Type Rule) */
-  --np-weight-display: 400;
-  --np-weight-headline: 500;
-  --np-weight-title: 600;
+  /* Weights — condensed display is set heavy; mono never exceeds 600 */
+  --np-weight-display: 800;
+  --np-weight-headline: 800;
+  --np-weight-title: 700;
   --np-weight-body: 400;
   --np-weight-label: 500;
   --np-weight-data: 500;
 
-  /* Scale — measured display, compact reading ramp */
-  --np-text-display: clamp(3.75rem, 8vw, 7.5rem);
-  --np-text-headline: clamp(2.25rem, 4.5vw, 4.5rem);
-  --np-text-subhead: clamp(1.5rem, 3vw, 3rem);
+  /* Scale — condensed headline over a mono spec ramp */
+  --np-text-display: clamp(3rem, 7vw, 6rem);
+  --np-text-headline: clamp(2.25rem, 4.5vw, 4rem);
+  --np-text-subhead: clamp(1.5rem, 3vw, 2.75rem);
   --np-text-title: 1rem;
   --np-text-body: 1.125rem;
+  --np-text-spec: 0.9375rem;
   --np-text-small: 1rem;
   --np-text-label: 0.75rem;
   --np-text-data: 0.875rem;
   --np-text-caption: 0.75rem;
 
-  /* Line heights — tighter for display, open for reading */
-  --np-leading-display: 0.95;
-  --np-leading-headline: 1.08;
-  --np-leading-subhead: 1.2;
+  /* Line heights — drafting heads run tight, spec copy runs open */
+  --np-leading-display: 0.9;
+  --np-leading-headline: 0.95;
+  --np-leading-subhead: 1.05;
   --np-leading-title: 1.2;
   --np-leading-body: 1.55;
+  --np-leading-spec: 1.7;
   --np-leading-data: 1.45;
   --np-leading-label: 1.2;
 
-  /* Letter spacing — tight display, precise labels */
-  --np-tracking-display: -0.035em;
-  --np-tracking-headline: -0.03em;
-  --np-tracking-subhead: -0.025em;
-  --np-tracking-title: -0.02em;
+  /* Letter spacing — condensed caps breathe, spec labels track wide */
+  --np-tracking-display: 0.01em;
+  --np-tracking-headline: 0.01em;
+  --np-tracking-subhead: 0.02em;
+  --np-tracking-title: -0.01em;
   --np-tracking-body: 0;
-  --np-tracking-label: 0.08em;
+  --np-tracking-label: 0.12em;
+
+  /* Drafting sheet grid unit — the ghost cell, plate inset, and dimension
+     tick all derive from this single number. */
+  --np-grid-unit: 18px;
 
   /* =============================================
      FLAT BY DESIGN
@@ -103,9 +124,13 @@
   --np-radius-card: 0px;
   --np-radius-input: 0px;
 
-  /* No shadows — tonal layering is the depth system */
+  /* No soft shadows — tonal layering is the depth system. The drafting
+     register is the one permitted exception: a hard offset plate with no
+     blur, used only on public drawing surfaces. */
   --np-shadow: none;
   --np-shadow-elevated: none;
+  --np-shadow-plate: 6px 6px 0 0 var(--np-cyan-wash);
+  --np-shadow-plate-strong: 10px 10px 0 0 var(--np-cyan-wash);
 
   /* =============================================
      LAYOUT
@@ -149,6 +174,10 @@
   /* Entrance curve — slow start, fast finish */
   --np-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
 
+  /* Drafting motion — the pen stroke, and the plate settling */
+  --np-duration-draw: 0.9s;
+  --np-ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
+
   /* =============================================
      Z-INDEX
      ============================================= */
@@ -160,32 +189,48 @@
 }
 
 /* =============================================
-   LIGHT MODE — Accessibility fallback
-   Flatter, cooler, designed to be less interesting
-   ============================================= */
+  LIGHT MODE — Accessibility fallback
+  Drafting paper: warm off-white ground, ink rules, deeper signals so
+  every accent still clears AA on paper.
+  ============================================= */
 :root[data-theme='light'] {
   color-scheme: light;
 
   --un-default-border-color: var(--np-line);
 
-  --np-bg: oklch(0.98 0 0); /* #fafafa */
-  --np-surface: oklch(0.95 0 0); /* #f2f2f2 */
-  --np-elevated: oklch(0.92 0 0); /* #ebebeb */
-  --np-hover: oklch(0.89 0 0);
-  --np-active: oklch(0.93 0 0);
-  --np-text: oklch(0.15 0 0); /* #262626 */
-  /* Lightness ceiling set by contrast: 0.48 is the highest value that clears
-     WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
-  --np-muted: oklch(0.48 0 0);
-  --np-mid: oklch(0.45 0 0);
-  --np-line: color-mix(in srgb, var(--ink, #000) 8%, transparent);
-  --np-line-strong: color-mix(in srgb, var(--ink, #000) 16%, transparent);
+  --np-bg: #f6f5f0; /* paper — page canvas */
+  --np-surface: #eeede7; /* panel */
+  --np-elevated: #e6e5de; /* raised panel */
+  --np-hover: #e1e0d9;
+  --np-active: #dad9d1;
+  --np-text: #16160f; /* graphite ink */
+  /* Lightness ceiling set by contrast: #5c5c55 is the highest value that
+     clears WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
+  --np-muted: #5c5c55;
+  --np-mid: #4a4a44;
+  --np-dim: #6b6b63;
+  --np-void: #f0efe9;
+  --np-line: color-mix(in srgb, var(--ink, #000) 10%, transparent);
+  --np-line-strong: color-mix(in srgb, var(--ink, #000) 20%, transparent);
+  --np-line-figure: color-mix(in srgb, var(--ink, #000) 32%, transparent);
   --np-overlay: rgba(0, 0, 0, 0.4);
-  --np-selection: rgba(0, 0, 0, 0.08);
-  --np-selection-text: oklch(0.15 0 0);
+  --np-selection: color-mix(in srgb, var(--np-text) 14%, transparent);
+  --np-selection-text: var(--np-text);
+
+  /* Signals darkened for paper — cyan #0a6e78 and amber #8a5a00 both clear
+     AA as text on every light surface. */
+  --np-cyan: #0a6e78;
+  --np-cyan-strong: #085a63;
+  --np-cyan-line: rgba(10, 110, 120, 0.22);
+  --np-cyan-wash: rgba(10, 110, 120, 0.1);
+  --np-amber: #8a5a00;
+  --np-amber-strong: #6f4900;
+  --np-amber-ink: #f6f5f0;
+  --np-shadow-plate: 6px 6px 0 0 var(--np-cyan-wash);
+  --np-shadow-plate-strong: 10px 10px 0 0 var(--np-cyan-wash);
 
   /* Legacy alias (see compatibility block): --np-text as rgb() triplet */
-  --accent-primary-rgb: 38, 38, 38;
+  --accent-primary-rgb: 22, 22, 15;
 }
 
 /* =============================================
@@ -216,26 +261,34 @@ html body {
 }
 
 /* =============================================
-   THE ZERO-CHROMA RULE — Enforced at token level
-   =============================================
-   No color enters the system through design tokens.
-   Not as an accent, not as a background tint, not as a hover state.
-   The only color in the interface is the content.
-   ============================================= */
+  THE TWO-SIGNAL RULE — Enforced at token level
+  =============================================
+  Colour enters the system through exactly two sanctioned tokens:
+
+  --np-cyan  structure. The centerline, stencil marks, dimension rules,
+             hover, and focus. Never a filled plate behind body copy.
+  --np-amber the single irreversible action on a surface. One per view.
+
+  This is a deliberate, tokenized accent decision (see TASTES.md §1).
+  Any other hue — orange, blue, green, purple — remains out of scope and
+  must be proposed as a token before it is used.
+  ============================================= */
 
 /* =============================================
    LEGACY COMPATIBILITY ALIASES (charliecreates PR #4932)
    Layouts still consumed: BrutalistLayout, ChatLayout, DashboardLayout,
    DocumentationLayout, TabbedLayout. Map the historical variable names
    onto the Neutral Precision ramp so the consumers stay renderable
-   without importing additional stylesheets. All values resolve to
-   zero-chroma NP tokens at the canonical elevation steps; no
-   accent/glass/shadow effects re-enter the system through this block.
+   without importing additional stylesheets. All values resolve to NP
+   tokens at the canonical elevation steps; no glass, blur, or soft-shadow
+   effects re-enter the system through this block.
    ============================================= */
 :root {
-  /* Accent (legacy) -> muted NP — preserves contrast on Brutalist scroll
-     progress while removing hue. */
-  --accent-primary: var(--np-text);
+  /* Accent (legacy) -> neutral mid by default. Product registers keep
+    zero chroma; the public register re-points this at the cyan structure
+    signal below, so the marketing sheets upgrade without editing call
+    sites and nothing chromatic leaks into the app. */
+  --accent-primary: var(--np-mid);
   --accent-primary-dim: var(--np-muted);
   --accent-primary-glow: transparent;
 
@@ -283,6 +336,7 @@ html body {
 
   /* Motion (state-only, neutral) */
   --duration-fast: var(--np-duration-fast);
+  --ease-out: var(--np-ease-out);
 
   /* Compatibility shim for Brutalist scroll-progress + ChatLayout skip link */
   --z-sticky: var(--np-z-sticky);
@@ -363,4 +417,22 @@ html body {
   --np-radius-button: 0px;
   --np-radius-card: 0px;
   --np-radius-input: 0px;
+}
+
+/* ==============================================
+  PUBLIC REGISTER — the drafting signals, opted in per layout
+  ==============================================
+  Only BaseLayout loads np-drafting.css and marketing.css, and it marks
+  <html data-register="public">. Product registers (dashboard, chat,
+  therapy, admin, docs) never set the attribute, so they keep the neutral
+  aliases above and the two signals cannot leak inward. Declared last so
+  it also wins over the palette bridge at equal specificity.
+  ============================================== */
+:root[data-register='public'] {
+  --accent-primary: var(--np-cyan);
+  --accent: var(--np-cyan);
+  --accent-soft: var(--np-cyan-wash);
+  --focus-ring: 0 0 0 3px var(--np-cyan);
+  --np-selection: var(--np-cyan);
+  --np-selection-text: var(--np-bg);
 }
