@@ -182,7 +182,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
       const themeColor = document.querySelector('meta[name="theme-color"]')
       themeColor?.setAttribute(
         'content',
-        storedTheme === 'light' ? '#fafafa' : '#0b0b0c',
+        storedTheme === 'light' ? '#f6f5f0' : '#0b0b0c',
       )
     </script>
     <script
@@ -366,7 +366,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         const themeColor = document.querySelector('meta[name="theme-color"]')
         themeColor?.setAttribute(
           'content',
-          next === 'dark' ? '#0b0b0c' : '#fafafa',
+          next === 'dark' ? '#0b0b0c' : '#f6f5f0',
         )
         window.dispatchEvent(
           new CustomEvent('theme-changed', { detail: { theme: next } }),

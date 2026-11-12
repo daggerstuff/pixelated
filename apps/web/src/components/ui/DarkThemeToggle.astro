@@ -135,25 +135,3 @@ const { class: className = '' } = Astro.props
       }
     })
 </script>
-
-<style>
-  /* Improved button styling */
-  #theme-toggle {
-    transition:
-      transform 0.2s ease,
-      background-color 0.2s ease;
-  }
-
-  #theme-toggle:hover {
-    transform: rotate(15deg);
-  }
-
-  :global(.dark) #theme-toggle {
-    color: #84cc16;
-  }
-
-  /* Fix SVG rendering in dark mode */
-  :global(.dark) #theme-toggle svg {
-    color: #84cc16;
-  }
-</style>
