@@ -6,6 +6,8 @@ import Layout from '@/layouts/Layout.astro'
 import { resolvePageSession } from '@/lib/auth/session'
 import { getTrainingSessionResponse } from '@/lib/services/training/session-api'
 import VitalsMonitorIsland from '@/components/simulation/VitalsMonitorIsland.tsx'
+import ClientReplyState from '../_ClientReplyState.astro'
+import SessionGuidancePanel from '../_SessionGuidancePanel.astro'
 import { classifyTrainingSessionLoad } from '../_session-load-state'
 
 type TrainingSessionResponse = {
@@ -113,6 +115,10 @@ if (unavailable) {
   Astro.response.status = 503
   Astro.response.headers.set('Retry-After', '1')
 }
+
+// The reply path and the coaching surface are structure only. Each surface
+// below asks its own path and renders the refusal (see `_reply-and-coaching.ts`).
+const transcript = sessionData?.messages ?? []
 
 // Map MongoDB roles to training context
 // In a real implementation, this would check specific training permissions
@@ -450,18 +456,6 @@ const isSupervisor = userRole === 'admin'
                             Therapeutic Confrontation
                           </option>
                         </select>
-
-                        <button
-                          id="suggestions-button"
-                          class="text-sm bg-secondary text-foreground px-3 py-1 rounded-none hover:bg-accent transition-colors"
-                        >
-                          <svg
-                            class="w-5 h-5"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                          />{' '}
-                          Get Suggestions
-                        </button>
                       </div>
 
                       {/* $1 */}
@@ -476,14 +470,13 @@ const isSupervisor = userRole === 'admin'
 
                           {/* $1 */}
                           <div class="flex justify-between items-center mt-2 text-xs text-muted-foreground">
-                            <span>
-                              Quality:{' '}
-                              <span id="response-quality" class="font-medium">
-                                Good
-                              </span>
-                            </span>
                             <span id="character-count">0/1000</span>
                           </div>
+
+                          <ClientReplyState
+                            {transcript}
+                            sessionId={sessionData.sessionId}
+                          />
                         </div>
 
                         <button
@@ -566,16 +559,10 @@ const isSupervisor = userRole === 'admin'
                 </div>
 
                 {/* $1 */}
-                <div class="p-6 border-b border-border">
-                  <h3 class="text-md font-semibold text-foreground mb-4">
-                    Live Feedback
-                  </h3>
-                  <div id="feedback-messages" class="space-y-2 text-sm">
-                    <p class="text-muted-foreground">
-                      Feedback will appear here.
-                    </p>
-                  </div>
-                </div>
+                <SessionGuidancePanel
+                  {transcript}
+                  sessionId={sessionData.sessionId}
+                />
 
                 {/* $1 */}
                 <div

@@ -101,7 +101,6 @@ class TrainingSession {
       })
 
       messageInput.addEventListener('input', () => {
-        this.updateMessageQuality()
         this.updateCharacterCount()
         this.updateSendButton()
       })
@@ -129,20 +128,6 @@ class TrainingSession {
       backButton.addEventListener('click', () => {
         window.location.href = '/training'
       })
-    }
-
-    // Suggestions button
-    const suggestionsButton = document.getElementById('suggestions-button')
-    if (suggestionsButton) {
-      suggestionsButton.addEventListener('click', () => this.showSuggestions())
-    }
-
-    // Intervention type selector
-    const interventionSelect = document.getElementById('intervention-type')
-    if (interventionSelect) {
-      interventionSelect.addEventListener('change', () =>
-        this.updateMessageQuality(),
-      )
     }
   }
 
@@ -278,6 +263,9 @@ class TrainingSession {
       const result = await response.json()
       if (!response.ok) throw new Error('Training message was not saved')
 
+      // No client reply is requested here. The reply path has no approved
+      // model (`apps/web/src/pages/training/_reply-and-coaching.ts`), and the
+      // page renders that state beside this composer instead.
       this.addMessage('therapist', result.content, {
         timestamp: new Date(result.createdAt),
         interventionType: interventionSelect?.value ?? 'reflection',
@@ -546,70 +534,11 @@ class TrainingSession {
     }
   }
 
-  updateMessageQuality() {
-    const messageInput = document.getElementById('message-input')
-    const qualitySpan = document.getElementById('response-quality')
-    const interventionSelect = document.getElementById('intervention-type')
-
-    if (!messageInput || !qualitySpan) return
-
-    const message = messageInput.value.trim()
-    const interventionType = interventionSelect?.value ?? 'reflection'
-
-    // Simple quality assessment
-    let quality = 'Fair'
-    let score = 0.5
-
-    // Check for therapeutic language
-    const therapeuticWords = [
-      'understand',
-      'feel',
-      'sounds like',
-      'tell me more',
-      'what was that like',
-      'how did you',
-      'i hear you',
-    ]
-
-    const problematicWords = ['should', 'must', 'have to', 'wrong', 'bad']
-
-    therapeuticWords.forEach((word) => {
-      if (message.toLowerCase().includes(word)) score += 0.1
-    })
-
-    problematicWords.forEach((word) => {
-      if (message.toLowerCase().includes(word)) score -= 0.1
-    })
-
-    // Adjust based on intervention type
-    if (
-      interventionType === 'empathy' &&
-      message.toLowerCase().includes('feel')
-    ) {
-      score += 0.1
-    }
-
-    if (interventionType === 'inquiry' && message.includes('?')) {
-      score += 0.1
-    }
-
-    // Determine quality label
-    if (score >= 0.8) quality = 'Excellent'
-    else if (score >= 0.6) quality = 'Good'
-    else if (score >= 0.4) quality = 'Fair'
-    else quality = 'Poor'
-
-    qualitySpan.textContent = quality
-    qualitySpan.className = `font-medium ${
-      quality === 'Excellent'
-        ? 'text-green-600'
-        : quality === 'Good'
-          ? 'text-blue-600'
-          : quality === 'Fair'
-            ? 'text-yellow-600'
-            : 'text-red-600'
-    }`
-  }
+  // There is deliberately no response-quality assessment here. The word-list
+  // scoring this script used to ship (a therapeutic-word count and an
+  // Excellent/Good/Fair/Poor ladder) is not an approved coaching model, so the
+  // coaching surface renders its blocker instead
+  // (`apps/web/src/pages/training/_reply-and-coaching.ts`).
 
   updateCharacterCount() {
     const messageInput = document.getElementById('message-input')
@@ -681,14 +610,9 @@ class TrainingSession {
     }
   }
 
-  showSuggestions() {
-    // This would show a modal with therapeutic response suggestions
-    // For now, just add a feedback message
-    this.addFeedbackMessage(
-      "Suggestion feature coming soon! Focus on reflecting the client's emotions.",
-      'info',
-    )
-  }
+  // There is no suggestions handler. The control that called one is gone with
+  // the quality ladder: it answered with therapeutic advice the coaching model
+  // has not been approved to give. The coaching surface renders its blocker.
 
   showConnectionStatus(connected) {
     const statusMessage = connected
