@@ -1,0 +1,169 @@
+---
+// Faculty review (structure only).
+//
+// This is the surface where a faculty member would review a trainee's training
+// session, and the access path to it. It stops at the boundary of the missing
+// relation: `sessions` has no `workspace_id`, so a faculty member cannot be
+// scoped to the sessions they may review, and nothing here reads a session.
+//
+// What this page deliberately does not do:
+//
+//  - It does not join `sessions.therapist_id`. That scopes to the therapist who
+//    owns a session, which is the trainee, not the faculty member reviewing it.
+//  - It does not read every session and filter in the browser. A client-side
+//    filter ships the foreign rows to the client before hiding them.
+//  - It does not show a blanket list. An unscoped faculty surface is a
+//    tenant-boundary defect of exactly the kind this mission exists to prevent.
+//
+// `?sessionId=` carries the session the faculty member opened. It is displayed
+// as an unverified reference and is not fetched: no session data is read until
+// the relation exists. The decisions live in `../_faculty-review.ts`; this page
+// only renders them.
+
+import Layout from '@/layouts/Layout.astro'
+import { providerUnavailableResponse } from '@/lib/auth/provider-unavailable'
+import { resolvePageSession } from '@/lib/auth/session'
+import {
+  CLOSING_MIGRATION,
+  CLOSING_MIGRATION_DETAIL,
+  FACULTY_REVIEW_ROLE,
+  refuseUnscopedSessionQuery,
+  resolveFacultyReviewScope,
+} from '../_faculty-review'
+
+// One page-session read for this request, through the helper that consumes the
+// middleware's verdict. A second `getSession` / `isAuthenticated` /
+// `getCurrentUser` call would re-validate the same token (diagnosis D7).
+const { session, providerUnavailable, developer } = await resolvePageSession(
+  Astro.request,
+  Astro.locals,
+)
+
+const role = session?.user.role ?? developer?.role ?? null
+if (!role) {
+  // The middleware already resolved this token. A failure here is a provider
+  // outage, not a logout.
+  if (providerUnavailable) {
+    return providerUnavailableResponse(Astro.url.pathname)
+  }
+  return Astro.redirect(
+    `/login?redirect=${encodeURIComponent('/training/faculty-review')}`,
+  )
+}
+
+// `workspaceId` is null: the identity carries a workspace, but no session
+// carries one to match it against. The query dependency throws if reached.
+const outcome = resolveFacultyReviewScope({
+  role,
+  workspaceId: null,
+  listSessionsInWorkspace: refuseUnscopedSessionQuery,
+})
+
+const requestedSessionId = Astro.url.searchParams.get('sessionId')
+---
+
+<Layout
+  title="Faculty review - Pixelated Empathy"
+  description="Faculty review of training sessions; structure only, awaiting the sessions-to-workspace relation."
+>
+  <div class="min-h-full bg-background px-4 py-16 text-foreground sm:px-6">
+    <div class="mx-auto max-w-3xl">
+      <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        Training journey
+      </p>
+      <h1 class="mt-3 text-3xl font-semibold text-foreground">
+        Faculty review
+      </h1>
+      <p class="mt-4 inline-block border border-border bg-secondary px-3 py-1 text-xs font-medium uppercase tracking-[0.14em] text-foreground">
+        Not available yet
+      </p>
+
+      <p
+        class="mt-6 text-sm leading-relaxed text-muted-foreground"
+        role="status"
+      >
+        This surface exists so the structure and the access path are real. It
+        cannot review anything: a faculty member has no way to be scoped to the
+        sessions they may review, and this surface will not approximate that
+        scope.
+      </p>
+
+      <section class="mt-8 border border-border bg-card p-6">
+        <h2 class="text-base font-semibold text-foreground">Access path</h2>
+        {outcome.canReview ? (
+          <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+            This account carries the faculty role. The role is not the blocker
+            here; the missing relation is.
+          </p>
+        ) : (
+          <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+            This account does not carry the faculty role, so this surface is
+            read-only for it. Faculty access requires{' '}
+            <code class="font-mono text-xs text-foreground">
+              {FACULTY_REVIEW_ROLE}
+            </code>
+            . The gate is stated rather than redirected: the surface has nothing
+            to show to any role until the relation exists.
+          </p>
+        )}
+        {requestedSessionId && (
+          <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Requested session{' '}
+            <code class="font-mono text-xs text-foreground">
+              {requestedSessionId}
+            </code>{' '}
+            — displayed as an unverified reference. No session data is read
+            while the relation is missing.
+          </p>
+        )}
+      </section>
+
+      <section class="mt-8">
+        <h2 class="text-base font-semibold text-foreground">
+          What is blocking it
+        </h2>
+        <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Four structural blockers, each owned by a role. Clearing one does not
+          clear another.
+        </p>
+        <ul class="mt-4 space-y-4">
+          {outcome.blockers.map((blocker) => (
+            <li class="border border-border bg-card p-6">
+              <p class="font-mono text-xs text-muted-foreground">
+                {blocker.id}
+              </p>
+              <h3 class="mt-2 text-base font-semibold text-foreground">
+                {blocker.headline}
+              </h3>
+              <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {blocker.detail}
+              </p>
+              <p class="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                Owner: <span class="text-foreground">{blocker.owner}</span>
+              </p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="mt-8 border border-border bg-secondary p-6">
+        <h2 class="text-base font-semibold text-foreground">
+          What would close it
+        </h2>
+        <p class="mt-2 font-mono text-xs text-foreground">
+          {CLOSING_MIGRATION}
+        </p>
+        <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+          {CLOSING_MIGRATION_DETAIL}
+        </p>
+      </section>
+
+      <a
+        href="/training"
+        class="mt-8 inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+      >
+        Back to training
+      </a>
+    </div>
+  </div>
+</Layout>

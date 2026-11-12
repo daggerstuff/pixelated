@@ -1,0 +1,72 @@
+---
+// Faculty review, inside the session page (structure only).
+//
+// The supervisor branch of `session/[sessionId].astro` used to hold an empty
+// `<div id="supervisor-dashboard" />` that no script ever populated, and then a
+// short not-available panel. This component is that panel extended: it renders
+// the blocker, names the migration that would close it, and offers the access
+// path a faculty member would follow once the relation exists.
+//
+// It is deliberately not a second surface beside the old one — the session page
+// renders this component in place of the old block, so there is exactly one
+// faculty-review panel on the page.
+//
+// The decision lives in `./_faculty-review.ts`; this component only renders it.
+// It reads no session data: `getTrainingSessionResponse` scopes by
+// `therapist_id`, which is the substitute scoping the surface must not use.
+
+import {
+  CLOSING_MIGRATION,
+  FACULTY_REVIEW_BLOCKERS,
+  FACULTY_REVIEW_ROLE,
+  refuseUnscopedSessionQuery,
+  resolveFacultyReviewScope,
+} from './_faculty-review'
+
+interface Props {
+  /** The session the faculty member opened, carried into the access path. */
+  sessionId: string
+}
+
+const { sessionId } = Astro.props
+
+// The branch this component renders in is already the faculty branch, so the
+// role is the faculty role. `workspaceId` is null because no session carries a
+// workspace to scope to yet.
+const outcome = resolveFacultyReviewScope({
+  role: FACULTY_REVIEW_ROLE,
+  workspaceId: null,
+  listSessionsInWorkspace: refuseUnscopedSessionQuery,
+})
+
+const [scopeBlocker] = FACULTY_REVIEW_BLOCKERS
+---
+
+<div class="flex-1 px-4 py-12 sm:px-6">
+  <section class="mx-auto max-w-2xl">
+    <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+      Faculty review
+    </p>
+    <h2 class="mt-3 text-2xl font-semibold text-foreground">
+      {scopeBlocker.headline}
+    </h2>
+    <p class="mt-4 text-sm leading-relaxed text-muted-foreground" role="status">
+      {scopeBlocker.detail}
+    </p>
+    <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+      Closing change:{' '}
+      <code class="font-mono text-xs text-foreground">{CLOSING_MIGRATION}</code>{' '}
+      — proposed, not written. This mission may not add DDL or a migration.
+    </p>
+    <a
+      href={`/training/faculty-review?sessionId=${encodeURIComponent(sessionId)}`}
+      class="mt-6 inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+    >
+      Open faculty review
+    </a>
+    <p class="mt-3 text-xs leading-relaxed text-muted-foreground">
+      {outcome.blockers.length} structural blockers are named there, each with
+      the role that owns it.
+    </p>
+  </section>
+</div>
