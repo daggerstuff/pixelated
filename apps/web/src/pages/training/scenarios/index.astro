@@ -1,0 +1,151 @@
+---
+// Training scenario catalog (structure only).
+//
+// This is the surface that would list and select an approved scenario. There is
+// no approved catalog: it does not exist as an artefact, and scenario names,
+// vignettes, difficulty levels, and learning objectives are an owner decision.
+// The page therefore renders the loader's explicit `not-approved` state instead
+// of a list, and renders rows only from a catalog the owner has approved.
+//
+// The data seam is `../_scenario-catalog.ts`, which validates the artefact and
+// fails closed. The authored scenario list in `src/data/scenarios.ts` is not an
+// approval and is deliberately not consumed here.
+
+import Layout from '@/layouts/Layout.astro'
+import { providerUnavailableResponse } from '@/lib/auth/provider-unavailable'
+import { resolvePageSession } from '@/lib/auth/session'
+import { loadApprovedScenarioCatalog } from '../_scenario-catalog'
+
+// One page-session read for this request, through the helper that consumes the
+// middleware's verdict. A second `getSession` / `isAuthenticated` /
+// `getCurrentUser` call would re-validate the same token (diagnosis D7).
+const { session, providerUnavailable, developer } = await resolvePageSession(
+  Astro.request,
+  Astro.locals,
+)
+
+// A developer key is not a token, so it arrives as a `none` verdict with a
+// developer identity alongside it; the portal entry point serves that caller and
+// this read-only surface does too.
+const signedIn = Boolean(session ?? developer)
+if (!signedIn) {
+  // The middleware already resolved this token. A failure here is a provider
+  // outage, not a logout.
+  if (providerUnavailable) {
+    return providerUnavailableResponse(Astro.url.pathname)
+  }
+  return Astro.redirect(
+    `/login?redirect=${encodeURIComponent('/training/scenarios')}`,
+  )
+}
+
+const catalog = loadApprovedScenarioCatalog()
+const approvedOn =
+  catalog.status === 'approved'
+    ? new Date(catalog.approval.approvedAt).toISOString().slice(0, 10)
+    : null
+---
+
+<Layout
+  title="Scenario catalog | Pixelated Empathy"
+  description="The training scenario catalog. Structure only: awaiting the approved scenario catalog."
+>
+  <div class="min-h-screen bg-background text-foreground">
+    <div class="px-4 py-12 mx-auto max-w-4xl sm:px-6">
+      <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+        Training
+      </p>
+      <h1 class="mt-3 text-3xl font-semibold text-foreground">
+        Scenario catalog
+      </h1>
+      <p class="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+        This surface lists and selects an approved training scenario. It is
+        structure only: the catalog it reads is an owner decision and has not
+        been approved.
+      </p>
+
+      {catalog.status === 'not-approved' ? (
+        <section
+          class="p-6 mt-8 border border-border bg-card"
+          aria-labelledby="catalog-blocker-heading"
+        >
+          <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            {catalog.blocker.owner}
+          </p>
+          <h2
+            id="catalog-blocker-heading"
+            class="mt-2 text-xl font-semibold text-foreground"
+          >
+            {catalog.blocker.headline}
+          </h2>
+          <p
+            class="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground"
+            role="status"
+          >
+            {catalog.blocker.detail}
+          </p>
+          <p class="mt-4 text-xs text-muted-foreground">
+            Blocker <span class="font-mono">{catalog.blocker.id}</span>
+          </p>
+        </section>
+      ) : (
+        <section class="p-6 mt-8 border border-border bg-card">
+          <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+            {catalog.approval.approvedBy}
+          </p>
+          <h2 class="mt-2 text-xl font-semibold text-foreground">
+            Approved catalog
+          </h2>
+          <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Approved {approvedOn}. Entries below are the owner's, not this
+            repository's.
+          </p>
+        </section>
+      )}
+
+      <section class="mt-8" aria-labelledby="approved-scenarios-heading">
+        <h2
+          id="approved-scenarios-heading"
+          class="text-lg font-semibold text-foreground"
+        >
+          Approved scenarios
+        </h2>
+
+        {catalog.scenarios.length > 0 ? (
+          <ul class="mt-4 border border-border bg-card divide-y divide-border">
+            {catalog.scenarios.map((scenario) => (
+              <li class="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+                <span class="text-sm font-medium text-foreground">
+                  {scenario.label}
+                </span>
+                <a
+                  href={`/training/sessions/new?scenario=${encodeURIComponent(scenario.id)}`}
+                  class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+                >
+                  Select this scenario
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p
+            class="p-6 mt-4 text-sm leading-relaxed border border-border bg-card text-muted-foreground"
+            role="status"
+          >
+            No approved scenarios are listed. Nothing appears here until the
+            clinical content owner approves a catalog.
+          </p>
+        )}
+      </section>
+
+      <nav class="pt-6 mt-10 border-t border-border">
+        <a
+          href="/training"
+          class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+        >
+          Back to training
+        </a>
+      </nav>
+    </div>
+  </div>
+</Layout>
