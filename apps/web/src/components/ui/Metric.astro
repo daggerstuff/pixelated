@@ -11,6 +11,6 @@ const { value, label, subtitle = '', class: className = '' } = Astro.props
 
 <div class={`theme-card metric-card--enhanced ${className}`.trim()}>
   <div class="metric-value--large organic-counter">{value}</div>
-  <div class="font-semibold text-white mb-1">{label}</div>
+  <div class="text-white mb-1 font-semibold">{label}</div>
   {subtitle && <div class="text-sm text-muted-foreground">{subtitle}</div>}
 </div>

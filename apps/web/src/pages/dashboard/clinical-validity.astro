@@ -1,8 +1,6 @@
 ---
 export const prerender = false
 
-import DashboardLayout from '@/layouts/DashboardLayout.astro'
-import Card from '@/components/ui/Card.astro'
 import {
   BarChart3,
   TrendingUp,
@@ -11,6 +9,9 @@ import {
   Clock,
   Activity,
 } from 'lucide-react'
+
+import Card from '@/components/ui/Card.astro'
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
 // Mock data - will be replaced with real API data
 const mockData = {
@@ -83,10 +84,10 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
   title="Clinical Validity Dashboard | Pixelated Empathy"
   description="Monitor clinical validity pass rates, per-dimension score distributions, annotation queue depth, and 7-day trends"
 >
-  <div class="container mx-auto py-6 px-4">
+  <div class="container mx-auto px-4 py-6">
     {/* Header */}
     <div class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight mb-2">
+      <h1 class="mb-2 text-3xl font-bold tracking-tight">
         Clinical Validity Dashboard
       </h1>
       <p class="text-muted-foreground">
@@ -99,16 +100,16 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
     {/* Degradation Alert */}
     {showDegradationAlert && (
       <div
-        class="mb-6 p-4 border rounded-none bg-secondary border-ring relative"
+        class="relative mb-6 rounded-none border border-ring bg-secondary p-4"
         role="alert"
         aria-labelledby="degradation-alert-title"
         aria-describedby="degradation-alert-description"
       >
         <div class="flex items-start gap-3">
           {/* Icon */}
-          <div class="flex-shrink-0 p-2 bg-secondary rounded-none">
+          <div class="flex-shrink-0 rounded-none bg-secondary p-2">
             <svg
-              class="w-5 h-5 text-foreground"
+              class="h-5 w-5 text-foreground"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg"
@@ -126,13 +127,13 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
           <div class="flex-1">
             <h3
               id="degradation-alert-title"
-              class="text-lg font-semibold text-foreground mb-1"
+              class="mb-1 text-lg font-semibold text-foreground"
             >
               Performance Degradation Detected
             </h3>
             <p
               id="degradation-alert-description"
-              class="text-muted-foreground mb-3"
+              class="mb-3 text-muted-foreground"
             >
               Clinical validity pass rate has dropped{' '}
               {degradationDetails.degradationPercentage.toFixed(1)} percentage
@@ -143,13 +144,13 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
             </p>
             <div class="flex flex-wrap gap-2">
               <button
-                class="px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-none transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+                class="hover:bg-primary/90 rounded-none bg-primary px-4 py-2 font-medium text-primary-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
                 onclick="console.log('Investigate degradation')"
               >
                 Investigate
               </button>
               <button
-                class="px-4 py-2 bg-secondary hover:bg-accent text-foreground font-medium rounded-none transition-colors border border-border focus:outline-none focus:ring-2 focus:ring-ring"
+                class="rounded-none border border-border bg-secondary px-4 py-2 font-medium text-foreground transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
                 onclick="this.closest('[role=\'alert\']').style.display = 'none'"
               >
                 Dismiss
@@ -169,10 +170,10 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
 
     {/* Error State */}
     {error && (
-      <div class="mb-6 p-4 bg-secondary border border-ring rounded-none">
-        <p class="text-foreground font-medium">Unable to load dashboard data</p>
-        <p class="text-foreground text-sm mt-1">{error}</p>
-        <p class="text-muted-foreground text-sm mt-2">
+      <div class="mb-6 rounded-none border border-ring bg-secondary p-4">
+        <p class="font-medium text-foreground">Unable to load dashboard data</p>
+        <p class="mt-1 text-sm text-foreground">{error}</p>
+        <p class="mt-2 text-sm text-muted-foreground">
           Showing mock data for demonstration. Ensure the clinical validity API
           endpoint is running.
         </p>
@@ -181,56 +182,56 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
 
     {/* Loading State */}
     {isLoading && (
-      <div class="mb-6 p-4 bg-secondary border border-border rounded-none">
-        <p class="text-foreground font-medium">Loading dashboard data...</p>
+      <div class="mb-6 rounded-none border border-border bg-secondary p-4">
+        <p class="font-medium text-foreground">Loading dashboard data...</p>
       </div>
     )}
 
     {/* Key Metrics Grid */}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
       {/* Current Pass Rate */}
       <Card class="p-6">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 bg-secondary rounded-none">
-            <TrendingUp class="w-5 h-5 text-foreground" />
+        <div class="mb-4 flex items-center gap-3">
+          <div class="rounded-none bg-secondary p-2">
+            <TrendingUp class="h-5 w-5 text-foreground" />
           </div>
           <h3 class="text-lg font-semibold">Current Pass Rate</h3>
         </div>
-        <div class="text-3xl font-bold mb-1">
+        <div class="mb-1 text-3xl font-bold">
           {(data.passRate * 100).toFixed(1)}%
         </div>
-        <p class="text-muted-foreground text-sm mb-2">Samples scoring ≥ 0.6</p>
-        <div class="text-foreground text-sm font-medium flex items-center gap-1">
-          <TrendingUp class="w-4 h-4" /> +2.1%
+        <p class="mb-2 text-sm text-muted-foreground">Samples scoring ≥ 0.6</p>
+        <div class="flex items-center gap-1 text-sm font-medium text-foreground">
+          <TrendingUp class="h-4 w-4" /> +2.1%
         </div>
       </Card>
 
       {/* Queue Depth */}
       <Card class="p-6">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 bg-secondary rounded-none">
-            <Users class="w-5 h-5 text-foreground" />
+        <div class="mb-4 flex items-center gap-3">
+          <div class="rounded-none bg-secondary p-2">
+            <Users class="h-5 w-5 text-foreground" />
           </div>
           <h3 class="text-lg font-semibold">Queue Depth</h3>
         </div>
-        <div class="text-3xl font-bold mb-1">{data.queueDepth}</div>
-        <p class="text-muted-foreground text-sm mb-2">
+        <div class="mb-1 text-3xl font-bold">{data.queueDepth}</div>
+        <p class="mb-2 text-sm text-muted-foreground">
           Samples awaiting review
         </p>
-        <div class="text-foreground text-sm font-medium flex items-center gap-1">
+        <div class="flex items-center gap-1 text-sm font-medium text-foreground">
           <span>+1</span>
         </div>
       </Card>
 
       {/* 7-Day Avg */}
       <Card class="p-6">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 bg-secondary rounded-none">
-            <Activity class="w-5 h-5 text-foreground" />
+        <div class="mb-4 flex items-center gap-3">
+          <div class="rounded-none bg-secondary p-2">
+            <Activity class="h-5 w-5 text-foreground" />
           </div>
           <h3 class="text-lg font-semibold">7-Day Avg</h3>
         </div>
-        <div class="text-3xl font-bold mb-1">
+        <div class="mb-1 text-3xl font-bold">
           {(
             (data.weeklyTrend.reduce((sum, day) => sum + day.passRate, 0) /
               data.weeklyTrend.length) *
@@ -238,42 +239,42 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
           ).toFixed(1)}
           %
         </div>
-        <p class="text-muted-foreground text-sm mb-2">
+        <p class="mb-2 text-sm text-muted-foreground">
           Weekly average pass rate
         </p>
-        <div class="text-foreground text-sm font-medium flex items-center gap-1">
-          <TrendingUp class="w-4 h-4" /> +1.5%
+        <div class="flex items-center gap-1 text-sm font-medium text-foreground">
+          <TrendingUp class="h-4 w-4" /> +1.5%
         </div>
       </Card>
 
       {/* Total Scored */}
       <Card class="p-6">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="p-2 bg-secondary rounded-none">
-            <BarChart3 class="w-5 h-5 text-foreground" />
+        <div class="mb-4 flex items-center gap-3">
+          <div class="rounded-none bg-secondary p-2">
+            <BarChart3 class="h-5 w-5 text-foreground" />
           </div>
           <h3 class="text-lg font-semibold">Total Scored</h3>
         </div>
-        <div class="text-3xl font-bold mb-1">1,247</div>
-        <p class="text-muted-foreground text-sm mb-2">Samples evaluated</p>
-        <div class="text-foreground text-sm font-medium flex items-center gap-1">
-          <TrendingUp class="w-4 h-4" /> +42
+        <div class="mb-1 text-3xl font-bold">1,247</div>
+        <p class="mb-2 text-sm text-muted-foreground">Samples evaluated</p>
+        <div class="flex items-center gap-1 text-sm font-medium text-foreground">
+          <TrendingUp class="h-4 w-4" /> +42
         </div>
       </Card>
     </div>
 
     {/* Main Content Grid */}
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Score Distribution */}
       <Card class="lg:col-span-2">
         <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
+          <div class="mb-4 flex items-center justify-between">
             <h2 class="text-xl font-semibold">
               Per-Dimension Score Distribution
             </h2>
-            <PieChart class="w-5 h-5 text-muted-foreground" />
+            <PieChart class="h-5 w-5 text-muted-foreground" />
           </div>
-          <p class="text-muted-foreground mb-6">
+          <p class="mb-6 text-muted-foreground">
             Breakdown across 6 clinical validity dimensions
           </p>
 
@@ -288,11 +289,11 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
 
                 return (
                   <div>
-                    <div class="flex justify-between text-sm mb-1">
+                    <div class="mb-1 flex justify-between text-sm">
                       <span class="font-medium capitalize">{dimension}</span>
                       <span class="font-mono">{scorePercent}%</span>
                     </div>
-                    <div class="h-2 bg-surface rounded-none overflow-hidden">
+                    <div class="bg-surface h-2 overflow-hidden rounded-none">
                       <div
                         class={`h-full ${colorClass} rounded-none transition-all duration-500`}
                         style={`width: ${width}`}
@@ -309,32 +310,32 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       {/* Queue Status */}
       <Card>
         <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
+          <div class="mb-4 flex items-center justify-between">
             <h2 class="text-xl font-semibold">Annotation Queue</h2>
-            <Clock class="w-5 h-5 text-muted-foreground" />
+            <Clock class="h-5 w-5 text-muted-foreground" />
           </div>
 
-          <div class="text-center mb-6">
-            <div class="text-5xl font-bold mb-2">{data.queueDepth}</div>
+          <div class="mb-6 text-center">
+            <div class="mb-2 text-5xl font-bold">{data.queueDepth}</div>
             <p class="text-muted-foreground">samples awaiting review</p>
           </div>
 
           <div class="space-y-3">
-            <div class="flex justify-between items-center">
+            <div class="flex items-center justify-between">
               <span class="text-sm">High priority</span>
               <span class="font-semibold">3</span>
             </div>
-            <div class="flex justify-between items-center">
+            <div class="flex items-center justify-between">
               <span class="text-sm">Medium priority</span>
               <span class="font-semibold">7</span>
             </div>
-            <div class="flex justify-between items-center">
+            <div class="flex items-center justify-between">
               <span class="text-sm">Low priority</span>
               <span class="font-semibold">4</span>
             </div>
           </div>
 
-          <button class="w-full mt-6 bg-accent hover:bg-accent-hover text-foreground font-medium py-2.5 px-4 rounded-none transition-colors">
+          <button class="hover:bg-accent-hover mt-6 w-full rounded-none bg-accent px-4 py-2.5 font-medium text-foreground transition-colors">
             Review Next Sample
           </button>
         </div>
@@ -344,11 +345,11 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
     {/* 7-Day Trend */}
     <Card class="mb-8">
       <div class="p-6">
-        <div class="flex items-center justify-between mb-4">
+        <div class="mb-4 flex items-center justify-between">
           <h2 class="text-xl font-semibold">7-Day Trend</h2>
-          <BarChart3 class="w-5 h-5 text-muted-foreground" />
+          <BarChart3 class="h-5 w-5 text-muted-foreground" />
         </div>
-        <p class="text-muted-foreground mb-6">
+        <p class="mb-6 text-muted-foreground">
           Pass rate and queue depth trends over the past week
         </p>
 
@@ -356,10 +357,10 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
           <table class="w-full">
             <thead>
               <tr class="border-b border-border">
-                <th class="text-left py-3 px-4 font-medium">Date</th>
-                <th class="text-left py-3 px-4 font-medium">Pass Rate</th>
-                <th class="text-left py-3 px-4 font-medium">Queue Depth</th>
-                <th class="text-left py-3 px-4 font-medium">Status</th>
+                <th class="px-4 py-3 text-left font-medium">Date</th>
+                <th class="px-4 py-3 text-left font-medium">Pass Rate</th>
+                <th class="px-4 py-3 text-left font-medium">Queue Depth</th>
+                <th class="px-4 py-3 text-left font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -378,11 +379,11 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
                 }
 
                 return (
-                  <tr class="border-b border-border last:border-0 hover:bg-surface/50">
-                    <td class="py-3 px-4">{day.date}</td>
-                    <td class="py-3 px-4 font-mono">{passRatePercent}%</td>
-                    <td class="py-3 px-4">{day.queueDepth}</td>
-                    <td class={`py-3 px-4 font-medium ${statusColor}`}>
+                  <tr class="hover:bg-surface/50 border-b border-border last:border-0">
+                    <td class="px-4 py-3">{day.date}</td>
+                    <td class="px-4 py-3 font-mono">{passRatePercent}%</td>
+                    <td class="px-4 py-3">{day.queueDepth}</td>
+                    <td class={`px-4 py-3 font-medium ${statusColor}`}>
                       {status}
                     </td>
                   </tr>
@@ -397,13 +398,13 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
     {/* Info Panel */}
     <Card class="bg-surface/50">
       <div class="p-6">
-        <h3 class="text-lg font-semibold mb-3">
+        <h3 class="mb-3 text-lg font-semibold">
           About Clinical Validity Scoring
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
           <div>
-            <h4 class="font-medium mb-2">6 Dimensions</h4>
-            <ul class="text-sm text-muted-foreground space-y-1">
+            <h4 class="mb-2 font-medium">6 Dimensions</h4>
+            <ul class="space-y-1 text-sm text-muted-foreground">
               <li>• Technique: Therapeutic modality detection</li>
               <li>• Alliance: Collaboration & validation</li>
               <li>• Structure: Assessment & planning</li>
@@ -413,8 +414,8 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
             </ul>
           </div>
           <div>
-            <h4 class="font-medium mb-2">Scoring Thresholds</h4>
-            <ul class="text-sm text-muted-foreground space-y-1">
+            <h4 class="mb-2 font-medium">Scoring Thresholds</h4>
+            <ul class="space-y-1 text-sm text-muted-foreground">
               <li>• Accept: ≥ 0.6 (pass through)</li>
               <li>• Borderline: 0.4 - 0.6 (needs review)</li>
               <li>• Reject: &lt; 0.4 (filtered out)</li>
@@ -422,8 +423,8 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
             </ul>
           </div>
           <div>
-            <h4 class="font-medium mb-2">Data Sources</h4>
-            <ul class="text-sm text-muted-foreground space-y-1">
+            <h4 class="mb-2 font-medium">Data Sources</h4>
+            <ul class="space-y-1 text-sm text-muted-foreground">
               <li>• ClinicalValidityScorer v4</li>
               <li>• 241 pre-labeled validation samples</li>
               <li>• SDG pipeline outputs</li>

@@ -1,11 +1,13 @@
 ---
 export const prerender = false
+import { Icon } from 'astro-icon/components'
+
 // data-transfer.astro
 // Admin page for managing data transfers, portability, and audit logs
 import AdminLayout from '@/layouts/AdminLayout.astro'
+
 import DataPortabilitySystem from '../../components/admin/DataPortabilitySystem.astro'
 import TransferAuditLog from '../../components/admin/TransferAuditLog.astro'
-import { Icon } from 'astro-icon/components'
 
 // Guard: page-level auth prevents AdminLayout ResponseSentError (PIXEL-ASTRO-S).
 // Layouts cannot safely `return Astro.redirect()` — it would render into the
@@ -71,7 +73,7 @@ const getTrendClass = (trend: string) => {
 <AdminLayout {title} {description} activeItem="data-transfer">
   <div class="space-y-6">
     <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-foreground">{title}</h1>
         <p class="mt-1 text-muted-foreground">
@@ -82,48 +84,48 @@ const getTrendClass = (trend: string) => {
       <div class="flex items-center gap-3">
         <button
           type="button"
-          class="px-4 py-2 bg-primary text-white rounded-none hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
+          class="text-white flex items-center rounded-none bg-primary px-4 py-2 hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <Icon name="file-export" class="w-5 h-5 mr-2" />
+          <Icon name="file-export" class="mr-2 h-5 w-5" />
           Export Audit Logs
         </button>
 
         <button
           type="button"
-          class="px-4 py-2 border border-input text-foreground rounded-none hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
+          class="flex items-center rounded-none border border-input px-4 py-2 text-foreground hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <Icon name="refresh" class="w-5 h-5 mr-2" />
+          <Icon name="refresh" class="mr-2 h-5 w-5" />
           Refresh
         </button>
       </div>
     </div>
 
     <!-- Metrics Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {metrics.map((metric) => (
-        <div class="bg-card rounded-none p-5">
-          <div class="flex justify-between items-start">
+        <div class="rounded-none bg-card p-5">
+          <div class="flex items-start justify-between">
             <div>
               <p class="text-sm font-medium text-muted-foreground">
                 {metric.label}
               </p>
-              <p class="text-2xl font-bold text-foreground mt-1">
+              <p class="mt-1 text-2xl font-bold text-foreground">
                 {metric.value}
               </p>
             </div>
             <div
-              class={`p-3 rounded-none bg-${metric.trend === 'up' ? 'green' : 'red'}-100 === 'up' ? 'green' : 'red'}-900/20`}
+              class={`rounded-none p-3 bg-${metric.trend === 'up' ? 'green' : 'red'}-100 === 'up' ? 'green' : 'red'}-900/20`}
             >
               <Icon
                 name={metric.icon}
-                class={`w-6 h-6 ${getTrendClass(metric.trend)}`}
+                class={`h-6 w-6 ${getTrendClass(metric.trend)}`}
               />
             </div>
           </div>
-          <div class={`flex items-center mt-4 ${getTrendClass(metric.trend)}`}>
+          <div class={`mt-4 flex items-center ${getTrendClass(metric.trend)}`}>
             <Icon
               name={metric.trend === 'up' ? 'trending-up' : 'trending-down'}
-              class="w-4 h-4 mr-1"
+              class="mr-1 h-4 w-4"
             />
             <span class="text-sm font-medium">
               {metric.change} from last month
@@ -134,13 +136,13 @@ const getTrendClass = (trend: string) => {
     </div>
 
     <!-- Main Content Tabs -->
-    <div class="bg-card rounded-none overflow-hidden">
+    <div class="overflow-hidden rounded-none bg-card">
       <div class="border-b border-border">
         <nav class="flex space-x-2 px-4" aria-label="Tabs">
           <button
             id="tab-data-portability"
             type="button"
-            class="py-4 px-1 border-b-2 border-ring text-foreground font-medium text-sm"
+            class="border-b-2 border-ring px-1 py-4 text-sm font-medium text-foreground"
             aria-selected="true"
           >
             Data Portability
@@ -148,7 +150,7 @@ const getTrendClass = (trend: string) => {
           <button
             id="tab-audit-logs"
             type="button"
-            class="py-4 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-input font-medium text-sm"
+            class="border-transparent border-b-2 px-1 py-4 text-sm font-medium text-muted-foreground hover:border-input hover:text-foreground"
             aria-selected="false"
           >
             Audit Logs
@@ -156,7 +158,7 @@ const getTrendClass = (trend: string) => {
           <button
             id="tab-settings"
             type="button"
-            class="py-4 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-input font-medium text-sm"
+            class="border-transparent border-b-2 px-1 py-4 text-sm font-medium text-muted-foreground hover:border-input hover:text-foreground"
             aria-selected="false"
           >
             Settings
@@ -178,8 +180,8 @@ const getTrendClass = (trend: string) => {
 
         <!-- Settings Panel (Initially Hidden) -->
         <div id="panel-settings" class="hidden">
-          <div class="p-6 bg-card rounded-none">
-            <h2 class="text-2xl font-bold text-foreground mb-4">
+          <div class="rounded-none bg-card p-6">
+            <h2 class="mb-4 text-2xl font-bold text-foreground">
               Data Transfer Settings
             </h2>
 
@@ -190,32 +192,32 @@ const getTrendClass = (trend: string) => {
                   Encryption Settings
                 </h3>
 
-                <div class="flex items-center justify-between py-2 border-b border-border">
+                <div class="flex items-center justify-between border-b border-border py-2">
                   <div>
                     <p class="font-medium">End-to-End Encryption</p>
                     <p class="text-sm text-muted-foreground">
                       Apply FHE to all data transfers
                     </p>
                   </div>
-                  <div class="relative inline-flex items-center cursor-pointer">
+                  <div class="relative inline-flex cursor-pointer items-center">
                     <input
                       type="checkbox"
                       id="encryption-toggle"
                       checked
-                      class="sr-only peer"
+                      class="peer sr-only"
                     />
-                    <div class="w-11 h-6 bg-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    <div class="peer-checked:after:border-white peer h-6 w-11 rounded-none bg-secondary after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-none after:border after:border-input after:bg-card after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring"></div>
                   </div>
                 </div>
 
-                <div class="flex items-center justify-between py-2 border-b border-border">
+                <div class="flex items-center justify-between border-b border-border py-2">
                   <div>
                     <p class="font-medium">Key Rotation Period</p>
                     <p class="text-sm text-muted-foreground">
                       Automatically rotate encryption keys
                     </p>
                   </div>
-                  <select class="bg-secondary border border-input text-foreground text-sm rounded-none focus:ring-ring focus:border-ring block p-2 border border-input">
+                  <select class="block rounded-none border border-input bg-secondary p-2 text-sm text-foreground focus:border-ring focus:ring-ring">
                     <option value="30">30 days</option>
                     <option value="60">60 days</option>
                     <option value="90" selected>
@@ -232,7 +234,7 @@ const getTrendClass = (trend: string) => {
                   Access Control
                 </h3>
 
-                <div class="flex items-center justify-between py-2 border-b border-border">
+                <div class="flex items-center justify-between border-b border-border py-2">
                   <div>
                     <p class="font-medium">
                       Two-Factor Authentication for Transfers
@@ -241,18 +243,18 @@ const getTrendClass = (trend: string) => {
                       Require 2FA for all data transfers
                     </p>
                   </div>
-                  <div class="relative inline-flex items-center cursor-pointer">
+                  <div class="relative inline-flex cursor-pointer items-center">
                     <input
                       type="checkbox"
                       id="tfa-toggle"
                       checked
-                      class="sr-only peer"
+                      class="peer sr-only"
                     />
-                    <div class="w-11 h-6 bg-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    <div class="peer-checked:after:border-white peer h-6 w-11 rounded-none bg-secondary after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-none after:border after:border-input after:bg-card after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring"></div>
                   </div>
                 </div>
 
-                <div class="flex items-center justify-between py-2 border-b border-border">
+                <div class="flex items-center justify-between border-b border-border py-2">
                   <div>
                     <p class="font-medium">Allowed Export Formats</p>
                     <p class="text-sm text-muted-foreground">
@@ -262,7 +264,7 @@ const getTrendClass = (trend: string) => {
                   <select
                     multiple
                     size="3"
-                    class="bg-secondary border border-input text-foreground text-sm rounded-none focus:ring-ring focus:border-ring block p-2 border border-input"
+                    class="block rounded-none border border-input bg-secondary p-2 text-sm text-foreground focus:border-ring focus:ring-ring"
                   >
                     <option value="json" selected>
                       JSON
@@ -289,14 +291,14 @@ const getTrendClass = (trend: string) => {
                   Audit Settings
                 </h3>
 
-                <div class="flex items-center justify-between py-2 border-b border-border">
+                <div class="flex items-center justify-between border-b border-border py-2">
                   <div>
                     <p class="font-medium">Log Retention Period</p>
                     <p class="text-sm text-muted-foreground">
                       Set how long audit logs are retained
                     </p>
                   </div>
-                  <select class="bg-secondary border border-input text-foreground text-sm rounded-none focus:ring-ring focus:border-ring block p-2 border border-input">
+                  <select class="block rounded-none border border-input bg-secondary p-2 text-sm text-foreground focus:border-ring focus:ring-ring">
                     <option value="180">6 months</option>
                     <option value="365">1 year</option>
                     <option value="730" selected>
@@ -306,21 +308,21 @@ const getTrendClass = (trend: string) => {
                   </select>
                 </div>
 
-                <div class="flex items-center justify-between py-2 border-b border-border">
+                <div class="flex items-center justify-between border-b border-border py-2">
                   <div>
                     <p class="font-medium">Suspicious Activity Alerts</p>
                     <p class="text-sm text-muted-foreground">
                       Notify admins about unusual transfer patterns
                     </p>
                   </div>
-                  <div class="relative inline-flex items-center cursor-pointer">
+                  <div class="relative inline-flex cursor-pointer items-center">
                     <input
                       type="checkbox"
                       id="alerts-toggle"
                       checked
-                      class="sr-only peer"
+                      class="peer sr-only"
                     />
-                    <div class="w-11 h-6 bg-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                    <div class="peer-checked:after:border-white peer h-6 w-11 rounded-none bg-secondary after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-none after:border after:border-input after:bg-card after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring"></div>
                   </div>
                 </div>
               </div>
@@ -329,7 +331,7 @@ const getTrendClass = (trend: string) => {
               <div class="mt-6">
                 <button
                   type="button"
-                  class="px-4 py-2 bg-primary text-white rounded-none hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  class="text-white rounded-none bg-primary px-4 py-2 hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
                   Save Settings
                 </button>

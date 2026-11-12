@@ -1,6 +1,7 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import { ChartBar, Dumbbell, Target } from 'lucide-react'
+
+import BaseLayout from '@/layouts/BaseLayout.astro'
 import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
 ---
 
@@ -8,13 +9,13 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
   title="Treatment Plan Management - Pixelated Empathy"
   description="Comprehensive treatment plan management system for therapists and patients"
 >
-  <section class="container mx-auto py-8 px-4">
-    <div class="max-w-7xl mx-auto">
-      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center">
+  <section class="container mx-auto px-4 py-8">
+    <div class="mx-auto max-w-7xl">
+      <h1 class="mb-6 text-center text-3xl font-bold md:text-4xl">
         Treatment Plan Management
       </h1>
 
-      <div class="prose dark:prose-invert max-w-none mb-8 text-center">
+      <div class="prose dark:prose-invert mb-8 max-w-none text-center">
         <p class="text-xl">
           Comprehensive treatment planning system with goal tracking, milestone
           management, and progress monitoring for effective therapy outcomes.
@@ -31,12 +32,12 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
       </div>
 
       <!-- Features Overview -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-        <div class="bg-card border border-border rounded-none p-6">
-          <div class="text-3xl mb-4 text-center">
-            <Target className="w-12 h-12" />
+      <div class="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-none border border-border bg-card p-6">
+          <div class="mb-4 text-center text-3xl">
+            <Target className="h-12 w-12" />
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-center">
+          <h3 class="mb-3 text-center text-xl font-semibold">
             Goal Management
           </h3>
           <ul class="space-y-2 text-sm">
@@ -48,9 +49,9 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
           </ul>
         </div>
 
-        <div class="bg-card border border-border rounded-none p-6">
-          <div class="text-3xl mb-4 text-center">📋</div>
-          <h3 class="text-xl font-semibold mb-3 text-center">
+        <div class="rounded-none border border-border bg-card p-6">
+          <div class="mb-4 text-center text-3xl">📋</div>
+          <h3 class="mb-3 text-center text-xl font-semibold">
             Milestone Tracking
           </h3>
           <ul class="space-y-2 text-sm">
@@ -62,11 +63,11 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
           </ul>
         </div>
 
-        <div class="bg-card border border-border rounded-none p-6">
-          <div class="text-3xl mb-4 text-center">
-            <ChartBar className="w-12 h-12" />
+        <div class="rounded-none border border-border bg-card p-6">
+          <div class="mb-4 text-center text-3xl">
+            <ChartBar className="h-12 w-12" />
           </div>
-          <h3 class="text-xl font-semibold mb-3 text-center">
+          <h3 class="mb-3 text-center text-xl font-semibold">
             Progress Analytics
           </h3>
           <ul class="space-y-2 text-sm">
@@ -80,44 +81,44 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
       </div>
 
       <!-- Clinical Categories -->
-      <div class="bg-card border border-border rounded-none p-6 mb-8">
-        <h2 class="text-2xl font-bold mb-6 text-center">
+      <div class="mb-8 rounded-none border border-border bg-card p-6">
+        <h2 class="mb-6 text-center text-2xl font-bold">
           Treatment Categories
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div class="text-center p-4 bg-card border border-border rounded-none">
-            <div class="text-3xl mb-2">
-              <Target className="w-8 h-8" />
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-5">
+          <div class="rounded-none border border-border bg-card p-4 text-center">
+            <div class="mb-2 text-3xl">
+              <Target className="h-8 w-8" />
             </div>
             <h4 class="font-semibold">Behavioral</h4>
             <p class="text-sm text-muted-foreground">
               Behavior modification and habit formation goals
             </p>
           </div>
-          <div class="text-center p-4 bg-card border border-border rounded-none">
-            <div class="text-3xl mb-2">🧠</div>
+          <div class="rounded-none border border-border bg-card p-4 text-center">
+            <div class="mb-2 text-3xl">🧠</div>
             <h4 class="font-semibold">Cognitive</h4>
             <p class="text-sm text-muted-foreground">
               Thought pattern restructuring and cognitive therapy
             </p>
           </div>
-          <div class="text-center p-4 bg-card border border-border rounded-none">
-            <div class="text-3xl mb-2">❤️</div>
+          <div class="rounded-none border border-border bg-card p-4 text-center">
+            <div class="mb-2 text-3xl">❤️</div>
             <h4 class="font-semibold">Emotional</h4>
             <p class="text-sm text-muted-foreground">
               Emotional regulation and awareness development
             </p>
           </div>
-          <div class="text-center p-4 bg-card border border-border rounded-none">
-            <div class="text-3xl mb-2">👥</div>
+          <div class="rounded-none border border-border bg-card p-4 text-center">
+            <div class="mb-2 text-3xl">👥</div>
             <h4 class="font-semibold">Social</h4>
             <p class="text-sm text-muted-foreground">
               Relationship building and social skills enhancement
             </p>
           </div>
-          <div class="text-center p-4 bg-card border border-border rounded-none">
-            <div class="text-3xl mb-2">
-              <Dumbbell className="w-8 h-8" />
+          <div class="rounded-none border border-border bg-card p-4 text-center">
+            <div class="mb-2 text-3xl">
+              <Dumbbell className="h-8 w-8" />
             </div>
             <h4 class="font-semibold">Physical</h4>
             <p class="text-sm text-muted-foreground">
@@ -128,11 +129,11 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
       </div>
 
       <!-- Workflow Integration -->
-      <div class="bg-secondary rounded-none p-6 mb-8">
-        <h2 class="text-2xl font-bold mb-4">Clinical Workflow Integration</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="mb-8 rounded-none bg-secondary p-6">
+        <h2 class="mb-4 text-2xl font-bold">Clinical Workflow Integration</h2>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <h3 class="text-lg font-semibold mb-3 text-foreground">
+            <h3 class="mb-3 text-lg font-semibold text-foreground">
               For Therapists
             </h3>
             <ul class="space-y-2 text-sm">
@@ -144,7 +145,7 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
             </ul>
           </div>
           <div>
-            <h3 class="text-lg font-semibold mb-3 text-foreground">
+            <h3 class="mb-3 text-lg font-semibold text-foreground">
               For Patients
             </h3>
             <ul class="space-y-2 text-sm">
@@ -159,35 +160,35 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
       </div>
 
       <!-- Technical Features -->
-      <div class="bg-secondary rounded-none p-6 mb-8">
-        <h2 class="text-2xl font-bold mb-6 text-center">
+      <div class="mb-8 rounded-none bg-secondary p-6">
+        <h2 class="mb-6 text-center text-2xl font-bold">
           Technical Capabilities
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <div class="text-center">
-            <div class="text-2xl mb-2">🔒</div>
+            <div class="mb-2 text-2xl">🔒</div>
             <h4 class="font-semibold">Synthetic Practice Data</h4>
             <p class="text-sm text-muted-foreground">
               Built for synthetic scenarios, not real client records
             </p>
           </div>
           <div class="text-center">
-            <div class="text-2xl mb-2">📱</div>
+            <div class="mb-2 text-2xl">📱</div>
             <h4 class="font-semibold">Mobile Ready</h4>
             <p class="text-sm text-muted-foreground">
               Responsive design for all devices
             </p>
           </div>
           <div class="text-center">
-            <div class="text-2xl mb-2">🔄</div>
+            <div class="mb-2 text-2xl">🔄</div>
             <h4 class="font-semibold">Real-time Sync</h4>
             <p class="text-sm text-muted-foreground">
               Instant updates across platforms
             </p>
           </div>
           <div class="text-center">
-            <div class="text-2xl mb-2">
-              <ChartBar className="w-6 h-6" />
+            <div class="mb-2 text-2xl">
+              <ChartBar className="h-6 w-6" />
             </div>
             <h4 class="font-semibold">Analytics Ready</h4>
             <p class="text-sm text-muted-foreground">
@@ -199,10 +200,10 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
 
       <!-- Call to Action -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold mb-4">
+        <h2 class="mb-4 text-2xl font-bold">
           Ready to Transform Your Practice?
         </h2>
-        <p class="text-muted-foreground mb-6 max-w-2xl mx-auto">
+        <p class="mx-auto mb-6 max-w-2xl text-muted-foreground">
           Start using our comprehensive treatment planning system to improve
           patient outcomes, streamline workflows, and enhance the therapeutic
           relationship.
@@ -210,19 +211,19 @@ import { DynamicTreatmentPlanManager } from '@/lib/utils/dynamic-components'
         <div class="flex justify-center space-x-4">
           <a
             href="/dashboard"
-            class="px-6 py-3 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
+            class="hover:bg-primary/90 rounded-none bg-primary px-6 py-3 text-primary-foreground transition-colors"
           >
             Start Planning
           </a>
           <a
             href="/demo-hub"
-            class="px-6 py-3 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
+            class="hover:bg-primary/90 rounded-none bg-primary px-6 py-3 text-primary-foreground transition-colors"
           >
             View Demo
           </a>
           <a
             href="/components"
-            class="px-6 py-3 bg-secondary text-foreground rounded-none hover:bg-accent transition-colors"
+            class="rounded-none bg-secondary px-6 py-3 text-foreground transition-colors hover:bg-accent"
           >
             All Components
           </a>

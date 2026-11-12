@@ -92,10 +92,22 @@ const mobileBlock = mediaBlock('max-width: 768px')
 
 /** The composer block: the container that holds the textarea and the button. */
 const composer = (() => {
-  const start = sessionPage.indexOf('<div class="border-t border-border p-4')
-  const end = sessionPage.indexOf('</main>', start)
-  return start === -1 ? '' : sessionPage.slice(start, end)
+  // The innermost `border-t border-border` container: the composer. Matched on
+  // the leading pair only, because the formatter sorts the rest of the class
+  // attribute.
+  const start = sessionPage.lastIndexOf('<div class="border-t border-border')
+  const end = start === -1 ? -1 : sessionPage.indexOf('</main>', start)
+  return start === -1 || end === -1 ? '' : sessionPage.slice(start, end)
 })()
+
+/**
+ * The `class` attribute of the first element that carries `className`.
+ *
+ * Utilities are read as a token set rather than a literal string: the formatter
+ * sorts class attributes, so their order is not part of what these guards pin.
+ */
+const classAttributeOf = (source: string, className: string): string =>
+  source.match(new RegExp(`class="([^"]*\\b${className}\\b[^"]*)"`))?.[1] ?? ''
 
 const sendButton = (() => {
   const start = sessionPage.indexOf('id="send-message"')
@@ -168,7 +180,9 @@ describe('training session transcript: scrolls instead of pushing the composer',
     // scroll it, which is how the harness reached a composer a pointer could
     // not. `clip` is not scrollable at all.
     expect(sessionPage).not.toMatch(/flex-1 flex overflow-hidden/)
-    expect(sessionPage).toMatch(/flex-1 flex session-panes/)
+    expect(classAttributeOf(sessionPage, 'session-panes').split(/\s+/)).toEqual(
+      expect.arrayContaining(['flex-1', 'flex', 'session-panes']),
+    )
     expect(declares(desktopBlock, '.session-panes', /overflow:\s*clip/)).toBe(
       true,
     )
@@ -197,7 +211,9 @@ describe('design system on the composer', () => {
   it('keeps a 44px send target', () => {
     // px-6 py-3 around a 20px icon: 24px of padding plus the glyph clears the
     // 44px floor at every width (measured 128px desktop, 44px at 320px).
-    expect(sendButton).toMatch(/px-6 py-3/)
-    expect(sendButton).toMatch(/w-5 h-5/)
+    // Each utility is asserted on its own because the formatter sorts them.
+    for (const className of ['px-6', 'py-3', 'w-5', 'h-5']) {
+      expect(sendButton).toMatch(new RegExp(`\\b${className}\\b`))
+    }
   })
 })

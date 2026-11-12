@@ -45,7 +45,7 @@ export interface SelectProps {
       for={(Astro.props as any).id || (Astro.props as any).name}
     >
       {(Astro.props as any).label}
-      {(Astro.props as any).required && <span class="text-accent ml-1">*</span>}
+      {(Astro.props as any).required && <span class="ml-1 text-accent">*</span>}
     </label>
     <input
       type={(Astro.props as any).type || 'text'}

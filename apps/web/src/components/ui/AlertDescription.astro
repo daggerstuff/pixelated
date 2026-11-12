@@ -1,5 +1,6 @@
 ---
 import type { HTMLAttributes } from 'astro/types'
+
 import { cn } from '../../lib/utils'
 
 type Props = HTMLAttributes<'div'>
@@ -7,6 +8,6 @@ type Props = HTMLAttributes<'div'>
 const { class: className, ...attrs } = Astro.props
 ---
 
-<div class={cn('text-sm mt-1', className)} {...attrs}>
+<div class={cn('mt-1 text-sm', className)} {...attrs}>
   <slot />
 </div>

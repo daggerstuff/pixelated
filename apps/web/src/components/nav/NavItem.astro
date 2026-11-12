@@ -1,8 +1,7 @@
 ---
 import Link from '@/components/base/Link.astro'
-import { resolvePath } from '@/utils/path'
-
 import type { InternalNav, SocialLink } from '@/types'
+import { resolvePath } from '@/utils/path'
 
 type Props =
   | {
@@ -36,9 +35,9 @@ const ariaCurrent =
     mobileItemType === 'text' ? (
       (item.displayMode === 'alwaysText' ||
         item.displayMode === 'iconToTextOnMobile') && (
-        <li class="block py-3 border-b b-[var(--c-scrollbar)] leading-6">
+        <li class="b-[var(--c-scrollbar)] block border-b py-3 leading-6">
           <Link
-            class="block op-50! op-transition"
+            class="op-50! op-transition block"
             {href}
             title={item.title}
             {rel}
@@ -53,7 +52,7 @@ const ariaCurrent =
       (item.displayMode === 'alwaysIcon' ||
         item.displayMode === 'textToIconOnMobile') && (
         <Link
-          class="block op-50! op-transition"
+          class="op-50! op-transition block"
           {href}
           title={item.title}
           {rel}

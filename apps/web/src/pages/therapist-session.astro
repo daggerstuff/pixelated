@@ -1,6 +1,6 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import MemoryAwareChatSystem from '@/components/chat/MemoryAwareChatSystem'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 
 export const prerender = false
 const sessionId = Astro.url.searchParams.get('sessionId') || undefined

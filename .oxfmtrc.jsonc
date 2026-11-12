@@ -10,6 +10,13 @@
   "trailingComma": "all",
   "insertFinalNewline": true,
   "proseWrap": "preserve",
+
+  // `.astro` formatting is opt-in upstream. It needs `@astrojs/compiler-rs` at
+  // runtime (oxfmt does not bundle it); that package currently arrives
+  // transitively via `prettier-plugin-astro`, so it must not be dropped from
+  // package.json until it is added as a direct devDependency.
+  "astro": true,
+
   "sortImports": {
     "groups": [
       "builtin",

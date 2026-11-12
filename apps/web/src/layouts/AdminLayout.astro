@@ -1,14 +1,17 @@
 ---
-import { SITE } from '../config'
+import SpeedInsights from '@vercel/speed-insights/astro'
+import { ClientRouter } from 'astro:transitions'
+
+import { ADMIN_NAV_ITEMS } from '@/components/admin/admin-nav'
+import AdminSidebarNav from '@/components/admin/AdminSidebarNav.astro'
+import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
 import { isAuthenticated, hasAdminRole } from '@/lib/auth/authUtils'
 import { getUser } from '@/lib/auth/sessionUtils'
-import { ClientRouter } from 'astro:transitions'
-import AdminSidebarNav from '@/components/admin/AdminSidebarNav.astro'
+
+import { SITE } from '../config'
+
 import '@/lib/fonts'
 import '@/styles/np-tokens.css'
-import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
-import { ADMIN_NAV_ITEMS } from '@/components/admin/admin-nav'
-import SpeedInsights from '@vercel/speed-insights/astro'
 
 interface Props {
   title?: string
@@ -86,7 +89,7 @@ if (!isAuthorized) {
       <!-- Skip to content link for accessibility -->
       <a
         href="#main-content"
-        class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 rounded-md focus:shadow-lg transition-transform"
+        class="sr-only rounded-md transition-transform focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:px-4 focus:py-2 focus:shadow-lg"
         style="background: var(--accent-primary); color: var(--bg-primary);"
       >
         Skip to content
@@ -95,7 +98,7 @@ if (!isAuthorized) {
         <!-- Sidebar -->
         <aside
           id="admin-sidebar"
-          class="w-64 hidden md:block glass-panel"
+          class="glass-panel hidden w-64 md:block"
           style="border-right: 1px solid var(--border-primary);"
         >
           <div class="p-6">
@@ -118,19 +121,19 @@ if (!isAuthorized) {
 
         <!-- Main Content -->
         <main
-          class="flex-1 overflow-x-hidden overflow-y-auto"
+          class="flex-1 overflow-y-auto overflow-x-hidden"
           id="main-content"
           style="background: var(--bg-primary);"
         >
           <!-- Top Navigation -->
           <header
-            class="glass-panel py-4 px-6"
+            class="glass-panel px-6 py-4"
             style="border-bottom: 1px solid var(--border-primary);"
           >
             <div class="flex items-center justify-between">
               <button
                 id="mobile-menu-button"
-                class="md:hidden text-muted-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring"
+                class="text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:hidden"
                 aria-label="Toggle navigation menu"
                 aria-controls="admin-sidebar"
                 aria-expanded="false"
@@ -153,7 +156,7 @@ if (!isAuthorized) {
 
               <div class="flex items-center">
                 <button
-                  class="text-muted-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring mr-4"
+                  class="mr-4 text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   aria-label="Notifications"
                 >
                   <svg
@@ -173,7 +176,7 @@ if (!isAuthorized) {
                 </button>
 
                 <div class="relative">
-                  <button class="flex items-center text-foreground focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring">
+                  <button class="flex items-center text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                     <img
                       class="h-8 w-8 rounded-full object-cover"
                       src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff"
@@ -182,7 +185,7 @@ if (!isAuthorized) {
                     <span class="ml-2">Admin</span>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      class="h-5 w-5 ml-1"
+                      class="ml-1 h-5 w-5"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >

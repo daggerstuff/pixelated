@@ -144,12 +144,12 @@ benefits for all stakeholders in mental health education **Key Points:**
 ---
 // ExplainerGraphic.astro
 interface Props {
-  graphic: string;
-  alt: string;
-  maxWidth?: string;
+  graphic: string
+  alt: string
+  maxWidth?: string
 }
 
-const { graphic, alt, maxWidth = "1200px" } = Astro.props;
+const { graphic, alt, maxWidth = '1200px' } = Astro.props
 ---
 
 <div class="explainer-container">

@@ -1,9 +1,8 @@
 ---
 import Link from '@/components/base/Link.astro'
-import { ensureTrailingSlash, resolvePath } from '@/utils/path'
 import { UI } from '@/config'
-
 import type { Tabs } from '@/types'
+import { ensureTrailingSlash, resolvePath } from '@/utils/path'
 
 interface Props {
   subtitle?: string
@@ -21,7 +20,7 @@ const isActive = (href: string) => currentPath === resolvePath(href)
   <nav id="nav-tabs" class="prose mx-auto mb-8" aria-label="Page sections">
     <div
       u-flex="~ gap-3 lt-sm:(col wrap gap-1)"
-      class="mb-0 text-3xl select-none"
+      class="mb-0 select-none text-3xl"
       role="tablist"
     >
       {tabs.map((tab) => (

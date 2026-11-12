@@ -1,6 +1,6 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import LiveRegionDemoReact from '@/components/accessibility/LiveRegionDemo'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 
 // Define demo sections
 const sections = [
@@ -44,10 +44,10 @@ const sections = [
 ---
 
 <BaseLayout title="Live Region Demo">
-  <div class="max-w-4xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6 text-center">Live Region System Demo</h1>
+  <div class="mx-auto max-w-4xl px-4 py-8">
+    <h1 class="mb-6 text-center text-3xl font-bold">Live Region System Demo</h1>
 
-    <p class="mb-8 text-lg text-center">
+    <p class="mb-8 text-center text-lg">
       This page demonstrates the Live Region System for screen reader
       announcements. Click the buttons below to trigger various types of
       announcements.
@@ -57,17 +57,17 @@ const sections = [
       </span>
     </p>
 
-    <div class="grid gap-10 mb-10">
+    <div class="mb-10 grid gap-10">
       {sections.map((section) => (
-        <section class="border border-border/40 rounded-lg p-6 bg-card/50">
-          <h2 class="text-xl font-semibold mb-3">{section.title}</h2>
+        <section class="border-border/40 bg-card/50 rounded-lg border p-6">
+          <h2 class="mb-3 text-xl font-semibold">{section.title}</h2>
           <p class="mb-5 text-muted-foreground">{section.description}</p>
 
           <div class="grid gap-3">
             {section.examples.map((example) => (
-              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <button
-                  class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-md"
+                  class="hover:bg-secondary/90 rounded-md bg-secondary px-4 py-2 text-secondary-foreground"
                   onclick={`window.LiveRegionSystem.${
                     section.title.startsWith('Status')
                       ? 'announceStatus'
@@ -86,8 +86,8 @@ const sections = [
         </section>
       ))}
 
-      <section class="border border-border/40 rounded-lg p-6 bg-card/50">
-        <h2 class="text-xl font-semibold mb-3">Progress Announcements</h2>
+      <section class="border-border/40 bg-card/50 rounded-lg border p-6">
+        <h2 class="mb-3 text-xl font-semibold">Progress Announcements</h2>
         <p class="mb-5 text-muted-foreground">
           Use for tracking progress of operations
         </p>
@@ -95,26 +95,26 @@ const sections = [
         <div class="mb-5">
           <button
             id="progress-demo"
-            class="px-4 py-2 bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-md mb-3"
+            class="hover:bg-secondary/90 mb-3 rounded-md bg-secondary px-4 py-2 text-secondary-foreground"
           >
             Start Progress Demo
           </button>
 
-          <div class="w-full bg-secondary rounded-none h-4 overflow-hidden">
+          <div class="h-4 w-full overflow-hidden rounded-none bg-secondary">
             <div
               id="progress-bar"
-              class="bg-primary h-4 rounded-none w-0 transition-all duration-500"
+              class="h-4 w-0 rounded-none bg-primary transition-all duration-500"
             ></div>
           </div>
-          <div class="mt-2 text-sm text-center" id="progress-text">
+          <div class="mt-2 text-center text-sm" id="progress-text">
             0%
           </div>
         </div>
       </section>
     </div>
 
-    <section class="border border-border/40 rounded-lg p-6 bg-card/50 mb-8">
-      <h2 class="text-xl font-semibold mb-3">React Component Example</h2>
+    <section class="border-border/40 bg-card/50 mb-8 rounded-lg border p-6">
+      <h2 class="mb-3 text-xl font-semibold">React Component Example</h2>
       <p class="mb-5 text-muted-foreground">
         Using the LiveRegionProvider React context
       </p>

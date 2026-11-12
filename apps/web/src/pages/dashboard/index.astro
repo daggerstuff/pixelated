@@ -1,8 +1,9 @@
 ---
 export const prerender = false
 
-import DashboardLayout from '../../layouts/DashboardLayout.astro'
 import { AnalyticsCharts } from '@/components/dashboard/AnalyticsCharts'
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
 const { user } = Astro.props as { user: any }
 const perfMode = Astro.url.searchParams.get('perf') === '1'
 ---

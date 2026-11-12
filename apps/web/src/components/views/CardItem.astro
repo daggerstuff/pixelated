@@ -1,13 +1,12 @@
 ---
+import type { HTMLAttributes } from 'astro/types'
 import { Image } from 'astro:assets'
+import type { LocalImageProps, RemoteImageProps } from 'astro:assets'
 import DOMPurify from 'isomorphic-dompurify'
 
 import Link from '@/components/base/Link.astro'
 import ImageCarousel from '@/components/widgets/ImageCarousel.astro'
 import { formatDate } from '@/utils/datetime'
-
-import type { HTMLAttributes } from 'astro/types'
-import type { LocalImageProps, RemoteImageProps } from 'astro:assets'
 
 interface ImageData {
   src: string
@@ -84,10 +83,7 @@ const sanitizedDetails = details
 ---
 
 <section class={className}>
-  <div
-    class="overflow-hidden flex flex-col
-      b b-border rounded-none bg-card"
-  >
+  <div class="b b-border flex flex-col overflow-hidden rounded-none bg-card">
     {((images && images.length > 0) || video) && (
       <MediaContainer
         class="b-b b-b-border op-100!"
@@ -116,7 +112,7 @@ const sanitizedDetails = details
 
         {video && (
           <video
-            class="w-full aspect-[16/9] object-cover"
+            class="aspect-[16/9] w-full object-cover"
             src={video.src}
             poster={video.thumbnail}
             aria-label={video.alt}
@@ -131,7 +127,7 @@ const sanitizedDetails = details
     )}
     {external && (
       <Link
-        class="overflow-hidden flex flex-col b b-border rounded-none mt-3 mx-3 op-100!"
+        class="b b-border op-100! mx-3 mt-3 flex flex-col overflow-hidden rounded-none"
         href={external.uri}
       >
         {!COMPACT && external.thumb && (
@@ -143,12 +139,12 @@ const sanitizedDetails = details
             height={628}
           />
         )}
-        <div class="flex flex-col px-3 pt-2 pb-1">
-          <div class="flex flex-col gap-1 pb-1.5 b-b b-b-border">
-            <p class="text-sm font-600">{external.title}</p>
+        <div class="flex flex-col px-3 pb-1 pt-2">
+          <div class="b-b b-b-border flex flex-col gap-1 pb-1.5">
+            <p class="font-600 text-sm">{external.title}</p>
             <p class="text-xs">{external.description}</p>
           </div>
-          <div class="flex items-center gap-1 pt-1 text-[0.72rem] op-70">
+          <div class="op-70 flex items-center gap-1 pt-1 text-[0.72rem]">
             <div u-i-lucide-globe class="size-1em" aria-hidden="true" />
             <p>{new URL(external.uri).hostname}</p>
           </div>
@@ -156,7 +152,7 @@ const sanitizedDetails = details
       </Link>
     )}
     {quote && (
-      <div class="overflow-hidden flex flex-col gap-2 b b-border rounded-none p-2 mt-3 mx-3 text-sm">
+      <div class="b b-border mx-3 mt-3 flex flex-col gap-2 overflow-hidden rounded-none p-2 text-sm">
         <div class="flex items-center gap-1">
           <Image
             class="size-1em rounded-full object-cover"
@@ -187,8 +183,8 @@ const sanitizedDetails = details
             {sanitizedDetails
               .slice(0, MAX_DETAILS + 1)
               .map((detail: string, idx: number) => (
-                <li class="ms-4 mb-6 last:mb-0">
-                  <div class="absolute start--1.6 w-3 h-3 border rounded-full border-background mt-1.5 bg-secondary" />
+                <li class="mb-6 ms-4 last:mb-0">
+                  <div class="start--1.6 absolute mt-1.5 h-3 w-3 rounded-full border border-background bg-secondary" />
                   {idx < MAX_DETAILS && (
                     <div class="prose card-item-prose" set:html={detail} />
                   )}
@@ -203,9 +199,9 @@ const sanitizedDetails = details
         </div>
       )}
       {date && (
-        <div class="flex justify-between items-center pt-3 text-sm">
+        <div class="flex items-center justify-between pt-3 text-sm">
           {link ? (
-            <Link class="flex-auto op-transition" href={link}>
+            <Link class="op-transition flex-auto" href={link}>
               {formatDate(date, false)}
             </Link>
           ) : (

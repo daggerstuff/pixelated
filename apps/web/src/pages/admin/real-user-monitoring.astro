@@ -1,6 +1,6 @@
 ---
-import DashboardLayout from '@/layouts/DashboardLayout.astro'
 import RealUserMonitoringComponent from '@/components/monitoring/RealUserMonitoring.astro'
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
 import { getMonitoringConfig } from '@/lib/monitoring/config'
 
 // Get monitoring configuration
@@ -8,7 +8,7 @@ const config = getMonitoringConfig()
 ---
 
 <DashboardLayout title="Real User Monitoring | Admin Dashboard">
-  <div class="container px-4 py-8 mx-auto">
+  <div class="container mx-auto px-4 py-8">
     <header class="mb-8">
       <h1 class="text-2xl font-bold text-foreground">Real User Monitoring</h1>
       <p class="mt-2 text-muted-foreground">
@@ -23,8 +23,8 @@ const config = getMonitoringConfig()
       />
     </div>
 
-    <div class="mb-8 p-4 bg-card border border-border rounded-none">
-      <h2 class="text-xl font-semibold mb-3 text-foreground">
+    <div class="mb-8 rounded-none border border-border bg-card p-4">
+      <h2 class="mb-3 text-xl font-semibold text-foreground">
         Understanding Real User Monitoring
       </h2>
 
@@ -35,16 +35,16 @@ const config = getMonitoringConfig()
           into real-world experiences across different:
         </p>
 
-        <ul class="list-disc ml-6 mt-2 mb-4">
+        <ul class="mb-4 ml-6 mt-2 list-disc">
           <li>Device types and capabilities</li>
           <li>Network conditions</li>
           <li>Geographic locations</li>
           <li>Browsers and operating systems</li>
         </ul>
 
-        <h3 class="text-lg font-medium mt-4 mb-2">Key Benefits</h3>
+        <h3 class="mb-2 mt-4 text-lg font-medium">Key Benefits</h3>
 
-        <ol class="list-decimal ml-6 mb-4">
+        <ol class="mb-4 ml-6 list-decimal">
           <li>
             <strong>Real-world data:</strong> See how your site performs for
             actual users
@@ -63,7 +63,7 @@ const config = getMonitoringConfig()
           </li>
         </ol>
 
-        <h3 class="text-lg font-medium mt-4 mb-2">Using This Dashboard</h3>
+        <h3 class="mb-2 mt-4 text-lg font-medium">Using This Dashboard</h3>
 
         <p>
           The dashboard above shows key metrics from the Web Vitals initiative
@@ -73,15 +73,15 @@ const config = getMonitoringConfig()
 
         <ul class="mt-2">
           <li>
-            <span class="text-foreground font-semibold">Good:</span> Normal -
+            <span class="font-semibold text-foreground">Good:</span> Normal -
             Meeting performance targets
           </li>
           <li>
-            <span class="text-foreground font-medium">Watch:</span> Needs
+            <span class="font-medium text-foreground">Watch:</span> Needs
             Improvement - Under acceptable limits but could be better
           </li>
           <li>
-            <span class="text-foreground font-semibold">Critical:</span> Poor -
+            <span class="font-semibold text-foreground">Critical:</span> Poor -
             Exceeding acceptable limits, requires attention
           </li>
         </ul>
@@ -89,7 +89,7 @@ const config = getMonitoringConfig()
     </div>
 
     {config.grafana.enableRUM && (
-      <div class="text-sm text-muted-foreground mb-6">
+      <div class="mb-6 text-sm text-muted-foreground">
         <p>
           Data is collected using Grafana Faro Web SDK with a sampling rate of{' '}
           {config.grafana.rumSamplingRate * 100}%. Configuration can be adjusted

@@ -98,43 +98,43 @@ const formatActionLabel = (action: string): string => {
 <div class="space-y-8">
   <!-- Compliance Metrics -->
   <div>
-    <h3 class="text-lg font-medium text-foreground mb-4">Compliance Metrics</h3>
+    <h3 class="mb-4 text-lg font-medium text-foreground">Compliance Metrics</h3>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
       <!-- Metrics Cards -->
-      <div class="bg-card rounded-none -md p-5">
+      <div class="-md rounded-none bg-card p-5">
         <p class="text-sm font-medium text-muted-foreground">
           Average Response Time
         </p>
-        <p class="text-2xl font-bold text-foreground mt-1">
+        <p class="mt-1 text-2xl font-bold text-foreground">
           {complianceMetrics.averageResponseTime}
         </p>
-        <div class="flex items-center mt-4 text-muted-foreground">
-          <Icon name="trending-down" class="w-4 h-4 mr-1" />
+        <div class="mt-4 flex items-center text-muted-foreground">
+          <Icon name="trending-down" class="mr-1 h-4 w-4" />
           <span class="text-sm font-medium">-12% from previous month</span>
         </div>
       </div>
 
-      <div class="bg-card rounded-none -md p-5">
+      <div class="-md rounded-none bg-card p-5">
         <p class="text-sm font-medium text-muted-foreground">
           30-Day Response Rate
         </p>
-        <p class="text-2xl font-bold text-foreground mt-1">
+        <p class="mt-1 text-2xl font-bold text-foreground">
           {complianceMetrics.timely30DayResponseRate}
         </p>
-        <div class="flex items-center mt-4 text-muted-foreground">
-          <Icon name="trending-up" class="w-4 h-4 mr-1" />
+        <div class="mt-4 flex items-center text-muted-foreground">
+          <Icon name="trending-up" class="mr-1 h-4 w-4" />
           <span class="text-sm font-medium">+3% from previous month</span>
         </div>
       </div>
 
-      <div class="bg-card rounded-none -md p-5">
+      <div class="-md rounded-none bg-card p-5">
         <p class="text-sm font-medium text-muted-foreground">Total Requests</p>
-        <p class="text-2xl font-bold text-foreground mt-1">
+        <p class="mt-1 text-2xl font-bold text-foreground">
           {complianceMetrics.totalRequests.current}
         </p>
-        <div class="flex items-center mt-4 text-muted-foreground">
-          <Icon name="trending-up" class="w-4 h-4 mr-1" />
+        <div class="mt-4 flex items-center text-muted-foreground">
+          <Icon name="trending-up" class="mr-1 h-4 w-4" />
           <span class="text-sm font-medium">
             {complianceMetrics.totalRequests.change} from previous month
           </span>
@@ -143,15 +143,15 @@ const formatActionLabel = (action: string): string => {
     </div>
 
     <!-- Request Type Distribution -->
-    <div class="mt-6 bg-card rounded-none -md p-5">
-      <h4 class="text-md font-medium text-foreground mb-4">
+    <div class="-md mt-6 rounded-none bg-card p-5">
+      <h4 class="text-md mb-4 font-medium text-foreground">
         Request Type Distribution
       </h4>
 
       <div class="space-y-3">
         {complianceMetrics.requestTypes.map((type) => (
           <div>
-            <div class="flex justify-between items-center">
+            <div class="flex items-center justify-between">
               <span class="text-sm font-medium text-foreground">
                 {type.type}
               </span>
@@ -159,9 +159,9 @@ const formatActionLabel = (action: string): string => {
                 {type.count} ({type.percentage}%)
               </span>
             </div>
-            <div class="mt-1 w-full bg-secondary rounded-none h-2.5">
+            <div class="mt-1 h-2.5 w-full rounded-none bg-secondary">
               <div
-                class="bg-primary h-2.5 rounded-none"
+                class="h-2.5 rounded-none bg-primary"
                 style={`width: ${type.percentage}%`}
               />
             </div>
@@ -173,64 +173,64 @@ const formatActionLabel = (action: string): string => {
 
   <!-- Audit Log -->
   <div>
-    <h3 class="text-lg font-medium text-foreground mb-4">
+    <h3 class="mb-4 text-lg font-medium text-foreground">
       Access Request Audit Log
     </h3>
 
-    <div class="bg-card rounded-none -md overflow-hidden">
+    <div class="-md overflow-hidden rounded-none bg-card">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-border">
           <thead class="bg-secondary">
             <tr>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Timestamp
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Request ID
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Action
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 User
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Details
               </th>
             </tr>
           </thead>
-          <tbody class="bg-card divide-y divide-border">
+          <tbody class="divide-y divide-border bg-card">
             {auditLogEntries.map((entry) => (
               <tr class="hover:bg-secondary">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                   {formatDate(entry.date)}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-foreground">
                   {entry.requestId}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                   <span
-                    class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${getActionBadgeClass(entry.action)}`}
+                    class={`inline-flex rounded-none px-2 py-1 text-xs font-medium ${getActionBadgeClass(entry.action)}`}
                   >
                     {formatActionLabel(entry.action)}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                   {entry.user}
                 </td>
                 <td class="px-6 py-4 text-sm text-muted-foreground">
@@ -246,12 +246,12 @@ const formatActionLabel = (action: string): string => {
 
   <!-- Export Controls -->
   <div>
-    <h3 class="text-lg font-medium text-foreground mb-4">Compliance Reports</h3>
+    <h3 class="mb-4 text-lg font-medium text-foreground">Compliance Reports</h3>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <!-- Report Generation -->
-      <div class="bg-card rounded-none -md p-5">
-        <h4 class="text-md font-medium text-foreground mb-4">
+      <div class="-md rounded-none bg-card p-5">
+        <h4 class="text-md mb-4 font-medium text-foreground">
           Generate Report
         </h4>
 
@@ -259,13 +259,13 @@ const formatActionLabel = (action: string): string => {
           <div>
             <label
               for="report-type"
-              class="block text-sm font-medium text-foreground mb-1"
+              class="mb-1 block text-sm font-medium text-foreground"
             >
               Report Type
             </label>
             <select
               id="report-type"
-              class="block w-full py-2 pl-3 pr-10 text-base border border-input rounded-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring sm:text-sm border border-input"
+              class="block w-full rounded-none border border-input py-2 pl-3 pr-10 text-base focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring sm:text-sm"
             >
               <option value="hipaa-compliance">HIPAA Compliance Summary</option>
               <option value="access-request-audit">Access Request Audit</option>
@@ -277,27 +277,27 @@ const formatActionLabel = (action: string): string => {
             <div>
               <label
                 for="start-date"
-                class="block text-sm font-medium text-foreground mb-1"
+                class="mb-1 block text-sm font-medium text-foreground"
               >
                 Start Date
               </label>
               <input
                 type="date"
                 id="start-date"
-                class="block w-full py-2 px-3 border border-input rounded-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring sm:text-sm border border-input"
+                class="block w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring sm:text-sm"
               />
             </div>
             <div>
               <label
                 for="end-date"
-                class="block text-sm font-medium text-foreground mb-1"
+                class="mb-1 block text-sm font-medium text-foreground"
               >
                 End Date
               </label>
               <input
                 type="date"
                 id="end-date"
-                class="block w-full py-2 px-3 border border-input rounded-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring sm:text-sm border border-input"
+                class="block w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring sm:text-sm"
               />
             </div>
           </div>
@@ -305,13 +305,13 @@ const formatActionLabel = (action: string): string => {
           <div>
             <label
               for="report-format"
-              class="block text-sm font-medium text-foreground mb-1"
+              class="mb-1 block text-sm font-medium text-foreground"
             >
               Format
             </label>
             <select
               id="report-format"
-              class="block w-full py-2 pl-3 pr-10 text-base border border-input rounded-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring sm:text-sm border border-input"
+              class="block w-full rounded-none border border-input py-2 pl-3 pr-10 text-base focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring sm:text-sm"
             >
               <option value="pdf">PDF</option>
               <option value="csv">CSV</option>
@@ -322,9 +322,9 @@ const formatActionLabel = (action: string): string => {
           <div>
             <button
               type="button"
-              class="w-full bg-primary text-white py-2 px-4 rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex justify-center items-center"
+              class="text-white flex w-full items-center justify-center rounded-none bg-primary px-4 py-2 hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
-              <Icon name="download" class="h-5 w-5 mr-2" />
+              <Icon name="download" class="mr-2 h-5 w-5" />
               Generate Report
             </button>
           </div>
@@ -332,8 +332,8 @@ const formatActionLabel = (action: string): string => {
       </div>
 
       <!-- Recent Reports -->
-      <div class="bg-card rounded-none -md p-5">
-        <h4 class="text-md font-medium text-foreground mb-4">Recent Reports</h4>
+      <div class="-md rounded-none bg-card p-5">
+        <h4 class="text-md mb-4 font-medium text-foreground">Recent Reports</h4>
 
         <ul class="divide-y divide-border">
           <li class="py-3">
@@ -346,7 +346,7 @@ const formatActionLabel = (action: string): string => {
                   Generated on Jun 15, 2025
                 </p>
               </div>
-              <button class="text-foreground hover:text-foreground font-medium font-medium">
+              <button class="font-medium text-foreground hover:text-foreground">
                 <Icon name="download" class="h-5 w-5" />
               </button>
             </div>
@@ -361,7 +361,7 @@ const formatActionLabel = (action: string): string => {
                   Generated on Jun 10, 2025
                 </p>
               </div>
-              <button class="text-foreground hover:text-foreground font-medium font-medium">
+              <button class="font-medium text-foreground hover:text-foreground">
                 <Icon name="download" class="h-5 w-5" />
               </button>
             </div>
@@ -376,7 +376,7 @@ const formatActionLabel = (action: string): string => {
                   Generated on Jun 5, 2025
                 </p>
               </div>
-              <button class="text-foreground hover:text-foreground font-medium font-medium">
+              <button class="font-medium text-foreground hover:text-foreground">
                 <Icon name="download" class="h-5 w-5" />
               </button>
             </div>
@@ -387,7 +387,7 @@ const formatActionLabel = (action: string): string => {
   </div>
 
   <!-- HIPAA Compliance Information -->
-  <div class="bg-secondary border-l-4 border-border p-4">
+  <div class="border-l-4 border-border bg-secondary p-4">
     <div class="flex">
       <div class="flex-shrink-0">
         <Icon name="info-circle" class="h-5 w-5 text-muted-foreground" />
@@ -396,7 +396,7 @@ const formatActionLabel = (action: string): string => {
         <h3 class="text-sm font-medium text-foreground">
           HIPAA Documentation Requirements
         </h3>
-        <div class="mt-2 text-sm text-foreground font-medium">
+        <div class="mt-2 text-sm font-medium text-foreground">
           <p>
             HIPAA requires maintaining comprehensive documentation of all
             patient data access requests and their resolution. Records must be

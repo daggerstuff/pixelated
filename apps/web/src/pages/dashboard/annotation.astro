@@ -1,9 +1,10 @@
 ---
 export const prerender = false
 
-import DashboardLayout from '@/layouts/DashboardLayout.astro'
-import Card from '@/components/ui/Card.astro'
 import { ClipboardList, XCircle, TrendingUp } from 'lucide-react'
+
+import Card from '@/components/ui/Card.astro'
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
 // Types for queue items
 interface QueueItem {
@@ -98,11 +99,11 @@ const handlePromote = `
   description="Expert review interface for clinical validity annotation queue"
   showSidebar={true}
 >
-  <div class="container mx-auto py-6 px-4">
+  <div class="container mx-auto px-4 py-6">
     <!-- Header -->
     <div class="mb-8">
-      <div class="flex items-center gap-3 mb-2">
-        <ClipboardList class="w-8 h-8 text-accent" />
+      <div class="mb-2 flex items-center gap-3">
+        <ClipboardList class="h-8 w-8 text-accent" />
         <h1 class="text-3xl font-bold tracking-tight">Annotation Queue</h1>
       </div>
       <p class="text-muted-foreground">
@@ -111,20 +112,20 @@ const handlePromote = `
     </div>
 
     {error ? (
-      <div class="bg-secondary border border-ring text-foreground px-4 py-3 rounded-none mb-6">
+      <div class="mb-6 rounded-none border border-ring bg-secondary px-4 py-3 text-foreground">
         <p class="font-medium">Error</p>
         <p class="text-sm">{error}</p>
       </div>
     ) : null}
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <!-- Left column: Pending items list -->
-      <div class="lg:col-span-2 space-y-6">
+      <div class="space-y-6 lg:col-span-2">
         <!-- Pending Items -->
         <Card class="p-6">
-          <div class="flex items-center justify-between mb-6">
+          <div class="mb-6 flex items-center justify-between">
             <h2 class="text-xl font-semibold">Pending Items</h2>
-            <span class="px-3 py-1 text-xs font-medium rounded-full bg-accent/10 text-accent">
+            <span class="bg-accent/10 rounded-full px-3 py-1 text-xs font-medium text-accent">
               {pendingItems.length} item{pendingItems.length !== 1 ? 's' : ''}
             </span>
           </div>
@@ -133,13 +134,13 @@ const handlePromote = `
             <div class="space-y-4" data-pending-list>
               {pendingItems.map((item) => (
                 <div
-                  class="p-4 border rounded-none border-border"
+                  class="rounded-none border border-border p-4"
                   data-queue-card
                 >
-                  <div class="flex justify-between items-start mb-3">
+                  <div class="mb-3 flex items-start justify-between">
                     <div>
                       <h3 class="font-medium">Sample #{item.id}</h3>
-                      <p class="text-xs text-muted-foreground mt-1">
+                      <p class="mt-1 text-xs text-muted-foreground">
                         Added {new Date(item.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -154,22 +155,22 @@ const handlePromote = `
                   </div>
 
                   <div class="mb-3">
-                    <p class="text-sm line-clamp-3">{item.sample_text}</p>
+                    <p class="line-clamp-3 text-sm">{item.sample_text}</p>
                   </div>
 
                   {item.routing_reason && (
                     <div class="mb-3">
-                      <span class="text-xs font-medium px-2 py-1 rounded-none border border-border bg-secondary text-foreground">
+                      <span class="rounded-none border border-border bg-secondary px-2 py-1 text-xs font-medium text-foreground">
                         {item.routing_reason}
                       </span>
                     </div>
                   )}
 
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                  <div class="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
                     {Object.entries(item.per_dimension_scores).map(
                       ([dimension, score]) => (
                         <div class="flex items-center justify-between">
-                          <span class="text-muted-foreground capitalize">
+                          <span class="capitalize text-muted-foreground">
                             {dimension}:
                           </span>
                           <span class="font-medium">
@@ -183,9 +184,9 @@ const handlePromote = `
               ))}
             </div>
           ) : (
-            <div class="text-center py-12" data-empty-pending>
-              <XCircle class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 class="text-lg font-medium mb-2">No pending items</h3>
+            <div class="py-12 text-center" data-empty-pending>
+              <XCircle class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <h3 class="mb-2 text-lg font-medium">No pending items</h3>
               <p class="text-muted-foreground">
                 All annotation queue items have been reviewed.
               </p>
@@ -194,13 +195,13 @@ const handlePromote = `
         </Card>
 
         <!-- Reviewed Items (eligible for promotion) -->
-        <Card class="p-6 border-accent/30">
-          <div class="flex items-center justify-between mb-6">
+        <Card class="border-accent/30 p-6">
+          <div class="mb-6 flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <TrendingUp class="w-5 h-5 text-accent" />
+              <TrendingUp class="h-5 w-5 text-accent" />
               <h2 class="text-xl font-semibold">Reviewed Items</h2>
             </div>
-            <span class="px-3 py-1 text-xs font-medium rounded-none border border-border bg-secondary text-foreground">
+            <span class="rounded-none border border-border bg-secondary px-3 py-1 text-xs font-medium text-foreground">
               {reviewedItems.length} ready for promotion
             </span>
           </div>
@@ -209,16 +210,16 @@ const handlePromote = `
             <div class="space-y-4" data-reviewed-list>
               {reviewedItems.map((item) => (
                 <div
-                  class="p-4 border rounded-none border-border bg-secondary"
+                  class="rounded-none border border-border bg-secondary p-4"
                   data-queue-card
                 >
-                  <div class="flex justify-between items-start mb-3">
+                  <div class="mb-3 flex items-start justify-between">
                     <div>
                       <h3 class="font-medium">Sample #{item.id}</h3>
-                      <p class="text-xs text-muted-foreground mt-1">
+                      <p class="mt-1 text-xs text-muted-foreground">
                         Added {new Date(item.created_at).toLocaleDateString()}
                       </p>
-                      <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded-none border border-border bg-secondary text-foreground">
+                      <span class="mt-1 inline-block rounded-none border border-border bg-secondary px-2 py-0.5 text-xs font-medium text-foreground">
                         Reviewed
                       </span>
                     </div>
@@ -233,22 +234,22 @@ const handlePromote = `
                   </div>
 
                   <div class="mb-3">
-                    <p class="text-sm line-clamp-3">{item.sample_text}</p>
+                    <p class="line-clamp-3 text-sm">{item.sample_text}</p>
                   </div>
 
                   {item.routing_reason && (
                     <div class="mb-3">
-                      <span class="text-xs font-medium px-2 py-1 rounded-none border border-border bg-secondary text-foreground">
+                      <span class="rounded-none border border-border bg-secondary px-2 py-1 text-xs font-medium text-foreground">
                         {item.routing_reason}
                       </span>
                     </div>
                   )}
 
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs mb-4">
+                  <div class="mb-4 grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
                     {Object.entries(item.per_dimension_scores).map(
                       ([dimension, score]) => (
                         <div class="flex items-center justify-between">
-                          <span class="text-muted-foreground capitalize">
+                          <span class="capitalize text-muted-foreground">
                             {dimension}:
                           </span>
                           <span class="font-medium">
@@ -263,7 +264,7 @@ const handlePromote = `
                     type="button"
                     data-promote-btn
                     onclick={`handlePromote(${item.id}, 'validated')`}
-                    class="w-full sm:w-auto px-4 py-2 bg-accent hover:bg-accentHover text-foreground text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="hover:bg-accentHover w-full rounded-md bg-accent px-4 py-2 text-sm font-medium text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-accent disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                   >
                     Promote to Validated
                   </button>
@@ -271,9 +272,9 @@ const handlePromote = `
               ))}
             </div>
           ) : (
-            <div class="text-center py-12" data-empty-reviewed>
-              <TrendingUp class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 class="text-lg font-medium mb-2">
+            <div class="py-12 text-center" data-empty-reviewed>
+              <TrendingUp class="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <h3 class="mb-2 text-lg font-medium">
                 No items ready for promotion
               </h3>
               <p class="text-muted-foreground">
@@ -287,14 +288,14 @@ const handlePromote = `
       <!-- Right column: Stats and instructions -->
       <div>
         <Card class="p-6">
-          <h2 class="text-xl font-semibold mb-6">Queue Statistics</h2>
+          <h2 class="mb-6 text-xl font-semibold">Queue Statistics</h2>
 
-          <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="text-center p-3 rounded-none bg-surface/50">
+          <div class="mb-6 grid grid-cols-2 gap-4">
+            <div class="bg-surface/50 rounded-none p-3 text-center">
               <div class="text-2xl font-bold">{pendingItems.length}</div>
               <div class="text-xs text-muted-foreground">Pending</div>
             </div>
-            <div class="text-center p-3 rounded-none bg-surface/50">
+            <div class="bg-surface/50 rounded-none p-3 text-center">
               <div class="text-2xl font-bold">{reviewedItems.length}</div>
               <div class="text-xs text-muted-foreground">Reviewed</div>
             </div>
@@ -310,54 +311,54 @@ const handlePromote = `
         </Card>
 
         {/* Instructions */}
-        <Card class="p-6 mt-6">
-          <h3 class="text-lg font-semibold mb-4">Review Guidelines</h3>
+        <Card class="mt-6 p-6">
+          <h3 class="mb-4 text-lg font-semibold">Review Guidelines</h3>
           <ul class="space-y-3 text-sm">
             <li class="flex items-start gap-2">
-              <span class="text-accent font-medium">•</span>
+              <span class="font-medium text-accent">•</span>
               <span>
                 Borderline samples (0.4-0.6 score) require expert review
               </span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-accent font-medium">•</span>
+              <span class="font-medium text-accent">•</span>
               <span>Assess clinical validity across all dimensions</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-accent font-medium">•</span>
+              <span class="font-medium text-accent">•</span>
               <span>Submit scores via the annotation API</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="text-accent font-medium">•</span>
+              <span class="font-medium text-accent">•</span>
               <span>Use your assigned reviewer ID</span>
             </li>
           </ul>
         </Card>
 
         {/* Promotion Workflow Info */}
-        <Card class="p-6 mt-6 border-border">
-          <h3 class="text-lg font-semibold mb-4 text-foreground">
+        <Card class="mt-6 border-border p-6">
+          <h3 class="mb-4 text-lg font-semibold text-foreground">
             Promotion Workflow
           </h3>
           <div class="space-y-2 text-sm">
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full border-2 border-muted-foreground"></span>
+              <span class="h-2 w-2 rounded-full border-2 border-muted-foreground"></span>
               <span class="text-muted-foreground">Pending</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-muted-foreground"></span>
+              <span class="h-2 w-2 rounded-full bg-muted-foreground"></span>
               <span class="text-muted-foreground">Reviewed</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-primary"></span>
+              <span class="h-2 w-2 rounded-full bg-primary"></span>
               <span class="text-muted-foreground">Validated</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-foreground"></span>
+              <span class="h-2 w-2 rounded-full bg-foreground"></span>
               <span class="text-muted-foreground">Merged</span>
             </div>
           </div>
-          <p class="text-xs text-muted-foreground mt-4">
+          <p class="mt-4 text-xs text-muted-foreground">
             Items must be reviewed before they can be promoted through the
             workflow stages.
           </p>

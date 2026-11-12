@@ -1,9 +1,9 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import BrutalistCard from '@/components/ui/BrutalistCard.astro'
-import BrutalistButton from '@/components/ui/BrutalistButton.astro'
-
 import { Rocket, Search, Target } from 'lucide-react'
+
+import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+import BrutalistCard from '@/components/ui/BrutalistCard.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 export const prerender = false
 ---
 
@@ -16,20 +16,20 @@ export const prerender = false
     <!-- Floating Background Elements -->
 
     <div class="brutalist-container relative z-10">
-      <div class="text-center mb-12">
+      <div class="mb-12 text-center">
         <!-- Enhanced Status Indicator -->
-        <div class="inline-flex items-center gap-3 mb-8 nav-pill nav-pill--active">
+        <div class="nav-pill nav-pill--active mb-8 inline-flex items-center gap-3">
           <div class="status-dot status-dot--processing"></div>
           <span class="font-bold">AI BIAS DETECTION ACTIVE</span>
         </div>
 
-        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
+        <h1 class="brutalist-heading mb-6 text-5xl md:text-7xl">
           <span>BIAS DETECTION</span>
           <br />
           <span>ENGINE</span>
         </h1>
 
-        <p class="text-xl text-foreground max-w-4xl mx-auto mb-8">
+        <p class="mx-auto mb-8 max-w-4xl text-xl text-foreground">
           Experience real-time bias detection across{' '}
           <span class="font-bold">200+ cultural patterns</span>. Test
           therapeutic scenarios and see instant feedback with enterprise-grade
@@ -37,10 +37,10 @@ export const prerender = false
         </p>
 
         <!-- Enhanced Badge System -->
-        <div class="flex flex-wrap justify-center gap-4 mb-12">
-          <div class="nav-pill bg-secondary border border-border text-foreground">
+        <div class="mb-12 flex flex-wrap justify-center gap-4">
+          <div class="nav-pill border border-border bg-secondary text-foreground">
             <svg
-              class="w-4 h-4"
+              class="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -54,9 +54,9 @@ export const prerender = false
             </svg>
             BIAS ALERTS
           </div>
-          <div class="nav-pill bg-secondary border border-border text-foreground">
+          <div class="nav-pill border border-border bg-secondary text-foreground">
             <svg
-              class="w-4 h-4"
+              class="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -70,9 +70,9 @@ export const prerender = false
             </svg>
             REAL-TIME
           </div>
-          <div class="nav-pill bg-secondary border border-border text-foreground">
+          <div class="nav-pill border border-border bg-secondary text-foreground">
             <svg
-              class="w-4 h-4"
+              class="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -92,17 +92,17 @@ export const prerender = false
   </section>
 
   <!-- Enhanced Main Demo Interface -->
-  <section class="brutalist-section bg-card mesh-bg-2">
+  <section class="brutalist-section mesh-bg-2 bg-card">
     <div class="brutalist-container">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+      <div class="mx-auto grid max-w-7xl grid-cols-1 gap-8 lg:grid-cols-2">
         <!-- Enhanced Input Panel -->
         <div class="glass-card">
           <div class="space-y-6">
             <div class="border-b border-border pb-4">
-              <div class="flex items-center gap-3 mb-2">
-                <div class="w-8 h-8 rounded-none bg-secondary border border-border flex items-center justify-center">
+              <div class="mb-2 flex items-center gap-3">
+                <div class="flex h-8 w-8 items-center justify-center rounded-none border border-border bg-secondary">
                   <svg
-                    class="w-4 h-4 text-foreground"
+                    class="h-4 w-4 text-foreground"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -116,7 +116,7 @@ export const prerender = false
                   </svg>
                 </div>
                 <h3 class="brutalist-subheading text-xl">SCENARIO INPUT</h3>
-                <p class="text-foreground text-sm">
+                <p class="text-sm text-foreground">
                   Enter therapeutic scenario to analyze for bias
                 </p>
               </div>
@@ -221,14 +221,14 @@ export const prerender = false
               <!-- Export Options (hidden until results) -->
               <div
                 id="export-controls"
-                class="hidden mb-3 flex items-center gap-3"
+                class="mb-3 flex hidden items-center gap-3"
               >
                 <label for="export-format" class="text-sm text-foreground">
                   Export format
                 </label>
                 <select
                   id="export-format"
-                  class="form-input !py-1 !px-2 !h-8 w-32"
+                  class="form-input !h-8 w-32 !px-2 !py-1"
                 >
                   <option value="json">JSON</option>
                   <option value="csv">CSV</option>
@@ -264,31 +264,31 @@ export const prerender = false
           <BrutalistCard variant="elevated">
             <div class="space-y-6">
               <div class="border-b border-border pb-4">
-                <h3 class="brutalist-subheading text-xl mb-2">
+                <h3 class="brutalist-subheading mb-2 text-xl">
                   <h2>📊 Analysis Results</h2>
                 </h3>
-                <p class="text-foreground text-sm">
+                <p class="text-sm text-foreground">
                   Real-time bias detection across multiple layers
                 </p>
               </div>
 
               <!-- Loading State -->
-              <div id="loading-state" class="hidden text-center py-8">
-                <div class="loading-skeleton w-8 h-8 rounded-full mx-auto mb-4"></div>
-                <p class="text-foreground font-bold">
+              <div id="loading-state" class="hidden py-8 text-center">
+                <div class="loading-skeleton mx-auto mb-4 h-8 w-8 rounded-full"></div>
+                <p class="font-bold text-foreground">
                   ANALYZING BIAS PATTERNS...
                 </p>
                 <ul
                   id="progress-log"
-                  class="mt-4 text-left max-w-prose mx-auto space-y-1 text-sm text-muted-foreground"
+                  class="mx-auto mt-4 max-w-prose space-y-1 text-left text-sm text-muted-foreground"
                 ></ul>
               </div>
 
               <!-- Results Display -->
               <div id="results-display" aria-live="polite" aria-busy="false">
-                <div class="text-center py-8 text-foreground">
-                  <div class="text-4xl mb-4">
-                    <Target className="w-10 h-10" />
+                <div class="py-8 text-center text-foreground">
+                  <div class="mb-4 text-4xl">
+                    <Target className="h-10 w-10" />
                   </div>
                   <p class="font-bold">RUN ANALYSIS TO SEE RESULTS</p>
                 </div>
@@ -302,8 +302,8 @@ export const prerender = false
     <!-- Real-time Dashboard -->
     <section class="brutalist-section">
       <div class="brutalist-container">
-        <div class="text-center mb-12">
-          <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+        <div class="mb-12 text-center">
+          <h2 class="brutalist-heading mb-4 text-3xl md:text-5xl">
             REAL-TIME
             <span class="confidence-boost">DASHBOARD</span>
           </h2>
@@ -344,8 +344,8 @@ export const prerender = false
     <!-- Feature Showcase -->
     <section class="brutalist-section bg-card">
       <div class="brutalist-container">
-        <div class="text-center mb-12">
-          <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+        <div class="mb-12 text-center">
+          <h2 class="brutalist-heading mb-4 text-3xl md:text-5xl">
             DETECTION
             <span class="text-foreground">CAPABILITIES</span>
           </h2>
@@ -354,27 +354,27 @@ export const prerender = false
         <div class="brutalist-grid brutalist-grid--3">
           <BrutalistCard hover={true}>
             <div class="text-center">
-              <div class="text-4xl mb-4">
-                <Search className="w-10 h-10" />
+              <div class="mb-4 text-4xl">
+                <Search className="h-10 w-10" />
               </div>
-              <h3 class="brutalist-subheading text-lg mb-3">
+              <h3 class="brutalist-subheading mb-3 text-lg">
                 MULTI-LAYER ANALYSIS
               </h3>
-              <p class="text-foreground text-sm mb-4">
+              <p class="mb-4 text-sm text-foreground">
                 Four-layer deep analysis: preprocessing, model-level,
                 interactive behavior, evaluation metrics.
               </p>
               <div class="space-y-2 text-sm">
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-primary rounded-full"></span>
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
                   <span>Linguistic bias detection</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-primary rounded-full"></span>
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
                   <span>Fairness metrics analysis</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-primary rounded-full"></span>
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
                   <span>Counterfactual scenarios</span>
                 </div>
               </div>
@@ -383,25 +383,25 @@ export const prerender = false
 
           <BrutalistCard hover={true}>
             <div class="text-center">
-              <div class="text-4xl mb-4">⚡</div>
-              <h3 class="brutalist-subheading text-lg mb-3">
+              <div class="mb-4 text-4xl">⚡</div>
+              <h3 class="brutalist-subheading mb-3 text-lg">
                 REAL-TIME MONITORING
               </h3>
-              <p class="text-foreground text-sm mb-4">
+              <p class="mb-4 text-sm text-foreground">
                 Continuous monitoring with instant alerts and adaptive
                 thresholds.
               </p>
               <div class="space-y-2 text-sm">
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-primary rounded-full"></span>
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
                   <span>Instant bias alerts</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-primary rounded-full"></span>
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
                   <span>Adaptive thresholds</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-primary rounded-full"></span>
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
                   <span>Performance tracking</span>
                 </div>
               </div>
@@ -410,22 +410,22 @@ export const prerender = false
 
           <BrutalistCard hover={true}>
             <div class="text-center">
-              <div class="text-4xl mb-4">🛡️</div>
-              <h3 class="brutalist-subheading text-lg mb-3">DEMO DATA ONLY</h3>
-              <p class="text-foreground text-sm mb-4">
+              <div class="mb-4 text-4xl">🛡️</div>
+              <h3 class="brutalist-subheading mb-3 text-lg">DEMO DATA ONLY</h3>
+              <p class="mb-4 text-sm text-foreground">
                 This page is an illustrative demo, not a clinical service.
               </p>
               <div class="space-y-2 text-sm">
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-primary rounded-full"></span>
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
                   <span>Illustrative inputs</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-primary rounded-full"></span>
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
                   <span>No client records</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="w-2 h-2 bg-primary rounded-full"></span>
+                  <span class="h-2 w-2 rounded-full bg-primary"></span>
                   <span>Not a clinical tool</span>
                 </div>
               </div>
@@ -438,23 +438,23 @@ export const prerender = false
     <!-- CTA Section -->
     <section class="brutalist-section">
       <div class="brutalist-container">
-        <div class="mental-health-safe max-w-4xl mx-auto text-center">
-          <div class="text-5xl mb-6">
-            <Rocket className="w-20 h-20" />
+        <div class="mental-health-safe mx-auto max-w-4xl text-center">
+          <div class="mb-6 text-5xl">
+            <Rocket className="h-20 w-20" />
           </div>
 
-          <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
+          <h2 class="brutalist-heading mb-6 text-3xl md:text-5xl">
             SPOT BIAS
             <br />
             <span class="confidence-boost">IN YOUR TRAINING</span>
           </h2>
 
-          <p class="text-xl text-foreground mb-8">
+          <p class="mb-8 text-xl text-foreground">
             Detection flags potentially biased language across therapeutic
             interactions so supervisors can review it turn by turn.
           </p>
 
-          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <div class="flex flex-col justify-center gap-4 sm:flex-row">
             <BrutalistButton href="/contact" variant="primary" size="lg">
               IMPLEMENT IN PROGRAM →
             </BrutalistButton>

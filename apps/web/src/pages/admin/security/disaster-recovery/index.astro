@@ -134,26 +134,26 @@ function getStatusDisplayText(
   description="Disaster Recovery and Business Continuity Planning"
 >
   <div class="px-6 py-8">
-    <div class="flex justify-between items-center mb-6">
+    <div class="mb-6 flex items-center justify-between">
       <h1 class="text-2xl font-bold text-foreground">
         Disaster Recovery Management
       </h1>
       <div class="flex space-x-3">
         <a
           href="#plans"
-          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
+          class="rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent"
         >
           Recovery Plans
         </a>
         <a
           href="#results"
-          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
+          class="rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent"
         >
           Test Results
         </a>
         <button
           id="run-test-btn"
-          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
+          class="rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-accent"
         >
           Run Test
         </button>
@@ -161,28 +161,28 @@ function getStatusDisplayText(
     </div>
 
     <!-- Recovery Metrics Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="bg-card rounded-none p-4">
+    <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-none bg-card p-4">
         <h3 class="text-sm font-medium text-muted-foreground">
           Recovery Plans
         </h3>
         <p class="text-2xl font-bold text-foreground">
           {recoveryMetrics.totalRecoveryPlans}
         </p>
-        <p class="text-xs text-muted-foreground mt-1">
+        <p class="mt-1 text-xs text-muted-foreground">
           {recoveryMetrics.testedPlans} tested in last 90 days
         </p>
       </div>
-      <div class="bg-card rounded-none p-4">
+      <div class="rounded-none bg-card p-4">
         <h3 class="text-sm font-medium text-muted-foreground">
           Avg Recovery Time
         </h3>
         <p class="text-2xl font-bold text-foreground">
           {recoveryMetrics.averageRecoveryTime} min
         </p>
-        <p class="text-xs text-muted-foreground mt-1">Target: 60 minutes</p>
+        <p class="mt-1 text-xs text-muted-foreground">Target: 60 minutes</p>
       </div>
-      <div class="bg-card rounded-none p-4">
+      <div class="rounded-none bg-card p-4">
         <h3 class="text-sm font-medium text-muted-foreground">
           Test Success Rate
         </h3>
@@ -194,129 +194,129 @@ function getStatusDisplayText(
           )}
           %
         </p>
-        <p class="text-xs text-muted-foreground mt-1">
+        <p class="mt-1 text-xs text-muted-foreground">
           {recoveryMetrics.successfulTests} of{' '}
           {recoveryMetrics.successfulTests + recoveryMetrics.failedTests} tests
           passed
         </p>
       </div>
-      <div class="bg-card rounded-none p-4">
+      <div class="rounded-none bg-card p-4">
         <h3 class="text-sm font-medium text-muted-foreground">
           Last Test Conducted
         </h3>
         <p class="text-2xl font-bold text-foreground">
           {formatDate(recoveryMetrics.lastTestDate)}
         </p>
-        <p class="text-xs text-muted-foreground mt-1">
+        <p class="mt-1 text-xs text-muted-foreground">
           Database Recovery Simulation
         </p>
       </div>
     </div>
 
     <!-- Recovery Plans Table -->
-    <div id="plans" class="bg-card rounded-none p-6 mb-6">
-      <h2 class="text-lg font-semibold mb-4">Disaster Recovery Plans</h2>
+    <div id="plans" class="mb-6 rounded-none bg-card p-6">
+      <h2 class="mb-4 text-lg font-semibold">Disaster Recovery Plans</h2>
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-border">
           <thead class="bg-secondary">
             <tr>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Plan ID
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Recovery Plan
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Systems
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 RTO
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 RPO
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Last Tested
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Status
               </th>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody class="bg-card divide-y divide-border">
+          <tbody class="divide-y divide-border bg-card">
             {recoveryPlans.map((plan) => (
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-foreground">
                   {plan.id}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                   {plan.name}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                   <div class="flex flex-wrap gap-1">
                     {plan.systems.map((system) => (
-                      <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
+                      <span class="inline-flex items-center rounded-none bg-secondary px-2 py-0.5 text-xs font-medium text-foreground">
                         {system}
                       </span>
                     ))}
                   </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                   {plan.rto} min
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                   {plan.rpo} min
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                <td class="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                   {formatDate(plan.lastTested)}
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="whitespace-nowrap px-6 py-4">
                   <span
-                    class={`inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium ${getStatusBadgeClass(plan.status as any)}`}
+                    class={`inline-flex items-center rounded-none px-2.5 py-0.5 text-xs font-medium ${getStatusBadgeClass(plan.status as any)}`}
                   >
                     {getStatusDisplayText(plan.status as any)}
                   </span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <a href="#plans" class="text-foreground hover:underline mr-3">
+                <td class="whitespace-nowrap px-6 py-4 text-sm font-medium">
+                  <a href="#plans" class="mr-3 text-foreground hover:underline">
                     View
                   </a>
                   <button
                     data-plan-id={plan.id}
-                    class="test-plan text-muted-foreground hover:text-muted-foreground mr-3"
+                    class="test-plan mr-3 text-muted-foreground hover:text-muted-foreground"
                   >
                     Test
                   </button>
                   <button
                     data-plan-id={plan.id}
-                    class="edit-plan text-foreground font-medium hover:text-foreground font-semibold"
+                    class="edit-plan font-medium font-semibold text-foreground hover:text-foreground"
                   >
                     Edit
                   </button>
@@ -329,7 +329,7 @@ function getStatusDisplayText(
       <div class="mt-4 text-right">
         <a
           href="#plans"
-          class="text-foreground hover:underline text-sm font-medium"
+          class="text-sm font-medium text-foreground hover:underline"
         >
           View All Recovery Plans
         </a>
@@ -337,11 +337,11 @@ function getStatusDisplayText(
     </div>
 
     <!-- Scheduled Tests and Business Continuity -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <div id="tests" class="bg-card rounded-none p-6">
-        <h2 class="text-lg font-semibold mb-4">Upcoming Recovery Tests</h2>
+    <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div id="tests" class="rounded-none bg-card p-6">
+        <h2 class="mb-4 text-lg font-semibold">Upcoming Recovery Tests</h2>
         {scheduledTests.length === 0 ? (
-          <p class="text-muted-foreground text-center py-4">
+          <p class="py-4 text-center text-muted-foreground">
             No scheduled tests found.
           </p>
         ) : (
@@ -378,18 +378,18 @@ function getStatusDisplayText(
         <div class="mt-4">
           <button
             id="schedule-test-btn"
-            class="w-full px-4 py-2 bg-secondary text-foreground rounded-none hover:bg-secondary transition-colors text-sm"
+            class="w-full rounded-none bg-secondary px-4 py-2 text-sm text-foreground transition-colors hover:bg-secondary"
           >
             Schedule New Test
           </button>
         </div>
       </div>
 
-      <div id="bcp" class="bg-card rounded-none p-6">
-        <h2 class="text-lg font-semibold mb-4">Business Continuity Planning</h2>
+      <div id="bcp" class="rounded-none bg-card p-6">
+        <h2 class="mb-4 text-lg font-semibold">Business Continuity Planning</h2>
         <div class="space-y-4">
-          <div class="p-4 rounded-none bg-secondary">
-            <h3 class="text-sm font-medium text-foreground mb-2">
+          <div class="rounded-none bg-secondary p-4">
+            <h3 class="mb-2 text-sm font-medium text-foreground">
               Critical Business Functions
             </h3>
             <div class="space-y-2">
@@ -397,9 +397,9 @@ function getStatusDisplayText(
                 <div class="w-32 text-xs text-muted-foreground">
                   Patient Data Access
                 </div>
-                <div class="w-full h-2 bg-secondary rounded-none">
+                <div class="h-2 w-full rounded-none bg-secondary">
                   <div
-                    class="h-2 bg-primary rounded-none"
+                    class="h-2 rounded-none bg-primary"
                     style="width: 95%"
                   ></div>
                 </div>
@@ -411,9 +411,9 @@ function getStatusDisplayText(
                 <div class="w-32 text-xs text-muted-foreground">
                   Authentication
                 </div>
-                <div class="w-full h-2 bg-secondary rounded-none">
+                <div class="h-2 w-full rounded-none bg-secondary">
                   <div
-                    class="h-2 bg-primary rounded-none"
+                    class="h-2 rounded-none bg-primary"
                     style="width: 100%"
                   ></div>
                 </div>
@@ -423,9 +423,9 @@ function getStatusDisplayText(
               </div>
               <div class="flex items-center">
                 <div class="w-32 text-xs text-muted-foreground">Analytics</div>
-                <div class="w-full h-2 bg-secondary rounded-none">
+                <div class="h-2 w-full rounded-none bg-secondary">
                   <div
-                    class="h-2 bg-primary rounded-none"
+                    class="h-2 rounded-none bg-primary"
                     style="width: 80%"
                   ></div>
                 </div>
@@ -435,9 +435,9 @@ function getStatusDisplayText(
               </div>
               <div class="flex items-center">
                 <div class="w-32 text-xs text-muted-foreground">Reporting</div>
-                <div class="w-full h-2 bg-secondary rounded-none">
+                <div class="h-2 w-full rounded-none bg-secondary">
                   <div
-                    class="h-2 bg-primary rounded-none"
+                    class="h-2 rounded-none bg-primary"
                     style="width: 75%"
                   ></div>
                 </div>
@@ -453,25 +453,25 @@ function getStatusDisplayText(
               BCP Documentation
             </h3>
             <ul class="space-y-2">
-              <li class="flex justify-between items-center text-sm">
+              <li class="flex items-center justify-between text-sm">
                 <span>Business Impact Analysis</span>
                 <a href="#bcp" class="text-foreground hover:underline">
                   View
                 </a>
               </li>
-              <li class="flex justify-between items-center text-sm">
+              <li class="flex items-center justify-between text-sm">
                 <span>Recovery Strategies</span>
                 <a href="#bcp" class="text-foreground hover:underline">
                   View
                 </a>
               </li>
-              <li class="flex justify-between items-center text-sm">
+              <li class="flex items-center justify-between text-sm">
                 <span>Communication Plan</span>
                 <a href="#bcp" class="text-foreground hover:underline">
                   View
                 </a>
               </li>
-              <li class="flex justify-between items-center text-sm">
+              <li class="flex items-center justify-between text-sm">
                 <span>Training Materials</span>
                 <a href="#bcp" class="text-foreground hover:underline">
                   View
@@ -483,7 +483,7 @@ function getStatusDisplayText(
           <div class="mt-4">
             <a
               href="/admin/backup-security"
-              class="block w-full px-4 py-2 bg-secondary text-foreground rounded-none hover:bg-accent transition-colors text-sm text-center"
+              class="block w-full rounded-none bg-secondary px-4 py-2 text-center text-sm text-foreground transition-colors hover:bg-accent"
             >
               Manage Backup & Continuity Settings
             </a>
@@ -493,12 +493,12 @@ function getStatusDisplayText(
     </div>
 
     <!-- Testing History -->
-    <div id="results" class="bg-card rounded-none p-6">
-      <h2 class="text-lg font-semibold mb-4">Recent Test Results</h2>
+    <div id="results" class="rounded-none bg-card p-6">
+      <h2 class="mb-4 text-lg font-semibold">Recent Test Results</h2>
       <div class="overflow-hidden">
-        <div class="flex items-center p-4 rounded-none bg-secondary border border-border mb-4">
-          <div class="flex-shrink-0 h-10 w-10 rounded-none bg-secondary border border-input flex items-center justify-center mr-4">
-            <span class="text-muted-foreground text-lg">✓</span>
+        <div class="mb-4 flex items-center rounded-none border border-border bg-secondary p-4">
+          <div class="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none border border-input bg-secondary">
+            <span class="text-lg text-muted-foreground">✓</span>
           </div>
           <div>
             <h3 class="text-sm font-medium text-foreground">
@@ -510,18 +510,18 @@ function getStatusDisplayText(
             </p>
           </div>
           <div class="ml-auto text-right">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+            <span class="inline-flex items-center rounded-none border border-input bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
               Success
             </span>
-            <p class="text-xs text-muted-foreground mt-1">
+            <p class="mt-1 text-xs text-muted-foreground">
               Recovery time: 28 minutes
             </p>
           </div>
         </div>
 
-        <div class="flex items-center p-4 rounded-none bg-card border border-border mb-4">
-          <div class="flex-shrink-0 h-10 w-10 rounded-none bg-primary flex items-center justify-center mr-4">
-            <span class="text-foreground font-semibold text-lg">×</span>
+        <div class="mb-4 flex items-center rounded-none border border-border bg-card p-4">
+          <div class="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none bg-primary">
+            <span class="text-lg font-semibold text-foreground">×</span>
           </div>
           <div>
             <h3 class="text-sm font-medium text-foreground">
@@ -533,18 +533,18 @@ function getStatusDisplayText(
             </p>
           </div>
           <div class="ml-auto text-right">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground font-semibold">
+            <span class="inline-flex items-center rounded-none bg-primary px-2.5 py-0.5 text-xs font-medium font-semibold text-primary-foreground">
               Failed
             </span>
-            <p class="text-xs text-muted-foreground mt-1">
+            <p class="mt-1 text-xs text-muted-foreground">
               Issue: Incomplete data recovery
             </p>
           </div>
         </div>
 
-        <div class="flex items-center p-4 rounded-none bg-secondary border border-border">
-          <div class="flex-shrink-0 h-10 w-10 rounded-none bg-secondary border border-input flex items-center justify-center mr-4">
-            <span class="text-muted-foreground text-lg">✓</span>
+        <div class="flex items-center rounded-none border border-border bg-secondary p-4">
+          <div class="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none border border-input bg-secondary">
+            <span class="text-lg text-muted-foreground">✓</span>
           </div>
           <div>
             <h3 class="text-sm font-medium text-foreground">
@@ -556,10 +556,10 @@ function getStatusDisplayText(
             </p>
           </div>
           <div class="ml-auto text-right">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
+            <span class="inline-flex items-center rounded-none border border-input bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
               Success
             </span>
-            <p class="text-xs text-muted-foreground mt-1">
+            <p class="mt-1 text-xs text-muted-foreground">
               Recovery time: 12 minutes
             </p>
           </div>
@@ -569,7 +569,7 @@ function getStatusDisplayText(
       <div class="mt-4 text-right">
         <a
           href="#results"
-          class="text-foreground hover:underline text-sm font-medium"
+          class="text-sm font-medium text-foreground hover:underline"
         >
           View All Test Results
         </a>

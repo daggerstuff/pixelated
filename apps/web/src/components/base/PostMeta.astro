@@ -1,6 +1,6 @@
 ---
-import { formatDate } from '@/utils/datetime'
 import { UI } from '@/config'
+import { formatDate } from '@/utils/datetime'
 
 interface Props {
   pubDate: string
@@ -24,7 +24,7 @@ const isMinimal = UI.postMetaStyle === 'minimal'
     )}
   </div>
 ) : (
-  <div class="flex justify-start items-center gap-4 mt--6! op-50">
+  <div class="mt--6! op-50 flex items-center justify-start gap-4">
     <div>
       <span class="i-ri-calendar-line mr-1.2" />
       <time datetime={pubDate}>{formatDate(pubDate)}</time>

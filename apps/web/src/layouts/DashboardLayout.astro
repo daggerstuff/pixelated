@@ -1,20 +1,20 @@
 ---
+import Analytics from '@vercel/analytics/astro'
+import SpeedInsights from '@vercel/speed-insights/astro'
+
+import ErrorBoundary from '@/components/base/ErrorBoundary.astro'
+// Astro components
+import Head from '@/components/base/Head.astro'
+// Layout components
+import Header from '@/components/layout/Header.astro'
+import Sidebar from '@/components/layout/Sidebar.astro'
+import Footer from '@/components/mizu/Footer.astro'
+import { FEATURES } from '@/config'
+
 // Style imports
 import '@unocss/reset/tailwind.css'
 import '@/lib/fonts'
 import '@/styles/np-tokens.css'
-
-// Astro components
-import Head from '@/components/base/Head.astro'
-import ErrorBoundary from '@/components/base/ErrorBoundary.astro'
-import SpeedInsights from '@vercel/speed-insights/astro'
-import Analytics from '@vercel/analytics/astro'
-
-// Layout components
-import Header from '@/components/layout/Header.astro'
-import Footer from '@/components/mizu/Footer.astro'
-import Sidebar from '@/components/layout/Sidebar.astro'
-import { FEATURES } from '@/config'
 
 interface Props {
   title?: string
@@ -60,12 +60,12 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
   )}
   <body
     style="background: var(--np-bg); color: var(--np-text);"
-    class="font-sans min-h-screen flex flex-col overflow-x-hidden"
+    class="flex min-h-screen flex-col overflow-x-hidden font-sans"
   >
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:px-4 focus:py-2"
       style="background:var(--np-elevated);color:var(--np-text);"
     >
       Skip to content
@@ -79,8 +79,7 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
       <div class="flex flex-grow flex-col lg:flex-row">
         {showSidebar && (
           <aside
-            class="sidebar fixed inset-y-0 z-20 flex-shrink-0 w-64 pt-16
-            transform transition-transform duration-300 lg:translate-x-0 lg:static lg:h-auto"
+            class="sidebar fixed inset-y-0 z-20 w-64 flex-shrink-0 transform pt-16 transition-transform duration-300 lg:static lg:h-auto lg:translate-x-0"
             id="sidebar"
             style="background: var(--np-bg); border-right: 1px solid var(--np-line);"
           >
@@ -96,7 +95,7 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
           ]}
           id="main-content"
         >
-          <div class="max-w-[var(--np-content)] mx-auto px-4 py-6 min-h-[calc(100vh-4rem)] flex flex-col">
+          <div class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-[var(--np-content)] flex-col px-4 py-6">
             <slot />
           </div>
 

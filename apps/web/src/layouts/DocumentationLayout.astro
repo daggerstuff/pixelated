@@ -1,15 +1,17 @@
 ---
+import Analytics from '@vercel/analytics/astro'
+import SpeedInsights from '@vercel/speed-insights/astro'
+
+import BaseHead from '@/components/base/Head.astro'
+import Footer from '@/components/mizu/Footer.astro'
+import Navbar from '@/components/mizu/Navbar.astro'
+import ThemeToggle from '@/components/ui/ThemeToggle.astro'
+import ToTopButton from '@/components/widgets/ToTopButton.astro'
+import { FEATURES } from '@/config'
+
 import '@/styles/np-tokens.css'
 import '@/lib/fonts'
-import BaseHead from '@/components/base/Head.astro'
-import Navbar from '@/components/mizu/Navbar.astro'
-import Footer from '@/components/mizu/Footer.astro'
-import ToTopButton from '@/components/widgets/ToTopButton.astro'
-import ThemeToggle from '@/components/ui/ThemeToggle.astro'
-import SpeedInsights from '@vercel/speed-insights/astro'
-import Analytics from '@vercel/analytics/astro'
 import '@/styles/docs-prose.css'
-import { FEATURES } from '@/config'
 
 interface Props {
   title: string
@@ -58,15 +60,15 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
     )}
   </head>
 
-  <body class="bg-background text-foreground font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-primary/30">
+  <body class="selection:bg-primary/30 flex min-h-screen flex-col overflow-x-hidden bg-background font-sans text-foreground">
     <Navbar />
 
-    <div class="container-refined py-12 flex flex-col md:flex-row gap-8">
+    <div class="container-refined flex flex-col gap-8 py-12 md:flex-row">
       <!-- Sidebar for navigation -->
-      <aside class="md:w-64 shrink-0 glass-panel p-6" transition:persist>
+      <aside class="glass-panel shrink-0 p-6 md:w-64" transition:persist>
         <div class="sticky top-24">
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="font-bold text-lg" style="color: var(--text-primary);">
+          <div class="mb-6 flex items-center justify-between">
+            <h3 class="text-lg font-bold" style="color: var(--text-primary);">
               Documentation
             </h3>
             <ThemeToggle />
@@ -112,12 +114,12 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
           <!-- On this page navigation (generated from headings) -->
           <div
-            class="mt-8 pt-8 border-t"
+            class="mt-8 border-t pt-8"
             style="border-color: var(--border-primary);"
           >
             <h4 class="eyebrow-text mb-3">ON THIS PAGE</h4>
             <div
-              class="text-sm space-y-2"
+              class="space-y-2 text-sm"
               id="on-this-page"
               style="color: var(--text-muted);"
             >
@@ -129,7 +131,7 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
       <!-- Main content -->
       <main class="flex-1" transition:animate="slide">
-        <article class="prose prose-lg dark:prose-invert max-w-none docs-content">
+        <article class="prose prose-lg dark:prose-invert docs-content max-w-none">
           <!-- Documentation title and metadata -->
           <header class="mb-12">
             <div class="section-number mb-6">Documentation</div>
@@ -152,16 +154,16 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
           <!-- Footer navigation -->
           <div
-            class="mt-16 pt-8 border-t flex justify-between"
+            class="mt-16 flex justify-between border-t pt-8"
             transition:animate="slide"
           >
             <a
               href="#"
-              class="text-sm flex items-center gap-1 hover:text-primary transition-colors"
+              class="flex items-center gap-1 text-sm transition-colors hover:text-primary"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="w-4 h-4"
+                class="h-4 w-4"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -175,12 +177,12 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
             </a>
             <a
               href="#"
-              class="text-sm flex items-center gap-1 hover:text-primary transition-colors"
+              class="flex items-center gap-1 text-sm transition-colors hover:text-primary"
             >
               Next Page
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="w-4 h-4"
+                class="h-4 w-4"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >

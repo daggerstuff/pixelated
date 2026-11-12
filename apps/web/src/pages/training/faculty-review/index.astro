@@ -23,6 +23,7 @@
 import Layout from '@/layouts/Layout.astro'
 import { providerUnavailableResponse } from '@/lib/auth/provider-unavailable'
 import { resolvePageSession } from '@/lib/auth/session'
+
 import {
   CLOSING_MIGRATION,
   CLOSING_MIGRATION_DETAIL,
@@ -160,7 +161,7 @@ const requestedSessionId = Astro.url.searchParams.get('sessionId')
 
       <a
         href="/training"
-        class="mt-8 inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+        class="mt-8 inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         Back to training
       </a>

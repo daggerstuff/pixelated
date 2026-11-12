@@ -1,7 +1,6 @@
 ---
 export const prerender = false
 
-import DashboardLayout from '../../layouts/DashboardLayout.astro'
 import Card from '@/components/ui/Card.astro'
 import {
   DynamicEnhancedChartComponent,
@@ -9,6 +8,8 @@ import {
   DynamicParticleVisualization,
   DynamicSwiperCarousel,
 } from '@/lib/utils/dynamic-components'
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
 
 const { user } = Astro.props as { user: any }
 
@@ -20,32 +21,32 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
   title="My Therapy Dashboard | Pixelated Empathy"
   description="Your personal therapy dashboard with progress tracking and interactive tools"
 >
-  <div class="container mx-auto py-6 space-y-6">
+  <div class="container mx-auto space-y-6 py-6">
     <!-- Welcome Header -->
-    <div class="text-center mb-8">
-      <h1 class="text-4xl font-bold tracking-tight mb-3">
+    <div class="mb-8 text-center">
+      <h1 class="mb-3 text-4xl font-bold tracking-tight">
         Welcome to Your Therapy Space
         {user?.name && (
           <span class="text-primary">, {user.name.split(' ')[0]}</span>
         )}
       </h1>
-      <p class="text-xl text-muted-foreground mb-6">
+      <p class="mb-6 text-xl text-muted-foreground">
         Track your progress, explore emotions, and engage with your healing
         journey
       </p>
 
       <!-- Progress Summary -->
-      <div class="inline-flex items-center gap-6 bg-card px-8 py-4 rounded-none border border-border">
+      <div class="inline-flex items-center gap-6 rounded-none border border-border bg-card px-8 py-4">
         <div class="text-center">
           <div class="text-2xl font-bold text-foreground">85%</div>
           <div class="text-sm text-muted-foreground">Overall Progress</div>
         </div>
-        <div class="w-px h-8 bg-border"></div>
+        <div class="h-8 w-px bg-border"></div>
         <div class="text-center">
           <div class="text-2xl font-bold text-foreground">12</div>
           <div class="text-sm text-muted-foreground">Sessions Complete</div>
         </div>
-        <div class="w-px h-8 bg-border"></div>
+        <div class="h-8 w-px bg-border"></div>
         <div class="text-center">
           <div class="text-2xl font-bold text-foreground">4.8</div>
           <div class="text-sm text-muted-foreground">Wellness Score</div>
@@ -56,7 +57,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     <!-- Journey Overview Carousel -->
     <Card>
       <div class="p-6">
-        <h2 class="text-2xl font-semibold mb-6 text-center flex items-center justify-center gap-2">
+        <h2 class="mb-6 flex items-center justify-center gap-2 text-center text-2xl font-semibold">
           <span class="material-symbols-outlined text-primary">timeline</span>
           Your Therapy Journey
         </h2>
@@ -119,16 +120,16 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     </Card>
 
     <!-- Interactive Emotion Exploration -->
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
       <Card>
         <div class="p-6">
-          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h3 class="mb-4 flex items-center gap-2 text-xl font-semibold">
             <span class="material-symbols-outlined text-foreground">
               psychology
             </span>
             Emotion Exploration Space
           </h3>
-          <p class="text-muted-foreground text-sm mb-4">
+          <p class="mb-4 text-sm text-muted-foreground">
             Interact with particles that respond to different emotions. Move
             your mouse to see how emotions can flow and change.
           </p>
@@ -147,13 +148,13 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 
       <Card>
         <div class="p-6">
-          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h3 class="mb-4 flex items-center gap-2 text-xl font-semibold">
             <span class="material-symbols-outlined text-foreground">
               3d_rotation
             </span>
             Your Emotion Journey
           </h3>
-          <p class="text-muted-foreground text-sm mb-4">
+          <p class="mb-4 text-sm text-muted-foreground">
             Explore your emotional landscape in 3D space. Each point represents
             your emotional state during different therapy sessions.
           </p>
@@ -168,16 +169,16 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     </div>
 
     <!-- Progress Tracking -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <Card>
         <div class="p-6">
-          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h3 class="mb-4 flex items-center gap-2 text-xl font-semibold">
             <span class="material-symbols-outlined text-foreground">
               trending_up
             </span>
             Your Progress Over Time
           </h3>
-          <p class="text-muted-foreground text-sm mb-4">
+          <p class="mb-4 text-sm text-muted-foreground">
             Track your improvement across different areas of your therapy.
           </p>
           <DynamicEnhancedChartComponent
@@ -201,11 +202,11 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 
       <Card>
         <div class="p-6">
-          <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h3 class="mb-4 flex items-center gap-2 text-xl font-semibold">
             <span class="material-symbols-outlined text-foreground">mood</span>
             Emotional Patterns
           </h3>
-          <p class="text-muted-foreground text-sm mb-4">
+          <p class="mb-4 text-sm text-muted-foreground">
             Understand the distribution of your emotional states.
           </p>
           <DynamicEnhancedChartComponent
@@ -225,21 +226,21 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     </div>
 
     <!-- Action Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
       <Card class="bg-card">
         <div class="p-6 text-center">
-          <div class="w-16 h-16 bg-primary rounded-none flex items-center justify-center mx-auto mb-4">
-            <span class="material-symbols-outlined text-foreground text-2xl">
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-none bg-primary">
+            <span class="material-symbols-outlined text-2xl text-foreground">
               chat
             </span>
           </div>
-          <h3 class="text-lg font-semibold mb-2">Continue Therapy</h3>
-          <p class="text-sm text-muted-foreground mb-4">
+          <h3 class="mb-2 text-lg font-semibold">Continue Therapy</h3>
+          <p class="mb-4 text-sm text-muted-foreground">
             Start a new session with your AI therapy assistant
           </p>
           <a
             href="/therapy-chat"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
+            class="hover:bg-primary/90 inline-flex items-center gap-2 rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors"
           >
             <span>Start Session</span>
             <span class="material-symbols-outlined">arrow_forward</span>
@@ -249,18 +250,18 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 
       <Card class="bg-card">
         <div class="p-6 text-center">
-          <div class="w-16 h-16 bg-primary rounded-none flex items-center justify-center mx-auto mb-4">
-            <span class="material-symbols-outlined text-foreground text-2xl">
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-none bg-primary">
+            <span class="material-symbols-outlined text-2xl text-foreground">
               assignment
             </span>
           </div>
-          <h3 class="text-lg font-semibold mb-2">Review Goals</h3>
-          <p class="text-sm text-muted-foreground mb-4">
+          <h3 class="mb-2 text-lg font-semibold">Review Goals</h3>
+          <p class="mb-4 text-sm text-muted-foreground">
             Check your treatment plan and update your goals
           </p>
           <a
             href="/components/treatment-plans"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
+            class="hover:bg-primary/90 inline-flex items-center gap-2 rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors"
           >
             <span>View Goals</span>
             <span class="material-symbols-outlined">arrow_forward</span>
@@ -270,18 +271,18 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 
       <Card class="bg-card">
         <div class="p-6 text-center">
-          <div class="w-16 h-16 bg-primary rounded-none flex items-center justify-center mx-auto mb-4">
-            <span class="material-symbols-outlined text-foreground text-2xl">
+          <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-none bg-primary">
+            <span class="material-symbols-outlined text-2xl text-foreground">
               insights
             </span>
           </div>
-          <h3 class="text-lg font-semibold mb-2">Explore Tools</h3>
-          <p class="text-sm text-muted-foreground mb-4">
+          <h3 class="mb-2 text-lg font-semibold">Explore Tools</h3>
+          <p class="mb-4 text-sm text-muted-foreground">
             Discover advanced visualization and analysis tools
           </p>
           <a
             href="/dashboard/enhanced"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
+            class="hover:bg-primary/90 inline-flex items-center gap-2 rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors"
           >
             <span>Explore</span>
             <span class="material-symbols-outlined">arrow_forward</span>
@@ -293,17 +294,17 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     <!-- Today's Insights -->
     <Card class="bg-card">
       <div class="p-6">
-        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+        <h3 class="mb-4 flex items-center gap-2 text-xl font-semibold">
           <span class="material-symbols-outlined text-foreground">
             lightbulb
           </span>
           Today's Insights
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="bg-card rounded-none p-4">
-            <div class="flex items-center gap-3 mb-2">
-              <div class="w-8 h-8 bg-secondary rounded-none flex items-center justify-center">
-                <span class="material-symbols-outlined text-foreground text-sm">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div class="rounded-none bg-card p-4">
+            <div class="mb-2 flex items-center gap-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-none bg-secondary">
+                <span class="material-symbols-outlined text-sm text-foreground">
                   trending_up
                 </span>
               </div>
@@ -315,10 +316,10 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
             </p>
           </div>
 
-          <div class="bg-card rounded-none p-4">
-            <div class="flex items-center gap-3 mb-2">
-              <div class="w-8 h-8 bg-secondary rounded-none flex items-center justify-center">
-                <span class="material-symbols-outlined text-foreground text-sm">
+          <div class="rounded-none bg-card p-4">
+            <div class="mb-2 flex items-center gap-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-none bg-secondary">
+                <span class="material-symbols-outlined text-sm text-foreground">
                   schedule
                 </span>
               </div>
@@ -329,10 +330,10 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
             </p>
           </div>
 
-          <div class="bg-card rounded-none p-4">
-            <div class="flex items-center gap-3 mb-2">
-              <div class="w-8 h-8 bg-secondary rounded-none flex items-center justify-center">
-                <span class="material-symbols-outlined text-foreground text-sm">
+          <div class="rounded-none bg-card p-4">
+            <div class="mb-2 flex items-center gap-3">
+              <div class="flex h-8 w-8 items-center justify-center rounded-none bg-secondary">
+                <span class="material-symbols-outlined text-sm text-foreground">
                   psychology
                 </span>
               </div>
@@ -348,7 +349,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
     </Card>
 
     <!-- Navigation Footer -->
-    <div class="flex items-center justify-between pt-6 border-t border-border">
+    <div class="flex items-center justify-between border-t border-border pt-6">
       <div class="flex items-center gap-4 text-sm text-muted-foreground">
         <span>Patient Dashboard</span>
         <span>•</span>
@@ -364,13 +365,13 @@ const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
       <div class="flex items-center gap-2">
         <a
           href="/dashboard"
-          class="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-none hover:bg-secondary/80 transition-colors"
+          class="hover:bg-secondary/80 rounded-none bg-secondary px-4 py-2 text-sm text-secondary-foreground transition-colors"
         >
           Standard Dashboard
         </a>
         <a
           href="/components"
-          class="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-none hover:bg-primary/90 transition-colors"
+          class="hover:bg-primary/90 rounded-none bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors"
         >
           Explore Components
         </a>

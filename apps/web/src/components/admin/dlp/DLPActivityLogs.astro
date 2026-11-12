@@ -2,12 +2,12 @@
 // DLPActivityLogs.astro
 // Displays the DLP activity logs
 
-import Card from '../../ui/Card.astro'
-import CardHeader from '../../ui/CardHeader.astro'
-import CardContent from '../../ui/CardContent.astro'
-import CardTitle from '../../ui/CardTitle.astro'
-import Badge from '../../ui/Badge.astro'
 import { AuditEventType } from '../../../lib/audit'
+import Badge from '../../ui/Badge.astro'
+import Card from '../../ui/Card.astro'
+import CardContent from '../../ui/CardContent.astro'
+import CardHeader from '../../ui/CardHeader.astro'
+import CardTitle from '../../ui/CardTitle.astro'
 
 interface DLPActivityLog {
   id: string
@@ -76,13 +76,13 @@ const getEventBadge = (
       </CardContent>
     </Card>
   ) : (
-    <div class="space-y-4 mt-4">
+    <div class="mt-4 space-y-4">
       {logs.map((log: DLPActivityLog) => {
         const eventBadge = getEventBadge(log.eventType)
         return (
           <Card>
             <CardHeader class="pb-2">
-              <div class="flex justify-between items-start">
+              <div class="flex items-start justify-between">
                 <div>
                   <CardTitle class="text-base font-medium">
                     {log.action}
@@ -95,10 +95,10 @@ const getEventBadge = (
               </div>
             </CardHeader>
             <CardContent class="pt-0">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
                 <div>
                   <p class="text-sm font-medium">Triggered Rules:</p>
-                  <div class="flex flex-wrap gap-1 mt-1">
+                  <div class="mt-1 flex flex-wrap gap-1">
                     {log.triggeredRules.map((rule: string) => (
                       <span>
                         <Badge variant="outline">{rule}</Badge>

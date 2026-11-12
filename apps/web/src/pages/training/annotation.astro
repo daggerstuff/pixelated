@@ -212,33 +212,33 @@ const handlePromote = `
   title="Pixelated Empathy - Expert Annotation Queue"
   description="Review pending clinical validity samples for expert annotation"
 >
-  <main class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+  <main class="from-blue-50 via-white to-purple-50 min-h-screen bg-gradient-to-br">
     {/* Hero Section */}
-    <section class="relative px-4 py-16 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <section class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div class="text-center">
-        <div class="flex items-center justify-center mb-6">
-          <div class="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-none flex items-center justify-center mr-4">
+        <div class="mb-6 flex items-center justify-center">
+          <div class="from-orange-600 to-red-600 mr-4 flex h-16 w-16 items-center justify-center rounded-none bg-gradient-to-br">
             <span class="text-2xl">📋</span>
           </div>
           <h1 class="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl">
             Expert{' '}
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600">
+            <span class="text-transparent from-orange-600 to-red-600 bg-gradient-to-r bg-clip-text">
               Annotation Queue
             </span>
           </h1>
         </div>
 
-        <p class="max-w-3xl mx-auto text-xl text-muted-foreground sm:text-2xl">
+        <p class="mx-auto max-w-3xl text-xl text-muted-foreground sm:text-2xl">
           Review pending clinical validity samples that require expert
           evaluation. Provide your assessment to help improve the scoring model.
         </p>
 
-        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        <div class="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
           <Button
             href="/training"
             variant="outline"
             size="lg"
-            class="border-2 border-primary text-primary hover:bg-primary/10"
+            class="hover:bg-primary/10 border-2 border-primary text-primary"
           >
             ← Back to Training Portal
           </Button>
@@ -247,14 +247,14 @@ const handlePromote = `
     </section>
 
     {/* Main Content */}
-    <section class="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <section class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div class="mb-8">
-        <h2 class="text-2xl font-bold text-foreground mb-4">
+        <h2 class="mb-4 text-2xl font-bold text-foreground">
           Pending Items for Review
         </h2>
 
         {error ? (
-          <div class="bg-secondary border border-border p-4 mb-6 rounded-none">
+          <div class="mb-6 rounded-none border border-border bg-secondary p-4">
             <div class="flex">
               <div class="flex-shrink-0">
                 <svg
@@ -279,15 +279,15 @@ const handlePromote = `
 
       {/* Empty State */}
       <div
-        class={`empty-state ${pendingItems.length > 0 ? 'hidden' : 'block'} mb-8 text-center py-12`}
+        class={`empty-state ${pendingItems.length > 0 ? 'hidden' : 'block'} mb-8 py-12 text-center`}
       >
-        <div class="mx-auto w-24 h-24 bg-secondary rounded-none flex items-center justify-center mb-6">
+        <div class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-none bg-secondary">
           <span class="text-3xl">📭</span>
         </div>
-        <h3 class="text-2xl font-bold text-foreground mb-3">
+        <h3 class="mb-3 text-2xl font-bold text-foreground">
           No pending items
         </h3>
-        <p class="text-muted-foreground max-w-md mx-auto">
+        <p class="mx-auto max-w-md text-muted-foreground">
           All items have been reviewed. Check back later for new samples that
           need expert annotation.
         </p>
@@ -297,25 +297,25 @@ const handlePromote = `
       <div class="items-container grid gap-6">
         {pendingItems.map((item) => (
           <div id={`item-${item.id}`} class="transition-all duration-300">
-            <Card class="p-6 border border-border">
-              <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+            <Card class="border border-border p-6">
+              <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 {/* Sample Text */}
                 <div class="flex-1">
                   <div class="mb-4">
-                    <h3 class="text-lg font-semibold text-foreground mb-2">
+                    <h3 class="mb-2 text-lg font-semibold text-foreground">
                       Sample Text
                     </h3>
-                    <div class="bg-secondary p-4 rounded-none border border-border max-h-48 overflow-y-auto">
-                      <p class="text-foreground whitespace-pre-wrap">
+                    <div class="max-h-48 overflow-y-auto rounded-none border border-border bg-secondary p-4">
+                      <p class="whitespace-pre-wrap text-foreground">
                         {item.sample_text}
                       </p>
                     </div>
                   </div>
 
                   {/* Scores Summary */}
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
-                    <div class="bg-secondary p-3 rounded-none border border-border">
-                      <div class="text-xs font-medium text-foreground uppercase tracking-wide mb-1">
+                  <div class="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                    <div class="rounded-none border border-border bg-secondary p-3">
+                      <div class="mb-1 text-xs font-medium uppercase tracking-wide text-foreground">
                         Original Score
                       </div>
                       <div class="text-xl font-bold text-foreground">
@@ -324,8 +324,8 @@ const handlePromote = `
                     </div>
 
                     {item.routing_reason ? (
-                      <div class="bg-secondary p-3 rounded-none border border-border">
-                        <div class="text-xs font-medium text-foreground uppercase tracking-wide mb-1">
+                      <div class="rounded-none border border-border bg-secondary p-3">
+                        <div class="mb-1 text-xs font-medium uppercase tracking-wide text-foreground">
                           Routing Reason
                         </div>
                         <div class="text-sm text-foreground">
@@ -334,8 +334,8 @@ const handlePromote = `
                       </div>
                     ) : null}
 
-                    <div class="bg-secondary p-3 rounded-none border border-border">
-                      <div class="text-xs font-medium text-foreground uppercase tracking-wide mb-1">
+                    <div class="rounded-none border border-border bg-secondary p-3">
+                      <div class="mb-1 text-xs font-medium uppercase tracking-wide text-foreground">
                         Dimensions
                       </div>
                       <div class="text-sm text-foreground">
@@ -349,13 +349,13 @@ const handlePromote = `
                   {item.per_dimension_scores &&
                   Object.keys(item.per_dimension_scores).length > 0 ? (
                     <div class="mb-4">
-                      <h4 class="text-sm font-semibold text-foreground mb-2">
+                      <h4 class="mb-2 text-sm font-semibold text-foreground">
                         Per-dimension Scores
                       </h4>
                       <div class="flex flex-wrap gap-2">
                         {Object.entries(item.per_dimension_scores).map(
                           ([dimension, score]) => (
-                            <div class="px-3 py-1 bg-secondary text-foreground text-sm rounded-none">
+                            <div class="rounded-none bg-secondary px-3 py-1 text-sm text-foreground">
                               {dimension}: {(score * 100).toFixed(0)}%
                             </div>
                           ),
@@ -367,7 +367,7 @@ const handlePromote = `
 
                 {/* Review Form */}
                 <div class="lg:w-96">
-                  <h3 class="text-lg font-semibold text-foreground mb-4">
+                  <h3 class="mb-4 text-lg font-semibold text-foreground">
                     Your Review
                   </h3>
 
@@ -380,7 +380,7 @@ const handlePromote = `
                     <div>
                       <label
                         for={`reviewer_score_${item.id}`}
-                        class="block text-sm font-medium text-foreground mb-1"
+                        class="mb-1 block text-sm font-medium text-foreground"
                       >
                         Reviewer Score (0-1)
                       </label>
@@ -393,10 +393,10 @@ const handlePromote = `
                           max="1"
                           step="0.01"
                           required
-                          class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
+                          class="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                           placeholder="e.g., 0.75"
                         />
-                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                           <span class="text-muted-foreground">/1</span>
                         </div>
                       </div>
@@ -410,7 +410,7 @@ const handlePromote = `
                     <div>
                       <label
                         for={`notes_${item.id}`}
-                        class="block text-sm font-medium text-foreground mb-1"
+                        class="mb-1 block text-sm font-medium text-foreground"
                       >
                         Notes (Optional)
                       </label>
@@ -418,7 +418,7 @@ const handlePromote = `
                         id={`notes_${item.id}`}
                         name="notes"
                         rows="3"
-                        class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring"
+                        class="w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                         placeholder="Add any notes about your assessment..."
                       ></textarea>
                       <p class="mt-1 text-xs text-muted-foreground">
@@ -429,7 +429,7 @@ const handlePromote = `
                     {/* Submit Button */}
                     <button
                       type="submit"
-                      class="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-4 rounded-none transition duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      class="hover:bg-primary/90 w-full rounded-none bg-primary px-4 py-2.5 font-medium text-primary-foreground transition duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     >
                       Submit Review
                     </button>
@@ -437,7 +437,7 @@ const handlePromote = `
 
                   {/* Success and Error Messages */}
                   <div class="mt-4 space-y-2">
-                    <div class="success-message hidden bg-secondary border border-border p-4 rounded-none">
+                    <div class="success-message hidden rounded-none border border-border bg-secondary p-4">
                       <div class="flex">
                         <div class="flex-shrink-0">
                           <svg
@@ -458,7 +458,7 @@ const handlePromote = `
                       </div>
                     </div>
 
-                    <div class="error-message hidden bg-secondary border border-border p-4 rounded-none">
+                    <div class="error-message hidden rounded-none border border-border bg-secondary p-4">
                       <div class="flex">
                         <div class="flex-shrink-0">
                           <svg
@@ -488,12 +488,12 @@ const handlePromote = `
 
       {/* Reviewed Items (eligible for promotion) */}
       <div class="mt-12">
-        <div class="flex items-center gap-3 mb-6">
-          <div class="w-10 h-10 bg-primary rounded-none flex items-center justify-center">
+        <div class="mb-6 flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-none bg-primary">
             <span class="text-xl text-primary-foreground">⬆</span>
           </div>
           <h2 class="text-2xl font-bold text-foreground">Reviewed Items</h2>
-          <span class="px-3 py-1 text-xs font-medium rounded-none bg-secondary text-foreground">
+          <span class="rounded-none bg-secondary px-3 py-1 text-xs font-medium text-foreground">
             {reviewedItems.length} ready for promotion
           </span>
         </div>
@@ -503,32 +503,32 @@ const handlePromote = `
             {reviewedItems.map((item) => (
               <div
                 id={`reviewed-${item.id}`}
-                class="transition-all duration-300 p-6 border border-border bg-secondary rounded-none"
+                class="rounded-none border border-border bg-secondary p-6 transition-all duration-300"
                 data-queue-card
               >
-                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                   {/* Sample Text */}
                   <div class="flex-1">
                     <div class="mb-4">
-                      <div class="flex items-center gap-2 mb-2">
+                      <div class="mb-2 flex items-center gap-2">
                         <h3 class="text-lg font-semibold text-foreground">
                           Sample #{item.id}
                         </h3>
-                        <span class="px-2 py-0.5 text-xs font-medium rounded-none bg-secondary text-foreground">
+                        <span class="rounded-none bg-secondary px-2 py-0.5 text-xs font-medium text-foreground">
                           Reviewed
                         </span>
                       </div>
-                      <div class="bg-card p-4 rounded-none border border-border max-h-48 overflow-y-auto">
-                        <p class="text-foreground whitespace-pre-wrap">
+                      <div class="max-h-48 overflow-y-auto rounded-none border border-border bg-card p-4">
+                        <p class="whitespace-pre-wrap text-foreground">
                           {item.sample_text}
                         </p>
                       </div>
                     </div>
 
                     {/* Scores Summary */}
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4">
-                      <div class="bg-secondary p-3 rounded-none border border-border">
-                        <div class="text-xs font-medium text-foreground uppercase tracking-wide mb-1">
+                    <div class="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+                      <div class="rounded-none border border-border bg-secondary p-3">
+                        <div class="mb-1 text-xs font-medium uppercase tracking-wide text-foreground">
                           Original Score
                         </div>
                         <div class="text-xl font-bold text-foreground">
@@ -537,8 +537,8 @@ const handlePromote = `
                       </div>
 
                       {item.routing_reason ? (
-                        <div class="bg-secondary p-3 rounded-none border border-border">
-                          <div class="text-xs font-medium text-foreground uppercase tracking-wide mb-1">
+                        <div class="rounded-none border border-border bg-secondary p-3">
+                          <div class="mb-1 text-xs font-medium uppercase tracking-wide text-foreground">
                             Routing Reason
                           </div>
                           <div class="text-sm text-foreground">
@@ -547,8 +547,8 @@ const handlePromote = `
                         </div>
                       ) : null}
 
-                      <div class="bg-secondary p-3 rounded-none border border-border">
-                        <div class="text-xs font-medium text-foreground uppercase tracking-wide mb-1">
+                      <div class="rounded-none border border-border bg-secondary p-3">
+                        <div class="mb-1 text-xs font-medium uppercase tracking-wide text-foreground">
                           Dimensions
                         </div>
                         <div class="text-sm text-foreground">
@@ -562,13 +562,13 @@ const handlePromote = `
                     {item.per_dimension_scores &&
                     Object.keys(item.per_dimension_scores).length > 0 ? (
                       <div class="mb-4">
-                        <h4 class="text-sm font-semibold text-foreground mb-2">
+                        <h4 class="mb-2 text-sm font-semibold text-foreground">
                           Per-dimension Scores
                         </h4>
                         <div class="flex flex-wrap gap-2">
                           {Object.entries(item.per_dimension_scores).map(
                             ([dimension, score]) => (
-                              <div class="px-3 py-1 bg-secondary text-foreground text-sm rounded-none">
+                              <div class="rounded-none bg-secondary px-3 py-1 text-sm text-foreground">
                                 {dimension}: {(score * 100).toFixed(0)}%
                               </div>
                             ),
@@ -580,10 +580,10 @@ const handlePromote = `
 
                   {/* Promote Action */}
                   <div class="lg:w-64">
-                    <h3 class="text-lg font-semibold text-foreground mb-4">
+                    <h3 class="mb-4 text-lg font-semibold text-foreground">
                       Promotion
                     </h3>
-                    <p class="text-sm text-muted-foreground mb-4">
+                    <p class="mb-4 text-sm text-muted-foreground">
                       This item has been reviewed and is ready to be promoted to
                       the next stage.
                     </p>
@@ -591,7 +591,7 @@ const handlePromote = `
                       type="button"
                       data-promote-btn
                       onclick={`handlePromote(${item.id}, 'validated')`}
-                      class="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-4 rounded-none transition duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      class="hover:bg-primary/90 w-full rounded-none bg-primary px-4 py-2.5 font-medium text-primary-foreground transition duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     >
                       Promote to Validated
                     </button>
@@ -602,16 +602,16 @@ const handlePromote = `
           </div>
         ) : (
           <div
-            class="text-center py-12 bg-secondary rounded-none"
+            class="rounded-none bg-secondary py-12 text-center"
             data-empty-reviewed
           >
-            <div class="mx-auto w-24 h-24 bg-secondary rounded-none flex items-center justify-center mb-6">
+            <div class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-none bg-secondary">
               <span class="text-3xl">✓</span>
             </div>
-            <h3 class="text-2xl font-bold text-foreground mb-3">
+            <h3 class="mb-3 text-2xl font-bold text-foreground">
               No items ready for promotion
             </h3>
-            <p class="text-muted-foreground max-w-md mx-auto">
+            <p class="mx-auto max-w-md text-muted-foreground">
               Reviewed items will appear here ready for promotion to the next
               workflow stage.
             </p>
@@ -621,42 +621,42 @@ const handlePromote = `
     </section>
 
     {/* Stats Section */}
-    <section class="px-4 py-12 bg-secondary mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="text-center mb-10">
+    <section class="mx-auto max-w-7xl bg-secondary px-4 py-12 sm:px-6 lg:px-8">
+      <div class="mb-10 text-center">
         <h2 class="text-2xl font-bold text-foreground">
           Annotation Queue Overview
         </h2>
-        <p class="mt-3 text-muted-foreground max-w-2xl mx-auto">
+        <p class="mx-auto mt-3 max-w-2xl text-muted-foreground">
           You are reviewing samples that were routed for expert annotation due
           to borderline clinical validity scores.
         </p>
       </div>
 
       <div class="grid gap-6 md:grid-cols-3">
-        <Card class="p-6 text-center border-t-4 border-t-neutral-500">
-          <div class="text-3xl font-bold text-foreground mb-2">
+        <Card class="border-t-neutral-500 border-t-4 p-6 text-center">
+          <div class="mb-2 text-3xl font-bold text-foreground">
             {pendingItems.length}
           </div>
-          <div class="text-foreground font-medium">Pending Items</div>
-          <p class="text-sm text-muted-foreground mt-2">
+          <div class="font-medium text-foreground">Pending Items</div>
+          <p class="mt-2 text-sm text-muted-foreground">
             Awaiting expert review
           </p>
         </Card>
 
-        <Card class="p-6 text-center border-t-4 border-t-neutral-400">
-          <div class="text-3xl font-bold text-foreground mb-2">Expert</div>
-          <div class="text-foreground font-medium">Reviewer Role</div>
-          <p class="text-sm text-muted-foreground mt-2">
+        <Card class="border-t-neutral-400 border-t-4 p-6 text-center">
+          <div class="mb-2 text-3xl font-bold text-foreground">Expert</div>
+          <div class="font-medium text-foreground">Reviewer Role</div>
+          <p class="mt-2 text-sm text-muted-foreground">
             Your reviews help improve the model
           </p>
         </Card>
 
-        <Card class="p-6 text-center border-t-4 border-t-neutral-500">
-          <div class="text-3xl font-bold text-foreground mb-2">
+        <Card class="border-t-neutral-500 border-t-4 p-6 text-center">
+          <div class="mb-2 text-3xl font-bold text-foreground">
             Clinical Validity
           </div>
-          <div class="text-foreground font-medium">Focus Area</div>
-          <p class="text-sm text-muted-foreground mt-2">
+          <div class="font-medium text-foreground">Focus Area</div>
+          <p class="mt-2 text-sm text-muted-foreground">
             Assessing therapeutic quality
           </p>
         </Card>

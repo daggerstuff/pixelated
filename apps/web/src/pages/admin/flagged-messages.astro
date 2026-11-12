@@ -1,8 +1,8 @@
 ---
 export const prerender = false
+import BaseLayout from '../../layouts/BaseLayout.astro'
 import { requirePermission } from '../../lib/access-control'
 import { adminGetFlaggedMessages } from '../../lib/db/messages'
-import BaseLayout from '../../layouts/BaseLayout.astro'
 
 // Check if user has admin permission
 const checkPermission = requirePermission('read:admin')

@@ -14,6 +14,7 @@
 import Layout from '@/layouts/Layout.astro'
 import { providerUnavailableResponse } from '@/lib/auth/provider-unavailable'
 import { resolvePageSession } from '@/lib/auth/session'
+
 import { loadApprovedScenarioCatalog } from '../_scenario-catalog'
 
 // One page-session read for this request, through the helper that consumes the
@@ -51,7 +52,7 @@ const approvedOn =
   description="The training scenario catalog. Structure only: awaiting the approved scenario catalog."
 >
   <div class="min-h-screen bg-background text-foreground">
-    <div class="px-4 py-12 mx-auto max-w-4xl sm:px-6">
+    <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6">
       <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
         Training
       </p>
@@ -66,7 +67,7 @@ const approvedOn =
 
       {catalog.status === 'not-approved' ? (
         <section
-          class="p-6 mt-8 border border-border bg-card"
+          class="mt-8 border border-border bg-card p-6"
           aria-labelledby="catalog-blocker-heading"
         >
           <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
@@ -89,7 +90,7 @@ const approvedOn =
           </p>
         </section>
       ) : (
-        <section class="p-6 mt-8 border border-border bg-card">
+        <section class="mt-8 border border-border bg-card p-6">
           <p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
             {catalog.approval.approvedBy}
           </p>
@@ -112,7 +113,7 @@ const approvedOn =
         </h2>
 
         {catalog.scenarios.length > 0 ? (
-          <ul class="mt-4 border border-border bg-card divide-y divide-border">
+          <ul class="mt-4 divide-y divide-border border border-border bg-card">
             {catalog.scenarios.map((scenario) => (
               <li class="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
                 <span class="text-sm font-medium text-foreground">
@@ -120,7 +121,7 @@ const approvedOn =
                 </span>
                 <a
                   href={`/training/sessions/new?scenario=${encodeURIComponent(scenario.id)}`}
-                  class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+                  class="inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Select this scenario
                 </a>
@@ -129,7 +130,7 @@ const approvedOn =
           </ul>
         ) : (
           <p
-            class="p-6 mt-4 text-sm leading-relaxed border border-border bg-card text-muted-foreground"
+            class="mt-4 border border-border bg-card p-6 text-sm leading-relaxed text-muted-foreground"
             role="status"
           >
             No approved scenarios are listed. Nothing appears here until the
@@ -138,10 +139,10 @@ const approvedOn =
         )}
       </section>
 
-      <nav class="pt-6 mt-10 border-t border-border">
+      <nav class="mt-10 border-t border-border pt-6">
         <a
           href="/training"
-          class="inline-flex items-center justify-center min-h-[44px] px-6 py-3 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+          class="inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           Back to training
         </a>

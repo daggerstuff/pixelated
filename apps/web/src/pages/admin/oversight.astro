@@ -3,7 +3,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 ---
 
 <DashboardLayout title="Human Oversight Dashboard | Admin">
-  <div class="container px-4 py-8 mx-auto max-w-6xl">
+  <div class="container mx-auto max-w-6xl px-4 py-8">
     <header class="mb-8">
       <h1 class="text-2xl font-bold text-foreground">
         Human Oversight Dashboard
@@ -19,12 +19,12 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       <div class="rounded-none border border-input bg-secondary p-4">
         <div class="flex items-center gap-3">
           <span
-            class="inline-flex items-center rounded-none bg-secondary border border-input px-2.5 py-0.5 text-xs font-medium text-muted-foreground"
+            class="inline-flex items-center rounded-none border border-input bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground"
             id="oversight-mode-badge"
           >
             Supervised Mode
           </span>
-          <p class="text-sm text-foreground font-medium">
+          <p class="text-sm font-medium text-foreground">
             All AI responses require human approval before delivery. Manual
             overrides are logged with full audit trail.
           </p>
@@ -46,12 +46,12 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         </p>
       </div>
       <div class="rounded-none border border-ring bg-secondary p-4">
-        <h2 class="text-xs font-medium uppercase tracking-wider text-foreground font-medium font-medium">
+        <h2 class="text-xs font-medium uppercase tracking-wider text-foreground">
           Pending
         </h2>
         <p
           id="stat-pending"
-          class="mt-2 text-2xl font-bold text-foreground font-medium"
+          class="mt-2 text-2xl font-bold font-medium text-foreground"
         >
           0
         </p>
@@ -68,18 +68,18 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         </p>
       </div>
       <div class="rounded-none border border-ring bg-card p-4">
-        <h2 class="text-xs font-medium uppercase tracking-wider text-foreground font-semibold">
+        <h2 class="text-xs font-medium font-semibold uppercase tracking-wider text-foreground">
           Rejected
         </h2>
         <p
           id="stat-rejected"
-          class="mt-2 text-2xl font-bold text-foreground font-semibold font-semibold"
+          class="mt-2 text-2xl font-bold font-semibold text-foreground"
         >
           0
         </p>
       </div>
       <div class="rounded-none border border-input bg-secondary p-4">
-        <h2 class="text-xs font-medium uppercase tracking-wider text-foreground font-semibold">
+        <h2 class="text-xs font-medium font-semibold uppercase tracking-wider text-foreground">
           Overridden
         </h2>
         <p id="stat-overridden" class="mt-2 text-2xl font-bold text-foreground">

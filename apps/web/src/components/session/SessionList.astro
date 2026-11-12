@@ -28,8 +28,8 @@ const formatDate = (dateString: string) => {
 }
 ---
 
-<div class="bg-card rounded-none border border-border overflow-hidden">
-  <div class="p-4 border-b border-border">
+<div class="overflow-hidden rounded-none border border-border bg-card">
+  <div class="border-b border-border p-4">
     <h3 class="text-lg font-semibold">Recent Sessions</h3>
   </div>
 
@@ -39,13 +39,13 @@ const formatDate = (dateString: string) => {
     <ul>
       {sessions.map((session) => (
         <li
-          class={`border-b border-border last:border-0 ${selectedSessionId === session.id ? 'bg-secondary border-ring' : ''}`}
+          class={`border-b border-border last:border-0 ${selectedSessionId === session.id ? 'border-ring bg-secondary' : ''}`}
         >
           <a
             href={`/client/${session.clientId}/sessions/${session.id}`}
-            class="block px-4 py-3 hover:bg-accent transition"
+            class="block px-4 py-3 transition hover:bg-accent"
           >
-            <div class="flex justify-between items-center">
+            <div class="flex items-center justify-between">
               <div>
                 <h4 class="font-medium text-foreground">{session.title}</h4>
                 <div class="text-sm text-muted-foreground">
@@ -54,16 +54,15 @@ const formatDate = (dateString: string) => {
               </div>
               <div>
                 <span
-                  class={`inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium
-                    ${
-                      session.status === 'completed'
-                        ? 'bg-secondary border border-input text-foreground'
-                        : session.status === 'scheduled'
-                          ? 'bg-secondary border border-ring text-foreground font-medium'
-                          : session.status === 'canceled'
-                            ? 'bg-primary text-primary-foreground font-semibold'
-                            : 'bg-secondary border border-border text-muted-foreground'
-                    }`}
+                  class={`inline-flex items-center rounded-none px-2.5 py-0.5 text-xs font-medium ${
+                    session.status === 'completed'
+                      ? 'border border-input bg-secondary text-foreground'
+                      : session.status === 'scheduled'
+                        ? 'border border-ring bg-secondary font-medium text-foreground'
+                        : session.status === 'canceled'
+                          ? 'bg-primary font-semibold text-primary-foreground'
+                          : 'border border-border bg-secondary text-muted-foreground'
+                  }`}
                 >
                   {session.status}
                 </span>

@@ -1,13 +1,14 @@
 ---
+import { getCollection, render } from 'astro:content'
+
 import Warning from '@/components/base/Warning.astro'
 import Toc from '@/components/toc/Toc.astro'
 import ShareLink from '@/components/widgets/ShareLink.astro'
 import { FEATURES } from '@/config'
-import type { PostSchema } from '@/lib/schema'
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { formatDate } from '@/utils/datetime'
+import type { PostSchema } from '@/lib/schema'
 import { getContentSlug } from '@/utils/blog'
-import { getCollection, render } from 'astro:content'
+import { formatDate } from '@/utils/datetime'
 
 // export const prerender = true;
 
@@ -51,11 +52,11 @@ Please check back later.`
 ---
 
 <BaseLayout title={frontmatter.title} description={frontmatter.description}>
-  <article class="max-w-3xl mx-auto py-12 px-4 prose prose-invert">
+  <article class="prose prose-invert mx-auto max-w-3xl px-4 py-12">
     <header class="not-prose mb-8">
-      <h1 class="text-4xl font-bold text-white mb-2">{frontmatter.title}</h1>
+      <h1 class="text-white mb-2 text-4xl font-bold">{frontmatter.title}</h1>
       {pubDate && (
-        <p class="text-muted-foreground text-sm">
+        <p class="text-sm text-muted-foreground">
           <time datetime={pubDate}>{formatDate(pubDate)}</time>
           {updatedDate && (
             <time datetime={updatedDate}>

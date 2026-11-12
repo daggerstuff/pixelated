@@ -1,6 +1,7 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import { Target, TrendingUp } from 'lucide-react'
+
+import BaseLayout from '@/layouts/BaseLayout.astro'
 import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 ---
 
@@ -8,14 +9,14 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
   title="UI Component Showcase - Pixelated Empathy"
   description="Interactive UI components including advanced carousel systems and user interface elements"
 >
-  <section class="container mx-auto py-8 px-4">
-    <div class="max-w-6xl mx-auto">
-      <h1 class="text-3xl md:text-4xl font-bold mb-6 text-center np-text">
+  <section class="container mx-auto px-4 py-8">
+    <div class="mx-auto max-w-6xl">
+      <h1 class="np-text mb-6 text-center text-3xl font-bold md:text-4xl">
         UI Component Showcase
       </h1>
 
-      <div class="prose dark:prose-invert max-w-none mb-8 text-center">
-        <p class="text-xl np-text">
+      <div class="prose dark:prose-invert mb-8 max-w-none text-center">
+        <p class="np-text text-xl">
           Modern, accessible, and responsive UI components designed for optimal
           user experience in therapy and healthcare applications.
         </p>
@@ -23,13 +24,13 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 
       <!-- Feature Carousel -->
       <div
-        class="p-6 mb-8 np-surface"
+        class="np-surface mb-8 p-6"
         style="border: 1px solid var(--np-line);"
       >
-        <h2 class="text-2xl font-semibold mb-4 np-text">
+        <h2 class="np-text mb-4 text-2xl font-semibold">
           Feature Carousel - Slide Effect
         </h2>
-        <p class="mb-6 np-muted">
+        <p class="np-muted mb-6">
           Showcase platform features with smooth sliding transitions and
           responsive design.
         </p>
@@ -49,13 +50,13 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 
       <!-- Therapy Journey Carousel - Coverflow Effect -->
       <div
-        class="p-6 mb-8 np-surface"
+        class="np-surface mb-8 p-6"
         style="border: 1px solid var(--np-line);"
       >
-        <h2 class="text-2xl font-semibold mb-4 np-text">
+        <h2 class="np-text mb-4 text-2xl font-semibold">
           Therapy Journey - Coverflow Effect
         </h2>
-        <p class="mb-6 np-muted">
+        <p class="np-muted mb-6">
           Interactive 3D coverflow effect for displaying therapy milestones and
           progress.
         </p>
@@ -114,13 +115,13 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 
       <!-- Testimonials - Fade Effect -->
       <div
-        class="p-6 mb-8 np-surface"
+        class="np-surface mb-8 p-6"
         style="border: 1px solid var(--np-line);"
       >
-        <h2 class="text-2xl font-semibold mb-4 np-text">
+        <h2 class="np-text mb-4 text-2xl font-semibold">
           Patient Testimonials - Fade Effect
         </h2>
-        <p class="mb-6 np-muted">
+        <p class="np-muted mb-6">
           Smooth fade transitions for displaying patient success stories and
           testimonials.
         </p>
@@ -158,38 +159,38 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 
       <!-- Technical Features -->
       <div
-        class="p-6 mb-8"
+        class="mb-8 p-6"
         style="background: var(--np-bg); border: 1px solid var(--np-line);"
       >
-        <h2 class="text-2xl font-bold mb-6 text-center np-text">
+        <h2 class="np-text mb-6 text-center text-2xl font-bold">
           Carousel Features
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <div class="text-center">
-            <div class="text-3xl mb-2">🎨</div>
-            <h4 class="font-semibold np-text">Multiple Effects</h4>
-            <p class="text-sm np-muted">
+            <div class="mb-2 text-3xl">🎨</div>
+            <h4 class="np-text font-semibold">Multiple Effects</h4>
+            <p class="np-muted text-sm">
               Slide, fade, coverflow, and more transition effects
             </p>
           </div>
           <div class="text-center">
-            <div class="text-3xl mb-2">📱</div>
-            <h4 class="font-semibold np-text">Touch Gestures</h4>
-            <p class="text-sm np-muted">
+            <div class="mb-2 text-3xl">📱</div>
+            <h4 class="np-text font-semibold">Touch Gestures</h4>
+            <p class="np-muted text-sm">
               Native touch and swipe support for mobile devices
             </p>
           </div>
           <div class="text-center">
-            <div class="text-3xl mb-2">⚡</div>
-            <h4 class="font-semibold np-text">Performance</h4>
-            <p class="text-sm np-muted">
+            <div class="mb-2 text-3xl">⚡</div>
+            <h4 class="np-text font-semibold">Performance</h4>
+            <p class="np-muted text-sm">
               Hardware accelerated and optimized for smooth performance
             </p>
           </div>
           <div class="text-center">
-            <div class="text-3xl mb-2">♿</div>
-            <h4 class="font-semibold np-text">Accessibility</h4>
-            <p class="text-sm np-muted">
+            <div class="mb-2 text-3xl">♿</div>
+            <h4 class="np-text font-semibold">Accessibility</h4>
+            <p class="np-muted text-sm">
               Full keyboard navigation and screen reader support
             </p>
           </div>
@@ -198,45 +199,45 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 
       <!-- Responsive Design Demo -->
       <div
-        class="p-6 mb-8"
+        class="mb-8 p-6"
         style="background: var(--np-surface); border: 1px solid var(--np-line);"
       >
-        <h2 class="text-2xl font-bold mb-4 np-text">Responsive Design</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+        <h2 class="np-text mb-4 text-2xl font-bold">Responsive Design</h2>
+        <div class="grid grid-cols-1 gap-4 text-center md:grid-cols-3">
           <div class="p-4" style="background: var(--np-elevated);">
-            <div class="text-2xl mb-2">📱</div>
-            <h4 class="font-semibold np-text">Mobile</h4>
-            <p class="text-sm np-muted">
+            <div class="mb-2 text-2xl">📱</div>
+            <h4 class="np-text font-semibold">Mobile</h4>
+            <p class="np-muted text-sm">
               1 slide per view, optimized touch controls
             </p>
           </div>
           <div class="p-4" style="background: var(--np-elevated);">
-            <div class="text-2xl mb-2">💻</div>
-            <h4 class="font-semibold np-text">Tablet</h4>
-            <p class="text-sm np-muted">2-3 slides per view, balanced layout</p>
+            <div class="mb-2 text-2xl">💻</div>
+            <h4 class="np-text font-semibold">Tablet</h4>
+            <p class="np-muted text-sm">2-3 slides per view, balanced layout</p>
           </div>
           <div class="p-4" style="background: var(--np-elevated);">
-            <div class="text-2xl mb-2">🖥️</div>
-            <h4 class="font-semibold np-text">Desktop</h4>
-            <p class="text-sm np-muted">Full feature set, multiple slides</p>
+            <div class="mb-2 text-2xl">🖥️</div>
+            <h4 class="np-text font-semibold">Desktop</h4>
+            <p class="np-muted text-sm">Full feature set, multiple slides</p>
           </div>
         </div>
       </div>
 
       <!-- Use Cases -->
       <div
-        class="p-6 mb-8 np-surface"
+        class="np-surface mb-8 p-6"
         style="border: 1px solid var(--np-line);"
       >
-        <h2 class="text-2xl font-bold mb-6 text-center np-text">
+        <h2 class="np-text mb-6 text-center text-2xl font-bold">
           Platform Integration Use Cases
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <h3 class="text-lg font-semibold mb-3 np-text">
+            <h3 class="np-text mb-3 text-lg font-semibold">
               Patient Onboarding
             </h3>
-            <ul class="space-y-2 text-sm np-mid">
+            <ul class="np-mid space-y-2 text-sm">
               <li>✓ Step-by-step platform introduction</li>
               <li>✓ Feature highlights and tutorials</li>
               <li>✓ Treatment process explanation</li>
@@ -244,10 +245,10 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
             </ul>
           </div>
           <div>
-            <h3 class="text-lg font-semibold mb-3 np-text">
+            <h3 class="np-text mb-3 text-lg font-semibold">
               Content Presentation
             </h3>
-            <ul class="space-y-2 text-sm np-mid">
+            <ul class="np-mid space-y-2 text-sm">
               <li>✓ Educational material delivery</li>
               <li>✓ Exercise and technique demonstrations</li>
               <li>✓ Progress celebration displays</li>
@@ -255,10 +256,10 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
             </ul>
           </div>
           <div>
-            <h3 class="text-lg font-semibold mb-3 np-text">
+            <h3 class="np-text mb-3 text-lg font-semibold">
               Dashboard Features
             </h3>
-            <ul class="space-y-2 text-sm np-mid">
+            <ul class="np-mid space-y-2 text-sm">
               <li>✓ Quick access to recent activities</li>
               <li>✓ Upcoming appointments display</li>
               <li>✓ Treatment plan overview</li>
@@ -266,10 +267,10 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
             </ul>
           </div>
           <div>
-            <h3 class="text-lg font-semibold mb-3 np-text">
+            <h3 class="np-text mb-3 text-lg font-semibold">
               Therapeutic Tools
             </h3>
-            <ul class="space-y-2 text-sm np-mid">
+            <ul class="np-mid space-y-2 text-sm">
               <li>✓ Guided meditation sessions</li>
               <li>✓ Coping strategy presentations</li>
               <li>✓ Interactive therapy exercises</li>
@@ -281,31 +282,31 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 
       <!-- Navigation Links -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold mb-4 np-text">
+        <h2 class="np-text mb-4 text-2xl font-bold">
           Enhance Your User Experience
         </h2>
-        <p class="mb-6 max-w-2xl mx-auto np-muted">
+        <p class="np-muted mx-auto mb-6 max-w-2xl">
           Discover how these interactive UI components can improve engagement
           and accessibility in your therapy platform.
         </p>
         <div class="flex justify-center space-x-4">
           <a
             href="/demo-hub"
-            class="px-6 py-3 font-semibold transition-colors np-cta"
+            class="np-cta px-6 py-3 font-semibold transition-colors"
             style="background: var(--np-elevated); color: var(--np-text); border: 1px solid var(--np-line);"
           >
             Try Interactive Demo
           </a>
           <a
             href="/docs/developer/code-examples"
-            class="px-6 py-3 font-semibold transition-colors np-cta"
+            class="np-cta px-6 py-3 font-semibold transition-colors"
             style="background: var(--np-elevated); color: var(--np-text); border: 1px solid var(--np-line);"
           >
             Design System
           </a>
           <a
             href="/components"
-            class="px-6 py-3 font-semibold transition-colors np-cta"
+            class="np-cta px-6 py-3 font-semibold transition-colors"
             style="background: var(--np-bg); color: var(--np-text); border: 1px solid var(--np-line);"
           >
             All Components

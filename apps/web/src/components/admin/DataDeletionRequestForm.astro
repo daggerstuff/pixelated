@@ -76,8 +76,8 @@ const deletionReasons = [
 ]
 ---
 
-<div class="bg-card rounded-none p-6">
-  <h2 class="text-xl font-bold text-foreground mb-6">
+<div class="rounded-none bg-card p-6">
+  <h2 class="mb-6 text-xl font-bold text-foreground">
     Patient Data Deletion Request
   </h2>
 
@@ -94,7 +94,7 @@ const deletionReasons = [
     <div class="space-y-4">
       <h3 class="text-lg font-medium text-foreground">Patient Information</h3>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label
             for="patient-id"
@@ -107,7 +107,7 @@ const deletionReasons = [
             id="patient-id"
             name="patient-id"
             value={patientId}
-            class="mt-1 block w-full py-2 px-3 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring sm:text-sm border border-input"
+            class="mt-1 block w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-ring sm:text-sm"
             required
           />
         </div>
@@ -124,7 +124,7 @@ const deletionReasons = [
             id="patient-name"
             name="patient-name"
             value={patientName}
-            class="mt-1 block w-full py-2 px-3 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring sm:text-sm border border-input"
+            class="mt-1 block w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-ring sm:text-sm"
             required
           />
         </div>
@@ -148,7 +148,7 @@ const deletionReasons = [
             id="scope-all"
             name="deletion-scope"
             value="all"
-            class="h-4 w-4 text-foreground border-input focus:ring-ring"
+            class="h-4 w-4 border-input text-foreground focus:ring-ring"
             checked
           />
           <label
@@ -167,7 +167,7 @@ const deletionReasons = [
             value="specific"
             aria-expanded="false"
             aria-controls="data-categories-container"
-            class="h-4 w-4 text-foreground border-input focus:ring-ring"
+            class="h-4 w-4 border-input text-foreground focus:ring-ring"
           />
           <label
             for="scope-specific"
@@ -181,7 +181,7 @@ const deletionReasons = [
       <!-- Specific Data Categories (initially hidden, shown when "Specific" is selected) -->
       <div
         id="data-categories-container"
-        class="pl-7 mt-3 space-y-3 hidden"
+        class="mt-3 hidden space-y-3 pl-7"
         role="group"
         aria-labelledby="data-categories-label"
       >
@@ -189,17 +189,17 @@ const deletionReasons = [
           Select data categories to delete:
         </p>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
           {dataCategories.map((category) => (
             <div class="flex items-start">
-              <div class="flex items-center h-5">
+              <div class="flex h-5 items-center">
                 <input
                   type="checkbox"
                   id={`category-${category.id}`}
                   name="data-categories"
                   value={category.id}
                   aria-describedby={`category-desc-${category.id}`}
-                  class="h-4 w-4 text-foreground border-input rounded-none focus:ring-ring"
+                  class="h-4 w-4 rounded-none border-input text-foreground focus:ring-ring"
                 />
               </div>
               <div class="ml-3 text-sm">
@@ -236,7 +236,7 @@ const deletionReasons = [
         <select
           id="deletion-reason"
           name="deletion-reason"
-          class="mt-1 block w-full py-2 px-3 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring sm:text-sm border border-input"
+          class="mt-1 block w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-ring sm:text-sm"
           required
         >
           <option value="">Select a reason...</option>
@@ -259,14 +259,14 @@ const deletionReasons = [
           id="additional-details"
           name="additional-details"
           rows="3"
-          class="mt-1 block w-full py-2 px-3 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring sm:text-sm border border-input"
+          class="mt-1 block w-full rounded-none border border-input px-3 py-2 focus:border-ring focus:outline-none focus:ring-ring sm:text-sm"
           placeholder="Provide any additional context or details about this deletion request..."
         ></textarea>
       </div>
     </div>
 
     <!-- HIPAA Compliance Section -->
-    <div class="p-4 bg-secondary border border-ring rounded-none">
+    <div class="rounded-none border border-ring bg-secondary p-4">
       <div class="flex">
         <div class="flex-shrink-0">
           <Icon
@@ -279,7 +279,7 @@ const deletionReasons = [
           <h3 class="text-sm font-medium text-foreground">
             HIPAA Compliance Notice
           </h3>
-          <div class="mt-2 text-sm text-foreground font-medium">
+          <div class="mt-2 text-sm font-medium text-foreground">
             <p>
               This deletion request will be logged and processed in accordance
               with HIPAA regulations. Certain data may need to be retained for
@@ -288,19 +288,19 @@ const deletionReasons = [
           </div>
           <div class="mt-4">
             <div class="flex items-start">
-              <div class="flex items-center h-5">
+              <div class="flex h-5 items-center">
                 <input
                   id="hipaa-confirmation"
                   name="hipaa-confirmation"
                   type="checkbox"
-                  class="h-4 w-4 text-foreground border-input rounded-none focus:ring-ring"
+                  class="h-4 w-4 rounded-none border-input text-foreground focus:ring-ring"
                   required
                 />
               </div>
               <div class="ml-3 text-sm">
                 <label
                   for="hipaa-confirmation"
-                  class="font-medium text-foreground font-medium"
+                  class="font-medium text-foreground"
                 >
                   I confirm this deletion request complies with HIPAA
                   requirements
@@ -317,15 +317,15 @@ const deletionReasons = [
       <button
         type="button"
         id="cancel-button"
-        class="py-2 px-4 border border-input rounded-none text-sm font-medium text-foreground bg-card hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+        class="rounded-none border border-input bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
       >
         Cancel
       </button>
       <button
         type="submit"
-        class="py-2 px-4 border border-transparent rounded-none text-sm font-medium text-primary-foreground bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring flex items-center"
+        class="border-transparent flex items-center rounded-none border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
       >
-        <Icon name="trash" class="w-4 h-4 mr-2" aria-hidden="true" />
+        <Icon name="trash" class="mr-2 h-4 w-4" aria-hidden="true" />
         Submit Deletion Request
       </button>
     </div>

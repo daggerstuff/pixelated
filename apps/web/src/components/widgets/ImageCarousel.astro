@@ -1,6 +1,6 @@
 ---
-import { Image } from 'astro:assets'
 import type { ImageMetadata } from 'astro'
+import { Image } from 'astro:assets'
 
 export interface Props {
   images: {
@@ -21,7 +21,7 @@ const { images, imageProps, autoplayDelay = 3000 } = Astro.props
 ---
 
 <image-carousel
-  class="block relative"
+  class="relative block"
   data-autoplay-delay={autoplayDelay}
   role="region"
   aria-roledescription="carousel"

@@ -2,17 +2,18 @@
 // DLPRulesList.astro
 // Displays the list of DLP rules with toggle controls
 
+import { Trash2 } from 'lucide-react'
+
+import { DLPAction, type DLPRule } from '../../../lib/security/dlp'
+import { dlpService } from '../../../lib/security/dlp'
 import Badge from '../../ui/Badge.astro'
+import Button from '../../ui/Button.astro'
 import Card from '../../ui/Card.astro'
 import CardContent from '../../ui/CardContent.astro'
 import CardDescription from '../../ui/CardDescription.astro'
 import CardHeader from '../../ui/CardHeader.astro'
 import CardTitle from '../../ui/CardTitle.astro'
 import { Switch } from '../../ui/switch'
-import Button from '../../ui/Button.astro'
-import { DLPAction, type DLPRule } from '../../../lib/security/dlp'
-import { dlpService } from '../../../lib/security/dlp'
-import { Trash2 } from 'lucide-react'
 
 interface Props {
   rules: DLPRule[]
@@ -38,9 +39,9 @@ const getActionBadge = (action: DLPAction) => {
 ---
 
 <div class="rules-list">
-  <div class="flex justify-between items-center mb-4">
+  <div class="mb-4 flex items-center justify-between">
     <h2 class="text-xl font-semibold">DLP Rules</h2>
-    <Button data-new-rule class="bg-primary text-white hover:bg-primary/90">
+    <Button data-new-rule class="text-white hover:bg-primary/90 bg-primary">
       Add New Rule
     </Button>
   </div>
@@ -61,7 +62,7 @@ const getActionBadge = (action: DLPAction) => {
           <div class="rule-card">
             <Card>
               <CardHeader class="pb-2">
-                <div class="flex justify-between items-start">
+                <div class="flex items-start justify-between">
                   <div>
                     <CardTitle class="text-lg">{ruleItem.name}</CardTitle>
                     <CardDescription>{ruleItem.description}</CardDescription>
@@ -80,7 +81,7 @@ const getActionBadge = (action: DLPAction) => {
                 </div>
               </CardHeader>
               <CardContent class="pt-0">
-                <div class="flex justify-between items-center">
+                <div class="flex items-center justify-between">
                   <div>
                     <Badge variant={actionBadge.variant as any}>
                       {actionBadge.text}

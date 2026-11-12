@@ -1,11 +1,11 @@
 ---
 import Link from '@/components/base/Link.astro'
-import { withBasePath } from '@/utils/path'
 import { SITE } from '@/config'
+import { withBasePath } from '@/utils/path'
 ---
 
 <Link
-  class="select-none op-transition"
+  class="op-transition select-none"
   href={withBasePath('/')}
   aria-label={SITE.author}
   aria-current={Astro.url.pathname === `${withBasePath('/')}` ? 'page' : false}

@@ -1,8 +1,10 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro'
-import '@/styles/auth-forms.css'
-import { LoginForm } from '../components/auth/LoginForm.tsx'
 import { ClientRouter } from 'astro:transitions'
+
+import { LoginForm } from '../components/auth/LoginForm.tsx'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+import '@/styles/auth-forms.css'
 
 // Get the redirect URL from the query parameters
 const redirectUrl = Astro.url.searchParams.get('redirect') || '/dashboard'

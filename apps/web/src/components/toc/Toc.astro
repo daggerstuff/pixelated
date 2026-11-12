@@ -1,11 +1,11 @@
 ---
+import type { MarkdownHeading } from 'astro'
+
 import TocButton from '@/components/toc/TocButton.astro'
 import TocItem from '@/components/toc/TocItem.astro'
-import { generateToc } from '@/utils/toc'
 import { FEATURES } from '@/config'
-
-import type { MarkdownHeading } from 'astro'
 import type { TocConfig } from '@/types'
+import { generateToc } from '@/utils/toc'
 
 type Props =
   | {

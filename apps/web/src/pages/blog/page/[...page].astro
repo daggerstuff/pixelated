@@ -1,6 +1,7 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getCollection } from 'astro:content'
+
+import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getContentSlug } from '@/utils/blog'
 
 // export const prerender = true
@@ -135,49 +136,49 @@ const description =
 ---
 
 <BaseLayout {title} {description}>
-  <div class="max-w-4xl mx-auto px-4 py-12">
+  <div class="mx-auto max-w-4xl px-4 py-12">
     <header class="mb-12">
-      <div class="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
-        <a href="/blog" class="hover:text-foreground transition-colors">
+      <div class="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+        <a href="/blog" class="transition-colors hover:text-foreground">
           Blog
         </a>
         <span>/</span>
         <span class="text-foreground">All Posts</span>
       </div>
-      <h1 class="text-3xl font-bold mb-4">All Posts</h1>
+      <h1 class="mb-4 text-3xl font-bold">All Posts</h1>
       <p class="text-muted-foreground">
         {page.total} articles about therapy, technology, and digital empathy
       </p>
     </header>
 
-    <div class="space-y-8 mb-12">
+    <div class="mb-12 space-y-8">
       {page.data.map((post: any) => (
         <article class="group">
-          <div class="flex flex-col sm:flex-row gap-4">
+          <div class="flex flex-col gap-4 sm:flex-row">
             <div class="flex-shrink-0 text-sm text-muted-foreground sm:w-32">
               {formatDate(new Date(post.data.pubDate))}
-              <span class="hidden sm:block mt-1">
+              <span class="mt-1 hidden sm:block">
                 {getReadingTime(post.body)}
               </span>
             </div>
 
             <div class="flex-1">
-              <h3 class="text-xl font-bold mb-2 group-hover:text-foreground transition-colors">
+              <h3 class="mb-2 text-xl font-bold transition-colors group-hover:text-foreground">
                 <a href={`/blog/${getContentSlug(post)}`} class="block">
                   {post.data.title}
                 </a>
               </h3>
 
-              <p class="text-foreground mb-3 leading-relaxed">
+              <p class="mb-3 leading-relaxed text-foreground">
                 {post.data.description}
               </p>
 
               {post.data.tags && post.data.tags.length > 0 && (
-                <div class="flex flex-wrap gap-2 mb-3">
+                <div class="mb-3 flex flex-wrap gap-2">
                   {post.data.tags.map((tag: string) => (
                     <a
                       href={`/blog/tags/${tag}`}
-                      class="text-xs text-foreground hover:text-foreground transition-colors"
+                      class="text-xs text-foreground transition-colors hover:text-foreground"
                     >
                       #{tag}
                     </a>
@@ -187,10 +188,10 @@ const description =
 
               <a
                 href={`/blog/${getContentSlug(post)}`}
-                class="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors group-hover:text-foreground"
+                class="inline-flex items-center text-sm text-muted-foreground transition-colors hover:text-foreground group-hover:text-foreground"
               >
                 Read article
-                <span class="ml-1 group-hover:translate-x-1 transition-transform">
+                <span class="ml-1 transition-transform group-hover:translate-x-1">
                   →
                 </span>
               </a>
@@ -202,12 +203,12 @@ const description =
       <!-- Pagination -->
       {(page.url.prev || page.url.next) && (
         <div class="border-t border-border pt-8">
-          <div class="flex justify-between items-center">
+          <div class="flex items-center justify-between">
             <div>
               {page.url.prev && (
                 <a
                   href={page.url.prev}
-                  class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+                  class="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
                 >
                   ← Previous page
                 </a>
@@ -222,7 +223,7 @@ const description =
               {page.url.next && (
                 <a
                   href={page.url.next}
-                  class="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
+                  class="inline-flex items-center text-muted-foreground transition-colors hover:text-foreground"
                 >
                   Next page →
                 </a>
@@ -233,25 +234,25 @@ const description =
       )}
 
       <!-- Navigation -->
-      <div class="border-t border-border pt-8 mt-8">
-        <div class="flex flex-col sm:flex-row gap-4 justify-between">
+      <div class="mt-8 border-t border-border pt-8">
+        <div class="flex flex-col justify-between gap-4 sm:flex-row">
           <div class="flex gap-4">
             <a
               href="/blog"
-              class="text-muted-foreground hover:text-foreground transition-colors"
+              class="text-muted-foreground transition-colors hover:text-foreground"
             >
               ← Blog home
             </a>
             <a
               href="/blog/tags"
-              class="text-muted-foreground hover:text-foreground transition-colors"
+              class="text-muted-foreground transition-colors hover:text-foreground"
             >
               All topics
             </a>
           </div>
           <a
             href="/rss.xml"
-            class="text-muted-foreground hover:text-foreground transition-colors"
+            class="text-muted-foreground transition-colors hover:text-foreground"
           >
             RSS feed
           </a>

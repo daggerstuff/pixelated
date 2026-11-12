@@ -3,11 +3,7 @@
 
 <button
   id="toc-open-button"
-  class="z-50 fixed right-5 bottom-18
-    w-10 h-10 rounded-none
-    op-0 bg-secondary border border-border pointer-events-none op-transition
-    lt-lgp:(op-50 pointer-events-auto)
-    hover:op-100 print:hidden"
+  class="bottom-18 op-0 op-transition lt-lgp:(op-50 pointer-events-auto) hover:op-100 pointer-events-none fixed right-5 z-50 h-10 w-10 rounded-none border border-border bg-secondary print:hidden"
   title="Open table of contents"
 >
   <div u-i-lucide-table-of-contents class="text-foreground"></div>
@@ -15,12 +11,9 @@
 
 <nav
   id="toc-panel"
-  class="hidden! z-200 fixed top-10% left-50% translate-x--50%
-    overflow-y-auto flex flex-col
-    w-90% max-h-80vh py-4 px-6 rounded-none
-    bg-card border border-border text-foreground"
+  class="hidden! z-200 top-10% left-50% translate-x--50% w-90% max-h-80vh fixed flex flex-col overflow-y-auto rounded-none border border-border bg-card px-6 py-4 text-foreground"
 >
-  <div class="pb-1 b-b b-border">Table of Contents</div>
+  <div class="b-b b-border pb-1">Table of Contents</div>
   <ul class="text-sm">
     <slot />
   </ul>

@@ -5,15 +5,15 @@ import { SITE } from '../../config'
 const currentYear = new Date().getFullYear()
 ---
 
-<footer class="bg-secondary py-12 mt-12">
+<footer class="mt-12 bg-secondary py-12">
   <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
       <div class="col-span-1 md:col-span-2">
-        <a href="/" class="flex items-center gap-2 mb-4">
-          <img src="/favicon.svg" alt="Logo" class="w-8 h-8" />
-          <span class="text-xl font-bold brand-title">{SITE.name}</span>
+        <a href="/" class="mb-4 flex items-center gap-2">
+          <img src="/favicon.svg" alt="Logo" class="h-8 w-8" />
+          <span class="brand-title text-xl font-bold">{SITE.name}</span>
         </a>
-        <p class="text-muted-foreground mb-4 max-w-md">{SITE.description}</p>
+        <p class="mb-4 max-w-md text-muted-foreground">{SITE.description}</p>
         <div class="flex space-x-4">
           <a
             href="https://x.com/tweetpixelated"
@@ -69,7 +69,7 @@ const currentYear = new Date().getFullYear()
       </div>
 
       <div>
-        <h3 class="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
           Resources
         </h3>
         <ul class="space-y-3">
@@ -103,7 +103,7 @@ const currentYear = new Date().getFullYear()
       </div>
 
       <div>
-        <h3 class="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-foreground">
           Company
         </h3>
         <ul class="space-y-3">
@@ -143,7 +143,7 @@ const currentYear = new Date().getFullYear()
       </div>
     </div>
 
-    <div class="border-t border-border mt-8 pt-8 text-center text-muted-foreground">
+    <div class="mt-8 border-t border-border pt-8 text-center text-muted-foreground">
       <p>
         &copy; {currentYear} {SITE.name}. All rights reserved.
       </p>

@@ -10,31 +10,31 @@ export const prerender = false
   bgType="default"
 >
   <div class="min-h-[80vh] px-4 py-16">
-    <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-16">
-        <h1 class="text-4xl lg:text-6xl font-bold text-foreground mb-6">
+    <div class="mx-auto max-w-6xl">
+      <div class="mb-16 text-center">
+        <h1 class="mb-6 text-4xl font-bold text-foreground lg:text-6xl">
           Meet Our Therapists
         </h1>
 
-        <p class="text-xl text-muted-foreground max-w-3xl mx-auto">
+        <p class="mx-auto max-w-3xl text-xl text-muted-foreground">
           Our team of licensed mental health professionals is here to support
           your journey to wellness.
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <div class="mb-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         <!-- Sample therapist cards -->
         {[1, 2, 3, 4, 5, 6].map((id) => (
-          <div class="bg-card border border-border rounded-none p-6 transition-colors">
-            <div class="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <div class="rounded-none border border-border bg-card p-6 transition-colors">
+            <div class="from-blue-500 to-purple-500 mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br">
               <span class="text-white text-2xl font-bold">Dr</span>
             </div>
 
-            <h3 class="text-xl font-semibold text-foreground text-center mb-2">
+            <h3 class="mb-2 text-center text-xl font-semibold text-foreground">
               Dr. Therapist {id}
             </h3>
 
-            <p class="text-muted-foreground text-center mb-4">
+            <p class="mb-4 text-center text-muted-foreground">
               Licensed Clinical Psychologist
             </p>
 
@@ -44,7 +44,7 @@ export const prerender = false
               <div>• Licensed in multiple states</div>
             </div>
 
-            <button class="w-full mt-4 px-4 py-2 text-sm font-semibold text-foreground border border-ring rounded-none hover:bg-accent transition-colors">
+            <button class="mt-4 w-full rounded-none border border-ring px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-accent">
               View Profile
             </button>
           </div>
@@ -52,18 +52,18 @@ export const prerender = false
       </div>
 
       <div class="text-center">
-        <div class="bg-secondary rounded-none p-8 border border-border">
-          <h2 class="text-2xl font-semibold text-foreground mb-4">
+        <div class="rounded-none border border-border bg-secondary p-8">
+          <h2 class="mb-4 text-2xl font-semibold text-foreground">
             Ready to Get Started?
           </h2>
-          <p class="text-muted-foreground mb-6">
+          <p class="mb-6 text-muted-foreground">
             Find the right therapist for your needs and begin your journey to
             wellness.
           </p>
 
           <a
             href="/book"
-            class="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            class="text-white from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 inline-flex transform items-center justify-center rounded-xl bg-gradient-to-r px-8 py-4 text-lg font-semibold shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
           >
             Book Your First Session
           </a>
