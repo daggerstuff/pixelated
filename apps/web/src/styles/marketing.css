@@ -120,8 +120,6 @@
   margin: 0;
   font-family: var(
     --np-font-display,
-    'Space Grotesk Variable',
-    'Space Grotesk',
     system-ui,
     sans-serif
   );
@@ -139,8 +137,6 @@
   max-width: 22ch;
   font-family: var(
     --np-font-headline,
-    'Space Grotesk Variable',
-    'Space Grotesk',
     system-ui,
     sans-serif
   );

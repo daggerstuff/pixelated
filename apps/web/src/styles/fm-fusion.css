@@ -45,8 +45,6 @@
   --fm-mono: 'Spline Sans Mono Variable', ui-monospace, monospace;
   --fm-display: var(
     --np-font-display,
-    'Space Grotesk Variable',
-    'Space Grotesk',
     system-ui,
     sans-serif
   );

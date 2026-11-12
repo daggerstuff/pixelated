@@ -836,9 +836,6 @@ importers:
       '@fontsource-variable/literata':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource-variable/space-grotesk':
-        specifier: ^5.3.0
-        version: 5.3.0
       '@fontsource-variable/spline-sans-mono':
         specifier: ^5.3.0
         version: 5.3.0
@@ -3121,9 +3118,6 @@ packages:
 
   '@fontsource-variable/literata@5.3.0':
     resolution: {integrity: sha512-1Jw7xvOcoGyB83lxB2nG4bfNbqtX2/TTbdh9sHAOmU064SvmSdulDtA5RBu5JYWf64fdaKX7xU+z3GO1T2bCHA==}
-
-  '@fontsource-variable/space-grotesk@5.3.0':
-    resolution: {integrity: sha512-2IxmvfB08i9vnGB3Ym/AXvhRE+8XOjWMXIyDum03c+tPwH0FUoMNQfGpU8NXPxjbws0Vvss3AH0Zqt4oJBBAdw==}
 
   '@fontsource-variable/spline-sans-mono@5.3.0':
     resolution: {integrity: sha512-dH/qBj/MCE4ObiuCwlA9X1o3AftMO9dwfFgoRVYjy6VCPYkpWAlEtK/RjeyICgsR8rW763IAQARskVgShBY5JA==}
@@ -16534,8 +16528,6 @@ snapshots:
 
   '@fontsource-variable/literata@5.3.0': {}
 
-  '@fontsource-variable/space-grotesk@5.3.0': {}
-
   '@fontsource-variable/spline-sans-mono@5.3.0': {}
 
   '@fontsource/big-shoulders-display@5.3.0': {}
@@ -29526,7 +29518,6 @@ time:
   '@composio/vercel@0.13.0': '2026-10-21T21:45:00.622Z'
   '@fontsource-variable/instrument-sans@5.3.0': '2026-07-19T03:50:25.023Z'
   '@fontsource-variable/literata@5.3.0': '2026-07-19T03:50:38.294Z'
-  '@fontsource-variable/space-grotesk@5.3.0': '2026-07-19T03:52:15.366Z'
   '@fontsource-variable/spline-sans-mono@5.3.0': '2026-07-19T03:52:15.829Z'
   '@fontsource/ibm-plex-mono@5.3.0': '2026-07-19T03:39:57.977Z'
   '@fontsource/instrument-serif@5.3.0': '2026-07-19T03:40:12.806Z'
