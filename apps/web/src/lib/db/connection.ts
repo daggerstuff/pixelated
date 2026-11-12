@@ -4,7 +4,7 @@
 import Redis from 'ioredis'
 import mongoose from 'mongoose'
 import type { Connection } from 'mongoose'
-import { Pool, PoolClient } from 'pg'
+import { Pool } from 'pg'
 
 import { getPool as getDbPool, initializeDatabase } from '../db'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
@@ -211,55 +211,5 @@ export async function disconnectRedis(): Promise<void> {
     await redisClient.quit()
     redisClient = null
     logger.info('Redis disconnected')
-  }
-}
-
-export async function disconnectAll() {
-  await Promise.all([
-    disconnectMongoDB(),
-    disconnectPostgreSQL(),
-    disconnectRedis(),
-  ])
-}
-
-// ============================================================================
-// TRANSACTION HELPERS
-// ============================================================================
-
-export async function withPostgresTransaction<T>(
-  callback: (client: PoolClient) => Promise<T>,
-): Promise<T> {
-  const pool = getPostgresPool()
-  const client = await pool.connect()
-
-  try {
-    await client.query('BEGIN')
-    const result = await callback(client)
-    await client.query('COMMIT')
-    return result
-  } catch (error: unknown) {
-    await client.query('ROLLBACK')
-    throw error
-  } finally {
-    client.release()
-  }
-}
-
-export async function withMongoSession<T>(
-  callback: (session: any) => Promise<T>,
-): Promise<T> {
-  const connection = getMongoConnection()
-  const session = await connection.startSession()
-
-  try {
-    session.startTransaction()
-    const result = await callback(session)
-    await session.commitTransaction()
-    return result
-  } catch (error: unknown) {
-    await session.abortTransaction()
-    throw error
-  } finally {
-    await session.endSession()
   }
 }
