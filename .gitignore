@@ -88,14 +88,14 @@ openhands/
 autobots.toml
 agents.toml
 CLAUDE.md
-DESIGN.md
+!DESIGN.md
 hackathon/
 HANDOFF.md
 id_ed25519
 id_rsa
 job.md
 KIMI.md
-PRODUCT.md
+!PRODUCT.md
 scratch
 # Agent runtime skill caches are local-only, but the repository's own skill
 # routing definitions (skills/*/SKILL.md) are source-controlled and are
@@ -112,7 +112,7 @@ skills/*
 /agent/
 skills-lock.json
 struct-agent-key.json
-TASTES.md
+!TASTES.md
 test.md
 # __mocks__ ignores agent-runtime junk dirs of that name, but vitest manual
 # mocks are source-controlled test fixtures — un-ignore this one.
