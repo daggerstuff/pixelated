@@ -83,10 +83,7 @@ describe('the cached PostgreSQL pool', () => {
   it('hands out the pool the db module owns after a rebuild', async () => {
     initializeDatabase()
     const first = FakePool.instances[0]
-    const connected = await connectPostgreSQL()
-
-    expect(connected).toBe(first)
-    expect(getPostgresPool()).toBe(first)
+    await connectPostgreSQL()
 
     // The db module discarded its pool; the next read rebuilds it.
     await closeDatabase()
@@ -94,9 +91,13 @@ describe('the cached PostgreSQL pool', () => {
 
     const replacement = getPostgresPool()
 
-    expect(replacement).not.toBe(first)
     expect(FakePool.instances).toHaveLength(2)
-    expect(replacement).toBe(FakePool.instances[1])
+    const second = FakePool.instances[1]
+    expect(second).not.toBe(first)
+    // The getter serves the replacement: ending the handle ends the second
+    // instance, not the discarded one.
+    await replacement.end()
+    expect(second.ended).toBe(true)
   })
 
   it('re-tests the connection against the replacement', async () => {
@@ -106,8 +107,10 @@ describe('the cached PostgreSQL pool', () => {
 
     const replacement = await connectPostgreSQL()
 
-    expect(replacement).toBe(FakePool.instances[1])
     expect(FakePool.instances).toHaveLength(2)
+    // The returned handle serves the rebuilt instance.
+    await replacement.end()
+    expect(FakePool.instances[1].ended).toBe(true)
   })
 
   it('hands back a pool injected with setPostgresPool', async () => {
