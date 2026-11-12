@@ -248,7 +248,8 @@ LOG_LEVEL=INFO
 LOG_FILE=bias_detection.log
 
 # Service Configuration
-HOST=0.0.0.0
+# Bind to loopback; expose publicly only through the TLS-terminating reverse proxy.
+HOST=127.0.0.1
 PORT=5000
 DEBUG=false
 EOF
@@ -276,7 +277,10 @@ fi
 
 # Start the service
 echo "Starting Bias Detection Engine Service..."
-python bias_detection_service.py
+# Use a production WSGI server; the Werkzeug dev server (app.run) is not
+# meant to face the internet.
+exec gunicorn --workers ${WORKERS:-4} --timeout 120 \
+    --bind "${HOST:-127.0.0.1}:${PORT:-5000}" bias_detection_service:app
 EOF
 
 	chmod +x start_service.sh

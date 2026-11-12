@@ -144,6 +144,18 @@ def health_check():
         return jsonify({"status": "unhealthy", "error": "Health check failed"}), 500
 
 
+_LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
+
+
 if __name__ == "__main__":
-    # Start the Flask app
+    # Local development only. In production run under gunicorn
+    # (see setup.sh / start_service.sh), behind the TLS reverse proxy.
+    if settings.host not in _LOOPBACK_HOSTS and not settings.debug:
+        logger.warning(
+            "Starting the Werkzeug development server on non-loopback host %s:%s. "
+            "It speaks plain HTTP only and should not be exposed publicly; "
+            "use gunicorn behind the reverse proxy instead.",
+            settings.host,
+            settings.port,
+        )
     app.run(host=settings.host, port=settings.port, debug=settings.debug)
