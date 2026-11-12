@@ -18,7 +18,14 @@
  *
  * Astro pages have no component test runner in this repository (see
  * `trainee-error-surface.test.ts`), so the page half is a structural guard over
- * the two page sources. The script half parses the class the page loads.
+ * the page sources. The script half parses the class the page loads.
+ *
+ * The blocker markup was extracted into `_FacultyReviewPanel.astro` (the session
+ * page is held to an 800-line hard limit), so the copy assertions read the seam
+ * that owns the words and the panel that renders them. The branch assertion
+ * still reads the page, and it now also proves the panel appears exactly once
+ * inside the faculty branch — an extraction that left a second copy behind, or
+ * dropped the panel out of the branch, fails here.
  *
  * The role mapping itself is out of scope and must stay unchanged: this suite
  * asserts what the training surfaces check, not what Auth0 returns.
@@ -34,6 +41,8 @@ const readFile = (relativePath: string): string =>
 
 const indexPage = readFile('../index.astro')
 const sessionPage = readFile('../session/[sessionId].astro')
+const facultyPanel = readFile('../_FacultyReviewPanel.astro')
+const facultySeam = readFile('../_faculty-review.ts')
 const trainingScript = readFile('../../../../public/js/training-session.js')
 
 /** Every role name a page compares `userRole` against. */
@@ -61,24 +70,32 @@ describe('faculty role vocabulary', () => {
 })
 
 describe('faculty review stays blocked', () => {
-  it('renders an explicit blocker instead of an empty supervisor container', () => {
-    expect(sessionPage).toMatch(/\{isSupervisor && \(/)
-    expect(sessionPage).toContain('Faculty review is not available')
-    // The blocker names the missing relation, not a substitute scoping rule.
-    expect(sessionPage).toMatch(/not linked to a workspace/)
+  it('renders the faculty panel instead of an empty supervisor container', () => {
+    expect(sessionPage).toMatch(/\{isSupervisor &&[\s(]*<FacultyReviewPanel\b/)
+    // Exactly one panel: the extraction must not leave a second copy behind.
+    expect(sessionPage.match(/<FacultyReviewPanel\b/g)).toHaveLength(1)
     // An empty container is a dead surface: nothing ever populates it.
     expect(sessionPage).not.toContain('id="supervisor-dashboard"')
   })
 
-  it('renders the blocker only inside the faculty branch', () => {
-    const facultyBranchStart = sessionPage.indexOf('{isSupervisor && (')
-    const blockerStart = sessionPage.indexOf('Faculty review is not available')
-    const traineeBranchStart = sessionPage.indexOf('{isTrainee && (')
+  it('renders an explicit blocker naming the missing relation', () => {
+    // The copy lives in the seam so the session panel and the faculty-review
+    // route cannot drift apart; the panel renders it rather than restating it.
+    expect(facultyPanel).toMatch(/scopeBlocker\.headline/)
+    expect(facultyPanel).toMatch(/scopeBlocker\.detail/)
+    expect(facultySeam).toContain('Faculty review is not available')
+    expect(facultySeam).toMatch(/not linked to a workspace/)
+    expect(facultySeam).toContain('`workspace_id`')
+  })
+
+  it('keeps the faculty panel in the faculty branch, not the trainee one', () => {
+    const facultyBranchStart = sessionPage.search(/\{isSupervisor &&/)
+    const panelStart = sessionPage.indexOf('<FacultyReviewPanel')
+    const traineeBranchStart = sessionPage.search(/\{isTrainee &&/)
 
     expect(facultyBranchStart).toBeGreaterThan(-1)
-    expect(blockerStart).toBeGreaterThan(facultyBranchStart)
     expect(traineeBranchStart).toBeGreaterThan(-1)
-    expect(traineeBranchStart).not.toBe(blockerStart)
+    expect(panelStart).toBeGreaterThan(facultyBranchStart)
   })
 })
 
