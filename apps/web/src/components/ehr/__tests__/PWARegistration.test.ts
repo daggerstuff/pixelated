@@ -32,8 +32,8 @@ describe('PWA Configuration', () => {
     expect(manifest.name).toBe('Pixelated Empathy')
     expect(manifest.short_name).toBe('Pixelated')
     expect(manifest.display).toBe('standalone')
-    expect(manifest.background_color).toBe('#131313')
-    expect(manifest.theme_color).toBe('#84cc16')
+    expect(manifest.background_color).toBe('#0b0b0c')
+    expect(manifest.theme_color).toBe('#0b0b0c')
     expect(manifest.start_url).toBe('./')
     expect(manifest.icons).toHaveLength(2)
 
