@@ -260,6 +260,7 @@ describe('first-login provisioning assigns a workspace', () => {
     expect(identity.email).toBe('from-provider@example.test')
     expect(mockProvider.getUserById).toHaveBeenCalledWith(
       'auth0|token-without-email',
+      { strict: true },
     )
     expect(database.inserts).toHaveLength(1)
     expect(database.inserts[0].values['email']).toBe(
@@ -372,6 +373,70 @@ describe('an absent or empty email claim never reaches the unique insert', () =>
     expect(identity.internalId).toBe(EXISTING_INTERNAL_UUID)
     expect(database.inserts).toHaveLength(0)
     expect(mockProvider.getUserById).not.toHaveBeenCalled()
+  })
+})
+
+describe('a provider outage during provisioning', () => {
+  const profileWithoutEmail = {
+    sub: 'auth0|first-login-outage',
+    email: '',
+    emailVerified: false,
+  }
+
+  it('reports a retryable identity error for a throttled lookup', async () => {
+    const database = createFakeDatabase()
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    mockProvider.getUserById.mockRejectedValue(
+      Object.assign(new Error('Too Many Requests'), { statusCode: 429 }),
+    )
+
+    await expect(
+      userIdentity.resolveIdentity(profileWithoutEmail),
+    ).rejects.toBeInstanceOf(userIdentity.IdentityProviderUnavailableError)
+  })
+
+  it('asks the provider for the error instead of a null it cannot classify', async () => {
+    const database = createFakeDatabase()
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    mockProvider.getUserById.mockResolvedValue(null)
+
+    await userIdentity.resolveIdentity(profileWithoutEmail)
+
+    expect(mockProvider.getUserById).toHaveBeenCalledWith(
+      'auth0|first-login-outage',
+      { strict: true },
+    )
+  })
+
+  it('sees a network failure wrapped in the SDK error cause', async () => {
+    const database = createFakeDatabase()
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    const wrapped = new Error('Request failed')
+    ;(wrapped as Error & { cause?: unknown }).cause = Object.assign(
+      new Error('socket hang up'),
+      { code: 'ECONNRESET' },
+    )
+    mockProvider.getUserById.mockRejectedValue(wrapped)
+
+    await expect(
+      userIdentity.resolveIdentity(profileWithoutEmail),
+    ).rejects.toBeInstanceOf(userIdentity.IdentityProviderUnavailableError)
+  })
+
+  it('does not turn a configuration failure into a retryable outage', async () => {
+    const database = createFakeDatabase()
+    useDatabase(database)
+    mockProvider.findInternalIdBySub.mockResolvedValue(null)
+    mockProvider.getUserById.mockRejectedValue(
+      new Error('Auth0 management client not initialized'),
+    )
+
+    await expect(
+      userIdentity.resolveIdentity(profileWithoutEmail),
+    ).rejects.not.toBeInstanceOf(userIdentity.IdentityProviderUnavailableError)
   })
 })
 

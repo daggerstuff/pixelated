@@ -33,6 +33,10 @@ import { DEFAULT_WORKSPACE_SLUG } from '../db/workspace'
 import { getFromCache, setInCache } from '../redis'
 import type { IdentityProvider } from './identity-provider'
 import { getIdentityProvider } from './identity-provider'
+import {
+  IDENTITY_PROVIDER_UNAVAILABLE_CODE,
+  isTransientIdentityProviderFailure,
+} from './provider-unavailable'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -137,6 +141,22 @@ export const IDENTITY_CACHE_WRITE_DEADLINE_MS = 1_000
  */
 export const PROVIDER_PROFILE_DEADLINE_MS = 1_500
 
+/**
+ * The identity provider could not answer a lookup the provisioning path needs.
+ *
+ * Distinct from a database failure: the caller answers a retryable `503` with
+ * `Retry-After` instead of a `500`, because the next request may succeed.
+ */
+export class IdentityProviderUnavailableError extends Error {
+  readonly code = IDENTITY_PROVIDER_UNAVAILABLE_CODE
+
+  constructor(message: string, cause?: unknown) {
+    super(message)
+    this.name = 'IdentityProviderUnavailableError'
+    if (cause !== undefined) this.cause = cause
+  }
+}
+
 class DeadlineExceededError extends Error {
   constructor(label: string, deadlineMs: number) {
     super(`${label} exceeded its ${deadlineMs}ms deadline`)
@@ -236,11 +256,26 @@ async function resolveProvisioningEmail(
   const fromProfile = normalizeEmail(profile.email)
   if (fromProfile) return fromProfile
 
-  const providerUser = await withDeadline(
-    provider.getUserById(profile.sub),
-    'Identity provider profile lookup',
-    PROVIDER_PROFILE_DEADLINE_MS,
-  )
+  let providerUser: Awaited<ReturnType<IdentityProvider['getUserById']>>
+  try {
+    // `strict` makes the provider rethrow a throttled or erroring lookup
+    // instead of answering `null`, which would read as "no such user".
+    providerUser = await withDeadline(
+      provider.getUserById(profile.sub, { strict: true }),
+      'Identity provider profile lookup',
+      PROVIDER_PROFILE_DEADLINE_MS,
+    )
+  } catch (error: unknown) {
+    // A missing client or a malformed request is a configuration failure, not
+    // an outage: it must not become a retryable 503.
+    if (!isTransientIdentityProviderFailure(error)) throw error
+
+    const detail = error instanceof Error ? error.message : String(error)
+    throw new IdentityProviderUnavailableError(
+      `Identity provider profile lookup failed during first-login provisioning: ${detail}`,
+      error,
+    )
+  }
   return normalizeEmail(providerUser?.email)
 }
 

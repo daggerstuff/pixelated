@@ -54,3 +54,85 @@ export function providerUnavailableResponse(
     },
   )
 }
+
+/**
+ * The `code` an identity-provider outage carries out of first-login
+ * provisioning.
+ *
+ * Callers detect the condition by this code rather than by `instanceof`: the
+ * error crosses a dynamic `import()`, and a test that mocks the module without
+ * the class must still be able to exercise the mapping.
+ */
+export const IDENTITY_PROVIDER_UNAVAILABLE_CODE =
+  'IDENTITY_PROVIDER_UNAVAILABLE'
+
+/** True when `error` is an identity-provider outage from provisioning. */
+export function isIdentityProviderUnavailable(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    (error as { code?: unknown }).code === IDENTITY_PROVIDER_UNAVAILABLE_CODE
+  )
+}
+
+/**
+ * True when a failure from the identity provider is worth retrying.
+ *
+ * The provider service answers `null` for a lookup it could not complete, so
+ * the provisioning path asks for the error instead and classifies it here: a
+ * throttled or erroring Management API, a network failure, or a lookup that
+ * ran out its deadline is an outage. A missing client or a malformed request is
+ * a configuration failure and must not become a retryable 503.
+ */
+export function isTransientIdentityProviderFailure(error: unknown): boolean {
+  return isTransientProviderFailureAt(error, 0)
+}
+
+/** The transient names and network codes a wrapped failure may carry. */
+const TRANSIENT_ERROR_NAMES = new Set([
+  'DeadlineExceededError',
+  'ManagementTimeoutError',
+])
+const TRANSIENT_NETWORK_CODES = new Set([
+  'ECONNRESET',
+  'ETIMEDOUT',
+  'ECONNREFUSED',
+  'EAI_AGAIN',
+  'ENOTFOUND',
+])
+
+/**
+ * Walk one failure and its causes.
+ *
+ * The SDK and `fetch` wrap the interesting failure (`cause`) inside their own
+ * error, so a network or timeout condition can sit one or two levels down.
+ * Two levels is what those wrappers produce; a longer chain is a bug, not a
+ * transient failure.
+ */
+function isTransientProviderFailureAt(error: unknown, depth: number): boolean {
+  if (!error || typeof error !== 'object') return false
+  const candidate = error as {
+    name?: unknown
+    statusCode?: unknown
+    code?: unknown
+    cause?: unknown
+  }
+
+  if (
+    typeof candidate.name === 'string' &&
+    TRANSIENT_ERROR_NAMES.has(candidate.name)
+  ) {
+    return true
+  }
+  if (typeof candidate.statusCode === 'number') {
+    return candidate.statusCode === 429 || candidate.statusCode >= 500
+  }
+  if (
+    typeof candidate.code === 'string' &&
+    TRANSIENT_NETWORK_CODES.has(candidate.code)
+  ) {
+    return true
+  }
+
+  return depth < 2 && isTransientProviderFailureAt(candidate.cause, depth + 1)
+}

@@ -30,8 +30,11 @@ export class Auth0IdentityProvider implements IdentityProvider {
     return result
   }
 
-  async getUserById(userId: string): Promise<IdentityProviderUser | null> {
-    const user = await auth0UserService.getUserById(userId)
+  async getUserById(
+    userId: string,
+    options?: { strict?: boolean },
+  ): Promise<IdentityProviderUser | null> {
+    const user = await auth0UserService.getUserById(userId, options)
     if (!user) return null
     return {
       id: user.id,

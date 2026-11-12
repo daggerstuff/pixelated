@@ -96,6 +96,7 @@ import type {
   WebAuthnCredentialCreationOptions,
   WebAuthnCredentialRequestOptions,
 } from '../auth/auth0-webauthn-service'
+import { isTransientIdentityProviderFailure } from '../auth/provider-unavailable'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 
@@ -406,7 +407,7 @@ export class Auth0UserService {
    * @param userId Auth0 user ID
    * @returns User object or null
    */
-  async getUserById(userId: string) {
+  async getUserById(userId: string, options: { strict?: boolean } = {}) {
     if (!auth0Management) {
       throw new Error('Auth0 management client not initialized')
     }
@@ -418,6 +419,12 @@ export class Auth0UserService {
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
       authLogger.error('Auth0 get user error', error)
+      // A caller that must tell "no such user" from "the Management API could
+      // not answer" asks for strict: a throttled or erroring API is rethrown so
+      // the caller can answer a retryable 503 instead of a denial.
+      if (options.strict && isTransientIdentityProviderFailure(error)) {
+        throw error
+      }
       return null
     }
   }
