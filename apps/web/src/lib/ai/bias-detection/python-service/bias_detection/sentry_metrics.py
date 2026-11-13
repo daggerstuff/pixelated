@@ -54,7 +54,19 @@ logger = logging.getLogger(__name__)
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
 SENTRY_ENVIRONMENT = os.environ.get("SENTRY_ENVIRONMENT", os.environ.get("NODE_ENV", "production"))
 SENTRY_RELEASE = os.environ.get("SENTRY_RELEASE", "1.0.0")
-SENTRY_ENABLE_METRICS = os.environ.get("SENTRY_ENABLE_METRICS", "true").lower() != "false"
+
+
+def _metrics_enabled() -> bool:
+    return os.environ.get("SENTRY_ENABLE_METRICS", "true").lower() != "false"
+
+
+def _current_environment() -> str:
+    sentry_sdk = _get_sentry_sdk()
+    if sentry_sdk is not None and sentry_sdk.is_initialized():
+        environment = sentry_sdk.get_client().options.get("environment")
+        if isinstance(environment, str) and environment:
+            return environment
+    return SENTRY_ENVIRONMENT
 
 
 @dataclass
@@ -81,7 +93,7 @@ def before_send_metric(metric: dict[str, Any], _hint: Any) -> dict[str, Any] | N
     metric["attributes"] = {
         **metric.get("attributes", {}),
         "service": "bias-detection-python",
-        "environment": SENTRY_ENVIRONMENT,
+        "environment": _current_environment(),
     }
 
     return metric
@@ -203,7 +215,17 @@ def init_sentry(
         return
 
     if sentry_sdk.is_initialized():
-        logger.debug("Sentry already initialized, skipping duplicate init")
+        logger.warning(
+            "Sentry was initialized before the bias-detection bootstrap; "
+            "applying the service callbacks and tags to the existing client"
+        )
+        options = getattr(sentry_sdk.get_client(), "options", None)
+        if isinstance(options, dict):
+            options["before_send"] = before_send_event
+            options["before_send_metric"] = before_send_metric
+            options["environment"] = effective_environment
+        sentry_sdk.set_tag("service", "bias-detection-python")
+        sentry_sdk.set_tag("component", "bias-detection")
         return
 
     sentry_sdk.init(
@@ -219,7 +241,7 @@ def init_sentry(
         before_send_metric=before_send_metric,
         before_send=before_send_event,
         # Additional options
-        send_default_pii=True,
+        send_default_pii=False,
         # Add Flask integration if available
         integrations=[],
         # Initial tags
@@ -232,7 +254,7 @@ def init_sentry(
 
     logger.info(
         f"Sentry initialized: environment={effective_environment}, "
-        f"release={effective_release}, metrics_enabled={SENTRY_ENABLE_METRICS}"
+        f"release={effective_release}, metrics_enabled={_metrics_enabled()}"
     )
 
 
@@ -262,7 +284,7 @@ def count_metric(
     Example:
         count_metric("bias.analysis_completed", 1, {"layer": "preprocessing"})
     """
-    if not SENTRY_ENABLE_METRICS:
+    if not _metrics_enabled():
         return
 
     sentry_sdk = _get_sentry_sdk()
@@ -298,7 +320,7 @@ def gauge_metric(
     Example:
         gauge_metric("bias.analysis_queue_depth", 15, {"priority": "high"})
     """
-    if not SENTRY_ENABLE_METRICS:
+    if not _metrics_enabled():
         return
 
     sentry_sdk = _get_sentry_sdk()
@@ -338,7 +360,7 @@ def distribution_metric(
         distribution_metric("bias.analysis_latency", 150.5,
                           {"layer": "model_level"}, unit="millisecond")
     """
-    if not SENTRY_ENABLE_METRICS:
+    if not _metrics_enabled():
         return
 
     sentry_sdk = _get_sentry_sdk()
