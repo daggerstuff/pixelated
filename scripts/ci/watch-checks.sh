@@ -8,6 +8,8 @@
 # a job that already passed. --paginate is the whole point of this script.
 # A commit also keeps every attempt of a check, so only the newest attempt per
 # name is judged: an older red attempt that was superseded is not a failure.
+# Exit: 0 green, 1 red, 2 no verdict, 3 the commit is no longer a branch head, so
+# its runs were cancelled and no further check-run will ever report for it.
 set -euo pipefail
 
 ALL=false
@@ -31,6 +33,12 @@ TIMEOUT_MINUTES=${WATCH_TIMEOUT_MINUTES:-60}
 REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
 DEADLINE=$((SECONDS + TIMEOUT_MINUTES * 60))
 
+if ! FULL_SHA=$(gh api "repos/$REPO/commits/$SHA" --jq .sha 2>/dev/null); then
+  echo "✖ $SHA is not a commit in $REPO" >&2
+  exit 2
+fi
+SHA=$FULL_SHA
+
 fetch() {
   gh api --paginate "repos/$REPO/commits/$SHA/check-runs?per_page=100" \
     --jq '.check_runs[] | {name, status, conclusion, started_at}' |
@@ -53,6 +61,13 @@ while :; do
   pending=$(printf '%s' "$rows" | awk -F'\t' '$1 != "completed"' | grep -c . || true)
   if [[ "$total" -gt 0 && "$pending" -eq 0 ]]; then
     break
+  fi
+  if [[ "$total" -eq 0 ]]; then
+    heads=$(gh api "repos/$REPO/commits/$SHA/branches-where-head" --jq '.[].name' 2>/dev/null || true)
+    if [[ -z "$heads" ]]; then
+      echo "✖ $SHA is not the head of any branch: its runs were superseded, so nothing will report for it" >&2
+      exit 3
+    fi
   fi
   if [[ "$SECONDS" -ge "$DEADLINE" ]]; then
     echo "✖ no verdict after ${TIMEOUT_MINUTES}m (total=$total pending=$pending)" >&2
