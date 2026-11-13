@@ -133,7 +133,7 @@ pnpm dev                  # Start dev server (port 5173)
 pnpm dev:all-services     # Start all services concurrently
 pnpm build                # Production build
 pnpm lint                 # Lint (oxlint, type-aware)
-pnpm format               # Format code (oxfmt + prettier)
+pnpm format               # Format with oxfmt (prettier: .Jules md, agent TS)
 pnpm test:unit            # Unit tests (Vitest)
 pnpm test:integration     # Integration tests
 pnpm e2e                  # End-to-end tests (Playwright)

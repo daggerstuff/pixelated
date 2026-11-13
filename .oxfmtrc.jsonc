@@ -12,9 +12,8 @@
   "proseWrap": "preserve",
 
   // `.astro` formatting is opt-in upstream. It needs `@astrojs/compiler-rs` at
-  // runtime (oxfmt does not bundle it); that package currently arrives
-  // transitively via `prettier-plugin-astro`, so it must not be dropped from
-  // package.json until it is added as a direct devDependency.
+  // runtime (oxfmt does not bundle it), so that package is a direct
+  // devDependency in package.json.
   "astro": true,
 
   "sortImports": {

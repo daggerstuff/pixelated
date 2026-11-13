@@ -125,11 +125,10 @@ if (changedFiles.length === 0) {
 
 // oxfmt is the sole formatter for every file this repo owns, `.astro`
 // included: `.oxfmtrc.jsonc` sets `astro: true`, which makes oxfmt parse
-// `.astro` with `@astrojs/compiler-rs` (not bundled with oxfmt — it currently
-// arrives transitively via `prettier-plugin-astro`, so that dependency has to
-// stay until `@astrojs/compiler-rs` is a direct devDependency). Prettier is
-// retired as the `.astro` formatter; running it here again would just fight
-// oxfmt's output.
+// `.astro` with `@astrojs/compiler-rs`. The compiler is not bundled with
+// oxfmt, so it is a direct devDependency here (astro and
+// astro-eslint-parser also request it). Prettier is retired as the `.astro`
+// formatter; running it here again would just fight oxfmt's output.
 const oxfmtFiles = changedFiles.filter((filePath) => {
   const extension = filePath.slice(filePath.lastIndexOf("."));
   return OXFMT_APPLICABLE_EXTENSIONS.has(extension);
