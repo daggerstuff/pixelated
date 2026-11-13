@@ -1,20 +1,18 @@
 ---
 import { getCollection, getEntry, render } from 'astro:content'
-
-import Categorizer from '@/components/base/Categorizer.astro'
-import ListItem from '@/components/views/ListItem.astro'
-import Toc from '@/components/toc/Toc.astro'
-import Warning from '@/components/base/Warning.astro'
-
-import { FEATURES } from '@/config'
-import { isSameYear, getYear } from '@/utils/datetime'
-
 import type {
   CollectionEntry,
   ContentCollectionKey,
   DataCollectionKey,
 } from 'astro:content'
+
+import Categorizer from '@/components/base/Categorizer.astro'
+import Warning from '@/components/base/Warning.astro'
+import Toc from '@/components/toc/Toc.astro'
+import ListItem from '@/components/views/ListItem.astro'
+import { FEATURES } from '@/config'
 import type { StreamGroupsSchema } from '@/lib/schema'
+import { isSameYear, getYear } from '@/utils/datetime'
 import type { PostCollectionType } from '@/utils/post'
 
 interface Props {
@@ -145,7 +143,7 @@ const warningHTML = `The '${collectionType}' collection type does no
 {(collectionType === 'blog' || collectionType === 'changelog') && (
   <div aria-label="Post list">
     {sortedBlogItems.length === 0 ? (
-      <div class="py-2 op-50">nothing here yet</div>
+      <div class="op-50 py-2">nothing here yet</div>
     ) : (
       sortedBlogItems.map(async (item, idx) => {
         const data = item.data
@@ -199,7 +197,7 @@ const warningHTML = `The '${collectionType}' collection type does no
 {collectionType === 'streams' && (
   <div aria-label="Stream list">
     {sortedStreamItems.length === 0 ? (
-      <div class="py-2 op-50">nothing here yet</div>
+      <div class="op-50 py-2">nothing here yet</div>
     ) : (
       sortedStreamItems.map((item, idx) => {
         return (
@@ -231,7 +229,7 @@ const warningHTML = `The '${collectionType}' collection type does no
 {collectionType === 'feeds' && (
   <div aria-label="Feed list">
     {sortedFeedItems.length === 0 ? (
-      <div class="py-2 op-50">nothing here yet</div>
+      <div class="op-50 py-2">nothing here yet</div>
     ) : (
       sortedFeedItems.map((item, idx) => {
         if (!item.link) throw new Error(`Feed item is missing 'link' field.`)

@@ -1,15 +1,17 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import PipelineOverview from '../../components/demo/PipelineOverview.tsx'
-import KnowledgeParsingDemo from '../../components/demo/KnowledgeParsingDemo.tsx'
-import ScenarioGenerationDemo from '../../components/demo/ScenarioGenerationDemo.tsx'
+import { ChartBar } from 'lucide-react'
+
+import Badge from '@/components/ui/Badge.astro'
 import Card from '@/components/ui/Card.astro'
 import CardContent from '@/components/ui/CardContent.astro'
 import CardDescription from '@/components/ui/CardDescription.astro'
 import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
-import { ChartBar } from 'lucide-react'
-import Badge from '@/components/ui/Badge.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+import KnowledgeParsingDemo from '../../components/demo/KnowledgeParsingDemo.tsx'
+import PipelineOverview from '../../components/demo/PipelineOverview.tsx'
+import ScenarioGenerationDemo from '../../components/demo/ScenarioGenerationDemo.tsx'
 ---
 
 <BaseLayout
@@ -17,26 +19,26 @@ import Badge from '@/components/ui/Badge.astro'
   description="Advanced AI-powered psychology pipeline demonstration featuring clinical knowledge parsing, therapeutic scenario generation, and comprehensive mental health analysis tools."
   bgType="plum"
 >
-  <div class="min-h-screen text-foreground py-8">
+  <div class="min-h-screen py-8 text-foreground">
     <div class="container mx-auto px-4">
       <!-- Header -->
-      <div class="text-center mb-12">
+      <div class="mb-12 text-center">
         <div class="mb-6">
-          <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-secondary border border-border text-muted-foreground rounded-none">
+          <Badge class="inline-flex items-center gap-2 rounded-none border border-border bg-secondary px-4 py-2 text-sm text-muted-foreground">
             <span class="relative flex h-3 w-3">
-              <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+              <span class="absolute inline-flex h-full w-full animate-pulse rounded-full bg-primary opacity-75"></span>
+              <span class="relative inline-flex h-3 w-3 rounded-full bg-primary"></span>
             </span>
             Live Demo Active
           </Badge>
         </div>
-        <h1 class="text-4xl lg:text-5xl font-bold mb-6">
+        <h1 class="mb-6 text-4xl font-bold lg:text-5xl">
           Psychology Pipeline
-          <span class="text-foreground block mt-2">
+          <span class="mt-2 block text-foreground">
             AI-Powered Clinical Analysis
           </span>
         </h1>
-        <p class="text-lg text-foreground max-w-3xl mx-auto">
+        <p class="mx-auto max-w-3xl text-lg text-foreground">
           Experience cutting-edge artificial intelligence in clinical psychology
           with real-time knowledge parsing, therapeutic scenario generation, and
           comprehensive mental health analysis tools.
@@ -44,10 +46,10 @@ import Badge from '@/components/ui/Badge.astro'
       </div>
 
       <!-- Features Overview -->
-      <div class="grid md:grid-cols-3 gap-8 mb-12">
+      <div class="mb-12 grid gap-8 md:grid-cols-3">
         <Card class="border border-border bg-secondary">
           <CardHeader>
-            <div class="text-4xl mb-3">🧠</div>
+            <div class="mb-3 text-4xl">🧠</div>
             <CardTitle class="text-foreground">Knowledge Parsing</CardTitle>
           </CardHeader>
           <CardContent>
@@ -57,15 +59,15 @@ import Badge from '@/components/ui/Badge.astro'
             </CardDescription>
             <div class="mt-4 space-y-2">
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>Mental health condition detection</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>Therapeutic technique identification</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>Risk assessment & analysis</span>
               </div>
             </div>
@@ -74,7 +76,7 @@ import Badge from '@/components/ui/Badge.astro'
 
         <Card class="border border-border bg-secondary">
           <CardHeader>
-            <div class="text-4xl mb-3">📋</div>
+            <div class="mb-3 text-4xl">📋</div>
             <CardTitle class="text-foreground">Scenario Generation</CardTitle>
           </CardHeader>
           <CardContent>
@@ -84,15 +86,15 @@ import Badge from '@/components/ui/Badge.astro'
             </CardDescription>
             <div class="mt-4 space-y-2">
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>Dynamic client profile creation</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>Clinical formulation generation</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>Treatment plan development</span>
               </div>
             </div>
@@ -101,8 +103,8 @@ import Badge from '@/components/ui/Badge.astro'
 
         <Card class="border border-border bg-secondary">
           <CardHeader>
-            <div class="text-4xl mb-3">
-              <ChartBar className="w-10 h-10" />
+            <div class="mb-3 text-4xl">
+              <ChartBar className="h-10 w-10" />
             </div>
             <CardTitle class="text-foreground">Analytics & Insights</CardTitle>
           </CardHeader>
@@ -113,15 +115,15 @@ import Badge from '@/components/ui/Badge.astro'
             </CardDescription>
             <div class="mt-4 space-y-2">
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>Real-time confidence scoring</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>Performance metrics tracking</span>
               </div>
               <div class="flex items-center gap-2 text-sm">
-                <span class="w-2 h-2 bg-primary rounded-full"></span>
+                <span class="h-2 w-2 rounded-full bg-primary"></span>
                 <span>Clinical relevance assessment</span>
               </div>
             </div>
@@ -130,9 +132,9 @@ import Badge from '@/components/ui/Badge.astro'
       </div>
 
       <!-- Pipeline Overview Section -->
-      <Card class="border border-border bg-secondary mb-12">
+      <Card class="mb-12 border border-border bg-secondary">
         <CardHeader>
-          <CardTitle class="text-foreground text-2xl">
+          <CardTitle class="text-2xl text-foreground">
             Pipeline Architecture Overview
           </CardTitle>
           <CardDescription class="text-foreground">
@@ -146,9 +148,9 @@ import Badge from '@/components/ui/Badge.astro'
       </Card>
 
       <!-- Knowledge Parsing Demo Section -->
-      <Card class="border border-border bg-secondary mb-12">
+      <Card class="mb-12 border border-border bg-secondary">
         <CardHeader>
-          <CardTitle class="text-foreground text-2xl">
+          <CardTitle class="text-2xl text-foreground">
             Clinical Knowledge Parsing Demo
           </CardTitle>
           <CardDescription class="text-foreground">
@@ -162,9 +164,9 @@ import Badge from '@/components/ui/Badge.astro'
       </Card>
 
       <!-- Scenario Generation Demo Section -->
-      <Card class="border border-border bg-secondary mb-12">
+      <Card class="mb-12 border border-border bg-secondary">
         <CardHeader>
-          <CardTitle class="text-foreground text-2xl">
+          <CardTitle class="text-2xl text-foreground">
             Therapeutic Scenario Generation Demo
           </CardTitle>
           <CardDescription class="text-foreground">
@@ -180,7 +182,7 @@ import Badge from '@/components/ui/Badge.astro'
       <!-- Technical Specifications -->
       <Card class="border border-border bg-secondary">
         <CardHeader>
-          <CardTitle class="text-foreground text-xl">
+          <CardTitle class="text-xl text-foreground">
             Technical Specifications
           </CardTitle>
           <CardDescription class="text-foreground">
@@ -189,30 +191,30 @@ import Badge from '@/components/ui/Badge.astro'
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="text-center p-4 bg-secondary rounded-none">
+          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-none bg-secondary p-4 text-center">
               <div class="text-2xl font-bold text-foreground">Streaming</div>
               <div class="text-sm text-foreground">Incremental Analysis</div>
             </div>
-            <div class="text-center p-4 bg-secondary rounded-none">
+            <div class="rounded-none bg-secondary p-4 text-center">
               <div class="text-2xl font-bold text-foreground">Structured</div>
               <div class="text-sm text-foreground">
                 Clinical Entity Extraction
               </div>
             </div>
-            <div class="text-center p-4 bg-secondary rounded-none">
+            <div class="rounded-none bg-secondary p-4 text-center">
               <div class="text-2xl font-bold text-foreground">Synthetic</div>
               <div class="text-sm text-foreground">Training Case Studies</div>
             </div>
-            <div class="text-center p-4 bg-secondary rounded-none">
+            <div class="rounded-none bg-secondary p-4 text-center">
               <div class="text-2xl font-bold text-foreground">Demo</div>
               <div class="text-sm text-foreground">Illustrative Data Only</div>
             </div>
-            <div class="text-center p-4 bg-secondary rounded-none">
+            <div class="rounded-none bg-secondary p-4 text-center">
               <div class="text-2xl font-bold text-foreground">Batch</div>
               <div class="text-sm text-foreground">Asynchronous Processing</div>
             </div>
-            <div class="text-center p-4 bg-secondary rounded-none">
+            <div class="rounded-none bg-secondary p-4 text-center">
               <div class="text-2xl font-bold text-foreground">REST</div>
               <div class="text-sm text-foreground">API with Webhooks</div>
             </div>

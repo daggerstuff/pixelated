@@ -1,15 +1,15 @@
 ---
 import { getCollection } from 'astro:content'
+import type { CollectionEntry } from 'astro:content'
+
 import Link from '@/components/base/Link.astro'
 import GithubItem from '@/components/views/GithubItem.astro'
 import { UI } from '@/config'
+import type { PrSchema, ReleaseSchema } from '@/lib/schema'
+import type { Icon, RepoWithOwner, Url } from '@/types'
 import { getUrl } from '@/utils/common'
 import { extractPackageName, matchLogo, processVersion } from '@/utils/data'
 import { formatDate, isDiffMonth } from '@/utils/datetime'
-
-import type { CollectionEntry } from 'astro:content'
-import type { Icon, RepoWithOwner, Url } from '@/types'
-import type { PrSchema, ReleaseSchema } from '@/lib/schema'
 
 interface Props {
   collectionType: 'releases' | 'prs'
@@ -179,7 +179,7 @@ if (collectionType === 'prs') {
 ---
 
 <div
-  class="flex flex-col gap-8 lt-sm:gap-6 mt-16.8"
+  class="lt-sm:gap-6 mt-16.8 flex flex-col gap-8"
   role="feed"
   aria-label={`GitHub ${collectionType}`}
 >
@@ -196,7 +196,7 @@ if (collectionType === 'prs') {
       />
     ))
   ) : collectionType === 'releases' ? (
-    <p class="text-center op-50" role="status">
+    <p class="op-50 text-center" role="status">
       No releases found
     </p>
   ) : null}
@@ -213,18 +213,18 @@ if (collectionType === 'prs') {
       />
     ))
   ) : collectionType === 'prs' ? (
-    <p class="text-center op-50" role="status">
+    <p class="op-50 text-center" role="status">
       No pull requests found
     </p>
   ) : null}
 </div>
 
 <div
-  class="prose flex flex-col items-center mx-a op-50 text-center text-3.75! lt-sm:text-sm!"
+  class="prose mx-a op-50 text-3.75! lt-sm:text-sm! flex flex-col items-center text-center"
   role="contentinfo"
 >
   <hr class="mt-3em!" />
-  <p class="flex lt-sm:flex-col items-center my-0! lt-sm:my-1.5!">
+  <p class="lt-sm:flex-col my-0! lt-sm:my-1.5! flex items-center">
     <span>
       Last fetched:
       <time

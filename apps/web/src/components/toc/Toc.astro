@@ -1,11 +1,11 @@
 ---
+import type { MarkdownHeading } from 'astro'
+
 import TocButton from '@/components/toc/TocButton.astro'
 import TocItem from '@/components/toc/TocItem.astro'
-import { generateToc } from '@/utils/toc'
 import { FEATURES } from '@/config'
-
-import type { MarkdownHeading } from 'astro'
 import type { TocConfig } from '@/types'
+import { generateToc } from '@/utils/toc'
 
 type Props =
   | {
@@ -51,6 +51,9 @@ const specHeadings = generateToc(headings, minHeadingLevel, maxHeadingLevel)
     <nav
       class:list={{
         'toc-desktop': true,
+        // Below the `lgp` breakpoint this nav and <TocButton> would render the
+        // same links twice, one of them as a permanent block above the article.
+        'lt-lgp:hidden': true,
         'toc-desktop-on': displayMode === 'always',
         'toc-desktop-content': displayMode === 'content',
         'toc-desktop-right': displayPosition === 'right',

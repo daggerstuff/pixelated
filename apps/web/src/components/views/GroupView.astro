@@ -1,7 +1,8 @@
 ---
 import { getEntry } from 'astro:content'
-import Toc from '~/components/toc/Toc.astro'
+
 import Categorizer from '~/components/base/Categorizer.astro'
+import Toc from '~/components/toc/Toc.astro'
 import GroupItem from '~/components/views/GroupItem.astro'
 import { FEATURES, UI } from '~/config'
 
@@ -23,26 +24,20 @@ const tocEnabled = Array.isArray(toc) && toc[0] && pageToc
 const { showGroupItemColorOnHover } = UI.groupView
 ---
 
-  tocEnabled && (
-    <Toc
-      anchors={Object.keys(projects)}
-      style={toc[1].displayPosition === 'right' ? 'text-align:end' : ''}
-    />
-  )
-}
-{
-  Object.keys(projects).map((key, idx) => (
-    <div class="slide-enter" style={{ '--enter-stage': idx }}>
-      <Categorizer text={key} needId={tocEnabled} wide={true} />
-      <GroupItem items={projects[key]} />
-    </div>
-  ))
-}
-
-{showGroupItemColorOnHover && (
-  <style>
-    .link:hover .icon {
-      filter: saturate(1);
-    }
-  </style>
-)}
+tocEnabled && (
+<Toc
+  anchors={Object.keys(projects)}
+  style={toc[1].displayPosition === 'right' ? 'text-align:end' : ''}
+/>
+)
+{Object.keys(projects).map((key, idx) => (
+  <div class="slide-enter" style={{ '--enter-stage': idx }}>
+    <Categorizer text={key} needId={tocEnabled} wide={true} />
+    <GroupItem items={projects[key]} />
+  </div>
+))}
+{showGroupItemColorOnHover && <style>
+  .link:hover .icon {
+    filter: saturate(1);
+  }
+</style>}

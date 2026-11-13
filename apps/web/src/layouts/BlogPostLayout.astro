@@ -1,9 +1,11 @@
 ---
 import type { CollectionEntry } from 'astro:content'
-import { getContentSlug } from '@/utils/blog'
-import type { ShareConfig } from '@/types'
-import BaseLayout from './BaseLayout.astro'
+
 import ShareLink from '@/components/widgets/ShareLink.astro'
+import type { ShareConfig } from '@/types'
+import { getContentSlug } from '@/utils/blog'
+
+import BaseLayout from './BaseLayout.astro'
 
 interface Props {
   entry: CollectionEntry<'blog'> | CollectionEntry<'docs'>
@@ -55,12 +57,12 @@ const pathname = `/${basePath}/${getContentSlug(entry)}`
   bgType="rose"
   {pathname}
 >
-  <article class="max-w-prose mx-auto container-refined py-12">
+  <article class="container-refined mx-auto max-w-prose py-12">
     <header class="mb-12">
       <div class="section-number mb-6">Blog</div>
       <div class="mb-6">
         <div
-          class="flex items-center text-sm mb-4"
+          class="mb-4 flex items-center text-sm"
           style="color: var(--text-muted);"
         >
           <time datetime={formattedDate.toISOString()}>
@@ -85,11 +87,11 @@ const pathname = `/${basePath}/${getContentSlug(entry)}`
       </div>
 
       {tags && tags.length > 0 && (
-        <div class="flex flex-wrap gap-2 mb-6">
+        <div class="mb-6 flex flex-wrap gap-2">
           {tags.map((tag: unknown) => (
             <a
               href={`/blog/tags/${tag}`}
-              class="eyebrow-text px-3 py-1 rounded-full transition-colors"
+              class="eyebrow-text rounded-full px-3 py-1 transition-colors"
               style="background: var(--bg-elevated); border: 1px solid var(--border-primary); color: var(--text-secondary);"
               onmouseover="this.style.background='var(--bg-card)'; this.style.borderColor='var(--accent-primary)'; this.style.color='var(--accent-primary)'"
               onmouseout="this.style.background='var(--bg-elevated)'; this.style.borderColor='var(--border-primary)'; this.style.color='var(--text-secondary)'"
@@ -106,7 +108,7 @@ const pathname = `/${basePath}/${getContentSlug(entry)}`
         <img
           src={image.url}
           alt={image.alt || postTitle}
-          class="w-full rounded-lg shadow-md mb-8"
+          class="mb-8 w-full rounded-lg shadow-md"
           transition:name={`image-${getContentSlug(entry)}`}
         />
       )}
@@ -117,11 +119,11 @@ const pathname = `/${basePath}/${getContentSlug(entry)}`
     </div>
 
     <footer
-      class="mt-12 pt-8 border-t"
+      class="mt-12 border-t pt-8"
       style="border-color: var(--border-primary);"
     >
       <!-- Social Share Section -->
-      <div class="flex justify-between items-center">
+      <div class="flex items-center justify-between">
         <a
           href="/blog"
           class="nav-link-refined flex items-center"
@@ -130,7 +132,7 @@ const pathname = `/${basePath}/${getContentSlug(entry)}`
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 mr-1"
+            class="mr-1 h-5 w-5"
             viewBox="0 0 20 20"
             fill="currentColor"
           >

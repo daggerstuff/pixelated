@@ -101,6 +101,15 @@ const asides = asideTags.map((tag) => {
     : sessionPage.slice(start, end + '</aside>'.length)
 })
 
+/**
+ * The `class` attribute of the first element that carries `className`.
+ *
+ * Utilities are read as a token set rather than a literal string: the formatter
+ * sorts class attributes, so their order is not part of what these guards pin.
+ */
+const classAttributeOf = (source: string, className: string): string =>
+  source.match(new RegExp(`class="([^"]*\\b${className}\\b[^"]*)"`))?.[1] ?? ''
+
 describe('trainee aside: the focus target is a scroll container', () => {
   it('marks every trainee aside as a scroll container', () => {
     // The session page draws two trainee asides, both siblings of the
@@ -125,7 +134,12 @@ describe('trainee aside: the focus target is a scroll container', () => {
     // The VAL-UX-002 property must survive this repair: `clip` is what makes
     // the row unscrollable, and the aside is a sibling of the transcript, so
     // its scroll cannot move the composer.
-    expect(sessionPage).toMatch(/flex-1 flex session-panes/)
+    //
+    // Asserted as a token set: the formatter sorts class attributes, so the
+    // order of these utilities is not part of the contract.
+    expect(classAttributeOf(sessionPage, 'session-panes').split(/\s+/)).toEqual(
+      expect.arrayContaining(['flex-1', 'flex', 'session-panes']),
+    )
     expect(declares(desktopBlock, '.session-panes', /overflow:\s*clip/)).toBe(
       true,
     )

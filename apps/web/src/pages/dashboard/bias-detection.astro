@@ -1,9 +1,9 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import BrutalistCard from '@/components/ui/BrutalistCard.astro'
-import BrutalistButton from '@/components/ui/BrutalistButton.astro'
-
 import { ChartBar, _Rocket, _Search, Target, TrendingUp } from 'lucide-react'
+
+import BrutalistButton from '@/components/ui/BrutalistButton.astro'
+import BrutalistCard from '@/components/ui/BrutalistCard.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 export const prerender = false
 ---
 
@@ -16,28 +16,28 @@ export const prerender = false
     <!-- Floating Background Elements -->
 
     <div class="brutalist-container relative z-10">
-      <div class="text-center mb-12">
-        <div class="inline-flex items-center gap-3 mb-8 nav-pill nav-pill--active">
+      <div class="mb-12 text-center">
+        <div class="nav-pill nav-pill--active mb-8 inline-flex items-center gap-3">
           <div class="status-dot status-dot--processing"></div>
           <span class="font-bold">BIAS DETECTION DASHBOARD</span>
         </div>
 
-        <h1 class="brutalist-heading text-5xl md:text-7xl mb-6">
+        <h1 class="brutalist-heading mb-6 text-5xl md:text-7xl">
           <span class="gradient-text-secondary">ANALYTICS</span>
           <br />
           <span class="gradient-text-primary">COMMAND CENTER</span>
         </h1>
 
-        <p class="text-xl text-muted-foreground max-w-4xl mx-auto mb-8">
+        <p class="mx-auto mb-8 max-w-4xl text-xl text-muted-foreground">
           A demonstration dashboard for bias-detection review across therapeutic
           interactions. The figures below are sample values, not live telemetry.
         </p>
 
         <!-- Status Badges -->
-        <div class="flex flex-wrap justify-center gap-4 mb-12">
+        <div class="mb-12 flex flex-wrap justify-center gap-4">
           <div class="nav-pill bg-primary text-primary-foreground">
             <svg
-              class="w-4 h-4"
+              class="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -53,7 +53,7 @@ export const prerender = false
           </div>
           <div class="nav-pill bg-primary text-primary-foreground">
             <svg
-              class="w-4 h-4"
+              class="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -69,7 +69,7 @@ export const prerender = false
           </div>
           <div class="nav-pill bg-primary text-primary-foreground">
             <svg
-              class="w-4 h-4"
+              class="h-4 w-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -91,19 +91,19 @@ export const prerender = false
   <!-- Main Dashboard Grid -->
   <section class="brutalist-section bg-background">
     <div class="brutalist-container">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+      <div class="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-3">
         <!-- System Overview -->
         <BrutalistCard variant="elevated" class="lg:col-span-2">
           <div class="space-y-6">
             <div class="border-b border-border pb-4">
-              <h3 class="brutalist-subheading text-xl mb-2">SYSTEM OVERVIEW</h3>
-              <p class="text-muted-foreground text-sm">
+              <h3 class="brutalist-subheading mb-2 text-xl">SYSTEM OVERVIEW</h3>
+              <p class="text-sm text-muted-foreground">
                 Sample values from an illustrative run. Not live telemetry.
               </p>
             </div>
 
             <!-- Key Metrics -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div class="metric-card">
                 <div class="metric-value" id="total-sessions">
                   1,247
@@ -135,14 +135,14 @@ export const prerender = false
             </div>
 
             <!-- Performance Chart Placeholder -->
-            <div class="bg-card rounded-none p-6 border border-border">
-              <h4 class="text-lg font-semibold text-muted-foreground mb-4">
+            <div class="rounded-none border border-border bg-card p-6">
+              <h4 class="mb-4 text-lg font-semibold text-muted-foreground">
                 Performance Trends
               </h4>
-              <div class="h-48 flex items-center justify-center bg-secondary rounded-none">
+              <div class="flex h-48 items-center justify-center rounded-none bg-secondary">
                 <div class="text-center text-muted-foreground">
-                  <div class="text-4xl mb-2">
-                    <ChartBar className="w-10 h-10" />
+                  <div class="mb-2 text-4xl">
+                    <ChartBar className="h-10 w-10" />
                   </div>
                   <p>Interactive performance charts loading...</p>
                 </div>
@@ -155,8 +155,8 @@ export const prerender = false
         <BrutalistCard variant="elevated">
           <div class="space-y-6">
             <div class="border-b border-border pb-4">
-              <h3 class="brutalist-subheading text-xl mb-2">QUICK ACTIONS</h3>
-              <p class="text-muted-foreground text-sm">
+              <h3 class="brutalist-subheading mb-2 text-xl">QUICK ACTIONS</h3>
+              <p class="text-sm text-muted-foreground">
                 Common management tasks
               </p>
             </div>
@@ -193,14 +193,14 @@ export const prerender = false
             </div>
 
             <!-- System Status -->
-            <div class="bg-card rounded-none p-4 border border-border">
-              <h4 class="text-sm font-semibold text-muted-foreground mb-3">
+            <div class="rounded-none border border-border bg-card p-4">
+              <h4 class="mb-3 text-sm font-semibold text-muted-foreground">
                 SYSTEM STATUS
               </h4>
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-muted-foreground">ML Models</span>
-                  <span class="text-foreground font-medium text-sm">
+                  <span class="text-sm font-medium text-foreground">
                     ✓ Active
                   </span>
                 </div>
@@ -208,19 +208,19 @@ export const prerender = false
                   <span class="text-sm text-muted-foreground">
                     API Services
                   </span>
-                  <span class="text-foreground font-medium text-sm">
+                  <span class="text-sm font-medium text-foreground">
                     ✓ Online
                   </span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-muted-foreground">Database</span>
-                  <span class="text-foreground font-medium text-sm">
+                  <span class="text-sm font-medium text-foreground">
                     ✓ Connected
                   </span>
                 </div>
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-muted-foreground">Data</span>
-                  <span class="text-foreground font-medium text-sm">
+                  <span class="text-sm font-medium text-foreground">
                     ✓ Sample
                   </span>
                 </div>
@@ -231,21 +231,21 @@ export const prerender = false
       </div>
 
       <!-- Recent Activity & Alerts -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <!-- Recent Analyses -->
         <BrutalistCard variant="elevated">
           <div class="space-y-6">
             <div class="border-b border-border pb-4">
-              <h3 class="brutalist-subheading text-xl mb-2">RECENT ANALYSES</h3>
-              <p class="text-muted-foreground text-sm">
+              <h3 class="brutalist-subheading mb-2 text-xl">RECENT ANALYSES</h3>
+              <p class="text-sm text-muted-foreground">
                 Latest bias detection sessions
               </p>
             </div>
 
             <div class="space-y-4" id="recent-analyses">
               <!-- Dynamic content will be loaded here -->
-              <div class="text-center py-8 text-muted-foreground">
-                <div class="text-3xl mb-2">🔄</div>
+              <div class="py-8 text-center text-muted-foreground">
+                <div class="mb-2 text-3xl">🔄</div>
                 <p>Loading recent analyses...</p>
               </div>
             </div>
@@ -256,16 +256,16 @@ export const prerender = false
         <BrutalistCard variant="elevated">
           <div class="space-y-6">
             <div class="border-b border-border pb-4">
-              <h3 class="brutalist-subheading text-xl mb-2">ACTIVE ALERTS</h3>
-              <p class="text-muted-foreground text-sm">
+              <h3 class="brutalist-subheading mb-2 text-xl">ACTIVE ALERTS</h3>
+              <p class="text-sm text-muted-foreground">
                 Current bias detection alerts
               </p>
             </div>
 
             <div class="space-y-4" id="active-alerts">
               <!-- Dynamic content will be loaded here -->
-              <div class="text-center py-8 text-muted-foreground">
-                <div class="text-3xl mb-2">🔔</div>
+              <div class="py-8 text-center text-muted-foreground">
+                <div class="mb-2 text-3xl">🔔</div>
                 <p>No active alerts</p>
               </div>
             </div>
@@ -278,8 +278,8 @@ export const prerender = false
   <!-- Advanced Analytics Section -->
   <section class="brutalist-section">
     <div class="brutalist-container">
-      <div class="text-center mb-12">
-        <h2 class="brutalist-heading text-3xl md:text-5xl mb-4">
+      <div class="mb-12 text-center">
+        <h2 class="brutalist-heading mb-4 text-3xl md:text-5xl">
           ADVANCED
           <span class="gradient-text-primary">ANALYTICS</span>
         </h2>
@@ -288,15 +288,15 @@ export const prerender = false
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         <!-- Bias Distribution -->
         <BrutalistCard hover={true}>
           <div class="text-center">
-            <div class="text-4xl mb-4">
-              <TrendingUp className="w-10 h-10" />
+            <div class="mb-4 text-4xl">
+              <TrendingUp className="h-10 w-10" />
             </div>
-            <h3 class="brutalist-subheading text-lg mb-3">BIAS DISTRIBUTION</h3>
-            <p class="text-muted-foreground text-sm mb-4">
+            <h3 class="brutalist-subheading mb-3 text-lg">BIAS DISTRIBUTION</h3>
+            <p class="mb-4 text-sm text-muted-foreground">
               Statistical analysis of bias scores across different demographics
               and scenarios.
             </p>
@@ -313,11 +313,11 @@ export const prerender = false
         <!-- Performance Metrics -->
         <BrutalistCard hover={true}>
           <div class="text-center">
-            <div class="text-4xl mb-4">⚡</div>
-            <h3 class="brutalist-subheading text-lg mb-3">
+            <div class="mb-4 text-4xl">⚡</div>
+            <h3 class="brutalist-subheading mb-3 text-lg">
               PERFORMANCE METRICS
             </h3>
-            <p class="text-muted-foreground text-sm mb-4">
+            <p class="mb-4 text-sm text-muted-foreground">
               Real-time monitoring of system performance, response times, and
               accuracy metrics.
             </p>
@@ -334,11 +334,11 @@ export const prerender = false
         <!-- Compliance Reports -->
         <BrutalistCard hover={true}>
           <div class="text-center">
-            <div class="text-4xl mb-4">📋</div>
-            <h3 class="brutalist-subheading text-lg mb-3">
+            <div class="mb-4 text-4xl">📋</div>
+            <h3 class="brutalist-subheading mb-3 text-lg">
               COMPLIANCE REPORTS
             </h3>
-            <p class="text-muted-foreground text-sm mb-4">
+            <p class="mb-4 text-sm text-muted-foreground">
               Review views for bias findings, audit trails, and reporting. No
               compliance determination is claimed.
             </p>
@@ -358,23 +358,23 @@ export const prerender = false
   <!-- Call to Action -->
   <section class="brutalist-section bg-background">
     <div class="brutalist-container">
-      <div class="mental-health-safe max-w-4xl mx-auto text-center">
-        <div class="text-5xl mb-6">
-          <Target className="w-16 h-16" />
+      <div class="mental-health-safe mx-auto max-w-4xl text-center">
+        <div class="mb-6 text-5xl">
+          <Target className="h-16 w-16" />
         </div>
 
-        <h2 class="brutalist-heading text-3xl md:text-5xl mb-6">
+        <h2 class="brutalist-heading mb-6 text-3xl md:text-5xl">
           TAKE CONTROL OF
           <br />
           <span class="gradient-text-primary">BIAS DETECTION</span>
         </h2>
 
-        <p class="text-xl text-muted-foreground mb-8">
+        <p class="mb-8 text-xl text-muted-foreground">
           Advanced analytics and real-time monitoring for comprehensive bias
           management. Enterprise-grade insights with actionable recommendations.
         </p>
 
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <div class="flex flex-col justify-center gap-4 sm:flex-row">
           <BrutalistButton href="/demo-hub" variant="primary" size="lg">
             🚀 Start Analysis
           </BrutalistButton>
@@ -389,11 +389,11 @@ export const prerender = false
 
 <style>
   .metric-card {
-    @apply bg-card rounded-none p-4 border border-border text-center;
+    @apply rounded-none border border-border bg-card p-4 text-center;
   }
 
   .metric-value {
-    @apply text-2xl font-bold text-foreground mb-1;
+    @apply mb-1 text-2xl font-bold text-foreground;
   }
 
   .metric-label {
@@ -401,15 +401,15 @@ export const prerender = false
   }
 
   .metric-trend {
-    @apply text-xs font-medium mt-1;
+    @apply mt-1 text-xs font-medium;
   }
 
   .trend-up {
-    @apply text-foreground font-medium;
+    @apply font-medium text-foreground;
   }
 
   .trend-down {
-    @apply text-foreground font-semibold;
+    @apply font-semibold text-foreground;
   }
 
   .trend-neutral {
@@ -418,11 +418,11 @@ export const prerender = false
 
   /* Status dots */
   .status-dot {
-    @apply w-3 h-3 rounded-full;
+    @apply h-3 w-3 rounded-full;
   }
 
   .status-dot--processing {
-    @apply bg-primary animate-pulse;
+    @apply animate-pulse bg-primary;
   }
 
   /* Gradient text */

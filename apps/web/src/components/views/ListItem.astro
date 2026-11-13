@@ -32,7 +32,7 @@ const {
 <div class="slide-enter" style={{ '--enter-stage': idx }}>
   <Link
     u-flex="~ items-center lt-md:(col items-start) gap-2"
-    class="border-b-none! mb-6 mt-2 op-transition!"
+    class="border-b-none! op-transition! mb-6 mt-2"
     href={redirect ?? getUrl(`/${collectionType}/${postSlug}/`)}
     external={redirect ? true : false}
   >
@@ -41,7 +41,7 @@ const {
       {video && (
         <span
           u-i-ri-film-line
-          class="flex-none op-50 align-middle"
+          class="op-50 flex-none align-middle"
           title="Provided in video"
           aria-label="Provided in video"
         />
@@ -49,21 +49,21 @@ const {
       {radio && (
         <span
           u-i-ri-radio-line
-          class="flex-none op-50 align-middle"
+          class="op-50 flex-none align-middle"
           title="Provided in radio"
           aria-label="Provided in radio"
         />
       )}
       <time
-        class="op-50 text-sm ws-nowrap"
+        class="op-50 ws-nowrap text-sm"
         datetime={new Date(date).toISOString()}
       >
         {formatDate(date, false)}
       </time>
       {typeof minutesRead === 'number' && minutesRead > 0 && (
-        <span class="op-40 text-sm ws-nowrap">· {minutesRead} min read</span>
+        <span class="op-40 ws-nowrap text-sm">· {minutesRead} min read</span>
       )}
-      {platform && <span class="op-40 text-sm ws-nowrap">· {platform}</span>}
+      {platform && <span class="op-40 ws-nowrap text-sm">· {platform}</span>}
     </span>
   </Link>
 </div>

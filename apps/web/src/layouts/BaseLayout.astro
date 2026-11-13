@@ -1,4 +1,13 @@
 ---
+import SpeedInsights from '@vercel/speed-insights/astro'
+
+import { SITE } from '@/config'
+import { withBasePath } from '@/utils/path'
+import {
+  getServiceWorkerScope,
+  getServiceWorkerScriptUrl,
+} from '@/utils/serviceWorkerPath'
+
 // Type system: Quiet Instrument, clinical editorial. Instrument Serif
 // carries display. Instrument Sans Variable carries body and tracked
 // uppercase labels. Spline Sans Mono stays for app-internal code/data.
@@ -9,13 +18,6 @@ import '@/lib/fonts'
    imported through Astro frontmatter (Vite build resolution failure). */
 import '@/styles/np-tokens.css'
 import '@/styles/marketing.css'
-import { withBasePath } from '@/utils/path'
-import {
-  getServiceWorkerScope,
-  getServiceWorkerScriptUrl,
-} from '@/utils/serviceWorkerPath'
-import { SITE } from '@/config'
-import SpeedInsights from '@vercel/speed-insights/astro'
 
 interface Props {
   title?: string
@@ -182,7 +184,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
       const themeColor = document.querySelector('meta[name="theme-color"]')
       themeColor?.setAttribute(
         'content',
-        storedTheme === 'light' ? '#fafafa' : '#0b0b0c',
+        storedTheme === 'light' ? '#f6f5f0' : '#0b0b0c',
       )
     </script>
     <script
@@ -366,7 +368,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         const themeColor = document.querySelector('meta[name="theme-color"]')
         themeColor?.setAttribute(
           'content',
-          next === 'dark' ? '#0b0b0c' : '#fafafa',
+          next === 'dark' ? '#0b0b0c' : '#f6f5f0',
         )
         window.dispatchEvent(
           new CustomEvent('theme-changed', { detail: { theme: next } }),

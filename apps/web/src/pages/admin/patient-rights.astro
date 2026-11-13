@@ -1,12 +1,14 @@
 ---
 export const prerender = false
+import { Icon } from 'astro-icon/components'
+
 // patient-rights.astro
 // Admin page for managing patient data access rights and requests
 import AdminLayout from '@/layouts/AdminLayout.astro'
-import PatientRightsSystem from '../../components/admin/PatientRightsSystem.astro'
+
 import AccessRequestsLog from '../../components/admin/AccessRequestsLog.astro'
 import DataDeletionLog from '../../components/admin/DataDeletionLog.astro'
-import { Icon } from 'astro-icon/components'
+import PatientRightsSystem from '../../components/admin/PatientRightsSystem.astro'
 
 // Page configuration
 const title = 'Patient Rights Management'
@@ -73,7 +75,7 @@ const fulfillmentPercentage = Math.round(
 <AdminLayout {title} {description} activeItem="patient-rights">
   <div class="space-y-6">
     <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-foreground">{title}</h1>
         <p class="mt-1 text-muted-foreground">
@@ -85,34 +87,34 @@ const fulfillmentPercentage = Math.round(
       <div class="flex items-center gap-3">
         <button
           type="button"
-          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
+          class="flex items-center rounded-none bg-primary px-4 py-2 text-primary-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <Icon name="plus" class="w-5 h-5 mr-2" />
+          <Icon name="plus" class="mr-2 h-5 w-5" />
           New Request
         </button>
 
         <button
           type="button"
-          class="px-4 py-2 border border-input text-foreground rounded-none hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
+          class="flex items-center rounded-none border border-input px-4 py-2 text-foreground hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <Icon name="refresh" class="w-5 h-5 mr-2" />
+          <Icon name="refresh" class="mr-2 h-5 w-5" />
           Refresh
         </button>
       </div>
     </div>
 
     <!-- Compliance Summary -->
-    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-5">
       <!-- Fulfillment Status Card -->
-      <div class="md:col-span-2 bg-card rounded-none p-5">
-        <h3 class="text-lg font-medium text-foreground mb-4">
+      <div class="rounded-none bg-card p-5 md:col-span-2">
+        <h3 class="mb-4 text-lg font-medium text-foreground">
           Request Fulfillment Status
         </h3>
 
-        <div class="flex items-center mb-4">
-          <div class="relative w-full h-4 bg-secondary rounded-none">
+        <div class="mb-4 flex items-center">
+          <div class="relative h-4 w-full rounded-none bg-secondary">
             <div
-              class="h-4 bg-primary rounded-none"
+              class="h-4 rounded-none bg-primary"
               style={`width: ${fulfillmentPercentage}%`}
             ></div>
           </div>
@@ -144,26 +146,26 @@ const fulfillmentPercentage = Math.round(
       </div>
 
       <!-- Quick Stats Cards -->
-      <div class="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:col-span-3 lg:grid-cols-2">
         {quickStats.map((stat) => (
-          <div class="bg-card rounded-none p-5">
-            <div class="flex justify-between items-start">
+          <div class="rounded-none bg-card p-5">
+            <div class="flex items-start justify-between">
               <div>
                 <p class="text-sm font-medium text-muted-foreground">
                   {stat.label}
                 </p>
-                <p class="text-2xl font-bold text-foreground mt-1">
+                <p class="mt-1 text-2xl font-bold text-foreground">
                   {stat.value}
                 </p>
               </div>
-              <div class="p-3 rounded-none bg-secondary border border-input">
-                <Icon name={stat.icon} class="w-6 h-6 text-foreground" />
+              <div class="rounded-none border border-input bg-secondary p-3">
+                <Icon name={stat.icon} class="h-6 w-6 text-foreground" />
               </div>
             </div>
-            <div class={`flex items-center mt-4 ${getTrendClass(stat.trend)}`}>
+            <div class={`mt-4 flex items-center ${getTrendClass(stat.trend)}`}>
               <Icon
                 name={stat.trend === 'up' ? 'trending-up' : 'trending-down'}
-                class="w-4 h-4 mr-1"
+                class="mr-1 h-4 w-4"
               />
               <span class="text-sm font-medium">
                 {stat.change} from last month
@@ -175,13 +177,13 @@ const fulfillmentPercentage = Math.round(
     </div>
 
     <!-- Main Content -->
-    <div class="bg-card rounded-none overflow-hidden">
+    <div class="overflow-hidden rounded-none bg-card">
       <div class="border-b border-border">
         <nav class="flex space-x-2 px-4" aria-label="Tabs">
           <button
             id="tab-requests"
             type="button"
-            class="py-4 px-1 border-b-2 border-ring text-foreground font-medium text-sm"
+            class="border-b-2 border-ring px-1 py-4 text-sm font-medium text-foreground"
             aria-selected="true"
           >
             Access Requests
@@ -189,7 +191,7 @@ const fulfillmentPercentage = Math.round(
           <button
             id="tab-deletions"
             type="button"
-            class="py-4 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-input font-medium text-sm"
+            class="border-transparent border-b-2 px-1 py-4 text-sm font-medium text-muted-foreground hover:border-input hover:text-foreground"
             aria-selected="false"
           >
             Deletion Requests
@@ -197,7 +199,7 @@ const fulfillmentPercentage = Math.round(
           <button
             id="tab-compliance"
             type="button"
-            class="py-4 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-input font-medium text-sm"
+            class="border-transparent border-b-2 px-1 py-4 text-sm font-medium text-muted-foreground hover:border-input hover:text-foreground"
             aria-selected="false"
           >
             Compliance Reports

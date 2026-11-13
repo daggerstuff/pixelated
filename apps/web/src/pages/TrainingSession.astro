@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+
 import TrainingSessionComponent from '../components/TrainingSession.tsx'
 ---
 
@@ -9,21 +10,21 @@ import TrainingSessionComponent from '../components/TrainingSession.tsx'
   bgType="plum"
 >
   <section
-    class="relative min-h-screen flex flex-col items-center justify-center py-12"
+    class="relative flex min-h-screen flex-col items-center justify-center py-12"
     aria-labelledby="training-session-title-heading"
   >
     <h1
       id="training-session-title-heading"
-      class="text-3xl font-bold mb-6 text-primary"
+      class="mb-6 text-3xl font-bold text-primary"
     >
       Therapist Training Session
     </h1>
-    <p class="mb-4 text-lg text-muted-foreground max-w-2xl text-center">
+    <p class="mb-4 max-w-2xl text-center text-lg text-muted-foreground">
       Welcome to the interactive therapist training session. This demo simulates
       a real client conversation, provides bias analysis, and lets you practice
       therapeutic responses in a safe environment.
     </p>
-    <ul class="mb-8 list-disc list-inside text-sm text-muted-foreground max-w-xl">
+    <ul class="mb-8 max-w-xl list-inside list-disc text-sm text-muted-foreground">
       <li>Type your response as the therapist and send it to the AI client.</li>
       <li>Review bias analysis feedback after each message.</li>
       <li>
@@ -38,7 +39,7 @@ import TrainingSessionComponent from '../components/TrainingSession.tsx'
       <TrainingSessionComponent client:load />
       <noscript>
         <div
-          class="bg-destructive text-destructive-foreground p-4 rounded-md mt-6"
+          class="mt-6 rounded-md bg-destructive p-4 text-destructive-foreground"
           role="alert"
         >
           <strong>JavaScript Required:</strong> This interactive training
@@ -47,8 +48,8 @@ import TrainingSessionComponent from '../components/TrainingSession.tsx'
         </div>
       </noscript>
     </div>
-    <div class="mt-10 w-full max-w-xl bg-muted p-6 rounded-lg shadow">
-      <h2 class="text-xl font-semibold mb-2">Demo Transcript</h2>
+    <div class="mt-10 w-full max-w-xl rounded-lg bg-muted p-6 shadow">
+      <h2 class="mb-2 text-xl font-semibold">Demo Transcript</h2>
       <div class="text-sm text-muted-foreground">
         <strong>Client:</strong> Hello, I am your client. How can you help me
         today?
@@ -66,11 +67,11 @@ import TrainingSessionComponent from '../components/TrainingSession.tsx'
       </div>
     </div>
     <div class="mt-10 w-full max-w-xl">
-      <h2 class="text-lg font-semibold mb-2">Accessibility & Support</h2>
+      <h2 class="mb-2 text-lg font-semibold">Accessibility & Support</h2>
       <p class="text-sm text-muted-foreground">
         This page uses ARIA landmarks, skip links, and high-contrast colors for
         accessibility. If you need help, contact{' '}
-        <a href="/contact" class="underline text-primary">
+        <a href="/contact" class="text-primary underline">
           support
         </a>
         .

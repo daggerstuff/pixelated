@@ -20,13 +20,13 @@ const fheStats = {
 
 <BaseLayout title="FHE Dashboard">
   <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">
+    <h1 class="mb-8 text-3xl font-bold">
       Fully Homomorphic Encryption Dashboard
     </h1>
 
     {fheStats ? (
-      <div class="bg-white shadow rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Latest Verification</h2>
+      <div class="bg-white rounded-lg p-6 shadow">
+        <h2 class="mb-4 text-xl font-semibold">Latest Verification</h2>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <p class="text-muted-foreground">Timestamp</p>
@@ -36,12 +36,12 @@ const fheStats = {
           </div>
           <div>
             <p class="text-muted-foreground">Verification Hash</p>
-            <p class="font-medium font-mono">{fheStats.verificationHash}</p>
+            <p class="font-mono font-medium">{fheStats.verificationHash}</p>
           </div>
         </div>
       </div>
     ) : (
-      <div class="bg-white shadow rounded-lg p-6 text-center">
+      <div class="bg-white rounded-lg p-6 text-center shadow">
         <p class="text-muted-foreground">No FHE verification data available</p>
       </div>
     )}

@@ -1,10 +1,12 @@
 ---
 import type { AstroGlobal } from 'astro'
-import { isAuthenticated } from '../lib/auth'
-import BaseLayout from '../layouts/BaseLayout.astro'
-import '@/styles/auth-forms.css'
-import { RegisterForm } from '../components/auth/RegisterForm.tsx'
 import { ClientRouter } from 'astro:transitions'
+
+import { RegisterForm } from '../components/auth/RegisterForm.tsx'
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { isAuthenticated } from '../lib/auth'
+
+import '@/styles/auth-forms.css'
 
 // Cast Astro to proper type to fix TypeScript errors
 const astro = Astro as AstroGlobal

@@ -2,6 +2,7 @@
 export const prerender = false
 // Frontmatter section (add imports and scripts here)
 import AdminLayout from '@/layouts/AdminLayout.astro'
+
 import BackupSecurityManager from '../../components/admin/BackupSecurityManager.astro'
 
 // Page metadata
@@ -14,7 +15,7 @@ const isAuthorized = true // Replace with actual authorization check
 
 <AdminLayout {title} {description} activeItem="backup-security">
   <div class="py-4">
-    <div class="flex flex-col gap-2 mb-6">
+    <div class="mb-6 flex flex-col gap-2">
       <h1 class="text-2xl font-bold">Backup Security Management</h1>
       <p class="text-muted-foreground">
         Configure and monitor secure encrypted backups, verify integrity, and
@@ -25,7 +26,7 @@ const isAuthorized = true // Replace with actual authorization check
     {isAuthorized ? (
       <BackupSecurityManager />
     ) : (
-      <div class="bg-card border border-ring rounded-none p-4">
+      <div class="rounded-none border border-ring bg-card p-4">
         <div class="flex">
           <div class="flex-shrink-0">
             <svg

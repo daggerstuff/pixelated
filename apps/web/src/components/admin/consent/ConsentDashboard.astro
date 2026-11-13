@@ -1,11 +1,12 @@
 ---
+import Badge from '@/components/ui/Badge.astro'
 // ConsentDashboard.astro - Admin dashboard for consent management
 import Card from '@/components/ui/Card.astro'
-import CardHeader from '@/components/ui/CardHeader.astro'
 import CardContent from '@/components/ui/CardContent.astro'
+import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
-import Badge from '@/components/ui/Badge.astro'
 import mongodb from '@/config/mongodb.config'
+
 import SafeIcon from '../../ui/SafeIcon.astro'
 
 function formatDate(dateInput: any, options: any = {}) {
@@ -122,11 +123,14 @@ interface UserConsentWithDetails {
 
 // Type assertions for the data
 const typedConsentVersions = consentVersions as unknown as
-  ConsentVersionWithTypeName[] | null
+  | ConsentVersionWithTypeName[]
+  | null
 const typedActiveConsents = activeConsents as unknown as
-  UserConsentWithDetails[] | null
+  | UserConsentWithDetails[]
+  | null
 const typedWithdrawnConsents = withdrawnConsents as unknown as
-  UserConsentWithDetails[] | null
+  | UserConsentWithDetails[]
+  | null
 
 // Calculate overall stats
 const totalActiveConsents = (typedActiveConsents || []).length
@@ -154,19 +158,19 @@ const withdrawalsByType: Record<string, number> = {}
 ---
 
 <div class="space-y-6">
-  <div class="flex justify-between items-center">
+  <div class="flex items-center justify-between">
     <h1 class="text-2xl font-bold tracking-tight">Consent Management</h1>
     <div class="flex space-x-2">
       <a
         href="/admin/consent-management"
-        class="inline-flex items-center justify-center rounded-none text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+        class="inline-flex h-10 items-center justify-center rounded-none border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
       >
         <SafeIcon name="tabler:settings" class="mr-2 h-4 w-4" />
         Manage Types
       </a>
       <a
         href="/admin/state-consent-rules"
-        class="inline-flex items-center justify-center rounded-none text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+        class="inline-flex h-10 items-center justify-center rounded-none border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
       >
         <SafeIcon name="tabler:versions" class="mr-2 h-4 w-4" />
         Manage Versions
@@ -252,7 +256,7 @@ const withdrawalsByType: Record<string, number> = {}
             ))}
 
           {(!consentTypes || consentTypes.length === 0) && (
-            <p class="text-center text-muted-foreground py-4">
+            <p class="py-4 text-center text-muted-foreground">
               No consent types defined
             </p>
           )}
@@ -289,7 +293,7 @@ const withdrawalsByType: Record<string, number> = {}
 
           {(!typedConsentVersions ||
             typedConsentVersions.filter((v) => v.is_current).length === 0) && (
-            <p class="text-center text-muted-foreground py-4">
+            <p class="py-4 text-center text-muted-foreground">
               No current versions found
             </p>
           )}
@@ -306,7 +310,7 @@ const withdrawalsByType: Record<string, number> = {}
         {Object.keys(consentsByType).length > 0 ? (
           <div class="space-y-8">
             <div>
-              <h3 class="text-sm font-medium mb-2">Active Consents by Type</h3>
+              <h3 class="mb-2 text-sm font-medium">Active Consents by Type</h3>
               <div class="space-y-2">
                 {Object.entries(consentsByType).map(([typeName, count]) => (
                   <div>
@@ -314,9 +318,9 @@ const withdrawalsByType: Record<string, number> = {}
                       <span class="text-sm">{typeName}</span>
                       <span class="text-sm font-medium">{count}</span>
                     </div>
-                    <div class="h-2 w-full mt-1 bg-secondary rounded-none overflow-hidden">
+                    <div class="mt-1 h-2 w-full overflow-hidden rounded-none bg-secondary">
                       <div
-                        class="bg-primary h-full rounded-none"
+                        class="h-full rounded-none bg-primary"
                         style={`width: ${Math.min(100, Math.round((count / totalActiveConsents) * 100))}%`}
                       />
                     </div>
@@ -327,7 +331,7 @@ const withdrawalsByType: Record<string, number> = {}
 
             {Object.keys(withdrawalsByType).length > 0 && (
               <div>
-                <h3 class="text-sm font-medium mb-2">Withdrawals by Type</h3>
+                <h3 class="mb-2 text-sm font-medium">Withdrawals by Type</h3>
                 <div class="space-y-2">
                   {Object.entries(withdrawalsByType).map(
                     ([typeName, count]) => (
@@ -336,9 +340,9 @@ const withdrawalsByType: Record<string, number> = {}
                           <span class="text-sm">{typeName}</span>
                           <span class="text-sm font-medium">{count}</span>
                         </div>
-                        <div class="h-2 w-full mt-1 bg-secondary rounded-none overflow-hidden">
+                        <div class="mt-1 h-2 w-full overflow-hidden rounded-none bg-secondary">
                           <div
-                            class="bg-primary h-full rounded-none"
+                            class="h-full rounded-none bg-primary"
                             style={`width: ${Math.min(100, Math.round((count / totalWithdrawnConsents) * 100))}%`}
                           />
                         </div>
@@ -350,10 +354,10 @@ const withdrawalsByType: Record<string, number> = {}
             )}
           </div>
         ) : (
-          <div class="text-center py-8">
+          <div class="py-8 text-center">
             <SafeIcon
               name="tabler:chart-bar"
-              class="h-12 w-12 text-muted-foreground mx-auto mb-3"
+              class="mx-auto mb-3 h-12 w-12 text-muted-foreground"
             />
             <p class="text-muted-foreground">
               No consent data available for analysis
@@ -373,13 +377,13 @@ const withdrawalsByType: Record<string, number> = {}
           <div class="space-y-4">
             {typedWithdrawnConsents.slice(0, 5).map((consent) => (
               <div class="border-b pb-4">
-                <div class="flex items-center justify-between mb-2">
+                <div class="mb-2 flex items-center justify-between">
                   <div>
                     <Badge variant="outline">
                       {consent.consent_versions?.consent_types?.name ||
                         'Unknown'}
                     </Badge>
-                    <span class="text-xs text-muted-foreground ml-2">
+                    <span class="ml-2 text-xs text-muted-foreground">
                       Withdrawn on{' '}
                       {formatDate(consent.withdrawal_date, {
                         month: 'short',
@@ -388,7 +392,7 @@ const withdrawalsByType: Record<string, number> = {}
                   </div>
                 </div>
                 {consent.withdrawal_reason && (
-                  <p class="text-sm border-l-2 border-ring pl-3 text-muted-foreground italic">
+                  <p class="border-l-2 border-ring pl-3 text-sm italic text-muted-foreground">
                     "{consent.withdrawal_reason}"
                   </p>
                 )}

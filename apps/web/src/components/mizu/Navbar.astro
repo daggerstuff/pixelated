@@ -9,7 +9,7 @@ const links = [
 ]
 ---
 
-<header class="marketing-nav fixed top-3 left-4 right-4 z-50">
+<header class="marketing-nav fixed left-4 right-4 top-3 z-50">
   <div class="marketing-nav__shell">
     <div class="marketing-nav__row">
       <a
@@ -64,7 +64,7 @@ const links = [
         aria-expanded="false"
       >
         <svg
-          class="w-5 h-5"
+          class="h-5 w-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -340,6 +340,15 @@ const links = [
     .marketing-nav__toggle {
       display: inline-flex;
     }
+  }
+
+  /* DashboardLayout does not load marketing.css, so this container name had
+     no rule here. Scoped, product register. */
+  .marketing-shell {
+    width: 100%;
+    max-width: var(--np-content);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
   }
 </style>
 

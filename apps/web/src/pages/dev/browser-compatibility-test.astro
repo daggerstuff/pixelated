@@ -1,8 +1,8 @@
 ---
-import ChatLayout from '../../layouts/ChatLayout.astro'
-import { BrowserCompatibilityTester } from '../../components/testing/BrowserCompatibilityTester'
 import AIChat from '../../components/AIChat.astro'
+import { BrowserCompatibilityTester } from '../../components/testing/BrowserCompatibilityTester'
 import { LOADING_SIZES } from '../../constants/testing'
+import ChatLayout from '../../layouts/ChatLayout.astro'
 import type { CompatibilityIssue, TestSections } from '../../types/testing'
 
 const TEST_SECTIONS: TestSections = {
@@ -369,12 +369,12 @@ const TEST_SECTIONS: TestSections = {
 </ChatLayout>
 
 <script>
+  import type { CompatibilityIssue } from '../../types/testing'
   import {
     addIssue,
     removeIssue,
     displayIssues,
   } from '../../utils/compatibility-testing'
-  import type { CompatibilityIssue } from '../../types/testing'
 
   // Initialize the issues array in localStorage if it doesn't exist
   if (!localStorage.getItem('compatibility-issues')) {

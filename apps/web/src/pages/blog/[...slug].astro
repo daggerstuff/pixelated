@@ -1,6 +1,6 @@
 ---
 import { getCollection, type CollectionEntry, render } from 'astro:content'
-import BaseLayout from '@/layouts/BaseLayout.astro'
+
 import Badge from '@/components/ui/Badge.astro'
 import { Button } from '@/components/ui/button/index.ts'
 import Card from '@/components/ui/Card.astro'
@@ -8,6 +8,7 @@ import CardContent from '@/components/ui/CardContent.astro'
 import CardDescription from '@/components/ui/CardDescription.astro'
 import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getContentSlug } from '@/utils/blog'
 
 // export const prerender = true;
@@ -81,10 +82,10 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
         </div>
 
         <!-- Article Header -->
-        <div class="max-w-4xl mx-auto mb-12">
-          <div class="text-center mb-8">
+        <div class="mx-auto mb-12 max-w-4xl">
+          <div class="mb-8 text-center">
             <!-- Category and Meta Info -->
-            <div class="flex items-center justify-center gap-4 mb-6">
+            <div class="mb-6 flex items-center justify-center gap-4">
               {entry.data.category && (
                 <Badge class="bg-secondary text-foreground">
                   {entry.data.category}
@@ -99,25 +100,25 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
             </div>
 
             <!-- Title -->
-            <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
+            <h1 class="mb-6 text-3xl font-bold leading-tight lg:text-5xl">
               <span>{entry.data.title}</span>
             </h1>
 
             <!-- Description -->
             {entry.data.description && (
-              <p class="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+              <p class="mx-auto mb-8 max-w-3xl text-lg leading-relaxed text-muted-foreground">
                 {entry.data.description}
               </p>
             )}
 
             <!-- Featured Image -->
             {entry.data.image && (
-              <div class="w-full max-w-3xl mx-auto mb-8">
-                <div class="rounded-none p-2 overflow-hidden border border-border">
+              <div class="mx-auto mb-8 w-full max-w-3xl">
+                <div class="overflow-hidden rounded-none border border-border p-2">
                   <img
                     src={entry.data.image.url}
                     alt={entry.data.image.alt}
-                    class="w-full h-64 lg:h-96 object-cover rounded-xl"
+                    class="h-64 w-full rounded-xl object-cover lg:h-96"
                   />
                 </div>
               </div>
@@ -125,9 +126,9 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
             <!-- Tags -->
             {entry.data.tags && entry.data.tags.length > 0 && (
-              <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
+              <div class="mb-8 flex flex-wrap items-center justify-center gap-2">
                 {entry.data.tags.map((tag: string) => (
-                  <Badge class="bg-secondary text-foreground text-xs">
+                  <Badge class="bg-secondary text-xs text-foreground">
                     #{tag}
                   </Badge>
                 ))}
@@ -137,8 +138,8 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
         </div>
 
         <!-- Article Content -->
-        <div class="max-w-4xl mx-auto">
-          <Card class="border border-border bg-card rounded-none overflow-hidden mb-12">
+        <div class="mx-auto max-w-4xl">
+          <Card class="mb-12 overflow-hidden rounded-none border border-border bg-card">
             <CardContent class="p-8 lg:p-12">
               <div class="prose prose-lg prose-invert max-w-none">
                 <Content />
@@ -148,29 +149,29 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
         </div>
 
         <!-- Article Actions -->
-        <div class="max-w-4xl mx-auto mb-16">
-          <Card class="border border-border bg-card rounded-none overflow-hidden">
-            <CardContent class="p-6 lg:p-8 text-center">
-              <div class="text-4xl mb-4 text-foreground">
-                <Lightbulb className="w-10 h-10" />
+        <div class="mx-auto mb-16 max-w-4xl">
+          <Card class="overflow-hidden rounded-none border border-border bg-card">
+            <CardContent class="p-6 text-center lg:p-8">
+              <div class="mb-4 text-4xl text-foreground">
+                <Lightbulb className="h-10 w-10" />
               </div>
-              <h3 class="text-xl font-bold text-foreground mb-4">
+              <h3 class="mb-4 text-xl font-bold text-foreground">
                 Found This Helpful?
               </h3>
-              <p class="text-muted-foreground mb-6 max-w-2xl mx-auto">
+              <p class="mx-auto mb-6 max-w-2xl text-muted-foreground">
                 Share your thoughts with other therapy educators or explore more
                 insights from the training revolution.
               </p>
-              <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Button
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-none"
+                  className="hover:bg-primary/90 rounded-none bg-primary px-6 py-3 text-primary-foreground"
                   data-demo-link="/demo-hub"
                 >
                   Try Our Training Demos →
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-border text-foreground hover:bg-accent px-6 py-3 rounded-none"
+                  className="rounded-none border-border px-6 py-3 text-foreground hover:bg-accent"
                   data-blog-link="/blog"
                 >
                   Read More Articles
@@ -182,38 +183,38 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
 
         <!-- Related Posts -->
         {relatedPosts.length > 0 && (
-          <div class="max-w-6xl mx-auto mb-16">
-            <div class="text-center mb-12">
-              <h2 class="text-2xl lg:text-3xl font-bold text-foreground mb-4">
+          <div class="mx-auto mb-16 max-w-6xl">
+            <div class="mb-12 text-center">
+              <h2 class="mb-4 text-2xl font-bold text-foreground lg:text-3xl">
                 You Might Also
                 <span>Enjoy</span>
               </h2>
-              <p class="text-base text-muted-foreground max-w-2xl mx-auto">
+              <p class="mx-auto max-w-2xl text-base text-muted-foreground">
                 More insights from the therapy training revolution
               </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
               {relatedPosts.map((post: CollectionEntry<'blog'>) => (
-                <Card class="border border-border hover:border-ring rounded-none overflow-hidden group transition-colors bg-card">
+                <Card class="group overflow-hidden rounded-none border border-border bg-card transition-colors hover:border-ring">
                   <CardHeader class="pb-4">
                     {post.data.image && (
-                      <div class="w-full h-40 rounded-none mb-4 overflow-hidden">
+                      <div class="mb-4 h-40 w-full overflow-hidden rounded-none">
                         <img
                           src={post.data.image.url}
                           alt={post.data.image.alt}
-                          class="w-full h-full object-cover"
+                          class="h-full w-full object-cover"
                         />
                       </div>
                     )}
 
                     {post.data.category && (
-                      <Badge class="bg-secondary text-foreground text-xs mb-3">
+                      <Badge class="mb-3 bg-secondary text-xs text-foreground">
                         {post.data.category}
                       </Badge>
                     )}
 
-                    <CardTitle class="text-base font-bold text-foreground tracking-wide mb-3">
+                    <CardTitle class="mb-3 text-base font-bold tracking-wide text-foreground">
                       <a
                         href={`/blog/${getContentSlug(post)}`}
                         class="hover:underline"
@@ -222,7 +223,7 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
                       </a>
                     </CardTitle>
 
-                    <CardDescription class="text-sm text-muted-foreground leading-relaxed mb-4">
+                    <CardDescription class="mb-4 text-sm leading-relaxed text-muted-foreground">
                       {post.data.description}
                     </CardDescription>
 
@@ -239,30 +240,30 @@ const readingTime = Math.ceil(wordCount / wordsPerMinute)
         )}
 
         <!-- Newsletter Signup -->
-        <div class="max-w-4xl mx-auto">
-          <Card class="border border-border bg-card rounded-none overflow-hidden">
-            <CardContent class="p-8 lg:p-12 text-center">
-              <div class="text-6xl mb-6">📬</div>
+        <div class="mx-auto max-w-4xl">
+          <Card class="overflow-hidden rounded-none border border-border bg-card">
+            <CardContent class="p-8 text-center lg:p-12">
+              <div class="mb-6 text-6xl">📬</div>
 
-              <h2 class="text-2xl lg:text-3xl font-bold text-foreground mb-6">
+              <h2 class="mb-6 text-2xl font-bold text-foreground lg:text-3xl">
                 Stay Ahead of the
                 <br />
                 <span>Training Revolution</span>
               </h2>
 
-              <p class="text-base text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
+              <p class="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-muted-foreground">
                 Get weekly insights like this delivered to your inbox.
                 University success stories, breakthrough research, and practical
                 tips for therapy educators.
               </p>
 
-              <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6 max-w-md mx-auto">
+              <div class="mx-auto mb-6 flex max-w-md flex-col items-center justify-center gap-4 sm:flex-row">
                 <input
                   type="email"
                   placeholder="your.email@university.edu"
-                  class="flex-1 px-4 py-3 rounded-none bg-secondary border border-input text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-ring"
+                  class="flex-1 rounded-none border border-input bg-secondary px-4 py-3 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none"
                 />
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-none">
+                <Button className="hover:bg-primary/90 rounded-none bg-primary px-6 py-3 text-primary-foreground">
                   Subscribe
                 </Button>
               </div>

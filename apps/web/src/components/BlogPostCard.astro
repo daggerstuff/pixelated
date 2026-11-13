@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content'
+
 import { getContentSlug } from '@/utils/blog'
 
 interface Props {
@@ -33,7 +34,7 @@ const formattedDate = formatDate(post.data.pubDate)
 
 {hasValidData && (
   <article class="group" itemscope itemtype="https://schema.org/BlogPosting">
-    <div class="flex flex-col sm:flex-row gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row">
       <aside class="flex-shrink-0 text-sm text-muted-foreground sm:w-32">
         <time
           datetime={post.data.pubDate.toISOString()}
@@ -42,7 +43,7 @@ const formattedDate = formatDate(post.data.pubDate)
           {formattedDate}
         </time>
         <span
-          class="hidden sm:block mt-1"
+          class="mt-1 hidden sm:block"
           aria-label={`Reading time: ${readingTime} minutes`}
         >
           {readingTime} min read
@@ -51,7 +52,7 @@ const formattedDate = formatDate(post.data.pubDate)
 
       <main class="flex-1">
         <h3
-          class="text-xl font-bold mb-2 transition-colors group-hover:text-foreground"
+          class="mb-2 text-xl font-bold transition-colors group-hover:text-foreground"
           itemprop="headline"
         >
           <a
@@ -71,7 +72,7 @@ const formattedDate = formatDate(post.data.pubDate)
         </p>
 
         {post.data.tags && post.data.tags.length > 0 && (
-          <nav class="flex flex-wrap gap-2 mb-3" aria-label="Post tags">
+          <nav class="mb-3 flex flex-wrap gap-2" aria-label="Post tags">
             {post.data.tags.map((postTag: string) => (
               <a
                 href={`/blog/tags/${postTag}`}
@@ -95,7 +96,7 @@ const formattedDate = formatDate(post.data.pubDate)
         >
           Read article
           <span
-            class="ml-1 group-hover:translate-x-1 transition-transform"
+            class="ml-1 transition-transform group-hover:translate-x-1"
             aria-hidden="true"
           >
             →

@@ -1,8 +1,9 @@
 ---
 export const prerender = false
+import { Icon } from 'astro-icon/components'
+
 import AdminLayout from '@/layouts/AdminLayout.astro'
 import { requirePageAuth } from '@/lib/auth/serverAuth'
-import { Icon } from 'astro-icon/components'
 
 await requirePageAuth(Astro, 'admin')
 ---
@@ -14,7 +15,7 @@ await requirePageAuth(Astro, 'admin')
 >
   <div class="space-y-6">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
         <h1 class="text-2xl font-bold text-foreground">State Consent Rules</h1>
         <p class="mt-1 text-muted-foreground">
@@ -26,35 +27,35 @@ await requirePageAuth(Astro, 'admin')
         <button
           id="btn-create"
           type="button"
-          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
+          class="flex items-center rounded-none bg-primary px-4 py-2 text-primary-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <Icon name="tabler:plus" class="w-5 h-5 mr-2" />
+          <Icon name="tabler:plus" class="mr-2 h-5 w-5" />
           Create New Rule
         </button>
         <button
           id="btn-refresh"
           type="button"
-          class="px-4 py-2 border border-input text-foreground rounded-none hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
+          class="flex items-center rounded-none border border-input px-4 py-2 text-foreground hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <Icon name="tabler:refresh" class="w-5 h-5 mr-2" />
+          <Icon name="tabler:refresh" class="mr-2 h-5 w-5" />
           Refresh
         </button>
       </div>
     </div>
 
     <!-- Filters -->
-    <div class="bg-card rounded-none shadow-md p-4">
-      <form id="filter-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="rounded-none bg-card p-4 shadow-md">
+      <form id="filter-form" class="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div>
           <label
             for="filter-state"
-            class="block text-sm font-medium text-foreground mb-1"
+            class="mb-1 block text-sm font-medium text-foreground"
           >
             State
           </label>
           <select
             id="filter-state"
-            class="w-full rounded-none border border-input text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="w-full rounded-none border border-input px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">All States</option>
           </select>
@@ -62,13 +63,13 @@ await requirePageAuth(Astro, 'admin')
         <div>
           <label
             for="filter-status"
-            class="block text-sm font-medium text-foreground mb-1"
+            class="mb-1 block text-sm font-medium text-foreground"
           >
             Status
           </label>
           <select
             id="filter-status"
-            class="w-full rounded-none border border-input text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="w-full rounded-none border border-input px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">All Statuses</option>
             <option value="draft">Draft</option>
@@ -82,7 +83,7 @@ await requirePageAuth(Astro, 'admin')
         <div>
           <label
             for="filter-search"
-            class="block text-sm font-medium text-foreground mb-1"
+            class="mb-1 block text-sm font-medium text-foreground"
           >
             Search
           </label>
@@ -90,13 +91,13 @@ await requirePageAuth(Astro, 'admin')
             type="text"
             id="filter-search"
             placeholder="Search by state code..."
-            class="w-full rounded-none border border-input text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="w-full rounded-none border border-input px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
         <div class="flex items-end">
           <button
             type="submit"
-            class="w-full px-4 py-2 bg-secondary text-foreground rounded-none hover:bg-secondary text-foreground text-sm font-medium"
+            class="w-full rounded-none bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
           >
             Apply Filters
           </button>
@@ -105,32 +106,32 @@ await requirePageAuth(Astro, 'admin')
     </div>
 
     <!-- Rules Table -->
-    <div class="bg-card rounded-none shadow-md overflow-hidden">
+    <div class="overflow-hidden rounded-none bg-card shadow-md">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-border">
           <thead class="bg-secondary">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 State
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Version
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Status
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Created By
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Created At
               </th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody id="rules-tbody" class="bg-card divide-y divide-border">
+          <tbody id="rules-tbody" class="divide-y divide-border bg-card">
             <tr id="loading-row">
               <td
                 colspan="6"
@@ -146,14 +147,14 @@ await requirePageAuth(Astro, 'admin')
       <!-- Pagination -->
       <div
         id="pagination-bar"
-        class="px-6 py-3 bg-secondary flex items-center justify-between hidden"
+        class="flex hidden items-center justify-between bg-secondary px-6 py-3"
       >
         <div id="pagination-info" class="text-sm text-muted-foreground"></div>
         <div class="flex items-center gap-2">
           <button
             id="btn-prev"
             type="button"
-            class="px-3 py-1 text-sm border border-input rounded-none hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            class="rounded-none border border-input px-3 py-1 text-sm hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
             disabled
           >
             Previous
@@ -164,7 +165,7 @@ await requirePageAuth(Astro, 'admin')
           <button
             id="btn-next"
             type="button"
-            class="px-3 py-1 text-sm border border-input rounded-none hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            class="rounded-none border border-input px-3 py-1 text-sm hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
             disabled
           >
             Next
@@ -177,27 +178,27 @@ await requirePageAuth(Astro, 'admin')
   <!-- Create Modal -->
   <div
     id="create-modal"
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50"
+    class="bg-black fixed inset-0 z-50 hidden items-center justify-center bg-opacity-50"
   >
-    <div class="bg-card rounded-none shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-      <div class="px-6 py-4 border-b border-border">
+    <div class="mx-4 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-none bg-card shadow-xl">
+      <div class="border-b border-border px-6 py-4">
         <h2 class="text-lg font-semibold text-foreground">
           Create New State Consent Rule
         </h2>
       </div>
-      <form id="create-form" class="px-6 py-4 space-y-4">
+      <form id="create-form" class="space-y-4 px-6 py-4">
         <div>
           <label
             for="create-state"
-            class="block text-sm font-medium text-foreground mb-1"
+            class="mb-1 block text-sm font-medium text-foreground"
           >
-            State Code <span class="text-foreground font-semibold">*</span>
+            State Code <span class="font-semibold text-foreground">*</span>
           </label>
           <select
             id="create-state"
             name="stateCode"
             required
-            class="w-full rounded-none border border-input text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="w-full rounded-none border border-input px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">Select a state...</option>
           </select>
@@ -206,16 +207,16 @@ await requirePageAuth(Astro, 'admin')
         <div>
           <label
             for="create-consent-level"
-            class="block text-sm font-medium text-foreground mb-1"
+            class="mb-1 block text-sm font-medium text-foreground"
           >
             Minimum Consent Level{' '}
-            <span class="text-foreground font-semibold">*</span>
+            <span class="font-semibold text-foreground">*</span>
           </label>
           <select
             id="create-consent-level"
             name="minimumConsentLevel"
             required
-            class="w-full rounded-none border border-input text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="w-full rounded-none border border-input px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="none">None</option>
             <option value="minimal">Minimal</option>
@@ -258,10 +259,10 @@ await requirePageAuth(Astro, 'admin')
           <div>
             <label
               for="create-age-majority"
-              class="block text-sm font-medium text-foreground mb-1"
+              class="mb-1 block text-sm font-medium text-foreground"
             >
               Age of Majority{' '}
-              <span class="text-foreground font-semibold">*</span>
+              <span class="font-semibold text-foreground">*</span>
             </label>
             <input
               type="number"
@@ -271,7 +272,7 @@ await requirePageAuth(Astro, 'admin')
               max="21"
               value="18"
               required
-              class="w-full rounded-none border border-input text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              class="w-full rounded-none border border-input px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
         </div>
@@ -279,7 +280,7 @@ await requirePageAuth(Astro, 'admin')
         <div>
           <label
             for="create-notes"
-            class="block text-sm font-medium text-foreground mb-1"
+            class="mb-1 block text-sm font-medium text-foreground"
           >
             Notes
           </label>
@@ -287,27 +288,27 @@ await requirePageAuth(Astro, 'admin')
             id="create-notes"
             name="notes"
             rows="3"
-            class="w-full rounded-none border border-input text-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            class="w-full rounded-none border border-input px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
             placeholder="Optional notes for this rule..."
           ></textarea>
         </div>
 
         <div
           id="create-error"
-          class="hidden text-sm text-foreground font-semibold"
+          class="hidden text-sm font-semibold text-foreground"
         ></div>
 
         <div class="flex justify-end gap-3 pt-2">
           <button
             type="button"
             id="btn-cancel-create"
-            class="px-4 py-2 border border-input text-foreground rounded-none hover:bg-secondary text-sm"
+            class="rounded-none border border-input px-4 py-2 text-sm text-foreground hover:bg-secondary"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent text-sm"
+            class="rounded-none bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-accent"
           >
             Create Draft
           </button>

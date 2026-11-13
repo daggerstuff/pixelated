@@ -1,10 +1,12 @@
 ---
+import Analytics from '@vercel/analytics/astro'
+import SpeedInsights from '@vercel/speed-insights/astro'
+
+import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
+import { FEATURES } from '@/config'
+
 import '@/styles/np-tokens.css'
 import '@/lib/fonts'
-import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
-import SpeedInsights from '@vercel/speed-insights/astro'
-import Analytics from '@vercel/analytics/astro'
-import { FEATURES } from '@/config'
 
 export interface Props {
   title?: string
@@ -32,11 +34,11 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
     <UmamiAnalytics nonce={cspNonce} />
   </head>
-  <body class="bg-background text-foreground font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-primary/30">
+  <body class="selection:bg-primary/30 flex min-h-screen flex-col overflow-x-hidden bg-background font-sans text-foreground">
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 rounded-md focus:shadow-lg transition-transform"
+      class="sr-only rounded-md transition-transform focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:px-4 focus:py-2 focus:shadow-lg"
       style="background: var(--accent-primary); color: var(--bg-primary);"
     >
       Skip to content

@@ -1,7 +1,8 @@
 ---
+import { getCollection, type CollectionEntry } from 'astro:content'
+
 import PostCard from '@/components/blog/PostCard.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { getCollection, type CollectionEntry } from 'astro:content'
 
 type BlogPost = CollectionEntry<'blog'>
 
@@ -47,15 +48,15 @@ const description = `All posts in the '${name}' series.`
 ---
 
 <BaseLayout {title} {description}>
-  <div class="max-w-6xl mx-auto py-12 px-4">
-    <div class="text-center mb-12">
+  <div class="mx-auto max-w-6xl px-4 py-12">
+    <div class="mb-12 text-center">
       <h1 class="text-4xl font-bold text-foreground">Series: {name}</h1>
-      <p class="text-lg text-muted-foreground mt-2">
+      <p class="mt-2 text-lg text-muted-foreground">
         {postsInSeries.length} post{postsInSeries.length !== 1 ? 's' : ''} in
         this series
       </p>
     </div>
-    <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <ul class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       {postsInSeries.map((post: BlogPost) => (
         <PostCard {post} />
       ))}

@@ -1,7 +1,7 @@
 ---
+import EnhancedBiasDetectionInterface from '@/components/demos/bias-detection/EnhancedBiasDetectionInterface.tsx'
 // Enhanced Bias Detection Demo Page (Modernized UI/UX)
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import EnhancedBiasDetectionInterface from '@/components/demos/bias-detection/EnhancedBiasDetectionInterface.tsx'
 ---
 
 <BaseLayout
@@ -11,27 +11,27 @@ import EnhancedBiasDetectionInterface from '@/components/demos/bias-detection/En
 >
   <main class="min-h-screen bg-secondary">
     <!-- Hero Section -->
-    <section class="bg-background text-foreground py-16">
+    <section class="bg-background py-16 text-foreground">
       <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-4xl md:text-5xl font-bold mb-6">
+        <div class="mx-auto max-w-4xl text-center">
+          <h1 class="mb-6 text-4xl font-bold md:text-5xl">
             Enhanced Bias Detection Demo
           </h1>
-          <p class="text-xl md:text-2xl mb-8 text-foreground">
+          <p class="mb-8 text-xl text-foreground md:text-2xl">
             Advanced AI-powered analysis of bias patterns in therapeutic
             conversations with modern UI/UX
           </p>
           <div class="flex flex-wrap justify-center gap-3">
-            <span class="px-3 py-1 rounded-none bg-secondary border border-border text-sm">
+            <span class="rounded-none border border-border bg-secondary px-3 py-1 text-sm">
               Real-time Analysis
             </span>
-            <span class="px-3 py-1 rounded-none bg-secondary border border-border text-sm">
+            <span class="rounded-none border border-border bg-secondary px-3 py-1 text-sm">
               Counterfactual Scenarios
             </span>
-            <span class="px-3 py-1 rounded-none bg-secondary border border-border text-sm">
+            <span class="rounded-none border border-border bg-secondary px-3 py-1 text-sm">
               Historical Trends
             </span>
-            <span class="px-3 py-1 rounded-none bg-secondary border border-border text-sm">
+            <span class="rounded-none border border-border bg-secondary px-3 py-1 text-sm">
               Responsive & Accessible
             </span>
           </div>
@@ -49,22 +49,22 @@ import EnhancedBiasDetectionInterface from '@/components/demos/bias-detection/En
     <!-- CTA -->
     <section class="py-12">
       <div class="container mx-auto px-4">
-        <div class="max-w-3xl mx-auto text-center bg-card rounded-none p-8 border border-border">
-          <h2 class="text-2xl font-bold mb-3">Ready to explore more?</h2>
-          <p class="text-muted-foreground mb-6">
+        <div class="mx-auto max-w-3xl rounded-none border border-border bg-card p-8 text-center">
+          <h2 class="mb-3 text-2xl font-bold">Ready to explore more?</h2>
+          <p class="mb-6 text-muted-foreground">
             Visit the original demo or explore platform dashboards for
             integrated analytics.
           </p>
           <div class="flex flex-wrap justify-center gap-3">
             <a
               href="/demo/bias-detection"
-              class="px-5 py-2 bg-secondary text-foreground rounded-none hover:bg-accent"
+              class="rounded-none bg-secondary px-5 py-2 text-foreground hover:bg-accent"
             >
               Original Demo
             </a>
             <a
               href="/dashboard/bias-detection"
-              class="px-5 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary/90"
+              class="hover:bg-primary/90 rounded-none bg-primary px-5 py-2 text-primary-foreground"
             >
               Bias Analytics Dashboard
             </a>

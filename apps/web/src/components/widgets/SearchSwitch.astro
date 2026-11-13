@@ -40,7 +40,7 @@ const parseSearchTuple = (
 const includes = Array.isArray(rawIncludes) ? rawIncludes : []
 if (includes.length === 0)
   throw new Error(
-    "Search feature enabled, but `includes` array is empty. Please check 'src/config.ts' for the correct configuration."
+    "Search feature enabled, but `includes` array is empty. Please check 'src/config.ts' for the correct configuration.",
   )
 const filterEnabled = filter && includes.length > 1
 const batchSize = parseSearchTuple(batchLoadSize, 'batchLoadSize')
@@ -62,10 +62,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
 <search-panel
   role="dialog"
   id="search-panel"
-  class={`hidden z-200 fixed top-15% lt-lgp:(top-10%) left-50% translate-x--50%
-    grid grid-rows-[auto_1fr_auto]
-    w-42rem lt-lgp:(w-90%) max-h-70vh lt-lgp:(max-h-80vh) p-3 lt-lgp:(pb-1) rounded-lg
-    text-[var(--c-text)] bg-[var(--c-bg)] shadow-custom_0_0_10_0`}
+  class={`z-200 top-15% lt-lgp:(top-10%) left-50% translate-x--50% w-42rem lt-lgp:(w-90%) max-h-70vh lt-lgp:(max-h-80vh) lt-lgp:(pb-1) shadow-custom_0_0_10_0 fixed grid hidden grid-rows-[auto_1fr_auto] rounded-lg bg-[var(--c-bg)] p-3 text-[var(--c-text)]`}
   aria-modal="true"
   aria-labelledby="search-label"
   aria-keyshortcuts="ArrowUp,ArrowDown,Enter,Esc"
@@ -75,42 +72,33 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
 >
   <div class="flex flex-col gap-2">
     <!-- Tab list -->
-    {
-      filterEnabled && (
-        <div
-          role="tablist"
-          class="search-tabs flex gap-2 justify-start items-center text-xs"
-          aria-label="Search categories"
-        >
-          {includes.map((item) => (
-            <button
-              type="button"
-              role="tab"
-              class="px-1.5 py-0.5 rounded
-                bg-[#88888816]! dark:bg-[#88888823]!
-                aria-[selected=false]:op-40 aria-[selected=true]:op-100
-                aria-[selected=false]:hover:op-70 op-transition cursor-pointer"
-              data-type={item.toLowerCase()}
-            >
-              {item.charAt(0).toUpperCase() + item.slice(1)}
-            </button>
-          ))}
-        </div>
-      )
-    }
+    {filterEnabled && (
+      <div
+        role="tablist"
+        class="search-tabs flex items-center justify-start gap-2 text-xs"
+        aria-label="Search categories"
+      >
+        {includes.map((item) => (
+          <button
+            type="button"
+            role="tab"
+            class="bg-[#88888816]! dark:bg-[#88888823]! aria-[selected=false]:op-40 aria-[selected=true]:op-100 aria-[selected=false]:hover:op-70 op-transition cursor-pointer rounded px-1.5 py-0.5"
+            data-type={item.toLowerCase()}
+          >
+            {item.charAt(0).toUpperCase() + item.slice(1)}
+          </button>
+        ))}
+      </div>
+    )}
     <!-- Search Bar -->
-    <div
-      class="grid grid-cols-[auto_1fr] items-center
-        h-10 px-3 rounded-md
-        bg-[#88888811] dark:bg-[#88888818]"
-    >
+    <div class="grid h-10 grid-cols-[auto_1fr] items-center rounded-md bg-[#88888811] px-3 dark:bg-[#88888818]">
       <div u-i-grommet-icons-search></div>
       <label for="search-input" id="search-label" class="sr-only"></label>
       <input
         type="search"
         role="combobox"
         id="search-input"
-        class="h-full pl-2 bg-transparent outline-0"
+        class="bg-transparent h-full pl-2 outline-0"
         autocomplete="off"
         autocorrect="off"
         spellcheck="false"
@@ -125,7 +113,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
   <div
     role="listbox"
     id="search-results"
-    class="overflow-y-auto my-1"
+    class="my-1 overflow-y-auto"
     aria-labelledby="search-input"
     tabindex="-1"
     data-base={withBasePath('/')}
@@ -133,23 +121,27 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
     <!-- Results -->
     <div id="search-content"></div>
     <!-- Feedback -->
-    <div id="search-feedback" class="hidden py-3 text-center text-sm op-40" aria-live="polite" aria-atomic="true">
-    </div>
+    <div
+      id="search-feedback"
+      class="op-40 hidden py-3 text-center text-sm"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
     <!-- Pagination -->
     <div
       id="search-pagination"
       style="display: none"
-      class="items-center justify-center gap-4 pt-4 pb-3 text-xs"
+      class="items-center justify-center gap-4 pb-3 pt-4 text-xs"
     >
       <button
-        class="flex items-center justify-center gap-1 op-40 hover:op-100 op-transition"
+        class="op-40 hover:op-100 op-transition flex items-center justify-center gap-1"
         data-action="more"
       >
         <div u-i-material-symbols-arrow-cool-down></div>
         <span></span>
       </button>
       <button
-        class="flex items-center justify-center gap-1 op-40 hover:op-100 op-transition"
+        class="op-40 hover:op-100 op-transition flex items-center justify-center gap-1"
         data-action="all"
       >
         <div u-i-material-symbols-expand-all></div>
@@ -159,11 +151,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
   </div>
   <!-- Shortcuts Footer -->
   <footer role="note" aria-label="Keyboard shortcuts">
-    <ul
-      class="flex flex-wrap items-center gap-4.5 lt-md:hidden
-        pt-3 border-t border-[#7d7d7d4d]
-        text-xs op-40 select-none"
-    >
+    <ul class="gap-4.5 lt-md:hidden op-40 flex select-none flex-wrap items-center border-t border-[#7d7d7d4d] pt-3 text-xs">
       <li class="flex items-center gap-1">
         <kbd class="search-kbd-key">
           <div u-i-material-symbols-arrow-upward></div>
@@ -272,14 +260,12 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
     pagefindHighlight?: {
       highlight: () => void
     }
-    PagefindHighlight?: new (
-      options: {
-        markContext: string
-        markOptions?: {
-          exclude: string[]
-        }
-      },
-    ) => {
+    PagefindHighlight?: new (options: {
+      markContext: string
+      markOptions?: {
+        exclude: string[]
+      }
+    }) => {
       destroy?: () => void
     }
   }
@@ -311,19 +297,19 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
     #btnAll: HTMLButtonElement | null = null
     #selectedItem: HTMLAnchorElement | null = null
 
-  #filter = this.dataset['filter'] === 'true'
+    #filter = this.dataset['filter'] === 'true'
     #tabs: HTMLElement[] = []
     #currentTab = 0
 
     #activeRequestId = 0
     #allResults: PagefindResultHandle[] = []
     #renderedCount = 0
-  #maxItems = this.dataset['maxItems']
+    #maxItems = this.dataset['maxItems']
       ? parseInt(this.dataset['maxItems'], 10)
       : undefined
 
     #batchLoading = false
-  #batchSize = this.dataset['batchSize']
+    #batchSize = this.dataset['batchSize']
       ? parseInt(this.dataset['batchSize'], 10)
       : undefined
 
@@ -342,7 +328,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
       this.#content?.addEventListener('click', this.#handleResultClick)
       this.#content?.addEventListener(
         'pointerover',
-        this.#handleResultsPointerOver
+        this.#handleResultsPointerOver,
       )
 
       this.addEventListener('keydown', this.#handleResultsKeyDown)
@@ -354,7 +340,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
       this.#content?.removeEventListener('click', this.#handleResultClick)
       this.#content?.removeEventListener(
         'pointerover',
-        this.#handleResultsPointerOver
+        this.#handleResultsPointerOver,
       )
 
       this.removeEventListener('keydown', this.#handleResultsKeyDown)
@@ -378,15 +364,17 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
       const storedTab = localStorage.getItem('search-tab')
       this.#currentTab = storedTab ? parseInt(storedTab, 10) : 0
 
-      this.#tabs = Array.from(this.querySelectorAll<HTMLElement>('[role="tab"]'))
+      this.#tabs = Array.from(
+        this.querySelectorAll<HTMLElement>('[role="tab"]'),
+      )
       for (let i = 0; i < this.#tabs.length; i++) {
-      const tab = this.#tabs[i]
-      if (!tab) continue
-      const isSelected = i === this.#currentTab
-      tab.setAttribute('aria-selected', isSelected.toString())
-      if (isSelected) this.#updateHint(tab.dataset['type'] || '')
+        const tab = this.#tabs[i]
+        if (!tab) continue
+        const isSelected = i === this.#currentTab
+        tab.setAttribute('aria-selected', isSelected.toString())
+        if (isSelected) this.#updateHint(tab.dataset['type'] || '')
 
-      tab.addEventListener('click', () => this.#activateTab(i))
+        tab.addEventListener('click', () => this.#activateTab(i))
       }
     }
 
@@ -394,19 +382,23 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
       if (!this.#batchSize) return
 
       this.#pagination = this.querySelector<HTMLElement>('#search-pagination')
-      this.#btnMore = this.querySelector<HTMLButtonElement>('[data-action="more"]')
-      this.#btnAll = this.querySelector<HTMLButtonElement>('[data-action="all"]')
+      this.#btnMore = this.querySelector<HTMLButtonElement>(
+        '[data-action="more"]',
+      )
+      this.#btnAll = this.querySelector<HTMLButtonElement>(
+        '[data-action="all"]',
+      )
 
       this.#btnMore?.addEventListener('click', this.#handlePaginateClick)
       this.#btnAll?.addEventListener('click', this.#handlePaginateClick)
     }
 
-  #handleInputEvent = (event: Event) => {
+    #handleInputEvent = (event: Event) => {
       const input = event.target as HTMLInputElement | null
       this.#handleInput(input?.value ?? '')
-  }
+    }
 
-  #handleInput = async (value: string) => {
+    #handleInput = async (value: string) => {
       const normalizedValue = value.trim()
 
       if (!this.#content) return
@@ -426,11 +418,9 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
 
           this.#showLoading(requestId)
 
-        const res = await (window as WindowWithPagefind).pagefind?.debouncedSearch(
-            normalizedValue,
-            options,
-            300,
-          )
+          const res = await (
+            window as WindowWithPagefind
+          ).pagefind?.debouncedSearch(normalizedValue, options, 300)
           if (!res) return
           // a more recent search call has been made, nothing to do
           if (requestId !== this.#activeRequestId) return
@@ -504,7 +494,9 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
         target =
           key === 'ArrowDown'
             ? (this.#content?.querySelector<HTMLAnchorElement>('a') ?? null)
-            : (this.#content?.querySelector<HTMLAnchorElement>('a:last-child') ?? null)
+            : (this.#content?.querySelector<HTMLAnchorElement>(
+                'a:last-child',
+              ) ?? null)
       }
 
       if (target) {
@@ -771,66 +763,74 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
 </script>
 
 <!-- https://github.com/pagefind/pagefind/blob/production-docs/pagefind_web_js/types/index.d.ts -->
-{import.meta.env.PROD &&
-  <script is:inline define:vars={{scriptUrl: withBasePath('/pagefind/pagefind.js'), navHighlight}}>
-    async function loadPagefind() {
-      const module = await import(scriptUrl)
-      const pagefind = module.default || module
+{import.meta.env.PROD && <script
+  is:inline
+  define:vars={{
+    scriptUrl: withBasePath('/pagefind/pagefind.js'),
+    navHighlight,
+  }}
+>
+  async function loadPagefind() {
+    const module = await import(scriptUrl)
+    const pagefind = module.default || module
 
-      // https://pagefind.app/docs/search-config/
-      await pagefind.options({
-        'excerptLength': 20,
-        ...(navHighlight && {
-          'highlightParam': 'search'
-        }),
+    // https://pagefind.app/docs/search-config/
+    await pagefind.options({
+      excerptLength: 20,
+      ...(navHighlight && {
+        highlightParam: 'search',
+      }),
 
-        // https://pagefind.app/docs/ranking/
-        ranking: {
-          termFrequency: 0.6,
-          termSimilarity: 1.0,
-          pageLength: 0.0,
-          termSaturation: 1.4
-        }
-      })
-
-      await pagefind.init()
-      window.pagefind = pagefind
-    }
-
-    if (!window.pagefind) loadPagefind()
-  </script>}
-
-{import.meta.env.PROD && navHighlight &&
-  <script is:inline define:vars={{scriptUrl: withBasePath('/pagefind/pagefind-highlight.js')}}>
-    async function loadPagefindHighlight() {
-      await import(scriptUrl)
-
-      const PagefindHighlight = window.PagefindHighlight
-      if (!PagefindHighlight) return
-      const pagefindHighlight = new PagefindHighlight({
-        // https://pagefind.app/docs/highlight-config
-        highlightParam: "search",
-        markContext: "[data-pagefind-body]",
-        markOptions: {
-          // https://markjs.io/#mark
-          className: "pagefind-highlight",
-          exclude: ["[data-pagefind-ignore]", "[data-pagefind-ignore] *"],
-        },
-        addStyles: false,
-      });
-
-      window.pagefindHighlight = pagefindHighlight
-    }
-
-    if (!window.pagefindHighlight) loadPagefindHighlight()
-  </script>}
-
-{import.meta.env.PROD && navHighlight &&
-  <script>
-    document.addEventListener('astro:page-load', () => {
-      const params = new URLSearchParams(location.search)
-      if(!params.has('search')) return
-
-      ;(window as { pagefindHighlight?: { highlight: () => void } }).pagefindHighlight?.highlight()
+      // https://pagefind.app/docs/ranking/
+      ranking: {
+        termFrequency: 0.6,
+        termSimilarity: 1.0,
+        pageLength: 0.0,
+        termSaturation: 1.4,
+      },
     })
-  </script>}
+
+    await pagefind.init()
+    window.pagefind = pagefind
+  }
+
+  if (!window.pagefind) loadPagefind()
+</script>}
+
+{import.meta.env.PROD && navHighlight && <script
+  is:inline
+  define:vars={{ scriptUrl: withBasePath('/pagefind/pagefind-highlight.js') }}
+>
+  async function loadPagefindHighlight() {
+    await import(scriptUrl)
+
+    const PagefindHighlight = window.PagefindHighlight
+    if (!PagefindHighlight) return
+    const pagefindHighlight = new PagefindHighlight({
+      // https://pagefind.app/docs/highlight-config
+      highlightParam: 'search',
+      markContext: '[data-pagefind-body]',
+      markOptions: {
+        // https://markjs.io/#mark
+        className: 'pagefind-highlight',
+        exclude: ['[data-pagefind-ignore]', '[data-pagefind-ignore] *'],
+      },
+      addStyles: false,
+    })
+
+    window.pagefindHighlight = pagefindHighlight
+  }
+
+  if (!window.pagefindHighlight) loadPagefindHighlight()
+</script>}
+
+{import.meta.env.PROD && navHighlight && <script>
+  document.addEventListener('astro:page-load', () => {
+    const params = new URLSearchParams(location.search)
+    if (!params.has('search')) return
+
+    ;(
+      window as { pagefindHighlight?: { highlight: () => void } }
+    ).pagefindHighlight?.highlight()
+  })
+</script>}

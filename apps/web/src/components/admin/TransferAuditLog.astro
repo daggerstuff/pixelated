@@ -106,40 +106,40 @@ const getEncryptionClass = (verified: boolean) => {
 }
 ---
 
-<div class="bg-card rounded-none overflow-hidden">
+<div class="overflow-hidden rounded-none bg-card">
   <div class="p-6">
-    <h2 class="text-2xl font-bold text-foreground mb-4">{title}</h2>
+    <h2 class="mb-4 text-2xl font-bold text-foreground">{title}</h2>
 
     <div class="mb-8">
-      <p class="text-muted-foreground mb-4">
+      <p class="mb-4 text-muted-foreground">
         Complete audit trail of all data transfers, including timestamps,
         recipient information, and encryption verification. All data transfer
         activities are logged for compliance with HIPAA regulations.
       </p>
 
       <!-- Filter and Search Controls -->
-      <div class="flex flex-col md:flex-row gap-4 mb-6">
+      <div class="mb-6 flex flex-col gap-4 md:flex-row">
         <div class="flex-1">
           <label for="search" class="sr-only">
             Search
           </label>
           <div class="relative">
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <SafeIcon name="search" class="w-5 h-5 text-muted-foreground" />
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <SafeIcon name="search" class="h-5 w-5 text-muted-foreground" />
             </div>
             <input
               type="search"
               id="search"
-              class="block w-full p-2 pl-10 text-sm text-foreground border border-input rounded-none bg-secondary focus:ring-ring focus:border-ring bg-popover"
+              class="block w-full rounded-none border border-input bg-popover bg-secondary p-2 pl-10 text-sm text-foreground focus:border-ring focus:ring-ring"
               placeholder="Search by patient ID, provider..."
             />
           </div>
         </div>
 
-        <div class="w-full md:w-auto flex flex-col md:flex-row gap-2">
+        <div class="flex w-full flex-col gap-2 md:w-auto md:flex-row">
           <select
             id="status-filter"
-            class="bg-secondary border border-input text-foreground text-sm rounded-none focus:ring-ring focus:border-ring block p-2 border border-input"
+            class="block rounded-none border border-input bg-secondary p-2 text-sm text-foreground focus:border-ring focus:ring-ring"
           >
             <option value="">All Statuses</option>
             <option value="completed">Completed</option>
@@ -149,7 +149,7 @@ const getEncryptionClass = (verified: boolean) => {
 
           <select
             id="date-filter"
-            class="bg-secondary border border-input text-foreground text-sm rounded-none focus:ring-ring focus:border-ring block p-2 border border-input"
+            class="block rounded-none border border-input bg-secondary p-2 text-sm text-foreground focus:border-ring focus:ring-ring"
           >
             <option value="7">Last 7 Days</option>
             <option value="30">Last 30 Days</option>
@@ -159,7 +159,7 @@ const getEncryptionClass = (verified: boolean) => {
 
           <button
             type="button"
-            class="text-primary-foreground bg-primary hover:bg-accent focus:ring-4 focus:ring-ring font-medium rounded-none text-sm px-5 py-2 focus:outline-none"
+            class="rounded-none bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:bg-accent focus:outline-none focus:ring-4 focus:ring-ring"
           >
             Apply Filters
           </button>
@@ -168,49 +168,49 @@ const getEncryptionClass = (verified: boolean) => {
     </div>
 
     <!-- Audit Log Table -->
-    <div class="overflow-x-auto relative sm:rounded-none">
-      <table class="w-full text-sm text-left text-muted-foreground">
-        <thead class="text-xs text-foreground uppercase bg-secondary">
+    <div class="relative overflow-x-auto sm:rounded-none">
+      <table class="w-full text-left text-sm text-muted-foreground">
+        <thead class="bg-secondary text-xs uppercase text-foreground">
           <tr>
-            <th scope="col" class="py-3 px-4">
+            <th scope="col" class="px-4 py-3">
               Timestamp
             </th>
-            <th scope="col" class="py-3 px-4">
+            <th scope="col" class="px-4 py-3">
               Patient ID
             </th>
-            <th scope="col" class="py-3 px-4">
+            <th scope="col" class="px-4 py-3">
               Initiated By
             </th>
-            <th scope="col" class="py-3 px-4">
+            <th scope="col" class="px-4 py-3">
               Recipient
             </th>
-            <th scope="col" class="py-3 px-4">
+            <th scope="col" class="px-4 py-3">
               Format
             </th>
-            <th scope="col" class="py-3 px-4">
+            <th scope="col" class="px-4 py-3">
               Status
             </th>
-            <th scope="col" class="py-3 px-4">
+            <th scope="col" class="px-4 py-3">
               Encryption
             </th>
-            <th scope="col" class="py-3 px-4">
+            <th scope="col" class="px-4 py-3">
               Actions
             </th>
           </tr>
         </thead>
         <tbody>
           {auditLogEntries.map((entry) => (
-            <tr class="bg-card border-b hover:bg-secondary">
-              <td class="py-3 px-4 font-medium text-foreground whitespace-nowrap">
+            <tr class="border-b bg-card hover:bg-secondary">
+              <td class="whitespace-nowrap px-4 py-3 font-medium text-foreground">
                 {formatDate(entry.timestamp, {
                   month: 'short',
                   hour: '2-digit',
                   minute: '2-digit',
                 })}
               </td>
-              <td class="py-3 px-4">{entry.patientId}</td>
-              <td class="py-3 px-4">{entry.initiatedBy}</td>
-              <td class="py-3 px-4">
+              <td class="px-4 py-3">{entry.patientId}</td>
+              <td class="px-4 py-3">{entry.initiatedBy}</td>
+              <td class="px-4 py-3">
                 <div>
                   <div class="font-medium">{entry.recipientType}</div>
                   <div class="text-xs text-muted-foreground">
@@ -218,46 +218,46 @@ const getEncryptionClass = (verified: boolean) => {
                   </div>
                 </div>
               </td>
-              <td class="py-3 px-4">{entry.dataFormat}</td>
-              <td class="py-3 px-4">
+              <td class="px-4 py-3">{entry.dataFormat}</td>
+              <td class="px-4 py-3">
                 <span
-                  class={`px-2 py-1 rounded-none text-xs font-medium ${getStatusClass(entry.status)}`}
+                  class={`rounded-none px-2 py-1 text-xs font-medium ${getStatusClass(entry.status)}`}
                 >
                   {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
                 </span>
               </td>
-              <td class="py-3 px-4">
+              <td class="px-4 py-3">
                 <div
                   class={`flex items-center ${getEncryptionClass(entry.encryptionVerified)}`}
                 >
                   {entry.encryptionVerified ? (
                     <span class="flex items-center">
-                      <SafeIcon name="check-circle" class="w-4 h-4 mr-1" />
+                      <SafeIcon name="check-circle" class="mr-1 h-4 w-4" />
                       Verified
                     </span>
                   ) : (
                     <span class="flex items-center">
-                      <SafeIcon name="x-circle" class="w-4 h-4 mr-1" />
+                      <SafeIcon name="x-circle" class="mr-1 h-4 w-4" />
                       Failed
                     </span>
                   )}
                 </div>
               </td>
-              <td class="py-3 px-4">
+              <td class="px-4 py-3">
                 <div class="flex space-x-2">
                   <button
                     type="button"
                     class="font-medium text-foreground hover:underline"
                     aria-label="View details"
                   >
-                    <SafeIcon name="eye" class="w-5 h-5" />
+                    <SafeIcon name="eye" class="h-5 w-5" />
                   </button>
                   <button
                     type="button"
                     class="font-medium text-muted-foreground hover:underline"
                     aria-label="Download report"
                   >
-                    <SafeIcon name="download" class="w-5 h-5" />
+                    <SafeIcon name="download" class="h-5 w-5" />
                   </button>
                 </div>
               </td>
@@ -267,7 +267,7 @@ const getEncryptionClass = (verified: boolean) => {
       </table>
 
       <!-- Pagination -->
-      <div class="flex justify-between items-center pt-4 px-2">
+      <div class="flex items-center justify-between px-2 pt-4">
         <div class="text-sm text-foreground">
           Showing <span class="font-medium">1</span> to{' '}
           <span class="font-medium">5</span> of{' '}
@@ -276,25 +276,25 @@ const getEncryptionClass = (verified: boolean) => {
         <div class="flex space-x-1">
           <button
             type="button"
-            class="px-3 py-1 border border-input rounded-none text-sm font-medium text-foreground hover:bg-secondary border border-input hover:bg-accent"
+            class="rounded-none border border-input px-3 py-1 text-sm font-medium text-foreground hover:bg-accent hover:bg-secondary"
           >
             Previous
           </button>
           <button
             type="button"
-            class="px-3 py-1 border border-input rounded-none text-sm font-medium text-foreground bg-secondary"
+            class="rounded-none border border-input bg-secondary px-3 py-1 text-sm font-medium text-foreground"
           >
             1
           </button>
           <button
             type="button"
-            class="px-3 py-1 border border-input rounded-none text-sm font-medium text-foreground hover:bg-secondary border border-input hover:bg-accent"
+            class="rounded-none border border-input px-3 py-1 text-sm font-medium text-foreground hover:bg-accent hover:bg-secondary"
           >
             2
           </button>
           <button
             type="button"
-            class="px-3 py-1 border border-input rounded-none text-sm font-medium text-foreground hover:bg-secondary border border-input hover:bg-accent"
+            class="rounded-none border border-input px-3 py-1 text-sm font-medium text-foreground hover:bg-accent hover:bg-secondary"
           >
             Next
           </button>

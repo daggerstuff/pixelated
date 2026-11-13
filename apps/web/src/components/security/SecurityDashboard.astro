@@ -53,8 +53,8 @@ const initialStats: SecurityStats = {
 }
 ---
 
-<div class="p-6 space-y-6">
-  <div class="flex justify-between items-center">
+<div class="space-y-6 p-6">
+  <div class="flex items-center justify-between">
     <h2 class="text-2xl font-bold">Security Dashboard</h2>
     <div class="flex gap-4">
       <select id="eventType" class="rounded-none border border-input p-2">
@@ -74,38 +74,38 @@ const initialStats: SecurityStats = {
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-    <div class="bg-card p-4 rounded-none border border-border">
-      <h3 class="text-lg font-semibold mb-2">Total Events</h3>
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-none border border-border bg-card p-4">
+      <h3 class="mb-2 text-lg font-semibold">Total Events</h3>
       <p id="totalEvents" class="text-3xl font-bold">
         {initialStats.total}
       </p>
     </div>
-    <div class="bg-card p-4 rounded-none border border-border">
-      <h3 class="text-lg font-semibold mb-2">Last 24h</h3>
+    <div class="rounded-none border border-border bg-card p-4">
+      <h3 class="mb-2 text-lg font-semibold">Last 24h</h3>
       <p id="last24h" class="text-3xl font-bold">
         {initialStats.last24h}
       </p>
     </div>
-    <div class="bg-card p-4 rounded-none border border-border">
-      <h3 class="text-lg font-semibold mb-2">Last 7 Days</h3>
+    <div class="rounded-none border border-border bg-card p-4">
+      <h3 class="mb-2 text-lg font-semibold">Last 7 Days</h3>
       <p id="last7d" class="text-3xl font-bold">
         {initialStats.last7d}
       </p>
     </div>
-    <div class="bg-card p-4 rounded-none border border-border">
-      <h3 class="text-lg font-semibold mb-2">By Severity</h3>
+    <div class="rounded-none border border-border bg-card p-4">
+      <h3 class="mb-2 text-lg font-semibold">By Severity</h3>
       <div class="space-y-2">
         <div class="flex justify-between">
-          <span class="text-foreground font-bold">Critical</span>
+          <span class="font-bold text-foreground">Critical</span>
           <span id="criticalCount">{initialStats.bySeverity.critical}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-foreground font-semibold">High</span>
+          <span class="font-semibold text-foreground">High</span>
           <span id="highCount">{initialStats.bySeverity.high}</span>
         </div>
         <div class="flex justify-between">
-          <span class="text-foreground font-medium">Medium</span>
+          <span class="font-medium text-foreground">Medium</span>
           <span id="mediumCount">{initialStats.bySeverity.medium}</span>
         </div>
         <div class="flex justify-between">
@@ -116,7 +116,7 @@ const initialStats: SecurityStats = {
     </div>
   </div>
 
-  <div class="bg-card rounded-none border border-border overflow-hidden">
+  <div class="overflow-hidden rounded-none border border-border bg-card">
     <div class="p-4">
       <h3 class="text-lg font-semibold">Security Events</h3>
     </div>
@@ -124,38 +124,37 @@ const initialStats: SecurityStats = {
       <table class="min-w-full divide-y divide-border">
         <thead class="bg-secondary">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Time
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Type
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Severity
             </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Details
             </th>
           </tr>
         </thead>
-        <tbody id="eventsTable" class="bg-card divide-y divide-border">
+        <tbody id="eventsTable" class="divide-y divide-border bg-card">
           {initialEvents.map((event) => (
             <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <td class="whitespace-nowrap px-6 py-4 text-sm">
                 {new Date(event.timestamp).toLocaleString()}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">{event.type}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">
+              <td class="whitespace-nowrap px-6 py-4 text-sm">{event.type}</td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm">
                 <span
-                  class={`inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium
-                  ${
+                  class={`inline-flex items-center rounded-none px-2.5 py-0.5 text-xs font-medium ${
                     event.severity === 'critical'
-                      ? 'bg-primary text-primary-foreground font-semibold'
+                      ? 'bg-primary font-semibold text-primary-foreground'
                       : event.severity === 'high'
-                        ? 'bg-secondary border border-ring text-foreground font-semibold'
+                        ? 'border border-ring bg-secondary font-semibold text-foreground'
                         : event.severity === 'medium'
-                          ? 'bg-secondary border border-ring text-foreground font-medium'
-                          : 'bg-secondary border border-input text-muted-foreground'
+                          ? 'border border-ring bg-secondary font-medium text-foreground'
+                          : 'border border-input bg-secondary text-muted-foreground'
                   }`}
                 >
                   {event.severity}

@@ -1,13 +1,13 @@
 ---
 export const prerender = false
 
-import Card from '@/components/ui/Card.astro'
-import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import type { AstroGlobal } from 'astro'
 
 import { Auth0UserProfile } from '@/components/auth/Auth0UserProfile'
+import Card from '@/components/ui/Card.astro'
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
 import { requirePageAuth } from '@/lib/auth/serverAuth'
 import { PolicyEngine } from '@/lib/governance/policy-engine'
-import type { AstroGlobal } from 'astro'
 
 const authResponse = await requirePageAuth(Astro as AstroGlobal)
 if (authResponse) {
@@ -40,15 +40,15 @@ if (!evalResult.allowed) {
     <div class="flex flex-col gap-6">
       <!-- Page Header -->
       <div class="flex items-center justify-between">
-        <div class="text-center w-full">
-          <h1 class="text-3xl font-bold tracking-tight mb-1">Your Profile</h1>
+        <div class="w-full text-center">
+          <h1 class="mb-1 text-3xl font-bold tracking-tight">Your Profile</h1>
           <p class="text-muted-foreground">
             Manage your account settings and preferences
           </p>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- Profile Information Card -->
         <Card class="lg:col-span-2">
           <div class="p-6">
@@ -59,7 +59,7 @@ if (!evalResult.allowed) {
         <!-- Security Settings -->
         <Card>
           <div class="p-6">
-            <h3 class="text-lg font-medium mb-4 text-center">
+            <h3 class="mb-4 text-center text-lg font-medium">
               Security Settings
             </h3>
             <div class="space-y-4">
@@ -69,8 +69,8 @@ if (!evalResult.allowed) {
                   <span class="text-sm text-muted-foreground">
                     Homomorphic Encryption
                   </span>
-                  <div class="w-11 h-6 bg-primary rounded-full px-1 flex items-center">
-                    <div class="w-4 h-4 bg-white rounded-full shadow-sm transform translate-x-5"></div>
+                  <div class="flex h-6 w-11 items-center rounded-full bg-primary px-1">
+                    <div class="bg-white h-4 w-4 translate-x-5 transform rounded-full shadow-sm"></div>
                   </div>
                 </div>
                 <p class="text-xs text-muted-foreground">
@@ -84,8 +84,8 @@ if (!evalResult.allowed) {
                 </span>
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-muted-foreground">Enable 2FA</span>
-                  <div class="w-11 h-6 bg-muted rounded-full px-1 flex items-center">
-                    <div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                  <div class="flex h-6 w-11 items-center rounded-full bg-muted px-1">
+                    <div class="bg-white h-4 w-4 rounded-full shadow-sm"></div>
                   </div>
                 </div>
                 <p class="text-xs text-muted-foreground">
@@ -107,7 +107,7 @@ if (!evalResult.allowed) {
               </div>
 
               <div class="pt-4">
-                <button class="w-full py-2 bg-primary/10 text-primary hover:bg-primary/20 rounded-md text-sm font-medium transition-colors">
+                <button class="bg-primary/10 hover:bg-primary/20 w-full rounded-md py-2 text-sm font-medium text-primary transition-colors">
                   Security Audit Log
                 </button>
               </div>
@@ -119,16 +119,16 @@ if (!evalResult.allowed) {
       <!-- Preferences Section -->
       <Card>
         <div class="p-6">
-          <h3 class="text-lg font-medium mb-4 text-center">Preferences</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <h3 class="mb-4 text-center text-lg font-medium">Preferences</h3>
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div class="flex flex-col space-y-2">
               <span class="text-sm font-medium">Notifications</span>
               <div class="flex items-center justify-between">
                 <span class="text-sm text-muted-foreground">
                   Email Notifications
                 </span>
-                <div class="w-11 h-6 bg-primary rounded-full px-1 flex items-center">
-                  <div class="w-4 h-4 bg-white rounded-full shadow-sm transform translate-x-5"></div>
+                <div class="flex h-6 w-11 items-center rounded-full bg-primary px-1">
+                  <div class="bg-white h-4 w-4 translate-x-5 transform rounded-full shadow-sm"></div>
                 </div>
               </div>
               <p class="text-xs text-muted-foreground">
@@ -140,8 +140,8 @@ if (!evalResult.allowed) {
               <span class="text-sm font-medium">Theme</span>
               <div class="flex items-center justify-between">
                 <span class="text-sm text-muted-foreground"> Dark Mode </span>
-                <div class="w-11 h-6 bg-primary rounded-full px-1 flex items-center">
-                  <div class="w-4 h-4 bg-white rounded-full shadow-sm transform translate-x-5"></div>
+                <div class="flex h-6 w-11 items-center rounded-full bg-primary px-1">
+                  <div class="bg-white h-4 w-4 translate-x-5 transform rounded-full shadow-sm"></div>
                 </div>
               </div>
               <p class="text-xs text-muted-foreground">

@@ -55,7 +55,7 @@ if (type === 'social') {
         {item.icon ? <i class={item.icon} /> : null}
         <span>{item.name}</span>
       </Link>
-      {item.desc && <div class="pl-7 op-50 text-xs">{item.desc}</div>}
+      {item.desc && <div class="op-50 pl-7 text-xs">{item.desc}</div>}
     </div>
   ) : (
     <Link href={item.link} class={classList}>
@@ -85,7 +85,7 @@ if (type === 'social') {
         {item.icon ? <i class={item.icon} /> : null}
         <span>{item.name}</span>
       </a>
-      {item.desc && <div class="pl-7 op-50 text-xs">{item.desc}</div>}
+      {item.desc && <div class="op-50 pl-7 text-xs">{item.desc}</div>}
     </div>
   ) : (
     <a

@@ -1,10 +1,10 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
 import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard.astro'
-import { PrivacyDashboard } from '@/components/analytics/PrivacyDashboard'
-import { MetricWidget } from '@/components/analytics/MetricWidget'
 import { ChartWidget } from '@/components/analytics/ChartWidget'
+import { MetricWidget } from '@/components/analytics/MetricWidget'
+import { PrivacyDashboard } from '@/components/analytics/PrivacyDashboard'
 import { TableWidget } from '@/components/analytics/TableWidget'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 
 // Type for engagement metrics
 interface EngagementMetrics {
@@ -79,18 +79,18 @@ const activityTableColumns: Column[] = [
   description="Track and analyze user engagement metrics"
 >
   <div class="container mx-auto px-4 py-8">
-    <div class="flex flex-col lg:flex-row gap-8">
+    <div class="flex flex-col gap-8 lg:flex-row">
       <!-- Sidebar -->
-      <div class="w-full lg:w-[350px] space-y-6">
+      <div class="w-full space-y-6 lg:w-[350px]">
         <PrivacyDashboard client:visible />
 
-        <div class="bg-card rounded-lg border p-4">
-          <h3 class="text-lg font-semibold mb-3">Analytics Sections</h3>
+        <div class="rounded-lg border bg-card p-4">
+          <h3 class="mb-3 text-lg font-semibold">Analytics Sections</h3>
           <ul class="space-y-2">
             <li>
               <a
                 href="/analytics"
-                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+                class="hover:bg-primary/10 flex items-center rounded-md px-3 py-2 text-foreground transition-colors hover:text-primary"
               >
                 <span class="text-sm font-medium">Usage Analytics</span>
               </a>
@@ -98,7 +98,7 @@ const activityTableColumns: Column[] = [
             <li>
               <a
                 href="/analytics/engagement"
-                class="flex items-center py-2 px-3 bg-primary/10 text-primary rounded-md"
+                class="bg-primary/10 flex items-center rounded-md px-3 py-2 text-primary"
               >
                 <span class="text-sm font-medium">Engagement Metrics</span>
               </a>
@@ -106,7 +106,7 @@ const activityTableColumns: Column[] = [
             <li>
               <a
                 href="/analytics/conversions"
-                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+                class="hover:bg-primary/10 flex items-center rounded-md px-3 py-2 text-foreground transition-colors hover:text-primary"
               >
                 <span class="text-sm font-medium">Conversion Tracking</span>
               </a>
@@ -114,7 +114,7 @@ const activityTableColumns: Column[] = [
             <li>
               <a
                 href="/admin/performance-dashboard"
-                class="flex items-center py-2 px-3 hover:bg-primary/10 text-foreground hover:text-primary rounded-md transition-colors"
+                class="hover:bg-primary/10 flex items-center rounded-md px-3 py-2 text-foreground transition-colors hover:text-primary"
               >
                 <span class="text-sm font-medium">Performance Metrics</span>
               </a>
@@ -132,11 +132,11 @@ const activityTableColumns: Column[] = [
           widgetGap="medium"
         >
           {error ? (
-            <div class="col-span-2 text-center text-foreground font-semibold py-8">
+            <div class="col-span-2 py-8 text-center font-semibold text-foreground">
               Failed to load engagement metrics: {error}
             </div>
           ) : !metrics ? (
-            <div class="col-span-2 text-center text-muted-foreground py-8">
+            <div class="col-span-2 py-8 text-center text-muted-foreground">
               Loading engagement metrics...
             </div>
           ) : (

@@ -1,13 +1,14 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
+import { Target } from 'lucide-react'
+
+import Badge from '@/components/ui/Badge.astro'
+import Button from '@/components/ui/Button.astro'
 import Card from '@/components/ui/Card.astro'
 import CardContent from '@/components/ui/CardContent.astro'
 import CardDescription from '@/components/ui/CardDescription.astro'
 import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
-import Badge from '@/components/ui/Badge.astro'
-import Button from '@/components/ui/Button.astro'
-import { Target } from 'lucide-react'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 
 export const prerender = false // Enable SSR for A/B testing
 
@@ -145,40 +146,40 @@ const universityResults = [
     <div class="relative z-10 py-8">
       <div class="container mx-auto px-4">
         <!-- Header -->
-        <div class="text-center mb-12">
+        <div class="mb-12 text-center">
           <div class="mb-8">
-            <Badge class="inline-flex items-center gap-3 px-6 py-3 text-sm bg-secondary border border-border text-muted-foreground rounded-none">
+            <Badge class="inline-flex items-center gap-3 rounded-none border border-border bg-secondary px-6 py-3 text-sm text-muted-foreground">
               <span class="relative flex h-3 w-3">
-                <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                <span class="absolute inline-flex h-full w-full animate-pulse rounded-full bg-primary opacity-75"></span>
+                <span class="relative inline-flex h-3 w-3 rounded-full bg-primary"></span>
               </span>
               Bias Detection Active
             </Badge>
           </div>
 
-          <h1 class="text-3xl lg:text-5xl font-bold mb-6 leading-tight">
+          <h1 class="mb-6 text-3xl font-bold leading-tight lg:text-5xl">
             {currentVariant.headline}
-            <span class="text-foreground block mt-2">
+            <span class="mt-2 block text-foreground">
               Security & Bias Detection Engine
             </span>
           </h1>
 
-          <p class="text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p class="mx-auto mb-8 max-w-3xl text-lg leading-relaxed text-muted-foreground">
             {currentVariant.subheadline}
           </p>
         </div>
 
         <!-- Detection Specifications -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div class="mb-16 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {detectionSpecs.map((spec) => (
-            <Card class="border border-border bg-card hover:border-ring transition-all duration-700 organic-card">
+            <Card class="organic-card border border-border bg-card transition-all duration-700 hover:border-ring">
               <CardHeader class="pb-2">
-                <CardTitle class="text-foreground text-sm">
+                <CardTitle class="text-sm text-foreground">
                   {spec.metric}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div class="text-2xl font-bold text-foreground mb-1">
+                <div class="mb-1 text-2xl font-bold text-foreground">
                   {spec.value}
                 </div>
                 <div class="text-xs text-muted-foreground">
@@ -191,11 +192,11 @@ const universityResults = [
 
         <!-- Live Detection Demo -->
         <div class="mb-16">
-          <Card class="border border-border bg-card overflow-hidden">
+          <Card class="overflow-hidden border border-border bg-card">
             <CardHeader>
-              <div class="flex justify-between items-start">
+              <div class="flex items-start justify-between">
                 <div>
-                  <CardTitle class="text-foreground text-xl mb-2">
+                  <CardTitle class="mb-2 text-xl text-foreground">
                     Live Bias Detection Demo
                   </CardTitle>
                   <CardDescription class="text-muted-foreground">
@@ -204,62 +205,62 @@ const universityResults = [
                   </CardDescription>
                 </div>
                 <Badge class="bg-secondary text-foreground">
-                  <span class="animate-pulse w-2 h-2 bg-primary rounded-full mr-2"></span>
+                  <span class="mr-2 h-2 w-2 animate-pulse rounded-full bg-primary"></span>
                   Monitoring...
                 </Badge>
               </div>
             </CardHeader>
             <CardContent>
-              <div class="bg-secondary rounded-none p-6 mb-6">
+              <div class="mb-6 rounded-none bg-secondary p-6">
                 <div class="mb-4">
-                  <div class="text-foreground font-medium mb-2">Scenario:</div>
-                  <div class="bg-secondary rounded-none p-3 text-foreground text-sm">
+                  <div class="mb-2 font-medium text-foreground">Scenario:</div>
+                  <div class="rounded-none bg-secondary p-3 text-sm text-foreground">
                     {detectionDemo.scenario}
                   </div>
                 </div>
 
                 <div class="mb-4">
-                  <div class="text-foreground font-medium mb-2">
+                  <div class="mb-2 font-medium text-foreground">
                     Bias Detected:
                   </div>
-                  <div class="bg-secondary rounded-none p-4">
-                    <div class="flex items-center gap-3 mb-3">
-                      <div class="w-8 h-8 bg-secondary rounded-none flex items-center justify-center">
+                  <div class="rounded-none bg-secondary p-4">
+                    <div class="mb-3 flex items-center gap-3">
+                      <div class="flex h-8 w-8 items-center justify-center rounded-none bg-secondary">
                         <span class="text-foreground">⚠️</span>
                       </div>
                       <div>
-                        <div class="text-foreground font-medium">
+                        <div class="font-medium text-foreground">
                           {detectionDemo.biasDetected.type}
                         </div>
-                        <div class="text-muted-foreground text-sm">
+                        <div class="text-sm text-muted-foreground">
                           Severity: {detectionDemo.biasDetected.severity}
                         </div>
                       </div>
                     </div>
 
                     <div class="mb-3">
-                      <div class="text-foreground font-medium text-sm mb-1">
+                      <div class="mb-1 text-sm font-medium text-foreground">
                         What was detected:
                       </div>
-                      <div class="text-foreground text-sm">
+                      <div class="text-sm text-foreground">
                         {detectionDemo.biasDetected.description}
                       </div>
                     </div>
 
                     <div class="mb-3">
-                      <div class="text-foreground font-medium text-sm mb-1">
+                      <div class="mb-1 text-sm font-medium text-foreground">
                         Suggested improvement:
                       </div>
-                      <div class="text-foreground text-sm">
+                      <div class="text-sm text-foreground">
                         {detectionDemo.biasDetected.suggestion}
                       </div>
                     </div>
 
-                    <div class="bg-secondary border border-border rounded-none p-3">
-                      <div class="text-foreground font-medium text-sm mb-1">
+                    <div class="rounded-none border border-border bg-secondary p-3">
+                      <div class="mb-1 text-sm font-medium text-foreground">
                         Feedback delivery:
                       </div>
-                      <div class="text-muted-foreground text-sm">
+                      <div class="text-sm text-muted-foreground">
                         {detectionDemo.feedback}
                       </div>
                     </div>
@@ -269,7 +270,7 @@ const universityResults = [
                 <div class="flex gap-3">
                   <Button
                     size="sm"
-                    class="bg-primary hover:bg-primary/90 text-primary-foreground"
+                    class="hover:bg-primary/90 bg-primary text-primary-foreground"
                     data-demo-action="run-bias-detection"
                   >
                     Run Bias Detection
@@ -294,31 +295,31 @@ const universityResults = [
 
         <!-- Bias Types Section -->
         <div class="mb-16">
-          <div class="text-center mb-12">
-            <h2 class="text-2xl lg:text-4xl font-bold text-foreground mb-4">
+          <div class="mb-12 text-center">
+            <h2 class="mb-4 text-2xl font-bold text-foreground lg:text-4xl">
               Comprehensive Bias Detection Across
               <span class="text-foreground">All Dimensions</span>
             </h2>
-            <p class="text-base text-foreground max-w-3xl mx-auto">
+            <p class="mx-auto max-w-3xl text-base text-foreground">
               Our AI monitors for unconscious bias across cultural,
               socioeconomic, age, and diagnostic dimensions
             </p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
             {biasTypes.map((type) => (
-              <Card class="border border-border hover:border-ring rounded-none overflow-hidden group transition-all duration-700 organic-card">
-                <CardHeader class="pb-4 relative">
-                  <div class="text-5xl mb-4 text-foreground">{type.icon}</div>
-                  <CardTitle class="text-base font-bold text-foreground tracking-wide mb-3">
+              <Card class="organic-card group overflow-hidden rounded-none border border-border transition-all duration-700 hover:border-ring">
+                <CardHeader class="relative pb-4">
+                  <div class="mb-4 text-5xl text-foreground">{type.icon}</div>
+                  <CardTitle class="mb-3 text-base font-bold tracking-wide text-foreground">
                     {type.title}
                   </CardTitle>
-                  <div class="text-sm text-foreground font-medium bg-secondary px-3 py-1 rounded-none border border-border mb-3">
+                  <div class="mb-3 rounded-none border border-border bg-secondary px-3 py-1 text-sm font-medium text-foreground">
                     Real-time monitoring and feedback
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription class="text-sm text-muted-foreground leading-relaxed mb-3">
+                  <CardDescription class="mb-3 text-sm leading-relaxed text-muted-foreground">
                     {type.description}
                   </CardDescription>
                   <div class="text-xs text-foreground">
@@ -332,31 +333,31 @@ const universityResults = [
 
         <!-- University Results -->
         <div class="mb-16">
-          <div class="text-center mb-12">
-            <h2 class="text-2xl lg:text-4xl font-bold text-foreground mb-4">
+          <div class="mb-12 text-center">
+            <h2 class="mb-4 text-2xl font-bold text-foreground lg:text-4xl">
               Universities Report
               <span class="text-foreground">Dramatic Bias Reduction</span>
             </h2>
-            <p class="text-base text-foreground max-w-3xl mx-auto">
+            <p class="mx-auto max-w-3xl text-base text-foreground">
               Training programs using Bias Detection Engine see unprecedented
               improvements in cultural competency
             </p>
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {universityResults.map((result) => (
-              <Card class="border border-border hover:border-ring rounded-none overflow-hidden group transition-all duration-700 organic-card">
+              <Card class="organic-card group overflow-hidden rounded-none border border-border transition-all duration-700 hover:border-ring">
                 <CardHeader class="pb-4">
-                  <div class="text-4xl mb-4 text-foreground">🏛️</div>
-                  <CardTitle class="text-base font-bold text-foreground tracking-wide mb-3">
+                  <div class="mb-4 text-4xl text-foreground">🏛️</div>
+                  <CardTitle class="mb-3 text-base font-bold tracking-wide text-foreground">
                     {result.university}
                   </CardTitle>
-                  <div class="text-lg text-foreground font-bold mb-2">
+                  <div class="mb-2 text-lg font-bold text-foreground">
                     {result.result}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription class="text-sm text-muted-foreground leading-relaxed">
+                  <CardDescription class="text-sm leading-relaxed text-muted-foreground">
                     {result.detail}
                   </CardDescription>
                 </CardContent>
@@ -367,30 +368,30 @@ const universityResults = [
 
         <!-- Privacy & Security Section -->
         <div class="mb-16">
-          <Card class="border border-border bg-card rounded-none overflow-hidden">
-            <CardContent class="p-8 lg:p-12 text-center">
-              <div class="text-6xl mb-6 text-foreground">🛡️</div>
-              <h3 class="text-lg lg:text-xl font-bold text-foreground mb-4">
+          <Card class="overflow-hidden rounded-none border border-border bg-card">
+            <CardContent class="p-8 text-center lg:p-12">
+              <div class="mb-6 text-6xl text-foreground">🛡️</div>
+              <h3 class="mb-4 text-lg font-bold text-foreground lg:text-xl">
                 Zero-Knowledge Bias Detection
               </h3>
-              <p class="text-base text-muted-foreground mb-6 leading-relaxed max-w-3xl mx-auto">
+              <p class="mx-auto mb-6 max-w-3xl text-base leading-relaxed text-muted-foreground">
                 Our bias detection uses Fully Homomorphic Encryption (FHE) to
                 analyze conversations while they remain completely encrypted. We
                 detect bias patterns without ever seeing the actual conversation
                 content - ensuring complete privacy.
               </p>
-              <div class="flex items-center justify-center gap-6 text-foreground text-sm">
+              <div class="flex items-center justify-center gap-6 text-sm text-foreground">
                 <span class="flex items-center gap-2">
                   <span class="text-foreground">✓</span>
                   Encrypted Analysis
                 </span>
                 <span class="hidden sm:inline">•</span>
-                <span class="hidden sm:inline flex items-center gap-2">
+                <span class="flex hidden items-center gap-2 sm:inline">
                   <span class="text-foreground">✓</span>
                   Private Feedback
                 </span>
                 <span class="hidden sm:inline">•</span>
-                <span class="hidden sm:inline flex items-center gap-2">
+                <span class="flex hidden items-center gap-2 sm:inline">
                   <span class="text-foreground">✓</span>
                   No Content Storage
                 </span>
@@ -401,35 +402,35 @@ const universityResults = [
 
         <!-- Final CTA -->
         <div class="text-center">
-          <Card class="border border-border bg-card rounded-none overflow-hidden">
+          <Card class="overflow-hidden rounded-none border border-border bg-card">
             <CardContent class="p-8 lg:p-12">
-              <div class="text-6xl text-foreground mb-6">
-                <Target className="w-24 h-24" />
+              <div class="mb-6 text-6xl text-foreground">
+                <Target className="h-24 w-24" />
               </div>
 
               <div class="mb-6">
-                <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-secondary border border-border text-muted-foreground rounded-none">
-                  <span class="animate-pulse w-2 h-2 bg-primary rounded-full"></span>
+                <Badge class="inline-flex items-center gap-2 rounded-none border border-border bg-secondary px-4 py-2 text-sm text-muted-foreground">
+                  <span class="h-2 w-2 animate-pulse rounded-full bg-primary"></span>
                   Protect Every Client Interaction
                 </Badge>
               </div>
 
-              <h2 class="text-2xl lg:text-4xl font-bold text-foreground mb-8">
+              <h2 class="mb-8 text-2xl font-bold text-foreground lg:text-4xl">
                 Ready to Make Therapy
                 <br />
                 <span class="text-foreground">Safer for Everyone?</span>
               </h2>
 
-              <p class="text-base lg:text-lg text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
+              <p class="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-muted-foreground lg:text-lg">
                 Every client deserves culturally competent, unbiased care. Help
                 your students see their blind spots before they impact real
                 people.
               </p>
 
-              <div class="flex flex-col sm:flex-row gap-6 justify-center items-center mb-6">
+              <div class="mb-6 flex flex-col items-center justify-center gap-6 sm:flex-row">
                 <Button
                   size="lg"
-                  class="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-5 text-base font-bold rounded-none transition-colors duration-300"
+                  class="hover:bg-primary/90 rounded-none bg-primary px-10 py-5 text-base font-bold text-primary-foreground transition-colors duration-300"
                   data-demo-cta="primary"
                   data-variant={variantKey}
                 >
@@ -438,7 +439,7 @@ const universityResults = [
                 <Button
                   size="lg"
                   variant="outline"
-                  class="border-2 border-ring text-foreground hover:bg-accent px-8 py-4 text-sm font-semibold rounded-none transition-all duration-300"
+                  class="rounded-none border-2 border-ring px-8 py-4 text-sm font-semibold text-foreground transition-all duration-300 hover:bg-accent"
                   data-demo-cta="secondary"
                 >
                   See Detection Examples

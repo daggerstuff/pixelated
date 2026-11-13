@@ -1,9 +1,10 @@
 ---
 export const prerender = false
 
-import AdminLayout from '@/layouts/AdminLayout.astro'
 import { ClientRouter } from 'astro:transitions'
+
 import { BiasDashboard } from '@/components/admin/bias-detection/BiasDashboard'
+import AdminLayout from '@/layouts/AdminLayout.astro'
 
 // Verify admin access via session
 const session = (Astro.locals as any)?.session

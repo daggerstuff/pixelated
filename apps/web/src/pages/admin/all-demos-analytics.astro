@@ -1,13 +1,14 @@
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro'
+import { ChartBar } from 'lucide-react'
+
+import Badge from '@/components/ui/Badge.astro'
+import { Button } from '@/components/ui/button/button.tsx'
 import Card from '@/components/ui/Card.astro'
 import CardContent from '@/components/ui/CardContent.astro'
 import CardDescription from '@/components/ui/CardDescription.astro'
 import CardHeader from '@/components/ui/CardHeader.astro'
 import CardTitle from '@/components/ui/CardTitle.astro'
-import Badge from '@/components/ui/Badge.astro'
-import { Button } from '@/components/ui/button/button.tsx'
-import { ChartBar } from 'lucide-react'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 
 export const prerender = false // Enable SSR for real-time data
 
@@ -46,7 +47,7 @@ const demoPages = [
 >
   <div class="relative min-h-screen text-foreground">
     {/* Floating Particles */}
-    <div class="particles-container absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="particles-container pointer-events-none absolute inset-0 overflow-hidden">
       <div class="particle particle-1"></div>
       <div class="particle particle-2"></div>
       <div class="particle particle-3"></div>
@@ -57,22 +58,22 @@ const demoPages = [
     <div class="relative z-10 py-8">
       <div class="container mx-auto px-4">
         {/* Header */}
-        <div class="text-center mb-12">
-          <h1 class="text-4xl lg:text-5xl font-bold mb-6">
+        <div class="mb-12 text-center">
+          <h1 class="mb-6 text-4xl font-bold lg:text-5xl">
             Demo Analytics Command Center
-            <span class="text-foreground block mt-2">
+            <span class="mt-2 block text-foreground">
               All Pages • Real-Time Results
             </span>
           </h1>
-          <div class="flex justify-center gap-4 mb-6">
-            <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary/20 border border-ring text-foreground rounded-none">
+          <div class="mb-6 flex justify-center gap-4">
+            <Badge class="bg-primary/20 inline-flex items-center gap-2 rounded-none border border-ring px-4 py-2 text-sm text-foreground">
               <span class="relative flex h-3 w-3">
-                <span class="animate-pulse absolute inline-flex h-full w-full rounded-none bg-primary opacity-75"></span>
-                <span class="relative inline-flex rounded-none h-3 w-3 bg-primary"></span>
+                <span class="absolute inline-flex h-full w-full animate-pulse rounded-none bg-primary opacity-75"></span>
+                <span class="relative inline-flex h-3 w-3 rounded-none bg-primary"></span>
               </span>
               Live Data Stream
             </Badge>
-            <Badge class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary/20 border border-ring text-foreground rounded-none">
+            <Badge class="bg-primary/20 inline-flex items-center gap-2 rounded-none border border-ring px-4 py-2 text-sm text-foreground">
               <span class="text-foreground">🧪</span>
               A/B Testing Active
             </Badge>
@@ -80,10 +81,10 @@ const demoPages = [
         </div>
 
         {/* Overall Performance Summary */}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div class="mb-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           <Card class="border border-input bg-secondary">
             <CardHeader class="pb-2">
-              <CardTitle class="text-foreground text-lg">
+              <CardTitle class="text-lg text-foreground">
                 Total Sessions
               </CardTitle>
             </CardHeader>
@@ -100,7 +101,7 @@ const demoPages = [
 
           <Card class="border border-input bg-secondary">
             <CardHeader class="pb-2">
-              <CardTitle class="text-foreground text-lg">
+              <CardTitle class="text-lg text-foreground">
                 Overall Conversion
               </CardTitle>
             </CardHeader>
@@ -117,7 +118,7 @@ const demoPages = [
 
           <Card class="border border-input bg-secondary">
             <CardHeader class="pb-2">
-              <CardTitle class="text-foreground text-lg">
+              <CardTitle class="text-lg text-foreground">
                 Best Performing Demo
               </CardTitle>
             </CardHeader>
@@ -133,7 +134,7 @@ const demoPages = [
 
           <Card class="border border-input bg-secondary">
             <CardHeader class="pb-2">
-              <CardTitle class="text-foreground text-lg">
+              <CardTitle class="text-lg text-foreground">
                 A/B Test Winners
               </CardTitle>
             </CardHeader>
@@ -149,11 +150,11 @@ const demoPages = [
         </div>
 
         {/* Individual Demo Performance */}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div class="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
           {demoPages.map((demo) => (
             <Card class="border border-input bg-card">
               <CardHeader>
-                <div class="flex justify-between items-start">
+                <div class="flex items-start justify-between">
                   <div>
                     <CardTitle class={`text-${demo.color}-100 text-xl`}>
                       {demo.title}
@@ -171,7 +172,7 @@ const demoPages = [
               </CardHeader>
               <CardContent>
                 {/* Performance Metrics */}
-                <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="mb-6 grid grid-cols-3 gap-4">
                   <div class="text-center">
                     <div
                       id={`${demo.name}-sessions`}
@@ -208,23 +209,23 @@ const demoPages = [
                 </div>
 
                 {/* A/B Test Results */}
-                <div class="bg-secondary rounded-none p-4">
-                  <h4 class={`text-${demo.color}-300 font-medium mb-3`}>
+                <div class="rounded-none bg-secondary p-4">
+                  <h4 class={`text-${demo.color}-300 mb-3 font-medium`}>
                     A/B Test Performance
                   </h4>
                   <div class="space-y-2">
-                    <div class="flex justify-between items-center">
-                      <span class="text-muted-foreground text-sm">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-muted-foreground">
                         Variant A
                       </span>
                       <div class="flex items-center gap-2">
                         <span
                           id={`${demo.name}-variant-a-rate`}
-                          class={`text-${demo.color}-400 font-bold text-sm`}
+                          class={`text-${demo.color}-400 text-sm font-bold`}
                         >
                           0%
                         </span>
-                        <div class="w-16 bg-secondary rounded-none h-1">
+                        <div class="h-1 w-16 rounded-none bg-secondary">
                           <div
                             id={`${demo.name}-variant-a-bar`}
                             class={`bg-${demo.color}-500 h-1 rounded-none`}
@@ -233,18 +234,18 @@ const demoPages = [
                         </div>
                       </div>
                     </div>
-                    <div class="flex justify-between items-center">
-                      <span class="text-muted-foreground text-sm">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-muted-foreground">
                         Variant B
                       </span>
                       <div class="flex items-center gap-2">
                         <span
                           id={`${demo.name}-variant-b-rate`}
-                          class={`text-${demo.color}-400 font-bold text-sm`}
+                          class={`text-${demo.color}-400 text-sm font-bold`}
                         >
                           0%
                         </span>
-                        <div class="w-16 bg-secondary rounded-none h-1">
+                        <div class="h-1 w-16 rounded-none bg-secondary">
                           <div
                             id={`${demo.name}-variant-b-bar`}
                             class={`bg-${demo.color}-500 h-1 rounded-none`}
@@ -253,18 +254,18 @@ const demoPages = [
                         </div>
                       </div>
                     </div>
-                    <div class="flex justify-between items-center">
-                      <span class="text-muted-foreground text-sm">
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-muted-foreground">
                         Variant C
                       </span>
                       <div class="flex items-center gap-2">
                         <span
                           id={`${demo.name}-variant-c-rate`}
-                          class={`text-${demo.color}-400 font-bold text-sm`}
+                          class={`text-${demo.color}-400 text-sm font-bold`}
                         >
                           0%
                         </span>
-                        <div class="w-16 bg-secondary rounded-none h-1">
+                        <div class="h-1 w-16 rounded-none bg-secondary">
                           <div
                             id={`${demo.name}-variant-c-bar`}
                             class={`bg-${demo.color}-500 h-1 rounded-none`}
@@ -274,9 +275,9 @@ const demoPages = [
                       </div>
                     </div>
                   </div>
-                  <div class="mt-3 pt-3 border-t border-border">
-                    <div class="flex justify-between items-center">
-                      <span class="text-muted-foreground text-xs">
+                  <div class="mt-3 border-t border-border pt-3">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs text-muted-foreground">
                         Statistical Significance
                       </span>
                       <span
@@ -290,7 +291,7 @@ const demoPages = [
                 </div>
 
                 {/* Quick Actions */}
-                <div class="flex gap-2 mt-4">
+                <div class="mt-4 flex gap-2">
                   <Button
                     size="sm"
                     variant="outline"
@@ -312,7 +313,7 @@ const demoPages = [
         </div>
 
         {/* Comparative Analysis */}
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div class="mb-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Conversion Funnel Comparison */}
           <Card class="border border-input bg-card">
             <CardHeader>
@@ -330,17 +331,17 @@ const demoPages = [
                   <div class="flex items-center gap-4">
                     <div
                       id="funnel-page-views-total"
-                      class="text-foreground font-bold"
+                      class="font-bold text-foreground"
                     >
                       0
                     </div>
-                    <div class="w-32 bg-secondary rounded-none h-2">
+                    <div class="h-2 w-32 rounded-none bg-secondary">
                       <div
                         class="bg-indigo-500 h-2 rounded-none"
                         style="width: 100%"
                       ></div>
                     </div>
-                    <span class="text-foreground text-sm">100%</span>
+                    <span class="text-sm text-foreground">100%</span>
                   </div>
                 </div>
 
@@ -349,20 +350,20 @@ const demoPages = [
                   <div class="flex items-center gap-4">
                     <div
                       id="funnel-interactions-total"
-                      class="text-foreground font-bold"
+                      class="font-bold text-foreground"
                     >
                       0
                     </div>
-                    <div class="w-32 bg-secondary rounded-none h-2">
+                    <div class="h-2 w-32 rounded-none bg-secondary">
                       <div
                         id="funnel-interactions-bar"
-                        class="bg-primary h-2 rounded-none"
+                        class="h-2 rounded-none bg-primary"
                         style="width: 0%"
                       ></div>
                     </div>
                     <span
                       id="funnel-interactions-pct"
-                      class="text-foreground text-sm"
+                      class="text-sm text-foreground"
                     >
                       0%
                     </span>
@@ -374,18 +375,18 @@ const demoPages = [
                   <div class="flex items-center gap-4">
                     <div
                       id="funnel-cta-total"
-                      class="text-foreground font-bold"
+                      class="font-bold text-foreground"
                     >
                       0
                     </div>
-                    <div class="w-32 bg-secondary rounded-none h-2">
+                    <div class="h-2 w-32 rounded-none bg-secondary">
                       <div
                         id="funnel-cta-bar"
-                        class="bg-primary h-2 rounded-none"
+                        class="h-2 rounded-none bg-primary"
                         style="width: 0%"
                       ></div>
                     </div>
-                    <span id="funnel-cta-pct" class="text-foreground text-sm">
+                    <span id="funnel-cta-pct" class="text-sm text-foreground">
                       0%
                     </span>
                   </div>
@@ -404,23 +405,23 @@ const demoPages = [
             </CardHeader>
             <CardContent>
               <div class="space-y-4">
-                <div class="bg-secondary rounded-none p-4">
-                  <div class="text-foreground font-medium mb-2">
+                <div class="rounded-none bg-secondary p-4">
+                  <div class="mb-2 font-medium text-foreground">
                     Overall Test Status
                   </div>
                   <div
                     id="overall-test-status"
-                    class="text-foreground font-bold"
+                    class="font-bold text-foreground"
                   >
                     Collecting Data...
                   </div>
-                  <div class="text-sm text-muted-foreground mt-1">
+                  <div class="mt-1 text-sm text-muted-foreground">
                     Across all demo pages
                   </div>
                 </div>
 
-                <div class="bg-secondary rounded-none p-4">
-                  <div class="text-foreground font-medium mb-2">
+                <div class="rounded-none bg-secondary p-4">
+                  <div class="mb-2 font-medium text-foreground">
                     Winning Variants
                   </div>
                   <div class="space-y-2">
@@ -457,13 +458,13 @@ const demoPages = [
                   </div>
                 </div>
 
-                <div class="bg-secondary rounded-none p-4">
-                  <div class="text-foreground font-medium mb-2">
+                <div class="rounded-none bg-secondary p-4">
+                  <div class="mb-2 font-medium text-foreground">
                     Recommendations
                   </div>
                   <div
                     id="overall-recommendations"
-                    class="text-foreground font-bold text-sm"
+                    class="text-sm font-bold text-foreground"
                   >
                     Continue testing all variants
                   </div>
@@ -474,7 +475,7 @@ const demoPages = [
         </div>
 
         {/* Live Event Stream */}
-        <Card class="border border-border bg-card mb-12">
+        <Card class="mb-12 border border-border bg-card">
           <CardHeader>
             <CardTitle class="text-foreground">Live Event Stream</CardTitle>
             <CardDescription class="text-muted-foreground">
@@ -484,9 +485,9 @@ const demoPages = [
           <CardContent>
             <div
               id="live-event-stream"
-              class="space-y-2 max-h-96 overflow-y-auto"
+              class="max-h-96 space-y-2 overflow-y-auto"
             >
-              <div class="text-muted-foreground text-center py-8">
+              <div class="py-8 text-center text-muted-foreground">
                 Waiting for events across all demos...
               </div>
             </div>
@@ -497,19 +498,19 @@ const demoPages = [
         <div class="flex justify-center gap-4">
           <Button
             variant="outline"
-            className="bg-primary hover:bg-accent text-primary-foreground px-6 py-3"
+            className="bg-primary px-6 py-3 text-primary-foreground hover:bg-accent"
           >
-            <ChartBar className="w-4 h-4 mr-2" /> Export All Data
+            <ChartBar className="mr-2 h-4 w-4" /> Export All Data
           </Button>
           <Button
             variant="outline"
-            className="border-input text-foreground hover:bg-primary/10 px-6 py-3"
+            className="hover:bg-primary/10 border-input px-6 py-3 text-foreground"
           >
             📧 Email Report
           </Button>
           <Button
             variant="outline"
-            className="border-input text-foreground hover:bg-primary/10 px-6 py-3"
+            className="hover:bg-primary/10 border-input px-6 py-3 text-foreground"
           >
             ⚙️ Configure Alerts
           </Button>

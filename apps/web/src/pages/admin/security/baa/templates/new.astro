@@ -1,13 +1,13 @@
 ---
 import AdminLayout from '../../../../../layouts/AdminLayout.astro'
 import {
-  BusinessAssociateType,
-  ServiceCategory,
-} from '../../../../../lib/security/baa/types'
-import {
   standardSections,
   standardPlaceholders,
 } from '../../../../../lib/security/baa/templates/hipaa-standard'
+import {
+  BusinessAssociateType,
+  ServiceCategory,
+} from '../../../../../lib/security/baa/types'
 
 // Convert enum values to options for select inputs
 const associateTypeOptions = Object.values(BusinessAssociateType).map(
@@ -34,10 +34,10 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
   description="Create a new HIPAA-compliant Business Associate Agreement template"
 >
   <div class="px-6 py-8">
-    <div class="flex items-center mb-6">
+    <div class="mb-6 flex items-center">
       <a
         href="/admin/security/baa/templates"
-        class="text-foreground hover:underline mr-4"
+        class="mr-4 text-foreground hover:underline"
       >
         &larr; Back to Templates
       </a>
@@ -47,14 +47,14 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
     </div>
 
     <form id="template-form" class="space-y-8">
-      <div class="bg-card rounded-none border border-border p-6">
-        <h2 class="text-xl font-semibold mb-4">Template Details</h2>
+      <div class="rounded-none border border-border bg-card p-6">
+        <h2 class="mb-4 text-xl font-semibold">Template Details</h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <label
               for="templateName"
-              class="block text-sm font-medium text-foreground mb-1"
+              class="mb-1 block text-sm font-medium text-foreground"
             >
               Template Name*
             </label>
@@ -63,7 +63,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               id="templateName"
               name="templateName"
               required
-              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
+              class="w-full rounded-none border border-input bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="e.g., Standard HIPAA BAA Template"
             />
           </div>
@@ -71,7 +71,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div>
             <label
               for="templateVersion"
-              class="block text-sm font-medium text-foreground mb-1"
+              class="mb-1 block text-sm font-medium text-foreground"
             >
               Version*
             </label>
@@ -80,7 +80,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               id="templateVersion"
               name="templateVersion"
               required
-              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
+              class="w-full rounded-none border border-input bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="e.g., 1.0.0"
             />
           </div>
@@ -88,7 +88,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div class="md:col-span-2">
             <label
               for="templateDescription"
-              class="block text-sm font-medium text-foreground mb-1"
+              class="mb-1 block text-sm font-medium text-foreground"
             >
               Description*
             </label>
@@ -97,7 +97,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               name="templateDescription"
               rows="3"
               required
-              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
+              class="w-full rounded-none border border-input bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="Describe the purpose and use case for this template"
             ></textarea>
           </div>
@@ -105,7 +105,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div>
             <label
               for="associateTypes"
-              class="block text-sm font-medium text-foreground mb-1"
+              class="mb-1 block text-sm font-medium text-foreground"
             >
               Associate Types*
             </label>
@@ -114,14 +114,14 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               name="associateTypes"
               multiple
               required
-              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
+              class="w-full rounded-none border border-input bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               size="5"
             >
               {associateTypeOptions.map((option) => (
                 <option value={option.value}>{option.label}</option>
               ))}
             </select>
-            <p class="text-xs text-muted-foreground mt-1">
+            <p class="mt-1 text-xs text-muted-foreground">
               Hold Ctrl/Cmd to select multiple types
             </p>
           </div>
@@ -129,7 +129,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div>
             <label
               for="serviceCategories"
-              class="block text-sm font-medium text-foreground mb-1"
+              class="mb-1 block text-sm font-medium text-foreground"
             >
               Service Categories*
             </label>
@@ -138,14 +138,14 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               name="serviceCategories"
               multiple
               required
-              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
+              class="w-full rounded-none border border-input bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               size="5"
             >
               {serviceCategoryOptions.map((option) => (
                 <option value={option.value}>{option.label}</option>
               ))}
             </select>
-            <p class="text-xs text-muted-foreground mt-1">
+            <p class="mt-1 text-xs text-muted-foreground">
               Hold Ctrl/Cmd to select multiple categories
             </p>
           </div>
@@ -153,7 +153,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div>
             <label
               for="tags"
-              class="block text-sm font-medium text-foreground mb-1"
+              class="mb-1 block text-sm font-medium text-foreground"
             >
               Tags
             </label>
@@ -161,10 +161,10 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               type="text"
               id="tags"
               name="tags"
-              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
+              class="w-full rounded-none border border-input bg-background px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="e.g., hipaa, vendor, cloud-storage"
             />
-            <p class="text-xs text-muted-foreground mt-1">
+            <p class="mt-1 text-xs text-muted-foreground">
               Comma-separated tags
             </p>
           </div>
@@ -174,7 +174,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               type="checkbox"
               id="isDefault"
               name="isDefault"
-              class="h-4 w-4 border-input rounded-none"
+              class="h-4 w-4 rounded-none border-input"
             />
             <label for="isDefault" class="ml-2 block text-sm text-foreground">
               Set
@@ -183,13 +183,13 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         </div>
       </div>
 
-      <div class="bg-card rounded-none border border-border p-6">
-        <div class="flex justify-between items-center mb-4">
+      <div class="rounded-none border border-border bg-card p-6">
+        <div class="mb-4 flex items-center justify-between">
           <h2 class="text-xl font-semibold">Template Sections</h2>
           <button
             type="button"
             id="add-section-btn"
-            class="px-3 py-1 bg-secondary border border-input text-foreground rounded-none hover:bg-accent transition-colors text-sm"
+            class="rounded-none border border-input bg-secondary px-3 py-1 text-sm text-foreground transition-colors hover:bg-accent"
           >
             Add New Section
           </button>
@@ -197,8 +197,8 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
 
         <div id="sections-container" class="space-y-6">
           <!-- Sections will be added here dynamically -->
-          <div class="border border-border p-4 rounded-none">
-            <p class="text-center text-muted-foreground my-4">
+          <div class="rounded-none border border-border p-4">
+            <p class="my-4 text-center text-muted-foreground">
               No sections added yet. Click "Add New Section" or "Use Standard
               Sections" to add sections to your template.
             </p>
@@ -209,20 +209,20 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <button
             type="button"
             id="use-standard-sections-btn"
-            class="px-4 py-2 bg-secondary border border-input text-foreground rounded-none hover:bg-accent transition-colors"
+            class="rounded-none border border-input bg-secondary px-4 py-2 text-foreground transition-colors hover:bg-accent"
           >
             Use Standard Sections
           </button>
         </div>
       </div>
 
-      <div class="bg-card rounded-none border border-border p-6">
-        <div class="flex justify-between items-center mb-4">
+      <div class="rounded-none border border-border bg-card p-6">
+        <div class="mb-4 flex items-center justify-between">
           <h2 class="text-xl font-semibold">Template Placeholders</h2>
           <button
             type="button"
             id="add-placeholder-btn"
-            class="px-3 py-1 bg-secondary border border-input text-foreground rounded-none hover:bg-accent transition-colors text-sm"
+            class="rounded-none border border-input bg-secondary px-3 py-1 text-sm text-foreground transition-colors hover:bg-accent"
           >
             Add New Placeholder
           </button>
@@ -230,8 +230,8 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
 
         <div id="placeholders-container" class="space-y-6">
           <!-- Placeholders will be added here dynamically -->
-          <div class="border border-border p-4 rounded-none">
-            <p class="text-center text-muted-foreground my-4">
+          <div class="rounded-none border border-border p-4">
+            <p class="my-4 text-center text-muted-foreground">
               No placeholders added yet. Click "Add New Placeholder" or "Use
               Standard Placeholders" to add placeholders to your template.
             </p>
@@ -242,7 +242,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <button
             type="button"
             id="use-standard-placeholders-btn"
-            class="px-4 py-2 bg-secondary border border-input text-foreground rounded-none hover:bg-accent transition-colors"
+            class="rounded-none border border-input bg-secondary px-4 py-2 text-foreground transition-colors hover:bg-accent"
           >
             Use Standard Placeholders
           </button>
@@ -252,13 +252,13 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
       <div class="flex justify-end space-x-4">
         <a
           href="/admin/security/baa/templates"
-          class="px-4 py-2 border border-input rounded-none text-sm font-medium text-foreground bg-card hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+          class="rounded-none border border-input bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
           Cancel
         </a>
         <button
           type="submit"
-          class="px-4 py-2 border border-transparent rounded-none text-sm font-medium text-primary-foreground bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
+          class="border-transparent rounded-none border bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
           Create Template
         </button>

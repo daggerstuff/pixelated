@@ -72,19 +72,19 @@ const trainingMetrics = {
 <BaseLayout {title} {description}>
   <!-- Hero Section -->
   <section
-    class="relative min-h-screen flex items-center justify-center overflow-hidden"
+    class="relative flex min-h-screen items-center justify-center overflow-hidden"
     style="background: var(--np-bg);"
   >
-    <div class="container mx-auto px-6 text-center relative z-10">
+    <div class="container relative z-10 mx-auto px-6 text-center">
       <div class="mb-12">
         <div
-          class="inline-flex items-center gap-4 px-6 py-3 np-elevated mb-8"
+          class="np-elevated mb-8 inline-flex items-center gap-4 px-6 py-3"
           style="border: 1px solid var(--np-line);"
         >
           <span class="np-mid" aria-hidden="true">
             ⚠️
           </span>
-          <span class="font-bold np-text tracking-wide">
+          <span class="np-text font-bold tracking-wide">
             HIGHLY SENSITIVE MATERIAL
           </span>
           <span class="np-mid" aria-hidden="true">
@@ -93,13 +93,13 @@ const trainingMetrics = {
         </div>
       </div>
 
-      <h1 class="text-6xl md:text-8xl lg:text-9xl font-black mb-8 np-text tracking-tighter">
+      <h1 class="np-text mb-8 text-6xl font-black tracking-tighter md:text-8xl lg:text-9xl">
         NIGHTMARE
         <br />
         FUEL
       </h1>
 
-      <p class="text-xl md:text-2xl np-muted mb-8 max-w-4xl mx-auto leading-relaxed">
+      <p class="np-muted mx-auto mb-8 max-w-4xl text-xl leading-relaxed md:text-2xl">
         The ultimate crisis training simulator.{' '}
         <strong class="np-text">No human supervision needed.</strong>
         <br />
@@ -107,42 +107,42 @@ const trainingMetrics = {
         <strong class="np-mid">AI-guided intervention.</strong>
       </p>
 
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 max-w-4xl mx-auto">
+      <div class="mx-auto mb-12 grid max-w-4xl grid-cols-2 gap-8 md:grid-cols-4">
         <div class="text-center">
-          <div class="text-4xl font-bold np-text">
+          <div class="np-text text-4xl font-bold">
             {trainingMetrics.counselors_trained}
           </div>
-          <div class="text-sm np-muted">Counselors Trained</div>
+          <div class="np-muted text-sm">Counselors Trained</div>
         </div>
         <div class="text-center">
-          <div class="text-4xl font-bold np-text">
+          <div class="np-text text-4xl font-bold">
             {trainingMetrics.success_rate}%
           </div>
-          <div class="text-sm np-muted">Success Rate</div>
+          <div class="np-muted text-sm">Success Rate</div>
         </div>
         <div class="text-center">
-          <div class="text-4xl font-bold np-text">
+          <div class="np-text text-4xl font-bold">
             {trainingMetrics.crisis_prevention_rate}%
           </div>
-          <div class="text-sm np-muted">Crisis Prevention</div>
+          <div class="np-muted text-sm">Crisis Prevention</div>
         </div>
         <div class="text-center">
-          <div class="text-4xl font-bold np-text">
+          <div class="np-text text-4xl font-bold">
             {trainingMetrics.secondary_trauma_reduction}%
           </div>
-          <div class="text-sm np-muted">Trauma Reduction</div>
+          <div class="np-muted text-sm">Trauma Reduction</div>
         </div>
       </div>
 
       <button
         id="startDemoBtn"
-        class="px-12 py-6 font-bold text-xl np-cta np-ring"
+        class="np-cta np-ring px-12 py-6 text-xl font-bold"
         style="background: var(--np-elevated);"
       >
         START TRAINING →
       </button>
 
-      <p class="mt-8 np-muted text-sm max-w-2xl mx-auto">
+      <p class="np-muted mx-auto mt-8 max-w-2xl text-sm">
         <strong class="np-text">⚠ WARNING:</strong> This demo contains extreme
         crisis scenarios designed for professional training only.
       </p>
@@ -152,36 +152,36 @@ const trainingMetrics = {
   <!-- Demo Interface - Hidden Initially -->
   <section
     id="demoInterface"
-    class="hidden min-h-screen relative"
+    class="relative hidden min-h-screen"
     style="background: var(--np-bg);"
   >
     <!-- Header -->
     <div
-      class="fixed top-0 left-0 right-0 z-50"
+      class="fixed left-0 right-0 top-0 z-50"
       style="background: var(--np-surface); border-bottom: 1px solid var(--np-line);"
     >
       <div class="container mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
-            <h1 class="text-xl font-bold np-text">LIVE TRAINING SESSION</h1>
-            <div class="text-sm np-muted">
+            <h1 class="np-text text-xl font-bold">LIVE TRAINING SESSION</h1>
+            <div class="np-muted text-sm">
               AI Supervision: <span class="np-text">ACTIVE</span>
             </div>
           </div>
           <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
-              <span class="text-sm np-muted">Timer:</span>
+              <span class="np-muted text-sm">Timer:</span>
               <div id="sessionTimer" class="np-text font-bold">
                 05:00
               </div>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-sm np-muted">Stability:</span>
+              <span class="np-muted text-sm">Stability:</span>
               <div id="stabilityMetric" class="np-mid">
                 STABLE
               </div>
             </div>
-            <button id="endSessionBtn" class="px-4 py-2 font-semibold np-cta">
+            <button id="endSessionBtn" class="np-cta px-4 py-2 font-semibold">
               END SESSION
             </button>
           </div>
@@ -190,23 +190,23 @@ const trainingMetrics = {
     </div>
 
     <!-- Main Content -->
-    <div class="container mx-auto px-6 py-8 mt-20">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 min-h-screen">
+    <div class="container mx-auto mt-20 px-6 py-8">
+      <div class="grid min-h-screen grid-cols-1 gap-8 lg:grid-cols-3">
         <!-- Scenario Panel -->
-        <div class="lg:col-span-2 space-y-6">
+        <div class="space-y-6 lg:col-span-2">
           <!-- Current Scenario -->
           <div
             id="scenarioPanel"
             class="p-6"
             style="background: var(--np-surface); border: 1px solid var(--np-line);"
           >
-            <div class="flex items-center justify-between mb-6">
-              <h2 id="scenarioTitle" class="text-2xl font-bold np-text">
+            <div class="mb-6 flex items-center justify-between">
+              <h2 id="scenarioTitle" class="np-text text-2xl font-bold">
                 Select Scenario to Begin
               </h2>
               <div
                 id="crisisBadge"
-                class="px-3 py-1 text-sm font-bold np-text uppercase"
+                class="np-text px-3 py-1 text-sm font-bold uppercase"
                 style="background: var(--np-elevated); border: 1px solid var(--np-line);"
               >
                 EXTREME
@@ -221,22 +221,22 @@ const trainingMetrics = {
             </div>
 
             <!-- Scenario Tags -->
-            <div id="scenarioTags" class="flex flex-wrap gap-2 mb-6"></div>
+            <div id="scenarioTags" class="mb-6 flex flex-wrap gap-2"></div>
 
             <!-- AI Analysis Panel -->
             <div
               id="aiAnalysisPanel"
-              class="p-4 mb-6"
+              class="mb-6 p-4"
               style="background: var(--np-bg); border: 1px solid var(--np-line);"
             >
-              <h3 class="text-lg font-semibold np-text mb-3 flex items-center gap-2">
+              <h3 class="np-text mb-3 flex items-center gap-2 text-lg font-semibold">
                 <span class="np-mid" aria-hidden="true">
                   ●
                 </span>
                 LIVE AI ANALYSIS
               </h3>
               <div id="aiAnalysis" class="np-muted">
-                <div class="flex items-center gap-2 mb-2">
+                <div class="mb-2 flex items-center gap-2">
                   <span class="np-muted">○</span>
                   <span class="np-muted">System initializing...</span>
                 </div>
@@ -248,12 +248,12 @@ const trainingMetrics = {
               class="p-4"
               style="background: var(--np-bg); border: 1px solid var(--np-line);"
             >
-              <h4 class="text-lg font-semibold np-text mb-3">
+              <h4 class="np-text mb-3 text-lg font-semibold">
                 CLIENT SIMULATOR
               </h4>
               <div
                 id="clientResponses"
-                class="space-y-3 mb-4 min-h-[200px] max-h-[400px] overflow-y-auto"
+                class="mb-4 max-h-[400px] min-h-[200px] space-y-3 overflow-y-auto"
               >
                 <div
                   class="p-3"
@@ -268,12 +268,12 @@ const trainingMetrics = {
                 <textarea
                   id="counselorInput"
                   placeholder="Type your therapeutic response..."
-                  class="flex-1 p-3 resize-none min-h-[80px] focus:outline-none"
+                  class="min-h-[80px] flex-1 resize-none p-3 focus:outline-none"
                   style="background: var(--np-bg); color: var(--np-text); border: 1px solid var(--np-line);"
                 ></textarea>
                 <button
                   id="sendResponseBtn"
-                  class="px-6 py-3 font-semibold np-cta"
+                  class="np-cta px-6 py-3 font-semibold"
                 >
                   →
                 </button>
@@ -289,7 +289,7 @@ const trainingMetrics = {
             class="p-6"
             style="background: var(--np-surface); border: 1px solid var(--np-line);"
           >
-            <h3 class="text-xl font-bold np-text mb-4 flex items-center gap-2">
+            <h3 class="np-text mb-4 flex items-center gap-2 text-xl font-bold">
               <span class="np-mid" aria-hidden="true">
                 💀
               </span>
@@ -298,24 +298,24 @@ const trainingMetrics = {
             <div id="scenarioList" class="space-y-3">
               {nightmareScenarios.map((scenario) => (
                 <div
-                  class="scenario-item p-4 cursor-pointer transition-all group"
+                  class="scenario-item group cursor-pointer p-4 transition-all"
                   data-scenario={scenario.id}
                   style="background: var(--np-bg); border: 1px solid var(--np-line);"
                 >
-                  <div class="flex items-center justify-between mb-2">
-                    <h4 class="font-semibold np-text">{scenario.title}</h4>
+                  <div class="mb-2 flex items-center justify-between">
+                    <h4 class="np-text font-semibold">{scenario.title}</h4>
                     <div
-                      class="text-xs px-2 py-1 np-mid"
+                      class="np-mid px-2 py-1 text-xs"
                       style="background: var(--np-elevated); border: 1px solid var(--np-line);"
                     >
                       {scenario.stephenKingFactor}/10 Stephen King Factor
                     </div>
                   </div>
-                  <p class="text-sm np-muted mb-2">{scenario.description}</p>
+                  <p class="np-muted mb-2 text-sm">{scenario.description}</p>
                   <div class="flex flex-wrap gap-1">
                     {scenario.tags.map((tag) => (
                       <span
-                        class="text-xs px-1 py-0.5 np-muted"
+                        class="np-muted px-1 py-0.5 text-xs"
                         style="background: var(--np-elevated);"
                       >
                         {tag}
@@ -332,14 +332,14 @@ const trainingMetrics = {
             class="p-6"
             style="background: var(--np-surface); border: 1px solid var(--np-line);"
           >
-            <h3 class="text-xl font-bold np-text mb-4">PERFORMANCE TRACKING</h3>
+            <h3 class="np-text mb-4 text-xl font-bold">PERFORMANCE TRACKING</h3>
             <div class="space-y-4">
               <div class="flex items-center justify-between">
                 <span class="np-muted">Crisis Recognition</span>
                 <div class="flex items-center gap-2">
                   <div
                     id="crisisRecognitionBar"
-                    class="w-20 h-2"
+                    class="h-2 w-20"
                     style="background: var(--np-elevated);"
                   >
                     <div
@@ -357,7 +357,7 @@ const trainingMetrics = {
                 <div class="flex items-center gap-2">
                   <div
                     id="interventionQualityBar"
-                    class="w-20 h-2"
+                    class="h-2 w-20"
                     style="background: var(--np-elevated);"
                   >
                     <div
@@ -375,7 +375,7 @@ const trainingMetrics = {
                 <div class="flex items-center gap-2">
                   <div
                     id="empathyScoreBar"
-                    class="w-20 h-2"
+                    class="h-2 w-20"
                     style="background: var(--np-elevated);"
                   >
                     <div
@@ -393,7 +393,7 @@ const trainingMetrics = {
                 <div class="flex items-center gap-2">
                   <div
                     id="boundariesBar"
-                    class="w-20 h-2"
+                    class="h-2 w-20"
                     style="background: var(--np-elevated);"
                   >
                     <div
@@ -414,7 +414,7 @@ const trainingMetrics = {
             class="p-6"
             style="background: var(--np-bg); border: 1px solid var(--np-line);"
           >
-            <h3 class="text-xl font-bold np-text mb-4">AI SUPERVISOR STATUS</h3>
+            <h3 class="np-text mb-4 text-xl font-bold">AI SUPERVISOR STATUS</h3>
             <div class="space-y-3">
               <div class="flex items-center gap-2">
                 <span class="np-mid" aria-hidden="true">
@@ -454,7 +454,7 @@ const trainingMetrics = {
             <!-- Alert Panel -->
             <div
               id="alertPanel"
-              class="mt-4 p-3 hidden"
+              class="mt-4 hidden p-3"
               style="background: var(--np-elevated); border: 1px solid var(--np-line);"
             >
               <div class="flex items-center gap-2">
@@ -471,18 +471,18 @@ const trainingMetrics = {
             class="p-6"
             style="background: var(--np-surface); border: 1px solid var(--np-line);"
           >
-            <h3 class="text-xl font-bold np-text mb-4">QUICK ACTIONS</h3>
+            <h3 class="np-text mb-4 text-xl font-bold">QUICK ACTIONS</h3>
             <div class="grid grid-cols-2 gap-3">
-              <button id="pauseBtn" class="px-4 py-2 font-semibold np-cta">
+              <button id="pauseBtn" class="np-cta px-4 py-2 font-semibold">
                 PAUSE
               </button>
-              <button id="safetyModeBtn" class="px-4 py-2 font-semibold np-cta">
+              <button id="safetyModeBtn" class="np-cta px-4 py-2 font-semibold">
                 SAFE MODE
               </button>
-              <button id="debriefBtn" class="px-4 py-2 font-semibold np-cta">
+              <button id="debriefBtn" class="np-cta px-4 py-2 font-semibold">
                 DEBRIEF
               </button>
-              <button id="emergencyBtn" class="px-4 py-2 font-semibold np-cta">
+              <button id="emergencyBtn" class="np-cta px-4 py-2 font-semibold">
                 EMERGENCY
               </button>
             </div>
@@ -495,23 +495,23 @@ const trainingMetrics = {
   <!-- Welcome Modal -->
   <div
     id="welcomeModal"
-    class="fixed inset-0 flex items-center justify-center z-50"
+    class="fixed inset-0 z-50 flex items-center justify-center"
     style="background: rgba(0, 0, 0, 0.8);"
   >
     <div
-      class="p-8 max-w-2xl mx-6"
+      class="mx-6 max-w-2xl p-8"
       style="background: var(--np-surface); border: 2px solid var(--np-line);"
     >
-      <div class="text-center mb-6">
-        <div class="text-6xl mb-4">⚠️</div>
-        <h2 class="text-3xl font-bold np-text mb-4">
+      <div class="mb-6 text-center">
+        <div class="mb-4 text-6xl">⚠️</div>
+        <h2 class="np-text mb-4 text-3xl font-bold">
           PSYCHOLOGICAL SAFETY WARNING
         </h2>
       </div>
 
       <div class="np-muted mb-6 space-y-3">
-        <p class="font-bold np-text">This training simulation contains:</p>
-        <ul class="list-disc list-inside space-y-2 text-sm">
+        <p class="np-text font-bold">This training simulation contains:</p>
+        <ul class="list-inside list-disc space-y-2 text-sm">
           <li>Extremely graphic descriptions of abuse and trauma</li>
           <li>Scenarios that may cause secondary traumatic stress</li>
           <li>
@@ -526,10 +526,10 @@ const trainingMetrics = {
       </div>
 
       <div
-        class="p-4 mb-6"
+        class="mb-6 p-4"
         style="background: var(--np-elevated); border: 1px solid var(--np-line);"
       >
-        <p class="np-text text-sm font-semibold text-center">
+        <p class="np-text text-center text-sm font-semibold">
           ⚠️ DO NOT PROCEED if you have active PTSD, trauma history, or
           psychological vulnerabilities
         </p>
@@ -538,14 +538,14 @@ const trainingMetrics = {
       <div class="flex gap-4">
         <button
           id="declineBtn"
-          class="flex-1 px-6 py-3 font-bold np-cta"
+          class="np-cta flex-1 px-6 py-3 font-bold"
           style="background: var(--np-bg);"
         >
           I DECLINE - EXIT NOW
         </button>
         <button
           id="acceptBtn"
-          class="flex-1 px-6 py-3 font-bold np-cta"
+          class="np-cta flex-1 px-6 py-3 font-bold"
           style="background: var(--np-elevated);"
         >
           I ACCEPT - SHOW ME THE HORROR

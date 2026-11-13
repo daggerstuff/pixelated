@@ -39,15 +39,15 @@ const href = sessionId
   : '/training/coaching'
 ---
 
-<div class="p-6 border-b border-border">
-  <h3 class="mb-4 text-md font-semibold text-foreground">Session status</h3>
+<div class="border-b border-border p-6">
+  <h3 class="text-md mb-4 font-semibold text-foreground">Session status</h3>
   <div id="feedback-messages" class="space-y-2 text-sm">
     <p class="text-muted-foreground">No status updates.</p>
   </div>
 </div>
 
-<div class="p-6 border-b border-border">
-  <h3 class="mb-2 text-md font-semibold text-foreground">Session coaching</h3>
+<div class="border-b border-border p-6">
+  <h3 class="text-md mb-2 font-semibold text-foreground">Session coaching</h3>
 
   {primary && (
     <div>
@@ -65,7 +65,7 @@ const href = sessionId
 
   <a
     {href}
-    class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 mt-4 text-sm font-medium border border-border bg-secondary text-foreground transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
+    class="mt-4 inline-flex min-h-[44px] items-center justify-center border border-border bg-secondary px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
   >
     Open coaching
   </a>
