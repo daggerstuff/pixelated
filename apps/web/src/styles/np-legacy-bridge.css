@@ -7,7 +7,7 @@
  * the *structure* those names stood for, expressed entirely in NP tokens:
  * zero radius, no blurred shadows, no chromatic accent beyond the drafting
  * signals. It is a bridge, not a theme — delete each block as its markup is
- * ported to the np- primitives in np-drafting.css.
+ * ported to the np- tokens.
  *
  * Deliberately absent: bare `.card`, `.btn` and `.input`. Those names are
  * used by 100+ files with no definition today, so globalising them would

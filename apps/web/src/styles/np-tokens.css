@@ -422,7 +422,7 @@ html body {
 /* ==============================================
   PUBLIC REGISTER — the drafting signals, opted in per layout
   ==============================================
-  Only BaseLayout loads np-drafting.css and marketing.css, and it marks
+  Only BaseLayout loads np-legacy-bridge.css and marketing.css, and it marks
   <html data-register="public">. Product registers (dashboard, chat,
   therapy, admin, docs) never set the attribute, so they keep the neutral
   aliases above and the two signals cannot leak inward. Declared last so

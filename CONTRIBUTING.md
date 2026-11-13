@@ -49,10 +49,10 @@ If merging `staging` into a PR branch (or the PR itself) conflicts on
 is a pure function of the merged manifests. One command:
 
 ```bash
-make lockfile-resolve   # seeds from MERGE_HEAD, regenerates, stages
+make lockfile-resolve   # seeds from the incoming side, regenerates, stages
 ```
 
-Then commit the merge. For merely-stale lockfiles use
+Then finish the merge or rebase. For merely-stale lockfiles use
 `pnpm install --lockfile-only`. Full triage in `docs/runbooks.md` §9. Keep merge
 conflicts rare to begin with: merge `staging` into long-lived PR branches early
 and often.

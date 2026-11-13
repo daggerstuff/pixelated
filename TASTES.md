@@ -86,8 +86,9 @@ face buys vertical room — do not compensate by enlarging the headline.
   centerline (`.np-centerline`, rendered once by `BaseLayout`) is the page
   datum — one per page, never two.
 - **Drawing primitives**: stencil, dimension row, head rule, ghost cell, plate,
-  figure, tick, crop marks, revision block. Defined once in
-  `src/styles/np-drafting.css`; reach for one before inventing a container.
+  figure, tick, crop marks, revision block. Specified once, in `DESIGN.md`
+  under drafting primitives, but not yet committed as CSS; until it lands,
+  build containers from the NP tokens.
 - **Component Shape**: Cards are content-shaped (discrete, scannable).
   One card inside another is never right; flatten with type and dividers
   instead. Wrappers that exist only to add margin should be deleted.
@@ -121,10 +122,11 @@ Four CSS files, four jobs. Do not collapse them.
   radii, motion, z-index, light/dark theme, and the two signal tokens. The
   `:root` and `[data-theme=light]` blocks. Legacy compatibility aliases
   (`--accent-primary`, `--accent-primary-rgb`, `--font-body`, `--ease-out`).
-- **`src/styles/np-drafting.css`** — The drafting layer merged from Supernova:
-  centerline, stencil, dimension row, head rule, ghost cell, plate, figure,
-  tick, crop marks, revision block, stroke mark. `np-` namespaced, loaded by
-  `BaseLayout.astro` for every public page.
+- **Drafting layer** — specified in `DESIGN.md`, not committed: there is no
+  `np-drafting.css` in the tree and nothing imports it. The centerline,
+  stencil, dimension row, head rule, ghost cell, plate, figure, tick, crop
+  marks, revision block and stroke mark are the intended primitives when it
+  lands.
 - **`src/styles/np-landing.css`** — Homepage (`/`) styles. Loaded only by
   `src/pages/index.astro`. Layout only: it must **not** redeclare palette or
   type tokens (it used to, including a Monocraft display override).

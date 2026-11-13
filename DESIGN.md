@@ -119,8 +119,10 @@ what changed is the sheet it is drawn on.
   fallback. Mono (IBM Plex Mono) became the _spec voice_: labels, dimensions,
   ticks, and supporting body copy on public surfaces.
 - **Two signals replace the zero-chroma rule** on public surfaces — see §2.
-- **A drafting layer** (`src/styles/np-drafting.css`) adds the centerline,
-  stencils, dimension rows, ghost cells, crop marks, and the hard offset plate.
+- **A drafting layer** adds the centerline, stencils, dimension rows, ghost
+  cells, crop marks, and the hard offset plate. It is specified here but not
+  yet committed: the theme ships today as `np-tokens.css` plus
+  `np-legacy-bridge.css`.
 
 **What did not change:** 0px radius, no soft shadows, no gradients or glass,
 dark-first, 150ms state-only motion, 44px targets, 2px focus rings. The product
@@ -196,7 +198,7 @@ declares the neutral defaults on `:root` — `--accent-primary: var(--np-mid)`,
 the cyan signal only under `:root[data-register='public']`. `BaseLayout` (and
 the `MizuLayout` / `AuthLayout` shells that wrap it) is the sole layout that
 sets that attribute, and it is also the only layout that imports
-`np-drafting.css` and `marketing.css`. `AdminLayout`, `DashboardLayout`,
+`np-legacy-bridge.css` and `marketing.css`. `AdminLayout`, `DashboardLayout`,
 `ChatLayout`, `DocumentationLayout`, and `BrutalistLayout` own their `<html>`
 shells and import `np-tokens.css` alone, so they inherit the neutral defaults
 and no hue reaches them through the legacy alias layer.
@@ -357,10 +359,12 @@ it never appears on product chrome, never animates, and never blurs.
   color.
 - **Active:** Border shifts to `--np-line-strong`, bg stays the same.
 
-### Drafting primitives (`src/styles/np-drafting.css`)
+### Drafting primitives (specified, not yet committed)
 
 The merged Supernova layer. Namespaced `np-` so it cannot collide with the
-legacy `marketing-*` system, loaded by `BaseLayout.astro` for every public page.
+legacy `marketing-*` system, to be loaded by `BaseLayout.astro` for every
+public page once it lands. No committed stylesheet defines these classes yet,
+and no markup uses them.
 
 | Primitive          | Class            | Rule                                                                                                                 |
 | ------------------ | ---------------- | -------------------------------------------------------------------------------------------------------------------- |
@@ -476,9 +480,10 @@ lands):
       belong to Phase 3, not here). `pnpm build` green (exit 0); lint errors
       = 0.
 - [x] **Phase 5 — drafting-sheet merge (2026-11-05) and its closure pass
-      (2026-11-08).** Supernova's drafting language landed as
-      `src/styles/np-drafting.css` + retuned `np-tokens.css`, scoped to the
-      public register (§2.3). Closure pass: the `lt-lgp:` utilities in `Toc`,
+      (2026-11-08).** Supernova's drafting language landed as the retuned
+      `np-tokens.css` plus `np-legacy-bridge.css`, scoped to the public
+      register (§2.3); the drafting primitives themselves remain specified,
+      not committed. Closure pass: the `lt-lgp:` utilities in `Toc`,
       `TocButton`, `ToTopButton`, `SearchSwitch` and `GroupItem` had been
       compiling to nothing for **two** reasons — `lgp` was not a registered
       breakpoint, and `transformerVariantGroup()` was missing from
