@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # usage: watch-checks.sh <sha> [--all] [check-name ...]
 #
-# Defaults to the `build` gate. --all waits for every check-run on the SHA, which
-# also picks up Dependabot PR runs attached to the commit.
+# Defaults to the two build gates, `build` and `build-test`; the second is CI's own
+# build-and-test job, so polling `build` alone does not cover the build. --all waits
+# for every check-run on the SHA, which also picks up Dependabot PR runs attached
+# to the commit.
 # The check-runs API pages at 30 by default and this repo makes ~50 per commit,
 # so an unpaginated query silently omits jobs and reports "never appeared" for
 # a job that already passed. --paginate is the whole point of this script.
@@ -28,7 +30,7 @@ fi
 shift || true
 
 if [[ $# -eq 0 && "$ALL" != true ]]; then
-  set -- build
+  set -- build build-test
 fi
 
 TIMEOUT_MINUTES=${WATCH_TIMEOUT_MINUTES:-60}
