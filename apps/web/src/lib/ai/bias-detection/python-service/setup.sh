@@ -248,7 +248,8 @@ LOG_LEVEL=INFO
 LOG_FILE=bias_detection.log
 
 # Service Configuration
-HOST=0.0.0.0
+# Bind to loopback; expose publicly only through the TLS-terminating reverse proxy.
+HOST=127.0.0.1
 PORT=5000
 DEBUG=false
 EOF
@@ -274,9 +275,27 @@ if [ -f .env ]; then
     export $(cat .env | grep -v '^#' | xargs)
 fi
 
+# Only bind to loopback. The service speaks plain HTTP; public traffic must
+# go through the TLS-terminating reverse proxy (nginx), never directly.
+BIND_HOST="${HOST:-127.0.0.1}"
+case "$BIND_HOST" in
+    127.0.0.1 | localhost) BIND_ADDR="${BIND_HOST}" ;;
+    ::1 | "[::1]") BIND_ADDR="[::1]" ;;
+    *)
+        echo "Refusing to start: HOST='${BIND_HOST}' is not a loopback address." >&2
+        echo "Set HOST=127.0.0.1 in .env and expose the service via the TLS reverse proxy." >&2
+        exit 1
+        ;;
+esac
+
 # Start the service
 echo "Starting Bias Detection Engine Service..."
-python bias_detection_service.py
+# Use a production WSGI server; the Werkzeug dev server (app.run) is not
+# meant to face the internet. A single worker process (with threads) keeps
+# model download and database schema initialization in one process and keeps
+# the memory footprint of the previous single-process deployment.
+exec gunicorn --workers 1 --threads "${THREADS:-4}" --timeout 120 \
+    --bind "${BIND_ADDR}:${PORT:-5000}" bias_detection_service:app
 EOF
 
 	chmod +x start_service.sh

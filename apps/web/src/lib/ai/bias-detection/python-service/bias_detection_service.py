@@ -144,6 +144,42 @@ def health_check():
         return jsonify({"status": "unhealthy", "error": "Health check failed"}), 500
 
 
+_LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
+_DEV_SERVER_DEFAULT_HOST = "127.0.0.1"
+
+
+def _dev_server_host() -> str:
+    """Host for the Werkzeug dev server.
+
+    The shared ``settings.host`` default (0.0.0.0) exists for containerised
+    deployments. When HOST is not explicitly configured, the dev server binds
+    to loopback instead so it is never exposed by accident.
+    """
+    if "host" in settings.model_fields_set:
+        return settings.host
+    return _DEV_SERVER_DEFAULT_HOST
+
+
+def _ensure_loopback_host(host: str) -> None:
+    """Refuse to run the Werkzeug dev server on a non-loopback address.
+
+    The dev server speaks plain HTTP only (and exposes the interactive
+    debugger when DEBUG is on), so it must never be reachable remotely,
+    regardless of debug mode.
+    """
+    if host not in _LOOPBACK_HOSTS:
+        logger.error(
+            "Refusing to start the Werkzeug development server on non-loopback "
+            "host %s. Use HOST=127.0.0.1 for local development; in production "
+            "run start_service.sh (gunicorn) behind the TLS reverse proxy.",
+            host,
+        )
+        raise SystemExit(1)
+
+
 if __name__ == "__main__":
-    # Start the Flask app
-    app.run(host=settings.host, port=settings.port, debug=settings.debug)
+    # Local development only. In production run under gunicorn
+    # (see setup.sh / start_service.sh), behind the TLS reverse proxy.
+    host = _dev_server_host()
+    _ensure_loopback_host(host)
+    app.run(host=host, port=settings.port, debug=settings.debug)
