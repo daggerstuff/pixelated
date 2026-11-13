@@ -17,6 +17,9 @@
 # did not execute and must not outrank an earlier success on the same commit.
 # Exit: 0 green, 1 red, 2 no verdict, 3 the commit is no longer a branch head, so
 # its runs were cancelled by a newer push and no verdict will ever come for it.
+# A requested gate that has no attempt after WATCH_GRACE_MINUTES (default 5) while
+# the rest of the matrix is complete does not run for this change - a docs-only
+# push has no build gates at all - so that exits 2 instead of burning the deadline.
 set -euo pipefail
 
 ALL=false
@@ -93,8 +96,11 @@ missing_names() {
 }
 
 rows=""
+LOOP_START=$SECONDS
+GRACE_MINUTES=${WATCH_GRACE_MINUTES:-5}
 while :; do
-  rows=$(fetch | select_rows "$@" | drop_dynamic)
+  all_rows=$(fetch)
+  rows=$(printf '%s\n' "$all_rows" | select_rows "$@" | drop_dynamic)
   total=$(printf '%s' "$rows" | grep -c . || true)
   pending=$(printf '%s' "$rows" | awk -F'\t' '$1 != "completed"' | grep -c . || true)
   missing=$(missing_names "$@")
@@ -107,6 +113,14 @@ while :; do
     if [[ -z "$heads" ]]; then
       echo "✖ $SHA is not the head of any branch: its runs were superseded, so nothing will report for it" >&2
       exit 3
+    fi
+  fi
+  if [[ "$total" -eq 0 && -n "$missing" && $((SECONDS - LOOP_START)) -ge $((GRACE_MINUTES * 60)) ]]; then
+    all_total=$(printf '%s' "$all_rows" | grep -c . || true)
+    all_pending=$(printf '%s' "$all_rows" | awk -F'\t' '$1 != "completed"' | grep -c . || true)
+    if [[ "$all_total" -gt 0 && "$all_pending" -eq 0 ]]; then
+      echo "✖ no attempt for $missing on $SHA after ${GRACE_MINUTES}m, and the rest of the matrix is complete: those gates do not run for this change" >&2
+      exit 2
     fi
   fi
   if [[ "$SECONDS" -ge "$DEADLINE" ]]; then
