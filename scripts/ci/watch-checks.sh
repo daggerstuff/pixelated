@@ -6,8 +6,10 @@
 # The check-runs API pages at 30 by default and this repo makes ~50 per commit,
 # so an unpaginated query silently omits jobs and reports "never appeared" for
 # a job that already passed. --paginate is the whole point of this script.
-# A commit also keeps every attempt of a check, so only the newest attempt per
-# name is judged: an older red attempt that was superseded is not a failure.
+# A commit also keeps every attempt of a check, so only one attempt per name is
+# judged: a pending attempt always wins (a queued run carries no started_at, so
+# ordering by time alone would discard it and call a still-running gate green),
+# and otherwise the newest completed attempt decides.
 # Exit: 0 green, 1 red, 2 no verdict, 3 the commit is no longer a branch head, so
 # its runs were cancelled and no further check-run will ever report for it.
 set -euo pipefail
@@ -42,7 +44,11 @@ SHA=$FULL_SHA
 fetch() {
   gh api --paginate "repos/$REPO/commits/$SHA/check-runs?per_page=100" \
     --jq '.check_runs[] | {name, status, conclusion, started_at}' |
-    jq -sr 'group_by(.name) | map(sort_by(.started_at // "") | .[-1]) |
+    jq -sr 'group_by(.name) | map(
+              if (map(select(.status != "completed")) | length) > 0
+              then (map(select(.status != "completed")) | .[0])
+              else (sort_by(.started_at // "") | .[-1])
+              end) |
             .[] | "\(.status)\t\(.conclusion // "-")\t\(.name)"'
 }
 
