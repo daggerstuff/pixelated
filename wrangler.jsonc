@@ -1,64 +1,64 @@
 {
-	// Cloudflare Workers deployment for the Pixelated Empathy Astro app.
-	//
-	// This is the BASE config the @astrojs/cloudflare adapter merges over. The
-	// adapter computes the SSR `main` entrypoint and the static-assets binding
-	// and writes a deployable `dist/server/wrangler.json` during `astro build`.
-	//
-	// Per Cloudflare best practices (developers.cloudflare.com/workers/best-practices):
-	//   - compatibility_date is kept current (adapter applies it if absent).
-	//   - upload_source_maps is enabled so error stack traces map to source.
-	//   - NO secrets live here. Non-secret vars may be added under "vars";
-	//     secrets are pushed with `wrangler secret put <KEY>` / CI and never committed.
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "pixelated-empathy",
-	"main": "@astrojs/cloudflare/entrypoints/server",
-	"compatibility_date": "2026-10-30",
-	"compatibility_flags": ["nodejs_compat"],
-	"upload_source_maps": true,
-	"assets": {
-		// Pointed at the Astro client output. The adapter rewrites this to the
-		// correct (base-unprefixed) client dir in the generated build-output config.
-		"directory": "./dist/client",
-		"binding": "ASSETS",
-		"not_found_handling": "none"
-	},
-	"workers_dev": true,
-	"kv_namespaces": [
-		// CSRF token store (one-hour TTL). Redis is unreachable from the Worker,
-		// so tokens are written here; see apps/web/src/lib/security/csrf-store.ts.
-		// Non-secret identifier only — no credential material in this file.
-		{
-			"binding": "CSRF_TOKENS",
-			"id": "1643bc8555e74fb7bb0eac0d7c1cb1e0"
-		}
-	],
-	"routes": [
-		// Zone routes: the zone's apex and www records are already
-		// Cloudflare-proxied (to the Vercel standby), so a Workers route takes
-		// the traffic with no DNS change at all. To fail back to Vercel, remove
-		// this block and redeploy — the untouched records resume serving
-		// immediately.
-		//
-		// www is routed here because the Vercel standby answers 402
-		// DEPLOYMENT_DISABLED; middleware redirects it to the apex.
-		{
-			"pattern": "pixelatedempathy.com/*",
-			"zone_name": "pixelatedempathy.com"
-		},
-		{
-			"pattern": "www.pixelatedempathy.com/*",
-			"zone_name": "pixelatedempathy.com"
-		}
-	],
-	"vars": {
-		// Non-secret, non-PUBLIC_ config only. PUBLIC_* values are inlined at build
-		// time by Vite; secrets come from the CF_WORKER_* repo secrets via the
-		// deploy workflow's `wrangler secret bulk` step.
-		"DEPLOY_TARGET": "cloudflare",
-		"NODE_ENV": "production",
-		// Excludes EHR, scheduling, payer and FHIR routes/pages from this release.
-		// See planning/pilot-readiness-2026-11-04/evidence/l09-excluded-tools-release.md
-		"PILOT_EXCLUDED_SURFACE": "1"
-	}
+  // Cloudflare Workers deployment for the Pixelated Empathy Astro app.
+  //
+  // This is the BASE config the @astrojs/cloudflare adapter merges over. The
+  // adapter computes the SSR `main` entrypoint and the static-assets binding
+  // and writes a deployable `dist/server/wrangler.json` during `astro build`.
+  //
+  // Per Cloudflare best practices (developers.cloudflare.com/workers/best-practices):
+  //   - compatibility_date is kept current (adapter applies it if absent).
+  //   - upload_source_maps is enabled so error stack traces map to source.
+  //   - NO secrets live here. Non-secret vars may be added under "vars";
+  //     secrets are pushed with `wrangler secret put <KEY>` / CI and never committed.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pixelated-empathy",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-10-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "upload_source_maps": true,
+  "assets": {
+    // Pointed at the Astro client output. The adapter rewrites this to the
+    // correct (base-unprefixed) client dir in the generated build-output config.
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+  },
+  "workers_dev": true,
+  "kv_namespaces": [
+    // CSRF token store (one-hour TTL). Redis is unreachable from the Worker,
+    // so tokens are written here; see apps/web/src/lib/security/csrf-store.ts.
+    // Non-secret identifier only — no credential material in this file.
+    {
+      "binding": "CSRF_TOKENS",
+      "id": "1643bc8555e74fb7bb0eac0d7c1cb1e0",
+    },
+  ],
+  "routes": [
+    // Zone routes: the zone's apex and www records are already
+    // Cloudflare-proxied (to the Vercel standby), so a Workers route takes
+    // the traffic with no DNS change at all. To fail back to Vercel, remove
+    // this block and redeploy — the untouched records resume serving
+    // immediately.
+    //
+    // www is routed here because the Vercel standby answers 402
+    // DEPLOYMENT_DISABLED; middleware redirects it to the apex.
+    {
+      "pattern": "pixelatedempathy.com/*",
+      "zone_name": "pixelatedempathy.com",
+    },
+    {
+      "pattern": "www.pixelatedempathy.com/*",
+      "zone_name": "pixelatedempathy.com",
+    },
+  ],
+  "vars": {
+    // Non-secret, non-PUBLIC_ config only. PUBLIC_* values are inlined at build
+    // time by Vite; secrets come from the CF_WORKER_* repo secrets via the
+    // deploy workflow's `wrangler secret bulk` step.
+    "DEPLOY_TARGET": "cloudflare",
+    "NODE_ENV": "production",
+    // Excludes EHR, scheduling, payer and FHIR routes/pages from this release.
+    // See planning/pilot-readiness-2026-11-04/evidence/l09-excluded-tools-release.md
+    "PILOT_EXCLUDED_SURFACE": "1",
+  },
 }

@@ -2,11 +2,7 @@
   "agents": {
     "advisor": {
       "endpoint": "http://127.0.0.1:2005",
-      "tools": [
-        "review",
-        "get_worktree",
-        "read_file"
-      ],
+      "tools": ["review", "get_worktree", "read_file"],
       "async": false,
       "timeout": 30000
     },

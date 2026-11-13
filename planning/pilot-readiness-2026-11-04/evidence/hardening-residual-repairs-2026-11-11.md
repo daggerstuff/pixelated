@@ -4,14 +4,14 @@ Record for feature `hardening-regression-and-residual-fixes`. It repairs the one
 regression the hardening milestone introduced and the three residuals scrutiny
 found, and it stops at an **open PR** — nothing in this record is deployed.
 
-| Item | Value |
-| --- | --- |
-| Release measured for the baseline | **`a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` / Worker `a6028a07-9534-4bcd-a9b8-47dc602d1dbc`** (live read 2026-11-11T12:1xZ, 100% of traffic) |
-| `origin/staging` HEAD at branch time | `aacae4c4459dc93b2ac95715da1c4fe231d3bee6` (docs-only on top of `a2f06cc38`) |
-| Worktree | `/home/vivi/pixelated-worktrees/hardening-regression-and-residual-fixes`, branch `mission/hardening-regression-and-residual-fixes` |
-| Baseline probe window | 2026-11-11T12:18:33Z–12:18:37Z (VAL-UX-003), 12:19:21Z (composer) |
-| Post-fix measurement | **not possible here.** The repair is on an open PR; the release feature that merges and deploys owns the post-fix live re-measurement |
-| Reader | `agent-browser` (Chromium) via `tools/probe-aside-focus.mjs` and `tools/probe-layout-candidate.mjs` |
+| Item                                 | Value                                                                                                                                         |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Release measured for the baseline    | **`a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` / Worker `a6028a07-9534-4bcd-a9b8-47dc602d1dbc`** (live read 2026-11-11T12:1xZ, 100% of traffic) |
+| `origin/staging` HEAD at branch time | `aacae4c4459dc93b2ac95715da1c4fe231d3bee6` (docs-only on top of `a2f06cc38`)                                                                  |
+| Worktree                             | `/home/vivi/pixelated-worktrees/hardening-regression-and-residual-fixes`, branch `mission/hardening-regression-and-residual-fixes`            |
+| Baseline probe window                | 2026-11-11T12:18:33Z–12:18:37Z (VAL-UX-003), 12:19:21Z (composer)                                                                             |
+| Post-fix measurement                 | **not possible here.** The repair is on an open PR; the release feature that merges and deploys owns the post-fix live re-measurement         |
+| Reader                               | `agent-browser` (Chromium) via `tools/probe-aside-focus.mjs` and `tools/probe-layout-candidate.mjs`                                           |
 
 The assertions this feature fulfils are `VAL-UX-003` and `VAL-IDENT-003`; it also
 removes a second dead handler of the `VAL-L04-008` class and corrects a factual
@@ -37,17 +37,17 @@ control's rect to lie inside the aside's visible box **and** inside the viewport
 
 **1440×900** — aside visible box `162.8–822.6` (height 659.8)
 
-| Aside | `overflow-y` | client / scroll height | Control | Rect before focus | Rect after focus | Focused | Visible when focused |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| left (client state) | `visible` | 660 / **1205** | `button` "Retry" | `1115.8–1137.8` | `1115.8–1137.8` | yes | **no** |
-| right (guidance) | `visible` | 660 / 660 | `textarea#session-notes` | `596.8–724.8` | `596.8–724.8` | yes | yes |
+| Aside               | `overflow-y` | client / scroll height | Control                  | Rect before focus | Rect after focus | Focused | Visible when focused |
+| ------------------- | ------------ | ---------------------- | ------------------------ | ----------------- | ---------------- | ------- | -------------------- |
+| left (client state) | `visible`    | 660 / **1205**         | `button` "Retry"         | `1115.8–1137.8`   | `1115.8–1137.8`  | yes     | **no**               |
+| right (guidance)    | `visible`    | 660 / 660              | `textarea#session-notes` | `596.8–724.8`     | `596.8–724.8`    | yes     | yes                  |
 
 **1024×900** — aside visible box `190.8–822.6` (height 631.8)
 
-| Aside | `overflow-y` | client / scroll height | Control | Rect before focus | Rect after focus | Focused | Visible when focused |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| left (client state) | `visible` | 632 / **1205** | `button` "Retry" | `1143.8–1165.8` | `1143.8–1165.8` | yes | **no** |
-| right (guidance) | `visible` | 632 / 632 | `textarea#session-notes` | `624.8–752.8` | `624.8–752.8` | yes | yes |
+| Aside               | `overflow-y` | client / scroll height | Control                  | Rect before focus | Rect after focus | Focused | Visible when focused |
+| ------------------- | ------------ | ---------------------- | ------------------------ | ----------------- | ---------------- | ------- | -------------------- |
+| left (client state) | `visible`    | 632 / **1205**         | `button` "Retry"         | `1143.8–1165.8`   | `1143.8–1165.8`  | yes     | **no**               |
+| right (guidance)    | `visible`    | 632 / 632              | `textarea#session-notes` | `624.8–752.8`     | `624.8–752.8`    | yes     | yes                  |
 
 The left aside's `scrollHeight` (1205) against its `clientHeight` (660 at
 1440×900, 632 at 1024×900) reproduces the ~660/~1205 shape the contract records.
@@ -65,17 +65,17 @@ asides plus the rule — to the same live page:
 
 #### 1440×900
 
-| Aside | `overflow-y` | min-height | Control | Rect after focus | Aside `scrollTop` after focus | Visible when focused |
-| --- | --- | --- | --- | --- | --- | --- |
-| left | `auto` | `0px` | `button` "Retry" | `570.8–592.8` | **545** | **yes** |
-| right | `auto` | `0px` | `textarea#session-notes` | `596.8–724.8` | 0 | yes |
+| Aside | `overflow-y` | min-height | Control                  | Rect after focus | Aside `scrollTop` after focus | Visible when focused |
+| ----- | ------------ | ---------- | ------------------------ | ---------------- | ----------------------------- | -------------------- |
+| left  | `auto`       | `0px`      | `button` "Retry"         | `570.8–592.8`    | **545**                       | **yes**              |
+| right | `auto`       | `0px`      | `textarea#session-notes` | `596.8–724.8`    | 0                             | yes                  |
 
 #### 1024×900
 
-| Aside | `overflow-y` | min-height | Control | Rect after focus | Aside `scrollTop` after focus | Visible when focused |
-| --- | --- | --- | --- | --- | --- | --- |
-| left | `auto` | `0px` | `button` "Retry" | `570.8–592.8` | **573** | **yes** |
-| right | `auto` | `0px` | `textarea#session-notes` | `624.8–752.8` | 0 | yes |
+| Aside | `overflow-y` | min-height | Control                  | Rect after focus | Aside `scrollTop` after focus | Visible when focused |
+| ----- | ------------ | ---------- | ------------------------ | ---------------- | ----------------------------- | -------------------- |
+| left  | `auto`       | `0px`      | `button` "Retry"         | `570.8–592.8`    | **573**                       | **yes**              |
+| right | `auto`       | `0px`      | `textarea#session-notes` | `624.8–752.8`    | 0                             | yes                  |
 
 Every focusable control in both asides is now focused and visible at both
 viewports (4 of 4; 2 of 4 before).
@@ -86,9 +86,9 @@ With the same repair applied, `tools/probe-layout-candidate.mjs` re-runs the
 VAL-UX-002 measurement:
 
 | Viewport | `elementFromPoint` at the send centre | Hit is the button or its child | Button bottom → footer top | Horizontal overflow | Transcript scrolls |
-| --- | --- | --- | --- | --- | --- |
-| 1440×900 | `path` (the button's SVG child) | **yes** | 16px | 0 | yes |
-| 1024×900 | `path` (the button's SVG child) | **yes** | 16px | 0 | yes |
+| -------- | ------------------------------------- | ------------------------------ | -------------------------- | ------------------- | ------------------ |
+| 1440×900 | `path` (the button's SVG child)       | **yes**                        | 16px                       | 0                   | yes                |
+| 1024×900 | `path` (the button's SVG child)       | **yes**                        | 16px                       | 0                   | yes                |
 
 The row is still `overflow: clip` in the layout chain
 (`div.flex-1.flex.session-panes … ov=clip`), the transcript still scrolls

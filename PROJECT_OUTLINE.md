@@ -14,14 +14,14 @@ problem is proving that a coherent, supported product works for the first
 customer. A completed issue, a passing synthetic evaluation, and a released
 customer workflow are three different states.
 
-| Measure                       | Observed snapshot                                    | What it means                                                                     |
-| ----------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Linear PIX issues             | 1,073: 783 Done, 253 Canceled, 37 active             | Historical delivery record, not a product completion score                        |
-| Linear PIX projects           | 18                                                   | Several project statuses disagree with their issue-level work                     |
-| GitHub root issues            | 1,105: 102 open, 1,003 closed                        | Includes stale mirrors and work absent from the active Linear list                |
-| Submodule GitHub issues       | Foresight: one closed; AI/docs: zero                 | All four feeds were queried to their terminal page                                |
-| Code inventory                | Root plus AI, Foresight and docs; no nested gitlinks | All repository boundaries and tracked domains inventoried; critical paths sampled |
-| Current model/policy evidence | Campaign handoff reaches v74, October 30             | Narrow consent/tool repairs progressed; candidates remain unpromoted              |
+| Measure                       | Observed snapshot                                    | What it means                                                                              |
+| ----------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Linear PIX issues             | 1,073: 783 Done, 253 Canceled, 37 active             | Historical delivery record, not a product completion score                                 |
+| Linear PIX projects           | 18                                                   | Several project statuses disagree with their issue-level work                              |
+| GitHub root issues            | 1,105: 102 open, 1,003 closed                        | Includes stale mirrors and work absent from the active Linear list                         |
+| Submodule GitHub issues       | Foresight: one closed; AI/docs: zero                 | All four feeds were queried to their terminal page                                         |
+| Code inventory                | Root plus AI, Foresight and docs; no nested gitlinks | All repository boundaries and tracked domains inventoried; critical paths sampled          |
+| Current model/policy evidence | Campaign handoff reaches v74, October 30             | Narrow consent/tool repairs progressed; candidates remain unpromoted                       |
 | Deployed launch readiness     | Not established by this audit                        | Technical training/auth fix shipped; customer, billing and clinical validation remain open |
 
 Do **not** turn 783 Done issues into “73% product complete,” or remove canceled
@@ -73,7 +73,7 @@ explicitly presented as demonstrations.
 | Foresight                                                | Verify the application's required memory behavior; keep its standalone roadmap separate            |
 | Developer API/SDK                                        | Separate release with its own auth, quotas, docs and adopter gates                                 |
 | Native EHR, prescribing, clearinghouse, HIE              | Separate product/release; exclude from the training pilot unless explicitly required and validated |
-| Alexa/AWS Builder mini-challenge                         | Dropped 2026-11-07: the project is not participating; the 12-issue backlog (#6369-#6380) is closed    |
+| Alexa/AWS Builder mini-challenge                         | Dropped 2026-11-07: the project is not participating; the 12-issue backlog (#6369-#6380) is closed |
 | CMS, marketplace tools, agent tooling, Churnmeon         | Adjacent capabilities; include only dependencies of the chosen release                             |
 | VR travel, rewards, express checkout, Checkmate          | Deferred or separate-product work; remove from the launch critical path                            |
 
@@ -91,7 +91,7 @@ application or training campaign.
 | Latest targeted research           | [Campaign handoff, v71–v74](docs/training/execution-2026-10-21/CAMPAIGN_HANDOFF.md), lines 338–360, records note-scope, lookup-retry and final-denial repairs                                                                                                                   | v74's final-denial path passed 16/16 checks; that narrow mocked pass is not a complete promotion or deployment approval |
 | Foresight                          | MCP/CLI/TUI/SDK, hybrid retrieval, graph/temporal memory, auth and proof-benchmark implementations exist                                                                                                                                                                        | Trace actual application callers, persistence, isolation and deletion against the deployed backend                      |
 | EHR                                | Linear records all 64 project issues Done; FHIR, RBAC, service and adapter code exists                                                                                                                                                                                          | Completed engineering tickets do not establish operational EHR, prescribing or payer readiness                          |
-| Infrastructure and developer tools | Cloudflare Workers production, Vercel standby, Docker Hub image publish, local Docker compose, CI, SDKs, `px`, agents, audit tooling and runbooks exist (AWS EKS production retired)                                                                                                                                                         | A current release must still demonstrate successful deploy, rollback, alerts and support                                |
+| Infrastructure and developer tools | Cloudflare Workers production, Vercel standby, Docker Hub image publish, local Docker compose, CI, SDKs, `px`, agents, audit tooling and runbooks exist (AWS EKS production retired)                                                                                            | A current release must still demonstrate successful deploy, rollback, alerts and support                                |
 | Historical programs                | Linear marks enterprise-readiness, PAL, vertical fidelity, Nightmare Fuel, remediation and CLI projects completed                                                                                                                                                               | Preserve their artifacts as foundations; require current evidence for the capabilities the pilot promises               |
 
 ## The material gaps
@@ -152,7 +152,7 @@ linked to these packages rather than copied into another parallel backlog.
 | ID  | Outcome / acceptance criterion                                                                                                                                                                                                              | Priority and proposed owner          | Depends on          |
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ------------------- |
 | L01 | Approve a one-page pilot contract: buyer, user roles, use case, included routes/scenarios, data boundaries, acceptance and stop conditions; name accountable owners                                                                         | P0 · Product/founder                 | None                |
-| L02 | Select release commits across all four repos; deploy to the current production targets, demonstrate health and rollback, and tie each CI/deploy incident to a successful equivalent run or a reproduced blocker | P0 · Platform                        | L01                 |
+| L02 | Select release commits across all four repos; deploy to the current production targets, demonstrate health and rollback, and tie each CI/deploy incident to a successful equivalent run or a reproduced blocker                             | P0 · Platform                        | L01                 |
 | L03 | Prove invite/sign-in/role/tenant boundaries with two isolated organizations and a forbidden cross-tenant attempt; remove or disable pilot-exposed unfinished token/auth paths                                                               | P0 · Security + application          | L01, L02            |
 | L04 | Run the full trainee → feedback → retry → persisted session → faculty review journey in a real browser with released APIs and database readback; include failure/reconnect behavior                                                         | P0 · Application + QA                | L02, L03, L07       |
 | L05 | Replace pilot analytics with persisted session/cohort measurements; verify counts against source events. Gate mocked metrics, exports and simulated multimodal claims outside the supported journey                                         | P0 · Application/data                | L01, L02            |
@@ -188,14 +188,14 @@ establishes scope and owners estimate the packages. The critical path is **scope
 evaluation → pilot approval → customer learning**. Commercial discovery and
 documentation can run alongside engineering.
 
-| Gate                                  | Pass condition                                                                                        | Current assessment                                                      |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| G1 — Product boundary                 | L01 accepted; included/excluded features and named owners published                                   | Proposed scope; owner acceptance needed                                 |
+| Gate                                  | Pass condition                                                                                        | Current assessment                                                                                                     |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| G1 — Product boundary                 | L01 accepted; included/excluded features and named owners published                                   | Proposed scope; owner acceptance needed                                                                                |
 | G2 — Working training journey         | L02–L05 pass on one pinned release; supported failure cases recorded                                  | Technical routes deployed; session creation, client replies, coaching, faculty review and integrated proof remain open |
-| G3 — Evaluation and release decision  | L06–L10 pass for included AI/data/tools; explicit reviewer provenance and promotion decision recorded | Targeted progress through v74; candidate remains unpromoted             |
-| G4 — Privacy, security and operations | L03/L11/L12 pass; support/incident ownership is real                                                  | Foundations exist; current release sign-off not established             |
-| G5 — Honest, supportable offer        | L13–L15 complete; price/cost/support and customer-facing claims agree                                 | Draft business materials exist; validation and scope alignment needed   |
-| G6 — Pilot learning and continuation  | L16 complete; measured results and a paid continuation or a documented no-go decision                 | Customer commitment and outcomes not established by inspected sources   |
+| G3 — Evaluation and release decision  | L06–L10 pass for included AI/data/tools; explicit reviewer provenance and promotion decision recorded | Targeted progress through v74; candidate remains unpromoted                                                            |
+| G4 — Privacy, security and operations | L03/L11/L12 pass; support/incident ownership is real                                                  | Foundations exist; current release sign-off not established                                                            |
+| G5 — Honest, supportable offer        | L13–L15 complete; price/cost/support and customer-facing claims agree                                 | Draft business materials exist; validation and scope alignment needed                                                  |
+| G6 — Pilot learning and continuation  | L16 complete; measured results and a paid continuation or a documented no-go decision                 | Customer commitment and outcomes not established by inspected sources                                                  |
 
 **M0 — Reset the baseline:** accept scope/owners, resolve tracker discrepancies,
 freeze commits and feature matrix. Exit at G1.

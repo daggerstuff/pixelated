@@ -147,8 +147,9 @@ export function getValidationRules(schema: GraphQLSchema) {
 
 export function formatGraphQLError(error: GraphQLError) {
   const isProduction =
-    ((import.meta as unknown as Record<string, unknown>)['env'] ??
-      process.env)?.['NODE_ENV'] === 'production'
+    (
+      (import.meta as unknown as Record<string, unknown>)['env'] ?? process.env
+    )?.['NODE_ENV'] === 'production'
 
   return {
     message: error.message,

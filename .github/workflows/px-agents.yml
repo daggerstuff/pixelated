@@ -14,178 +14,177 @@
 name: px Agent CI
 
 on:
-    pull_request:
-        types: [opened, synchronize]
-        branches: [staging]
-    push:
-        branches: [staging]
-        paths:
-            - "apps/web/src/**"
-            - "ai/**"
-            - "cli/**"
-            - "agents/**"
+  pull_request:
+    types: [opened, synchronize]
+    branches: [staging]
+  push:
+    branches: [staging]
+    paths:
+      - 'apps/web/src/**'
+      - 'ai/**'
+      - 'cli/**'
+      - 'agents/**'
 
 permissions:
-    contents: read
-    pull-requests: write
-    statuses: write
+  contents: read
+  pull-requests: write
+  statuses: write
 
 jobs:
-    advisor-review:
-        name: Advisor Code Review
-        if:
-            github.event_name == 'pull_request' || (github.event_name == 'push' &&
-            github.ref == 'refs/heads/staging')
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-        steps:
-            - uses: actions/checkout@v7
-              with:
-                  fetch-depth: 0
-                  persist-credentials: false
-                  submodules: recursive
+  advisor-review:
+    name: Advisor Code Review
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' &&
+      github.ref == 'refs/heads/staging')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: recursive
 
-            - uses: ./.github/actions/setup-node-pnpm
-              with:
-                  node-version: "24.16.0"
-                  install-native-deps: "false"
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          install-native-deps: 'false'
 
-            - name: Build px CLI
-              run: pnpm --filter px-cli build
+      - name: Build px CLI
+        run: pnpm --filter px-cli build
 
-            - name: Run advisor review
-              env:
-                  PX_LOCAL: "1"
-              run: |
-                  node tools/px/dist/index.mjs serve --port 2000 &
-                  SERVE_PID=$!
-                  sleep 2
-                  node tools/px/dist/index.mjs advisor review --json > advisor-review.json
-                  kill $SERVE_PID
-                  cat advisor-review.json
+      - name: Run advisor review
+        env:
+          PX_LOCAL: '1'
+        run: |
+          node tools/px/dist/index.mjs serve --port 2000 &
+          SERVE_PID=$!
+          sleep 2
+          node tools/px/dist/index.mjs advisor review --json > advisor-review.json
+          kill $SERVE_PID
+          cat advisor-review.json
 
-            - name: Post review comment
-              if: always() && github.event_name == 'pull_request'
-              uses: actions/github-script@v9
-              with:
-                  script: |
-                      const fs = require('fs');
-                      let body;
-                      try {
-                        const raw = fs.readFileSync('advisor-review.json', 'utf8');
-                        const data = JSON.parse(raw);
-                        const findings = data.findings || [];
-                        const summary = data.summary || 'No summary available';
-                        const risk = data.risk || 'unknown';
-                        const lines = [
-                          `## px Advisor Review`,
-                          ``,
-                          `**Risk:** ${risk}`,
-                          ``,
-                          summary,
-                          ``,
-                        ];
-                        if (findings.length > 0) {
-                          lines.push('| Severity | Message | Path |');
-                          lines.push('|----------|---------|------|');
-                          for (const f of findings) {
-                            lines.push(`| ${f.severity} | ${f.message} | \`${f.path || '-'}\` |`);
-                          }
-                        } else {
-                          lines.push('No findings.');
-                        }
-                        const body = lines.join('\n');
-                        // Find existing px Advisor Review comment to avoid spam
-                        const { data: comments } = await github.rest.issues.listComments({
-                          owner: context.repo.owner,
-                          repo: context.repo.repo,
-                          issue_number: context.issue.number,
-                        });
-                        const existing = comments.find(c => c.body && c.body.includes('## px Advisor Review'));
-                        if (existing) {
-                          await github.rest.issues.updateComment({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            comment_id: existing.id,
-                            body,
-                          });
-                        } else {
-                          await github.rest.issues.createComment({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            issue_number: context.issue.number,
-                            body,
-                          });
-                        }
-                      } catch (e) {
-                        console.log('Could not post review comment:', e.message);
-                      }
+      - name: Post review comment
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            let body;
+            try {
+              const raw = fs.readFileSync('advisor-review.json', 'utf8');
+              const data = JSON.parse(raw);
+              const findings = data.findings || [];
+              const summary = data.summary || 'No summary available';
+              const risk = data.risk || 'unknown';
+              const lines = [
+                `## px Advisor Review`,
+                ``,
+                `**Risk:** ${risk}`,
+                ``,
+                summary,
+                ``,
+              ];
+              if (findings.length > 0) {
+                lines.push('| Severity | Message | Path |');
+                lines.push('|----------|---------|------|');
+                for (const f of findings) {
+                  lines.push(`| ${f.severity} | ${f.message} | \`${f.path || '-'}\` |`);
+                }
+              } else {
+                lines.push('No findings.');
+              }
+              const body = lines.join('\n');
+              // Find existing px Advisor Review comment to avoid spam
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+              const existing = comments.find(c => c.body && c.body.includes('## px Advisor Review'));
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existing.id,
+                  body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body,
+                });
+              }
+            } catch (e) {
+              console.log('Could not post review comment:', e.message);
+            }
 
-            - name: Post commit status
-              if: always() && github.event_name == 'push'
-              uses: actions/github-script@v9
-              with:
-                  script: |
-                      const fs = require('fs');
-                      let state = 'success';
-                      let summary = 'No summary available';
-                      try {
-                        const data = JSON.parse(fs.readFileSync('advisor-review.json', 'utf8'));
-                        summary = data.summary || summary;
-                        const findings = data.findings || [];
-                        const sev = (f) => String(f.severity || '').toLowerCase();
-                        if (findings.some(f => sev(f) === 'high' || sev(f) === 'critical')) {
-                          state = 'failure';
-                        }
-                      } catch (e) {
-                        state = 'failure';
-                        summary = 'Advisor review failed: ' + e.message;
-                      }
-                      const body = typeof summary === 'string' ? summary.slice(0, 1000) : 'Advisor review completed';
-                      await github.rest.repos.createCommitStatus({
-                        owner: context.repo.owner,
-                        repo: context.repo.repo,
-                        sha: context.sha,
-                        state,
-                        context: 'px/advisor-review',
-                        description: body,
-                      });
+      - name: Post commit status
+        if: always() && github.event_name == 'push'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            let state = 'success';
+            let summary = 'No summary available';
+            try {
+              const data = JSON.parse(fs.readFileSync('advisor-review.json', 'utf8'));
+              summary = data.summary || summary;
+              const findings = data.findings || [];
+              const sev = (f) => String(f.severity || '').toLowerCase();
+              if (findings.some(f => sev(f) === 'high' || sev(f) === 'critical')) {
+                state = 'failure';
+              }
+            } catch (e) {
+              state = 'failure';
+              summary = 'Advisor review failed: ' + e.message;
+            }
+            const body = typeof summary === 'string' ? summary.slice(0, 1000) : 'Advisor review completed';
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state,
+              context: 'px/advisor-review',
+              description: body,
+            });
 
-    qa-score:
-        name: QA Session Score
-        if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-        steps:
-            - uses: actions/checkout@v7
-              with:
-                  fetch-depth: 0
-                  persist-credentials: false
-                  submodules: recursive
+  qa-score:
+    name: QA Session Score
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: recursive
 
-            - uses: ./.github/actions/setup-node-pnpm
-              with:
-                  node-version: "24.16.0"
-                  install-native-deps: "false"
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          install-native-deps: 'false'
 
-            - name: Build px CLI
-              run: pnpm --filter px-cli build
+      - name: Build px CLI
+        run: pnpm --filter px-cli build
 
-            - name: Run QA session scoring
-              env:
-                  PX_LOCAL: "1"
-              run: |
-                  node tools/px/dist/index.mjs serve --port 2000 &
-                  SERVE_PID=$!
-                  sleep 2
-                  node tools/px/dist/index.mjs qa score --json > qa-score.json
-                  kill $SERVE_PID
-                  cat qa-score.json
+      - name: Run QA session scoring
+        env:
+          PX_LOCAL: '1'
+        run: |
+          node tools/px/dist/index.mjs serve --port 2000 &
+          SERVE_PID=$!
+          sleep 2
+          node tools/px/dist/index.mjs qa score --json > qa-score.json
+          kill $SERVE_PID
+          cat qa-score.json
 
-            - name: Upload QA results
-              if: always()
-              uses: actions/upload-artifact@v7
-              with:
-                  name: px-qa-results
-                  path: qa-score.json
-                  retention-days: 30
+      - name: Upload QA results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: px-qa-results
+          path: qa-score.json
+          retention-days: 30

@@ -12,13 +12,13 @@ research papers:
 | 2   | **TSCG** (Sakizli)            | Compress MCP / tool JSON schemas                         | `skillreducer reduce … --tscg`             |
 | 3   | **SkillRevise** (Liu et al.)  | Revise skill quality from execution traces               | `skillreducer revise` _(separate command)_ |
 
-| Resource           | Link                                                                                                  |
-| ------------------ | ----------------------------------------------------------------------------------------------------- |
-| SkillReducer arXiv | [2603.29919](https://arxiv.org/abs/2603.29919) · [Detail](PAPER_DETAIL.md) |
-| TSCG arXiv         | [2605.04107](https://arxiv.org/abs/2605.04107) · [Detail](docs/TSCG_PAPER_DETAIL.md)                  |
-| SkillRevise arXiv  | [2606.01139](https://arxiv.org/abs/2606.01139) · [Docs](src/skillrevise/README.md)                    |
-| Paper index        | [docs/PAPERS.md](docs/PAPERS.md)                                                                      |
-| Citations          | [CITATION.md](CITATION.md)                                                                            |
+| Resource           | Link                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------ |
+| SkillReducer arXiv | [2603.29919](https://arxiv.org/abs/2603.29919) · [Detail](PAPER_DETAIL.md)           |
+| TSCG arXiv         | [2605.04107](https://arxiv.org/abs/2605.04107) · [Detail](docs/TSCG_PAPER_DETAIL.md) |
+| SkillRevise arXiv  | [2606.01139](https://arxiv.org/abs/2606.01139) · [Docs](src/skillrevise/README.md)   |
+| Paper index        | [docs/PAPERS.md](docs/PAPERS.md)                                                     |
+| Citations          | [CITATION.md](CITATION.md)                                                           |
 
 Works with **any agent platform** that uses the standard `SKILL.md` + YAML
 frontmatter convention (Claude Code, Windsurf, OpenCode, SkillHub, GitHub

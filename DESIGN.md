@@ -302,7 +302,7 @@ it never appears on product chrome, never animates, and never blurs.
   padding. On hover: moves to `hover` (`#1f1f24`). On click: `active`
   (`#232329`).
 - **Ghost / secondary:** Transparent bg, `text` color, `1px solid
---np-line-figure` border. On hover: cyan border and cyan text.
+  --np-line-figure` border. On hover: cyan border and cyan text.
 - **Link:** Text only, `text` color, 1px underline in `--np-line-figure`; on
   hover both go cyan.
 - **Focus:** `2px solid --np-cyan` outline, 3px offset, on **every**

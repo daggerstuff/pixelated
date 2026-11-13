@@ -15,15 +15,15 @@ the effect of a single change stays attributable.
 
 ### 1.1 What was merged
 
-| Step | Record |
-| --- | --- |
-| PR | [#6667](https://github.com/daggerstuff/pixelated/pull/6667) — `fix(cache): bound the Redis command path so a dead cache is a fast miss` |
-| Head validated | `9fa4d26648d8aea0705c67788778900187b65f28` |
-| PR-head `build-test` | run `42770195523` — **success**, 6m41s, on `9fa4d2664` itself |
-| PR-head `CI` workflow | run `42770195523` — **success** |
-| PR diff | 2 files, +177/−7: `apps/web/src/lib/redis.ts` and `apps/web/src/lib/redis-command-deadline.test.ts` |
-| Merge | `gh pr merge 6667 --squash` at 07:18:20Z → `a24ab11d9604134788d13a60f018545e39b4242c` |
-| Staging `CI` on the merge SHA | run `42774353571`, event `push`, **success**, 07:18:24Z → 07:25:51Z — this pin has its own green CI on its exact SHA |
+| Step                          | Record                                                                                                                                  |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| PR                            | [#6667](https://github.com/daggerstuff/pixelated/pull/6667) — `fix(cache): bound the Redis command path so a dead cache is a fast miss` |
+| Head validated                | `9fa4d26648d8aea0705c67788778900187b65f28`                                                                                              |
+| PR-head `build-test`          | run `42770195523` — **success**, 6m41s, on `9fa4d2664` itself                                                                           |
+| PR-head `CI` workflow         | run `42770195523` — **success**                                                                                                         |
+| PR diff                       | 2 files, +177/−7: `apps/web/src/lib/redis.ts` and `apps/web/src/lib/redis-command-deadline.test.ts`                                     |
+| Merge                         | `gh pr merge 6667 --squash` at 07:18:20Z → `a24ab11d9604134788d13a60f018545e39b4242c`                                                   |
+| Staging `CI` on the merge SHA | run `42774353571`, event `push`, **success**, 07:18:24Z → 07:25:51Z — this pin has its own green CI on its exact SHA                    |
 
 The four failing PR checks were the documented non-blocking set and nothing
 else: `Vercel` and `Vercel Deployments – Wutang` ("Account is blocked"), `ai
@@ -32,19 +32,19 @@ other check passed, including `build-test`.
 
 ### 1.2 Deploy
 
-| Item | Value |
-| --- | --- |
-| Cloudflare deploy run | `42775239565`, event `workflow_run`, **success** |
-| Job list | `Detect app-facing changes` success, `Check deploy credentials` success, `Build Cloudflare bundle` success, `Deploy to Cloudflare` success — **none skipped** |
-| Built SHA (both jobs, `git log -1 --format=%H`) | `a24ab11d9604134788d13a60f018545e39b4242c` |
-| Deploy log version line | `Current Version ID: e9aed1a4-920a-4338-a163-55dcc60446cd` |
-| Active Worker version (live read) | `e9aed1a4-920a-4338-a163-55dcc60446cd` |
-| Traffic percentage | **100%** (single active version) |
-| Worker version created | 2026-11-10T07:29:17.412Z |
-| Deployment created | 2026-11-10T07:29:19.252Z |
-| Wrangler CLI used | `4.158.0` via `./node_modules/.bin/wrangler` |
-| `origin/staging` HEAD | `a24ab11d9…` before the window, during it, and at 07:53:39Z after it — the pin did not move |
-| Health | `https://pixelatedempathy.com/api/health` → **200** (1.15–2.38 s across the window) |
+| Item                                            | Value                                                                                                                                                         |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cloudflare deploy run                           | `42775239565`, event `workflow_run`, **success**                                                                                                              |
+| Job list                                        | `Detect app-facing changes` success, `Check deploy credentials` success, `Build Cloudflare bundle` success, `Deploy to Cloudflare` success — **none skipped** |
+| Built SHA (both jobs, `git log -1 --format=%H`) | `a24ab11d9604134788d13a60f018545e39b4242c`                                                                                                                    |
+| Deploy log version line                         | `Current Version ID: e9aed1a4-920a-4338-a163-55dcc60446cd`                                                                                                    |
+| Active Worker version (live read)               | `e9aed1a4-920a-4338-a163-55dcc60446cd`                                                                                                                        |
+| Traffic percentage                              | **100%** (single active version)                                                                                                                              |
+| Worker version created                          | 2026-11-10T07:29:17.412Z                                                                                                                                      |
+| Deployment created                              | 2026-11-10T07:29:19.252Z                                                                                                                                      |
+| Wrangler CLI used                               | `4.158.0` via `./node_modules/.bin/wrangler`                                                                                                                  |
+| `origin/staging` HEAD                           | `a24ab11d9…` before the window, during it, and at 07:53:39Z after it — the pin did not move                                                                   |
+| Health                                          | `https://pixelatedempathy.com/api/health` → **200** (1.15–2.38 s across the window)                                                                           |
 
 The automatic deploy was **not** skipped: all four jobs ran. This pin therefore
 does not repeat the "deploy run reports success and deploys nothing" trap, and
@@ -68,26 +68,26 @@ Artifact: `results/availability-release-and-remeasure/burst-a24ab11d9-20261110T0
 document requests to the org A training-session URL, manual redirect handling,
 at most one 2 s-backed-off retry per request).
 
-| Quantity | Measured on this pin |
-| --- | --- |
-| Navigations | 20 |
-| **First-attempt session `200`** | **3 of 20** |
-| **Final session `200` after at most one retry** | **18 of 20** |
-| First attempts that hit the 8 s deadline (302 at 7 993–8 044 ms) | 16 |
-| Retries issued | 17 |
-| Final non-200 | 1 × bounded `503` (leg 14, 6 079 ms), 1 × `/login` redirect (leg 16) |
-| Runtime-cancelled requests / Cloudflare Error 1101 | 0 |
-| First-attempt success latencies | 311 ms, 1 182 ms, 2 620 ms |
+| Quantity                                                         | Measured on this pin                                                 |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Navigations                                                      | 20                                                                   |
+| **First-attempt session `200`**                                  | **3 of 20**                                                          |
+| **Final session `200` after at most one retry**                  | **18 of 20**                                                         |
+| First attempts that hit the 8 s deadline (302 at 7 993–8 044 ms) | 16                                                                   |
+| Retries issued                                                   | 17                                                                   |
+| Final non-200                                                    | 1 × bounded `503` (leg 14, 6 079 ms), 1 × `/login` redirect (leg 16) |
+| Runtime-cancelled requests / Cloudflare Error 1101               | 0                                                                    |
+| First-attempt success latencies                                  | 311 ms, 1 182 ms, 2 620 ms                                           |
 
 Per leg, first attempt → final:
 
-| Legs | First attempt | Final (after ≤ 1 retry) |
-| --- | --- | --- |
-| 1, 15, 17 | `200` (1 182 / 2 620 / 311 ms) | `200` |
-| 2–13, 18, 20 | `302` at 8 012–8 044 ms → `/training?error=session-not-found` `200` | `200` (262–2 623 ms) |
-| 14 | `302` at 8 014 ms → `/training` `200` | `503` at 6 079 ms |
-| 16 | `503` at 5 033 ms | `302` → `/login?redirect=…`, `200` login page |
-| 19 | `302` at 8 032 ms → `/training` `503` at 4 048 ms | `200` at 448 ms |
+| Legs         | First attempt                                                       | Final (after ≤ 1 retry)                       |
+| ------------ | ------------------------------------------------------------------- | --------------------------------------------- |
+| 1, 15, 17    | `200` (1 182 / 2 620 / 311 ms)                                      | `200`                                         |
+| 2–13, 18, 20 | `302` at 8 012–8 044 ms → `/training?error=session-not-found` `200` | `200` (262–2 623 ms)                          |
+| 14           | `302` at 8 014 ms → `/training` `200`                               | `503` at 6 079 ms                             |
+| 16           | `503` at 5 033 ms                                                   | `302` → `/login?redirect=…`, `200` login page |
+| 19           | `302` at 8 032 ms → `/training` `503` at 4 048 ms                   | `200` at 448 ms                               |
 
 Sixteen legs spent the 8 s deadline on the first attempt, and seventeen retries
 were issued.
@@ -101,12 +101,12 @@ were issued.
 Artifact: `results/l03-tenant-matrix-2026-11-10T07-39-54-893Z.json` (written by
 `tools/l03-tenant-matrix.mjs --worker e9aed1a4… --commit a24ab11d9…`).
 
-| Phase | Pass | Deny | Exclusion | Fail | 5xx |
-| --- | --- | --- | --- | --- | --- |
-| org A | 0 | 2 | 7 | 0 | 5 |
-| org B | 2 | 3 | 7 | 0 | 2 |
-| unauthenticated | 0 | 7 | 0 | 0 | 0 |
-| **Total (35 legs)** | **2** | **12** | **14** | **0** | **7** |
+| Phase               | Pass  | Deny   | Exclusion | Fail  | 5xx   |
+| ------------------- | ----- | ------ | --------- | ----- | ----- |
+| org A               | 0     | 2      | 7         | 0     | 5     |
+| org B               | 2     | 3      | 7         | 0     | 2     |
+| unauthenticated     | 0     | 7      | 0         | 0     | 0     |
+| **Total (35 legs)** | **2** | **12** | **14**    | **0** | **7** |
 
 **Hard failures: 7** (any 5xx, any leg without a final response, any transient
 429). Transient 429: 0. Verdict **OPEN**; the driver exited 1.
@@ -143,15 +143,15 @@ Artifact: `results/availability-release-and-remeasure/ui-posts-a24ab11d9-2026111
 One agent-browser session, signed in as org A through the real `/login` form,
 submission issued through the session UI (`#message-input` + `#send-message`).
 
-| Step | Observed |
-| --- | --- |
-| Submission #2 | **201** in 1 030 ms |
-| Row | `bf99e09a-71f3-4d3e-9d79-36d01fb08174`, content `VAL-POST-001 20261110T0800Z #2` |
-| Initial page load, attempt 1 | `302` to `/training?error=session-not-found` — the page's translation of the deadline `503` |
-| Initial page load, attempt 2 | **200** on the session URL, 48 bubbles |
-| Reload attempt 1 | `302` to `/training?error=session-not-found` again |
-| Reload attempt 2 | **200** on the session URL, `#message-input` present, **53** `.message-bubble` children (48 before the run, 5 new) |
-| Visible after reload | `#2`, `#4`, `#6`, `#8`, `#10` all present in the rendered body |
+| Step                         | Observed                                                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Submission #2                | **201** in 1 030 ms                                                                                                |
+| Row                          | `bf99e09a-71f3-4d3e-9d79-36d01fb08174`, content `VAL-POST-001 20261110T0800Z #2`                                   |
+| Initial page load, attempt 1 | `302` to `/training?error=session-not-found` — the page's translation of the deadline `503`                        |
+| Initial page load, attempt 2 | **200** on the session URL, 48 bubbles                                                                             |
+| Reload attempt 1             | `302` to `/training?error=session-not-found` again                                                                 |
+| Reload attempt 2             | **200** on the session URL, `#message-input` present, **53** `.message-bubble` children (48 before the run, 5 new) |
+| Visible after reload         | `#2`, `#4`, `#6`, `#8`, `#10` all present in the rendered body                                                     |
 
 Both page loads needed one retry because the first attempt hit the same 8 s
 deadline as the burst. That is recorded as the load's behaviour, not as a pass:
@@ -174,18 +174,18 @@ Same artifact and surface. Statuses are scored from the plain
 `agent-browser network requests` listing; rows are scored from
 `training_session_messages` read-back, never from the client status.
 
-| # | Status | Duration | Row |
-| --- | --- | --- | --- |
-| 1 | 503 | 8 082 ms | none |
-| 2 | 201 | 1 030 ms | `bf99e09a-71f3-4d3e-9d79-36d01fb08174` |
-| 3 | 503 | 8 068 ms | none |
-| 4 | 201 | 1 023 ms | `8bf8e5ed-c85a-4875-90cc-5c1e7e65c2fa` |
-| 5 | 503 | 8 062 ms | none |
-| 6 | 201 | 1 028 ms | `184f0ee5-53bd-44f7-9dcb-432d1303438b` |
-| 7 | 503 | 8 078 ms | none |
-| 8 | 201 | 1 023 ms | `6ceb584b-008e-4114-8e21-fa2a343fd07c` |
-| 9 | 503 | 8 068 ms | none |
-| 10 | 201 | 1 031 ms | `2a06e4f8-7769-471b-88ba-ab7a91d87ad5` |
+| #   | Status | Duration | Row                                    |
+| --- | ------ | -------- | -------------------------------------- |
+| 1   | 503    | 8 082 ms | none                                   |
+| 2   | 201    | 1 030 ms | `bf99e09a-71f3-4d3e-9d79-36d01fb08174` |
+| 3   | 503    | 8 068 ms | none                                   |
+| 4   | 201    | 1 023 ms | `8bf8e5ed-c85a-4875-90cc-5c1e7e65c2fa` |
+| 5   | 503    | 8 062 ms | none                                   |
+| 6   | 201    | 1 028 ms | `184f0ee5-53bd-44f7-9dcb-432d1303438b` |
+| 7   | 503    | 8 078 ms | none                                   |
+| 8   | 201    | 1 023 ms | `6ceb584b-008e-4114-8e21-fa2a343fd07c` |
+| 9   | 503    | 8 068 ms | none                                   |
+| 10  | 201    | 1 031 ms | `2a06e4f8-7769-471b-88ba-ab7a91d87ad5` |
 
 - **`201`: 5 of 10. Rows persisted: 5 of 10.** They agree, and the bubble count
   moves 48 → 53 exactly as the five rows appear.
@@ -227,11 +227,11 @@ confirms the serving version.
 events=167 withRedis=136 silence>=7500ms=30 ofWhichDeadline=30
 ```
 
-| Request class | Legs with ≥ 7 500 ms silence after a Redis error | Silence | Redis error offset |
-| --- | --- | --- | --- |
-| `GET /training/session/:id` → `302` (page deadline) | 18 | 7 993–7 999 ms | 1–134 ms |
-| `GET /api/training/sessions/:id` → `503` | 2 | 7 993–7 999 ms | 2–3 ms |
-| `POST /api/training/sessions/:id/messages` → `503` | 10 | 7 993–7 999 ms | 1–134 ms |
+| Request class                                       | Legs with ≥ 7 500 ms silence after a Redis error | Silence        | Redis error offset |
+| --------------------------------------------------- | ------------------------------------------------ | -------------- | ------------------ |
+| `GET /training/session/:id` → `302` (page deadline) | 18                                               | 7 993–7 999 ms | 1–134 ms           |
+| `GET /api/training/sessions/:id` → `503`            | 2                                                | 7 993–7 999 ms | 2–3 ms             |
+| `POST /api/training/sessions/:id/messages` → `503`  | 10                                               | 7 993–7 999 ms | 1–134 ms           |
 
 **The requested confirmation cannot be made: the 8 s silence after a Redis error
 line is still present on this release.** Thirty legs show it and every one ends
@@ -262,11 +262,11 @@ the Postgres client path, and the tail separates it cleanly (§7.2).
 
 ### 7.1 The three named suspects
 
-| Suspect | Evidence | Excluded? |
-| --- | --- | --- |
-| Middleware rate limiter awaits Redis | `apps/web/src/lib/middleware/rate-limit.ts` has no Redis import and keeps its counters in an in-memory `RateLimiter`; `rateLimitMiddleware` returns `next()` at its first branch for any URL without `/api/`, so it never runs on `/training/session/*`. On `/api/` paths it does `await getSession(request)` before the handler, but `USE_REDIS_SESSIONS` is unset on the Worker, so that is cookie/JWT work, and the API deadline legs show no session-store line. The Redis-backed `lib/middleware/enhanced-rate-limit.ts` is imported only by `lib/api/rate-limit.ts` and `pages/api/evaluation.ts`, never by `middleware.ts`. | **excluded** |
-| Module-level `ensureConnected()` memo path | Bounded by `REDIS_CONNECT_DEADLINE_MS = 3 000` and cleared in `.finally()`. On a failing connect the whole cache stage costs ~90 ms in practice: successful legs log `Redis error` + `Redis connection closed` at 2–5 ms and reach `New client connected` at 94–263 ms. | **excluded as the 8 s cost** |
-| A caller outside `lib/redis.ts` | There is one, and it is the stall: the Postgres client acquired in `lib/db/index.ts` (§7.2). | **this is the stall** |
+| Suspect                                    | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Excluded?                    |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| Middleware rate limiter awaits Redis       | `apps/web/src/lib/middleware/rate-limit.ts` has no Redis import and keeps its counters in an in-memory `RateLimiter`; `rateLimitMiddleware` returns `next()` at its first branch for any URL without `/api/`, so it never runs on `/training/session/*`. On `/api/` paths it does `await getSession(request)` before the handler, but `USE_REDIS_SESSIONS` is unset on the Worker, so that is cookie/JWT work, and the API deadline legs show no session-store line. The Redis-backed `lib/middleware/enhanced-rate-limit.ts` is imported only by `lib/api/rate-limit.ts` and `pages/api/evaluation.ts`, never by `middleware.ts`. | **excluded**                 |
+| Module-level `ensureConnected()` memo path | Bounded by `REDIS_CONNECT_DEADLINE_MS = 3 000` and cleared in `.finally()`. On a failing connect the whole cache stage costs ~90 ms in practice: successful legs log `Redis error` + `Redis connection closed` at 2–5 ms and reach `New client connected` at 94–263 ms.                                                                                                                                                                                                                                                                                                                                                            | **excluded as the 8 s cost** |
+| A caller outside `lib/redis.ts`            | There is one, and it is the stall: the Postgres client acquired in `lib/db/index.ts` (§7.2).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | **this is the stall**        |
 
 ### 7.2 Where the stall is
 
@@ -283,10 +283,10 @@ The tail separates the two outcomes perfectly. Classifying every session request
 in both captures by whether the isolate opened a **new** Postgres connection
 (`New client connected to database`, emitted on the pool's `connect` event):
 
-| Class | Legs | With a new connection |
-| --- | --- | --- |
-| Session load that returned `200` | 35 | **35** |
-| Leg that hit the 8 s deadline | 38 | **0** |
+| Class                            | Legs | With a new connection |
+| -------------------------------- | ---- | --------------------- |
+| Session load that returned `200` | 35   | **35**                |
+| Leg that hit the 8 s deadline    | 38   | **0**                 |
 
 Not one success ran on a connection that already existed, and not one deadline
 leg opened one. **A request that opens a Postgres connection succeeds in
@@ -296,14 +296,14 @@ acquisition.
 
 Across the 38 deadline legs:
 
-| Marker | Deadline legs carrying it |
-| --- | --- |
-| `New client connected` | **0** |
-| `Failed to acquire a database connection; rebuilding the pool and retrying once` | **0** |
-| `Training session database unavailable` (`DatabaseUnavailableError`) | **0** |
-| `Unexpected error on idle client; discarding the pool` | **0** |
-| runtime-cancel exception | **0** |
-| a completed validation (`Failed to track security event`) | 3 |
+| Marker                                                                           | Deadline legs carrying it |
+| -------------------------------------------------------------------------------- | ------------------------- |
+| `New client connected`                                                           | **0**                     |
+| `Failed to acquire a database connection; rebuilding the pool and retrying once` | **0**                     |
+| `Training session database unavailable` (`DatabaseUnavailableError`)             | **0**                     |
+| `Unexpected error on idle client; discarding the pool`                           | **0**                     |
+| runtime-cancel exception                                                         | **0**                     |
+| a completed validation (`Failed to track security event`)                        | 3                         |
 
 Read together:
 
@@ -342,11 +342,11 @@ never the cost.
 
 **Residual, reported as unattributed:** two things the capture cannot settle.
 
-1. *Which* database step waits. `acquireClient()` returning a client and the
+1. _Which_ database step waits. `acquireClient()` returning a client and the
    statement on it are not separately logged, so "`connect()` handed back a
    pooled client" and "`connect()` is still queued" cannot be told apart from the
    tail alone; both are inside `lib/db/index.ts`.
-2. *Why* the socket never answers — a peer-side close the runtime never
+2. _Why_ the socket never answers — a peer-side close the runtime never
    surfaces, a frozen-isolate socket, and a middlebox black-holing it are all
    consistent with the evidence.
 
@@ -363,12 +363,12 @@ a hung query).
 `tools/request-path-diag.mjs --mode endpoints --n 10` on the same pin, under the
 second capture:
 
-| Series | Statuses | Latency |
-| --- | --- | --- |
-| `health` | 10 × 200 | 11–1 913 ms (median 30 ms) |
-| `session-api-invalid-token` | 10 × 401 | 2 319–2 447 ms (four validations each, ~580 ms apart) |
-| `session-api-valid-token` | 6 × 200, 4 × 503 | 286–8 307 ms |
-| `session-page-valid-token` | 6 × 200, 4 × 302 | 200–8 027 ms |
+| Series                      | Statuses         | Latency                                               |
+| --------------------------- | ---------------- | ----------------------------------------------------- |
+| `health`                    | 10 × 200         | 11–1 913 ms (median 30 ms)                            |
+| `session-api-invalid-token` | 10 × 401         | 2 319–2 447 ms (four validations each, ~580 ms apart) |
+| `session-api-valid-token`   | 6 × 200, 4 × 503 | 286–8 307 ms                                          |
+| `session-page-valid-token`  | 6 × 200, 4 × 302 | 200–8 027 ms                                          |
 
 The JSON API route and the page route fail in the same proportion and with the
 same signature, so the stall is in the shared service path, not in Astro page
@@ -388,13 +388,13 @@ attributed to the Redis bound.
 Baselines on the unchanged pre-fix pin `f811440d6` / Worker `af615b73`. The two
 windows disagreed, so the comparison is against the **spread**, not a point.
 
-| Quantity | Window A (`availability-remeasure-f811440d6-2026-11-10.md`, `54c0ec8cc`) | Window B (`results/redis-command-bounding/`) | **This pin** | Inside the spread? |
-| --- | --- | --- | --- | --- |
-| `VAL-HANG-001` first-attempt 200 | 1 of 20 | 4 of 20 | **3 of 20** | **yes** |
-| `VAL-HANG-001` final 200 after one retry | 20 of 20 | 15 of 20 | **18 of 20** | **yes** |
-| Deadline legs | 19 | 13 | **16** | **yes** |
-| `VAL-L03-011` hard failures | 8 | 3 | **7** | **yes** |
-| `VAL-POST-001` successes | 5 of 10 | 6 of 10 and 5 of 10 | **5 of 10** | **yes** |
+| Quantity                                 | Window A (`availability-remeasure-f811440d6-2026-11-10.md`, `54c0ec8cc`) | Window B (`results/redis-command-bounding/`) | **This pin** | Inside the spread? |
+| ---------------------------------------- | ------------------------------------------------------------------------ | -------------------------------------------- | ------------ | ------------------ |
+| `VAL-HANG-001` first-attempt 200         | 1 of 20                                                                  | 4 of 20                                      | **3 of 20**  | **yes**            |
+| `VAL-HANG-001` final 200 after one retry | 20 of 20                                                                 | 15 of 20                                     | **18 of 20** | **yes**            |
+| Deadline legs                            | 19                                                                       | 13                                           | **16**       | **yes**            |
+| `VAL-L03-011` hard failures              | 8                                                                        | 3                                            | **7**        | **yes**            |
+| `VAL-POST-001` successes                 | 5 of 10                                                                  | 6 of 10 and 5 of 10                          | **5 of 10**  | **yes**            |
 
 **Nothing moved.** Every number falls inside the pre-fix spread. The Redis
 command bound did not change the burst, the matrix, or the message-reliability
@@ -403,14 +403,14 @@ connection, not in the Redis command.
 
 Latency and the 503 count, recorded independently as D2/D3 require:
 
-| Quantity | This pin | Moved by #6667? |
-| --- | --- | --- |
-| Successful session-page load latency | 262–2 623 ms (warm ~300 ms; cold isolate ~1.8–2.6 s) | **no** — same range as the `f811440d6` baseline (231–369 ms warm, 1 583 ms cold) |
-| Deadline legs in the burst | 16 of 20 | **no** — inside 13–19 |
-| First-attempt `503` responses in the burst | 2 (leg 16 on the session route at 5 033 ms; leg 19 on the `/training` redirect target at 4 048 ms) | **no** |
-| Final non-200 legs in the burst | 2 (1 × `503`, 1 × `/login`) | **no** — window B ended 5 of 20 non-200, window A 0 |
-| Hard failures in the matrix | 7 | **no** — inside 3–8 |
-| Message POST `201` | 5 of 10 | **no** — inside 5–6 |
+| Quantity                                   | This pin                                                                                           | Moved by #6667?                                                                  |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Successful session-page load latency       | 262–2 623 ms (warm ~300 ms; cold isolate ~1.8–2.6 s)                                               | **no** — same range as the `f811440d6` baseline (231–369 ms warm, 1 583 ms cold) |
+| Deadline legs in the burst                 | 16 of 20                                                                                           | **no** — inside 13–19                                                            |
+| First-attempt `503` responses in the burst | 2 (leg 16 on the session route at 5 033 ms; leg 19 on the `/training` redirect target at 4 048 ms) | **no**                                                                           |
+| Final non-200 legs in the burst            | 2 (1 × `503`, 1 × `/login`)                                                                        | **no** — window B ended 5 of 20 non-200, window A 0                              |
+| Hard failures in the matrix                | 7                                                                                                  | **no** — inside 3–8                                                              |
+| Message POST `201`                         | 5 of 10                                                                                            | **no** — inside 5–6                                                              |
 
 D2 predicted that the cache migration would not move `VAL-HANG-001`; that holds
 here. D3's fix (`acquireClient()` rebuilding the pool and retrying once on a
@@ -424,13 +424,13 @@ on a reused client (§7.2), which is why the deadline count sits still.
 All rows are synthetic, mission-marked, and reversible with
 `tools/reverse-l03-identities.mjs`.
 
-| Source | Org A | Org B |
-| --- | --- | --- |
-| Start of window (07:22:17Z) | 45 | 5 |
-| Matrix own-write probes | +0 (`503`) | +1 |
-| UI run 07:45Z (unscored harness run, §5.1) | +3 | 0 |
-| UI run 08:00Z (VAL-POST-001) | +5 | 0 |
-| **End of window (07:53:24Z)** | **53** | **6** |
+| Source                                     | Org A      | Org B |
+| ------------------------------------------ | ---------- | ----- |
+| Start of window (07:22:17Z)                | 45         | 5     |
+| Matrix own-write probes                    | +0 (`503`) | +1    |
+| UI run 07:45Z (unscored harness run, §5.1) | +3         | 0     |
+| UI run 08:00Z (VAL-POST-001)               | +5         | 0     |
+| **End of window (07:53:24Z)**              | **53**     | **6** |
 
 Total messages in the two synthetic sessions at the end of the window: **59**
 (org A 53, org B 6). Session hashes are unchanged from the start of the window.
@@ -442,31 +442,31 @@ at **53**. Org B is at **6**. Both counts come from
 
 ## 10. Artifacts
 
-| File (under `results/availability-release-and-remeasure/` unless noted) | What it holds |
-| --- | --- |
-| `burst-a24ab11d9-20261110T0731Z.json` | the 20-navigation burst, per-leg first and final chains |
-| `l03-tenant-matrix-2026-11-10T07-39-54-893Z.json` / `.md` (in `results/`) | the 35-leg matrix and its row-integrity hashes |
-| `matrix-run.log`, `matrix-verify-result.json` | driver output and the offline `--verify-result` recomputation (exit 1, OPEN) |
-| `ui-posts-a24ab11d9-20261110T0800Z.json` | the scored ten-submission run, reload, and DB read-back |
-| `ui-posts-a24ab11d9-20261110T0745Z.json` | the earlier unscored run that wrote 3 rows (§5.1) |
-| `endpoints-a24ab11d9-20261110T0750Z.json` | the endpoint stage bisect (§7.3) |
-| `cache-validations-a24ab11d9.json` | per-request `validateToken` counts behind §6, for both path filters |
-| `tail-a24ab11d9-20261110T0731Z.jsonl` | redacted tail over the burst, matrix and UI windows (167 events) |
-| `tail-a24ab11d9-20261110T0750Z.jsonl` | redacted tail over the endpoint bisect (49 events) |
-| `tail-20261110T0731Z-silence.json`, `tail-20261110T0750Z-silence.json` | `tools/tail-silence-report.mjs` output for each capture |
-| `row-state-before.json`, `row-state-after.json` | row counts and hashes at 07:22:17Z and 07:53:24Z |
+| File (under `results/availability-release-and-remeasure/` unless noted)   | What it holds                                                                |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `burst-a24ab11d9-20261110T0731Z.json`                                     | the 20-navigation burst, per-leg first and final chains                      |
+| `l03-tenant-matrix-2026-11-10T07-39-54-893Z.json` / `.md` (in `results/`) | the 35-leg matrix and its row-integrity hashes                               |
+| `matrix-run.log`, `matrix-verify-result.json`                             | driver output and the offline `--verify-result` recomputation (exit 1, OPEN) |
+| `ui-posts-a24ab11d9-20261110T0800Z.json`                                  | the scored ten-submission run, reload, and DB read-back                      |
+| `ui-posts-a24ab11d9-20261110T0745Z.json`                                  | the earlier unscored run that wrote 3 rows (§5.1)                            |
+| `endpoints-a24ab11d9-20261110T0750Z.json`                                 | the endpoint stage bisect (§7.3)                                             |
+| `cache-validations-a24ab11d9.json`                                        | per-request `validateToken` counts behind §6, for both path filters          |
+| `tail-a24ab11d9-20261110T0731Z.jsonl`                                     | redacted tail over the burst, matrix and UI windows (167 events)             |
+| `tail-a24ab11d9-20261110T0750Z.jsonl`                                     | redacted tail over the endpoint bisect (49 events)                           |
+| `tail-20261110T0731Z-silence.json`, `tail-20261110T0750Z-silence.json`    | `tools/tail-silence-report.mjs` output for each capture                      |
+| `row-state-before.json`, `row-state-after.json`                           | row counts and hashes at 07:22:17Z and 07:53:24Z                             |
 
 ## 11. Decision
 
 **NO-GO is unchanged.** Three of the four assertions measured here still fail on
 this release, and the fourth passes:
 
-| Assertion | Requirement | Measured | Verdict |
-| --- | --- | --- | --- |
-| `VAL-HANG-001` | 20 of 20 first-attempt 200 | 3 first-attempt, 18 final, 16 deadline legs, 1 `/login` redirect | **FAIL** |
-| `VAL-L03-011` | zero hard failures across 35 legs | 7 hard failures (7 × 503) | **FAIL (OPEN)** |
-| `VAL-L04-003` | one UI message persists and is visible after reload | row `bf99e09a-…`, visible after a `200` reload | **PASS** |
-| `VAL-POST-001` | ten consecutive successes with a row each | 5 of 10 `201`, 5 rows, 0 runtime-cancelled | **FAIL** |
+| Assertion      | Requirement                                         | Measured                                                         | Verdict         |
+| -------------- | --------------------------------------------------- | ---------------------------------------------------------------- | --------------- |
+| `VAL-HANG-001` | 20 of 20 first-attempt 200                          | 3 first-attempt, 18 final, 16 deadline legs, 1 `/login` redirect | **FAIL**        |
+| `VAL-L03-011`  | zero hard failures across 35 legs                   | 7 hard failures (7 × 503)                                        | **FAIL (OPEN)** |
+| `VAL-L04-003`  | one UI message persists and is visible after reload | row `bf99e09a-…`, visible after a `200` reload                   | **PASS**        |
+| `VAL-POST-001` | ten consecutive successes with a row each           | 5 of 10 `201`, 5 rows, 0 runtime-cancelled                       | **FAIL**        |
 
 No assertion is recorded as passed without a reproduced measurement, and no
 pre-fix result is restated as taken on this pin.

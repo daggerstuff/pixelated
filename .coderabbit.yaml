@@ -1,9 +1,9 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-language: "en-US"
-tone_instructions: "Be concise, direct, and technical. Focus on real defects, race conditions, security vulnerabilities (especially HIPAA/PHI privacy compliance), and regressions. Minimize cosmetic nitpicks."
+language: 'en-US'
+tone_instructions: 'Be concise, direct, and technical. Focus on real defects, race conditions, security vulnerabilities (especially HIPAA/PHI privacy compliance), and regressions. Minimize cosmetic nitpicks.'
 early_access: false
 reviews:
-  profile: "chill"
+  profile: 'chill'
   request_changes_workflow: false
   high_level_summary: true
   poem: false
@@ -12,14 +12,14 @@ reviews:
   auto_review:
     enabled: true
     ignore_title_keywords:
-      - "WIP"
-      - "draft"
+      - 'WIP'
+      - 'draft'
     drafts: false
     base_branches:
-      - "main"
-      - "master"
-      - "staging"
-      - "dev"
+      - 'main'
+      - 'master'
+      - 'staging'
+      - 'dev'
   instructions: |
     - **Clinical Privacy & HIPAA**: Flag any logging, exposure, or insecure serialization of Protected Health Information (PHI), client identities, or medical records.
     - **Zero Anti-Suppression Policy**: Flag any `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck`, `# noqa`, `# type: ignore`, or `/* eslint-disable */`.
@@ -27,19 +27,19 @@ reviews:
     - **Database Multi-Tenancy**: Verify that EHR queries enforce tenant isolation (`tenant_id`) and Row-Level Security.
     - **Style/Formatting**: Do not comment on stylistic preferences, indentation, or whitespace; these are enforced by `oxlint`, `ruff`, and `prettier`.
   path_filters:
-    - "!**/pnpm-lock.yaml"
-    - "!**/package-lock.json"
-    - "!**/uv.lock"
-    - "!**/*.min.js"
-    - "!**/dist/**"
-    - "!**/dist-ssr/**"
-    - "!**/worktrees/**"
-    - "!**/*.map"
-    - "!**/*.svg"
-    - "!**/*.csv"
-    - "!**/*.jsonl"
-    - "!docs/Books/**"
-    - "!ai/docs/Books/**"
-    - "!submodules/**"
+    - '!**/pnpm-lock.yaml'
+    - '!**/package-lock.json'
+    - '!**/uv.lock'
+    - '!**/*.min.js'
+    - '!**/dist/**'
+    - '!**/dist-ssr/**'
+    - '!**/worktrees/**'
+    - '!**/*.map'
+    - '!**/*.svg'
+    - '!**/*.csv'
+    - '!**/*.jsonl'
+    - '!docs/Books/**'
+    - '!ai/docs/Books/**'
+    - '!submodules/**'
 chat:
   auto_reply: true

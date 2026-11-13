@@ -7,10 +7,10 @@ steps, and SARIF upload.
 
 ## Files here
 
-| Path | Role |
-| ---- | ---- |
+| Path                | Role                                                       |
+| ------------------- | ---------------------------------------------------------- |
 | `codeql-config.yml` | Query filters, included/excluded paths, custom query packs |
-| `custom-queries/` | Healthcare- and FHIR-focused CodeQL queries |
+| `custom-queries/`   | Healthcare- and FHIR-focused CodeQL queries                |
 
 ## Local / manual runs
 

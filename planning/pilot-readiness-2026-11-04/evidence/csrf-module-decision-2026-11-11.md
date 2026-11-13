@@ -81,12 +81,12 @@ gate rather than cover a gap.
 
 ## 5. Changes made
 
-| File | Change |
-| --- | --- |
-| `apps/web/src/lib/middleware/csrf.ts` | **deleted** (280 lines, zero importers) |
-| `apps/web/src/pages/api/auth/__tests__/csrf.test.ts` | added the `CSRF mechanism ownership` guard: the module path does not exist and `middleware.ts` wires no csrf middleware |
-| `knip.json` | removed the module from `entry` and `ignore` (the deleted file's own entries; same pattern as deletion commit `aa813a09a`) |
-| `scripts/ci/check-unused-exports.mjs` | removed the module from `SCAN_IGNORE` |
+| File                                                 | Change                                                                                                                     |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `apps/web/src/lib/middleware/csrf.ts`                | **deleted** (280 lines, zero importers)                                                                                    |
+| `apps/web/src/pages/api/auth/__tests__/csrf.test.ts` | added the `CSRF mechanism ownership` guard: the module path does not exist and `middleware.ts` wires no csrf middleware    |
+| `knip.json`                                          | removed the module from `entry` and `ignore` (the deleted file's own entries; same pattern as deletion commit `aa813a09a`) |
+| `scripts/ci/check-unused-exports.mjs`                | removed the module from `SCAN_IGNORE`                                                                                      |
 
 `apps/web/src/middleware.ts` needed no change: it never referenced the module.
 After the change, `rg "csrfMiddleware|defaultCSRFConfig|CSRFConfig|lib/middleware/csrf|__Host-csrf_token"`
@@ -108,13 +108,13 @@ Tests  1 failed | 3 passed (4)
 Tests  4 passed (4)
 ```
 
-| Command | Result |
-| --- | --- |
-| `vitest run apps/web/src/pages/api/auth apps/web/src/lib/auth apps/web/src/lib/middleware apps/web/src/lib/security` | 41 files, 591 tests, **exit 0** |
-| milestone gate (the `services.yaml` `commands.test` directory list) | 69 files, 974 tests, **exit 0** |
-| `oxlint --type-aware apps/web/src/pages/api/auth apps/web/src/lib/middleware` | 15 warnings (pre-existing), **0 errors**, exit 0 |
-| `oxfmt --check` on the changed TS/MJS files | clean, exit 0 |
-| `node scripts/ci/verify-build-contract.mjs` | passed, exit 0 |
+| Command                                                                                                              | Result                                           |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `vitest run apps/web/src/pages/api/auth apps/web/src/lib/auth apps/web/src/lib/middleware apps/web/src/lib/security` | 41 files, 591 tests, **exit 0**                  |
+| milestone gate (the `services.yaml` `commands.test` directory list)                                                  | 69 files, 974 tests, **exit 0**                  |
+| `oxlint --type-aware apps/web/src/pages/api/auth apps/web/src/lib/middleware`                                        | 15 warnings (pre-existing), **0 errors**, exit 0 |
+| `oxfmt --check` on the changed TS/MJS files                                                                          | clean, exit 0                                    |
+| `node scripts/ci/verify-build-contract.mjs`                                                                          | passed, exit 0                                   |
 
 ## 7. CSRF contract on the deployed release
 
@@ -122,11 +122,11 @@ Measured on the live pin before the change. This feature stops at an open PR, so
 the deployed release is unchanged by it and these are the current production
 statuses, not post-fix results.
 
-| Request | Status | Body |
-| --- | --- | --- |
+| Request                                          | Status  | Body                                                                                |
+| ------------------------------------------------ | ------- | ----------------------------------------------------------------------------------- |
 | `GET https://pixelatedempathy.com/api/auth/csrf` | **200** | keys `csrfToken,expiresAt`; token is a 64-character string; `expiresAt` is a number |
-| `POST /api/auth/signin`, no `X-CSRF-Token` | **403** | `{"error":"CSRF token required"}` |
-| `POST /api/auth/signin`, invalid `X-CSRF-Token` | **403** | `{"error":"Invalid CSRF token"}` |
+| `POST /api/auth/signin`, no `X-CSRF-Token`       | **403** | `{"error":"CSRF token required"}`                                                   |
+| `POST /api/auth/signin`, invalid `X-CSRF-Token`  | **403** | `{"error":"Invalid CSRF token"}`                                                    |
 
 The minted token value is not reproduced in this record.
 

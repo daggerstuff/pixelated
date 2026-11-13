@@ -53,13 +53,13 @@ The setup consists of two tightly integrated layers designed to address AI-gener
 
 The engine has been packaged to support any stack or agent architecture:
 
-| Delivery Target            | Method                                   | Primary Use Case                                              |
-| :------------------------- | :--------------------------------------- | :------------------------------------------------------------ |
-| **Python Package**         | `pip install deslop-cli` or `dist/*.whl` | Direct Python import in agent runtimes                        |
-| **Standalone Drop-In**     | `anti_sycophancy_filter.py`              | Zero-dependency single-file embed in any repo                 |
-| **MCP Server**             | `deslop mcp` (stdio)                     | Native tool for Claude Desktop, Cursor, Antigravity, OpenCode |
+| Delivery Target            | Method                                          | Primary Use Case                                              |
+| :------------------------- | :---------------------------------------------- | :------------------------------------------------------------ |
+| **Python Package**         | `pip install deslop-cli` or `dist/*.whl`        | Direct Python import in agent runtimes                        |
+| **Standalone Drop-In**     | `anti_sycophancy_filter.py`                     | Zero-dependency single-file embed in any repo                 |
+| **MCP Server**             | `deslop mcp` (stdio)                            | Native tool for Claude Desktop, Cursor, Antigravity, OpenCode |
 | **HTTP REST Microservice** | Docker (wrap `deslop` in your own HTTP service) | Non-Python agents (Node.js, Go, Rust, Ruby)                   |
-| **CLI / Shell Pipe**       | `deslop gate` / `deslop text`            | CI/CD pipelines, pre-commit hooks, bash scripts               |
+| **CLI / Shell Pipe**       | `deslop gate` / `deslop text`                   | CI/CD pipelines, pre-commit hooks, bash scripts               |
 
 ---
 

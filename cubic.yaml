@@ -11,24 +11,24 @@ reviews:
 
   ignore:
     pr_labels:
-      - "dependencies"
-      - "automated"
+      - 'dependencies'
+      - 'automated'
     max_changed_lines: 5000
     files:
-      - "pnpm-lock.yaml"
-      - "package-lock.json"
-      - "uv.lock"
-      - "**/dist/**"
-      - "**/dist-ssr/**"
-      - "**/worktrees/**"
-      - "**/*.min.js"
-      - "**/*.map"
-      - "**/*.svg"
-      - "**/*.csv"
-      - "**/*.jsonl"
-      - "docs/Books/**"
-      - "ai/docs/Books/**"
-      - "submodules/**"
+      - 'pnpm-lock.yaml'
+      - 'package-lock.json'
+      - 'uv.lock'
+      - '**/dist/**'
+      - '**/dist-ssr/**'
+      - '**/worktrees/**'
+      - '**/*.min.js'
+      - '**/*.map'
+      - '**/*.svg'
+      - '**/*.csv'
+      - '**/*.jsonl'
+      - 'docs/Books/**'
+      - 'ai/docs/Books/**'
+      - 'submodules/**'
 
 instructions: |
   Focus on high-severity issues:
