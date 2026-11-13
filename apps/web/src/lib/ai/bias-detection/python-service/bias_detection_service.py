@@ -20,6 +20,7 @@ from bias_detection.compat import (
 )
 
 # Module imports from the 'bias_detection' package
+from bias_detection.bootstrap import configure as configure_observability
 from bias_detection.config import settings
 from bias_detection.services.analysis_orchestrator import AnalysisOrchestrator
 from bias_detection.services.database_service import DatabaseService
@@ -48,6 +49,7 @@ __all__ = [
 
 # Initialize services
 load_dotenv()
+configure_observability()
 bias_service = BiasDetectionService()
 db_service = DatabaseService()
 orchestrator = AnalysisOrchestrator(bias_service, db_service, settings)
