@@ -10,10 +10,11 @@
 # a job that already passed. --paginate is the whole point of this script.
 # A commit also keeps every attempt of a check, so only one attempt per name is
 # judged: a pending attempt always wins (a queued run carries no started_at, so
-# ordering by time alone would discard it and call a still-running gate green),
-# and otherwise the newest completed attempt decides.
+# ordering by time alone would discard it and call a still-running gate green);
+# otherwise the newest attempt that actually ran decides, because a skipped run
+# did not execute and must not outrank an earlier success on the same commit.
 # Exit: 0 green, 1 red, 2 no verdict, 3 the commit is no longer a branch head, so
-# its runs were cancelled and no further check-run will ever report for it.
+# its runs were cancelled by a newer push and no verdict will ever come for it.
 set -euo pipefail
 
 ALL=false
@@ -49,7 +50,11 @@ fetch() {
     jq -sr 'group_by(.name) | map(
               if (map(select(.status != "completed")) | length) > 0
               then (map(select(.status != "completed")) | .[0])
-              else (sort_by(.started_at // "") | .[-1])
+              else
+                (map(select(.conclusion != "skipped")) as $ran
+                 | if ($ran | length) > 0
+                   then ($ran | sort_by(.started_at // "") | .[-1])
+                   else (sort_by(.started_at // "") | .[-1]) end)
               end) |
             .[] | "\(.status)\t\(.conclusion // "-")\t\(.name)"'
 }
@@ -87,9 +92,21 @@ while :; do
   sleep 30
 done
 
-printf '%s\n' "$rows" | awk -F'\t' '$2 == "failure" || $2 == "cancelled" || $2 == "timed_out" { print "✖ " $3 ": " $2 }'
 failed=$(printf '%s\n' "$rows" | awk -F'\t' '$2 == "failure" || $2 == "cancelled" || $2 == "timed_out"' | grep -c . || true)
 skipped=$(printf '%s\n' "$rows" | awk -F'\t' '$2 == "skipped"' | grep -c . || true)
+
+if [[ "$failed" -gt 0 ]]; then
+  real_failures=$(printf '%s\n' "$rows" | awk -F'\t' '$2 == "failure" || $2 == "timed_out"' | grep -c . || true)
+  if [[ "$real_failures" -eq 0 ]]; then
+    heads=$(gh api "repos/$REPO/commits/$SHA/branches-where-head" --jq '.[].name' 2>/dev/null || true)
+    if [[ -z "$heads" ]]; then
+      echo "✖ $SHA is not the head of any branch: its runs were cancelled by a newer push" >&2
+      exit 3
+    fi
+  fi
+fi
+
+printf '%s\n' "$rows" | awk -F'\t' '$2 == "failure" || $2 == "cancelled" || $2 == "timed_out" { print "✖ " $3 ": " $2 }'
 printf 'checked=%s failed=%s skipped=%s\n' "$total" "$failed" "$skipped"
 
 if [[ "$failed" -gt 0 ]]; then
