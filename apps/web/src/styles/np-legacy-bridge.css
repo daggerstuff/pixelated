@@ -1,0 +1,582 @@
+/*
+ * LEGACY BRIDGE — removable compatibility layer
+ *
+ * The pre-merge "brutalist" theme was deleted from CSS while thirteen files
+ * still reference its class names, so those pages render with no container,
+ * no section rhythm, and no card or button chrome at all. This file restores
+ * the *structure* those names stood for, expressed entirely in NP tokens:
+ * zero radius, no blurred shadows, no chromatic accent beyond the drafting
+ * signals. It is a bridge, not a theme — delete each block as its markup is
+ * ported to the np- primitives in np-drafting.css.
+ *
+ * Deliberately absent: bare `.card`, `.btn` and `.input`. Those names are
+ * used by 100+ files with no definition today, so globalising them would
+ * restyle surfaces nobody has reviewed. Pages that need them scope their own
+ * rules instead.
+ */
+
+/* === Layout primitives === */
+.brutalist-container {
+  max-width: var(--np-content);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.brutalist-section {
+  padding-block: clamp(2.5rem, 6vw, 5rem);
+}
+
+.brutalist-grid {
+  display: grid;
+  gap: clamp(1.25rem, 3vw, 2rem);
+}
+
+.brutalist-grid--2 {
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+}
+
+.brutalist-grid--3 {
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+}
+
+.brutalist-grid--4 {
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+}
+
+/* === Typography === */
+.brutalist-heading {
+  margin: 0;
+  font-family: var(--np-font-display);
+  font-weight: 800;
+  line-height: var(--np-leading-display);
+  letter-spacing: -0.015em;
+  color: var(--np-text);
+}
+
+.brutalist-subheading {
+  margin: 0;
+  font-family: var(--np-font-headline);
+  font-weight: 600;
+  line-height: var(--np-leading-subhead);
+  letter-spacing: -0.01em;
+  color: var(--np-text);
+}
+
+.brutalist-body {
+  font-family: var(--np-font-body);
+  font-weight: 400;
+  line-height: var(--np-leading-body);
+  color: var(--np-mid);
+}
+
+/* === Surfaces === */
+.brutalist-card {
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  border: 1px solid var(--np-line);
+  border-radius: 0;
+  background: var(--np-surface);
+  transition:
+    border-color var(--np-duration-fast) var(--np-ease),
+    background-color var(--np-duration-fast) var(--np-ease);
+}
+
+.brutalist-card:hover {
+  border-color: var(--np-line-figure);
+  background: var(--np-hover);
+}
+
+/* === Buttons === */
+.brutalist-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--np-line-strong);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--np-font-label);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-text);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--np-duration-fast) var(--np-ease),
+    border-color var(--np-duration-fast) var(--np-ease),
+    color var(--np-duration-fast) var(--np-ease);
+}
+
+.brutalist-button:hover {
+  background: var(--np-hover);
+  border-color: var(--np-line-figure);
+}
+
+.brutalist-button:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 3px;
+}
+
+/* Filled action. The product register is zero-chroma, so "primary" is the
+   body ink inverted, not a hue. */
+.brutalist-button--primary {
+  border-color: var(--np-text);
+  background: var(--np-text);
+  color: var(--np-bg);
+}
+
+.brutalist-button--primary:hover {
+  border-color: var(--np-mid);
+  background: var(--np-mid);
+  color: var(--np-bg);
+}
+
+.brutalist-button--secondary {
+  border-color: var(--np-line-strong);
+  background: var(--np-surface);
+  color: var(--np-text);
+}
+
+.brutalist-button--secondary:hover {
+  background: var(--np-hover);
+}
+
+.brutalist-button--outline {
+  border-color: var(--np-line-figure);
+  background: transparent;
+  color: var(--np-text);
+}
+
+.brutalist-button--outline:hover {
+  border-color: var(--np-text);
+  background: var(--np-hover);
+}
+
+/* One-off coloured buttons left in /projects. They resolve to the two
+   drafting signals rather than reintroducing arbitrary hues. */
+.btn-orange {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--np-amber);
+  border-radius: 0;
+  background: var(--np-amber);
+  font-family: var(--np-font-label);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-amber-ink);
+  text-decoration: none;
+}
+
+.btn-orange:hover {
+  background: var(--np-amber-strong);
+  border-color: var(--np-amber-strong);
+}
+
+.btn-violet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--np-cyan);
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--np-font-label);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-text);
+  text-decoration: none;
+}
+
+.btn-violet:hover {
+  background: var(--np-cyan-wash);
+}
+
+/* === Nav pills === */
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0;
+  font-family: var(--np-font-label);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-mid);
+  text-decoration: none;
+  transition:
+    color var(--np-duration-fast) var(--np-ease),
+    border-color var(--np-duration-fast) var(--np-ease);
+}
+
+.nav-pill:hover {
+  color: var(--np-text);
+}
+
+.nav-pill--active {
+  border-color: var(--np-line-strong);
+  background: var(--np-surface);
+  color: var(--np-text);
+}
+
+/* === Inputs === */
+.brutalist-input,
+.input-bordered {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--np-line-strong);
+  border-radius: 0;
+  background: var(--np-bg);
+  font-family: var(--np-font-body);
+  color: var(--np-text);
+}
+
+.brutalist-input:focus-visible,
+.input-bordered:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* === Badges === */
+.brutalist-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid var(--np-line-strong);
+  border-radius: 0;
+  font-family: var(--np-font-spec);
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--np-mid);
+}
+
+.brutalist-badge--success,
+.brutalist-badge--info,
+.brutalist-badge--warning,
+.brutalist-badge--danger {
+  border-color: var(--np-line-figure);
+  color: var(--np-text);
+}
+
+/* === Shells (site-shell was a second container name) === */
+.site-shell {
+  width: 100%;
+  max-width: var(--np-content);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.site-shell--narrow {
+  max-width: var(--np-content-narrow);
+}
+
+/* === Table of contents === */
+.toc-desktop {
+  font-family: var(--np-font-spec);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.toc-desktop-anchor {
+  display: block;
+  padding-block: 0.3rem;
+  color: var(--np-dim);
+  text-decoration: none;
+  transition: color var(--np-duration-fast) var(--np-ease);
+}
+
+.toc-desktop-anchor:hover,
+.toc-desktop-anchor:focus-visible {
+  color: var(--np-text);
+}
+
+.toc-desktop-on {
+  color: var(--np-text);
+}
+
+.toc-desktop-right {
+  position: sticky;
+  top: 6rem;
+}
+
+/* === Transition helpers === */
+.op-transition {
+  transition:
+    opacity var(--np-duration-normal) var(--np-ease),
+    transform var(--np-duration-normal) var(--np-ease);
+}
+
+.op-transition-500 {
+  transition: opacity var(--np-duration-slow) var(--np-ease);
+}
+
+.card-masonry {
+  columns: 1;
+  column-gap: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+@media (min-width: 720px) {
+  .card-masonry {
+    columns: 2;
+  }
+}
+
+/* === Copy guard used by the clinical surfaces === */
+.mental-health-safe {
+  text-wrap: pretty;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+/* Long-form copy in the product register. Public surfaces have their own
+   document sheet (.np-doc); product pages that still mark article bodies
+   with the legacy `prose` name had no rule at all, so paragraphs, headings
+   and lists ran together with no rhythm. Only the sibling rhythm is set, so
+   any explicit margin a component already declares still wins. */
+:root[data-register='product'] .prose {
+  max-width: 70ch;
+  font-family: var(--np-font-body);
+  line-height: 1.7;
+  color: var(--np-mid);
+}
+
+:root[data-register='product'] .prose > * + * {
+  margin-top: 1.15em;
+}
+
+:root[data-register='product'] .prose h2,
+:root[data-register='product'] .prose h3 {
+  font-family: var(--np-font-headline);
+  line-height: 1.25;
+  color: var(--np-text);
+}
+
+:root[data-register='product'] .prose ul,
+:root[data-register='product'] .prose ol {
+  padding-left: 1.25em;
+}
+
+:root[data-register='product'] .prose a {
+  color: var(--np-text);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+/* =============================================
+   ISLAND-RENDERED PAGE CLASSES
+   Astro scopes a page's <style> block with a data-astro-cid attribute that
+   React islands and runtime-generated DOM never receive, so rules written
+   for those subtrees never match. These classes are rendered exclusively by
+   islands and are undefined everywhere else, so they live here, globally,
+   instead of in a dead per-page block.
+   ============================================= */
+.metric-card {
+  padding: 1rem;
+  border: 1px solid var(--np-line);
+  border-radius: 0;
+  background: var(--np-surface);
+  text-align: center;
+}
+
+.metric-value {
+  margin-bottom: 0.25rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 700;
+  color: var(--np-text);
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: var(--np-muted);
+}
+
+.metric-trend {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+}
+
+.trend-up,
+.trend-down {
+  color: var(--np-text);
+  font-weight: 600;
+}
+
+.trend-neutral {
+  color: var(--np-muted);
+}
+
+/* Status dots — hard ring, no glow (TASTES.md §4). No colour is set: the
+   modifier decides it, so a dot without one stays neutral. */
+.status-dot {
+  display: inline-block;
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 9999px;
+}
+
+.status-dot--processing {
+  background: var(--np-text);
+  animation: np-status-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Liveness states are value-only, never hue: the product register carries no
+   accent, so "online" is full ink and everything else steps down the ramp.
+   Without these the modifier alone left an invisible dot. */
+.status-dot--online {
+  background: var(--np-text);
+}
+
+.status-dot--idle {
+  background: var(--np-mid);
+}
+
+.status-dot--offline,
+.status-dot--error {
+  border: 1px solid var(--np-dim);
+  background: transparent;
+}
+
+@keyframes np-status-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* The originals paired `bg-clip-text` with `text-transparent` over a flat
+   surface, which renders invisible text; they resolve to the body ink. */
+.gradient-text-primary,
+.gradient-text-secondary {
+  color: var(--np-text);
+}
+
+.time-range-btn,
+.filter-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--np-line);
+  border-radius: 0;
+  background: var(--np-surface);
+  color: var(--np-text);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.time-range-btn:hover,
+.filter-btn:hover {
+  background: var(--np-hover);
+}
+
+.time-range-btn.active,
+.filter-btn.active {
+  border-color: var(--np-text);
+  background: var(--np-text);
+  color: var(--np-bg);
+}
+
+.alert-error {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--np-mid);
+  border-radius: 0;
+  background: var(--np-surface);
+  color: var(--np-text);
+}
+
+/* === Token-named utilities ===
+   Four demo/showcase pages (187 occurrences) write the token name itself as a
+   class — `class="… np-text"`, `np-muted`, `np-mid`, `np-surface`,
+   `np-elevated` — as though they were utilities. Only the custom properties
+   exist, so every one of those declarations emitted nothing: muted body copy
+   rendered at full ink, and the status bar and showcase panels had no surface
+   at all. Each class maps to the property its call sites expect, which is why
+   the backgrounds and the text colours are separate rules rather than one
+   shorthand. The panels already carry their own `border: 1px solid
+   var(--np-line)`, so no border is added here. */
+.np-text {
+  color: var(--np-text);
+}
+
+.np-muted {
+  color: var(--np-muted);
+}
+
+.np-mid {
+  color: var(--np-mid);
+}
+
+.np-surface {
+  background-color: var(--np-surface);
+}
+
+.np-elevated {
+  background-color: var(--np-elevated);
+}
+
+/* === Demo CTA + ring ===
+   `np-cta` and `np-ring` are the last survivors of the deleted theme's button
+   names, used only on the demo/showcase funnel (/components, /components/
+   ui-showcase, /demo-hub). Half of those call sites set their own background
+   inline and lean on the class for the rest of the button; the other half set
+   nothing, so the component cards and demo cards rendered as plain underlined
+   text with no button at all. `display` is deliberately not set: the call
+   sites already pass `block`/`inline-block` utilities and those must win. */
+.np-cta {
+  border: 1px solid var(--np-line);
+  border-radius: 0;
+  background: var(--np-surface);
+  color: var(--np-text);
+  text-decoration: none;
+  transition:
+    background-color 120ms var(--ease-out),
+    border-color 120ms var(--ease-out);
+}
+
+.np-cta:hover {
+  background: var(--np-elevated);
+  border-color: var(--np-mid);
+}
+
+/* The drafting offset ring — a second frame, never a blurred shadow. */
+.np-ring {
+  outline: 1px solid var(--np-line);
+  outline-offset: 2px;
+}
+
+.np-ring:hover {
+  outline-color: var(--np-mid);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brutalist-card:hover,
+  .brutalist-button:hover {
+    transform: none;
+  }
+
+  .status-dot--processing {
+    animation: none;
+  }
+
+  .np-cta {
+    transition: none;
+  }
+}
