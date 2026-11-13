@@ -61,7 +61,6 @@
     // skipped only because oxfmt also reads .prettierignore; they live here now
     // so oxfmt's scope is defined in exactly one file.
     "metoro-exporter",
-    ".Jules",
     "monitoring",
     "api-docs",
     "apps/web/src/content-store",

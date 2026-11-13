@@ -247,12 +247,6 @@ backup_coding_agents() {
         cp -r "${user_home}/.gemini" "${dest}/gemini"
         success "Gemini config backed up"
     fi
-    
-    # General AI configs
-    if [[ -d "${user_home}/.config/jules" ]]; then
-        cp -r "${user_home}/.config/jules" "${dest}/jules"
-        success "Jules config backed up"
-    fi
 }
 
 backup_ohmyzsh() {

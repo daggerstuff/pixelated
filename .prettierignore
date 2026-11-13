@@ -1,6 +1,5 @@
 # exclude formatting
 pnpm-lock.yaml
-.Jules/
 metoro-exporter/
 monitoring/
 public/test-results/

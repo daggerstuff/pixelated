@@ -849,7 +849,6 @@ restore_gitignore_gaps() {
         ".cursor/"
         ".continue/"
         ".windsurf/"
-        ".Jules/"
         ".claude/"
         "node_modules/"
         ".venv/"
