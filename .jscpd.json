@@ -27,7 +27,6 @@
     "**/*.d.ts",
     "**/*.generated.*",
     "**/generated/**",
-    "**/.Jules/**",
     "**/tmp/**"
   ]
 }

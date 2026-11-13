@@ -98,9 +98,8 @@ fi
 if [ -n "$NVM_SH" ]; then
     # shellcheck disable=SC1090
     . "$NVM_SH"
-    # --silent matches the existing project convention
-    # (scripts/devops/jules-setup.sh:17). Errors are swallowed here so
-    # the version check below can give actionable guidance.
+    # --silent keeps the version check below in charge of the
+    # actionable guidance. Errors are swallowed here on purpose.
     nvm use --silent >/dev/null 2>&1 || true
 fi
 

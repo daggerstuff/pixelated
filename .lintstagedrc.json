@@ -1,6 +1,4 @@
 {
-  ".Jules/**/*.md": ["pnpm run format:jules-markdown"],
-  ".Jules/**/*.mdx": ["pnpm run format:jules-markdown"],
   "*.{js,ts,jsx,tsx,astro,mjs,cjs}": [
     "bash scripts/ci/oxlint-staged.sh -c .oxlintrc.json --ignore-pattern 'src/scripts/**'",
     "bash scripts/ci/check-no-suppressions.sh"
@@ -13,7 +11,7 @@
   ],
   "*.{ts,tsx}": ["node scripts/ci/check-zod-deprecations.mjs"],
   "*.{md,mdx}": [
-    "markdownlint --config .markdownlint.json --ignore \".agents/**\" --ignore \".Jules/**\""
+    "markdownlint --config .markdownlint.json --ignore \".agents/**\""
   ],
   "*.py": ["uv run ruff check --fix --exit-zero", "uv run ruff format"]
 }

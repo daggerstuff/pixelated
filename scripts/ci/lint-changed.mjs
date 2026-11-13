@@ -162,25 +162,6 @@ function isLintableFile(filePath) {
   );
 }
 
-/** @param {string} filePath */
-/** @returns {boolean} */
-function isGeneratedMarkdownFile(filePath) {
-  const normalizedPath = String(filePath).replaceAll("\\", "/");
-  return normalizedPath.startsWith(".Jules/");
-}
-
-/** @param {string[]} files */
-function runGeneratedMarkdownLintFix(files) {
-  /** @type {SpawnSyncTextResult} */
-  const result = spawnSync("pnpm", ["run", "format:jules-markdown", ...files], {
-    stdio: "inherit",
-  });
-  const { status } = result;
-  if (status !== 0) {
-    process.exit(status);
-  }
-}
-
 /** @param {string[]} files */
 function runLint(files) {
   if (mode === "imports" || mode === "unused-exports") {
@@ -235,16 +216,6 @@ function runFullLint() {
 const changedFiles = getCandidateFileDiffs()
   .map((filePath) => filePath.trim())
   .filter(isLintableFile);
-
-if (isMarkdown) {
-  const generatedMarkdownFiles = changedFiles.filter(isGeneratedMarkdownFile);
-  if (generatedMarkdownFiles.length > 0) {
-    console.log(
-      `Auto-formatting ${generatedMarkdownFiles.length} generated markdown file(s) from .Jules`,
-    );
-    runGeneratedMarkdownLintFix(generatedMarkdownFiles);
-  }
-}
 
 if (changedFiles.length === 0) {
   if (process.env.GITHUB_ACTIONS === "true") {
