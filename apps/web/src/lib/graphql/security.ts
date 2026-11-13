@@ -28,8 +28,8 @@ const logger = createBuildSafeLogger('graphql-security')
 // Constants
 // ──────────────────────────────────────────────
 
-export const MAX_DEPTH = 10
-export const MAX_COMPLEXITY = 1000
+const MAX_DEPTH = 10
+const MAX_COMPLEXITY = 1000
 const LIST_BASE_COST = 10
 
 // ──────────────────────────────────────────────
@@ -137,7 +137,7 @@ export function isIntrospectionEnabled(): boolean {
 // Combined validation rules
 // ──────────────────────────────────────────────
 
-export function getValidationRules(schema: GraphQLSchema) {
+function getValidationRules(schema: GraphQLSchema) {
   return [depthLimitRule(), complexityLimitRule(schema)]
 }
 
@@ -145,10 +145,11 @@ export function getValidationRules(schema: GraphQLSchema) {
 // Error formatter
 // ──────────────────────────────────────────────
 
-export function formatGraphQLError(error: GraphQLError) {
+function formatGraphQLError(error: GraphQLError) {
   const isProduction =
-    ((import.meta as unknown as Record<string, unknown>)['env'] ??
-      process.env)?.['NODE_ENV'] === 'production'
+    (
+      (import.meta as unknown as Record<string, unknown>)['env'] ?? process.env
+    )?.['NODE_ENV'] === 'production'
 
   return {
     message: error.message,

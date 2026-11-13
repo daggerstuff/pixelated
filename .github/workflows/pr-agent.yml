@@ -29,8 +29,8 @@ jobs:
           OPENAI__API_BASE: ${{ secrets.OPENAI_BASE_URL || vars.OPENAI_BASE_URL }}
           GEMINI_KEY: ${{ secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CONFIG.AUTO_REVIEW: "true"
-          CONFIG.AUTO_DESCRIBE: "false"
-          CONFIG.AUTO_IMPROVE: "false"
-          PR_REVIEWER.REQUIRE_ALL_CHECKS_PASSED: "false"
-          PR_REVIEWER.EXTRA_INSTRUCTIONS: "Focus on defects, HIPAA/PHI privacy compliance, data leakage, concurrency issues, and test regressions. Keep findings clear and actionable."
+          CONFIG.AUTO_REVIEW: 'true'
+          CONFIG.AUTO_DESCRIBE: 'false'
+          CONFIG.AUTO_IMPROVE: 'false'
+          PR_REVIEWER.REQUIRE_ALL_CHECKS_PASSED: 'false'
+          PR_REVIEWER.EXTRA_INSTRUCTIONS: 'Focus on defects, HIPAA/PHI privacy compliance, data leakage, concurrency issues, and test regressions. Keep findings clear and actionable.'

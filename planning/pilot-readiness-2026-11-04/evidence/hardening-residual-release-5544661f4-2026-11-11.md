@@ -7,16 +7,16 @@ whole milestone: the other assertions were measured on `a2f06cc38` and keep that
 attribution (`evidence/hardening-release-a2f06cc38-2026-11-11.md`,
 `library/release-pin.md` §0.21).
 
-| Item | Value |
-| --- | --- |
-| Pin at feature start (live read) | `a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` (+ docs-only `e597fe6da`, `aacae4c44`) / Worker `a6028a07-9534-4bcd-a9b8-47dc602d1dbc` (§0.21) |
-| **Pin this feature produced** | **`5544661f4710ee660fe11f4c51c614adf6e6a3ee` / Worker `42310b03-63c5-4750-81b3-a756ad1cc02f`** (§0.22) |
-| `origin/staging` HEAD at final read | `5544661f4710ee660fe11f4c51c614adf6e6a3ee` |
-| Worker traffic | **100%** |
-| Worker version created | 2026-11-11T12:57:08.848Z |
-| Deployment created | 2026-11-11T12:57:10.833Z |
-| Pin read at | 2026-11-11T12:57Z, re-read 2026-11-11T13:01Z (unchanged) |
-| Reader | `./node_modules/.bin/wrangler deployments status --name pixelated-empathy`, wrangler 4.158.0 |
+| Item                                | Value                                                                                                                                     |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Pin at feature start (live read)    | `a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` (+ docs-only `e597fe6da`, `aacae4c44`) / Worker `a6028a07-9534-4bcd-a9b8-47dc602d1dbc` (§0.21) |
+| **Pin this feature produced**       | **`5544661f4710ee660fe11f4c51c614adf6e6a3ee` / Worker `42310b03-63c5-4750-81b3-a756ad1cc02f`** (§0.22)                                    |
+| `origin/staging` HEAD at final read | `5544661f4710ee660fe11f4c51c614adf6e6a3ee`                                                                                                |
+| Worker traffic                      | **100%**                                                                                                                                  |
+| Worker version created              | 2026-11-11T12:57:08.848Z                                                                                                                  |
+| Deployment created                  | 2026-11-11T12:57:10.833Z                                                                                                                  |
+| Pin read at                         | 2026-11-11T12:57Z, re-read 2026-11-11T13:01Z (unchanged)                                                                                  |
+| Reader                              | `./node_modules/.bin/wrangler deployments status --name pixelated-empathy`, wrangler 4.158.0                                              |
 
 The pin was read **live before anything was merged**. It returned §0.21's
 release, so the PR was merged on top of the pin that was actually serving, not
@@ -24,24 +24,24 @@ on an assumed one.
 
 ## 1. The merge, and the combined head
 
-| # | Subject | Head | Own head CI | Merged |
-| --- | --- | --- | --- | --- |
+| #     | Subject                                                                                                 | Head        | Own head CI                                                                                                                                                                                                                                                                                                                           | Merged                                     |
+| ----- | ------------------------------------------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
 | #6720 | `fix(training): scroll the trainee aside, provision registration with a workspace, drop a dead handler` | `845b284e1` | **green**: `CI`, `Quality`, `Security Scanning`, `Bundle size`, `Advisory Tests — Core + Lib`, `Advisory Tests — Frontend`, `Advisory Tests — Agents`, `Smoke Tests`, `Usability / Accessibility Tests`, `Browser Compatibility Tests`, `Lighthouse CI`, `px Agent CI`, `Vercel Deploy`, `Qodo Merge` — 15 runs, 0 failing, 0 pending | 2026-11-11T12:48:07Z, squash → `5544661f4` |
 
 It was merged only after reading **its own head** CI. Its diff is confined to the
 2026-11-11 owner grant:
 
-| File | Change |
-| --- | --- |
-| `apps/web/src/pages/training/session/[sessionId].astro` | `+15 −2` — `session-aside` class on both asides, desktop scroll rule |
-| `apps/web/public/js/training-session.js` | `+0 −12` — dead `handleSessionUpdate` removed |
-| `apps/web/src/lib/db/index.ts` | `+30 −2` — `createUser` resolves the workspace before inserting |
-| `apps/web/src/lib/db/workspace.ts` | new — shared `DEFAULT_WORKSPACE_SLUG`, `WorkspaceResolutionError` |
-| `apps/web/src/pages/api/auth/register/route.ts` | `+43 −1` — named 409 for a workspace failure, `unknown` catch |
-| `apps/web/src/lib/auth/user-identity.ts` | `+4 −2` — uses the shared slug constant |
-| four test files | `+536` — aside reach, workspace resolution, register mapping, dead handler |
-| `planning/.../hardening-release-a2f06cc38-2026-11-11.md` | `+34 −9` — the v1→v2 namespace correction |
-| `planning/.../hardening-residual-repairs-2026-11-11.md` | new — the repair feature's own record |
+| File                                                     | Change                                                                     |
+| -------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `apps/web/src/pages/training/session/[sessionId].astro`  | `+15 −2` — `session-aside` class on both asides, desktop scroll rule       |
+| `apps/web/public/js/training-session.js`                 | `+0 −12` — dead `handleSessionUpdate` removed                              |
+| `apps/web/src/lib/db/index.ts`                           | `+30 −2` — `createUser` resolves the workspace before inserting            |
+| `apps/web/src/lib/db/workspace.ts`                       | new — shared `DEFAULT_WORKSPACE_SLUG`, `WorkspaceResolutionError`          |
+| `apps/web/src/pages/api/auth/register/route.ts`          | `+43 −1` — named 409 for a workspace failure, `unknown` catch              |
+| `apps/web/src/lib/auth/user-identity.ts`                 | `+4 −2` — uses the shared slug constant                                    |
+| four test files                                          | `+536` — aside reach, workspace resolution, register mapping, dead handler |
+| `planning/.../hardening-release-a2f06cc38-2026-11-11.md` | `+34 −9` — the v1→v2 namespace correction                                  |
+| `planning/.../hardening-residual-repairs-2026-11-11.md`  | new — the repair feature's own record                                      |
 
 No workflow, migration, DDL, Auth0 object, public route or clinical gate changed.
 
@@ -49,12 +49,12 @@ No workflow, migration, DDL, Auth0 object, public route or clinical gate changed
 merged result is green, so staging CI was read on the resulting head before the
 deploy was read:
 
-| Item | Run | Result |
-| --- | --- | --- |
-| Staging `CI` on `5544661f4` | `43023487504` | **success** (`build-test`, 240 s) |
-| Staging `Quality` on `5544661f4` | `43023487362` | **success**, all jobs |
+| Item                                             | Run                                                            | Result                                             |
+| ------------------------------------------------ | -------------------------------------------------------------- | -------------------------------------------------- |
+| Staging `CI` on `5544661f4`                      | `43023487504`                                                  | **success** (`build-test`, 240 s)                  |
+| Staging `Quality` on `5544661f4`                 | `43023487362`                                                  | **success**, all jobs                              |
 | Milestone gate re-run locally on the merged head | detached worktree at `5544661f4`, `./node_modules/.bin/vitest` | **81 files / 1 127 tests passed**, exit 0, 21.36 s |
-| The four new/updated suites alone | same worktree, `VITEST_TARGET_TESTS` | **4 files / 25 tests passed**, exit 0 |
+| The four new/updated suites alone                | same worktree, `VITEST_TARGET_TESTS`                           | **4 files / 25 tests passed**, exit 0              |
 
 The worktree was removed and `git worktree prune` run afterwards; `vitest
 4.1.12` and `wrangler 4.158.0` still resolve from the primary tree. No `pnpm`
@@ -62,12 +62,12 @@ command ran inside the worktree.
 
 ## 2. The deploy, read as a job list
 
-| Job | Status |
-| --- | --- |
-| `Detect app-facing changes` | completed **success** |
-| `Check deploy credentials` | completed **success** |
-| `Build Cloudflare bundle` | completed **success** — `git log -1 --format=%H` = `5544661f4710ee660fe11f4c51c614adf6e6a3ee` |
-| `Deploy to Cloudflare` | completed **success** — `git log -1` = `5544661f4710ee660fe11f4c51c614adf6e6a3ee` |
+| Job                         | Status                                                                                        |
+| --------------------------- | --------------------------------------------------------------------------------------------- |
+| `Detect app-facing changes` | completed **success**                                                                         |
+| `Check deploy credentials`  | completed **success**                                                                         |
+| `Build Cloudflare bundle`   | completed **success** — `git log -1 --format=%H` = `5544661f4710ee660fe11f4c51c614adf6e6a3ee` |
+| `Deploy to Cloudflare`      | completed **success** — `git log -1` = `5544661f4710ee660fe11f4c51c614adf6e6a3ee`             |
 
 Run `43024336642`, conclusion **success**, event `workflow_run`,
 `headSha=5544661f4`. **No job was skipped**, so the §0.20/§0.21 skipped-deploy
@@ -94,12 +94,12 @@ fixed` (the shipped rules injected). Both produced identical results, which is
 the point of re-probing: the deployed DOM carries the fix, not only the
 injection.
 
-| Viewport | Aside | client / scroll | `overflow-y` / `min-height` | Control | Focused | Visible when focused | After-focus rect | Aside box | `scrollTop` after focus |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1440x900 | left (aside0) | 660 / **1 205** | `auto` / `0px` | `button` "Retry" | yes | **yes** | 570.8–592.8 | 162.8–822.6 | **545** |
-| 1440x900 | right (aside1) | 660 / 660 | `auto` / `0px` | `textarea#session-notes` | yes | **yes** | 596.8–724.8 | 162.8–822.6 | 0 |
-| 1024x900 | left (aside0) | 632 / **1 205** | `auto` / `0px` | `button` "Retry" | yes | **yes** | 570.8–592.8 | 190.8–822.6 | **573** |
-| 1024x900 | right (aside1) | 632 / 632 | `auto` / `0px` | `textarea#session-notes` | yes | **yes** | 624.8–752.8 | 190.8–822.6 | 0 |
+| Viewport | Aside          | client / scroll | `overflow-y` / `min-height` | Control                  | Focused | Visible when focused | After-focus rect | Aside box   | `scrollTop` after focus |
+| -------- | -------------- | --------------- | --------------------------- | ------------------------ | ------- | -------------------- | ---------------- | ----------- | ----------------------- |
+| 1440x900 | left (aside0)  | 660 / **1 205** | `auto` / `0px`              | `button` "Retry"         | yes     | **yes**              | 570.8–592.8      | 162.8–822.6 | **545**                 |
+| 1440x900 | right (aside1) | 660 / 660       | `auto` / `0px`              | `textarea#session-notes` | yes     | **yes**              | 596.8–724.8      | 162.8–822.6 | 0                       |
+| 1024x900 | left (aside0)  | 632 / **1 205** | `auto` / `0px`              | `button` "Retry"         | yes     | **yes**              | 570.8–592.8      | 190.8–822.6 | **573**                 |
+| 1024x900 | right (aside1) | 632 / 632       | `auto` / `0px`              | `textarea#session-notes` | yes     | **yes**              | 624.8–752.8      | 190.8–822.6 | 0                       |
 
 Summary, both modes: `probedViewports: 2`, `controlsMeasured: 4`,
 `focusable: 4`, `visibleWhenFocused: 4`, `notVisible: []`,
@@ -108,13 +108,13 @@ Summary, both modes: `probedViewports: 2`, `controlsMeasured: 4`,
 **Before-numbers, measured with the same tool on `a2f06cc38` / Worker
 `a6028a07`** (`results/hardening-regression-and-residual-fixes/aside-focus-baseline-a2f06cc38.json`):
 
-| | Before (`a2f06cc38`, served) | After (`5544661f4`, served) |
-| --- | --- | --- |
-| Controls measured | 4 | 4 |
-| Visible when focused | **2** | **4** |
-| `notVisible` | `button "Retry"` ×2 | `[]` |
-| Aside `overflow-y` | `visible` | `auto` |
-| Retry `scrollTop` after focus | **0** (stuck) | 545 / 573 |
+|                               | Before (`a2f06cc38`, served) | After (`5544661f4`, served) |
+| ----------------------------- | ---------------------------- | --------------------------- |
+| Controls measured             | 4                            | 4                           |
+| Visible when focused          | **2**                        | **4**                       |
+| `notVisible`                  | `button "Retry"` ×2          | `[]`                        |
+| Aside `overflow-y`            | `visible`                    | `auto`                      |
+| Retry `scrollTop` after focus | **0** (stuck)                | 545 / 573                   |
 
 The overflowing column is the **left** (client-state) aside, as the corrected
 assertion says. `#session-notes` lives in the **right** aside, which fits at both
@@ -135,10 +135,10 @@ feature owns no source change.
 `apps/web/src/pages/api/auth/register/route.ts` is the only `route.ts` under
 `src/pages/api`, so Astro treats it as a page file named `route`.
 
-| Request | Status | Body |
-| --- | --- | --- |
-| `POST /api/auth/register` (documented path) | **404** | the site's 404 page HTML |
-| `POST /api/auth/register/route`, empty body | **400** | `{"error":"Invalid input: expected string, received undefined"}` |
+| Request                                     | Status  | Body                                                                                         |
+| ------------------------------------------- | ------- | -------------------------------------------------------------------------------------------- |
+| `POST /api/auth/register` (documented path) | **404** | the site's 404 page HTML                                                                     |
+| `POST /api/auth/register/route`, empty body | **400** | `{"error":"Invalid input: expected string, received undefined"}`                             |
 | `POST /api/auth/register/route`, valid body | **201** | `{"message":"User registered successfully","userId":"2c5513f4-dd73-4b73-ba17-9cb7ecc356e1"}` |
 
 The `404` on the documented path is a **pre-existing routing defect and out of
@@ -154,13 +154,13 @@ literal for a synthetic account and is not a credential of any real identity.
 
 Read-back on the configured Neon database for the returned `userId`:
 
-| Column | Value |
-| --- | --- |
-| `id` | `2c5513f4-dd73-4b73-ba17-9cb7ecc356e1` |
-| `email` | `l03-register-probe-20261111T125902Z@example.invalid` |
-| `role` | `user` |
-| `workspace_id` | `00000000-0000-0000-0000-000000000001` |
-| `created_at` | 2026-11-11T12:59:06.041Z |
+| Column         | Value                                                 |
+| -------------- | ----------------------------------------------------- |
+| `id`           | `2c5513f4-dd73-4b73-ba17-9cb7ecc356e1`                |
+| `email`        | `l03-register-probe-20261111T125902Z@example.invalid` |
+| `role`         | `user`                                                |
+| `workspace_id` | `00000000-0000-0000-0000-000000000001`                |
+| `created_at`   | 2026-11-11T12:59:06.041Z                              |
 
 `workspaces` holds exactly one row with slug `personal`
 (`00000000-0000-0000-0000-000000000001`, name `Personal`), so the created user
@@ -211,14 +211,14 @@ proven at test level: `apps/web/src/pages/api/auth/register/__tests__/register-w
 `tools/probe-pointer-click.mjs --configs 1440x900:none` drives the same
 coordinate `agent-browser click '#send-message'` the submission harness uses.
 
-| Field | Value |
-| --- | --- |
-| `click.accepted` | **true** (not refused, no covering element) |
-| `status` | **201** |
-| Request line | `POST …/api/training/sessions/33333333-…/messages (Fetch) 201` |
-| DOM hit at the click point | `path` (the button's SVG child) |
-| Gap button-bottom → footer-top | 16 px |
-| Row persisted | `6d08079d-180c-8ebc-b6ef-92bebf448332`, content `L03 SYNTHETIC — DO NOT USE VAL-UX-002 pointer probe 1440x900:none …` |
+| Field                          | Value                                                                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `click.accepted`               | **true** (not refused, no covering element)                                                                           |
+| `status`                       | **201**                                                                                                               |
+| Request line                   | `POST …/api/training/sessions/33333333-…/messages (Fetch) 201`                                                        |
+| DOM hit at the click point     | `path` (the button's SVG child)                                                                                       |
+| Gap button-bottom → footer-top | 16 px                                                                                                                 |
+| Row persisted                  | `6d08079d-180c-8ebc-b6ef-92bebf448332`, content `L03 SYNTHETIC — DO NOT USE VAL-UX-002 pointer probe 1440x900:none …` |
 
 The row is scored, not the status: the mission has already seen a `503` for a
 submission that did persist, and the reverse. Here both agree.
@@ -227,10 +227,10 @@ submission that did persist, and the reverse. Here both agree.
 
 `tools/probe-send-control.mjs --widths 320,1440 --heights 900`:
 
-| Viewport | `scrollWidth − innerWidth` | Send control hit test |
-| --- | --- | --- |
-| 320x900 | **0** | `null` — the button is at document `y` 9 445 with `scrollY` 2 166, i.e. far below the fold; the document scrolls to it |
-| 1440x900 | **0** | `path`, `hitIsButtonOrDescendant: true` |
+| Viewport | `scrollWidth − innerWidth` | Send control hit test                                                                                                  |
+| -------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| 320x900  | **0**                      | `null` — the button is at document `y` 9 445 with `scrollY` 2 166, i.e. far below the fold; the document scrolls to it |
+| 1440x900 | **0**                      | `path`, `hitIsButtonOrDescendant: true`                                                                                |
 
 The 320 result is a pre-existing mobile property, not a regression from this
 release: the previous record observed the same below-the-fold geometry at
@@ -238,10 +238,10 @@ release: the previous record observed the same below-the-fold geometry at
 
 ## 6. Rows and cleanup
 
-| Snapshot | UTC | `training_session_messages` | org A | org B |
-| --- | --- | --- | --- | --- |
-| Before this feature's writes | 2026-11-11T10:51Z (prior record) | 136 | 125 | 11 |
-| After this feature's writes | 2026-11-11T13:01:02Z | **137** | **126** | **11** |
+| Snapshot                     | UTC                              | `training_session_messages` | org A   | org B  |
+| ---------------------------- | -------------------------------- | --------------------------- | ------- | ------ |
+| Before this feature's writes | 2026-11-11T10:51Z (prior record) | 136                         | 125     | 11     |
+| After this feature's writes  | 2026-11-11T13:01:02Z             | **137**                     | **126** | **11** |
 
 The +1 is the pointer probe's message. Org B is untouched. Session hashes are
 unchanged from the prior record (org A `16c99c27c729d95ce741ded2e8596d91`, org B
@@ -271,13 +271,13 @@ deleted.
 
 Under `<missionDir>/results/hardening-regression-release/`:
 
-| File | Contents |
-| --- | --- |
-| `aside-focus-baseline-5544661f4.json` | `VAL-UX-003` on the served DOM, both viewports, per-control rects |
-| `aside-focus-fixed-5544661f4.json` | the same with the shipped rules injected (parity check) |
-| `pointer-send-1440-5544661f4.json` | the pointer-only click, its hit test and the persisted row |
-| `send-control-overflow-5544661f4.json` | hit test and `horizontalOverflow` at 320x900 and 1440x900 |
-| `row-state-after-5544661f4.json` | table totals, per-org counts and hashes |
+| File                                   | Contents                                                          |
+| -------------------------------------- | ----------------------------------------------------------------- |
+| `aside-focus-baseline-5544661f4.json`  | `VAL-UX-003` on the served DOM, both viewports, per-control rects |
+| `aside-focus-fixed-5544661f4.json`     | the same with the shipped rules injected (parity check)           |
+| `pointer-send-1440-5544661f4.json`     | the pointer-only click, its hit test and the persisted row        |
+| `send-control-overflow-5544661f4.json` | hit test and `horizontalOverflow` at 320x900 and 1440x900         |
+| `row-state-after-5544661f4.json`       | table totals, per-org counts and hashes                           |
 
 The before-state artifacts stay under
 `results/hardening-regression-and-residual-fixes/` (`aside-focus-baseline-a2f06cc38.json`,

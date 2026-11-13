@@ -92,9 +92,7 @@
     "title": "Unblock scripts by removing banned typecheck npm targets",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -116,9 +114,7 @@
     "title": "Refresh development dependencies and regenerate lockfile",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -184,9 +180,7 @@
     "title": "Submission prep for AWS Builder mini-challenge (demo, README, checklist)",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -208,9 +202,7 @@
     "title": "Frontend event listener for real-time vital spikes",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -232,9 +224,7 @@
     "title": "Set up AgentCore integration/deployment for the debrief pipeline",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -256,9 +246,7 @@
     "title": "IAM: grant bedrock:InvokeModel for Claude 3.5 Sonnet in us-east-1 and enable model access",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -280,9 +268,7 @@
     "title": "Define competency rubric format and transcript ingestion from sessions",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -304,9 +290,7 @@
     "title": "Add error-handling wrapper for Bedrock debrief call",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -328,9 +312,7 @@
     "title": "Implement generate_clinical_debrief with boto3 bedrock-runtime",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -352,9 +334,7 @@
     "title": "Integrate adjust_clinical_scenario with Alexa+ conversational runtime and test end to end",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -376,9 +356,7 @@
     "title": "Compute friction_metric from real-time trainee telemetry",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -400,9 +378,7 @@
     "title": "Implement scenario branching logic (friction_metric + trigger_event → vitals & branch)",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -424,9 +400,7 @@
     "title": "Implement Python MCP server routing handler for adjust_clinical_scenario",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -448,9 +422,7 @@
     "title": "Define adjust_clinical_scenario tool JSON schema in MCP server manifest",
     "category": "alexa-optional",
     "triage_required": false,
-    "projects": [
-      "alexa-submit"
-    ],
+    "projects": ["alexa-submit"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -560,9 +532,7 @@
     "title": "Unblock API image builds by allowing Pillow 13",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -958,9 +928,7 @@
     "title": "Force patched @modelcontextprotocol/client to clear CVE-2026-104850",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -982,9 +950,7 @@
     "title": "Regenerate bias-detection Python 3.14 requirements to unblock CI",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1006,9 +972,7 @@
     "title": "Fix Docker pnpm version pin to unblock EKS deploy builds",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1030,9 +994,7 @@
     "title": "Re-pin AI strict-typing baseline so CI ratchet stays green",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1142,9 +1104,7 @@
     "title": "Commit pending Postgres transactions before returning pool conn",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1166,9 +1126,7 @@
     "title": "Run CI tests against job-local Postgres to avoid flakes",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1278,9 +1236,7 @@
     "title": "Unblock staging CI by fixing Docker deps, AI ratchet, and a11y scroll region",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1588,9 +1544,7 @@
     "title": "ai submodule: orphaned commit ab49562c9 (arc writer retries + generator cleanup) needs revive/discard decision",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1722,9 +1676,7 @@
     "title": "Auto-tagging: deterministic local tag extraction at write time",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1746,9 +1698,7 @@
     "title": "Memory taxonomy: procedural / episodic / semantic types",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1770,9 +1720,7 @@
     "title": "Extraction control: per-call infer toggle and custom instructions",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1794,9 +1742,7 @@
     "title": "Memory lifecycle: per-memory expiration (TTL)",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1818,9 +1764,7 @@
     "title": "Retrieval precision: filter search by category, scope, retention, bank, and tags",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1930,9 +1874,7 @@
     "title": "Evaluate simple-jev end-to-end for Pixelated training, evaluation, and serving improvements",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1954,9 +1896,7 @@
     "title": "RFDT: calibrated classifier distillation — K3 audit pre-screen cascade + Foresight write gate",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -1978,9 +1918,7 @@
     "title": "CI: publish.yml misfires on branch pushes (zero-job failed runs)",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2068,9 +2006,7 @@
     "title": "Quick win: expose synthesize_profile as an MCP tool + add profile buckets",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2092,9 +2028,7 @@
     "title": "Publish reproducible self-hosted benchmarks (LoCoMo / LongMemEval)",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2116,9 +2050,7 @@
     "title": "HTTP REST API surface, then document ingestion (PDF / OCR)",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2140,9 +2072,7 @@
     "title": "Inferred-fact review queue: manage_inferred (list / approve / decline / undo)",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2164,9 +2094,7 @@
     "title": "Truth resolution: is_latest / inferred flags, write-time supersede detection, ranking penalties",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2188,9 +2116,7 @@
     "title": "Retrieval quality: real embedding providers, pgvector ANN index, and reranking",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2278,9 +2204,7 @@
     "title": "Migrate Auth0 management to v7 and route legacy auth via auth0-legacy",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2368,9 +2292,7 @@
     "title": "Move agent instrumentation entrypoints to instrumentation/ directory",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2634,9 +2556,7 @@
     "title": "Fix DocumentReference encounter fixture to match FHIR R4",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2658,9 +2578,7 @@
     "title": "Align EHR-native FHIR R4 Zod schemas and fix Claim validation",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2682,9 +2600,7 @@
     "title": "Fix EHR-native FHIR R4 Zod schemas and claim insurance validation",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2706,9 +2622,7 @@
     "title": "Enable EHR telehealth joinSession with session lookup and auditing",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2972,9 +2886,7 @@
     "title": "Extend CONVERT/HASH HOLD batch with remaining corpora",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -2996,9 +2908,7 @@
     "title": "Extend corpus HOLD conversion to support remaining DS corpora",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3042,9 +2952,7 @@
     "title": "CONVERT/HASH HOLD corpus: DS-064",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3066,9 +2974,7 @@
     "title": "CONVERT/HASH HOLD corpus: DS-008",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3112,9 +3018,7 @@
     "title": "CONVERT/HASH HOLD corpus: DS-012",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3136,9 +3040,7 @@
     "title": "CONVERT/HASH HOLD corpus: DS-069",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3160,9 +3062,7 @@
     "title": "CONVERT/HASH HOLD corpus: DS-096",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3448,9 +3348,7 @@
     "title": "Reduce CodeQL false positives for EHR and FHIR security rules",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3516,9 +3414,7 @@
     "title": "Fix CI workflows to use correct submodules and paths",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3540,9 +3436,7 @@
     "title": "Fix broken relative import paths to restore staging builds",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3608,9 +3502,7 @@
     "title": "Add HIE integration adapter for patient discovery and document exchange",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3654,9 +3546,7 @@
     "title": "Add structured, type-safe EHR audit logging builders (F2.4)",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3678,9 +3568,7 @@
     "title": "Add clearinghouse adapter integration for eligibility and claims",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3702,9 +3590,7 @@
     "title": "Add service-level tests for EHR claims, notes, patients, scheduling",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3726,9 +3612,7 @@
     "title": "Expose tenant-aware, RBAC-protected REST API for EHR resources",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3750,9 +3634,7 @@
     "title": "Add ClaimsService for clearinghouse claim lifecycle (F1.10)",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3774,9 +3656,7 @@
     "title": "Add SchedulingService for appointment management",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3798,9 +3678,7 @@
     "title": "Add behavioral health NoteTemplateService for FHIR notes",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3822,9 +3700,7 @@
     "title": "Add request-scoped PatientService for chart management",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3846,9 +3722,7 @@
     "title": "Thread tenantId and stateCode through EHR RBAC checks",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3870,9 +3744,7 @@
     "title": "Add RLS-aware EHR repositories for core FHIR resources",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -3894,9 +3766,7 @@
     "title": "Implement tenant- and state-aware EHR consent engine with RBAC integration",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4006,9 +3876,7 @@
     "title": "Fix FHIR audit bridge to handle break-glass and client context",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4030,9 +3898,7 @@
     "title": "Audit FHIR R4 CRUD and reads to HIPAA and tamper-evident chain",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4054,9 +3920,7 @@
     "title": "Dissect source family: knowledge and creator material",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4078,9 +3942,7 @@
     "title": "Dissect source family: classification and taxonomy corpora",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4102,9 +3964,7 @@
     "title": "Dissect source family: safety, evaluation, and restricted research",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4126,9 +3986,7 @@
     "title": "Dissect source family: clinical dialogue, counseling, and lived experience",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4150,9 +4008,7 @@
     "title": "Dissect source family: provenance, aggregates, and generated lineages",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4174,9 +4030,7 @@
     "title": "Split construction releases by source, product, and safety axes",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "In Progress",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4198,9 +4052,7 @@
     "title": "Version construction registry and preview artifacts",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "In Progress",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4222,9 +4074,7 @@
     "title": "Review source dossiers and construction previews",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4246,9 +4096,7 @@
     "title": "P12: Knowledge-task construction",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4270,9 +4118,7 @@
     "title": "P2: DPO preference construction",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4294,9 +4140,7 @@
     "title": "P14/P21: Crisis-safety construction",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4318,9 +4162,7 @@
     "title": "P14: Edge-case construction",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4342,9 +4184,7 @@
     "title": "P11: CPTSD dialogue construction",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4366,9 +4206,7 @@
     "title": "P15: Long-running therapy construction",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4390,9 +4228,7 @@
     "title": "P14: Therapeutic SFT construction",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4414,9 +4250,7 @@
     "title": "SRC-099: Dissect Additional therapeutic PDF/EPUB library",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4438,9 +4272,7 @@
     "title": "SRC-098: Dissect *When the Body Says No*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4462,9 +4294,7 @@
     "title": "SRC-097: Dissect *The Myth of Normal*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4486,9 +4316,7 @@
     "title": "SRC-096: Dissect *Scattered Minds*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4510,9 +4338,7 @@
     "title": "SRC-095: Dissect *Rewiring Your Self*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4534,9 +4360,7 @@
     "title": "SRC-094: Dissect *Rewire*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4558,9 +4382,7 @@
     "title": "SRC-093: Dissect *Maybe You Should Talk to Someone*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4582,9 +4404,7 @@
     "title": "SRC-092: Dissect *In the Realm of Hungry Ghosts*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4606,9 +4426,7 @@
     "title": "SRC-091: Dissect *In an Unspoken Voice*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4630,9 +4448,7 @@
     "title": "SRC-090: Dissect *Hold On to Your Kids*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4654,9 +4470,7 @@
     "title": "SRC-089: Dissect *Fundamentals of Addiction*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4678,9 +4492,7 @@
     "title": "SRC-088: Dissect *Drug Use and Abuse: A Comprehensive Introduction*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4702,9 +4514,7 @@
     "title": "SRC-087: Dissect *Driven to Distraction (Revised)*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4726,9 +4536,7 @@
     "title": "SRC-086: Dissect *ADHD 2.0*",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4750,9 +4558,7 @@
     "title": "SRC-085: Dissect Restored Hetzner consolidated collection",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4774,9 +4580,7 @@
     "title": "SRC-084: Dissect Restored Hetzner staged datasets",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4798,9 +4602,7 @@
     "title": "SRC-083: Dissect Restored Hetzner compiled splits",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4822,9 +4624,7 @@
     "title": "SRC-082: Dissect Restored Hetzner final aggregate",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4846,9 +4646,7 @@
     "title": "SRC-081: Dissect Processed-ready aggregate family",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4870,9 +4668,7 @@
     "title": "SRC-080: Dissect Kickflip RL collection",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4894,9 +4690,7 @@
     "title": "SRC-079: Dissect Kickflip final training collection",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4918,9 +4712,7 @@
     "title": "SRC-078: Dissect ULTIMATE edge/scenario specification corpus",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4942,9 +4734,7 @@
     "title": "SRC-077: Dissect GitHub adapter backlog",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4966,9 +4756,7 @@
     "title": "SRC-076: Dissect Zenodo Low et al. TF-IDF artifact",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -4990,9 +4778,7 @@
     "title": "SRC-075: Dissect TraumaNarratives",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5014,9 +4800,7 @@
     "title": "SRC-074: Dissect Reddit-Impacts NER",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5038,9 +4822,7 @@
     "title": "SRC-073: Dissect PersonalityDBench",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5062,9 +4844,7 @@
     "title": "SRC-072: Dissect DMTCorpus",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5086,9 +4866,7 @@
     "title": "SRC-071: Dissect eRisk CLEF",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5110,9 +4888,7 @@
     "title": "SRC-070: Dissect CLPsych shared tasks",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5134,9 +4910,7 @@
     "title": "SRC-069: Dissect ANGST",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5158,9 +4932,7 @@
     "title": "SRC-068: Dissect AIPsy-Bench",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5182,9 +4954,7 @@
     "title": "SRC-067: Dissect MENTAT",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5206,9 +4976,7 @@
     "title": "SRC-066: Dissect LingxiDiag-16K",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5230,9 +4998,7 @@
     "title": "SRC-065: Dissect MentalBench-DSM",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5254,9 +5020,7 @@
     "title": "SRC-064: Dissect Psychosis-Bench",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5278,9 +5042,7 @@
     "title": "SRC-063: Dissect PsychosisSafetyBench",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5302,9 +5064,7 @@
     "title": "SRC-062: Dissect MentalAlign-70K",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5326,9 +5086,7 @@
     "title": "SRC-061: Dissect MentalBench-100K",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5350,9 +5108,7 @@
     "title": "SRC-060: Dissect Mental Health Analysis (5-class)",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5374,9 +5130,7 @@
     "title": "SRC-059: Dissect Mental Health Corpus",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5398,9 +5152,7 @@
     "title": "SRC-058: Dissect Sentiment & Mental Health Reddit",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5422,9 +5174,7 @@
     "title": "SRC-057: Dissect Mental Health (Kagle)",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5446,9 +5196,7 @@
     "title": "SRC-056: Dissect Sentiment Analysis for Mental Health",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5470,9 +5218,7 @@
     "title": "SRC-055: Dissect Jikadara Mental Health Dataset",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5494,9 +5240,7 @@
     "title": "SRC-054: Dissect Mental Health Condition Classification",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5518,9 +5262,7 @@
     "title": "SRC-053: Dissect Mental Health Text Classification",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5542,9 +5284,7 @@
     "title": "SRC-052: Dissect Mental Health Text Dataset (Balanced)",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5566,9 +5306,7 @@
     "title": "SRC-051: Dissect HOPE",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5590,9 +5328,7 @@
     "title": "SRC-050: Dissect MITAGS",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5614,9 +5350,7 @@
     "title": "SRC-049: Dissect MHSafeEval",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5638,9 +5372,7 @@
     "title": "SRC-048: Dissect VERA-MH",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5662,9 +5394,7 @@
     "title": "SRC-047: Dissect AnnoMI",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5686,9 +5416,7 @@
     "title": "SRC-046: Dissect DAIC-WOZ",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5710,9 +5438,7 @@
     "title": "SRC-045: Dissect ML-BPD research corpus",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5734,9 +5460,7 @@
     "title": "SRC-044: Dissect DSM vector-space",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5758,9 +5482,7 @@
     "title": "SRC-043: Dissect AI psychotherapy clinical red-team",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5782,9 +5504,7 @@
     "title": "SRC-042: Dissect Addiction Stories",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5806,9 +5526,7 @@
     "title": "SRC-041: Dissect PsyInsight",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5830,9 +5548,7 @@
     "title": "SRC-040: Dissect PsyDial",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5854,9 +5570,7 @@
     "title": "SRC-039: Dissect ESConv",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5878,9 +5592,7 @@
     "title": "SRC-038: Dissect UCL psychological abuse",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5902,9 +5614,7 @@
     "title": "SRC-037: Dissect Mental-health crisis benchmark",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5926,9 +5636,7 @@
     "title": "SRC-036: Dissect PsychEval",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5950,9 +5658,7 @@
     "title": "SRC-035: Dissect Mental-health counseling conversations",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5974,9 +5680,7 @@
     "title": "SRC-034: Dissect KokoroChat",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -5998,9 +5702,7 @@
     "title": "SRC-033: Dissect Mental Health MultiAgent",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6022,9 +5724,7 @@
     "title": "SRC-032: Dissect MentalChat16K",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6046,9 +5746,7 @@
     "title": "SRC-031: Dissect Mitch Hamidi BPD NLP",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6070,9 +5768,7 @@
     "title": "SRC-030: Dissect Empathetic Dialogues v2",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6094,9 +5790,7 @@
     "title": "SRC-029: Dissect MIT psychosis corpus",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6118,9 +5812,7 @@
     "title": "SRC-028: Dissect Reddit mental-health posts",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6142,9 +5834,7 @@
     "title": "SRC-027: Dissect Reddit mental-disorders identification",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6166,9 +5856,7 @@
     "title": "SRC-026: Dissect Burnout source family",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6190,9 +5878,7 @@
     "title": "SRC-025: Dissect BBRD",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6214,9 +5900,7 @@
     "title": "SRC-024: Dissect ADHD XAI study metadata",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6238,9 +5922,7 @@
     "title": "SRC-023: Dissect BPD longitudinal suicide metadata",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6262,9 +5944,7 @@
     "title": "SRC-022: Dissect CBT audio HF",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6286,9 +5966,7 @@
     "title": "SRC-021: Dissect BPD Synthetic Zenodo",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6310,9 +5988,7 @@
     "title": "SRC-020: Dissect ACE NLP",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6334,9 +6010,7 @@
     "title": "SRC-019: Dissect Lane C staged corpus",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6358,9 +6032,7 @@
     "title": "SRC-018: Dissect MentalLLaMA",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6382,9 +6054,7 @@
     "title": "SRC-017: Dissect CBTBench",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6406,9 +6076,7 @@
     "title": "SRC-016: Dissect Ian Steenstra psychotherapy evaluation",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6430,9 +6098,7 @@
     "title": "SRC-015: Dissect CBT LLM CoreIssue",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6454,9 +6120,7 @@
     "title": "SRC-014: Dissect Session generation collections",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6478,9 +6142,7 @@
     "title": "SRC-013: Dissect Voice persona and creator transcripts",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6502,9 +6164,7 @@
     "title": "SRC-012: Dissect CoT reasoning families",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6526,9 +6186,7 @@
     "title": "SRC-011: Dissect PAL framework",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6550,9 +6208,7 @@
     "title": "SRC-010: Dissect Monthly generated work",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6574,9 +6230,7 @@
     "title": "SRC-009: Dissect Hackathon generated collection",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6598,9 +6252,7 @@
     "title": "SRC-008: Dissect V5 sycophancy backup",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6622,9 +6274,7 @@
     "title": "SRC-007: Dissect Nightmare Fuel",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6646,9 +6296,7 @@
     "title": "SRC-006: Dissect Safety conversations",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6670,9 +6318,7 @@
     "title": "SRC-005: Dissect External-ingested cleaned aggregate",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6694,9 +6340,7 @@
     "title": "SRC-004: Dissect GitHub research cleaned aggregate",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6718,9 +6362,7 @@
     "title": "SRC-003: Dissect Hugging Face cleaned aggregate",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6742,9 +6384,7 @@
     "title": "SRC-002: Dissect Master-clean aggregate",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6766,9 +6406,7 @@
     "title": "SRC-001: Dissect Foundation SFT lineage",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6790,9 +6428,7 @@
     "title": "Source Inventory & Dissection",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6814,9 +6450,7 @@
     "title": "Harden FHIR R4 persistence with soft-delete and If-Match",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -6838,9 +6472,7 @@
     "title": "Add tenant-aware FHIR R4 internal server with CRUD/search/history",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7698,9 +7330,7 @@
     "title": "Add Postgres EHR native tables with tenant RLS and consent gating",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7722,9 +7352,7 @@
     "title": "Add consent-aware EHR RBAC with audited break-glass access",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7746,9 +7374,7 @@
     "title": "Add native FHIR R4 Zod type system schemas and TS types",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7770,9 +7396,7 @@
     "title": "G3.3: Compliance Report Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7794,9 +7418,7 @@
     "title": "G3.2: Mobile Parity Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7818,9 +7440,7 @@
     "title": "G3.1: Legal Review Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7842,9 +7462,7 @@
     "title": "G2.3: BAA Compliance Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7866,9 +7484,7 @@
     "title": "G2.2: Risk Stratification Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7890,9 +7506,7 @@
     "title": "G2.1: AI No Auto-Sign Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7914,9 +7528,7 @@
     "title": "G1.7: Pen Test Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7938,9 +7550,7 @@
     "title": "G1.6: FHIR R4 Conformance Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7962,9 +7572,7 @@
     "title": "G1.5: HIPAA Audit Log Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -7986,9 +7594,7 @@
     "title": "G1.4: E2E Smoke Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8010,9 +7616,7 @@
     "title": "G1.3: Test Suite Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8034,9 +7638,7 @@
     "title": "G1.2: Lint Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8058,9 +7660,7 @@
     "title": "G1.1: Type Check Gate",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8082,9 +7682,7 @@
     "title": "F3.6: Automated Compliance Reports",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8106,9 +7704,7 @@
     "title": "F3.5: Mobile Parity Hardening",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8130,9 +7726,7 @@
     "title": "F3.4: HIE + E-Prescribing Integration",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8154,9 +7748,7 @@
     "title": "F3.3: State-by-State Consent Engine",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8178,9 +7770,7 @@
     "title": "F3.2: Supervisor Tools",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8202,9 +7792,7 @@
     "title": "F3.1: Customizable Dashboards",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8226,9 +7814,7 @@
     "title": "F2.3: Treatment Plan Suggestions",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8250,9 +7836,7 @@
     "title": "F2.2: Risk Stratification",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8274,9 +7858,7 @@
     "title": "F2.1: AI Note Drafting",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8298,9 +7880,7 @@
     "title": "F2.4: Outcome Measure Trending",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8322,9 +7902,7 @@
     "title": "F2.6: Open API + Developer Documentation",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8346,9 +7924,7 @@
     "title": "F2.5: Integration Marketplace v1",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8370,9 +7946,7 @@
     "title": "F1.13: Mobile-Responsive Shell",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8394,9 +7968,7 @@
     "title": "F1.12: Native Telehealth",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8418,9 +7990,7 @@
     "title": "F1.11: Client Portal v1",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8442,9 +8012,7 @@
     "title": "F1.10: Claims Tracking",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8466,9 +8034,7 @@
     "title": "F1.9: Scheduling",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8490,9 +8056,7 @@
     "title": "F1.8: Modality Note Templates",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8514,9 +8078,7 @@
     "title": "F1.7: Patient Chart Management",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8538,9 +8100,7 @@
     "title": "F1.6: REST API Surface v1",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8562,9 +8122,7 @@
     "title": "F1.4: Consent Engine v1",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8586,9 +8144,7 @@
     "title": "F1.3: Audit Chain Extension for EHR",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8610,9 +8166,7 @@
     "title": "F1.2: FHIR R4 Internal Server",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8634,9 +8188,7 @@
     "title": "F1.1: Postgres Schema + RLS",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8658,9 +8210,7 @@
     "title": "F1.5: RBAC Roles",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8682,9 +8232,7 @@
     "title": "F1.0: FHIR R4 Type System",
     "category": "ehr-adjacent",
     "triage_required": false,
-    "projects": [
-      "EHR Module Add-On"
-    ],
+    "projects": ["EHR Module Add-On"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8706,9 +8254,7 @@
     "title": "Sync vetted local pipeline work to staging with fixes",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8752,9 +8298,7 @@
     "title": "Gate optional IAA import in curate pipeline",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8798,9 +8342,7 @@
     "title": "Consolidate pnpm version pins and restore docs submodule",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8822,9 +8364,7 @@
     "title": "Complete data lineage tracking in quality audit system",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8846,9 +8386,7 @@
     "title": "Implement academic sourcing, journal privacy verifier, MCP server, CLI exports, and rclone shim",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8870,9 +8408,7 @@
     "title": "Implement HIPAA validator controls (encryption, access, audit logging)",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8894,9 +8430,7 @@
     "title": "Implement simulation Celery integration and reprioritizer middleware",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8918,9 +8452,7 @@
     "title": "Replace DEV-ONLY plaintext email encryption stub with real encryption",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8942,9 +8474,7 @@
     "title": "Implement dream consolidation, multimodal fusion, pkg_mera, and foresight local retention",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8966,9 +8496,7 @@
     "title": "Implement therapy benchmark evaluation (replace dummy results)",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -8990,9 +8518,7 @@
     "title": "Implement memory manager clear session memory for current backend",
     "category": "developer-api-memory",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9014,9 +8540,7 @@
     "title": "Implement emotions service with actual LLaMA emotion model",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9038,9 +8562,7 @@
     "title": "Resolve SSR stubs (search-browser, flexsearch, framer-motion)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9062,9 +8584,7 @@
     "title": "Implement or remove Supabase client wrapper",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9086,9 +8606,7 @@
     "title": "Implement image optimizer utility",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9110,9 +8628,7 @@
     "title": "Implement patient data portability service",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9134,9 +8650,7 @@
     "title": "Implement emotion tracking service",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9158,9 +8672,7 @@
     "title": "Implement MemoryAwareChatSystem placeholder methods",
     "category": "developer-api-memory",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9182,9 +8694,7 @@
     "title": "Implement ResearchDashboard publications management",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9206,9 +8716,7 @@
     "title": "Implement PerformanceDashboard component",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9230,9 +8738,7 @@
     "title": "Implement admin module methods",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9254,9 +8760,7 @@
     "title": "Implement or remove FHE store",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9278,9 +8782,7 @@
     "title": "Implement DLP processSensitiveContent",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9302,9 +8804,7 @@
     "title": "Implement audit log querying and export",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9326,9 +8826,7 @@
     "title": "Implement data restoration from backup (PIX-43)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9350,9 +8848,7 @@
     "title": "Remove mental-llama browser stub",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9374,9 +8870,7 @@
     "title": "Remove bias-detection serverless handler stub",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9398,9 +8892,7 @@
     "title": "Implement Auth0 OAuth verification",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9422,9 +8914,7 @@
     "title": "Implement AI usage analytics",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9446,9 +8936,7 @@
     "title": "Implement chat completion hook (useChatCompletion)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9470,9 +8958,7 @@
     "title": "Implement MetaAligner provider adapters (OpenAI, Anthropic, Gemini)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9494,9 +8980,7 @@
     "title": "Implement AI provider adapters (Anthropic, OpenAI, HuggingFace)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9540,9 +9024,7 @@
     "title": "Fix CI pnpm setup and px-cli build filter",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "px CLI + Git Hook Integration"
-    ],
+    "projects": ["px CLI + Git Hook Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9564,9 +9046,7 @@
     "title": "Remove hardcoded pnpm version and fix px-cli filter",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "px CLI + Git Hook Integration"
-    ],
+    "projects": ["px CLI + Git Hook Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9588,9 +9068,7 @@
     "title": "Add persona-driven email regeneration pipeline with QA",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9656,9 +9134,7 @@
     "title": "Month 3: 405B / MoE path (Megatron + EP) if pipeline extends",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9680,9 +9156,7 @@
     "title": "Month 2 wk3: Megatron trial (TP=4, PP=2, CP=1) for 70B + vs FSDP2 comparison",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9704,9 +9178,7 @@
     "title": "Month 2 wk2: Long-context CP=2 + multi-node HSDP switch",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9728,9 +9200,7 @@
     "title": "Month 2 wk1: FSDP2 trial on 70B (8×H100) + WandB baseline",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9752,9 +9222,7 @@
     "title": "Week 5: Multi-node torchrun launcher + NCCL/IB verification",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9776,9 +9244,7 @@
     "title": "4C: Stratified split (multi-axis) replaces dataset_splitter hash-split",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9800,9 +9266,7 @@
     "title": "4B: DVC init + remote (S3/MinIO) + first curated push",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9824,9 +9288,7 @@
     "title": "Data Designer Construction",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9848,9 +9310,7 @@
     "title": "3A: Label Studio project + IAA script (Fleiss/Cohen kappa)",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9872,9 +9332,7 @@
     "title": "2B: LLM judge dual-model (DeepSeek primary + Kimi-K3 secondary) + golden calibration",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "In Progress",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9896,9 +9354,7 @@
     "title": "2A: Wire Stage 1 filters (lang, PII, toxicity, dedup) into curate_pipeline",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9920,9 +9376,7 @@
     "title": "1B: Install filter deps (fasttext, presidio, detoxify, iterstrat)",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -9944,9 +9398,7 @@
     "title": "1A: Ingest router (web + DOCX + API parsers, provenance wiring)",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10034,9 +9486,7 @@
     "title": "Phase 6: Phased Agent Activation (Dogfooding Rollout)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "px CLI + Git Hook Integration"
-    ],
+    "projects": ["px CLI + Git Hook Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10058,9 +9508,7 @@
     "title": "Phase 5: Testing (Unit, Integration, Hook, E2E Smoke)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "px CLI + Git Hook Integration"
-    ],
+    "projects": ["px CLI + Git Hook Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10082,9 +9530,7 @@
     "title": "Phase 4: Global Commands (init, health, list, config)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "px CLI + Git Hook Integration"
-    ],
+    "projects": ["px CLI + Git Hook Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10106,9 +9552,7 @@
     "title": "Phase 3: Git Hook Scripts",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "px CLI + Git Hook Integration"
-    ],
+    "projects": ["px CLI + Git Hook Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10130,9 +9574,7 @@
     "title": "Phase 2: HTTP Client + Command Surface",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "px CLI + Git Hook Integration"
-    ],
+    "projects": ["px CLI + Git Hook Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10154,9 +9596,7 @@
     "title": "Phase 1: CLI Scaffolding + Config System",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "px CLI + Git Hook Integration"
-    ],
+    "projects": ["px CLI + Git Hook Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10178,9 +9618,7 @@
     "title": "px CLI + Git Hook Integration — Design Doc",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "px CLI + Git Hook Integration"
-    ],
+    "projects": ["px CLI + Git Hook Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10224,9 +9662,7 @@
     "title": "Implement S3 Sync with atomic swap logic to pixeldata@US-EAST-VA",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10248,9 +9684,7 @@
     "title": "Execute full integrity test (token limits, role validity, UTF-8) against V7 output",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10272,9 +9706,7 @@
     "title": "Implement MinHash/LSH embeddings for semantic deduplication across 10k+ records",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10296,9 +9728,7 @@
     "title": "Migrate consolidate script to V7 format with advanced hash deduping",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10320,9 +9750,7 @@
     "title": "Run heuristic toxicity and strict PII stripping across all imported hackathon data",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10344,9 +9772,7 @@
     "title": "Extract, clean, and standardize third-party raw CSV/JSON data into ChatML format",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10368,9 +9794,7 @@
     "title": "Scrape GitHub repositories from top HealthTech/Mental Health hackathons",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10392,9 +9816,7 @@
     "title": "Map Kaggle NLP datasets targeting 'BPD splitting' and 'CPTSD addiction' using Tavily",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10416,9 +9838,7 @@
     "title": "Refactor the 5-dimensional LLM judge to process validations asynchronously",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10440,9 +9860,7 @@
     "title": "Add distributed state tracking and jsonl checkpointing to prevent progress loss",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10464,9 +9882,7 @@
     "title": "Implement dynamic batch sizing and endpoint token backpressure handling",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10488,9 +9904,7 @@
     "title": "Rewrite generator using asyncio and aiohttp for concurrent requests",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10512,9 +9926,7 @@
     "title": "Assemble V7 MASTER Dataset and Sync to S3",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10536,9 +9948,7 @@
     "title": "Deploy Sub-agents for Kaggle/Hackathon Clinical Data",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10560,9 +9970,7 @@
     "title": "Scale Nightmare Fuel Generator to 10k+ Output",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Project Nightmare Fuel (V7 Scale)"
-    ],
+    "projects": ["Project Nightmare Fuel (V7 Scale)"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10584,9 +9992,7 @@
     "title": "Fix minor plan inaccuracies: log quote, status line, heuristic caveat",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "PAL Framework → 100% Roadmap"
-    ],
+    "projects": ["PAL Framework → 100% Roadmap"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10608,9 +10014,7 @@
     "title": "Update Phase 6.1 status and add missing test files to plan file map",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "PAL Framework → 100% Roadmap"
-    ],
+    "projects": ["PAL Framework → 100% Roadmap"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10632,9 +10036,7 @@
     "title": "Fix PIX-4078 reference and create Linear issues for Phase 5 & 6",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "PAL Framework → 100% Roadmap"
-    ],
+    "projects": ["PAL Framework → 100% Roadmap"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10656,9 +10058,7 @@
     "title": "Fix plan path errors: Phase 2.3 and Phase 4.1",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "PAL Framework → 100% Roadmap"
-    ],
+    "projects": ["PAL Framework → 100% Roadmap"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10680,9 +10080,7 @@
     "title": "Document pal_dataloader.py and pal_inference_service.py in implementation plan",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "PAL Framework → 100% Roadmap"
-    ],
+    "projects": ["PAL Framework → 100% Roadmap"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10704,9 +10102,7 @@
     "title": "Document disabled safety filter in DPO trainer",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "PAL Framework → 100% Roadmap"
-    ],
+    "projects": ["PAL Framework → 100% Roadmap"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10728,9 +10124,7 @@
     "title": "Phase 6.1: Run SFT + DPO end-to-end smoke and verify C.score",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "PAL Framework → 100% Roadmap"
-    ],
+    "projects": ["PAL Framework → 100% Roadmap"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10752,9 +10146,7 @@
     "title": "Recover Phase 5.2 eval tests from Google Drive backups or rewrite from scratch",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "PAL Framework → 100% Roadmap"
-    ],
+    "projects": ["PAL Framework → 100% Roadmap"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10798,9 +10190,7 @@
     "title": "[P3] Implement Causal DAG Execution Engine & Intervention API",
     "category": "developer-api-memory",
     "triage_required": false,
-    "projects": [
-      "ML & Platform Remediation Sprint"
-    ],
+    "projects": ["ML & Platform Remediation Sprint"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10822,9 +10212,7 @@
     "title": "[P2] Ingest Stage 5 Safety/DPO Datasets",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "ML & Platform Remediation Sprint"
-    ],
+    "projects": ["ML & Platform Remediation Sprint"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10846,9 +10234,7 @@
     "title": "[P1] Integrate Field-Level FHE Database Encryption Hooks",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "ML & Platform Remediation Sprint"
-    ],
+    "projects": ["ML & Platform Remediation Sprint"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10870,9 +10256,7 @@
     "title": "[P1] Fix NeMo Data Designer Jobs Controller NGC Authentication",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "ML & Platform Remediation Sprint"
-    ],
+    "projects": ["ML & Platform Remediation Sprint"],
     "status": "Canceled",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10894,9 +10278,7 @@
     "title": "[P1] Stabilize TypeScript Test Baseline (Fix 42 Vitest Failures)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "ML & Platform Remediation Sprint"
-    ],
+    "projects": ["ML & Platform Remediation Sprint"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10918,9 +10300,7 @@
     "title": "[P0] Correct Stage 1 Training Notebook Path Configuration",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "ML & Platform Remediation Sprint"
-    ],
+    "projects": ["ML & Platform Remediation Sprint"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10942,9 +10322,7 @@
     "title": "[P0] Build & Execute Stage 4 Voice Persona Processing Pipeline",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "ML & Platform Remediation Sprint"
-    ],
+    "projects": ["ML & Platform Remediation Sprint"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10966,9 +10344,7 @@
     "title": "[P0] Implement Stage-Based Dataset Directory Organizer",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "ML & Platform Remediation Sprint"
-    ],
+    "projects": ["ML & Platform Remediation Sprint"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -10990,9 +10366,7 @@
     "title": "[P0] Implement Stage-Aware Deduplication Algorithm",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "ML & Platform Remediation Sprint"
-    ],
+    "projects": ["ML & Platform Remediation Sprint"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11168,9 +10542,7 @@
     "title": "INT-6: Complete Vertical Fidelity Stack E2E Integration & Audit Verification",
     "category": "governance",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11192,9 +10564,7 @@
     "title": "INT-5.2: Create audit trail export utility for legal/compliance verification",
     "category": "governance",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11216,9 +10586,7 @@
     "title": "INT-5.1: Build DB persistence schema for ReceiptEnvelope and Ledger",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11240,9 +10608,7 @@
     "title": "INT-4.2: Implement SQLite/PostgreSQL storage for CaseFlag persistence",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11264,9 +10630,7 @@
     "title": "INT-4.1: Refactor JITTriggerEngine.rolling_window for per-clinician grouping",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11288,9 +10652,7 @@
     "title": "INT-3.3: Implement pre-prompt session block topup injection",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11312,9 +10674,7 @@
     "title": "INT-3.2: Wire NightmareFuelGenerator for targeted scenario generation",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11336,9 +10696,7 @@
     "title": "INT-3.1: Create JITScenarioInjector class and event listener interface",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11360,9 +10718,7 @@
     "title": "INT-2.2: Attach receipt_root_hash to final_result and EventBus payloads",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11384,9 +10740,7 @@
     "title": "INT-2.1: Update session_data parser to extract receipt_root_hash",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11408,9 +10762,7 @@
     "title": "INT-1.3: Add CRISIS_DETECTED event emission from diagnostic layer results",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11432,9 +10784,7 @@
     "title": "INT-1.2: Add BIAS_DETECTED event emission on threshold breach (score >= 0.3)",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11456,9 +10806,7 @@
     "title": "INT-1.1: Import and initialize EventBus singleton in AnalysisOrchestrator",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11480,9 +10828,7 @@
     "title": "INT-5: Receipt ledger persistence + audit export",
     "category": "governance",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11504,9 +10850,7 @@
     "title": "INT-4: Per-clinician rolling windows + persistence",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11528,9 +10872,7 @@
     "title": "INT-3: Build JIT scenario injector (Nightmare Fuel -> session block)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11552,9 +10894,7 @@
     "title": "INT-2: Wire receipt_root_hash through bias detection pipeline",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11576,9 +10916,7 @@
     "title": "INT-1: Emit EventBus events from AnalysisOrchestrator",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Vertical Fidelity Stack Implementation"
-    ],
+    "projects": ["Vertical Fidelity Stack Implementation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11666,9 +11004,7 @@
     "title": "Remediate CVE-2026-48746 CRITICAL: bump vllm 0.20.2rc1 → ≥0.24.0 (auth bypass)",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11690,9 +11026,7 @@
     "title": "Remediate pnpm audit HIGH: bump @babel/core (via @tarquinen/opencode-dcp)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11714,9 +11048,7 @@
     "title": "Remediate CVE-2026-48818 + CVE-2026-54283: bump starlette 0.52.1 → 1.3.1",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11738,9 +11070,7 @@
     "title": "Remediate CVE-2026-42561 + CVE-2026-53539: bump python-multipart 0.0.24 → 0.0.30",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11762,9 +11092,7 @@
     "title": "Remediate CVE-2026-48526: bump pyjwt 2.12.1 → 2.13.0",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11786,9 +11114,7 @@
     "title": "Quarterly Workspace Audit — Linear Hygiene Check",
     "category": "governance",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11810,9 +11136,7 @@
     "title": "SOC2-4: Engage External Auditor for Formal Review",
     "category": "governance",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11834,9 +11158,7 @@
     "title": "SOC2-3: Remediate Top 10 Compliance Gaps",
     "category": "governance",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11858,9 +11180,7 @@
     "title": "SOC2-2: Conduct HIPAA Compliance Gap Assessment",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11882,9 +11202,7 @@
     "title": "SOC2-1: Conduct SOC2 Readiness Gap Assessment",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11906,9 +11224,7 @@
     "title": "VRA-3: Conduct Tier 1 Vendor Security Reviews",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11930,9 +11246,7 @@
     "title": "VRA-2: Create Vendor Risk Assessment Framework",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11954,9 +11268,7 @@
     "title": "VRA-1: Inventory All Third-Party Dependencies",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -11978,9 +11290,7 @@
     "title": "CE-3: Run Weekly Chaos Experiments",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12002,9 +11312,7 @@
     "title": "CE-2: Define Resilience Testing Scenarios",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12026,9 +11334,7 @@
     "title": "CE-1: Install Chaos Engineering Tooling",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12050,9 +11356,7 @@
     "title": "SLA-4: Create SLA Breach Response Procedure",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12074,9 +11378,7 @@
     "title": "SLA-3: Draft Customer SLA Contract Terms",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12098,9 +11400,7 @@
     "title": "SLA-2: Implement SLO Monitoring & Burn Rate Alerts",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12122,9 +11422,7 @@
     "title": "SLA-1: Define Service-Level Objectives for Each Service",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12146,9 +11444,7 @@
     "title": "S9: Remediation, Reporting & Retest",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12170,9 +11466,7 @@
     "title": "S8: Post-Exploitation & Lateral Movement Assessment",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12194,9 +11488,7 @@
     "title": "S7: Manual Deep-Dive — Business Logic & Multi-Tenancy",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12218,9 +11510,7 @@
     "title": "S6: Manual Deep-Dive — Injection & Data Validation",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12242,9 +11532,7 @@
     "title": "S5: Manual Deep-Dive — Authentication & Authorization",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12266,9 +11554,7 @@
     "title": "S4: Automated Vulnerability Scanning — Application & API",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12290,9 +11576,7 @@
     "title": "S3: Automated Vulnerability Scanning — Infrastructure",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12314,9 +11598,7 @@
     "title": "S2: Reconnaissance & Threat Modeling",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12338,9 +11620,7 @@
     "title": "S1: Pre-Engagement — Scope Definition & Vendor Selection",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12362,9 +11642,7 @@
     "title": "DR-3: Infrastructure Disaster Recovery Procedure",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12386,9 +11664,7 @@
     "title": "DR-2: Database Backup & Restore Testing",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12410,9 +11686,7 @@
     "title": "DR-1: Define RTO/RPO Targets for All Critical Services",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12434,9 +11708,7 @@
     "title": "EPIC: Enterprise Readiness — Close All Enterprise Gaps",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12458,9 +11730,7 @@
     "title": "Enterprise Gap: SOC2 / HIPAA Certification Readiness",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12482,9 +11752,7 @@
     "title": "Enterprise Gap: Vendor Risk Assessment & Third-Party Audit",
     "category": "governance",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12506,9 +11774,7 @@
     "title": "Enterprise Gap: Chaos Engineering & Resilience Testing",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12530,9 +11796,7 @@
     "title": "Enterprise Gap: SLA/SLO Definitions & Error Budgets",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12554,9 +11818,7 @@
     "title": "Enterprise Gap: Penetration Testing & External Security Assessment",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12578,9 +11840,7 @@
     "title": "Enterprise Gap: Disaster Recovery & Business Continuity Plan",
     "category": "deferred-offscope",
     "triage_required": true,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12602,9 +11862,7 @@
     "title": "S1 — Charter rewrite: replace phantom Linear IDs with real tickets",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "Training Pipeline v2 — Audit Remediation"
-    ],
+    "projects": ["Training Pipeline v2 — Audit Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -12626,9 +11884,7 @@
     "title": "S5/S6 — Milestone discipline: zero milestone-less issues, reconciled progress",
     "category": "governance",
     "triage_required": false,
-    "projects": [
-      "Training Pipeline v2 — Audit Remediation"
-    ],
+    "projects": ["Training Pipeline v2 — Audit Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -14564,9 +13820,7 @@
     "title": "Full history sterilization for old hackathon secret-bearing commits",
     "category": "security-privacy",
     "triage_required": false,
-    "projects": [
-      "Enterprise Readiness Program"
-    ],
+    "projects": ["Enterprise Readiness Program"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -14698,9 +13952,7 @@
     "title": "Corpus Simulation Engine — Monthly Gated Pipeline (Aug 2025 – Jun 2026)",
     "category": "corpus-data",
     "triage_required": false,
-    "projects": [
-      "AI Training Pipeline"
-    ],
+    "projects": ["AI Training Pipeline"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -17032,9 +16284,7 @@
     "title": "Cross-Cutting: Infrastructure, Monitoring & Deployment",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "AI Research-Clinical Integration"
-    ],
+    "projects": ["AI Research-Clinical Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -17056,9 +16306,7 @@
     "title": "[Mera] Hierarchical Clinical Prediction with Memorize & Rank",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Research-Clinical Integration"
-    ],
+    "projects": ["AI Research-Clinical Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -17080,9 +16328,7 @@
     "title": "[Mental-LLM] Instruction Fine-Tuning for Mental Health Prediction",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Research-Clinical Integration"
-    ],
+    "projects": ["AI Research-Clinical Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -17104,9 +16350,7 @@
     "title": "[MedSSR] Self-Supervised RL Training Pipeline with Synthetic Data",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Research-Clinical Integration"
-    ],
+    "projects": ["AI Research-Clinical Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -17128,9 +16372,7 @@
     "title": "[DiagnosisArena] Comprehensive Diagnostic Evaluation Suite",
     "category": "model-evaluation",
     "triage_required": false,
-    "projects": [
-      "AI Research-Clinical Integration"
-    ],
+    "projects": ["AI Research-Clinical Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -17152,9 +16394,7 @@
     "title": "[Inquiry-Diagnosis] Patient Simulator & Diagnostic Quality Framework",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Research-Clinical Integration"
-    ],
+    "projects": ["AI Research-Clinical Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -17176,9 +16416,7 @@
     "title": "[DeepRare] Multi-Agent Rare Disease Diagnosis Architecture",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Research-Clinical Integration"
-    ],
+    "projects": ["AI Research-Clinical Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -17200,9 +16438,7 @@
     "title": "[Patient-Ψ] CCD-Based Cognitive Patient Simulation Engine",
     "category": "core-training-product",
     "triage_required": false,
-    "projects": [
-      "AI Research-Clinical Integration"
-    ],
+    "projects": ["AI Research-Clinical Integration"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -19600,9 +18836,7 @@
     "title": "EPIC: Churnmeon Phase 1 — Ship to Production",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -19646,9 +18880,7 @@
     "title": "EPIC: Churnmeon — Reliability Finish Line",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -19703,9 +18935,7 @@
     "title": "Churnmeon: end-to-end smoke test on real pixelated PR",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -19727,9 +18957,7 @@
     "title": "Churnmeon: LLM provider failover chain",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -20697,9 +19925,7 @@
     "title": "Explore VR travel features",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Stub & Technical Debt Remediation"
-    ],
+    "projects": ["Stub & Technical Debt Remediation"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -21491,9 +20717,7 @@
     "title": "Workstream E: Build evidence-based reprioritization engine",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Steering & Adaptive Development Loop"
-    ],
+    "projects": ["Steering & Adaptive Development Loop"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -21548,9 +20772,7 @@
     "title": "Define the canonical public memory API contract",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -21572,9 +20794,7 @@
     "title": "Implement secure deletion through crypto-shredding in the lifecycle manager",
     "category": "foresight",
     "triage_required": false,
-    "projects": [
-      "Foresight"
-    ],
+    "projects": ["Foresight"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -23983,9 +23203,7 @@
     "title": "*1.3 Unit tests for shared_config.py",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Training Pipeline v2 — Audit Remediation"
-    ],
+    "projects": ["Training Pipeline v2 — Audit Remediation"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24348,9 +23566,7 @@
     "title": "Churnmeon: align README and packaging narrative with the current workflow and plugin architecture",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Backlog",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24449,9 +23665,7 @@
     "title": "C6: Dashboard integration — live workflow status",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24473,9 +23687,7 @@
     "title": "C5: Learning loop — improve decisions from historical outcomes",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24497,9 +23709,7 @@
     "title": "C2: Post processing summary comment on each PR",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24521,9 +23731,7 @@
     "title": "C3: Human-in-the-loop escalation",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24556,9 +23764,7 @@
     "title": "B3: Smart bot comment filtering (pattern-based, not hardcoded)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24591,9 +23797,7 @@
     "title": "A4: Fix comment resolution — track processed comments locally",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24626,9 +23830,7 @@
     "title": "B2: LLM timeout handling and fallback for large files",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24661,9 +23863,7 @@
     "title": "B1: Test suite validation in E2B sandbox before merge",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24696,9 +23896,7 @@
     "title": "B4: Smart conflict resolution strategy per PR type",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24720,9 +23918,7 @@
     "title": "A3: Fast-path for clean PRs (no actionable comments → immediate merge)",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24755,9 +23951,7 @@
     "title": "Churnmeon AI — Workflow Expansion & Improvement",
     "category": "infrastructure-ci",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [
@@ -24779,9 +23973,7 @@
     "title": "Phase 1: Fix the Bleeding — Auto-rebase, fast-path, commit messages, error recovery",
     "category": "developer-tooling",
     "triage_required": false,
-    "projects": [
-      "Churnmeon Reliability"
-    ],
+    "projects": ["Churnmeon Reliability"],
     "status": "Done",
     "completion_evidence": "tracker-reported only; not runtime-verified",
     "sources": [

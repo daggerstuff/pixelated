@@ -5,16 +5,16 @@ is the first pin the milestone produced itself: the two earlier pins were merged
 and deployed by a concurrent session while the milestone ran, and are recorded
 in `library/release-pin.md` §0.19 and §0.20 rather than assumed away.
 
-| Item | Value |
-| --- | --- |
-| Pin at feature start (live read) | `99b44142783a985f4ed08579dceaf93a389ab25f` / Worker `1f1c7586-12a0-49f6-8418-f757e3500e49` (§0.20, the concurrent session's second intermediate pin) |
-| **Pin this feature produced** | **`a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` / Worker `a6028a07-9534-4bcd-a9b8-47dc602d1dbc`** (§0.21) |
-| `origin/staging` HEAD at final read | `a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` (this document was pushed on top of it as `e597fe6da`, docs-only, and did **not** redeploy the Worker) |
-| Worker traffic | **100%** |
-| Worker version created | 2026-11-11T10:38:56.888Z |
-| Deployment created | 2026-11-11T10:38:58.508Z |
-| Pin read at | 2026-11-11T10:39:33Z, re-read 2026-11-11T10:53:20Z (unchanged) |
-| Reader | `./node_modules/.bin/wrangler deployments status --name pixelated-empathy`, wrangler 4.158.0 |
+| Item                                | Value                                                                                                                                                |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pin at feature start (live read)    | `99b44142783a985f4ed08579dceaf93a389ab25f` / Worker `1f1c7586-12a0-49f6-8418-f757e3500e49` (§0.20, the concurrent session's second intermediate pin) |
+| **Pin this feature produced**       | **`a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` / Worker `a6028a07-9534-4bcd-a9b8-47dc602d1dbc`** (§0.21)                                               |
+| `origin/staging` HEAD at final read | `a2f06cc38fe19f53c2788f79cfcff22d576dd5b1` (this document was pushed on top of it as `e597fe6da`, docs-only, and did **not** redeploy the Worker)    |
+| Worker traffic                      | **100%**                                                                                                                                             |
+| Worker version created              | 2026-11-11T10:38:56.888Z                                                                                                                             |
+| Deployment created                  | 2026-11-11T10:38:58.508Z                                                                                                                             |
+| Pin read at                         | 2026-11-11T10:39:33Z, re-read 2026-11-11T10:53:20Z (unchanged)                                                                                       |
+| Reader                              | `./node_modules/.bin/wrangler deployments status --name pixelated-empathy`, wrangler 4.158.0                                                         |
 
 The pin was read **live before anything was merged**, not assumed to be
 `1580a719f`. It returned §0.20's pin, so seven PRs were still open on top of it.
@@ -27,15 +27,15 @@ red was `Qodo Merge (PR-Agent)` on #6706/#6707/#6708/#6709/#6712, which is
 infrastructure (`litellm.AuthenticationError: 401` through the Cloudflare AI
 Gateway, `internalCode 2009`), not a finding.
 
-| # | Subject | Squash commit |
-| --- | --- | --- |
-| #6706 | first-login provider-email follow-up | `134226984` |
-| #6708 | provider outage is not a denial | `ae4a1e3be` |
-| #6711 | db knob guards + comment-aware build scanner | `928ad7af3` |
-| #6710 | message POST idempotency, `MESSAGE_KEY_NAMESPACE` v1 → v2 | `ee449b20f` |
-| #6707 | faculty vocabulary + dead supervisor handler | `040e30cb1` |
-| #6709 | one session validation per request | `cff23f463` |
-| #6712 | composer send-control hit target | `a2f06cc38` |
+| #     | Subject                                                   | Squash commit |
+| ----- | --------------------------------------------------------- | ------------- |
+| #6706 | first-login provider-email follow-up                      | `134226984`   |
+| #6708 | provider outage is not a denial                           | `ae4a1e3be`   |
+| #6711 | db knob guards + comment-aware build scanner              | `928ad7af3`   |
+| #6710 | message POST idempotency, `MESSAGE_KEY_NAMESPACE` v1 → v2 | `ee449b20f`   |
+| #6707 | faculty vocabulary + dead supervisor handler              | `040e30cb1`   |
+| #6709 | one session validation per request                        | `cff23f463`   |
+| #6712 | composer send-control hit target                          | `a2f06cc38`   |
 
 **#6701 was already merged** as `45c4d9417` on the start pin and was not
 re-merged. Its subject (the deleted `lib/middleware/csrf.ts` and the live
@@ -59,12 +59,12 @@ and after #6709) and needed no resolution.
 merged result is green, so staging CI was read on the resulting head before the
 deploy was read:
 
-| Item | Run | Result |
-| --- | --- | --- |
-| Staging `CI` on `a2f06cc38` | `43003930517` | **success** (`build-test`) |
-| Staging `Quality` on `a2f06cc38` | `43003930578` | **success**, all 9 jobs |
-| Deploy run, first | `43003953044` | conclusion **success**, `Build Cloudflare bundle` and `Deploy to Cloudflare` **skipped** |
-| Deploy run, second | `43004911424` | **success**, all four jobs ran |
+| Item                             | Run           | Result                                                                                   |
+| -------------------------------- | ------------- | ---------------------------------------------------------------------------------------- |
+| Staging `CI` on `a2f06cc38`      | `43003930517` | **success** (`build-test`)                                                               |
+| Staging `Quality` on `a2f06cc38` | `43003930578` | **success**, all 9 jobs                                                                  |
+| Deploy run, first                | `43003953044` | conclusion **success**, `Build Cloudflare bundle` and `Deploy to Cloudflare` **skipped** |
+| Deploy run, second               | `43004911424` | **success**, all four jobs ran                                                           |
 
 `Quality`'s nine green jobs include `ai submodule strict ratchet`, which
 confirms the `94a8deeb2` fix rather than the old "permanently red" reading.
@@ -83,11 +83,11 @@ mode.
 Measured at 10:52Z, **after** every scored burst, because
 `tools/auth0-stage-timing.mjs` spends the `/userinfo` budget. n = 10 per stage.
 
-| Stage | min / median / max (ms) | Outcomes |
-| --- | --- | --- |
-| `/userinfo` with app retry | 62 / 82 / **8798** | 9 × `200`, **1 × `429`** |
-| Management `getUser` (SDK retry) | 46 / 73 / 185 | 10 × `200` |
-| Postgres connect + select | 13 / 13 / 115 | 10 × `ok` |
+| Stage                            | min / median / max (ms) | Outcomes                 |
+| -------------------------------- | ----------------------- | ------------------------ |
+| `/userinfo` with app retry       | 62 / 82 / **8798**      | 9 × `200`, **1 × `429`** |
+| Management `getUser` (SDK retry) | 46 / 73 / 185           | 10 × `200`               |
+| Postgres connect + select        | 13 / 13 / 115           | 10 × `ok`                |
 
 The `/userinfo` ceiling is real and was reached inside ten samples, with an
 8.8 s tail. **The tenant was not touched**: the limit is the owner's action.
@@ -105,13 +105,13 @@ The sub was put into the unmapped state deliberately: org A's
 `auth_accounts` link was deleted (`linkDeleted: true`), leaving the user row
 intact with no provider link.
 
-| Step | Result |
-| --- | --- |
-| `POST /api/auth/signin` (attempt 1) | **200**, auth cookie set |
+| Step                                                              | Result                                                                         |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `POST /api/auth/signin` (attempt 1)                               | **200**, auth cookie set                                                       |
 | `GET /api/training/sessions/33333333-3333-4333-8333-333333333333` | **200**, body keys `sessionId`, `clientProfile`, `difficultyLevel`, `messages` |
-| `sessionIdInBody` | `33333333-3333-4333-8333-333333333333` — org A's own session |
-| `messageCount` / `workspacePopulated` | 125 / `true` |
-| `auth_accounts` after | one new row `8828b320-38b0-4580-a3f1-92d2a441c635`, same `provider_id` |
+| `sessionIdInBody`                                                 | `33333333-3333-4333-8333-333333333333` — org A's own session                   |
+| `messageCount` / `workspacePopulated`                             | 125 / `true`                                                                   |
+| `auth_accounts` after                                             | one new row `8828b320-38b0-4580-a3f1-92d2a441c635`, same `provider_id`         |
 
 No `403` loop: the unmapped sub signed in and reached its own trainee surface on
 the first attempt. This is the live probe
@@ -132,8 +132,8 @@ Two observations, recorded rather than hidden:
 Focused test `apps/web/src/lib/auth/__tests__/user-identity-provisioning.test.ts`
 — 10 cases, green on the deployed commit. Read-only SQL on the live database:
 
-| `provider_id` | `user_id` | `workspace_id` |
-| --- | --- | --- |
+| `provider_id`                     | `user_id`                              | `workspace_id`                         |
+| --------------------------------- | -------------------------------------- | -------------------------------------- |
 | `auth0\|6af0f3f3a68ee520ba8e046b` | `22222222-2222-4222-8222-222222222222` | `11111111-1111-4111-8111-111111111111` |
 | `auth0\|6af0f3f48c63f77d31d9bc63` | `66666666-6666-4666-8666-666666666666` | `55555555-5555-4555-8555-555555555555` |
 
@@ -149,11 +149,11 @@ never `401`, never a `/login` redirect).
 The invalid-token half was measured live so the two outcomes are visibly
 distinct:
 
-| Leg | Result |
-| --- | --- |
-| invalid token, `GET /api/chat/messages` (`routeAuthConfig`) | **401** `No authorization header` |
-| invalid token, `GET /training` (session-required page) | **302** `Location: /login?redirect=/training` |
-| invalid token, `GET /dashboard` | **200** — renders signed out; `/dashboard` carries no page-level guard on this pin |
+| Leg                                                         | Result                                                                             |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| invalid token, `GET /api/chat/messages` (`routeAuthConfig`) | **401** `No authorization header`                                                  |
+| invalid token, `GET /training` (session-required page)      | **302** `Location: /login?redirect=/training`                                      |
+| invalid token, `GET /dashboard`                             | **200** — renders signed out; `/dashboard` carries no page-level guard on this pin |
 
 One **live provider-outage response was observed** while the bucket was
 throttled (manual browser observation, 10:45Z): the body was
@@ -174,31 +174,31 @@ every completed validation logs exactly one).
 
 Window 1, 2026-11-11T10:40:32.905Z → 10:40:38.740Z:
 
-| Request | Status | Wall | Failed-track lines |
-| --- | --- | --- | --- |
-| `GET /api/auth/csrf` | 200 | 409 ms | 0 |
-| `POST /api/auth/signin` | 200 | 651 ms | **2** |
-| cold `GET /training` | 200 | 658 ms | **1** |
-| warm `GET /training` #1 | 200 | 200 ms | 1 |
-| warm `GET /training` #2 | 200 | 7 ms | **0** |
-| invalid token, `GET /training/session/<uuid>` | 302 | 584 ms | **1** |
+| Request                                       | Status | Wall   | Failed-track lines |
+| --------------------------------------------- | ------ | ------ | ------------------ |
+| `GET /api/auth/csrf`                          | 200    | 409 ms | 0                  |
+| `POST /api/auth/signin`                       | 200    | 651 ms | **2**              |
+| cold `GET /training`                          | 200    | 658 ms | **1**              |
+| warm `GET /training` #1                       | 200    | 200 ms | 1                  |
+| warm `GET /training` #2                       | 200    | 7 ms   | **0**              |
+| invalid token, `GET /training/session/<uuid>` | 302    | 584 ms | **1**              |
 
 Window 2, 2026-11-11T10:41:23.238Z → 10:41:28.801Z:
 
-| Request | Status | Wall | Failed-track lines |
-| --- | --- | --- | --- |
-| `GET /api/auth/csrf` | 200 | 324 ms | 0 |
-| `POST /api/auth/signin` | 200 | 607 ms | **2** |
-| cold `GET /training` | 200 | 543 ms | **1** |
-| warm `GET /training` #1 | 200 | 157 ms | 1 |
-| warm `GET /training` #2–#6 | 200 | 8 / 3 / 5 / 3 / 8 ms | **0 each** |
-| invalid token, `GET /training/session/<uuid>` | 302 | 581 ms | **1** |
+| Request                                       | Status | Wall                 | Failed-track lines |
+| --------------------------------------------- | ------ | -------------------- | ------------------ |
+| `GET /api/auth/csrf`                          | 200    | 324 ms               | 0                  |
+| `POST /api/auth/signin`                       | 200    | 607 ms               | **2**              |
+| cold `GET /training`                          | 200    | 543 ms               | **1**              |
+| warm `GET /training` #1                       | 200    | 157 ms               | 1                  |
+| warm `GET /training` #2–#6                    | 200    | 8 / 3 / 5 / 3 / 8 ms | **0 each**         |
+| invalid token, `GET /training/session/<uuid>` | 302    | 581 ms               | **1**              |
 
-| Leg | Before (`1580a719f`) | After (`a2f06cc38`) |
-| --- | --- | --- |
-| cold `/training` | **2** | **1** |
-| warm `/training` | 0 | **0** |
-| invalid token on `/training/session` | **2** | **1** |
+| Leg                                  | Before (`1580a719f`) | After (`a2f06cc38`) |
+| ------------------------------------ | -------------------- | ------------------- |
+| cold `/training`                     | **2**                | **1**               |
+| warm `/training`                     | 0                    | **0**               |
+| invalid token on `/training/session` | **2**                | **1**               |
 
 The partition is what makes this measurable: the whole-window count is 5 in
 both windows, because the sign-in POST contributes 2 and is not a session
@@ -216,22 +216,22 @@ is stated rather than smoothed out.
 already on the start pin) and `git grep` finds no caller. The live KV-backed
 contract still holds:
 
-| Leg | Result |
-| --- | --- |
-| `GET /api/auth/csrf` | **200**, body carries `csrfToken` and `expiresAt` (token length 64) |
-| `POST /api/auth/signin` with no token | **403** `CSRF token required` |
-| `POST /api/auth/signin` with an invalid token | **403** `Invalid CSRF token` |
+| Leg                                           | Result                                                              |
+| --------------------------------------------- | ------------------------------------------------------------------- |
+| `GET /api/auth/csrf`                          | **200**, body carries `csrfToken` and `expiresAt` (token length 64) |
+| `POST /api/auth/signin` with no token         | **403** `CSRF token required`                                       |
+| `POST /api/auth/signin` with an invalid token | **403** `Invalid CSRF token`                                        |
 
 ### VAL-INPUT-001 — Malformed input is a 4xx, never a 5xx — **PASS (live)**
 
-| Request | Status | Body |
-| --- | --- | --- |
-| `GET /api/session/snapshots?sessionId=not-a-uuid` | **400** | `Invalid sessionId: expected a UUID`, `LEGACY_SESSION_INVALID_REQUEST` |
-| `POST /api/session/snapshots` non-UUID | **400** | `Invalid payload: require sessionId and up to 500 snapshots…` |
-| `POST /api/session/snapshots` invalid JSON | **400** | `Invalid JSON body`, `LEGACY_SESSION_INVALID_REQUEST` |
-| `POST /api/session/snapshots` empty body | **400** | `Invalid JSON body`, `LEGACY_SESSION_INVALID_REQUEST` |
-| `GET /api/session/{progress,skills,comparison,analytics}` | **410** each | `LEGACY_SESSION_API_UNAVAILABLE` |
-| `POST /api/session/{progress,skills}` malformed | **400** each | `LEGACY_SESSION_INVALID_REQUEST` |
+| Request                                                   | Status       | Body                                                                   |
+| --------------------------------------------------------- | ------------ | ---------------------------------------------------------------------- |
+| `GET /api/session/snapshots?sessionId=not-a-uuid`         | **400**      | `Invalid sessionId: expected a UUID`, `LEGACY_SESSION_INVALID_REQUEST` |
+| `POST /api/session/snapshots` non-UUID                    | **400**      | `Invalid payload: require sessionId and up to 500 snapshots…`          |
+| `POST /api/session/snapshots` invalid JSON                | **400**      | `Invalid JSON body`, `LEGACY_SESSION_INVALID_REQUEST`                  |
+| `POST /api/session/snapshots` empty body                  | **400**      | `Invalid JSON body`, `LEGACY_SESSION_INVALID_REQUEST`                  |
+| `GET /api/session/{progress,skills,comparison,analytics}` | **410** each | `LEGACY_SESSION_API_UNAVAILABLE`                                       |
+| `POST /api/session/{progress,skills}` malformed           | **400** each | `LEGACY_SESSION_INVALID_REQUEST`                                       |
 
 No leg produced a `5xx`, and no body leaked a Postgres error code or table name.
 The `410` exclusion contract for the other four legacy routes is unchanged.
@@ -259,11 +259,11 @@ proven at test level: `messages-deadline.test.ts` (8 cases) and
 All three pairs sent in the same session within one measurement window
 (10:42:40Z), entirely **after** the 10:38:58Z deploy.
 
-| Pair | Submission identity | Rows | Statuses |
-| --- | --- | --- | --- |
-| deliberate repeat, identical text | two distinct `X-Message-Submission-Id` | **2** (`1ad9a67a…`, `5caa8b6b…`) | 201, 201 |
-| retry of one send action | the **same** id twice | **1** (`7a8a5d6c…`) | 201, 201 |
-| retry with no identity | none | **1** (`efd9fa43…`), payload-derived dedupe | 201, 201 |
+| Pair                              | Submission identity                    | Rows                                        | Statuses |
+| --------------------------------- | -------------------------------------- | ------------------------------------------- | -------- |
+| deliberate repeat, identical text | two distinct `X-Message-Submission-Id` | **2** (`1ad9a67a…`, `5caa8b6b…`)            | 201, 201 |
+| retry of one send action          | the **same** id twice                  | **1** (`7a8a5d6c…`)                         | 201, 201 |
+| retry with no identity            | none                                   | **1** (`efd9fa43…`), payload-derived dedupe | 201, 201 |
 
 Both halves are proven on the live pin: a retry persists one row **and** a
 second deliberate send of identical text persists a second row. The first half
@@ -306,12 +306,11 @@ scheme cannot collide with one derived here.
 
 1440×900, `repeat8`, `elementFromPoint` at the centre of the send control:
 
-| Cycle | `hit` before click | POST status | Rows persisted |
-| --- | --- | --- | --- |
-| 1–8 | `path` (the button's SVG child) | **201** each | 8 |
+| Cycle | `hit` before click              | POST status  | Rows persisted |
+| ----- | ------------------------------- | ------------ | -------------- |
+| 1–8   | `path` (the button's SVG child) | **201** each | 8              |
 
-`hitIsButtonOrDescendant: true`, `gapButtonBottomToFooterTop: 16`, button top
-679. Every cycle used a coordinate click, no `el.click()`, and every accepted
+`hitIsButtonOrDescendant: true`, `gapButtonBottomToFooterTop: 16`, button top 679. Every cycle used a coordinate click, no `el.click()`, and every accepted
 cycle persisted a row carrying the mission marker.
 
 The 320×568 mobile leg is **supplementary and inconclusive**: at that viewport
@@ -326,22 +325,22 @@ trees (the broken import sits under `apps/web/src/pages/` because the scanner
 deliberately ignores relative imports from `apps/web/src/lib/` and
 `apps/web/src/components/`):
 
-| Fixture | Exit | Last line |
-| --- | --- | --- |
+| Fixture                                                     | Exit  | Last line                                                |
+| ----------------------------------------------------------- | ----- | -------------------------------------------------------- |
 | import-like text only in line, block, HTML and CSS comments | **0** | `✅ Build contract validation passed: imports resolved.` |
-| the **same text as a real import** (non-vacuity pair) | **1** | unresolved-import hint |
-| genuinely unresolved package import | **1** | unresolved-import hint |
+| the **same text as a real import** (non-vacuity pair)       | **1** | unresolved-import hint                                   |
+| genuinely unresolved package import                         | **1** | unresolved-import hint                                   |
 
 The second row is what makes the first meaningful: the comment case is not
 passing because the file was skipped.
 
 ### VAL-DB-001 — The query-timeout knob cannot silently disable itself — **PASS**
 
-| Input | Resolved behaviour |
-| --- | --- |
+| Input                | Resolved behaviour                                                                                                            |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `DB_QUERY_TIMEOUT=0` | `normalisePoolBound` returns `0` — the bound is **explicitly disabled**, documented at `apps/web/src/lib/db/index.ts:392–398` |
-| negative | normalised to `0` (disabled) rather than a truthy negative that would schedule `setTimeout(…, -N)` and fire on the next turn |
-| non-numeric | `envInt` falls back to the default (`Number.isFinite` guard, `index.ts:289–294`) |
+| negative             | normalised to `0` (disabled) rather than a truthy negative that would schedule `setTimeout(…, -N)` and fire on the next turn  |
+| non-numeric          | `envInt` falls back to the default (`Number.isFinite` guard, `index.ts:289–294`)                                              |
 
 Focused tests green on the deployed commit: `query-timeout-disable.test.ts`
 (8 cases), `pool-option-contract.test.ts` (38), plus `query-timeout.test.ts`
@@ -401,25 +400,25 @@ not reclassified as a pass.
 Run in a detached worktree at `a2f06cc38`, using `./node_modules/.bin/vitest`
 (the worktree shares the primary tree's `node_modules`; no `pnpm` invocation).
 
-| Scope | Files | Tests |
-| --- | --- | --- |
+| Scope                                                                                                                                                                                                                        | Files  | Tests    |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
 | Milestone gate (`lib/auth`, `lib/middleware`, `lib/db`, `lib/services/training`, `lib/security`, `api/auth`, `api/session`, `api/training/sessions`, `pages/training`, `tests/api/session`, `tests/ci`, `redis-local-cache`) | **78** | **1109** |
-| `pages/training/__tests__` | 4 | 37 |
-| `tests/ci` | 1 | 6 |
-| `lib/db/__tests__` | 9 | 134 |
-| `api/training/sessions/__tests__` | 5 | 42 |
-| `api/session/__tests__` | 6 | 151 |
-| `lib/auth` (3 assertion-owning suites) | 3 | 37 |
-| `api/auth/__tests__/csrf.test.ts` | 1 | 4 |
+| `pages/training/__tests__`                                                                                                                                                                                                   | 4      | 37       |
+| `tests/ci`                                                                                                                                                                                                                   | 1      | 6        |
+| `lib/db/__tests__`                                                                                                                                                                                                           | 9      | 134      |
+| `api/training/sessions/__tests__`                                                                                                                                                                                            | 5      | 42       |
+| `api/session/__tests__`                                                                                                                                                                                                      | 6      | 151      |
+| `lib/auth` (3 assertion-owning suites)                                                                                                                                                                                       | 3      | 37       |
+| `api/auth/__tests__/csrf.test.ts`                                                                                                                                                                                            | 1      | 4        |
 
 All green, exit 0.
 
 ## 5. Row accounting (owner decision: keep the rows)
 
-| Snapshot | UTC | Total messages | Mission-marked |
-| --- | --- | --- | --- |
-| Before any write | 2026-11-11T10:17:06.996Z | **124** | 124 |
-| After the release window | 2026-11-11T10:51:51.453Z | **136** | **136** |
+| Snapshot                 | UTC                      | Total messages | Mission-marked |
+| ------------------------ | ------------------------ | -------------- | -------------- |
+| Before any write         | 2026-11-11T10:17:06.996Z | **124**        | 124            |
+| After the release window | 2026-11-11T10:51:51.453Z | **136**        | **136**        |
 
 The +12 rows are the measurement's own writes: 8 from the VAL-UX-002 pointer
 probe and 4 from the VAL-POST-004/VAL-POST-002 pairs. All 12 landed in org A
@@ -448,19 +447,19 @@ so this record does not delete them.
 Raw measurement files live under
 `<missionDir>/results/hardening-release-and-remeasure/`:
 
-| File | Contents |
-| --- | --- |
-| `row-state-before-20261111.json`, `row-state-after-20261111.json` | the two row snapshots |
-| `tail-auth003-20261111T104005Z.jsonl`, `auth003-window-20261111T104005Z.json` | window 1 tail and legs |
-| `tail-auth003-w2-20261111T1042Z.jsonl`, `auth003-window-w2-20261111T1042Z.json` | window 2 tail and legs |
-| `legacy-legs-20261111.json` | VAL-INPUT-001 / VAL-POST-003 legs |
-| `post-idempotency-20261111.json` | VAL-POST-004 / VAL-POST-002 pairs |
-| `csrf-outage-legs-20261111.json` | VAL-CSRF-006 and the invalid-token legs |
-| `pointer-ux002-20261111.json`, `pointer-ux002-mobile-20261111.json` | VAL-UX-002 |
-| `val-ident-001-20261111.json` | the first-login probe |
-| `val-ci-002-20261111.json` | the three scanner fixtures |
-| `stage-timing-20261111.json` | the provider stage timings |
-| `provider-503-observation-20261111.json` | the one live provider-503 body |
+| File                                                                            | Contents                                |
+| ------------------------------------------------------------------------------- | --------------------------------------- |
+| `row-state-before-20261111.json`, `row-state-after-20261111.json`               | the two row snapshots                   |
+| `tail-auth003-20261111T104005Z.jsonl`, `auth003-window-20261111T104005Z.json`   | window 1 tail and legs                  |
+| `tail-auth003-w2-20261111T1042Z.jsonl`, `auth003-window-w2-20261111T1042Z.json` | window 2 tail and legs                  |
+| `legacy-legs-20261111.json`                                                     | VAL-INPUT-001 / VAL-POST-003 legs       |
+| `post-idempotency-20261111.json`                                                | VAL-POST-004 / VAL-POST-002 pairs       |
+| `csrf-outage-legs-20261111.json`                                                | VAL-CSRF-006 and the invalid-token legs |
+| `pointer-ux002-20261111.json`, `pointer-ux002-mobile-20261111.json`             | VAL-UX-002                              |
+| `val-ident-001-20261111.json`                                                   | the first-login probe                   |
+| `val-ci-002-20261111.json`                                                      | the three scanner fixtures              |
+| `stage-timing-20261111.json`                                                    | the provider stage timings              |
+| `provider-503-observation-20261111.json`                                        | the one live provider-503 body          |
 
 The pin itself is recorded in `library/release-pin.md` §0.21, beside the two
 concurrent-session intermediate pins (§0.19, §0.20) that this feature started

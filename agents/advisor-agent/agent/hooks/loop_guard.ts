@@ -22,12 +22,14 @@ const recentMessagesByTurn = new Map<string, { text: string; count: number }>()
 export default defineHook({
   events: {
     'content.completed'(event) {
-      const data = (event as { data?: { kind?: unknown; value?: unknown; phase?: unknown } })
-        .data
+      const data = (
+        event as { data?: { kind?: unknown; value?: unknown; phase?: unknown } }
+      ).data
       if (data?.kind !== 'text' || data?.phase !== 'reply') return
       const text = typeof data.value === 'string' ? data.value : ''
       const turnId =
-        typeof (event as { scope?: { turnId?: unknown } }).scope?.turnId === 'string'
+        typeof (event as { scope?: { turnId?: unknown } }).scope?.turnId ===
+        'string'
           ? ((event as { scope?: { turnId?: string } }).scope?.turnId as string)
           : ''
       if (!text) return

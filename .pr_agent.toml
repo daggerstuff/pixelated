@@ -35,5 +35,5 @@ glob = [
   "**/*.jsonl",
   "docs/Books/**",
   "ai/docs/Books/**",
-  "submodules/**"
+  "submodules/**",
 ]

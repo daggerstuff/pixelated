@@ -12,10 +12,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -30,10 +27,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -48,10 +42,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -66,10 +57,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -84,10 +72,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -102,10 +87,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -120,10 +102,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -138,10 +117,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -156,10 +132,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -174,10 +147,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -192,10 +162,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -210,10 +177,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -228,10 +192,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -246,10 +207,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -264,10 +222,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -282,10 +237,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -300,10 +252,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -318,10 +267,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -336,10 +282,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -354,10 +297,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-17-ci-federation-asana-tasks.csv",
@@ -372,10 +312,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -390,10 +327,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -408,10 +342,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -426,10 +357,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -444,10 +372,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -462,10 +387,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -480,10 +402,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -498,10 +417,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -516,10 +432,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -534,10 +447,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -552,10 +462,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -570,10 +477,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -588,10 +492,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -606,10 +507,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-18-mtgc-asana-tasks.csv",
@@ -624,10 +522,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
@@ -638,10 +533,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "description",
-      "assignee"
-    ]
+    "omitted_fields": ["description", "assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
@@ -652,10 +544,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "description",
-      "assignee"
-    ]
+    "omitted_fields": ["description", "assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
@@ -666,10 +555,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "description",
-      "assignee"
-    ]
+    "omitted_fields": ["description", "assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
@@ -680,10 +566,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "description",
-      "assignee"
-    ]
+    "omitted_fields": ["description", "assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
@@ -694,10 +577,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "description",
-      "assignee"
-    ]
+    "omitted_fields": ["description", "assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
@@ -708,10 +588,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "description",
-      "assignee"
-    ]
+    "omitted_fields": ["description", "assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
@@ -722,10 +599,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "description",
-      "assignee"
-    ]
+    "omitted_fields": ["description", "assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-21-test-coverage-baseline-tasks.csv",
@@ -736,10 +610,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "description",
-      "assignee"
-    ]
+    "omitted_fields": ["description", "assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -754,10 +625,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -772,10 +640,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -790,10 +655,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -808,10 +670,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -826,10 +685,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -844,10 +700,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -862,10 +715,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -880,10 +730,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -898,10 +745,7 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   },
   {
     "source_path": ".agent/internal/plans/2026-03-23-dataset-acquisition-asana-tasks.csv",
@@ -916,9 +760,6 @@
     },
     "reported_status": null,
     "implementation_verified": false,
-    "omitted_fields": [
-      "Description",
-      "Assignee"
-    ]
+    "omitted_fields": ["Description", "Assignee"]
   }
 ]

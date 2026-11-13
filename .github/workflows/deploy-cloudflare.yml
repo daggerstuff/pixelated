@@ -7,323 +7,323 @@ name: Deploy to Cloudflare Workers
 # or agents-only push skips the rebuild. The runtime env is synced from the
 # CF_WORKER_* repository secrets before every deploy.
 on:
-    workflow_dispatch:
-    workflow_run:
-        workflows: [CI]
-        types: [completed]
-        branches: [staging]
+  workflow_dispatch:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [staging]
 
 # Deploys must not overlap: a newer run waits for the current one.
 concurrency:
-    group: deploy-cloudflare
-    cancel-in-progress: false
+  group: deploy-cloudflare
+  cancel-in-progress: false
 
 permissions:
-    contents: read
-    actions: read
+  contents: read
+  actions: read
 
 env:
-    CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
 jobs:
-    # The pipeline lands before the credentials exist, so it must be a no-op
-    # rather than a red X on every green staging CI run. A job-level `if` cannot
-    # read the secrets context reliably, so gate through a step output instead.
-    preflight:
-        name: Check deploy credentials
-        runs-on: ubuntu-latest
-        outputs:
-            enabled: ${{ steps.check.outputs.enabled }}
-        steps:
-            - name: Check for Cloudflare API token
-              id: check
-              env:
-                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-              run: |
-                  if [ -n "${CLOUDFLARE_API_TOKEN}" ]; then
-                    echo "enabled=true" >> "$GITHUB_OUTPUT"
-                  else
-                    echo "enabled=false" >> "$GITHUB_OUTPUT"
-                    echo "::notice::CLOUDFLARE_API_TOKEN is not configured; skipping the Cloudflare deploy."
-                  fi
+  # The pipeline lands before the credentials exist, so it must be a no-op
+  # rather than a red X on every green staging CI run. A job-level `if` cannot
+  # read the secrets context reliably, so gate through a step output instead.
+  preflight:
+    name: Check deploy credentials
+    runs-on: ubuntu-latest
+    outputs:
+      enabled: ${{ steps.check.outputs.enabled }}
+    steps:
+      - name: Check for Cloudflare API token
+        id: check
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -n "${CLOUDFLARE_API_TOKEN}" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::CLOUDFLARE_API_TOKEN is not configured; skipping the Cloudflare deploy."
+          fi
 
-    # The Worker only serves the web app, so a green CI run that changed no
-    # app-facing file (docs-only, agents-only, submodule-pointer pushes) does
-    # not need a rebuild. Compare against the head of the last successful
-    # deploy; anything ambiguous (no history, truncated compare, rerun of the
-    # same head) errs on deploying. Manual dispatch always deploys.
-    paths:
-        name: Detect app-facing changes
-        runs-on: ubuntu-latest
-        outputs:
-            needed: ${{ steps.decide.outputs.needed }}
-        steps:
-            - name: Compare against the last deployed head
-              id: decide
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: |
-                  set -euo pipefail
-                  if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-                    echo "Manual dispatch: deploying." >&2
-                    echo "needed=true" >> "$GITHUB_OUTPUT"
-                    exit 0
-                  fi
-                  HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
-                  # The base must be the last run that actually BUILT and deployed:
-                  # skipped deploy runs also conclude success, and comparing from
-                  # one would silently skip any app changes below it. Walk the
-                  # recent successful runs back to one whose build job ran.
-                  LAST=""
-                  for ENTRY in $(gh run list -R "$GITHUB_REPOSITORY" --workflow deploy-cloudflare.yml --status success --limit 15 --json databaseId,headSha --jq '.[] | (.databaseId|tostring) + "@" + .headSha' 2>/dev/null); do
-                    RID="${ENTRY%%@*}"; RSHA="${ENTRY##*@}"
-                    BUILT=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RID/jobs" --jq '[.jobs[] | select(.name == "Build Cloudflare bundle") | .conclusion] | index("success") != null' 2>/dev/null || true)
-                    if [ "$BUILT" = "true" ]; then
-                      LAST="$RSHA"
-                      break
-                    fi
-                  done
-                  if [ -z "$LAST" ]; then
-                    echo "No prior deploy to compare against: deploying." >&2
-                    echo "needed=true" >> "$GITHUB_OUTPUT"
-                    exit 0
-                  fi
-                  if [ "$LAST" = "$HEAD_SHA" ]; then
-                    echo "This exact head already deployed successfully: skipping (use workflow_dispatch to redeploy, e.g. after a secret rotation)." >&2
-                    echo "needed=false" >> "$GITHUB_OUTPUT"
-                    exit 0
-                  fi
-                  gh api "repos/$GITHUB_REPOSITORY/compare/$LAST...$HEAD_SHA" > "$RUNNER_TEMP/compare.json" 2>/dev/null || true
-                  if [ ! -s "$RUNNER_TEMP/compare.json" ]; then
-                    echo "Compare failed: deploying." >&2
-                    echo "needed=true" >> "$GITHUB_OUTPUT"
-                    exit 0
-                  fi
-                  COMMITS=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["total_commits"])' "$RUNNER_TEMP/compare.json")
-                  if [ "${COMMITS:-999}" -gt 250 ]; then
-                    echo "Large compare range: deploying." >&2
-                    echo "needed=true" >> "$GITHUB_OUTPUT"
-                    exit 0
-                  fi
-                  python3 -c 'import json,sys; [print(f["filename"]) for f in json.load(open(sys.argv[1]))["files"]]' "$RUNNER_TEMP/compare.json" > "$RUNNER_TEMP/changed.txt"
-                  rm -f "$RUNNER_TEMP/compare.json"
-                  if grep -qE '^(apps/web/|packages/ui/|packages/components/|astro\.config\.|wrangler\.jsonc$|package\.json$|pnpm-lock\.yaml$|tsconfig\.json$|scripts/ci/build-cloudflare\.sh$|\.github/workflows/deploy-cloudflare\.yml$|\.github/actions/)' "$RUNNER_TEMP/changed.txt"; then
-                    echo "App-facing files changed: deploying." >&2
-                    echo "needed=true" >> "$GITHUB_OUTPUT"
-                  else
-                    echo "No app-facing changes since $LAST: skipping the deploy." >&2
-                    echo "needed=false" >> "$GITHUB_OUTPUT"
-                  fi
+  # The Worker only serves the web app, so a green CI run that changed no
+  # app-facing file (docs-only, agents-only, submodule-pointer pushes) does
+  # not need a rebuild. Compare against the head of the last successful
+  # deploy; anything ambiguous (no history, truncated compare, rerun of the
+  # same head) errs on deploying. Manual dispatch always deploys.
+  paths:
+    name: Detect app-facing changes
+    runs-on: ubuntu-latest
+    outputs:
+      needed: ${{ steps.decide.outputs.needed }}
+    steps:
+      - name: Compare against the last deployed head
+        id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual dispatch: deploying." >&2
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+          # The base must be the last run that actually BUILT and deployed:
+          # skipped deploy runs also conclude success, and comparing from
+          # one would silently skip any app changes below it. Walk the
+          # recent successful runs back to one whose build job ran.
+          LAST=""
+          for ENTRY in $(gh run list -R "$GITHUB_REPOSITORY" --workflow deploy-cloudflare.yml --status success --limit 15 --json databaseId,headSha --jq '.[] | (.databaseId|tostring) + "@" + .headSha' 2>/dev/null); do
+            RID="${ENTRY%%@*}"; RSHA="${ENTRY##*@}"
+            BUILT=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$RID/jobs" --jq '[.jobs[] | select(.name == "Build Cloudflare bundle") | .conclusion] | index("success") != null' 2>/dev/null || true)
+            if [ "$BUILT" = "true" ]; then
+              LAST="$RSHA"
+              break
+            fi
+          done
+          if [ -z "$LAST" ]; then
+            echo "No prior deploy to compare against: deploying." >&2
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$LAST" = "$HEAD_SHA" ]; then
+            echo "This exact head already deployed successfully: skipping (use workflow_dispatch to redeploy, e.g. after a secret rotation)." >&2
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/compare/$LAST...$HEAD_SHA" > "$RUNNER_TEMP/compare.json" 2>/dev/null || true
+          if [ ! -s "$RUNNER_TEMP/compare.json" ]; then
+            echo "Compare failed: deploying." >&2
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          COMMITS=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["total_commits"])' "$RUNNER_TEMP/compare.json")
+          if [ "${COMMITS:-999}" -gt 250 ]; then
+            echo "Large compare range: deploying." >&2
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 -c 'import json,sys; [print(f["filename"]) for f in json.load(open(sys.argv[1]))["files"]]' "$RUNNER_TEMP/compare.json" > "$RUNNER_TEMP/changed.txt"
+          rm -f "$RUNNER_TEMP/compare.json"
+          if grep -qE '^(apps/web/|packages/ui/|packages/components/|astro\.config\.|wrangler\.jsonc$|package\.json$|pnpm-lock\.yaml$|tsconfig\.json$|scripts/ci/build-cloudflare\.sh$|\.github/workflows/deploy-cloudflare\.yml$|\.github/actions/)' "$RUNNER_TEMP/changed.txt"; then
+            echo "App-facing files changed: deploying." >&2
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No app-facing changes since $LAST: skipping the deploy." >&2
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+          fi
 
-    build:
-        name: Build Cloudflare bundle
-        needs: [preflight, paths]
-        if: >-
-            needs.preflight.outputs.enabled == 'true' &&
-            needs.paths.outputs.needed == 'true' &&
-            (github.event_name == 'workflow_dispatch' ||
-             (github.event.workflow_run.conclusion == 'success' &&
-              github.event.workflow_run.head_branch == 'staging'))
-        runs-on: ubuntu-latest
-        outputs:
-            artifact-name: ${{ steps.pack.outputs.name }}
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
+  build:
+    name: Build Cloudflare bundle
+    needs: [preflight, paths]
+    if: >-
+      needs.preflight.outputs.enabled == 'true' &&
+      needs.paths.outputs.needed == 'true' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'staging'))
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.pack.outputs.name }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-            - name: Setup Node.js with pnpm
-              uses: ./.github/actions/setup-node-pnpm
-              with:
-                  node-version: "24.16.0"
+      - name: Setup Node.js with pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
 
-            - name: Build Cloudflare target
-              # The wrapper runs verify-build-contract + astro build + ensure-server-entry.
-              # ensure-server-entry skips on DEPLOY_TARGET=cloudflare (the adapter emits
-              # its own fetch-handler entry that imports 'cloudflare:workers', which the
-              # guard's Node import check cannot load).
-              run: pnpm build
-              env:
-                  CI: "true"
-                  DEPLOY_TARGET: "cloudflare"
+      - name: Build Cloudflare target
+        # The wrapper runs verify-build-contract + astro build + ensure-server-entry.
+        # ensure-server-entry skips on DEPLOY_TARGET=cloudflare (the adapter emits
+        # its own fetch-handler entry that imports 'cloudflare:workers', which the
+        # guard's Node import check cannot load).
+        run: pnpm build
+        env:
+          CI: 'true'
+          DEPLOY_TARGET: 'cloudflare'
 
-            - name: Verify build artifact
-              run: |
-                  test -f dist/server/entry2.mjs || { echo "::error::dist/server/entry2.mjs missing"; exit 1; }
-                  test -f dist/server/wrangler.json || { echo "::error::dist/server/wrangler.json missing"; exit 1; }
-                  node -e '
-                    const config = require("./dist/server/wrangler.json");
-                    if (config.name !== "pixelated-empathy") throw new Error(`unexpected worker name: ${config.name}`);
-                    if (config.main !== "entry2.mjs") throw new Error(`unexpected main: ${config.main}`);
-                    if (config.compatibility_flags?.includes("nodejs_compat") !== true) throw new Error("nodejs_compat missing");
-                    if (!config.kv_namespaces?.some((ns) => ns.binding === "SESSION")) throw new Error("SESSION KV binding missing");
-                    if (!config.images) throw new Error("IMAGES binding missing");
-                    if (!config.routes?.some((r) => r.pattern === "pixelatedempathy.com/*" && r.zone_name === "pixelatedempathy.com")) throw new Error("production zone route missing");
-                    if (config.workers_dev !== true) throw new Error("workers.dev mirror must stay enabled");
-                    console.log("wrangler.json contract verified:", config.name, config.main);
-                  '
-                  test -d dist/client || { echo "::error::dist/client missing"; exit 1; }
-                  echo "Build artifact verified: dist/server (entry2.mjs + wrangler.json) + dist/client"
+      - name: Verify build artifact
+        run: |
+          test -f dist/server/entry2.mjs || { echo "::error::dist/server/entry2.mjs missing"; exit 1; }
+          test -f dist/server/wrangler.json || { echo "::error::dist/server/wrangler.json missing"; exit 1; }
+          node -e '
+            const config = require("./dist/server/wrangler.json");
+            if (config.name !== "pixelated-empathy") throw new Error(`unexpected worker name: ${config.name}`);
+            if (config.main !== "entry2.mjs") throw new Error(`unexpected main: ${config.main}`);
+            if (config.compatibility_flags?.includes("nodejs_compat") !== true) throw new Error("nodejs_compat missing");
+            if (!config.kv_namespaces?.some((ns) => ns.binding === "SESSION")) throw new Error("SESSION KV binding missing");
+            if (!config.images) throw new Error("IMAGES binding missing");
+            if (!config.routes?.some((r) => r.pattern === "pixelatedempathy.com/*" && r.zone_name === "pixelatedempathy.com")) throw new Error("production zone route missing");
+            if (config.workers_dev !== true) throw new Error("workers.dev mirror must stay enabled");
+            console.log("wrangler.json contract verified:", config.name, config.main);
+          '
+          test -d dist/client || { echo "::error::dist/client missing"; exit 1; }
+          echo "Build artifact verified: dist/server (entry2.mjs + wrangler.json) + dist/client"
 
-            - name: Pack deploy artifact
-              id: pack
-              run: |
-                  NAME="cf-deploy-${{ github.run_id }}-${{ github.run_attempt }}"
-                  echo "name=$NAME" >> "$GITHUB_OUTPUT"
-                  tar --directory dist --create --gzip --file "dist/${NAME}.tar.gz" server client
-                  echo "Packed dist/${NAME}.tar.gz ($(du -h "dist/${NAME}.tar.gz" | cut -f1))"
+      - name: Pack deploy artifact
+        id: pack
+        run: |
+          NAME="cf-deploy-${{ github.run_id }}-${{ github.run_attempt }}"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          tar --directory dist --create --gzip --file "dist/${NAME}.tar.gz" server client
+          echo "Packed dist/${NAME}.tar.gz ($(du -h "dist/${NAME}.tar.gz" | cut -f1))"
 
-            - name: Upload deploy artifact
-              uses: actions/upload-artifact@v7
-              with:
-                  name: ${{ steps.pack.outputs.name }}
-                  path: dist/cf-deploy-*.tar.gz
-                  retention-days: 7
+      - name: Upload deploy artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.pack.outputs.name }}
+          path: dist/cf-deploy-*.tar.gz
+          retention-days: 7
 
-    deploy:
-        name: Deploy to Cloudflare
-        needs: [preflight, paths, build]
-        if: >-
-            needs.preflight.outputs.enabled == 'true' &&
-            needs.paths.outputs.needed == 'true'
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v7
-              with:
-                  ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+  deploy:
+    name: Deploy to Cloudflare
+    needs: [preflight, paths, build]
+    if: >-
+      needs.preflight.outputs.enabled == 'true' &&
+      needs.paths.outputs.needed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
-            # wrangler is a devDependency, so the CLI has to be installed before
-            # `pnpm exec wrangler` can run.
-            - name: Setup Node.js with pnpm
-              uses: ./.github/actions/setup-node-pnpm
-              with:
-                  node-version: "24.16.0"
-                  install-native-deps: "false"
+      # wrangler is a devDependency, so the CLI has to be installed before
+      # `pnpm exec wrangler` can run.
+      - name: Setup Node.js with pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          install-native-deps: 'false'
 
-            - name: Download deploy artifact
-              uses: actions/download-artifact@v8
-              with:
-                  name: ${{ needs.build.outputs.artifact-name }}
-                  path: artifact
+      - name: Download deploy artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.build.outputs.artifact-name }}
+          path: artifact
 
-            - name: Extract bundle
-              run: |
-                  tar --extract --gzip --file artifact/cf-deploy-*.tar.gz
-                  test -f server/wrangler.json || { echo "::error::server/wrangler.json missing from artifact"; exit 1; }
+      - name: Extract bundle
+        run: |
+          tar --extract --gzip --file artifact/cf-deploy-*.tar.gz
+          test -f server/wrangler.json || { echo "::error::server/wrangler.json missing from artifact"; exit 1; }
 
-            # Mirror the web app's runtime env (the same values Vercel
-            # production runs with) onto the Worker. Repository secrets are
-            # namespaced CF_WORKER_* so the un-prefixed names stay free for
-            # the CI jobs that consume them. nodejs_compat exposes the Worker
-            # secrets as process.env, which is how
-            # apps/web/src/config/env.config.ts reads them.
-            - name: Sync Worker secrets
-              env:
-                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                  CF_WORKER_AUDIT_LOG_RETENTION_DAYS: ${{ secrets.CF_WORKER_AUDIT_LOG_RETENTION_DAYS }}
-                  # The Worker reads DATABASE_URL (the sync step strips the
-                  # CF_WORKER_ prefix). Reuse the same production Postgres the
-                  # db-migrate workflow uses so the pg-backed API routes
-                  # (e.g. /api/evaluation) have a database on the Worker.
-                  CF_WORKER_DATABASE_URL: ${{ secrets.APP_DATABASE_URL }}
-                  CF_WORKER_EMAIL_FROM: ${{ secrets.CF_WORKER_EMAIL_FROM }}
-                  CF_WORKER_ENABLE_AUDIT_LOGGING: ${{ secrets.CF_WORKER_ENABLE_AUDIT_LOGGING }}
-                  CF_WORKER_ENABLE_RATE_LIMITING: ${{ secrets.CF_WORKER_ENABLE_RATE_LIMITING }}
-                  CF_WORKER_ENCRYPTION_ALGORITHM: ${{ secrets.CF_WORKER_ENCRYPTION_ALGORITHM }}
-                  CF_WORKER_ENCRYPTION_KEY: ${{ secrets.CF_WORKER_ENCRYPTION_KEY }}
-                  CF_WORKER_JWT_EXPIRES_IN: ${{ secrets.CF_WORKER_JWT_EXPIRES_IN }}
-                  CF_WORKER_JWT_SECRET: ${{ secrets.CF_WORKER_JWT_SECRET }}
-                  CF_WORKER_LOG_LEVEL: ${{ secrets.CF_WORKER_LOG_LEVEL }}
-                  CF_WORKER_MONGODB_DB_NAME: ${{ secrets.CF_WORKER_MONGODB_DB_NAME }}
-                  CF_WORKER_MONGODB_URI: ${{ secrets.CF_WORKER_MONGODB_URI }}
-                  CF_WORKER_OPENAI_API_KEY: ${{ secrets.CF_WORKER_OPENAI_API_KEY }}
-                  CF_WORKER_OPENAI_BASE_URL: ${{ secrets.CF_WORKER_OPENAI_BASE_URL }}
-                  CF_WORKER_PUBLIC_SENTRY_DSN: ${{ secrets.CF_WORKER_PUBLIC_SENTRY_DSN }}
-                  CF_WORKER_RATE_LIMIT_MAX_REQUESTS: ${{ secrets.CF_WORKER_RATE_LIMIT_MAX_REQUESTS }}
-                  CF_WORKER_RATE_LIMIT_WINDOW_MS: ${{ secrets.CF_WORKER_RATE_LIMIT_WINDOW_MS }}
-                  CF_WORKER_REDIS_URL: ${{ secrets.CF_WORKER_REDIS_URL }}
-                  CF_WORKER_RESEND_API_KEY: ${{ secrets.CF_WORKER_RESEND_API_KEY }}
-                  CF_WORKER_SENTRY_DSN: ${{ secrets.CF_WORKER_SENTRY_DSN }}
-                  CF_WORKER_SLACK_WEBHOOK_URL: ${{ secrets.CF_WORKER_SLACK_WEBHOOK_URL }}
-                  CF_WORKER_UPSTASH_REDIS_REST_TOKEN: ${{ secrets.CF_WORKER_UPSTASH_REDIS_REST_TOKEN }}
-                  CF_WORKER_UPSTASH_REDIS_REST_URL: ${{ secrets.CF_WORKER_UPSTASH_REDIS_REST_URL }}
-                  CF_WORKER_AUTH0_AUDIENCE: ${{ secrets.CF_WORKER_AUTH0_AUDIENCE }}
-                  CF_WORKER_AUTH0_CALLBACK_URL: ${{ secrets.CF_WORKER_AUTH0_CALLBACK_URL }}
-                  CF_WORKER_AUTH0_CLIENT_ID: ${{ secrets.CF_WORKER_AUTH0_CLIENT_ID }}
-                  CF_WORKER_AUTH0_CLIENT_SECRET: ${{ secrets.CF_WORKER_AUTH0_CLIENT_SECRET }}
-                  CF_WORKER_AUTH0_DOMAIN: ${{ secrets.CF_WORKER_AUTH0_DOMAIN }}
-                  CF_WORKER_AUTH0_MANAGEMENT_CLIENT_ID: ${{ secrets.CF_WORKER_AUTH0_MANAGEMENT_CLIENT_ID }}
-                  CF_WORKER_AUTH0_MANAGEMENT_CLIENT_SECRET: ${{ secrets.CF_WORKER_AUTH0_MANAGEMENT_CLIENT_SECRET }}
-                  CF_WORKER_PUBLIC_AUTH0_CLIENT_ID: ${{ secrets.CF_WORKER_PUBLIC_AUTH0_CLIENT_ID }}
-                  CF_WORKER_PUBLIC_AUTH0_DOMAIN: ${{ secrets.CF_WORKER_PUBLIC_AUTH0_DOMAIN }}
-              run: |
-                  set -euo pipefail
-                  node -e '
-                    const fs = require("fs");
-                    const prefix = "CF_WORKER_";
-                    const secrets = {};
-                    const missing = [];
-                    for (const [key, value] of Object.entries(process.env)) {
-                      if (!key.startsWith(prefix)) continue;
-                      if (value) secrets[key.slice(prefix.length)] = value;
-                      else missing.push(key.slice(prefix.length));
-                    }
-                    if (missing.length) {
-                      console.log("::warning::unset repository secrets skipped: " + missing.join(", "));
-                    }
-                    fs.writeFileSync("worker-secrets.json", JSON.stringify(secrets));
-                    console.log("secret bulk payload keys:", Object.keys(secrets).join(", "));
-                  '
-                  pnpm exec wrangler secret bulk --config server/wrangler.json worker-secrets.json
-                  rm -f worker-secrets.json
+      # Mirror the web app's runtime env (the same values Vercel
+      # production runs with) onto the Worker. Repository secrets are
+      # namespaced CF_WORKER_* so the un-prefixed names stay free for
+      # the CI jobs that consume them. nodejs_compat exposes the Worker
+      # secrets as process.env, which is how
+      # apps/web/src/config/env.config.ts reads them.
+      - name: Sync Worker secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_WORKER_AUDIT_LOG_RETENTION_DAYS: ${{ secrets.CF_WORKER_AUDIT_LOG_RETENTION_DAYS }}
+          # The Worker reads DATABASE_URL (the sync step strips the
+          # CF_WORKER_ prefix). Reuse the same production Postgres the
+          # db-migrate workflow uses so the pg-backed API routes
+          # (e.g. /api/evaluation) have a database on the Worker.
+          CF_WORKER_DATABASE_URL: ${{ secrets.APP_DATABASE_URL }}
+          CF_WORKER_EMAIL_FROM: ${{ secrets.CF_WORKER_EMAIL_FROM }}
+          CF_WORKER_ENABLE_AUDIT_LOGGING: ${{ secrets.CF_WORKER_ENABLE_AUDIT_LOGGING }}
+          CF_WORKER_ENABLE_RATE_LIMITING: ${{ secrets.CF_WORKER_ENABLE_RATE_LIMITING }}
+          CF_WORKER_ENCRYPTION_ALGORITHM: ${{ secrets.CF_WORKER_ENCRYPTION_ALGORITHM }}
+          CF_WORKER_ENCRYPTION_KEY: ${{ secrets.CF_WORKER_ENCRYPTION_KEY }}
+          CF_WORKER_JWT_EXPIRES_IN: ${{ secrets.CF_WORKER_JWT_EXPIRES_IN }}
+          CF_WORKER_JWT_SECRET: ${{ secrets.CF_WORKER_JWT_SECRET }}
+          CF_WORKER_LOG_LEVEL: ${{ secrets.CF_WORKER_LOG_LEVEL }}
+          CF_WORKER_MONGODB_DB_NAME: ${{ secrets.CF_WORKER_MONGODB_DB_NAME }}
+          CF_WORKER_MONGODB_URI: ${{ secrets.CF_WORKER_MONGODB_URI }}
+          CF_WORKER_OPENAI_API_KEY: ${{ secrets.CF_WORKER_OPENAI_API_KEY }}
+          CF_WORKER_OPENAI_BASE_URL: ${{ secrets.CF_WORKER_OPENAI_BASE_URL }}
+          CF_WORKER_PUBLIC_SENTRY_DSN: ${{ secrets.CF_WORKER_PUBLIC_SENTRY_DSN }}
+          CF_WORKER_RATE_LIMIT_MAX_REQUESTS: ${{ secrets.CF_WORKER_RATE_LIMIT_MAX_REQUESTS }}
+          CF_WORKER_RATE_LIMIT_WINDOW_MS: ${{ secrets.CF_WORKER_RATE_LIMIT_WINDOW_MS }}
+          CF_WORKER_REDIS_URL: ${{ secrets.CF_WORKER_REDIS_URL }}
+          CF_WORKER_RESEND_API_KEY: ${{ secrets.CF_WORKER_RESEND_API_KEY }}
+          CF_WORKER_SENTRY_DSN: ${{ secrets.CF_WORKER_SENTRY_DSN }}
+          CF_WORKER_SLACK_WEBHOOK_URL: ${{ secrets.CF_WORKER_SLACK_WEBHOOK_URL }}
+          CF_WORKER_UPSTASH_REDIS_REST_TOKEN: ${{ secrets.CF_WORKER_UPSTASH_REDIS_REST_TOKEN }}
+          CF_WORKER_UPSTASH_REDIS_REST_URL: ${{ secrets.CF_WORKER_UPSTASH_REDIS_REST_URL }}
+          CF_WORKER_AUTH0_AUDIENCE: ${{ secrets.CF_WORKER_AUTH0_AUDIENCE }}
+          CF_WORKER_AUTH0_CALLBACK_URL: ${{ secrets.CF_WORKER_AUTH0_CALLBACK_URL }}
+          CF_WORKER_AUTH0_CLIENT_ID: ${{ secrets.CF_WORKER_AUTH0_CLIENT_ID }}
+          CF_WORKER_AUTH0_CLIENT_SECRET: ${{ secrets.CF_WORKER_AUTH0_CLIENT_SECRET }}
+          CF_WORKER_AUTH0_DOMAIN: ${{ secrets.CF_WORKER_AUTH0_DOMAIN }}
+          CF_WORKER_AUTH0_MANAGEMENT_CLIENT_ID: ${{ secrets.CF_WORKER_AUTH0_MANAGEMENT_CLIENT_ID }}
+          CF_WORKER_AUTH0_MANAGEMENT_CLIENT_SECRET: ${{ secrets.CF_WORKER_AUTH0_MANAGEMENT_CLIENT_SECRET }}
+          CF_WORKER_PUBLIC_AUTH0_CLIENT_ID: ${{ secrets.CF_WORKER_PUBLIC_AUTH0_CLIENT_ID }}
+          CF_WORKER_PUBLIC_AUTH0_DOMAIN: ${{ secrets.CF_WORKER_PUBLIC_AUTH0_DOMAIN }}
+        run: |
+          set -euo pipefail
+          node -e '
+            const fs = require("fs");
+            const prefix = "CF_WORKER_";
+            const secrets = {};
+            const missing = [];
+            for (const [key, value] of Object.entries(process.env)) {
+              if (!key.startsWith(prefix)) continue;
+              if (value) secrets[key.slice(prefix.length)] = value;
+              else missing.push(key.slice(prefix.length));
+            }
+            if (missing.length) {
+              console.log("::warning::unset repository secrets skipped: " + missing.join(", "));
+            }
+            fs.writeFileSync("worker-secrets.json", JSON.stringify(secrets));
+            console.log("secret bulk payload keys:", Object.keys(secrets).join(", "));
+          '
+          pnpm exec wrangler secret bulk --config server/wrangler.json worker-secrets.json
+          rm -f worker-secrets.json
 
-            - name: Deploy Worker
-              id: deploy
-              env:
-                  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-              run: |
-                  set -euo pipefail
-                  pnpm exec wrangler deploy --config server/wrangler.json 2>&1 | tee "$RUNNER_TEMP/deploy.log"
-                  # The workers.dev host is the account's subdomain, not the account ID,
-                  # so take the URL wrangler prints instead of constructing one.
-                  URL=$(grep -oE 'https://[A-Za-z0-9._-]+\.workers\.dev' "$RUNNER_TEMP/deploy.log" | head -n 1 || true)
-                  if [ -z "$URL" ]; then
-                    echo "::error::wrangler deploy did not report a workers.dev URL"
-                    exit 1
-                  fi
-                  echo "url=$URL" >> "$GITHUB_OUTPUT"
-                  echo "Deployed: $URL"
+      - name: Deploy Worker
+        id: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          pnpm exec wrangler deploy --config server/wrangler.json 2>&1 | tee "$RUNNER_TEMP/deploy.log"
+          # The workers.dev host is the account's subdomain, not the account ID,
+          # so take the URL wrangler prints instead of constructing one.
+          URL=$(grep -oE 'https://[A-Za-z0-9._-]+\.workers\.dev' "$RUNNER_TEMP/deploy.log" | head -n 1 || true)
+          if [ -z "$URL" ]; then
+            echo "::error::wrangler deploy did not report a workers.dev URL"
+            exit 1
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Deployed: $URL"
 
-            - name: Smoke test Worker URL
-              env:
-                  WORKER_URL: ${{ steps.deploy.outputs.url }}
-              run: |
-                  set -euo pipefail
-                  for i in 1 2 3 4 5; do
-                    STATUS=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 30 "$WORKER_URL/" || true)
-                    if [ "$STATUS" = "200" ]; then
-                      echo "Smoke test passed: $WORKER_URL returned 200"
-                      exit 0
-                    fi
-                    echo "Attempt $i: $WORKER_URL returned $STATUS; retrying in 15s..."
-                    sleep 15
-                  done
-                  echo "::error::Smoke test failed: $WORKER_URL did not return 200 after 5 attempts"
-                  exit 1
+      - name: Smoke test Worker URL
+        env:
+          WORKER_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          set -euo pipefail
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 30 "$WORKER_URL/" || true)
+            if [ "$STATUS" = "200" ]; then
+              echo "Smoke test passed: $WORKER_URL returned 200"
+              exit 0
+            fi
+            echo "Attempt $i: $WORKER_URL returned $STATUS; retrying in 15s..."
+            sleep 15
+          done
+          echo "::error::Smoke test failed: $WORKER_URL did not return 200 after 5 attempts"
+          exit 1
 
-            - name: Smoke test production domain
-              env:
-                  WORKER_URL: https://pixelatedempathy.com
-              run: |
-                  set -euo pipefail
-                  for i in 1 2 3 4 5; do
-                    STATUS=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 30 "$WORKER_URL/" || true)
-                    if [ "$STATUS" = "200" ]; then
-                      echo "Production domain smoke test passed: $WORKER_URL returned 200"
-                      exit 0
-                    fi
-                    echo "Attempt $i: $WORKER_URL returned $STATUS; retrying in 15s..."
-                    sleep 15
-                  done
-                  echo "::error::Production domain smoke test failed: $WORKER_URL did not return 200 after 5 attempts"
-                  exit 1
+      - name: Smoke test production domain
+        env:
+          WORKER_URL: https://pixelatedempathy.com
+        run: |
+          set -euo pipefail
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 30 "$WORKER_URL/" || true)
+            if [ "$STATUS" = "200" ]; then
+              echo "Production domain smoke test passed: $WORKER_URL returned 200"
+              exit 0
+            fi
+            echo "Attempt $i: $WORKER_URL returned $STATUS; retrying in 15s..."
+            sleep 15
+          done
+          echo "::error::Production domain smoke test failed: $WORKER_URL did not return 200 after 5 attempts"
+          exit 1
