@@ -17,9 +17,12 @@
 # did not execute and must not outrank an earlier success on the same commit.
 # Exit: 0 green, 1 red, 2 no verdict, 3 the commit is no longer a branch head, so
 # its runs were cancelled by a newer push and no verdict will ever come for it.
-# A requested gate that has no attempt after WATCH_GRACE_MINUTES (default 5) while
-# the rest of the matrix is complete does not run for this change - a docs-only
-# push has no build gates at all - so that exits 2 instead of burning the deadline.
+# A requested gate with no attempt does not run for this change when the rest of
+# the matrix has been settled (nothing pending) for WATCH_GRACE_MINUTES (default
+# 5): a docs-only push has no build gates at all, and a formatting-only push has
+# `build` without `build-test`. Exit 2 then instead of burning the deadline. The
+# clock starts when the matrix settles, not when the watch starts, so a gate that
+# queues behind CI (sentry-build) is not cut off.
 set -euo pipefail
 
 ALL=false
@@ -96,8 +99,8 @@ missing_names() {
 }
 
 rows=""
-LOOP_START=$SECONDS
 GRACE_MINUTES=${WATCH_GRACE_MINUTES:-5}
+SETTLED_SINCE=""
 while :; do
   all_rows=$(fetch)
   rows=$(printf '%s\n' "$all_rows" | select_rows "$@" | drop_dynamic)
@@ -108,6 +111,12 @@ while :; do
   if [[ "$total" -gt 0 && "$pending" -eq 0 && -z "$missing" ]]; then
     break
   fi
+  all_pending=$(printf '%s' "$all_rows" | awk -F'\t' '$1 != "completed"' | grep -c . || true)
+  if [[ "$all_pending" -eq 0 ]]; then
+    [[ -z "$SETTLED_SINCE" ]] && SETTLED_SINCE=$SECONDS
+  else
+    SETTLED_SINCE=""
+  fi
   if [[ "$total" -eq 0 || -n "$missing" ]]; then
     heads=$(gh api "repos/$REPO/commits/$SHA/branches-where-head" --jq '.[].name' 2>/dev/null || true)
     if [[ -z "$heads" ]]; then
@@ -115,13 +124,9 @@ while :; do
       exit 3
     fi
   fi
-  if [[ "$total" -eq 0 && -n "$missing" && $((SECONDS - LOOP_START)) -ge $((GRACE_MINUTES * 60)) ]]; then
-    all_total=$(printf '%s' "$all_rows" | grep -c . || true)
-    all_pending=$(printf '%s' "$all_rows" | awk -F'\t' '$1 != "completed"' | grep -c . || true)
-    if [[ "$all_total" -gt 0 && "$all_pending" -eq 0 ]]; then
-      echo "✖ no attempt for $missing on $SHA after ${GRACE_MINUTES}m, and the rest of the matrix is complete: those gates do not run for this change" >&2
-      exit 2
-    fi
+  if [[ -n "$missing" && -n "$SETTLED_SINCE" ]] && ((SECONDS - SETTLED_SINCE >= GRACE_MINUTES * 60)); then
+    echo "✖ no attempt for $missing on $SHA: the matrix settled ${GRACE_MINUTES}m ago with nothing pending, so those gates do not run for this change" >&2
+    exit 2
   fi
   if [[ "$SECONDS" -ge "$DEADLINE" ]]; then
     echo "✖ no verdict after ${TIMEOUT_MINUTES}m (total=$total pending=$pending${missing:+ never_appeared=$missing})" >&2
