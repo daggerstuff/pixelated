@@ -11,14 +11,14 @@ planning document with no machine-consumed behavior.
 All 16 package IDs appear exactly once. Applicable gate mapping and dependency
 shape match the outline; cross-gate packages remain cross-gate:
 
-| Gate | Packages |
-| --- | --- |
-| G1 | L01 |
-| G2 | L02, L03, L04, L05 |
-| G3 | L06, L07, L08, L09, L10 |
-| G4 | L03, L11, L12 |
-| G5 | L13, L14, L15 |
-| G6 | L16 |
+| Gate | Packages                |
+| ---- | ----------------------- |
+| G1   | L01                     |
+| G2   | L02, L03, L04, L05      |
+| G3   | L06, L07, L08, L09, L10 |
+| G4   | L03, L11, L12           |
+| G5   | L13, L14, L15           |
+| G6   | L16                     |
 
 Each package row contains a proposed role, dependencies, binary exit evidence
 and current state. L04's L07 dependency is explicit. The plan links existing
@@ -51,17 +51,17 @@ references. These are work-package gaps, not permission to duplicate tickets.
 
 Before/after SHA-256 values match for all nine reference sources:
 
-| Source | Before and after SHA-256 |
-| --- | --- |
-| `PROJECT_OUTLINE.md` | `d36fab56d5cb263715e72936792eb2c2a6d80deb2ad11f4a92cc1b0f9408dbec` |
-| `planning/project-outline-2026-11-02/ACTIVE_TASKS.md` | `00ece4e0a0e3d39532a26227cea166e6ef278e598669fbbc3adad5a525d8665f` |
-| `planning/project-outline-2026-11-02/ACTION_MAP.csv` | `beb8201b70abd1a6e614e9f3986b77a2ae9a525f6f31216c3e3b69d1f38c3aaa` |
-| `planning/project-outline-2026-11-02/ACTION_MAP.json` | `eecefee76ce77b227b707a9d34a386fa292932b938dd3be7bb892d3d9f9c1516` |
-| `content/business-strategy/pilot-program-structure.md` | `e88988c30f5cac37e7f6593f90f51dbee9d199f3ef18126b066f6a6a2c35a4e7` |
-| `content/business-strategy/pilot-program-framework.md` | `cd37abc45a97cd8edadf6d5ca21d9b127e65d779c282f224fae1a14f36ca8002` |
+| Source                                                                | Before and after SHA-256                                           |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `PROJECT_OUTLINE.md`                                                  | `d36fab56d5cb263715e72936792eb2c2a6d80deb2ad11f4a92cc1b0f9408dbec` |
+| `planning/project-outline-2026-11-02/ACTIVE_TASKS.md`                 | `00ece4e0a0e3d39532a26227cea166e6ef278e598669fbbc3adad5a525d8665f` |
+| `planning/project-outline-2026-11-02/ACTION_MAP.csv`                  | `beb8201b70abd1a6e614e9f3986b77a2ae9a525f6f31216c3e3b69d1f38c3aaa` |
+| `planning/project-outline-2026-11-02/ACTION_MAP.json`                 | `eecefee76ce77b227b707a9d34a386fa292932b938dd3be7bb892d3d9f9c1516` |
+| `content/business-strategy/pilot-program-structure.md`                | `e88988c30f5cac37e7f6593f90f51dbee9d199f3ef18126b066f6a6a2c35a4e7` |
+| `content/business-strategy/pilot-program-framework.md`                | `cd37abc45a97cd8edadf6d5ca21d9b127e65d779c282f224fae1a14f36ca8002` |
 | `content/business-strategy/pilot-operations/operational-checklist.md` | `8f6a82d7c27a6daae0b413b25ab8f9535df0676ca409d35000bde4ef1d939c2a` |
-| `content/business-strategy/pricing-strategy.md` | `f51d416279291c2b564a41206e91ae130abd5dabc4e188f52070b7a9deb8c11b` |
-| `content/business-strategy/outreach/simple-pilot-contract.md` | `6e0813045ffa86c42a756d323bf3e4ae4676a55fc4103a4ec7accaefa1b2c48e` |
+| `content/business-strategy/pricing-strategy.md`                       | `f51d416279291c2b564a41206e91ae130abd5dabc4e188f52070b7a9deb8c11b` |
+| `content/business-strategy/outreach/simple-pilot-contract.md`         | `6e0813045ffa86c42a756d323bf3e4ae4676a55fc4103a4ec7accaefa1b2c48e` |
 
 At the time of this review, all three saved Composio Linear connections showed
 expired and the November 2 snapshot still needed refresh. A follow-up read-only
