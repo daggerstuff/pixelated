@@ -425,8 +425,8 @@ importers:
         specifier: ^0.47.0
         version: 0.47.1(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
       '@opentelemetry/instrumentation-http':
-        specifier: ^0.219.0
-        version: 0.219.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
+        specifier: ^0.222.0
+        version: 0.222.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
       '@opentelemetry/instrumentation-mongodb':
         specifier: 0.72.0
         version: 0.72.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
@@ -4377,6 +4377,10 @@ packages:
     resolution: {integrity: sha512-CmVa4ImJ+ynfrPMNaAXHET6Bhb44SwzmfyVJFq9ni2jgXJR/l7C6gfVFddNmHP+ZOkP9cf4f9DBe68qVLTHc9w==}
     engines: {node: '>=8.0.0'}
 
+  '@opentelemetry/api-logs@0.222.0':
+    resolution: {integrity: sha512-9mb1If+IF6u0ZVXkHQ6ogEae5HwA6ajIVUgpSDQyRASxft6BSXHvBvPooRle3yFN/fKnCdSOnuu0OC3PLcF6+g==}
+    engines: {node: '>=8.0.0'}
+
   '@opentelemetry/api-logs@0.53.0':
     resolution: {integrity: sha512-8HArjKx+RaAI8uEIgcORbZIPklyh1YLjPSBus8hjRmvLi6DeFzgOcdZ7KwPabKj8mXF8dX0hyfAyGfycz0DbFw==}
     engines: {node: '>=14'}
@@ -4736,6 +4740,12 @@ packages:
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
 
+  '@opentelemetry/instrumentation-http@0.222.0':
+    resolution: {integrity: sha512-HhMHW32LyGzIJEmUElxaML4oUe6JiCq0Hvjt/Awxb60SlMsSFetFLFjed45g/0wrPr1n7z+xW+x1B/584WBAkg==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': ^1.9.0
+
   '@opentelemetry/instrumentation-http@0.57.1':
     resolution: {integrity: sha512-ThLmzAQDs7b/tdKI3BV2+yawuF09jF111OFsovqT1Qj3D8vjwKBwhi/rDE5xethwn4tSXtZcJ9hBsVAlWFQZ7g==}
     engines: {node: '>=14'}
@@ -4984,6 +4994,12 @@ packages:
 
   '@opentelemetry/instrumentation@0.220.0':
     resolution: {integrity: sha512-xQx3E2WxP1mDvKzxLxX+CTCtNLa560YJZ3087qYHerl2YmiKpv7AH+dAy7vmx+eVrZ5BwhfWUAVoKOoxCNHcpw==}
+    engines: {node: ^18.19.0 || >=20.6.0}
+    peerDependencies:
+      '@opentelemetry/api': ^1.9.0
+
+  '@opentelemetry/instrumentation@0.222.0':
+    resolution: {integrity: sha512-fhbRDuAgzPKpq1k5+hX3uS+3QAYNca0on0Ngot/R8dDsQtuFaADeZnG2uSgxABuvcI7S2phAaRhbct9jieeKZw==}
     engines: {node: ^18.19.0 || >=20.6.0}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
@@ -18016,6 +18032,10 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
 
+  '@opentelemetry/api-logs@0.222.0':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+
   '@opentelemetry/api-logs@0.53.0':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -18558,6 +18578,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@opentelemetry/instrumentation-http@0.222.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/core': 2.8.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/instrumentation': 0.222.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
+      '@opentelemetry/semantic-conventions': 1.43.0
+      forwarded-parse: 2.1.2
+    transitivePeerDependencies:
+      - supports-color
+
   '@opentelemetry/instrumentation-http@0.57.1(@opentelemetry/api@1.9.1)(supports-color@10.2.2)':
     dependencies:
       '@opentelemetry/api': 1.9.1
@@ -18925,6 +18955,15 @@ snapshots:
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/api-logs': 0.220.0
+      import-in-the-middle: 3.5.2
+      require-in-the-middle: 8.0.1(supports-color@10.2.2)
+    transitivePeerDependencies:
+      - supports-color
+
+  '@opentelemetry/instrumentation@0.222.0(@opentelemetry/api@1.9.1)(supports-color@10.2.2)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/api-logs': 0.222.0
       import-in-the-middle: 3.5.2
       require-in-the-middle: 8.0.1(supports-color@10.2.2)
     transitivePeerDependencies:
@@ -29741,7 +29780,6 @@ time:
   '@opentelemetry/exporter-trace-otlp-grpc@0.218.0': '2026-05-13T08:55:52.013Z'
   '@opentelemetry/exporter-trace-otlp-http@0.218.0': '2026-05-13T08:55:36.128Z'
   '@opentelemetry/exporter-trace-otlp-http@0.219.0': '2026-06-11T12:38:09.894Z'
-  '@opentelemetry/instrumentation-http@0.219.0': '2026-06-11T12:37:54.512Z'
   '@opentelemetry/instrumentation-mongodb@0.72.0': '2026-06-11T14:55:02.109Z'
   '@opentelemetry/instrumentation-redis@0.67.0': '2026-06-11T14:55:05.883Z'
   '@opentelemetry/instrumentation@0.218.0': '2026-05-13T08:55:07.575Z'
