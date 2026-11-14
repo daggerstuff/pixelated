@@ -169,7 +169,7 @@ executing==2.2.1
     #   stack-data
 fairlearn==0.14.0
     # via -r requirements.txt
-filelock==4.2.5
+filelock==4.2.10
     # via
     #   -r requirements.txt
     #   datasets
@@ -970,7 +970,7 @@ toolz==1.1.0
     #   altair
 torch==2.13.0
     # via -r requirements.txt
-tornado==6.6
+tornado==6.6.1
     # via -r requirements.txt
 tqdm==4.67.1
     # via
