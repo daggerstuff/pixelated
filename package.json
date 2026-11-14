@@ -214,7 +214,7 @@
     "@ai-sdk/anthropic": "^4.0.46",
     "@ai-sdk/openai": "^4.0.47",
     "@astrojs/cloudflare": "^14.4.6",
-    "@astrojs/node": "^11.1.4",
+    "@astrojs/node": "^11.1.12",
     "@astrojs/react": "^7.1.5",
     "@auth0/auth0-react": "^2.30.0",
     "@aws-sdk/client-dynamodb": "^3.1121.0",
