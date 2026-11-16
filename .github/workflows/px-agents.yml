@@ -75,6 +75,20 @@ jobs:
               const data = JSON.parse(raw);
               const findings = data.findings || [];
               const summary = data.summary || 'No summary available';
+              const hasSignal = findings.length > 0 || summary !== 'No summary available';
+              // Find existing px Advisor Review comment to avoid spam
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+              const existing = comments.find(c => c.body && c.body.includes('## px Advisor Review'));
+              if (!hasSignal && !existing) {
+                // Stub/empty review with nothing previously posted: stay silent
+                // instead of adding a "No findings" comment to every PR.
+                console.log('Advisor review produced no findings and no summary — skipping PR comment.');
+                return;
+              }
               const risk = data.risk || 'unknown';
               const lines = [
                 `## px Advisor Review`,
@@ -94,13 +108,6 @@ jobs:
                 lines.push('No findings.');
               }
               const body = lines.join('\n');
-              // Find existing px Advisor Review comment to avoid spam
-              const { data: comments } = await github.rest.issues.listComments({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-              });
-              const existing = comments.find(c => c.body && c.body.includes('## px Advisor Review'));
               if (existing) {
                 await github.rest.issues.updateComment({
                   owner: context.repo.owner,
