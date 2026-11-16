@@ -230,6 +230,17 @@ exclude = [
   "dist",
   "**/__pycache__",
   "**/.*",
+  # Git submodules own their own lint config; ruff runs inside their repos,
+  # not from here (mirrors .oxfmtrc.jsonc). Glob-anchored (`ai/**`, not a bare
+  # `ai`) because ruff matches a slashless pattern against every directory of
+  # that name at any depth — a bare `ai` also drops authored trees such as
+  # apps/web/src/lib/ai.
+  "ai/**",
+  "docs/**",
+  "foresight/**",
+  # Generated OpenAPI output. The generator emits its own suppression headers,
+  # so linting it here measures the generator, not authored code.
+  "packages/sdk-python/pixelated_empathy_sdk",
 ]
 [tool.ruff.lint]
 select = [

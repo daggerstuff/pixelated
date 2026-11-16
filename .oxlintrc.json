@@ -6,6 +6,7 @@
     "scripts/**/*.mjs",
     "scripts/**/*.ts",
     "apps/web/public/polyfills/**/*.js",
+    "packages/sdk-typescript/src",
     ".github/cookbook/**/*.ts",
     ".github/cookbook/**/*.tsx",
     "apps/web/src/lib/export/index.node.ts",
