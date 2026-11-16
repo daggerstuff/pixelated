@@ -1,0 +1,49 @@
+name: Qodo Merge (PR-Agent)
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  pr-agent:
+    name: AI PR Code Review
+    # Self-gating: without the Neon gateway URL secret there is nothing to
+    # call — skip silently instead of failing every run and posting a
+    # failure comment on every PR (the Nov 2026 behavior).
+    if: (github.event_name == 'pull_request' || (github.event.issue.pull_request && startsWith(github.event.comment.body, '/'))) && secrets.OPENAI_BASE_URL != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Run PR Agent
+        uses: Codium-ai/pr-agent@ef5a40031b21658e4657db44d6618e22db34ed8b # main (pinned)
+        env:
+          OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY || secrets.LLM_API_KEY }}
+          OPENAI__KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY || secrets.LLM_API_KEY }}
+          # Neon AI Gateway (OpenAI-compatible), NOT api.openai.com: the
+          # nt_live_* keys the repo uses are rejected anywhere else (401/2009).
+          # No fallback to vars.OPENAI_BASE_URL — that points at a Cloudflare
+          # gateway and silently re-breaks auth. Create the secret from the
+          # Neon console branch URL (see .env.example "NEON AI GATEWAY").
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          OPENAI__API_BASE: ${{ secrets.OPENAI_BASE_URL }}
+          GEMINI_KEY: ${{ secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Open-weight model served by the Neon gateway (per .env.example
+          # default). Dotted lowercase form — uppercase variants of these
+          # keys are silently ignored by the action.
+          config.model: 'openai/gpt-oss-120b'
+          config.custom_model_max_tokens: '32000'
+          CONFIG.AUTO_REVIEW: 'true'
+          CONFIG.AUTO_DESCRIBE: 'false'
+          CONFIG.AUTO_IMPROVE: 'false'
+          PR_REVIEWER.REQUIRE_ALL_CHECKS_PASSED: 'false'
+          PR_REVIEWER.EXTRA_INSTRUCTIONS: 'Focus on defects, HIPAA/PHI privacy compliance, data leakage, concurrency issues, and test regressions. Keep findings clear and actionable.'
