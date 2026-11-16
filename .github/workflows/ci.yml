@@ -89,6 +89,9 @@ jobs:
       - name: Check for unused exports
         run: pnpm lint:ci:unused-exports
 
+      - name: No forbidden suppressions
+        run: pnpm lint:no-suppressions
+
       - name: Run unit tests
         run: |
           # Blocking suite — fails CI on test failures. The full unbucketed
