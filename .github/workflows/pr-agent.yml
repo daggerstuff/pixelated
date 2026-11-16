@@ -21,7 +21,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Run PR Agent
-        uses: Codium-ai/pr-agent@a8c604794ddb5766dc3fa674cbb64aac6f9f509f # main (pinned)
+        uses: Codium-ai/pr-agent@ef5a40031b21658e4657db44d6618e22db34ed8b # main (pinned)
         env:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY || secrets.LLM_API_KEY }}
           OPENAI__KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY || secrets.LLM_API_KEY }}
