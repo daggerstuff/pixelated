@@ -63,6 +63,61 @@ jobs:
           kill $SERVE_PID
           cat advisor-review.json
 
+      - name: Normalize advisor review output
+        if: always()
+        run: |
+          node - <<'NODE'
+          // `px advisor review --json` prints the Eve session result
+          // ({ sessionId, message }), not the review object itself: `message` is
+          // the agent's final assistant text. Normalize it into the
+          // findings/summary/risk shape the steps below render, and treat the
+          // stub server's "[stub] Processed: ..." reply as no signal.
+          const fs = require('fs')
+          const path = 'advisor-review.json'
+          let raw
+          try {
+            raw = JSON.parse(fs.readFileSync(path, 'utf8'))
+          } catch {
+            process.exit(0)
+          }
+          const review = {
+            findings: [],
+            summary: 'No summary available',
+            risk: 'unknown',
+          }
+          const text =
+            typeof raw.message === 'string' && !raw.error ? raw.message.trim() : ''
+          if (text && !text.startsWith('[stub]')) {
+            let structured = null
+            try {
+              structured = JSON.parse(text)
+            } catch {
+              structured = null
+            }
+            if (
+              structured &&
+              typeof structured === 'object' &&
+              !Array.isArray(structured)
+            ) {
+              if (Array.isArray(structured.findings)) {
+                review.findings = structured.findings
+              }
+              if (
+                typeof structured.summary === 'string' &&
+                structured.summary
+              ) {
+                review.summary = structured.summary
+              }
+              if (typeof structured.risk === 'string' && structured.risk) {
+                review.risk = structured.risk
+              }
+            } else {
+              review.summary = text
+            }
+          }
+          fs.writeFileSync(path, JSON.stringify(review, null, 2))
+          NODE
+
       - name: Post review comment
         if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v9
@@ -75,6 +130,20 @@ jobs:
               const data = JSON.parse(raw);
               const findings = data.findings || [];
               const summary = data.summary || 'No summary available';
+              const hasSignal = findings.length > 0 || summary !== 'No summary available';
+              // Find existing px Advisor Review comment to avoid spam
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+              const existing = comments.find(c => c.body && c.body.includes('## px Advisor Review'));
+              if (!hasSignal && !existing) {
+                // Stub/empty review with nothing previously posted: stay silent
+                // instead of adding a "No findings" comment to every PR.
+                console.log('Advisor review produced no findings and no summary — skipping PR comment.');
+                return;
+              }
               const risk = data.risk || 'unknown';
               const lines = [
                 `## px Advisor Review`,
@@ -94,13 +163,6 @@ jobs:
                 lines.push('No findings.');
               }
               const body = lines.join('\n');
-              // Find existing px Advisor Review comment to avoid spam
-              const { data: comments } = await github.rest.issues.listComments({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-              });
-              const existing = comments.find(c => c.body && c.body.includes('## px Advisor Review'));
               if (existing) {
                 await github.rest.issues.updateComment({
                   owner: context.repo.owner,
