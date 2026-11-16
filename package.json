@@ -232,7 +232,7 @@
     "@cloudflare/think": "^0.23.0",
     "@composio/core": "^0.29.0",
     "@fontsource/big-shoulders-display": "^5.3.0",
-    "@google-cloud/storage": "^8.4.0",
+    "@google-cloud/storage": "^9.0.0",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^7.0.5",
     "@iconify-json/lucide": "^1.2.151",
