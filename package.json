@@ -248,7 +248,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "^0.218.0",
     "@opentelemetry/instrumentation": "^0.218.0",
     "@opentelemetry/instrumentation-express": "^0.47.0",
-    "@opentelemetry/instrumentation-http": "^0.219.0",
+    "@opentelemetry/instrumentation-http": "^0.222.0",
     "@opentelemetry/instrumentation-mongodb": "^0.51.0",
     "@opentelemetry/instrumentation-pg": "^0.78.0",
     "@opentelemetry/instrumentation-redis": "^0.67.0",
