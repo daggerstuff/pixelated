@@ -123,15 +123,33 @@ jobs:
               reportLinks.push('- Report files not found (see artifacts)');
             }
 
-            const body = `## Lighthouse CI Results\n\n` +
+            let body = `## Lighthouse CI Results\n\n` +
               `**Routes audited:** \`/\`, \`/dashboard?perf=1\`, \`/training-session\`\n\n` +
               `**Thresholds:** Performance \u226590 | Accessibility \u226590 | Best Practices \u226585\n\n` +
               `### Reports\n${reportLinks.join('\n') || '- See workflow artifacts for details'}\n\n` +
               `>Reports are also available as [workflow artifacts](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
 
-            await github.rest.issues.createComment({
+            // Update the existing report comment instead of posting a new one
+            // on every run — one comment per PR, always showing the latest run.
+            body = body.replace('## Lighthouse CI Results\n\n', '## Lighthouse CI Results\n\n<!-- lhci-report -->\n\n');
+            const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body
             });
+            const existing = comments.find(c => c.body && c.body.includes('<!-- lhci-report -->'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body
+              });
+            }
