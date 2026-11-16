@@ -160,7 +160,7 @@ jobs:
                   const u = new URL(lhr.finalUrl || lhr.requestedUrl || '');
                   route = u.pathname + u.search;
                 } catch {
-                  route = path.basename(p, '.report.json');
+                  route = path.basename(p).replace(/\.json$/, '');
                 }
                 if (!byRoute.has(route)) byRoute.set(route, {});
                 const entry = byRoute.get(route);
@@ -199,7 +199,10 @@ jobs:
             try {
               const files = fs.readdirSync(lhciDir);
               const htmlFiles = files.filter(f => f.endsWith('.html'));
-              const jsonFiles = files.filter(f => f.endsWith('.report.json'));
+              // LHCI names its reports lhr-<timestamp>.json (no `.report` suffix), so a
+              // `.report.json` filter matched nothing and the score table was always
+              // dropped from the comment.
+              const jsonFiles = files.filter(f => /^lhr-.*\.json$/.test(f));
 
               for (const file of htmlFiles) {
                 const name = path.basename(file, '.html');
