@@ -97,6 +97,9 @@ jobs:
         with:
           name: lhci-report-${{ github.run_id }}
           path: .lighthouseci
+          # .lighthouseci is a hidden directory — without this the upload
+          # silently matches nothing and the PR comment's artifact link is dead.
+          include-hidden-files: true
           retention-days: 30
           if-no-files-found: warn
 
@@ -109,23 +112,108 @@ jobs:
             const path = require('path');
 
             const lhciDir = path.join(process.cwd(), '.lighthouseci');
-            let reportLinks = [];
+            const CATEGORIES = [
+              { key: 'performance', label: 'Performance' },
+              { key: 'accessibility', label: 'Accessibility' },
+              { key: 'best-practices', label: 'Best Practices' },
+            ];
 
+            // Thresholds come from .lighthouserc.json (single source of truth);
+            // fall back to the previously hardcoded values if it can't be read.
+            // (Note: the old comment claimed Performance >= 90, but the config
+            // enforces minScore 0.7 — deriving it here fixes that drift.)
+            let thresholds = { performance: 90, accessibility: 90, 'best-practices': 85 };
+            try {
+              const rc = JSON.parse(fs.readFileSync(path.join(process.cwd(), '.lighthouserc.json'), 'utf8'));
+              const assertions = (((rc || {}).ci || {}).assert || {}).assertions || {};
+              for (const { key } of CATEGORIES) {
+                const rule = assertions[`categories:${key}`];
+                const minScore = Array.isArray(rule) && rule[1] && rule[1].minScore;
+                if (typeof minScore === 'number') thresholds[key] = Math.round(minScore * 100);
+              }
+            } catch (e) {
+              console.log('Could not read .lighthouserc.json thresholds, using defaults.');
+            }
+
+            function median(xs) {
+              const s = [...xs].sort((a, b) => a - b);
+              const m = Math.floor(s.length / 2);
+              return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+            }
+
+            // Median category score per route across the collected runs, with a
+            // pass/fail mark against the configured thresholds. Returns ''
+            // when no usable run JSON is present (comment falls back to the
+            // report-file list, as before).
+            function buildScoreTable(jsonPaths) {
+              const byRoute = new Map();
+              for (const p of jsonPaths) {
+                let lhr;
+                try {
+                  lhr = JSON.parse(fs.readFileSync(p, 'utf8'));
+                } catch {
+                  continue;
+                }
+                const categories = (lhr && lhr.categories) || {};
+                let route;
+                try {
+                  const u = new URL(lhr.finalUrl || lhr.requestedUrl || '');
+                  route = u.pathname + u.search;
+                } catch {
+                  route = path.basename(p, '.report.json');
+                }
+                if (!byRoute.has(route)) byRoute.set(route, {});
+                const entry = byRoute.get(route);
+                for (const { key } of CATEGORIES) {
+                  const score = categories[key] && categories[key].score;
+                  if (typeof score === 'number') {
+                    if (!entry[key]) entry[key] = [];
+                    entry[key].push(score);
+                  }
+                }
+              }
+              if (byRoute.size === 0) return '';
+              const header = `| Route | ${CATEGORIES.map(c => c.label).join(' | ')} |`;
+              const divider = `| --- | ${CATEGORIES.map(() => '---').join(' | ')} |`;
+              let failures = 0;
+              const rows = [];
+              for (const [route, entry] of byRoute) {
+                const cells = CATEGORIES.map(({ key }) => {
+                  const vals = entry[key] || [];
+                  if (!vals.length) return 'n/a';
+                  const pct = Math.round(median(vals) * 100);
+                  const pass = pct >= (thresholds[key] ?? 0);
+                  if (!pass) failures++;
+                  return `${pct} ${pass ? '✅' : '❌'}`;
+                });
+                rows.push(`| \`${route}\` | ${cells.join(' | ')} |`);
+              }
+              const verdict = failures === 0
+                ? `**Verdict:** ✅ all routes within budget`
+                : `**Verdict:** ❌ ${failures} check(s) below threshold`;
+              return `${verdict} (median of collected runs)\n\n${header}\n${divider}\n${rows.join('\n')}\n`;
+            }
+
+            let reportLinks = [];
+            let scoreTable = '';
             try {
               const files = fs.readdirSync(lhciDir);
               const htmlFiles = files.filter(f => f.endsWith('.html'));
+              const jsonFiles = files.filter(f => f.endsWith('.report.json'));
 
               for (const file of htmlFiles) {
                 const name = path.basename(file, '.html');
                 reportLinks.push(`- ${name}`);
               }
+              scoreTable = buildScoreTable(jsonFiles.map(f => path.join(lhciDir, f)));
             } catch (e) {
               reportLinks.push('- Report files not found (see artifacts)');
             }
 
             let body = `## Lighthouse CI Results\n\n` +
               `**Routes audited:** \`/\`, \`/dashboard?perf=1\`, \`/training-session\`\n\n` +
-              `**Thresholds:** Performance \u226590 | Accessibility \u226590 | Best Practices \u226585\n\n` +
+              `**Thresholds:** ${CATEGORIES.map(c => `${c.label} ≥${thresholds[c.key]}`).join(' | ')}\n\n` +
+              (scoreTable ? `### Scores\n${scoreTable}\n` : '') +
               `### Reports\n${reportLinks.join('\n') || '- See workflow artifacts for details'}\n\n` +
               `>Reports are also available as [workflow artifacts](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
 
