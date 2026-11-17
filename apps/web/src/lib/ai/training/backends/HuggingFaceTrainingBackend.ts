@@ -224,8 +224,8 @@ export class HuggingFaceTrainingBackend extends TrainingBackend {
       this.log("listModels failed", { error: (err as Error).message });
       // Fallback to static list so the UI doesn't break on transient errors.
       return [
-        { id: "meta-llama/Llama-2-7b-hf", ownedBy: "meta", fineTunable: true },
-        { id: "meta-llama/Llama-2-13b-hf", ownedBy: "meta", fineTunable: true },
+        { id: "Qwen/Qwen2.5-7B-Instruct", ownedBy: "Qwen", fineTunable: true },
+        { id: "Qwen/Qwen2.5-14B-Instruct", ownedBy: "Qwen", fineTunable: true },
         { id: "mistralai/Mistral-7B-v0.1", ownedBy: "mistralai", fineTunable: true },
         { id: "google/gemma-2b", ownedBy: "google", fineTunable: true },
       ];

@@ -344,9 +344,9 @@ export default function SyntheticTherapyDemo() {
                 <SelectContent>
                   <SelectItem value='gpt-3.5-turbo'>GPT-3.5 Turbo</SelectItem>
                   <SelectItem value='gpt-4'>GPT-4</SelectItem>
-                  <SelectItem value='llama-3-8b'>Llama 3 (8B)</SelectItem>
-                  <SelectItem value='meta-llama/Meta-Llama-3-8B'>
-                    Meta-Llama-3-8B
+                  <SelectItem value='@cf/mistralai/mistral-small-3.1-24b-instruct'>Mistral Small 3.1 (24B)</SelectItem>
+                  <SelectItem value='@cf/mistralai/mistral-small-3.1-24b-instruct'>
+                    Mistral Small 3.1 24B
                   </SelectItem>
                 </SelectContent>
               </Select>

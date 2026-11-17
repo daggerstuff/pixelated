@@ -166,7 +166,7 @@ export interface MetricAttributes {
  * // Track emotional analysis completions
  * countMetric('emotion_analysis_completed', 1, {
  *   session_type: 'therapy',
- *   model: 'mental-llama'
+ *   model: 'mental-health-ai'
  * })
  * ```
  */
@@ -208,7 +208,7 @@ export function countMetric(
  *
  * // Track emotion analysis latency
  * distributionMetric('emotion_analysis_latency', 234, {
- *   attributes: { model: 'emotion-llama' },
+ *   attributes: { model: 'emotion-analysis' },
  *   unit: 'millisecond'
  * })
  * ```

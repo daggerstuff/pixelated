@@ -56,7 +56,7 @@ export default defineTool({
         preEvalScore !== null
           ? {
               estimated_pass_rate: preEvalScore,
-              model: '@cf/meta/llama-3.2-3b-instruct',
+              model: '@cf/mistralai/mistral-small-3.1-24b-instruct',
             }
           : null,
       benchmark_run_stub: {

@@ -63,7 +63,7 @@ function maskEnv(env: Record<string, unknown>): Record<string, unknown> {
     /^AUDIT_LOG_RETENTION_DAYS$/,
     /^ENCRYPTION_ALGORITHM$/,
     /^VAPID_SUBJECT$/,
-    /^MENTALLAMA_(DEFAULT_MODEL_TIER|ENABLE_PYTHON_BRIDGE|PYTHON_BRIDGE_SCRIPT_PATH)$/,
+    /^MENTAL_HEALTH_AI_(DEFAULT_MODEL_TIER|ENABLE_PYTHON_BRIDGE|PYTHON_BRIDGE_SCRIPT_PATH)$/,
   ]
   return Object.fromEntries(
     Object.entries(env).map(([k, v]) => [
@@ -120,7 +120,6 @@ export const env = (() => {
 /**
  * Type definition for environment variables
  */
-export type Env = z.infer<typeof envSchema>
 
 /**
  * Environment configuration object
@@ -273,16 +272,15 @@ export const config = {
     phoneNumber: (): string | undefined => env().TWILIO_PHONE_NUMBER,
   },
 
-  mentalLLaMA: {
-    apiKey: (): string | undefined => env().MENTALLAMA_API_KEY,
-    endpointUrl7B: (): string | undefined => env().MENTALLAMA_ENDPOINT_URL_7B,
-    endpointUrl13B: (): string | undefined => env().MENTALLAMA_ENDPOINT_URL_13B,
+  mentalHealthAI: {
+    apiKey: (): string | undefined => env().CLOUDFLARE_AI_API_KEY,
+    accountId: (): string | undefined => env().CLOUDFLARE_ACCOUNT_ID,
     defaultModelTier: (): '7B' | '13B' | undefined =>
-      env().MENTALLAMA_DEFAULT_MODEL_TIER,
+      env().MENTAL_HEALTH_AI_DEFAULT_MODEL_TIER,
     enablePythonBridge: (): boolean | undefined =>
-      env().MENTALLAMA_ENABLE_PYTHON_BRIDGE,
+      env().MENTAL_HEALTH_AI_ENABLE_PYTHON_BRIDGE,
     pythonBridgeScriptPath: (): string | undefined =>
-      env().MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH,
+      env().MENTAL_HEALTH_AI_PYTHON_BRIDGE_SCRIPT_PATH,
   },
 }
 

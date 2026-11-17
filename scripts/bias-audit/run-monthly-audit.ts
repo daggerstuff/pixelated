@@ -127,7 +127,7 @@ function generateSyntheticSessions(): TherapeuticSession[] {
           timestamp: new Date(),
           type: 'intervention' as const,
           confidence: sharedConfidences[i * RESPONSES_PER_SESSION + j],
-          modelUsed: 'llama-3.1-70b',
+          modelUsed: '@cf/mistralai/mistral-small-3.1-24b-instruct',
         })
       }
       sessions.push({

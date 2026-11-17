@@ -168,7 +168,7 @@ describe("FineTuningOrchestrator", () => {
               huggingface: huggingfacePath,
             },
             {
-              model: "meta-llama/Llama-2-7b",
+              model: "Qwen/Qwen2.5-7B-Instruct",
               nEpochs: 3,
               backend: "huggingface",
             },

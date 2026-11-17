@@ -32,7 +32,7 @@ digests. Sub-agent of the broader Eve workflow. Status: **Done** (PIX-3958).
 - `score_session.ts` calls
   `searchMemories({ query: 'session_id:<uuid>', limit, tag_filter: ['session_id:<uuid>'] })`,
   concatenates `memories[].content` into the scored `transcript`, and passes it
-  to the Workers AI (`llama-3.2-3b-instruct`) scoring prompt. Returns
+  to the Workers AI (`@cf/mistralai/mistral-small-3.1-24b-instruct`) scoring prompt. Returns
   `transcript_fetched: boolean`.
 - `summarize_cohort.ts` queries a cohort `tag_filter`, parses per-session JSON
   memory content, aggregates the 5 rubric dimensions (mean / p10 / p90), and

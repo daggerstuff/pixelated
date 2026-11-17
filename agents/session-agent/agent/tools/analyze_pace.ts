@@ -2,7 +2,7 @@
  * analyze_pace — pacing analysis for the session-agent.
  *
  * Analyzes recent turn history for conversational rhythm patterns using
- * Workers AI (@cf/meta/llama-3.2-3b-instruct). Runs sub-second and
+ * Workers AI (@cf/mistralai/mistral-small-3.1-24b-instruct). Runs sub-second and
  * returns a structured pacing signal the agent can attach to persistent_notes.
  *
  * Exported at two levels:
@@ -75,10 +75,12 @@ export async function analyzePace(
   const parsed = parsePaceJson(text)
 
   return {
+    ...parsed,
+    // session_id after the spread: parsePaceJson's fallback carries
+    // session_id 'unknown', which must not overwrite the caller's ID.
     session_id: input.session_id,
     analyzed_at: new Date().toISOString(),
-    ...parsed,
-    model: '@cf/meta/llama-3.2-3b-instruct',
+    model: '@cf/mistralai/mistral-small-3.1-24b-instruct',
   }
 }
 
@@ -121,7 +123,7 @@ function parsePaceJson(raw: string) {
       ).slice(0, 200),
     }
   } catch {
-    return emptyPace('unknown', '@cf/meta/llama-3.2-3b-instruct')
+    return emptyPace('unknown', '@cf/mistralai/mistral-small-3.1-24b-instruct')
   }
 }
 

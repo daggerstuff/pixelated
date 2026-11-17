@@ -2,7 +2,7 @@
  * Shared Workers AI provider instance for pipeline-agent tools and sub-agents.
  *
  * Uses CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_AI_API_KEY env vars to create a
- * @cf/meta/llama-3.2-3b-instruct model instance via the workers-ai-provider
+ * @cf/mistralai/mistral-small-3.1-24b-instruct model instance via the workers-ai-provider
  * package. Model DEFAULT is overridable via the WORKERS_AI_EVAL_MODEL env var
  * so the supervisor can pin a different CF model per run.
  */
@@ -25,7 +25,7 @@ const workersai = createWorkersAI({
   apiKey: apiKey ?? 'missing-cloudflare-api-key',
 })
 
-export const MODEL = '@cf/meta/llama-3.2-3b-instruct'
+const MODEL = '@cf/mistralai/mistral-small-3.1-24b-instruct'
 
 // GLM 5.2 — 1M token context window. Free for eve agents through Aug 27 2026
 // via Blackbox on Vercel AI Gateway.

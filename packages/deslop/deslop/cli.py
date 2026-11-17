@@ -149,7 +149,7 @@ def regen(
     output: Path = typer.Option(..., "--output", "-o"),
     provider: str = typer.Option("ollama", "--provider", help="ollama or openai-compatible"),
     endpoint: str = typer.Option("http://127.0.0.1:11434", "--endpoint"),
-    model: str = typer.Option("llama3.2", "--model"),
+    model: str = typer.Option("mistral", "--model"),
     api_key_env: str = typer.Option("OPENAI_API_KEY", "--api-key-env"),
     all_records: bool = typer.Option(False, "--all-records"),
     rules: Path | None = typer.Option(None, "--rules"),

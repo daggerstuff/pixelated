@@ -46,7 +46,7 @@ const SCHEMA = z.object({
 export default defineTool({
   description:
     'Produce a structured emotion signal for the most recent turn by ' +
-    'calling Workers AI (@cf/meta/llama-3.2-3b-instruct). Returns a ' +
+    'calling Workers AI (@cf/mistralai/mistral-small-3.1-24b-instruct). Returns a ' +
     'structured emotion label, intensity, valence, and risk flags. ' +
     'When recent_turns is provided, also runs a parallel pace analysis ' +
     'and attaches pacing observations as a persistent_note. ' +
@@ -74,7 +74,7 @@ export default defineTool({
         ? 'session-agent.tools.analyze_emotion:workers-ai:v1'
         : 'session-agent.tools.analyze_emotion:fallback:v1',
       evaluated_at: new Date().toISOString(),
-      model: model ? '@cf/meta/llama-3.2-3b-instruct' : 'none',
+      model: model ? '@cf/mistralai/mistral-small-3.1-24b-instruct' : 'none',
     }
 
     if (pace?.suggestion) {

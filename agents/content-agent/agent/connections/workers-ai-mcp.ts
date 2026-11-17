@@ -6,7 +6,7 @@ import { defineMcpClientConnection } from 'eve/connections'
 export default defineMcpClientConnection({
   url: 'https://workers-ai-mcp.coburncd.workers.dev/mcp',
   description:
-    'Workers AI inference MCP backed by @cf/meta/llama-3.2-3b-instruct ' +
+    'Workers AI inference MCP backed by @cf/mistralai/mistral-small-3.1-24b-instruct ' +
     'on Cloudflare Workers. Exposes text analysis tools used by the demo ' +
     'QA agent for thread scoring and corpus review.',
   headers: {

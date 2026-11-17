@@ -5,7 +5,7 @@
  * (set in the agent's runtime environment) to create a Workers AI
  * language model compatible with the Vercel AI SDK.
  *
- * Model: @cf/meta/llama-3.2-3b-instruct
+ * Model: @cf/mistralai/mistral-small-3.1-24b-instruct
  *   - 3B params, free tier, fast inference
  *   - Sufficient for classification, sentiment, crisis detection
  */
@@ -28,7 +28,7 @@ const workersai = createWorkersAI({
   apiKey: apiKey ?? 'missing-cloudflare-api-key',
 })
 
-export const MODEL = '@cf/meta/llama-3.2-3b-instruct'
+const MODEL = '@cf/mistralai/mistral-small-3.1-24b-instruct'
 
 // GLM 5.2 — 1M token context window. Free for eve agents through Aug 27 2026
 // via Blackbox on Vercel AI Gateway.

@@ -163,7 +163,7 @@ def regen_file_with_ollama(
     input_file: Path,
     output_file: Path,
     endpoint: str = "http://127.0.0.1:11434",
-    model: str = "llama3.2",
+    model: str = "mistral",
     only_flagged: bool = True,
     rules: RuleSet | None = None,
 ) -> RegenReport:

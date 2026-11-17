@@ -31,7 +31,7 @@ Environment:
 
 Example:
   scripts/devops/install-red-hat-ai-inference-linux.sh \
-    --model RedHatAI/Llama-3.2-1B-Instruct-FP8 \
+    --model Qwen/Qwen2.5-7B-Instruct \
     --tensor-parallel-size 1
 EOF
 }
@@ -62,7 +62,7 @@ command_exists() {
 
 ENGINE=""
 IMAGE="registry.redhat.io/rhaii/vllm-cuda-rhel9:3.4.0"
-MODEL="RedHatAI/Llama-3.2-1B-Instruct-FP8"
+MODEL="Qwen/Qwen2.5-7B-Instruct"
 PORT="8000"
 CACHE_DIR="$(pwd)/rhaii-cache"
 CONTAINER_NAME="rhaii-vllm"

@@ -31,9 +31,6 @@ export const DEFAULT_LLM_MODEL: string =
 export const NEON_ENABLED_MODELS: readonly string[] = [
   'gpt-oss-120b',
   'gpt-oss-20b',
-  'llama-4-maverick',
-  'meta-llama-3-3-70b-instruct',
-  'meta-llama-3-1-8b-instruct',
   'qwen3-next-80b-a3b-instruct',
   'qwen35-122b-a10b',
   'gemma-3-12b',

@@ -70,7 +70,7 @@ export default defineTool({
       analyzed_at: new Date().toISOString(),
       pattern_flags: result.pattern_flags,
       recommendation: result.recommendation,
-      model: '@cf/meta/llama-3.2-3b-instruct',
+      model: '@cf/mistralai/mistral-small-3.1-24b-instruct',
     } satisfies EmotionalAnalysisResult
   },
 })

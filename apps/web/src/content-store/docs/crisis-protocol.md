@@ -16,13 +16,13 @@ title: Crisis Protocol Documentation
 The Crisis Protocol is a comprehensive system designed to detect potential
 mental health crises in user communications and automatically alert appropriate
 personnel for immediate intervention. The protocol integrates with the
-MentalLLaMA analysis system to provide real-time crisis detection and response.
+MentalHealthAI analysis system to provide real-time crisis detection and response.
 
 ## Architecture
 
 ### Components
 
-1. **MentalLLaMAAdapter**: Core component that performs mental health analysis
+1. **MentalHealthAIAdapter**: Core component that performs mental health analysis
 2. **MentalHealthTaskRouter**: Intelligent routing system for determining
    analysis type
 3. **ICrisisNotificationHandler**: Interface for crisis notification services
@@ -33,7 +33,7 @@ MentalLLaMA analysis system to provide real-time crisis detection and response.
 
 ```mermaid
 graph TD
-    A[User Input Text] --> B[MentalLLaMAAdapter.analyzeMentalHealth]
+    A[User Input Text] --> B[MentalHealthAIAdapter.analyzeMentalHealth]
     B --> C[MentalHealthTaskRouter.determineRoute]
     C --> D{Crisis Detected?}
     D -->|Yes| E[Crisis Protocol Activation]
@@ -62,14 +62,14 @@ graph TD
    - Formats and sends rich Slack messages with crisis details
    - Robust error handling and logging
 
-3. **MentalLLaMAAdapter Crisis Integration**
-   - Location: `src/lib/ai/mental-llama/MentalLLaMAAdapter.ts`
+3. **MentalHealthAIAdapter Crisis Integration**
+   - Location: `src/lib/ai/mental-health-ai/MentalHealthAIAdapter.ts`
    - Crisis detection in `analyzeMentalHealth` method
    - Enhanced structured logging for crisis events
    - Optional crisis notifier integration
 
-4. **MentalLLaMAFactory Updates**
-   - Location: `src/lib/ai/mental-llama/index.ts`
+4. **MentalHealthAIFactory Updates**
+   - Location: `src/lib/ai/mental-health-ai/index.ts`
    - Automatic SlackNotificationService initialization
    - Environment-based configuration
 
@@ -119,10 +119,10 @@ VAPID_SUBJECT=mailto:admin@yourdomain.com
 ### Basic Implementation
 
 ```typescript
-import { createMentalLLaMAFromEnv } from '@/lib/ai/mental-llama'
+import { createMentalHealthAIFromEnv } from '@/lib/ai/mental-health-ai'
 
 // Create adapter with crisis protocol enabled
-const { adapter } = await createMentalLLaMAFromEnv()
+const { adapter } = await createMentalHealthAIFromEnv()
 
 // Analyze text with automatic crisis detection
 const result = await adapter.analyzeMentalHealth(
@@ -146,7 +146,7 @@ if (result.mentalHealthCategory === 'crisis') {
 
 ```typescript
 import { SlackNotificationService } from '@/lib/services/notification/SlackNotificationService'
-import { MentalLLaMAAdapter } from '@/lib/ai/mental-llama/MentalLLaMAAdapter'
+import { MentalHealthAIAdapter } from '@/lib/ai/mental-health-ai/MentalHealthAIAdapter'
 
 // Create custom crisis notifier
 const crisisNotifier = new SlackNotificationService(
@@ -154,7 +154,7 @@ const crisisNotifier = new SlackNotificationService(
 )
 
 // Create adapter with custom notifier
-const adapter = new MentalLLaMAAdapter(
+const adapter = new MentalHealthAIAdapter(
   provider,
   fheService,
   baseUrl,

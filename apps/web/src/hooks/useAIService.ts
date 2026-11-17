@@ -53,7 +53,7 @@ export function useAIService() {
 
         // Get completion from the service
         const response = await aiService.createChatCompletion(messages, {
-          model: 'emotion-llama-2',
+          model: '@cf/mistralai/mistral-small-3.1-24b-instruct',
           ...options,
         })
 
@@ -73,5 +73,3 @@ export function useAIService() {
     getAIResponse,
   }
 }
-
-export default useAIService

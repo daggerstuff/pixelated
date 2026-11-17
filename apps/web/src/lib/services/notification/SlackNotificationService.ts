@@ -79,7 +79,7 @@ export class SlackNotificationService implements ICrisisNotificationHandler {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `A potential user crisis was detected by the MentalLLaMA system. *Urgent review required.*`,
+          text: `A potential user crisis was detected by the MentalHealthAI system. *Urgent review required.*`,
         },
       },
       {
@@ -133,7 +133,7 @@ export class SlackNotificationService implements ICrisisNotificationHandler {
     return {
       text: `CRITICAL CRISIS ALERT: User ID ${userId || 'N/A'}, Session ID ${sessionId || 'N/A'}. Urgent review required.`,
       blocks,
-      username: 'MentalLLaMA Crisis Monitor',
+      username: 'MentalHealthAI Crisis Monitor',
       icon_emoji: ':rotating_light:',
       // channel: '#crisis-alerts', // Can be set here or in webhook config
     }
@@ -187,7 +187,7 @@ export class SlackNotificationService implements ICrisisNotificationHandler {
             this.webhookUrl.indexOf('/services/') + '/services/'.length,
           ) + '...',
       })
-      // Rethrow to indicate failure to dispatch, allowing caller (MentalLLaMAAdapter) to handle
+      // Rethrow to indicate failure to dispatch, allowing caller (MentalHealthAIAdapter) to handle
       throw new Error(
         `Failed to dispatch crisis alert via SlackNotificationService: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },

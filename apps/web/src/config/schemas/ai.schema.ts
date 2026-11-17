@@ -27,16 +27,16 @@ export const aiEnvSchema = z.object({
   AZURE_OPENAI_API_VERSION: z.string().optional(),
   AZURE_OPENAI_DEPLOYMENT_NAME: z.string().optional(),
 
-  // MentalLLaMA
-  MENTALLAMA_API_KEY: z.string().optional(),
-  MENTALLAMA_ENDPOINT_URL_7B: z.url().optional(),
-  MENTALLAMA_ENDPOINT_URL_13B: z.url().optional(),
-  MENTALLAMA_DEFAULT_MODEL_TIER: z.enum(['7B', '13B']).optional(),
-  MENTALLAMA_ENABLE_PYTHON_BRIDGE: z
+  // MentalHealthAI
+  // MentalHealthAI runs on Cloudflare Workers AI.
+  CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
+  CLOUDFLARE_AI_API_KEY: z.string().optional(),
+  MENTAL_HEALTH_AI_DEFAULT_MODEL_TIER: z.enum(['7B', '13B']).optional(),
+  MENTAL_HEALTH_AI_ENABLE_PYTHON_BRIDGE: z
     .string()
     .transform((val: string) => val === 'true')
     .optional(),
-  MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH: z.string().optional(),
+  MENTAL_HEALTH_AI_PYTHON_BRIDGE_SCRIPT_PATH: z.string().optional(),
 
   // AI Microservice (PIX-3926)
   AI_SERVICE_URL: z.url().optional(),

@@ -64,7 +64,7 @@ interface MentalHealthChatDemoReactProps {
 }
 
 /**
- * React component for the MentalLLaMA chat integration
+ * React component for the MentalHealthAI chat integration
  */
 export default function MentalHealthChatDemoReact({
   initialTab = 'chat',

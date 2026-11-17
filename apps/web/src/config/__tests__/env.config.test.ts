@@ -218,12 +218,11 @@ describe('config object getters', () => {
       TWILIO_ACCOUNT_SID: undefined,
       TWILIO_AUTH_TOKEN: undefined,
       TWILIO_PHONE_NUMBER: undefined,
-      MENTALLAMA_API_KEY: undefined,
-      MENTALLAMA_ENDPOINT_URL_7B: undefined,
-      MENTALLAMA_ENDPOINT_URL_13B: undefined,
-      MENTALLAMA_DEFAULT_MODEL_TIER: undefined,
-      MENTALLAMA_ENABLE_PYTHON_BRIDGE: undefined,
-      MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH: undefined,
+      CLOUDFLARE_ACCOUNT_ID: undefined,
+      CLOUDFLARE_AI_API_KEY: undefined,
+      MENTAL_HEALTH_AI_DEFAULT_MODEL_TIER: undefined,
+      MENTAL_HEALTH_AI_ENABLE_PYTHON_BRIDGE: undefined,
+      MENTAL_HEALTH_AI_PYTHON_BRIDGE_SCRIPT_PATH: undefined,
       // Defaulted keys cleared so assertions on their *default* values are
       // deterministic (the host environment leaks some, e.g. RATE_LIMIT_WINDOW_MS).
       ANALYTICS_WS_PORT: undefined,
@@ -372,13 +371,12 @@ describe('config object getters', () => {
     expect(config.twilio.phoneNumber()).toBeUndefined()
   })
 
-  it('returns undefined for all optional MentalLLaMA credentials', () => {
-    expect(config.mentalLLaMA.apiKey()).toBeUndefined()
-    expect(config.mentalLLaMA.endpointUrl7B()).toBeUndefined()
-    expect(config.mentalLLaMA.endpointUrl13B()).toBeUndefined()
-    expect(config.mentalLLaMA.defaultModelTier()).toBeUndefined()
-    expect(config.mentalLLaMA.enablePythonBridge()).toBeUndefined()
-    expect(config.mentalLLaMA.pythonBridgeScriptPath()).toBeUndefined()
+  it('returns undefined for all optional MentalHealthAI credentials', () => {
+    expect(config.mentalHealthAI.apiKey()).toBeUndefined()
+    expect(config.mentalHealthAI.accountId()).toBeUndefined()
+    expect(config.mentalHealthAI.defaultModelTier()).toBeUndefined()
+    expect(config.mentalHealthAI.enablePythonBridge()).toBeUndefined()
+    expect(config.mentalHealthAI.pythonBridgeScriptPath()).toBeUndefined()
   })
 })
 

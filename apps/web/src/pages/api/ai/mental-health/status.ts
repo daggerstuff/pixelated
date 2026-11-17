@@ -1,14 +1,14 @@
 import type { APIRoute } from 'astro'
 
-import { verifyMentalLLaMAModelConfiguration } from '../../../../lib/ai/mental-llama/utils/testModelIntegration'
+import { verifyMentalHealthAIModelConfiguration } from '../../../../lib/ai/mental-health-ai/utils/testModelIntegration'
 
 /**
- * API endpoint to check the status of the MentalLLaMA model
+ * API endpoint to check the status of the MentalHealthAI model
  * Returns configuration status and any error messages
  */
 export const GET: APIRoute = async () => {
   try {
-    const configResult = await verifyMentalLLaMAModelConfiguration()
+    const configResult = await verifyMentalHealthAIModelConfiguration()
 
     return new Response(
       JSON.stringify({
@@ -23,7 +23,7 @@ export const GET: APIRoute = async () => {
       },
     )
   } catch (error: unknown) {
-    console.error('Error checking MentalLLaMA model status:', error)
+    console.error('Error checking MentalHealthAI model status:', error)
 
     return new Response(
       JSON.stringify({
