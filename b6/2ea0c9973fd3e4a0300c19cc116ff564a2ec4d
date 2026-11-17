@@ -1,0 +1,19 @@
+tests/integration/auth0/auth0-integration.test.ts
+  s_7d4811cf1b0ba7::t_97dfa691d3f095 60,88-97,99-101,106-108,110-113,115-117,119,121-129,132,137-139,143,145,149,152-153,157,159,164-165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b62ea0c9973fd3e4a0300c19cc116ff564a2ec4d",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
