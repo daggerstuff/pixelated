@@ -29,9 +29,10 @@
  */
 
 import { spawn } from "node:child_process";
-import { accessSync, constants, mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { accessSync, constants, mkdirSync, writeFileSync, readFileSync, realpathSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { resolve, dirname, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import { glob } from "glob";
 
 // ---------------------------------------------------------------------------
@@ -39,9 +40,9 @@ import { glob } from "glob";
 // ---------------------------------------------------------------------------
 
 const INDEX_PATH = resolve(".cache/knip-index.json");
-const INDEX_VERSION = 3;
+const INDEX_VERSION = 4;
 const SCAN_GLOB = "apps/web/src/**/*.{ts,tsx,js,jsx,astro}";
-const CONSUMER_GLOB = "apps/web/src/**/*.{test,spec}.{ts,tsx,js,jsx}";
+const CONSUMER_GLOB = "{apps/web/src,tests}/**/*.{test,spec}.{ts,tsx,js,jsx}";
 const CONSUMER_IGNORE = [
   "**/node_modules/**",
   "**/dist/**",
@@ -79,6 +80,47 @@ function pathExists(filePath) {
   } catch {
     return false;
   }
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Whether an exported name is also referenced inside the file that exports it.
+ *
+ * The index only records importers, so a symbol with no importer looked
+ * identical whether it was dead or merely over-exported. This separates the
+ * two: a declaration contributes the first match, so a second match on
+ * identifier boundaries means the symbol is used locally and the fix is to
+ * drop `export`, not the declaration.
+ *
+ * Deliberately a word match rather than a parse: it can over-report (a
+ * self-referential type, or the name reused as an object key), and
+ * over-reporting only changes which remedy is suggested.
+ */
+export function hasInternalReference(source, name) {
+  const pattern = new RegExp(
+    "(?<![A-Za-z0-9_$])" + escapeRegExp(name) + "(?![A-Za-z0-9_$])",
+    "g",
+  );
+  let seen = 0;
+  let match;
+  while ((match = pattern.exec(source)) !== null) {
+    seen += 1;
+    if (seen > 1) return true;
+    if (match.index === pattern.lastIndex) pattern.lastIndex += 1;
+  }
+  return false;
+}
+
+/**
+ * Classify a scoped violation. Both kinds fail the gate; they differ in the
+ * remedy, which is the point of separating them.
+ */
+export function classifyViolation(info) {
+  if (info.importedBy.length > 0) return null;
+  return info.referencedInFile ? "internal-only" : "unused";
 }
 
 const RESOLVE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts"];
@@ -374,7 +416,13 @@ async function buildIndex() {
     const cleanSource = stripComments(source);
     const exports = extractExports(source, cleanSource);
     if (exports.length > 0) {
-      fileExports.set(absPath, exports);
+      fileExports.set(
+        absPath,
+        exports.map((exp) => ({
+          ...exp,
+          referencedInFile: hasInternalReference(cleanSource, exp.name),
+        })),
+      );
     }
   }
 
@@ -433,6 +481,7 @@ async function buildIndex() {
         line: exp.line,
         col: exp.col,
         kind: exp.kind,
+        referencedInFile: exp.referencedInFile === true,
         importedBy: consumers ? [...consumers].map((p) => relative(resolve("."), p)).sort() : [],
       };
     }
@@ -549,18 +598,53 @@ function reportViolations(violations, isScoped, fileCount) {
   }
 
   for (const v of violations) {
-    console.error(
-      v.file + ":" + v.line + ":" + v.col + "  error  Unused " + v.kind + ': "' + v.name + '"',
+    if (v.violationKind === "internal-only") {
+      console.error(
+        v.file +
+          ":" +
+          v.line +
+          ":" +
+          v.col +
+          "  error  Over-exported " +
+          v.kind +
+          ': "' +
+          v.name +
+          '" is referenced only inside its own file. Drop the `export` keyword; the declaration is live.',
+      );
+    } else if (v.violationKind === "unused") {
+      console.error(
+        v.file +
+          ":" +
+          v.line +
+          ":" +
+          v.col +
+          "  error  Unused " +
+          v.kind +
+          ': "' +
+          v.name +
+          '" has no importer and no in-file reference. Delete it.',
+      );
+    } else {
+      console.error(
+        v.file + ":" + v.line + ":" + v.col + "  error  Unused " + v.kind + ': "' + v.name + '"',
+      );
+    }
+  }
+
+  const overExported = violations.filter((v) => v.violationKind === "internal-only").length;
+  const unused = violations.length - overExported;
+  const parts = [];
+  if (unused > 0) parts.push(unused + (unused === 1 ? " unused symbol" : " unused symbols"));
+  if (overExported > 0) {
+    parts.push(
+      overExported + (overExported === 1 ? " over-exported symbol" : " over-exported symbols"),
     );
   }
 
-  const label = violations.length === 1 ? "unused symbol" : "unused symbols";
   console.error(
     "\nFound " +
-      violations.length +
-      " " +
-      label +
-      ". Remove them or add the --no-exit-code flag.\n" +
+      parts.join(" and ") +
+      ". Fix them or add the --no-exit-code flag.\n" +
       "(Hint: if these are false positives, add an entry point or pattern\n" +
       " to knip.json or ignoreDependencies.)",
   );
@@ -621,15 +705,16 @@ async function main() {
       foundCount++;
 
       for (const [exportName, info] of Object.entries(fileEntry)) {
-        if (info.importedBy.length === 0) {
-          violations.push({
-            file: filePath,
-            line: info.line,
-            col: info.col,
-            name: exportName,
-            kind: info.kind,
-          });
-        }
+        const violationKind = classifyViolation(info);
+        if (!violationKind) continue;
+        violations.push({
+          file: filePath,
+          line: info.line,
+          col: info.col,
+          name: exportName,
+          kind: info.kind,
+          violationKind,
+        });
       }
     }
 
@@ -708,4 +793,12 @@ async function main() {
   reportViolations(violations, isScoped, changedFiles.length);
 }
 
-main();
+function isDirectInvocation() {
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
+if (isDirectInvocation()) main();
