@@ -18,7 +18,7 @@ export async function createMentalHealthAIPythonBridge(
   if (typeof process !== "undefined" && process.versions?.node && typeof window === "undefined") {
     try {
       // Server environment - use real implementation with dynamic import to avoid bundling
-      const modulePath = ["..", "..", "..", "server-only", "MentalHealthAIPythonBridge"].join("/");
+      const modulePath = ["..", "..", "..", "server-only", "MentalHealthPythonBridge"].join("/");
       const module = await import(/* @vite-ignore */ modulePath);
       return new module.MentalHealthAIPythonBridge(scriptPath);
     } catch (error: unknown) {
