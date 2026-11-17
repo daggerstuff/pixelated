@@ -1,0 +1,47 @@
+apps/web/src/lib/server/memory-transport-factory.test.ts
+  s_7d4811cf1b0ba7::t_9b3e54136100ca 4
+  s_7d4811cf1b0ba7::t_b23f195faadaa8 133
+apps/web/src/pages/api/memory/search.ts
+  s_7d4811cf1b0ba7::t_b877badff89da0 2-3
+  s_7d4811cf1b0ba7::t_db296281b14f79 26
+  s_7d4811cf1b0ba7::t_a8cdab3c975877 1,14
+  s_7d4811cf1b0ba7::t_3057647ae065bb 76,117
+scripts/ci/lint-changed.mjs
+  s_7d4811cf1b0ba7::t_d799740c61c02a 164-167,169,177-178,180
+  s_7d4811cf1b0ba7::t_78f13afe7ce8ce 49-62,66-67,69-73,76-86
+  s_7d4811cf1b0ba7::t_58679ef05b836a 210-245
+  s_7d4811cf1b0ba7::t_2b057a67d0eb5b 6
+apps/web/src/lib/services/product-memory-ownership.ts
+  s_7d4811cf1b0ba7::t_d8c3ed0762f4e5 1,9,12
+apps/web/src/pages/api/memory/list.ts
+  s_7d4811cf1b0ba7::t_f7665febfc00e6 25
+  s_7d4811cf1b0ba7::t_96374aaa54e132 1,13
+  s_7d4811cf1b0ba7::t_38c50bf2287d7d 2-3
+  s_7d4811cf1b0ba7::t_d726a34ab20592 69
+apps/web/src/lib/server/memory-transport-factory.ts
+  s_7d4811cf1b0ba7::t_92d01c25027754 9,21-51,53,56,58-60,111
+  s_7d4811cf1b0ba7::t_cdafb646f228f5 159,168,178-180
+apps/web/src/lib/server/mcp-memory-transport.ts
+  s_7d4811cf1b0ba7::t_fe8e0009320df8 457
+  s_7d4811cf1b0ba7::t_66c3ee12111448 6
+apps/web/src/lib/server/internal-memory-service-client.ts
+  s_7d4811cf1b0ba7::t_fc11d678e32e0e 66,71,78,84,90,94
+apps/web/src/lib/services/product-memory-gateway.ts
+  s_7d4811cf1b0ba7::t_7233e0f93700c0 16-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "143c61e49c46bb68037e633d3ec5dd9e34c33e02",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
