@@ -5,7 +5,7 @@ import { createLazyMcpClient } from './lib/lazy-mcp-client.js'
 
 const FORESIGHT_URL = process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/mcp'
 
-export const { getClient, close } = createLazyMcpClient<Client>(async () => {
+const { getClient, close } = createLazyMcpClient<Client>(async () => {
   const transport = new StreamableHTTPClientTransport(new URL(FORESIGHT_URL))
   const client = new Client(
     { name: 'intake-agent', version: '1.0.0' },
@@ -41,14 +41,16 @@ export async function storeMemory(
     const result = await c.callTool({
       name: 'manage_memories',
       arguments: {
-        action: 'store',
-        content: params.content,
-        options: {
-          category: params.category ?? 'general',
-          scope: params.scope ?? 'intake',
-          retention: params.retention ?? 'long_term',
-          importance: params.importance ?? 0.5,
-          tags: params.tags ?? [],
+        params: {
+          action: 'store',
+          content: params.content,
+          store_options: {
+            category: params.category ?? 'general',
+            scope: params.scope ?? 'intake',
+            retention: params.retention ?? 'long_term',
+            importance: params.importance ?? 0.5,
+            tags: params.tags ?? [],
+          },
         },
       },
     })
@@ -76,11 +78,13 @@ export async function searchMemories(
     const result = await c.callTool({
       name: 'search_memories',
       arguments: {
-        query: params.query,
-        options: {
-          query_type: 'keyword',
-          limit: params.limit ?? 10,
-          min_importance: params.min_importance ?? 0.1,
+        params: {
+          query: params.query,
+          options: {
+            query_type: 'keyword',
+            limit: params.limit ?? 10,
+            min_importance: params.min_importance ?? 0.1,
+          },
         },
       },
     })
@@ -101,15 +105,12 @@ export async function searchMemories(
   }
 }
 
-export async function getSystemStatus(): Promise<Record<
-  string,
-  unknown
-> | null> {
+async function getSystemStatus(): Promise<Record<string, unknown> | null> {
   try {
     const c = await getClient()
     const result = await c.callTool({
       name: 'get_system_status',
-      arguments: {},
+      arguments: { params: {} },
     })
     const text = extractText(result)
     try {
