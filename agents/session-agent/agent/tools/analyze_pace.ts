@@ -75,9 +75,11 @@ export async function analyzePace(
   const parsed = parsePaceJson(text)
 
   return {
+    ...parsed,
+    // session_id after the spread: parsePaceJson's fallback carries
+    // session_id 'unknown', which must not overwrite the caller's ID.
     session_id: input.session_id,
     analyzed_at: new Date().toISOString(),
-    ...parsed,
     model: '@cf/mistralai/mistral-small-3.1-24b-instruct',
   }
 }
