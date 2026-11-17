@@ -1,0 +1,30 @@
+{
+  "base_model": "Qwen/Qwen3-0.6B",
+  "bytes": 5996752,
+  "counts": {
+    "acute_client_rows": 1104,
+    "datums": 5754,
+    "datums_skipped_no_targets": 0,
+    "datums_skipped_too_long": 1350,
+    "datums_trimmed_opening": 1235,
+    "routing_kept": 2000,
+    "routing_rows": 7989,
+    "sample": 4000,
+    "too_long_excluded": 1096,
+    "tool_rows_excluded": 4151,
+    "total_tokens": 504142,
+    "trained_tokens": 262059
+  },
+  "datums": 5754,
+  "end_token": "<|im_end|>",
+  "max_tokens": 512,
+  "path": "training/output/ovh-v27-qwen3-8b/tinker-sft-train.jsonl",
+  "schema": "tinker-tokenized-datums-v1",
+  "sha256": "59af246d6271bba11add2911ea795d88eba4bf05fda34116ea80bd53ff05fcc8",
+  "source_manifest": "docs/training/execution-2026-11-10/wandb-full-corpus-current-master-20261110-v27.json",
+  "source_release_id": "wandb-full-corpus-current-master-20261110-v27",
+  "source_rows": 7104,
+  "source_train_sha256": "8895102a757c13ac9d1905fbb496435b5559e7a64988446f5d20d085be44042e",
+  "template_kwargs": {},
+  "tokenizer": "Qwen/Qwen3-0.6B"
+}

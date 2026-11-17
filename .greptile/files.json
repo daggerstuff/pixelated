@@ -1,0 +1,22 @@
+{
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "description": "Repo operating protocol: stack, CI/CD off staging, banned tsc/astro check (OOM, use type-aware oxlint), anti-suppression policy, HIPAA gating"
+    },
+    {
+      "path": "SECURITY.md",
+      "description": "Security policy and reporting",
+      "scope": ["src/**", "services/**", "apps/**", ".github/**"]
+    },
+    {
+      "path": "THREAT_MODEL.md",
+      "description": "Threat model for clinical/PHI data flows",
+      "scope": ["src/**", "services/**", "apps/**"]
+    },
+    {
+      "path": ".coderabbit.yaml",
+      "description": "Sibling AI reviewer config — keep Greptile findings consistent with it (HIPAA, anti-suppression, tenant isolation, no style nitpicks)"
+    }
+  ]
+}

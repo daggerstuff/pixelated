@@ -1,7 +1,59 @@
 {
   "strictness": 2,
   "commentTypes": ["logic", "syntax"],
-  "autoReview": ["open", "push"],
   "effort": "auto",
-  "ignorePatterns": "node_modules/\ndist/\ndist-ssr/\nworktrees/\n.git/\n*.lock\n*.min.js\n*.map\n*.csv\n*.jsonl\n**/Books/**\n**/*.svg\nsubmodules/**"
+  "autoReview": ["open", "push"],
+  "triggerOnDrafts": false,
+  "statusCheck": true,
+  "includeConfidenceScore": true,
+  "includeIssuesTable": true,
+  "includeSequenceDiagram": false,
+  "disabledLabels": ["dependencies", "automated"],
+  "excludeAuthors": ["dependabot[bot]"],
+  "ignoreKeywords": "WIP\n[WIP]\nDraft\n[Draft]",
+  "ignorePatterns": "node_modules/\ndist/\ndist-ssr/\nworktrees/\n.git/\n*.lock\npnpm-lock.yaml\npackage-lock.json\nuv.lock\n*.min.js\n*.map\n*.csv\n*.jsonl\n**/Books/**\n**/*.svg\n**/*.generated.*\nsubmodules/**\nai/\nforesight/\ndocs/\ncoverage/\ntest-results/\nplaywright-report/",
+  "instructions": "Pixelated Empathy: Astro 6 + React 19 frontend (TypeScript, Tailwind), Python 3.12+ backend via uv/ruff, PostgreSQL 17 + pgvector. Default/base branch is staging. Be concise, direct, and high-signal: focus on real defects, HIPAA/PHI privacy, security, race conditions, and regressions. Do not comment on style, formatting, or whitespace (enforced by oxlint/ruff/oxfmt). Do not suggest tsc or astro check (OOM); type-aware oxlint is used instead.",
+  "summarySection": {
+    "included": true,
+    "collapsible": true,
+    "defaultOpen": false
+  },
+  "issuesTableSection": {
+    "included": true,
+    "collapsible": true,
+    "defaultOpen": false
+  },
+  "confidenceScoreSection": {
+    "included": true,
+    "collapsible": true,
+    "defaultOpen": false
+  },
+  "rules": [
+    {
+      "id": "hipaa-phi",
+      "rule": "Never allow PHI/PII, MRNs, patient identifiers, psychiatric notes, or clinical transcripts to be logged, serialized into unencrypted stores, or emitted in error responses. Test fixtures must use synthetic, non-identifiable data only.",
+      "severity": "high"
+    },
+    {
+      "id": "no-suppressions",
+      "rule": "Flag any @ts-ignore, @ts-expect-error, @ts-nocheck, /* eslint-disable */, # noqa, # type: ignore, or # pylint: disable. Fix the underlying type/lint issue instead; never downgrade linter or compiler strictness configs.",
+      "severity": "high"
+    },
+    {
+      "id": "tenant-isolation",
+      "rule": "Every EHR/clinical database query must enforce tenant isolation (tenant_id) and Row-Level Security (RLS). Flag queries missing tenant scoping.",
+      "scope": ["src/**", "services/**", "apps/**"],
+      "severity": "high"
+    },
+    {
+      "id": "async-error-handling",
+      "rule": "All async operations must handle rejected/error states and propagate errors gracefully. Reject silent error swallowing (empty catch blocks). Database connections, file handles, and stream readers must be properly closed (using, try...finally, or context managers). In Python/FastAPI, async routes must not perform blocking synchronous I/O.",
+      "severity": "high"
+    },
+    {
+      "id": "no-secrets",
+      "rule": "Never hardcode credentials, API tokens, passwords, or patient-identifiable data in code, tests, or mock fixtures.",
+      "severity": "high"
+    }
+  ]
 }

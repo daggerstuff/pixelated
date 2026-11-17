@@ -1,64 +1,84 @@
 name: Qodo Merge (PR-Agent)
 
 on:
-  pull_request:
-    types: [opened, reopened, ready_for_review, synchronize]
-  issue_comment:
-    types: [created]
+    pull_request:
+        types: [opened, reopened, ready_for_review, synchronize]
+    issue_comment:
+        types: [created]
 
 permissions:
-  contents: read
-  pull-requests: write
-  issues: write
+    contents: read
+    pull-requests: write
+    issues: write
 
 jobs:
-  pr-agent:
-    name: AI PR Code Review
-    # Self-gating: without Workers AI credentials there is nothing to
-    # call — skip silently instead of failing every run and posting a
-    # failure comment on every PR. Gate is a step output (evaluated per run).
-    if: github.event_name == 'pull_request' || (github.event.issue.pull_request && startsWith(github.event.comment.body, '/'))
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - name: Check Workers AI credentials
-        id: gateway
+    pr-agent:
+        name: AI PR Code Review
+        # Self-gating: without Workers AI credentials there is nothing to
+        # call — skip silently instead of failing every run and posting a
+        # failure comment on every PR. Gate is a step output (evaluated per run).
+        if: github.event_name == 'pull_request' || (github.event.issue.pull_request && startsWith(github.event.comment.body, '/'))
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
         env:
-          CLOUDFLARE_AI_API_KEY: ${{ secrets.CLOUDFLARE_AI_API_KEY }}
-        run: |
-          if [ -n "$CLOUDFLARE_AI_API_KEY" ]; then
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::CLOUDFLARE_AI_API_KEY is not set — skipping PR-Agent"
-          fi
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - name: Check Workers AI credentials
+              id: gateway
+              env:
+                  CLOUDFLARE_AI_API_KEY: ${{ secrets.CLOUDFLARE_AI_API_KEY }}
+              run: |
+                  if [ -n "$CLOUDFLARE_AI_API_KEY" ]; then
+                    echo "configured=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "configured=false" >> "$GITHUB_OUTPUT"
+                    echo "::notice::CLOUDFLARE_AI_API_KEY is not set — skipping PR-Agent"
+                  fi
 
-      - name: Run PR Agent
-        if: steps.gateway.outputs.configured == 'true'
-        uses: Codium-ai/pr-agent@ef5a40031b21658e4657db44d6618e22db34ed8b # main (pinned)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Cloudflare Workers AI via LiteLLM's cloudflare/ provider prefix —
-          # the same account + key contract as the repo's own
-          # workers-ai-provider clients (agents/*/agent/lib/workers-ai.ts).
-          # NOTE: no OPENAI_* vars here on purpose. The repo's nt_live_*
-          # keys only work against the Neon gateway; sending them to the
-          # Cloudflare gateway base URL got every call rejected with
-          # 401/2009 and a failure comment on every PR.
-          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_AI_API_KEY }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # Standing user rule (Foresight user_preferences): NEVER use Llama
-          # models for any task — GLM, Qwen, Mistral, or any other non-Llama
-          # model instead. So NOT llama-3.2-3b: Mistral Small 3.1 24B, the
-          # live non-Llama Workers AI chat model already in use in this
-          # checkout (FORESIGHT_LLM_MODEL). Dotted lowercase form —
-          # uppercase variants of these keys are silently ignored by the action.
-          config.model: 'cloudflare/@cf/mistralai/mistral-small-3.1-24b-instruct'
-          config.custom_model_max_tokens: '32000'
-          CONFIG.AUTO_REVIEW: 'true'
-          CONFIG.AUTO_DESCRIBE: 'false'
-          CONFIG.AUTO_IMPROVE: 'false'
-          PR_REVIEWER.REQUIRE_ALL_CHECKS_PASSED: 'false'
-          PR_REVIEWER.EXTRA_INSTRUCTIONS: 'Focus on defects, HIPAA/PHI privacy compliance, data leakage, concurrency issues, and test regressions. Keep findings clear and actionable.'
+            - name: Run PR Agent
+              if: steps.gateway.outputs.configured == 'true'
+              uses: Codium-ai/pr-agent@ef5a40031b21658e4657db44d6618e22db34ed8b # main (pinned)
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  # Cloudflare Workers AI via LiteLLM's cloudflare/ provider prefix —
+                  # the same account + key contract as the repo's own
+                  # workers-ai-provider clients (agents/*/agent/lib/workers-ai.ts).
+                  # NOTE: no OPENAI_* vars here on purpose. The repo's nt_live_*
+                  # keys only work against the Neon gateway; sending them to the
+                  # Cloudflare gateway base URL got every call rejected with
+                  # 401/2009 and a failure comment on every PR.
+                  CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_AI_API_KEY }}
+                  CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  # Standing user rule (Foresight user_preferences): NEVER use Llama
+                  # models for any task — GLM, Qwen, Mistral, or any other non-Llama
+                  # model instead. So NOT llama-3.2-3b: Mistral Small 3.1 24B, the
+                  # live non-Llama Workers AI chat model already in use in this
+                  # checkout (FORESIGHT_LLM_MODEL). Dotted lowercase form —
+                  # uppercase variants of these keys are silently ignored by the action.
+                  config.model: "cloudflare/@cf/mistralai/mistral-small-3.1-24b-instruct"
+                  # Workers AI caps a completion at 256 tokens when the request omits
+                  # max_tokens, and PR-Agent leaves it unset by default (config.max_output_tokens
+                  # ships as 0). Every answer therefore came back finish_reason=length, which
+                  # PR-Agent reports as "response was truncated", and the job fell through to
+                  # the shipped gpt-6-luna fallback, which has no key here. Measured against
+                  # this account: 256 completion tokens with the cap unset, a natural stop well
+                  # inside 8192 with it set.
+                  config.max_output_tokens: "8192"
+                  # Chunking budget for the diff, not the model's real 128k window: it keeps a
+                  # single request well inside Workers AI's per-call limits.
+                  config.custom_model_max_tokens: "32000"
+                  # Keep the fallback on Workers AI. The shipped default is gpt-6-luna, which
+                  # this workflow has no key for — it fails with "Incorrect API key provided:
+                  # dummy_key" and buries the model error that actually caused the fallback.
+                  config.fallback_models: "cloudflare/@cf/zai-org/glm-4.7-flash"
+                  # The trigger list above includes synchronize, but PR-Agent skips that
+                  # event unless push handling is switched on and a command is named for
+                  # it — otherwise every push produced a green check that logged
+                  # "Skipping action: synchronize" and reviewed nothing.
+                  github_action_config.handle_push_trigger: "true"
+                  github_action_config.push_commands: "review"
+                  CONFIG.AUTO_REVIEW: "true"
+                  CONFIG.AUTO_DESCRIBE: "false"
+                  CONFIG.AUTO_IMPROVE: "false"
+                  PR_REVIEWER.REQUIRE_ALL_CHECKS_PASSED: "false"
+                  PR_REVIEWER.EXTRA_INSTRUCTIONS: "Focus on defects, HIPAA/PHI privacy compliance, data leakage, concurrency issues, and test regressions. Keep findings clear and actionable."

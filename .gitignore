@@ -298,6 +298,12 @@ qualified_channels.json
 *.pt
 *.pth
 *.safetensors
+# A LoRA adapter's tokenizer copy is an 11 MB local artifact; the run manifest,
+# adapter config and README beside it are tracked (weights are *.safetensors).
+training/output/**/adapter-final/tokenizer.json
+# The adapter card is the untouched HuggingFace template ("Model Card for Model
+# ID", every field "[More Information Needed]"); ovh-run.json is the record.
+training/output/**/adapter-final/README.md
 .kaggle-outputs
 checkpoints/
 compiled_dataset/
