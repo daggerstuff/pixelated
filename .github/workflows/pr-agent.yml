@@ -49,10 +49,13 @@ jobs:
           # 401/2009 and a failure comment on every PR.
           CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_AI_API_KEY }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # Repo-primary Workers AI chat model (agents/*/agent/lib/workers-ai.ts
-          # MODEL). Dotted lowercase form — uppercase variants of these keys
-          # are silently ignored by the action.
-          config.model: 'cloudflare/@cf/meta/llama-3.2-3b-instruct'
+          # Standing user rule (Foresight user_preferences): NEVER use Llama
+          # models for any task — GLM, Qwen, Mistral, or any other non-Llama
+          # model instead. So NOT llama-3.2-3b: Mistral Small 3.1 24B, the
+          # live non-Llama Workers AI chat model already in use in this
+          # checkout (FORESIGHT_LLM_MODEL). Dotted lowercase form —
+          # uppercase variants of these keys are silently ignored by the action.
+          config.model: 'cloudflare/@cf/mistralai/mistral-small-3.1-24b-instruct'
           config.custom_model_max_tokens: '32000'
           CONFIG.AUTO_REVIEW: 'true'
           CONFIG.AUTO_DESCRIBE: 'false'
