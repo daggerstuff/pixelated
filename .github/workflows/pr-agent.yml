@@ -14,47 +14,48 @@ permissions:
 jobs:
   pr-agent:
     name: AI PR Code Review
-    # Self-gating: without the Neon gateway URL secret there is nothing to
+    # Self-gating: without Workers AI credentials there is nothing to
     # call — skip silently instead of failing every run and posting a
-    # failure comment on every PR (the Nov 2026 behavior). A job-level `if`
-    # cannot read `secrets`, so the gate is a step output instead.
+    # failure comment on every PR. Gate is a step output (evaluated per run).
     if: github.event_name == 'pull_request' || (github.event.issue.pull_request && startsWith(github.event.comment.body, '/'))
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Check gateway secret
+      - name: Check Workers AI credentials
         id: gateway
         env:
-          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          CLOUDFLARE_AI_API_KEY: ${{ secrets.CLOUDFLARE_AI_API_KEY }}
         run: |
-          if [ -n "$OPENAI_BASE_URL" ]; then
+          if [ -n "$CLOUDFLARE_AI_API_KEY" ]; then
             echo "configured=true" >> "$GITHUB_OUTPUT"
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::OPENAI_BASE_URL is not set — skipping PR-Agent"
+            echo "::notice::CLOUDFLARE_AI_API_KEY is not set — skipping PR-Agent"
           fi
 
       - name: Run PR Agent
         if: steps.gateway.outputs.configured == 'true'
         uses: Codium-ai/pr-agent@ef5a40031b21658e4657db44d6618e22db34ed8b # main (pinned)
         env:
-          OPENAI_KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY || secrets.LLM_API_KEY }}
-          OPENAI__KEY: ${{ secrets.OPENAI_KEY || secrets.OPENAI_API_KEY || secrets.LLM_API_KEY }}
-          # Neon AI Gateway (OpenAI-compatible), NOT api.openai.com: the
-          # nt_live_* keys the repo uses are rejected anywhere else (401/2009).
-          # No fallback to vars.OPENAI_BASE_URL — that points at a Cloudflare
-          # gateway and silently re-breaks auth. Create the secret from the
-          # Neon console branch URL (see .env.example "NEON AI GATEWAY").
-          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
-          OPENAI__API_BASE: ${{ secrets.OPENAI_BASE_URL }}
-          GEMINI_KEY: ${{ secrets.GEMINI_KEY || secrets.GOOGLE_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Open-weight model served by the Neon gateway (per .env.example
-          # default). Dotted lowercase form — uppercase variants of these
-          # keys are silently ignored by the action.
-          config.model: 'openai/gpt-oss-120b'
+          # Cloudflare Workers AI via LiteLLM's cloudflare/ provider prefix —
+          # the same account + key contract as the repo's own
+          # workers-ai-provider clients (agents/*/agent/lib/workers-ai.ts).
+          # NOTE: no OPENAI_* vars here on purpose. The repo's nt_live_*
+          # keys only work against the Neon gateway; sending them to the
+          # Cloudflare gateway base URL got every call rejected with
+          # 401/2009 and a failure comment on every PR.
+          CLOUDFLARE_API_KEY: ${{ secrets.CLOUDFLARE_AI_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Standing user rule (Foresight user_preferences): NEVER use Llama
+          # models for any task — GLM, Qwen, Mistral, or any other non-Llama
+          # model instead. So NOT llama-3.2-3b: Mistral Small 3.1 24B, the
+          # live non-Llama Workers AI chat model already in use in this
+          # checkout (FORESIGHT_LLM_MODEL). Dotted lowercase form —
+          # uppercase variants of these keys are silently ignored by the action.
+          config.model: 'cloudflare/@cf/mistralai/mistral-small-3.1-24b-instruct'
           config.custom_model_max_tokens: '32000'
           CONFIG.AUTO_REVIEW: 'true'
           CONFIG.AUTO_DESCRIBE: 'false'
