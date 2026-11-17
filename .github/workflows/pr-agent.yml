@@ -71,6 +71,12 @@ jobs:
                   # this workflow has no key for — it fails with "Incorrect API key provided:
                   # dummy_key" and buries the model error that actually caused the fallback.
                   config.fallback_models: "cloudflare/@cf/zai-org/glm-4.7-flash"
+                  # The trigger list above includes synchronize, but PR-Agent skips that
+                  # event unless push handling is switched on and a command is named for
+                  # it — otherwise every push produced a green check that logged
+                  # "Skipping action: synchronize" and reviewed nothing.
+                  github_action_config.handle_push_trigger: "true"
+                  github_action_config.push_commands: "review"
                   CONFIG.AUTO_REVIEW: "true"
                   CONFIG.AUTO_DESCRIBE: "false"
                   CONFIG.AUTO_IMPROVE: "false"
