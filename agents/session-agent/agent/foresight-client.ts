@@ -13,7 +13,7 @@ const FORESIGHT_URL = process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/mcp'
  * agent's startup context small and avoiding an idle SSE connection when the
  * agent is not actively using Foresight.
  */
-export const { getClient, close } = createLazyMcpClient<Client>(async () => {
+const { getClient, close } = createLazyMcpClient<Client>(async () => {
   const transport = new StreamableHTTPClientTransport(new URL(FORESIGHT_URL))
   const client = new Client(
     { name: 'session-agent', version: '1.0.0' },
@@ -113,10 +113,7 @@ export async function searchMemories(
   }
 }
 
-export async function getSystemStatus(): Promise<Record<
-  string,
-  unknown
-> | null> {
+async function getSystemStatus(): Promise<Record<string, unknown> | null> {
   try {
     const c = await getClient()
     const result = await c.callTool({
