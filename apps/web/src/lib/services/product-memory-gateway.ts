@@ -13,7 +13,10 @@ import {
   type InternalMemoryRecord,
   type InternalMemoryScopeInput,
 } from '../server/internal-memory-service-client'
-import { createMemoryTransport } from '../server/memory-transport-factory'
+import {
+  createMemoryTransport,
+  type InternalMemoryServiceClientLike,
+} from '../server/memory-transport-factory'
 import { AuditLogger, NoOpAuditLogger } from './product-memory-audit'
 import { assertOwnedMemoryAccessible } from './product-memory-ownership'
 
@@ -31,7 +34,7 @@ export interface ProductMemoryScope {
   includeShared?: boolean
 }
 
-export interface ProductMemoryListOptions extends ProductMemoryScope {
+interface ProductMemoryListOptions extends ProductMemoryScope {
   limit?: number
   offset?: number
   category?: string
@@ -40,11 +43,11 @@ export interface ProductMemoryListOptions extends ProductMemoryScope {
   retention?: string
 }
 
-export interface ProductMemorySearchOptions extends ProductMemoryListOptions {
+interface ProductMemorySearchOptions extends ProductMemoryListOptions {
   query: string
 }
 
-export interface ProductMemoryCreateInput extends ProductMemoryScope {
+interface ProductMemoryCreateInput extends ProductMemoryScope {
   content: string
   metadata?: Record<string, unknown>
 }
@@ -59,11 +62,11 @@ export interface ProductMemoryDeleteInput extends ProductMemoryScope {
   memoryId: string
 }
 
-export interface ProductMemoryGetInput extends ProductMemoryScope {
+interface ProductMemoryGetInput extends ProductMemoryScope {
   memoryId: string
 }
 
-export interface ProductMemoryStats {
+interface ProductMemoryStats {
   totalMemories: number
   categoryCounts: Record<string, number>
 }
@@ -80,23 +83,6 @@ export class ProductMemoryGatewayError extends Error {
 }
 
 type Caller = { userId: string; tenantId?: string }
-
-type InternalMemoryServiceClientLike = {
-  addMemory: (input: any) => Promise<{ memory_id: string }>
-  listMemories: (
-    input: any,
-  ) => Promise<{ memories: UnifiedMemory[]; count: number }>
-  searchMemories: (
-    input: any,
-  ) => Promise<{ memories: UnifiedMemory[]; count: number }>
-  updateMemory: (input: any) => Promise<void>
-  getMemory: (input: any) => Promise<UnifiedMemory | null>
-  deleteMemory: (input: any) => Promise<void>
-  getMemoryStats: (input: any) => Promise<{
-    totalMemories: number
-    categoryCounts: Record<string, number>
-  }>
-}
 
 type CallContext = {
   correlationId: string
@@ -539,7 +525,7 @@ export function getProductMemoryGateway(): ProductMemoryGateway {
  * operators can switch from the HTTP self-loopback to the foresight-server
  * transport without code changes.
  */
-export function getProductMemoryGatewayFor(
+function getProductMemoryGatewayFor(
   caller: Caller,
   audit?: AuditLogger,
 ): ProductMemoryGateway {

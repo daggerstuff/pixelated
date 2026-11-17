@@ -623,9 +623,9 @@ describe('Auth0UserService', () => {
         ticket: 'https://test-domain.auth0.com/lo/reset?ticket=abc123',
       }
 
-      mockManagementClient.createPasswordChangeTicket.mockResolvedValue({
-        data: mockTicket,
-      })
+      mockManagementClient.createPasswordChangeTicket.mockResolvedValue(
+        mockTicket,
+      )
 
       const result = await auth0UserService.createPasswordResetTicket(
         'auth0|123456',

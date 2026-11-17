@@ -680,7 +680,7 @@ export class Auth0UserService {
         result_url: returnUrl,
         ttl_sec: 3600, // 1 hour
       })
-      const ticket = this.toRecord(ticketRes.data)
+      const ticket = this.toRecord(ticketRes)
       return ticket
         ? (this.toStringOrUndefined(ticket['ticket']) ?? null)
         : null
@@ -1015,19 +1015,19 @@ export class Auth0UserService {
     if (
       record &&
       'data' in record &&
-      record.data !== null &&
-      typeof record.data === 'object' &&
-      !Array.isArray(record.data)
+      record['data'] !== null &&
+      typeof record['data'] === 'object' &&
+      !Array.isArray(record['data'])
     ) {
-      return this.toRecord(record.data) ?? {}
+      return this.toRecord(record['data']) ?? {}
     }
     return record ?? {}
   }
 
   private parseAuth0UserList(value: unknown): Auth0UserRecord[] {
     const record = this.toRecord(value)
-    if (record && 'data' in record && Array.isArray(record.data)) {
-      return record.data.map((item) => this.parseAuth0UserRecord(item))
+    if (record && 'data' in record && Array.isArray(record['data'])) {
+      return record['data'].map((item) => this.parseAuth0UserRecord(item))
     }
     if (!Array.isArray(value)) {
       return []

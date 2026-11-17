@@ -168,6 +168,25 @@ describe('validateSessionToken', () => {
     expect(mockValidateToken).toHaveBeenCalledTimes(1)
   })
 
+  it('a cache write failure still returns the verified session', async () => {
+    process.env['USE_REDIS_SESSIONS'] = '1'
+    mockRedis.setInCache.mockRejectedValueOnce(
+      new Error('cache backend write failed'),
+    )
+    mockValidateToken.mockResolvedValue(validValidation())
+    const token = tokenFor('cache-write-failure')
+
+    const resolution = await validateSessionToken(token)
+
+    // The token was verified, so a failed store must not turn it into a
+    // denial: the verdict stays valid and the session is returned. The next
+    // request simply validates again.
+    expect(resolution.status).toBe('valid')
+    expect(resolution.session?.user.id).toBe('auth0|pilot-gamma')
+    expect(mockValidateToken).toHaveBeenCalledTimes(1)
+    expect(mockRedis.setInCache).toHaveBeenCalledTimes(1)
+  })
+
   it('keeps getSession null for every non-valid verdict', async () => {
     mockValidateToken.mockResolvedValueOnce({
       valid: false,

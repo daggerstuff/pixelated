@@ -297,10 +297,12 @@ export class Auth0AdaptiveMFAService {
           const management = auth0Management
           const logs = await retry(
             async () =>
-              management.getLogs({
-                per_page: 10,
-                q: `ip:${ipAddress} AND type:f`,
-              }),
+              (
+                await management.logs.list({
+                  per_page: 10,
+                  search: `ip:${ipAddress} AND type:f`,
+                })
+              ).data,
             2,
             500,
           )
@@ -447,10 +449,12 @@ export class Auth0AdaptiveMFAService {
           const management = auth0Management
           const recentLogs = await retry(
             async () =>
-              management.getLogs({
-                per_page: 20,
-                q: `user_id:${userId} AND type:f AND date:[${new Date(Date.now() - 3600000).toISOString()} TO *]`,
-              }),
+              (
+                await management.logs.list({
+                  per_page: 20,
+                  search: `user_id:${userId} AND type:f AND date:[${new Date(Date.now() - 3600000).toISOString()} TO *]`,
+                })
+              ).data,
             2,
             500,
           )

@@ -1,24 +1,132 @@
-import type { UnifiedMemory } from '@pixelated/memory-schema'
+import type {
+  EmotionalContext,
+  EmpathyMetrics,
+  UnifiedMemory,
+} from '@pixelated/memory-schema'
+import {
+  EmotionalContextSchema,
+  EmpathyMetricsSchema,
+  MEMORY_SCHEMA_VERSION,
+} from '@pixelated/memory-schema'
 
 import { resolveInternalMemoryServiceConfig } from './internal-memory-service-auth'
-import { InternalMemoryServiceClient } from './internal-memory-service-client'
+import {
+  InternalMemoryServiceClient,
+  type InternalMemoryMetadata,
+  type InternalMemoryRecord,
+  type InternalMemoryScopeInput,
+} from './internal-memory-service-client'
 import { McpMemoryTransport } from './mcp-memory-transport'
 
+type AddMemoryInput = InternalMemoryScopeInput & {
+  content: string
+  category?: string
+  metadata?: InternalMemoryMetadata
+}
+
+type ListMemoriesInput = InternalMemoryScopeInput & {
+  limit: number
+  offset?: number
+  category?: string
+  tags?: string[]
+  scope?: string
+  retention?: string
+}
+
+type SearchMemoriesInput = ListMemoriesInput & {
+  query: string
+}
+
+type MemoryIdInput = InternalMemoryScopeInput & {
+  memoryId: string
+}
+
+type UpdateMemoryInput = MemoryIdInput & {
+  content: string
+  category?: string
+  metadata?: InternalMemoryMetadata
+}
+
 export type InternalMemoryServiceClientLike = {
-  addMemory: (input: any) => Promise<{ memory_id: string }>
+  addMemory: (input: AddMemoryInput) => Promise<{ memory_id: string }>
   listMemories: (
-    input: any,
+    input: ListMemoriesInput,
   ) => Promise<{ memories: UnifiedMemory[]; count: number }>
   searchMemories: (
-    input: any,
+    input: SearchMemoriesInput,
   ) => Promise<{ memories: UnifiedMemory[]; count: number }>
-  updateMemory: (input: any) => Promise<void>
-  getMemory: (input: any) => Promise<UnifiedMemory | null>
-  deleteMemory: (input: any) => Promise<void>
-  getMemoryStats: (input: any) => Promise<{
+  updateMemory: (input: UpdateMemoryInput) => Promise<void>
+  getMemory: (input: MemoryIdInput) => Promise<UnifiedMemory | null>
+  deleteMemory: (input: MemoryIdInput) => Promise<void>
+  getMemoryStats: (input: InternalMemoryScopeInput) => Promise<{
     totalMemories: number
     categoryCounts: Record<string, number>
   }>
+}
+
+type MetadataValue = InternalMemoryMetadata[string]
+
+const DEFAULT_CATEGORY = 'general'
+const DEFAULT_IMPORTANCE = 0.5
+
+function readString(value: MetadataValue, fallback: string): string {
+  return typeof value === 'string' && value.length > 0 ? value : fallback
+}
+
+function readNumber(value: MetadataValue, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback
+}
+
+function readStringArray(value: MetadataValue): string[] {
+  if (!Array.isArray(value)) return []
+  return value.filter((item): item is string => typeof item === 'string')
+}
+
+function readEmotionalContext(value: MetadataValue): EmotionalContext | null {
+  const parsed = EmotionalContextSchema.safeParse(value)
+  return parsed.success ? parsed.data : null
+}
+
+function readEmpathyMetrics(value: MetadataValue): EmpathyMetrics | null {
+  const parsed = EmpathyMetricsSchema.safeParse(value)
+  return parsed.success ? parsed.data : null
+}
+
+function toUnifiedMemory(
+  record: InternalMemoryRecord,
+  userId: string,
+): UnifiedMemory {
+  const metadata = record.metadata
+  return {
+    id: record.id,
+    tenantId: 'default',
+    userId,
+    bankId: 'default',
+    content: record.content ?? record.memory ?? '',
+    scope: 'session',
+    retention: 'short_term',
+    category: readString(metadata?.['category'], DEFAULT_CATEGORY),
+    tags: readStringArray(metadata?.['tags']),
+    version: 1,
+    schemaVersion: MEMORY_SCHEMA_VERSION,
+    sourceService: 'foresight',
+    importance: readNumber(metadata?.['importance'], DEFAULT_IMPORTANCE),
+    decayRate: 0.01,
+    strengthTrend: 'stable',
+    activationCount: 0,
+    retrievalCount: 0,
+    isGhost: false,
+    gist: null,
+    synthesizedFrom: [],
+    vectorId: null,
+    emotionalContext: readEmotionalContext(metadata?.['emotional_context']),
+    empathyMetrics: readEmpathyMetrics(metadata?.['metrics']),
+    createdAt:
+      record.createdAt ?? record.created_at ?? new Date().toISOString(),
+    updatedAt: record.updatedAt ?? record.updated_at ?? null,
+    accessedAt: null,
+    lastRetrievedAt: null,
+  }
 }
 
 /**
@@ -42,120 +150,37 @@ export function createMemoryTransport(): InternalMemoryServiceClientLike {
       return new McpMemoryTransport({ launcherPath, timeoutMs })
     }
     case 'http-loopback': {
-      // Legacy HTTP client - wrap to return UnifiedMemory format
       const legacyClient = new InternalMemoryServiceClient(
         resolveInternalMemoryServiceConfig(),
       )
 
-      // Adapter to convert InternalMemoryRecord to UnifiedMemory
       return {
         addMemory: legacyClient.addMemory.bind(legacyClient),
-        listMemories: async (input: any) => {
+        listMemories: async (input: ListMemoriesInput) => {
           const result = await legacyClient.listMemories(input)
           return {
-            memories: result.memories.map((m: any) => ({
-              id: m.id,
-              tenantId: 'default',
-              userId: input.userId,
-              bankId: 'default',
-              content: m.content ?? m.memory ?? '',
-              scope: 'session',
-              retention: 'short_term',
-              category: m.metadata?.['category'] ?? 'general',
-              tags: m.metadata?.['tags'] ?? [],
-              version: 1,
-              schemaVersion: '1.0.0',
-              sourceService: 'foresight',
-              importance: m.metadata?.['importance'] ?? 0.5,
-              decayRate: 0.01,
-              strengthTrend: 'stable',
-              activationCount: 0,
-              retrievalCount: 0,
-              isGhost: false,
-              gist: null,
-              synthesizedFrom: [],
-              vectorId: null,
-              emotionalContext: m.metadata?.['emotional_context'] ?? null,
-              empathyMetrics: m.metadata?.['metrics'] ?? null,
-              createdAt:
-                m.createdAt ?? m.created_at ?? new Date().toISOString(),
-              updatedAt: m.updatedAt ?? m.updated_at ?? null,
-              accessedAt: null,
-              lastRetrievedAt: null,
-            })),
+            memories: result.memories.map((record) =>
+              toUnifiedMemory(record, input.userId),
+            ),
             count: result.count,
           }
         },
-        searchMemories: async (input: any) => {
+        searchMemories: async (input: SearchMemoriesInput) => {
           const result = await legacyClient.searchMemories(input)
           return {
-            memories: result.memories.map((m: any) => ({
-              id: m.id,
-              tenantId: 'default',
-              userId: input.userId,
-              bankId: 'default',
-              content: m.content ?? m.memory ?? '',
-              scope: 'session',
-              retention: 'short_term',
-              category: m.metadata?.['category'] ?? 'general',
-              tags: m.metadata?.['tags'] ?? [],
-              version: 1,
-              schemaVersion: '1.0.0',
-              sourceService: 'foresight',
-              importance: m.metadata?.['importance'] ?? 0.5,
-              decayRate: 0.01,
-              strengthTrend: 'stable',
-              activationCount: 0,
-              retrievalCount: 0,
-              isGhost: false,
-              gist: null,
-              synthesizedFrom: [],
-              vectorId: null,
-              emotionalContext: m.metadata?.['emotional_context'] ?? null,
-              empathyMetrics: m.metadata?.['metrics'] ?? null,
-              createdAt:
-                m.createdAt ?? m.created_at ?? new Date().toISOString(),
-              updatedAt: m.updatedAt ?? m.updated_at ?? null,
-              accessedAt: null,
-              lastRetrievedAt: null,
-            })),
+            memories: result.memories.map((record) =>
+              toUnifiedMemory(record, input.userId),
+            ),
             count: result.count,
           }
         },
         updateMemory: legacyClient.updateMemory.bind(legacyClient),
-        getMemory: async (input: any): Promise<UnifiedMemory | null> => {
-          const memory = await legacyClient.getMemory(input)
-          if (!memory) return null
-          return {
-            id: memory.id,
-            tenantId: 'default',
-            userId: input.userId,
-            bankId: 'default',
-            content: memory.content ?? memory.memory ?? '',
-            scope: 'session',
-            retention: 'short_term',
-            category: memory.metadata?.['category'] ?? 'general',
-            tags: memory.metadata?.['tags'] ?? [],
-            version: 1,
-            schemaVersion: '1.0.0',
-            sourceService: 'foresight',
-            importance: memory.metadata?.['importance'] ?? 0.5,
-            decayRate: 0.01,
-            strengthTrend: 'stable',
-            activationCount: 0,
-            retrievalCount: 0,
-            isGhost: false,
-            gist: null,
-            synthesizedFrom: [],
-            vectorId: null,
-            emotionalContext: memory.metadata?.['emotional_context'] ?? null,
-            empathyMetrics: memory.metadata?.['metrics'] ?? null,
-            createdAt:
-              memory.createdAt ?? memory.created_at ?? new Date().toISOString(),
-            updatedAt: memory.updatedAt ?? memory.updated_at ?? null,
-            accessedAt: null,
-            lastRetrievedAt: null,
-          } as UnifiedMemory
+        getMemory: async (
+          input: MemoryIdInput,
+        ): Promise<UnifiedMemory | null> => {
+          const record = await legacyClient.getMemory(input)
+          if (!record) return null
+          return toUnifiedMemory(record, input.userId)
         },
         deleteMemory: legacyClient.deleteMemory.bind(legacyClient),
         getMemoryStats: legacyClient.getMemoryStats.bind(legacyClient),

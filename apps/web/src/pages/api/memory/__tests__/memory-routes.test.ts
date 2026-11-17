@@ -271,6 +271,44 @@ describe('Memory API routes (PIX-328: gateway-backed)', () => {
         expect.objectContaining({ query: 'find me' }),
       )
     })
+
+    it('returns 400 when the body is not a JSON object', async () => {
+      mockGetCurrentUser.mockResolvedValue(makeUser())
+
+      const response = await searchPost({
+        request: makeRequest('http://localhost/api/memory/search', 'find me'),
+      })
+
+      expect(response.status).toBe(400)
+      expect(gateway.searchMemories).not.toHaveBeenCalled()
+    })
+
+    it('returns 400 when the query is present but not a string', async () => {
+      mockGetCurrentUser.mockResolvedValue(makeUser())
+
+      const response = await searchPost({
+        request: makeRequest('http://localhost/api/memory/search', {
+          query: 42,
+        }),
+      })
+
+      expect(response.status).toBe(400)
+      expect(gateway.searchMemories).not.toHaveBeenCalled()
+    })
+
+    it('returns 400 when the body is not valid JSON', async () => {
+      mockGetCurrentUser.mockResolvedValue(makeUser())
+
+      const response = await searchPost({
+        request: {
+          url: 'http://localhost/api/memory/search',
+          json: vi.fn().mockRejectedValue(new SyntaxError('Unexpected token')),
+        } as unknown as Request,
+      })
+
+      expect(response.status).toBe(400)
+      expect(gateway.searchMemories).not.toHaveBeenCalled()
+    })
   })
 
   // ------------------------------------------------------------------

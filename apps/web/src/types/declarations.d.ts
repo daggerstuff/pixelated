@@ -425,3 +425,7 @@ declare module 'uuid' {
     v5: number
   }
 }
+
+declare module 'cloudflare:workers' {
+  export const env: Record<string, unknown>
+}

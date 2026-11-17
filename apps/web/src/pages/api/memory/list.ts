@@ -1,3 +1,6 @@
+import type { UnifiedMemory } from '@pixelated/memory-schema'
+import { MEMORY_SCHEMA_VERSION } from '@pixelated/memory-schema'
+
 import {
   assertRequestedUser,
   getGateway,
@@ -7,7 +10,7 @@ import {
   withAuthenticatedMemoryRoute,
 } from './_shared'
 
-function toUnifiedMemoryFormat(memory: any, userId: string) {
+function toUnifiedMemoryFormat(memory: UnifiedMemory, userId: string) {
   return {
     id: memory.id,
     tenantId: memory.tenantId ?? 'default',
@@ -19,7 +22,7 @@ function toUnifiedMemoryFormat(memory: any, userId: string) {
     category: memory.category ?? 'general',
     tags: memory.tags ?? [],
     version: memory.version ?? 1,
-    schemaVersion: memory.schemaVersion ?? '1.0.0',
+    schemaVersion: memory.schemaVersion ?? MEMORY_SCHEMA_VERSION,
     sourceService: memory.sourceService ?? 'astro-frontend',
     importance: memory.importance ?? 0.5,
     decayRate: memory.decayRate ?? 0.01,
@@ -63,7 +66,7 @@ export const GET = withAuthenticatedMemoryRoute(
 
     return jsonResponse({
       success: true,
-      memories: (result.memories ?? []).map((m: any) =>
+      memories: (result.memories ?? []).map((m) =>
         toUnifiedMemoryFormat(m, user.id),
       ),
       pagination: { limit, offset, total: result.total },

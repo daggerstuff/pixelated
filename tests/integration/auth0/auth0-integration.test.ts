@@ -19,7 +19,6 @@ import {
   afterAll,
   beforeEach,
   vi,
-  type MockedFunction,
 } from 'vitest'
 
 import type {
@@ -58,9 +57,7 @@ type MockAuth0TokenResponse = {
   data: MockAuth0TokenPayload
 }
 
-type MockManagementDataResponse = {
-  data: UnknownRecord
-}
+type MockManagementDataResponse = UnknownRecord
 
 type PasswordGrantArgs = {
   username: string
@@ -88,81 +85,84 @@ type MockAuth0ClientInfo = {
 // Define mock instances at top level to ensure tests configure the same objects used by the service
 const mockAuthenticationClient = {
   oauth: {
-    passwordGrant: vi.fn() as MockedFunction<
-      (payload: PasswordGrantArgs) => Promise<MockAuth0TokenResponse>
-    >,
-    authorizationCodeGrant: vi.fn() as MockedFunction<
-      (payload: AuthorizationCodeArgs) => Promise<MockAuth0TokenResponse>
-    >,
-    refreshTokenGrant: vi.fn() as MockedFunction<
-      (payload: RefreshTokenArgs) => Promise<MockAuth0TokenResponse>
-    >,
-    revokeRefreshToken: vi.fn() as MockedFunction<
-      (payload: RefreshTokenArgs) => Promise<UnknownRecord>
-    >,
+    passwordGrant:
+      vi.fn<(payload: PasswordGrantArgs) => Promise<MockAuth0TokenResponse>>(),
+    authorizationCodeGrant:
+      vi.fn<
+        (payload: AuthorizationCodeArgs) => Promise<MockAuth0TokenResponse>
+      >(),
+    refreshTokenGrant:
+      vi.fn<(payload: RefreshTokenArgs) => Promise<MockAuth0TokenResponse>>(),
+    revokeRefreshToken:
+      vi.fn<(payload: RefreshTokenArgs) => Promise<UnknownRecord>>(),
   },
-  getProfile: vi.fn() as MockedFunction<
-    (accessToken: string) => Promise<UnknownRecord>
-  >,
-  refreshToken: vi.fn() as MockedFunction<
-    (payload: RefreshTokenArgs) => Promise<MockAuth0TokenResponse>
-  >,
+  getProfile: vi.fn<(accessToken: string) => Promise<UnknownRecord>>(),
+  refreshToken:
+    vi.fn<(payload: RefreshTokenArgs) => Promise<MockAuth0TokenResponse>>(),
 }
 
 const mockManagementClient = {
   users: {
-    create: vi.fn() as MockedFunction<
+    create:
+      vi.fn<(params: UnknownRecord) => Promise<MockManagementDataResponse>>(),
+    get: vi.fn<
       (params: UnknownRecord) => Promise<MockManagementDataResponse>
-    >,
-    get: vi.fn() as MockedFunction<
-      (params: UnknownRecord) => Promise<MockManagementDataResponse>
-    >,
-    update: vi.fn() as MockedFunction<
-      (params: UnknownRecord) => Promise<MockManagementDataResponse>
-    >,
-    list: vi.fn() as MockedFunction<
+    >(),
+    update:
+      vi.fn<(params: UnknownRecord) => Promise<MockManagementDataResponse>>(),
+    list: vi.fn<
       (params?: UnknownRecord) => Promise<MockManagementDataResponse[]>
-    >,
-    listUsersByEmail: vi.fn() as MockedFunction<
-      (params: UnknownRecord) => Promise<MockManagementDataResponse[]>
-    >,
+    >(),
+    listUsersByEmail:
+      vi.fn<(params: UnknownRecord) => Promise<MockManagementDataResponse[]>>(),
     identities: {
-      link: vi.fn() as MockedFunction<
+      link: vi.fn<
         (id: string, body: UnknownRecord) => Promise<MockManagementDataResponse>
-      >,
-      delete: vi.fn() as MockedFunction<
+      >(),
+      delete:
+        vi.fn<
+          (
+            id: string,
+            provider: string,
+            user_id: string,
+          ) => Promise<MockManagementDataResponse>
+        >(),
+    },
+    roles: {
+      list: vi.fn<
         (
           id: string,
-          provider: string,
-          user_id: string,
-        ) => Promise<MockManagementDataResponse>
-      >,
+          params?: UnknownRecord,
+        ) => Promise<{ data: UnknownRecord[] }>
+      >(),
+      assign: vi.fn<(id: string, body: { roles: string[] }) => Promise<void>>(),
+      delete: vi.fn<(id: string, body: { roles: string[] }) => Promise<void>>(),
     },
   },
-  assignRolestoUser: vi.fn() as MockedFunction<
-    (params: { id: string; roles: string[] }) => Promise<void>
-  >,
-  getUserRoles: vi.fn() as MockedFunction<
-    (params: { id: string }) => Promise<UnknownRecord[]>
-  >,
-  getUserPermissions: vi.fn() as MockedFunction<
-    (params: { id: string }) => Promise<UnknownRecord[]>
-  >,
-  getRoles: vi.fn() as MockedFunction<
-    (params: { name_filter: string }) => Promise<UnknownRecord[]>
-  >,
-  getPermissions: vi.fn() as MockedFunction<
-    (params?: UnknownRecord) => Promise<UnknownRecord[]>
-  >,
-  removeRolesFromUser: vi.fn() as MockedFunction<
-    (params: { id: string; roles: string[] }) => Promise<void>
-  >,
+  roles: {
+    list: vi.fn<
+      (params?: { name_filter?: string }) => Promise<{ data: UnknownRecord[] }>
+    >(),
+  },
+  guardian: {
+    factors: {
+      list: vi.fn<() => Promise<UnknownRecord[]>>(),
+    },
+    enrollments: {
+      createTicket: vi.fn<(body: UnknownRecord) => Promise<UnknownRecord>>(),
+      delete: vi.fn<(id: string) => Promise<void>>(),
+    },
+  },
+  logs: {
+    list: vi.fn<
+      (params?: UnknownRecord) => Promise<{ data: UnknownRecord[] }>
+    >(),
+  },
 }
 
 const mockUserInfoClient = {
-  getUserInfo: vi.fn() as MockedFunction<
-    (accessToken: string) => Promise<{ data: UnknownRecord }>
-  >,
+  getUserInfo:
+    vi.fn<(accessToken: string) => Promise<{ data: UnknownRecord }>>(),
 }
 
 type JwtServiceShape = {
@@ -328,12 +328,10 @@ describe('Auth0 Integration Tests', () => {
     mockManagementClient.users.listUsersByEmail.mockReset()
     mockManagementClient.users.identities.link.mockReset()
     mockManagementClient.users.identities.delete.mockReset()
-    mockManagementClient.assignRolestoUser.mockReset()
-    mockManagementClient.getUserRoles.mockReset()
-    mockManagementClient.getUserPermissions.mockReset()
-    mockManagementClient.getRoles.mockReset()
-    mockManagementClient.getPermissions.mockReset()
-    mockManagementClient.removeRolesFromUser.mockReset()
+    mockManagementClient.users.roles.assign.mockReset()
+    mockManagementClient.users.roles.list.mockReset()
+    mockManagementClient.roles.list.mockReset()
+    mockManagementClient.users.roles.delete.mockReset()
 
     mockUserInfoClient.getUserInfo.mockReset()
   })
@@ -773,26 +771,30 @@ describe('Auth0 Integration Tests', () => {
   describe('Role-Based Access Control', () => {
     it('should assign role to user', async () => {
       // Mock role lookup
-      mockManagementClient.getRoles.mockResolvedValue([
-        {
-          id: 'role-id-123',
-          name: 'therapist',
-        },
-      ])
+      mockManagementClient.roles.list.mockResolvedValue({
+        data: [
+          {
+            id: 'role-id-123',
+            name: 'therapist',
+          },
+        ],
+      })
 
       // Mock role assignment
-      mockManagementClient.assignRolestoUser.mockResolvedValue(undefined)
+      mockManagementClient.users.roles.assign.mockResolvedValue(undefined)
 
       await auth0RbacService.assignRoleToUser('auth0|user123', 'therapist')
 
-      expect(mockManagementClient.getRoles).toHaveBeenCalledWith({
+      expect(mockManagementClient.roles.list).toHaveBeenCalledWith({
         name_filter: 'therapist',
       })
 
-      expect(mockManagementClient.assignRolestoUser).toHaveBeenCalledWith({
-        id: 'auth0|user123',
-        roles: ['role-id-123'],
-      })
+      expect(mockManagementClient.users.roles.assign).toHaveBeenCalledWith(
+        'auth0|user123',
+        {
+          roles: ['role-id-123'],
+        },
+      )
 
       // Verify security event was logged
       const securityModule =
@@ -810,10 +812,12 @@ describe('Auth0 Integration Tests', () => {
 
     it('should check if user has specific role', async () => {
       // Mock getUserRoles to return roles including 'therapist'
-      mockManagementClient.getUserRoles.mockResolvedValue([
-        { id: 'role-1', name: 'patient' },
-        { id: 'role-2', name: 'therapist' },
-      ])
+      mockManagementClient.users.roles.list.mockResolvedValue({
+        data: [
+          { id: 'role-1', name: 'patient' },
+          { id: 'role-2', name: 'therapist' },
+        ],
+      })
 
       const hasRole: boolean = await auth0RbacService.userHasRole(
         'auth0|user123',
@@ -825,14 +829,9 @@ describe('Auth0 Integration Tests', () => {
 
     it('should check if user has specific permission', async () => {
       // Mock getUserRoles to return therapist role
-      mockManagementClient.getUserRoles.mockResolvedValue([
-        { id: 'role-2', name: 'therapist' },
-      ])
-      // Mock permissions for the role (if applicable, though userHasPermission might check local mapping or API)
-      mockManagementClient.getPermissions.mockResolvedValue([
-        { permission_name: 'read:patients' },
-      ])
-
+      mockManagementClient.users.roles.list.mockResolvedValue({
+        data: [{ id: 'role-2', name: 'therapist' }],
+      })
       const hasPermission: boolean = await auth0RbacService.userHasPermission(
         'auth0|user123',
         'read:patients',
@@ -843,19 +842,10 @@ describe('Auth0 Integration Tests', () => {
 
     it('should get all permissions for user', async () => {
       // Mock getUserRoles to return admin role
-      mockManagementClient.getUserRoles.mockResolvedValue([
-        { id: 'role-3', name: 'admin' },
-      ])
+      mockManagementClient.users.roles.list.mockResolvedValue({
+        data: [{ id: 'role-3', name: 'admin' }],
+      })
       // Mock permissions for admin
-      mockManagementClient.getUserPermissions.mockResolvedValue([
-        { permission_name: 'read:patients' },
-        { permission_name: 'manage:roles' },
-      ])
-      // Also ensure getPermissions returns a list if called
-      mockManagementClient.getPermissions.mockResolvedValue([
-        { permission_name: 'read:patients' },
-        { permission_name: 'manage:roles' },
-      ])
 
       const permissions: string[] =
         await auth0RbacService.getUserPermissions('auth0|user123')
@@ -927,15 +917,17 @@ describe('Auth0 Integration Tests', () => {
 
     it('should log security events for role assignments', async () => {
       // Mock role lookup
-      mockManagementClient.getRoles.mockResolvedValue([
-        {
-          id: 'role-id-123',
-          name: 'therapist',
-        },
-      ])
+      mockManagementClient.roles.list.mockResolvedValue({
+        data: [
+          {
+            id: 'role-id-123',
+            name: 'therapist',
+          },
+        ],
+      })
 
       // Mock role assignment
-      mockManagementClient.assignRolestoUser.mockResolvedValue(undefined)
+      mockManagementClient.users.roles.assign.mockResolvedValue(undefined)
 
       await auth0RbacService.assignRoleToUser('auth0|user123', 'therapist')
 
@@ -1163,13 +1155,10 @@ describe('Auth0 Integration Tests', () => {
       )
 
       // Check RBAC permissions
-      mockManagementClient.getUserRoles.mockResolvedValue([
-        { id: 'role-2', name: 'therapist' },
-      ])
+      mockManagementClient.users.roles.list.mockResolvedValue({
+        data: [{ id: 'role-2', name: 'therapist' }],
+      })
       // Assuming therapist has permission
-      mockManagementClient.getPermissions.mockResolvedValue([
-        { permission_name: 'read:patients' },
-      ])
       const hasPermission: boolean = await auth0RbacService.userHasPermission(
         authResult.user.id,
         'read:patients',

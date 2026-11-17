@@ -1,0 +1,74 @@
+{
+  "foresightCommit": "c1a7ea4494f961ed24759a1733ba627f7b6ca15f",
+  "foresightRepository": "daggerstuff/foresight",
+  "generatedFrom": "foresight.server.mcp local provider, each tool's .parameters JSON schema",
+  "toolCount": 22,
+  "tools": {
+    "analyze_memories": {
+      "takesParams": true
+    },
+    "capture_in_flight_memory": {
+      "takesParams": true
+    },
+    "capture_triggered_memories": {
+      "takesParams": false
+    },
+    "compaction_lifecycle": {
+      "takesParams": false
+    },
+    "curate_observations": {
+      "takesParams": false
+    },
+    "export_profile": {
+      "takesParams": false
+    },
+    "get_system_status": {
+      "takesParams": true
+    },
+    "ingest_document_file": {
+      "takesParams": true
+    },
+    "inject_context": {
+      "takesParams": true
+    },
+    "link_memories": {
+      "takesParams": true
+    },
+    "manage_context_blocks": {
+      "takesParams": true
+    },
+    "manage_curation_runs": {
+      "takesParams": true
+    },
+    "manage_inferred": {
+      "takesParams": true
+    },
+    "manage_memories": {
+      "takesParams": true
+    },
+    "manage_memory_versions": {
+      "takesParams": true
+    },
+    "manage_mental_models": {
+      "takesParams": true
+    },
+    "process_session_transcript": {
+      "takesParams": true
+    },
+    "query_memories_temporal": {
+      "takesParams": true
+    },
+    "reflect": {
+      "takesParams": true
+    },
+    "reprocess_raw_events": {
+      "takesParams": false
+    },
+    "search_memories": {
+      "takesParams": true
+    },
+    "synthesize_profile": {
+      "takesParams": true
+    }
+  }
+}

@@ -40,7 +40,13 @@ import { glob } from "glob";
 
 const INDEX_PATH = resolve(".cache/knip-index.json");
 const INDEX_VERSION = 3;
-const SCAN_GLOB = "{apps/web/src}/**/*.{ts,tsx,js,jsx,astro}";
+const SCAN_GLOB = "apps/web/src/**/*.{ts,tsx,js,jsx,astro}";
+const CONSUMER_GLOB = "apps/web/src/**/*.{test,spec}.{ts,tsx,js,jsx}";
+const CONSUMER_IGNORE = [
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/.astro/**",
+];
 const SCAN_IGNORE = [
   "**/node_modules/**",
   "**/dist/**",
@@ -268,7 +274,8 @@ function extractImports(cleanSource) {
     const names = m[1]
       .split(",")
       .map((s) => {
-        const parts = s.trim().split(/\s+as\s+/);
+        const withoutTypeModifier = s.trim().replace(/^type\s+/, "");
+        const parts = withoutTypeModifier.split(/\s+as\s+/);
         return parts[0].trim();
       })
       .filter(Boolean);
@@ -376,34 +383,39 @@ async function buildIndex() {
   // file -> exportName -> Set<consumerFilePath>
   const usage = new Map();
 
-  for (const file of files) {
-    const absPath = resolve(file);
-    const source = await readFile(absPath, "utf8");
-    const cleanSource = stripComments(source);
-    const imports = extractImports(cleanSource);
+  const collectUsage = async (fileList) => {
+    for (const file of fileList) {
+      const absPath = resolve(file);
+      const source = await readFile(absPath, "utf8");
+      const cleanSource = stripComments(source);
+      const imports = extractImports(cleanSource);
 
-    for (const imp of imports) {
-      const isAlias = ALIAS_PATTERNS.some((a) => a.regex.test(imp.source));
-      if (!isRelativePath(imp.source) && !isAlias) continue;
+      for (const imp of imports) {
+        const isAlias = ALIAS_PATTERNS.some((a) => a.regex.test(imp.source));
+        if (!isRelativePath(imp.source) && !isAlias) continue;
 
-      const resolvedTarget = resolveImport(imp.source, dirname(absPath));
-      if (!resolvedTarget) continue;
+        const resolvedTarget = resolveImport(imp.source, dirname(absPath));
+        if (!resolvedTarget) continue;
 
-      // For each imported name, check if the target file exports it
-      for (const importedName of imp.names) {
-        const targetExports = fileExports.get(resolvedTarget);
-        if (!targetExports) continue;
+        // For each imported name, check if the target file exports it
+        for (const importedName of imp.names) {
+          const targetExports = fileExports.get(resolvedTarget);
+          if (!targetExports) continue;
 
-        const hasExport = targetExports.some((e) => e.name === importedName);
-        if (hasExport) {
-          if (!usage.has(resolvedTarget)) usage.set(resolvedTarget, new Map());
-          const exportMap = usage.get(resolvedTarget);
-          if (!exportMap.has(importedName)) exportMap.set(importedName, new Set());
-          exportMap.get(importedName).add(absPath);
+          const hasExport = targetExports.some((e) => e.name === importedName);
+          if (hasExport) {
+            if (!usage.has(resolvedTarget)) usage.set(resolvedTarget, new Map());
+            const exportMap = usage.get(resolvedTarget);
+            if (!exportMap.has(importedName)) exportMap.set(importedName, new Set());
+            exportMap.get(importedName).add(absPath);
+          }
         }
       }
     }
-  }
+  };
+
+  await collectUsage(files);
+  await collectUsage(await glob(CONSUMER_GLOB, { ignore: CONSUMER_IGNORE }));
 
   // Phase 3: build the index object
   /** @type {Record<string, Record<string, { line: number, col: number, kind: string, importedBy: string[] }>>} */
@@ -467,12 +479,18 @@ function loadIndex() {
 // Knip runner (full scan)
 // ---------------------------------------------------------------------------
 
+const KNIP_ARGS = ["--no-exit-code", "--exports", "--reporter", "json"];
+
 function runKnip() {
   return new Promise((resolvePromise, reject) => {
     const chunks = [];
+    const knipEntry = resolve("node_modules/knip/bin/knip.js");
+    const useDirectEntry = pathExists(knipEntry);
     const proc = spawn(
-      "pnpm",
-      ["exec", "knip", "--no-exit-code", "--exports", "--reporter", "json"],
+      useDirectEntry ? process.execPath : "pnpm",
+      useDirectEntry
+        ? [knipEntry, ...KNIP_ARGS]
+        : ["exec", "knip", ...KNIP_ARGS],
       {
         encoding: "buffer",
         timeout: 45_000,
