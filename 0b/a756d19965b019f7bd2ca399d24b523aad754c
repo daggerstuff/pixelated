@@ -1,0 +1,14 @@
+.env.example
+  h_07d84030f79d30 216-218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0ba756d19965b019f7bd2ca399d24b523aad754c",
+  "prompts": {},
+  "humans": {
+    "h_07d84030f79d30": {
+      "author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
