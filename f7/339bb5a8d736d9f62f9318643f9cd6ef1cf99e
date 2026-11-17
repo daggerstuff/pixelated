@@ -1,0 +1,20 @@
+package.json
+  s_7d4811cf1b0ba7::t_38af89a269f764 74
+  s_7d4811cf1b0ba7::t_eccc69d6ca7967 40,48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f7339bb5a8d736d9f62f9318643f9cd6ef1cf99e",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
