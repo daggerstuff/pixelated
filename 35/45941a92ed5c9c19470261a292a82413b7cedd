@@ -1,0 +1,29 @@
+apps/web/src/lib/server/internal-memory-service-client.test.ts
+  s_7d4811cf1b0ba7::t_26e5d7b27eeb98 1-8,10-26,31-37,42-63,65-84,86-102,104-115,117-121
+  s_7d4811cf1b0ba7::t_794818238a5495 9,27-30,38-41,64,85,103,116
+apps/web/src/pages/api/memory/search.ts
+  s_7d4811cf1b0ba7::t_89056ead69de07 84-153,160,164-165,168
+  s_7d4811cf1b0ba7::t_8024a9a878cff0 157-159,161-163,166-167,169
+apps/web/src/lib/server/internal-memory-service-client.ts
+  s_7d4811cf1b0ba7::t_d385014468bf0d 69-73,81-82
+  s_7d4811cf1b0ba7::t_173ae08c80c3c4 145-149
+  s_7d4811cf1b0ba7::t_9bfaf241cb191d 166-171
+apps/web/src/pages/api/memory/__tests__/memory-routes.test.ts
+  s_7d4811cf1b0ba7::t_cce156f930f753 274-311
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3545941a92ed5c9c19470261a292a82413b7cedd",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
