@@ -1,0 +1,39 @@
+apps/web/src/lib/server/__fixtures__/foresight-tools.json
+  s_7d4811cf1b0ba7::t_f2b5e264be2ef9 1-74
+apps/web/src/lib/server/mcp-memory-transport.test.ts
+  s_7d4811cf1b0ba7::t_d7a9e9cd0c953b 287-288,303-304
+  s_7d4811cf1b0ba7::t_dc01755b67888b 14,16-50,54-89,91-107,109,114,118-198,205-206,229,231-232,234-236,239-258,261-263,267-268,271-279,281,285-286,289,292-302,305-307,309-314,317-320,323-332,335,339-340,343-351,354-355,357,360-364,367,370-376,379-390,392,395,401-422,424-427,432-433,435,438-451,453-456,459-460,463-470,474,476-479,481-492,494,496-528,531-548
+  s_7d4811cf1b0ba7::t_7732faf2af1677 90
+  s_7d4811cf1b0ba7::t_a4de6cb6976e0e 337-338,352-353
+apps/web/src/lib/server/mcp-memory-transport.ts
+  s_7d4811cf1b0ba7::t_9c7b1090f5a7af 568-572,591-595
+  s_7d4811cf1b0ba7::t_da1851bbb18d44 3-9,16-30,42-160,162,164-180,184,219,221-227,240-242,254-287,298-299,301,315-316,322,325-326,328,330,334,337,340,342,346,353-357,360-365,367-468,470,487-505,508-517,537-545,548-551,554-562,584-590,596-600,603-611,627-634,651-665,667-680,694-699,701-714,731-745,747-748
+  s_7d4811cf1b0ba7::t_8e1b4b7f366380 229-233
+  s_7d4811cf1b0ba7::t_7ebe6a14332206 161,163
+  s_7d4811cf1b0ba7::t_e7738e6c7626c4 525-526,546-547
+  s_59c83024c29646::t_a77e21003bfac1 228
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c09ec9f9bb049b0d7905ce051f6b01b3673a9b2d",
+  "prompts": {},
+  "sessions": {
+    "s_59c83024c29646": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "a2951143-e825-4eec-b17c-e7f98e73f3c2",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    },
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
