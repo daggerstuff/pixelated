@@ -1,0 +1,55 @@
+.coderabbit.yaml
+  s_7d4811cf1b0ba7::t_0a66920ff2fc4b 14,18-19,26-35
+.env.example
+  s_7d4811cf1b0ba7::t_98b504a309df42 216-218
+.github/AI_REVIEWERS.md
+  s_7d4811cf1b0ba7::t_67d8c2cb54e245 1-54
+.github/workflows/pr-agent.yml
+  s_7d4811cf1b0ba7::t_1f19c9338932e0 4-7,10-12,15-22,24-36,38-84
+.gitignore
+  s_7d4811cf1b0ba7::t_6fac754b8616cf 301-306
+.greptile/README.md
+  s_7d4811cf1b0ba7::t_5e49114a955749 1-51
+.greptile/config.json
+  s_7d4811cf1b0ba7::t_27dd9c5f711d07 5-58
+.greptile/files.json
+  s_7d4811cf1b0ba7::t_206ddb9dbb5c0c 1-22
+.greptile/rules.md
+  s_7d4811cf1b0ba7::t_9551bdd30bd1f5 29-34
+ai
+  s_7d4811cf1b0ba7::t_369f9ca9a0374d 1
+cubic.yaml
+  s_7d4811cf1b0ba7::t_964244f443d23f 11-24,30-33,47,51-69,71-74
+docs
+  s_7d4811cf1b0ba7::t_ff0853bdd68c67 1
+scripts/ci/ai-strict-baseline.json
+  s_7d4811cf1b0ba7::t_772f6fe0258c6e 4,6-184,571-575,605-609,702-703,724,736,738,781,803-807,822-826,843,869,881-882,892-893,902,921,943-987,989-1013,1015-1155,1158,1160-1205,1207-1208,1211-1432,1437-1570,1572-1577,1579-1600,1602-1604,1607-1645,1649-1695,1700-1838,1840,1843-1926,1929-1984,1986,1988-2101,2104-2106,2109-2111,2113-2119,2121-2141
+training/output/ovh-v27-qwen3-8b/run-v27-l4/adapter-final/adapter_config.json
+  s_7d4811cf1b0ba7::t_0d6baf6a9d6bb2 1-51
+training/output/ovh-v27-qwen3-8b/run-v27-l4/adapter-final/chat_template.jinja
+  s_7d4811cf1b0ba7::t_6e0eb4850a2bb5 1-89
+training/output/ovh-v27-qwen3-8b/run-v27-l4/adapter-final/tokenizer_config.json
+  s_7d4811cf1b0ba7::t_6120d4cc0f7cd6 1-30
+training/output/ovh-v27-qwen3-8b/run-v27-l4/ovh-run.json
+  s_7d4811cf1b0ba7::t_7a3a8ab1920665 1-311
+training/output/ovh-v27-qwen3-8b/tinker-dataset.json
+  s_7d4811cf1b0ba7::t_7cb75809d39f23 1-30
+training/output/ovh-v28-qwen3-8b/tinker-dataset.json
+  s_7d4811cf1b0ba7::t_ba1c4660f4baaf 1-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1c1bfd9cbca2475c9255be0f9775fa53cb09e75a",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
