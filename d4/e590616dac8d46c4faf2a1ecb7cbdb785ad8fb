@@ -1,0 +1,23 @@
+scripts/ci/export-classification.mjs
+  s_7d4811cf1b0ba7::t_4367e500f0e158 1-47
+tests/unit/ci/check-unused-exports.test.ts
+  s_7d4811cf1b0ba7::t_dca654a6cd446b 6
+scripts/ci/check-unused-exports.mjs
+  s_7d4811cf1b0ba7::t_92f32398eb34be 38-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d4e590616dac8d46c4faf2a1ecb7cbdb785ad8fb",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
