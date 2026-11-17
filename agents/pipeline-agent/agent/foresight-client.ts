@@ -12,7 +12,7 @@ const FORESIGHT_URL = process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/mcp'
  * agent's startup context small and avoiding an idle SSE connection when the
  * agent is not actively using Foresight.
  */
-const { getClient, close } = createLazyMcpClient<Client>(async () => {
+const { getClient } = createLazyMcpClient<Client>(async () => {
   const transport = new StreamableHTTPClientTransport(new URL(FORESIGHT_URL))
   const client = new Client(
     { name: 'pipeline-agent', version: '1.0.0' },
