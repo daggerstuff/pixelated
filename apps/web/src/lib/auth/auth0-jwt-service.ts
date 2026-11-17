@@ -98,9 +98,10 @@ function initializeAuth0Client() {
       const userInfoClient = new UserInfoClient({
         domain: runtimeConfig.domain,
       })
+      const userInfoProbe = userInfoClient as unknown as Auth0UserInfoClient
       const hasUserInfoMethod =
-        typeof userInfoClient.getUserInfo === 'function' ||
-        typeof userInfoClient.getProfile === 'function'
+        typeof userInfoProbe.getUserInfo === 'function' ||
+        typeof userInfoProbe.getProfile === 'function'
       if (hasUserInfoMethod) {
         auth0UserInfo = userInfoClient
         return
@@ -110,9 +111,11 @@ function initializeAuth0Client() {
     }
   }
 
+  const authenticationProbe =
+    auth0Authentication as unknown as Auth0UserInfoClient
   const hasAuthenticationUserInfoMethod =
-    typeof auth0Authentication.getUserInfo === 'function' ||
-    typeof auth0Authentication.getProfile === 'function'
+    typeof authenticationProbe.getUserInfo === 'function' ||
+    typeof authenticationProbe.getProfile === 'function'
   if (hasAuthenticationUserInfoMethod) {
     auth0UserInfo = auth0Authentication
     return

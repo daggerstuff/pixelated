@@ -553,9 +553,7 @@ export async function assignRoleToUser(
   try {
     // Get role ID
     const roles = toAuth0ManagementRoles(
-      await management.getRoles({
-        name_filter: roleName,
-      }),
+      (await management.roles.list({ name_filter: roleName })).data,
     )
     if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
@@ -567,7 +565,7 @@ export async function assignRoleToUser(
     }
 
     // Assign role to user
-    await management.assignRolestoUser({ id: userId, roles: [roleId] })
+    await management.users.roles.assign(userId, { roles: [roleId] })
 
     // Log role assignment
     logSecurityEvent(SecurityEventType.ROLE_ASSIGNED, null, {
@@ -599,9 +597,7 @@ export async function removeRoleFromUser(
   try {
     // Get role ID
     const roles = toAuth0ManagementRoles(
-      await management.getRoles({
-        name_filter: roleName,
-      }),
+      (await management.roles.list({ name_filter: roleName })).data,
     )
     if (roles.length === 0) {
       throw new Error(`Role ${roleName} not found`)
@@ -613,7 +609,7 @@ export async function removeRoleFromUser(
     }
 
     // Remove role from user
-    await management.removeRolesFromUser({ id: userId, roles: [roleId] })
+    await management.users.roles.delete(userId, { roles: [roleId] })
 
     // Log role removal
     logSecurityEvent(SecurityEventType.ROLE_REMOVED, null, {
@@ -641,7 +637,7 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
 
   try {
     const userRoles = toAuth0UserRoles(
-      await management.getUserRoles({ id: userId }),
+      (await management.users.roles.list(userId)).data,
     )
     return userRoles
       .map((role) => (typeof role.name === 'string' ? role.name : undefined))

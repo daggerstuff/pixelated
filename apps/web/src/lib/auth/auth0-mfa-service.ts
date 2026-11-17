@@ -204,7 +204,7 @@ class Auth0MFAService {
 
       // Get all available factors
       const availableFactors = parseGuardianFactors(
-        await auth0Management.getGuardianFactors(),
+        await auth0Management.guardian.factors.list(),
       )
 
       // Filter out already enrolled factors
@@ -245,7 +245,7 @@ class Auth0MFAService {
         case 'otp':
           // For OTP, we generate a QR code for authenticator apps
           const otpEnrollment = parseEnrollmentTicket(
-            await auth0Management.createGuardianEnrollmentTicket({
+            await auth0Management.guardian.enrollments.createTicket({
               user_id: userId,
               send_mail: false,
             }),
@@ -376,7 +376,7 @@ class Auth0MFAService {
     }
 
     try {
-      await auth0Management.deleteGuardianEnrollment({ id: factorId })
+      await auth0Management.guardian.enrollments.delete(factorId)
 
       // Log factor deletion event
       logSecurityEvent(SecurityEventType.MFA_FACTOR_DELETED, null, {

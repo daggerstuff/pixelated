@@ -968,7 +968,7 @@ function queryWithDeadline<T>(
   params: unknown[] | undefined,
   timeoutMs: number,
 ): Promise<T> {
-  const attempt = client.query<T>(text, params) as unknown as Promise<T>
+  const attempt = client.query(text, params) as unknown as Promise<T>
   // A non-positive bound disables the deadline, matching pg's `query_timeout`
   // and the liveness-probe and client-lifetime guards. Without this guard
   // `setTimeout(…, 0)` fires before any statement can settle, so
