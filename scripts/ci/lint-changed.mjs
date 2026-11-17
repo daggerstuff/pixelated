@@ -80,7 +80,7 @@ function getToolInvocation(files) {
       ...prefix,
       "-c",
       ".oxlintrc.json",
-      ...(isTypeAware ? ["--type-aware"] : []),
+      ...(isTypeAware ? ["--type-aware", "--type-check"] : []),
       ...files.map(String),
     ],
   };
@@ -92,7 +92,7 @@ function logMode() {
   if (mode === "imports") return `Checking imports on ${changedFiles.length} changed files`;
   if (mode === "unused-exports")
     return `Checking unused exports on ${changedFiles.length} changed files`;
-  const lintMode = isTypeAware ? "type-aware" : "standard";
+  const lintMode = isTypeAware ? "type-aware, type-check" : "standard";
   return `Running oxlint (${lintMode}) on ${changedFiles.length} changed files`;
 }
 
