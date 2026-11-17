@@ -1,0 +1,20 @@
+scripts/ci/lint-changed.mjs
+  s_7d4811cf1b0ba7::t_ae615e3ed111cb 83
+  s_7d4811cf1b0ba7::t_ad317dd55d45c2 95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bf925384e40ed6559f0a39e9ae41b28fceea32e8",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
