@@ -1,0 +1,51 @@
+agents/content-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_45a4a2bc556773 51-60
+  s_7d809d2bbd9cef::t_5aa31546d64631 88-94
+  s_7d809d2bbd9cef::t_ea288925c59358 123
+agents/pipeline-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_f2b7e2c8189d9b 123
+  s_7d809d2bbd9cef::t_18e3c6be54ce99 51-60
+  s_7d809d2bbd9cef::t_1e7a43d369489a 88-94
+agents/advisor-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_7d1cf5638626ce 88-94
+  s_7d809d2bbd9cef::t_c1f858669debc3 123
+  s_7d809d2bbd9cef::t_9300c09755e9b8 51-60
+agents/session-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_53579ab2b9dbe4 52-61
+  s_7d809d2bbd9cef::t_d3cf693c365e4d 89-95
+  s_7d809d2bbd9cef::t_2bb0ee2db05866 124
+agents/intake-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_7cb7b0b949a48a 116
+  s_7d809d2bbd9cef::t_b9dc37de55ddbc 44-53
+  s_7d809d2bbd9cef::t_30a92f52cd53e0 81-87
+agents/supervisor-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_667d2aef337942 44-53
+  s_7d809d2bbd9cef::t_9a876d0e5947dd 116
+  s_7d809d2bbd9cef::t_e5634d7ac74c9c 81-87
+agents/qa-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_3e22a5f8419490 51-60
+  s_7d809d2bbd9cef::t_1c0ed646eb0886 123
+  s_7d809d2bbd9cef::t_3f49e82f22552e 88-94
+ai
+  s_7d809d2bbd9cef::t_2944bb5983ff40 1
+foresight
+  s_7d809d2bbd9cef::t_c5a9849f119e86 1
+scripts/ci/ai-strict-baseline.json
+  s_7d809d2bbd9cef::t_789aa3ad706f57 4,356-611,909-1050,1053-1067,1069-1141,1144,1146-1162,1164-1173,1175,1177-1416,1418-1536,1539-1576,1578-1621,1623-1726,1729,1731-1732,1736-1761,1764-1768,1770,1772-1788,1790,1792,1794-1820,1822-1863,1866-1887,1890-1975,1977-2030,2032-2071
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "64b2a55a6d7eec40ace8acc05b1b80b4e98de4c6",
+  "prompts": {},
+  "sessions": {
+    "s_7d809d2bbd9cef": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "478df62b-5505-4aec-b6a8-ba3fb0b5b2b4",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
