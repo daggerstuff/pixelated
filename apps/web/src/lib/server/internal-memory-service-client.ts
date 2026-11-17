@@ -66,6 +66,11 @@ export class InternalMemoryServiceError extends Error {
 interface SearchInput extends InternalMemoryScopeInput {
   query: string
   limit: number
+  offset?: number
+  category?: string
+  tags?: string[]
+  scope?: string
+  retention?: string
 }
 
 interface ListInput extends InternalMemoryScopeInput {
@@ -73,6 +78,8 @@ interface ListInput extends InternalMemoryScopeInput {
   offset?: number
   category?: string
   tags?: string[]
+  scope?: string
+  retention?: string
 }
 
 interface CreateInput extends InternalMemoryScopeInput {
@@ -135,6 +142,11 @@ export class InternalMemoryServiceClient {
         query: input.query,
         ...buildScopePayload(input),
         limit: input.limit,
+        offset: input.offset ?? 0,
+        category: input.category,
+        tags: input.tags,
+        scope: input.scope,
+        retention: input.retention,
       },
     })
   }
@@ -150,6 +162,12 @@ export class InternalMemoryServiceClient {
     }
     for (const tag of input.tags ?? []) {
       params.append('tag', tag)
+    }
+    if (input.scope) {
+      params.set('scope', input.scope)
+    }
+    if (input.retention) {
+      params.set('retention', input.retention)
     }
 
     return this.requestJson<{

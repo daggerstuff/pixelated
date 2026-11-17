@@ -81,16 +81,92 @@ export const GET = withAuthenticatedMemoryRoute(
   },
 )
 
+type ParsedSearchBody =
+  | {
+      ok: true
+      query: string
+      requestedUserId: string | undefined
+      limit: number
+    }
+  | { ok: false; response: Response }
+
+function parseSearchBody(payload: unknown): ParsedSearchBody {
+  if (
+    typeof payload !== 'object' ||
+    payload === null ||
+    Array.isArray(payload)
+  ) {
+    return {
+      ok: false,
+      response: jsonError(
+        400,
+        'Bad Request',
+        'Request body must be a JSON object',
+      ),
+    }
+  }
+
+  const body = payload as Record<string, unknown>
+  const candidate =
+    typeof body['query'] === 'string' ? body['query'] : body['q']
+
+  if (
+    candidate !== undefined &&
+    candidate !== null &&
+    typeof candidate !== 'string'
+  ) {
+    return {
+      ok: false,
+      response: jsonError(400, 'Bad Request', 'Search query must be a string'),
+    }
+  }
+
+  const rawUserId = body['user_id'] ?? body['userId']
+  if (
+    rawUserId !== undefined &&
+    rawUserId !== null &&
+    typeof rawUserId !== 'string'
+  ) {
+    return {
+      ok: false,
+      response: jsonError(
+        400,
+        'Bad Request',
+        'userId must match the authenticated user',
+      ),
+    }
+  }
+
+  const rawLimit = body['limit']
+  const limit =
+    typeof rawLimit === 'number' && Number.isFinite(rawLimit) && rawLimit > 0
+      ? Math.min(rawLimit, 100)
+      : 10
+
+  return {
+    ok: true,
+    query: candidate ?? '',
+    requestedUserId: rawUserId ?? undefined,
+    limit,
+  }
+}
+
 export const POST = withAuthenticatedMemoryRoute(
   'searching memories',
   async ({ request }, user) => {
-    const body = await request.json()
-    const query = typeof body.query === 'string' ? body.query : body.q
-    const requestedUserId = body.user_id ?? body.userId
-    const limit =
-      Number.isFinite(body.limit) && body.limit > 0
-        ? Math.min(body.limit, 100)
-        : 10
+    let payload: unknown
+    try {
+      payload = await request.json()
+    } catch {
+      return jsonError(400, 'Bad Request', 'Request body must be valid JSON')
+    }
+
+    const parsed = parseSearchBody(payload)
+    if (!parsed.ok) {
+      return parsed.response
+    }
+
+    const { limit, query, requestedUserId } = parsed
 
     const userError = assertRequestedUser(user.id, requestedUserId)
     if (userError) {
