@@ -1,0 +1,33 @@
+training/output/ovh-v28-qwen3-8b/run-v28-l4/adapter-final/adapter_config.json
+  s_e96f85d720e925::t_739f3ae679290f 1-51
+training/output/ovh-v28-qwen3-8b/run-v28-l4/adapter-final/chat_template.jinja
+  s_7d4811cf1b0ba7::t_be31069d7b318f 1-89
+training/output/ovh-v28-qwen3-8b/run-v28-l4/adapter-final/tokenizer_config.json
+  s_7d4811cf1b0ba7::t_3e1476acc4d1fc 1-30
+training/output/ovh-v28-qwen3-8b/run-v28-l4/ovh-run.json
+  s_7d4811cf1b0ba7::t_e30e2150a10cc9 1-311
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2625fcc2385761170a31d7089daf40c98bb20741",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    },
+    "s_e96f85d720e925": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "spiffy-seagull",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
