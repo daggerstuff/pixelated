@@ -168,3 +168,18 @@ Example crontab entry:
  0  9 * * 1  curl -s -u "$EVE_AUTH_USERNAME:$EVE_AUTH_PASSWORD" -X POST http://127.0.0.1:2005/eve/v1/dev/schedules/weekly-review
  0  9 * * 1  curl -s -u "$EVE_AUTH_USERNAME:$EVE_AUTH_PASSWORD" -X POST http://127.0.0.1:2025/eve/v1/dev/schedules/weekly-train
 ```
+
+## Slack Integration
+
+Four Slack apps (`px-supervisor`, `px-advisor`, `px-pipeline`, `px-qa`) are
+provisioned in the workspace, one per agent that declares a `slackChannel`.
+Each app's Events and Interactivity Request URLs point at
+`https://<app>.pixelatedempathy.com/eve/v1/slack`, served publicly by the
+`px-agents` Cloudflare Tunnel (user systemd unit `cloudflared-px-agents.service`,
+config `~/.cloudflared/config.yml`) which forwards each hostname to the
+agent's loopback port.
+
+Per-agent `.env` files carry `SLACK_BOT_TOKEN` and `SLACK_SIGNING_SECRET`.
+Invite each bot into the channels it should serve (`/invite @pxsupervisor`
+etc.). App manifests: `slack-app-manifest.yaml`; OAuth code capture helper:
+`slack-oauth-callback.py`.

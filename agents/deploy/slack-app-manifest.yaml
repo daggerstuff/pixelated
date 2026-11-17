@@ -1,0 +1,67 @@
+# Slack app manifest for the Pixelated Empathy eve agent fleet.
+#
+# PROVISIONED (2026-11-17): four apps exist in the pixel-me workspace, created
+# from this manifest shape via apps.manifest.create:
+#   px-supervisor -> https://px-supervisor.pixelatedempathy.com/eve/v1/slack
+#   px-advisor    -> https://px-advisor.pixelatedempathy.com/eve/v1/slack
+#   px-pipeline   -> https://px-pipeline.pixelatedempathy.com/eve/v1/slack
+#   px-qa         -> https://px-qa.pixelatedempathy.com/eve/v1/slack
+# Public ingress is the `px-agents` Cloudflare Tunnel (systemd user unit
+# cloudflared-px-agents.service, config ~/.cloudflared/config.yml) which maps
+# each hostname to the agent's loopback port. Bot tokens + signing secrets
+# live in each agent's gitignored .env as SLACK_BOT_TOKEN/SLACK_SIGNING_SECRET.
+#
+# To re-provision or add an agent: duplicate this manifest per agent, set a
+# distinct display name, point REQUEST_URL at that agent's tunnel hostname,
+# then create via api.slack.com/apps -> Create New App -> From an app manifest
+# (or apps.manifest.create with an app configuration token).
+#
+# Replace REQUEST_URL before pasting, e.g.:
+#   local dev (tunnel):  https://<tunnel>/eve/v1/slack
+#   fleet host:          http://<fleet-host>:<port>/eve/v1/slack  (use https)
+#
+# After install, copy into the agent's .env:
+#   SLACK_BOT_TOKEN=xoxb-...        (OAuth & Permissions -> Bot User OAuth Token)
+#   SLACK_SIGNING_SECRET=...        (Basic Information -> App Credentials)
+
+display_information:
+  name: Pixelated Empathy Agents
+  description: Clinical training agent fleet — supervisor, QA, pipeline, intake.
+  background_color: '#4A154B'
+
+features:
+  bot_user:
+    display_name: px-agents
+    always_online: true
+
+# Bot scopes required by eve's slackChannel: mentions + posting, channel/DM
+# history for threads and edits, files for attachments and long replies,
+# im:write for sign-in-link DM delivery.
+oauth_config:
+  scopes:
+    bot:
+      - app_mentions:read
+      - chat:write
+      - channels:history
+      - groups:history
+      - im:history
+      - mpim:history
+      - files:read
+      - files:write
+      - im:write
+
+settings:
+  event_subscriptions:
+    request_url: REQUEST_URL
+    bot_events:
+      - app_mention
+      - message.channels
+      - message.groups
+      - message.im
+      - message.mpim
+  interactivity:
+    is_enabled: true
+    request_url: REQUEST_URL
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false
