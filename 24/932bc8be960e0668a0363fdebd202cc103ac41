@@ -1,0 +1,24 @@
+.gitignore
+  h_07d84030f79d30 301-306
+training/output/ovh-v27-qwen3-8b/run-v27-l4/adapter-final/adapter_config.json
+  h_07d84030f79d30 1-51
+training/output/ovh-v27-qwen3-8b/run-v27-l4/adapter-final/chat_template.jinja
+  h_07d84030f79d30 1-89
+training/output/ovh-v27-qwen3-8b/run-v27-l4/adapter-final/tokenizer_config.json
+  h_07d84030f79d30 1-30
+training/output/ovh-v27-qwen3-8b/run-v27-l4/ovh-run.json
+  h_07d84030f79d30 1-311
+training/output/ovh-v27-qwen3-8b/tinker-dataset.json
+  h_07d84030f79d30 1-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "24932bc8be960e0668a0363fdebd202cc103ac41",
+  "prompts": {},
+  "humans": {
+    "h_07d84030f79d30": {
+      "author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
