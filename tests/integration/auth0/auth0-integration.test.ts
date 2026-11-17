@@ -19,7 +19,6 @@ import {
   afterAll,
   beforeEach,
   vi,
-  type MockedFunction,
 } from 'vitest'
 
 import type {
@@ -58,9 +57,7 @@ type MockAuth0TokenResponse = {
   data: MockAuth0TokenPayload
 }
 
-type MockManagementDataResponse = {
-  data: UnknownRecord
-}
+type MockManagementDataResponse = UnknownRecord
 
 type PasswordGrantArgs = {
   username: string
@@ -88,98 +85,84 @@ type MockAuth0ClientInfo = {
 // Define mock instances at top level to ensure tests configure the same objects used by the service
 const mockAuthenticationClient = {
   oauth: {
-    passwordGrant: vi.fn() as MockedFunction<
-      (payload: PasswordGrantArgs) => Promise<MockAuth0TokenResponse>
-    >,
-    authorizationCodeGrant: vi.fn() as MockedFunction<
-      (payload: AuthorizationCodeArgs) => Promise<MockAuth0TokenResponse>
-    >,
-    refreshTokenGrant: vi.fn() as MockedFunction<
-      (payload: RefreshTokenArgs) => Promise<MockAuth0TokenResponse>
-    >,
-    revokeRefreshToken: vi.fn() as MockedFunction<
-      (payload: RefreshTokenArgs) => Promise<UnknownRecord>
-    >,
+    passwordGrant:
+      vi.fn<(payload: PasswordGrantArgs) => Promise<MockAuth0TokenResponse>>(),
+    authorizationCodeGrant:
+      vi.fn<
+        (payload: AuthorizationCodeArgs) => Promise<MockAuth0TokenResponse>
+      >(),
+    refreshTokenGrant:
+      vi.fn<(payload: RefreshTokenArgs) => Promise<MockAuth0TokenResponse>>(),
+    revokeRefreshToken:
+      vi.fn<(payload: RefreshTokenArgs) => Promise<UnknownRecord>>(),
   },
-  getProfile: vi.fn() as MockedFunction<
-    (accessToken: string) => Promise<UnknownRecord>
-  >,
-  refreshToken: vi.fn() as MockedFunction<
-    (payload: RefreshTokenArgs) => Promise<MockAuth0TokenResponse>
-  >,
+  getProfile: vi.fn<(accessToken: string) => Promise<UnknownRecord>>(),
+  refreshToken:
+    vi.fn<(payload: RefreshTokenArgs) => Promise<MockAuth0TokenResponse>>(),
 }
 
 const mockManagementClient = {
   users: {
-    create: vi.fn() as MockedFunction<
+    create:
+      vi.fn<(params: UnknownRecord) => Promise<MockManagementDataResponse>>(),
+    get: vi.fn<
       (params: UnknownRecord) => Promise<MockManagementDataResponse>
-    >,
-    get: vi.fn() as MockedFunction<
-      (params: UnknownRecord) => Promise<MockManagementDataResponse>
-    >,
-    update: vi.fn() as MockedFunction<
-      (params: UnknownRecord) => Promise<MockManagementDataResponse>
-    >,
-    list: vi.fn() as MockedFunction<
+    >(),
+    update:
+      vi.fn<(params: UnknownRecord) => Promise<MockManagementDataResponse>>(),
+    list: vi.fn<
       (params?: UnknownRecord) => Promise<MockManagementDataResponse[]>
-    >,
-    listUsersByEmail: vi.fn() as MockedFunction<
-      (params: UnknownRecord) => Promise<MockManagementDataResponse[]>
-    >,
+    >(),
+    listUsersByEmail:
+      vi.fn<(params: UnknownRecord) => Promise<MockManagementDataResponse[]>>(),
     identities: {
-      link: vi.fn() as MockedFunction<
+      link: vi.fn<
         (id: string, body: UnknownRecord) => Promise<MockManagementDataResponse>
-      >,
-      delete: vi.fn() as MockedFunction<
-        (
-          id: string,
-          provider: string,
-          user_id: string,
-        ) => Promise<MockManagementDataResponse>
-      >,
+      >(),
+      delete:
+        vi.fn<
+          (
+            id: string,
+            provider: string,
+            user_id: string,
+          ) => Promise<MockManagementDataResponse>
+        >(),
     },
     roles: {
-      list: vi.fn() as MockedFunction<
+      list: vi.fn<
         (
           id: string,
           params?: UnknownRecord,
         ) => Promise<{ data: UnknownRecord[] }>
-      >,
-      assign: vi.fn() as MockedFunction<
-        (id: string, body: { roles: string[] }) => Promise<void>
-      >,
-      delete: vi.fn() as MockedFunction<
-        (id: string, body: { roles: string[] }) => Promise<void>
-      >,
+      >(),
+      assign: vi.fn<(id: string, body: { roles: string[] }) => Promise<void>>(),
+      delete: vi.fn<(id: string, body: { roles: string[] }) => Promise<void>>(),
     },
   },
   roles: {
-    list: vi.fn() as MockedFunction<
+    list: vi.fn<
       (params?: { name_filter?: string }) => Promise<{ data: UnknownRecord[] }>
-    >,
+    >(),
   },
   guardian: {
     factors: {
-      list: vi.fn() as MockedFunction<() => Promise<UnknownRecord[]>>,
+      list: vi.fn<() => Promise<UnknownRecord[]>>(),
     },
     enrollments: {
-      createTicket: vi.fn() as MockedFunction<
-        (body: UnknownRecord) => Promise<UnknownRecord>
-      >,
-      delete: vi.fn() as MockedFunction<(id: string) => Promise<void>>,
+      createTicket: vi.fn<(body: UnknownRecord) => Promise<UnknownRecord>>(),
+      delete: vi.fn<(id: string) => Promise<void>>(),
     },
   },
   logs: {
-    list: vi.fn() as MockedFunction<
+    list: vi.fn<
       (params?: UnknownRecord) => Promise<{ data: UnknownRecord[] }>
-    >,
+    >(),
   },
 }
 
 const mockUserInfoClient = {
-  getUserInfo: vi.fn() as MockedFunction<
-    (accessToken: string) => Promise<{ data: UnknownRecord }>
-  >,
+  getUserInfo:
+    vi.fn<(accessToken: string) => Promise<{ data: UnknownRecord }>>(),
 }
 
 type JwtServiceShape = {
