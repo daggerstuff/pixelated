@@ -113,23 +113,4 @@ export async function searchMemories(
   }
 }
 
-async function getSystemStatus(): Promise<Record<string, unknown> | null> {
-  try {
-    const c = await getClient()
-    const result = await c.callTool({
-      name: 'get_system_status',
-      arguments: { params: {} },
-    })
-    const text = extractText(result)
-    try {
-      return JSON.parse(text)
-    } catch {
-      return { status: text }
-    }
-  } catch (err) {
-    console.error('[foresight-client] getSystemStatus failed:', err)
-    return null
-  }
-}
-
 registerProcessShutdown(close)

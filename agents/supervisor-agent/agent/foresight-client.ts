@@ -5,7 +5,7 @@ import { createLazyMcpClient } from './lib/lazy-mcp-client.js'
 
 const FORESIGHT_URL = process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/mcp'
 
-const { getClient, close } = createLazyMcpClient<Client>(async () => {
+const { getClient } = createLazyMcpClient<Client>(async () => {
   const transport = new StreamableHTTPClientTransport(new URL(FORESIGHT_URL))
   const client = new Client(
     { name: 'supervisor-agent', version: '1.0.0' },
@@ -101,25 +101,6 @@ export async function searchMemories(
     }
   } catch (err) {
     console.error('[foresight-client] searchMemories failed:', err)
-    return null
-  }
-}
-
-async function getSystemStatus(): Promise<Record<string, unknown> | null> {
-  try {
-    const c = await getClient()
-    const result = await c.callTool({
-      name: 'get_system_status',
-      arguments: { params: {} },
-    })
-    const text = extractText(result)
-    try {
-      return JSON.parse(text)
-    } catch {
-      return { status: text }
-    }
-  } catch (err) {
-    console.error('[foresight-client] getSystemStatus failed:', err)
     return null
   }
 }
