@@ -1,0 +1,20 @@
+apps/web/src/lib/services/product-memory-gateway.ts
+  s_7d4811cf1b0ba7::t_4100d1dda9f818 528
+  s_7d4811cf1b0ba7::t_fdd8d6d6533595 37,46,50,65,69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3c199b1bedf3538228548ca6cc7402dc828200f6",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
