@@ -1,0 +1,14 @@
+.github/workflows/pr-agent.yml
+  h_07d84030f79d30 4-7,10-12,15-22,24-36,38-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "309bd3ba3560f6d6fdca6fd616f1e6cb8b516062",
+  "prompts": {},
+  "humans": {
+    "h_07d84030f79d30": {
+      "author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
