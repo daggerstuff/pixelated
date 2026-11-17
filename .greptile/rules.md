@@ -26,3 +26,9 @@
 - Ensure all async operations (Promises, Python `async def`) handle rejected states and error propagation gracefully.
 - Ensure database connections, file handles, and stream readers are properly closed (e.g. `using`, `try...finally`, or context managers).
 - Reject silent error swallowing (empty `catch {}` blocks).
+
+## 5. Secrets & Review Scope
+
+- Never hardcode credentials, API tokens, passwords, or patient-identifiable data in code, tests, or mock fixtures.
+- Do not comment on style, formatting, or whitespace — enforced by `oxlint`, `ruff`, and `oxfmt`.
+- Base branch is `staging`. Submodules (`ai/`, `foresight/`, `docs/`) are separate repos; do not review their internals from this repo.

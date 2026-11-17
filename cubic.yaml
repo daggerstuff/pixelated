@@ -8,11 +8,29 @@ reviews:
   check_drafts: false
   architecture_diagrams: false
   merge_confidence_summary: true
+  auto_approve_behavior: disabled
+  auto_approve: disabled
+  ultrareview: manual
+  auto_ultrareview: disabled
+
+  # NOTE: cubic reads this file only from the default branch (staging).
+  custom_instructions: |
+    Pixelated Empathy: Astro 6 + React 19 frontend (TypeScript, Tailwind), Python 3.12+ backend via uv/ruff, PostgreSQL 17 + pgvector. Base branch is staging.
+    Focus on high-severity issues:
+    1. HIPAA compliance: flag any exposed PHI or unencrypted clinical identifiers in logs, requests, or database fields.
+    2. Zero-suppression policy: flag any @ts-ignore, @ts-expect-error, @ts-nocheck, # noqa, or # type: ignore.
+    3. Ensure async operations handle error cases and reject unhandled Promise rejections; reject silent error swallowing.
+    4. Verify EHR/clinical queries enforce tenant isolation (tenant_id) and Row-Level Security.
+    5. Disregard code styling, whitespace, and formatting (handled by oxlint and ruff). Do not suggest tsc or astro check (OOM); type-aware oxlint is used instead.
 
   ignore:
     pr_labels:
       - 'dependencies'
       - 'automated'
+    pr_titles:
+      - 'WIP*'
+      - '*[WIP]*'
+      - 'Draft*'
     max_changed_lines: 5000
     files:
       - 'pnpm-lock.yaml'
@@ -26,13 +44,31 @@ reviews:
       - '**/*.svg'
       - '**/*.csv'
       - '**/*.jsonl'
+      - '**/*.generated.*'
       - 'docs/Books/**'
       - 'ai/docs/Books/**'
       - 'submodules/**'
+      - 'coverage/**'
+      - 'test-results/**'
+      - 'playwright-report/**'
 
-instructions: |
-  Focus on high-severity issues:
-  1. HIPAA compliance: flag any exposed PHI or unencrypted clinical identifiers in logs, requests, or database fields.
-  2. Zero-suppression policy: flag any @ts-ignore, @ts-expect-error, # noqa, or # type: ignore.
-  3. Ensure async operations handle error cases and reject unhandled Promise rejections.
-  4. Disregard code styling, whitespace, and formatting (handled by oxlint and ruff).
+  custom_rules:
+    - name: HIPAA PHI protection
+      description: Flag any PHI/PII, MRNs, patient identifiers, psychiatric notes, or clinical transcripts being logged, serialized into unencrypted stores, or emitted in error responses. Test fixtures must use synthetic, non-identifiable data only.
+    - name: No suppressions
+      description: Flag any @ts-ignore, @ts-expect-error, @ts-nocheck, /* eslint-disable */, # noqa, # type: ignore, or # pylint: disable. The underlying type/lint issue must be fixed instead; never downgrade linter or compiler strictness configs.
+    - name: Tenant isolation
+      description: Every EHR/clinical database query must enforce tenant isolation (tenant_id) and Row-Level Security (RLS). Flag queries missing tenant scoping.
+      include:
+        - 'src/**'
+        - 'services/**'
+        - 'apps/**'
+    - name: Async error handling
+      description: All async operations must handle rejected/error states and propagate errors gracefully. Reject silent error swallowing (empty catch blocks). Database connections, file handles, and stream readers must be properly closed. Python/FastAPI async routes must not perform blocking synchronous I/O.
+    - name: No hardcoded secrets
+      description: Flag hardcoded credentials, API tokens, passwords, or patient-identifiable data in code, tests, or mock fixtures.
+
+issues:
+  fix_with_cubic_buttons: true
+  pr_comment_fixes: true
+  auto_fix: on_demand
