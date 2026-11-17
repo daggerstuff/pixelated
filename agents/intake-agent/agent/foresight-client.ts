@@ -41,14 +41,16 @@ export async function storeMemory(
     const result = await c.callTool({
       name: 'manage_memories',
       arguments: {
-        action: 'store',
-        content: params.content,
-        options: {
-          category: params.category ?? 'general',
-          scope: params.scope ?? 'intake',
-          retention: params.retention ?? 'long_term',
-          importance: params.importance ?? 0.5,
-          tags: params.tags ?? [],
+        params: {
+          action: 'store',
+          content: params.content,
+          store_options: {
+            category: params.category ?? 'general',
+            scope: params.scope ?? 'intake',
+            retention: params.retention ?? 'long_term',
+            importance: params.importance ?? 0.5,
+            tags: params.tags ?? [],
+          },
         },
       },
     })
@@ -76,11 +78,13 @@ export async function searchMemories(
     const result = await c.callTool({
       name: 'search_memories',
       arguments: {
-        query: params.query,
-        options: {
-          query_type: 'keyword',
-          limit: params.limit ?? 10,
-          min_importance: params.min_importance ?? 0.1,
+        params: {
+          query: params.query,
+          options: {
+            query_type: 'keyword',
+            limit: params.limit ?? 10,
+            min_importance: params.min_importance ?? 0.1,
+          },
         },
       },
     })
@@ -109,7 +113,7 @@ export async function getSystemStatus(): Promise<Record<
     const c = await getClient()
     const result = await c.callTool({
       name: 'get_system_status',
-      arguments: {},
+      arguments: { params: {} },
     })
     const text = extractText(result)
     try {
