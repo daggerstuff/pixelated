@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import {
   hasInternalReference,
   classifyViolation,
-} from '../../../scripts/ci/check-unused-exports.mjs'
+} from '../../../scripts/ci/export-classification.mjs'
 
 describe('hasInternalReference', () => {
   it('detects a type used only inside its own file', () => {
