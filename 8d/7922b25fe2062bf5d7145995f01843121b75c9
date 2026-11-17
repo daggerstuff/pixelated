@@ -1,0 +1,42 @@
+apps/web/src/lib/auth/auth0-rbac-service.ts
+  s_7d4811cf1b0ba7::t_4c582f7bbb9bd2 556,600
+  s_7d4811cf1b0ba7::t_3d46e08418ce0f 612
+  s_7d4811cf1b0ba7::t_220e99db619017 568
+  s_7d4811cf1b0ba7::t_842006eb147943 640
+apps/web/src/lib/auth/auth0-jwt-service.ts
+  s_7d4811cf1b0ba7::t_6ee08000d40f7e 101,103-104
+  s_7d4811cf1b0ba7::t_9e27c7e98eeb4e 114-115,117-118
+apps/web/src/lib/services/auth0.service.ts
+  s_7d4811cf1b0ba7::t_0cb9cdf3e1909e 1029-1030
+  s_7d4811cf1b0ba7::t_8670462e024f41 683
+  s_7d4811cf1b0ba7::t_6281da1c24b94a 1018-1020,1022
+apps/web/src/lib/db/index.ts
+  s_7d4811cf1b0ba7::t_76a03e06320db5 971
+apps/web/src/lib/auth/auth0-adaptive-mfa-service.ts
+  s_7d4811cf1b0ba7::t_5a1e1b83a2728b 455
+  s_7d4811cf1b0ba7::t_e6bda27cdfd1ce 452-454,456-457
+  s_7d4811cf1b0ba7::t_4859f63b6d0ec6 303
+  s_7d4811cf1b0ba7::t_772c7e7ccab9bc 300-302,304-305
+apps/web/src/lib/auth/auth0-mfa-service.ts
+  s_7d4811cf1b0ba7::t_8de11ba7c269e2 207
+  s_7d4811cf1b0ba7::t_44f772f849cd1a 248
+  s_7d4811cf1b0ba7::t_ea7d29f40e9dfe 379
+apps/web/src/types/declarations.d.ts
+  s_7d4811cf1b0ba7::t_a13c870868fe60 428-431
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8d7922b25fe2062bf5d7145995f01843121b75c9",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
