@@ -628,10 +628,13 @@ function hardenPool(target: Pool): Pool {
       if (property === 'query') {
         return (text: string, params?: unknown[]) => query(text, params)
       }
-      const value = Reflect.get(object, property)
-      return typeof value === 'function' ? value.bind(object) : value
+      const value: unknown = Reflect.get(object, property)
+      if (typeof value === 'function') {
+        return (value as (...args: unknown[]) => unknown).bind(object)
+      }
+      return value
     },
-  }) as Pool
+  })
   poolHandles.set(target, handle)
   return handle
 }
@@ -968,7 +971,7 @@ function queryWithDeadline<T>(
   params: unknown[] | undefined,
   timeoutMs: number,
 ): Promise<T> {
-  const attempt = client.query<T>(text, params) as unknown as Promise<T>
+  const attempt = client.query(text, params) as unknown as Promise<T>
   // A non-positive bound disables the deadline, matching pg's `query_timeout`
   // and the liveness-probe and client-lifetime guards. Without this guard
   // `setTimeout(…, 0)` fires before any statement can settle, so
