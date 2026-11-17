@@ -97,6 +97,27 @@ type RoutingContextParams = Omit<RoutingContext, 'sessionHistory'>
 /**
  * Maps LLM output categories to internal analyzer names and critical status.
  */
+interface LLMCategoryMapEntry {
+  targetAnalyzer: string
+  isCritical: boolean
+  confidenceBoost?: number // Optional boost to apply to LLM confidence for this category
+}
+
+
+/**
+ * Configuration for the MentalHealthAI models.
+ */
+export interface MentalHealthAIModelConfig {
+  modelId: string // Identifier for the specific model (e.g., 'mental-health-ai-chat-7b-v1')
+  endpointUrl?: string // URL for the model inference API
+  apiKey?: string // API key if required
+  providerType:
+    | 'azure_openai'
+    | 'llm_api'
+    | 'custom_api'
+    | 'python_bridge' // Type of provider
+  // Add other model-specific parameters as needed
+}
 
 /**
  * Parameters for the analyzeMentalHealth method in MentalHealthAIAdapter.
@@ -114,6 +135,8 @@ export interface AnalyzeMentalHealthParams {
 }
 
 // PythonBridge related types
+
+
 
 // Add other core types and interfaces as they are identified.
 
