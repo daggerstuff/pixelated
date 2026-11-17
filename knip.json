@@ -53,7 +53,6 @@
     "apps/web/src/lib/access-control.ts",
     "apps/web/src/lib/ai/AIService.ts",
     "apps/web/src/lib/ai/index.ts",
-    "apps/web/src/lib/ai/mental-health-ai/index.ts",
     "apps/web/src/lib/ai/providers.ts",
     "apps/web/src/lib/auth/auth0-adaptive-mfa-service.ts",
     "apps/web/src/lib/auth/auth0-middleware.ts",
