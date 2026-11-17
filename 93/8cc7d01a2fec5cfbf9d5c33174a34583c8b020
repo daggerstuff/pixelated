@@ -1,0 +1,35 @@
+apps/web/src/lib/server/mcp-memory-transport.ts
+  s_7d4811cf1b0ba7::t_1c374a0bf0cd5a 22
+apps/web/src/lib/server/memory-transport-factory.ts
+  s_7d4811cf1b0ba7::t_e49a74f71a636c 1-9,12-23,27,29,32,34-37,43-107,135,138-140,144,147-149,154-156
+  s_7d4811cf1b0ba7::t_8ae1a8737f2a3c 26
+  s_7d4811cf1b0ba7::t_29d9e61a010b0f 157
+apps/web/src/lib/server/internal-memory-service-client.ts
+  s_7d4811cf1b0ba7::t_f1cfbe90bd3520 66,71,78,84,90,94
+apps/web/src/lib/server/memory-transport-factory.test.ts
+  s_7d4811cf1b0ba7::t_4a8fc4469b1112 3-4,6-8
+  s_7d4811cf1b0ba7::t_4a353477f93952 79-406
+  s_7d4811cf1b0ba7::t_1f3ed6e94824a5 9,407
+scripts/ci/check-unused-exports.mjs
+  s_7d4811cf1b0ba7::t_c4d4d8bcf40677 43
+  s_7d4811cf1b0ba7::t_00417b42f8ade6 277-278
+  s_7d4811cf1b0ba7::t_42c5e8aea17478 386-411,415-418
+  s_7d4811cf1b0ba7::t_badda225b1f665 44-49
+  s_7d4811cf1b0ba7::t_b9a27f2159d8ba 482-483,487-488,490-493
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "938cc7d01a2fec5cfbf9d5c33174a34583c8b020",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
