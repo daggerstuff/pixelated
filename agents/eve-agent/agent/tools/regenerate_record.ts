@@ -4,6 +4,8 @@ import { promisify } from 'node:util'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { hackathonScript } from '../lib/hackathon.js'
+
 const execFileAsync = promisify(execFile)
 
 const SCHEMA = z.object({
@@ -29,12 +31,22 @@ export default defineTool({
     'Targets specific record IDs that violate quality predicates or voice rules, running structural repairs and metric expansion to regenerate clean body text.',
   inputSchema: SCHEMA,
   async execute(input: RegenerateRecordInput) {
+    const target = hackathonScript('scripts/fix/repair_upgraded_v2.py')
+    if ('error' in target) {
+      return {
+        success: false,
+        error: target.error,
+        target_ids: input.record_ids,
+        processed_at: new Date().toISOString(),
+      }
+    }
+
     try {
       const { stdout } = await execFileAsync(
         'uv',
-        ['run', 'python', 'scripts/fix/repair_upgraded_v2.py'],
+        ['run', 'python', target.script],
         {
-          cwd: '/home/vivi/pixelated/hackathon',
+          cwd: target.cwd,
         },
       )
 
@@ -49,6 +61,7 @@ export default defineTool({
       return {
         success: false,
         error: errorMsg,
+        target_ids: input.record_ids,
         processed_at: new Date().toISOString(),
       }
     }

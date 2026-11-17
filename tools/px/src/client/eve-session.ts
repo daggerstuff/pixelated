@@ -139,8 +139,49 @@ export async function streamEveSession(
     const reader = res.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
-    let lastMessage = ''
+    const replyParts: string[] = []
     let usage: EveSessionResult['usage']
+    let turnOutcome: string | undefined
+
+    // eve 0.91+ streams NDJSON envelopes: {"facts": [{type, data, scope}]},
+    // {"progress": {type, data, scope}}, and {"$eve": "heartbeat"} keepalives.
+    // Older servers emitted flat {"type", "data"} events. Handle both.
+    const handleEntry = (
+      type: string | undefined,
+      data: Record<string, unknown>,
+    ) => {
+      if (type === 'content.completed') {
+        if (data['kind'] === 'text' && data['phase'] === 'reply') {
+          const value = data['value']
+          if (typeof value === 'string') replyParts.push(value)
+        }
+        return
+      }
+      if (type === 'message.completed') {
+        const msg = data['message']
+        if (typeof msg === 'string') replyParts.push(msg)
+        const u = data['usage'] as
+          | { inputTokens?: number; outputTokens?: number }
+          | undefined
+        if (u) usage = u
+        return
+      }
+      if (type === 'usage.recorded') {
+        const u = data['usage'] as
+          | { inputTokens?: number; outputTokens?: number }
+          | undefined
+        if (u) usage = { ...usage, ...u }
+        return
+      }
+      if (
+        type === 'turn.settled' ||
+        type === 'turn.completed' ||
+        type === 'session.waiting'
+      ) {
+        turnOutcome =
+          typeof data['outcome'] === 'string' ? data['outcome'] : 'completed'
+      }
+    }
 
     for (;;) {
       const { done, value } = await reader.read()
@@ -152,33 +193,49 @@ export async function streamEveSession(
 
       for (const line of lines) {
         const trimmed = line.trim()
-        if (!trimmed) continue
+        if (!trimmed || !trimmed.startsWith('{')) continue
 
-        let event: EveEvent
+        let event: Record<string, unknown>
         try {
-          event = JSON.parse(trimmed) as EveEvent
+          event = JSON.parse(trimmed) as Record<string, unknown>
         } catch {
           continue
         }
 
-        if (onEvent) onEvent(event)
+        if (onEvent) onEvent(event as unknown as EveEvent)
 
-        if (event.type === 'message.completed') {
-          lastMessage = (event.data['message'] as string) ?? ''
-          const u = event.data['usage'] as
-            | { inputTokens?: number; outputTokens?: number }
-            | undefined
-          if (u) usage = u
+        const facts = event['facts']
+        if (Array.isArray(facts) && facts.length > 0) {
+          for (const fact of facts) {
+            if (fact && typeof fact === 'object') {
+              const f = fact as Record<string, unknown>
+              handleEntry(
+                f['type'] as string | undefined,
+                (f['data'] as Record<string, unknown>) ?? {},
+              )
+            }
+          }
+        } else {
+          const progress = event['progress']
+          if (progress && typeof progress === 'object') {
+            const p = progress as Record<string, unknown>
+            handleEntry(
+              p['type'] as string | undefined,
+              (p['data'] as Record<string, unknown>) ?? {},
+            )
+          } else {
+            handleEntry(
+              event['type'] as string | undefined,
+              (event['data'] as Record<string, unknown>) ?? {},
+            )
+          }
         }
 
-        if (
-          event.type === 'turn.completed' ||
-          event.type === 'session.waiting'
-        ) {
+        if (turnOutcome !== undefined) {
           await reader.cancel().catch(() => {})
           return {
             sessionId,
-            message: lastMessage,
+            message: replyParts.join('').trim(),
             usage,
           }
         }
@@ -189,7 +246,7 @@ export async function streamEveSession(
     await reader.cancel().catch(() => {})
     return {
       sessionId,
-      message: lastMessage,
+      message: replyParts.join('').trim(),
       usage,
     }
   } finally {

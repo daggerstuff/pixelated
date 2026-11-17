@@ -4,6 +4,8 @@ import { promisify } from 'node:util'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { hackathonScript } from '../lib/hackathon.js'
+
 const execFileAsync = promisify(execFile)
 
 const SCHEMA = z.object({})
@@ -13,12 +15,22 @@ export default defineTool({
     'Evaluates the email corpus against quality verification gates, reporting any predicate violations (missing measurements, follow-up fragments, too-short bodies) and returning a gate pass/fail verdict.',
   inputSchema: SCHEMA,
   async execute() {
+    const target = hackathonScript('scripts/fix/verify_repairs.py')
+    if ('error' in target) {
+      return {
+        success: false,
+        passed: false,
+        error: target.error,
+        evaluated_at: new Date().toISOString(),
+      }
+    }
+
     try {
       const { stdout } = await execFileAsync(
         'uv',
-        ['run', 'python', 'scripts/fix/verify_repairs.py'],
+        ['run', 'python', target.script],
         {
-          cwd: '/home/vivi/pixelated/hackathon',
+          cwd: target.cwd,
         },
       )
 

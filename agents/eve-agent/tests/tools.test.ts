@@ -13,6 +13,14 @@ vi.mock('node:child_process', () => ({
   },
 }))
 
+vi.mock('../agent/lib/hackathon.js', () => ({
+  hackathonScript: vi.fn(() => ({
+    cwd: '/tmp/hackathon',
+    script: '/tmp/hackathon/scripts/fix/tool.py',
+  })),
+}))
+
+import { hackathonScript } from '../agent/lib/hackathon.js'
 import cleanCorpus from '../agent/tools/clean_corpus.js'
 import evaluateCorpusGate from '../agent/tools/evaluate_corpus_gate.js'
 import regenerateRecord from '../agent/tools/regenerate_record.js'
@@ -140,6 +148,20 @@ describe('eve-agent tools', () => {
       )
       expect(result.success).toBe(false)
       expect(result.error).toContain('LLM rate limit reached')
+    })
+  })
+
+  describe('missing corpus scripts', () => {
+    it('returns a structured error when the hackathon script is absent', async () => {
+      vi.mocked(hackathonScript).mockReturnValueOnce({
+        error: 'corpus script not found: /x/scripts/fix/verify_repairs.py',
+      })
+
+      const result = await evaluateCorpusGate.execute({}, ctx)
+      expect(result.success).toBe(false)
+      expect(result.passed).toBe(false)
+      expect(result.error).toContain('corpus script not found')
+      expect(execFileMock).not.toHaveBeenCalled()
     })
   })
 })

@@ -34,7 +34,7 @@ class OnboardingWizard:
         ("mastracode", "mastracode run {prompt_file}", "frontend_engineer"),
         ("cursor", "cursor --agent {prompt_file}", "general_coder"),
         ("agy", "agy exec {prompt_file}", "security_sentinel"),
-        ("eve", "pnpm --dir agents/eve-agent start -- {prompt_file}", "lead_architect"),
+        ("eve", "eve-agent service http://127.0.0.1:2015/eve/v1", "lead_architect"),
         ("fx", "fx run {prompt_file}", "qa_automator"),
     ]
 
@@ -62,7 +62,7 @@ class OnboardingWizard:
             discovered.append(
                 DiscoveredAgent(
                     name="eve_architect",
-                    cli_command="pnpm --dir agents/eve-agent start -- {prompt_file}",
+                    cli_command="eve-agent service http://127.0.0.1:2015/eve/v1",
                     path=eve_path,
                     available=True,
                     version="Eve GLM-5.2 (1M ctx)",

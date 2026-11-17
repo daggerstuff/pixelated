@@ -4,6 +4,8 @@ import { promisify } from 'node:util'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { hackathonScript } from '../lib/hackathon.js'
+
 const execFileAsync = promisify(execFile)
 
 const SCHEMA = z.object({
@@ -34,10 +36,22 @@ export default defineTool({
     'Runs the email filter pipeline across the specified corpus dump to clean up slop, formatting errors, excessive letters, and orphaned punctuation.',
   inputSchema: SCHEMA,
   async execute(input: CleanCorpusInput) {
+    const target = hackathonScript(
+      'scripts/fix/email_filters/pipeline/pipeline_cli.py',
+    )
+    if ('error' in target) {
+      return {
+        success: false,
+        error: target.error,
+        dry_run: input.dry_run ?? false,
+        processed_at: new Date().toISOString(),
+      }
+    }
+
     const args = [
       'run',
       'python',
-      'scripts/fix/email_filters/pipeline/pipeline_cli.py',
+      target.script,
       'run',
       '--input',
       input.input_path,
@@ -51,7 +65,7 @@ export default defineTool({
 
     try {
       const { stdout } = await execFileAsync('uv', args, {
-        cwd: '/home/vivi/pixelated/hackathon',
+        cwd: target.cwd,
       })
 
       return {
