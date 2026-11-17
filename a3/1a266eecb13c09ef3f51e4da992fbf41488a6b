@@ -1,0 +1,26 @@
+.coderabbit.yaml
+  h_07d84030f79d30 14,18-19,26-35
+.github/AI_REVIEWERS.md
+  h_07d84030f79d30 1-54
+.greptile/README.md
+  h_07d84030f79d30 1-51
+.greptile/config.json
+  h_07d84030f79d30 5-58
+.greptile/files.json
+  h_07d84030f79d30 1-22
+.greptile/rules.md
+  h_07d84030f79d30 29-34
+cubic.yaml
+  h_07d84030f79d30 11-24,30-33,47,51-69,71-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a31a266eecb13c09ef3f51e4da992fbf41488a6b",
+  "prompts": {},
+  "humans": {
+    "h_07d84030f79d30": {
+      "author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
