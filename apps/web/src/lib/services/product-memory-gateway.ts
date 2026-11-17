@@ -34,7 +34,7 @@ export interface ProductMemoryScope {
   includeShared?: boolean
 }
 
-export interface ProductMemoryListOptions extends ProductMemoryScope {
+interface ProductMemoryListOptions extends ProductMemoryScope {
   limit?: number
   offset?: number
   category?: string
@@ -43,11 +43,11 @@ export interface ProductMemoryListOptions extends ProductMemoryScope {
   retention?: string
 }
 
-export interface ProductMemorySearchOptions extends ProductMemoryListOptions {
+interface ProductMemorySearchOptions extends ProductMemoryListOptions {
   query: string
 }
 
-export interface ProductMemoryCreateInput extends ProductMemoryScope {
+interface ProductMemoryCreateInput extends ProductMemoryScope {
   content: string
   metadata?: Record<string, unknown>
 }
@@ -62,11 +62,11 @@ export interface ProductMemoryDeleteInput extends ProductMemoryScope {
   memoryId: string
 }
 
-export interface ProductMemoryGetInput extends ProductMemoryScope {
+interface ProductMemoryGetInput extends ProductMemoryScope {
   memoryId: string
 }
 
-export interface ProductMemoryStats {
+interface ProductMemoryStats {
   totalMemories: number
   categoryCounts: Record<string, number>
 }
@@ -525,7 +525,7 @@ export function getProductMemoryGateway(): ProductMemoryGateway {
  * operators can switch from the HTTP self-loopback to the foresight-server
  * transport without code changes.
  */
-export function getProductMemoryGatewayFor(
+function getProductMemoryGatewayFor(
   caller: Caller,
   audit?: AuditLogger,
 ): ProductMemoryGateway {
