@@ -26,7 +26,7 @@ services:
       - nemo-network
 
   nim-reranking:
-    image: nvcr.io/nim/nvidia/llama-3.2-nv-rerankqa-1b-v2:latest
+    image: nvcr.io/nim/nvidia/nemotron-rerank:latest
     container_name: nim-reranking
     ports:
       - '8081:8000'
@@ -35,7 +35,6 @@ services:
       - NIM_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NGC_USER_NAME=$$oauthtoken
       - NIM_MANIFEST_ALLOW_UNSAFE=1
-      - NIM_MODEL_PROFILE=f7391ddbcb95b2406853526b8e489fedf20083a2420563ca3e65358ff417b10f
     volumes:
       - nim_model_cache:/opt/nim/.cache
     deploy:

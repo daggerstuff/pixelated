@@ -1,7 +1,7 @@
 models:
-  compression: meta-llama/Llama-3.3-70B-Instruct:groq
-  routing_oracle: meta-llama/Llama-3.3-70B-Instruct:groq
-  evaluation: meta-llama/Llama-3.3-70B-Instruct:groq
+  compression: openai/gpt-oss-120b:groq
+  routing_oracle: openai/gpt-oss-120b:groq
+  evaluation: openai/gpt-oss-120b:groq
 
 thresholds:
   short_description_tokens: 40
