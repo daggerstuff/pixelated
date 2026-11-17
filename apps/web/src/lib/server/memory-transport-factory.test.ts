@@ -1,6 +1,7 @@
 // @vitest-environment node
 
 import type { UnifiedMemory } from '@pixelated/memory-schema'
+import { MEMORY_SCHEMA_VERSION } from '@pixelated/memory-schema'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -129,7 +130,7 @@ describe('memory-transport-factory', () => {
           category: 'decision',
           tags: ['a', 'b'],
           version: 1,
-          schemaVersion: '1.0.0',
+          schemaVersion: MEMORY_SCHEMA_VERSION,
           sourceService: 'foresight',
           importance: 0.9,
           decayRate: 0.01,

@@ -13,7 +13,10 @@ import {
   type InternalMemoryRecord,
   type InternalMemoryScopeInput,
 } from '../server/internal-memory-service-client'
-import { createMemoryTransport } from '../server/memory-transport-factory'
+import {
+  createMemoryTransport,
+  type InternalMemoryServiceClientLike,
+} from '../server/memory-transport-factory'
 import { AuditLogger, NoOpAuditLogger } from './product-memory-audit'
 import { assertOwnedMemoryAccessible } from './product-memory-ownership'
 
@@ -80,23 +83,6 @@ export class ProductMemoryGatewayError extends Error {
 }
 
 type Caller = { userId: string; tenantId?: string }
-
-type InternalMemoryServiceClientLike = {
-  addMemory: (input: any) => Promise<{ memory_id: string }>
-  listMemories: (
-    input: any,
-  ) => Promise<{ memories: UnifiedMemory[]; count: number }>
-  searchMemories: (
-    input: any,
-  ) => Promise<{ memories: UnifiedMemory[]; count: number }>
-  updateMemory: (input: any) => Promise<void>
-  getMemory: (input: any) => Promise<UnifiedMemory | null>
-  deleteMemory: (input: any) => Promise<void>
-  getMemoryStats: (input: any) => Promise<{
-    totalMemories: number
-    categoryCounts: Record<string, number>
-  }>
-}
 
 type CallContext = {
   correlationId: string

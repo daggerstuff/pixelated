@@ -3,6 +3,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import {
   isMemoryScope,
   isRetentionPolicy,
+  MEMORY_SCHEMA_VERSION,
   type MemoryScope,
   type RetentionPolicy,
   type UnifiedMemory,
@@ -453,7 +454,7 @@ export class McpMemoryTransport implements McpMemoryTransportLike {
       category: 'general',
       tags: detail.tags,
       version: 1,
-      schemaVersion: '1.0.0',
+      schemaVersion: MEMORY_SCHEMA_VERSION,
       sourceService: 'foresight',
       importance: 0.5,
       decayRate: 0.01,

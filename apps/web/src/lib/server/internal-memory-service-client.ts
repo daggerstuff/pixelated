@@ -63,35 +63,35 @@ export class InternalMemoryServiceError extends Error {
   }
 }
 
-export interface SearchInput extends InternalMemoryScopeInput {
+interface SearchInput extends InternalMemoryScopeInput {
   query: string
   limit: number
 }
 
-export interface ListInput extends InternalMemoryScopeInput {
+interface ListInput extends InternalMemoryScopeInput {
   limit: number
   offset?: number
   category?: string
   tags?: string[]
 }
 
-export interface CreateInput extends InternalMemoryScopeInput {
+interface CreateInput extends InternalMemoryScopeInput {
   content: string
   category?: string
   metadata?: InternalMemoryMetadata
 }
 
-export interface UpdateInput extends InternalMemoryScopeInput {
+interface UpdateInput extends InternalMemoryScopeInput {
   memoryId: string
   content: string
   metadata?: InternalMemoryMetadata
 }
 
-export interface DeleteInput extends InternalMemoryScopeInput {
+interface DeleteInput extends InternalMemoryScopeInput {
   memoryId: string
 }
 
-export interface GetInput extends InternalMemoryScopeInput {
+interface GetInput extends InternalMemoryScopeInput {
   memoryId: string
 }
 

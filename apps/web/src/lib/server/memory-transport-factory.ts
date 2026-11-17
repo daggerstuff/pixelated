@@ -6,34 +6,58 @@ import type {
 import {
   EmotionalContextSchema,
   EmpathyMetricsSchema,
+  MEMORY_SCHEMA_VERSION,
 } from '@pixelated/memory-schema'
 
 import { resolveInternalMemoryServiceConfig } from './internal-memory-service-auth'
 import {
   InternalMemoryServiceClient,
-  type CreateInput,
-  type DeleteInput,
-  type GetInput,
   type InternalMemoryMetadata,
   type InternalMemoryRecord,
   type InternalMemoryScopeInput,
-  type ListInput,
-  type SearchInput,
-  type UpdateInput,
 } from './internal-memory-service-client'
 import { McpMemoryTransport } from './mcp-memory-transport'
 
-type InternalMemoryServiceClientLike = {
-  addMemory: (input: CreateInput) => Promise<{ memory_id: string }>
+type AddMemoryInput = InternalMemoryScopeInput & {
+  content: string
+  category?: string
+  metadata?: InternalMemoryMetadata
+}
+
+type ListMemoriesInput = InternalMemoryScopeInput & {
+  limit: number
+  offset?: number
+  category?: string
+  tags?: string[]
+  scope?: string
+  retention?: string
+}
+
+type SearchMemoriesInput = ListMemoriesInput & {
+  query: string
+}
+
+type MemoryIdInput = InternalMemoryScopeInput & {
+  memoryId: string
+}
+
+type UpdateMemoryInput = MemoryIdInput & {
+  content: string
+  category?: string
+  metadata?: InternalMemoryMetadata
+}
+
+export type InternalMemoryServiceClientLike = {
+  addMemory: (input: AddMemoryInput) => Promise<{ memory_id: string }>
   listMemories: (
-    input: ListInput,
+    input: ListMemoriesInput,
   ) => Promise<{ memories: UnifiedMemory[]; count: number }>
   searchMemories: (
-    input: SearchInput,
+    input: SearchMemoriesInput,
   ) => Promise<{ memories: UnifiedMemory[]; count: number }>
-  updateMemory: (input: UpdateInput) => Promise<void>
-  getMemory: (input: GetInput) => Promise<UnifiedMemory | null>
-  deleteMemory: (input: DeleteInput) => Promise<void>
+  updateMemory: (input: UpdateMemoryInput) => Promise<void>
+  getMemory: (input: MemoryIdInput) => Promise<UnifiedMemory | null>
+  deleteMemory: (input: MemoryIdInput) => Promise<void>
   getMemoryStats: (input: InternalMemoryScopeInput) => Promise<{
     totalMemories: number
     categoryCounts: Record<string, number>
@@ -84,7 +108,7 @@ function toUnifiedMemory(
     category: readString(metadata?.['category'], DEFAULT_CATEGORY),
     tags: readStringArray(metadata?.['tags']),
     version: 1,
-    schemaVersion: '1.0.0',
+    schemaVersion: MEMORY_SCHEMA_VERSION,
     sourceService: 'foresight',
     importance: readNumber(metadata?.['importance'], DEFAULT_IMPORTANCE),
     decayRate: 0.01,
@@ -132,7 +156,7 @@ export function createMemoryTransport(): InternalMemoryServiceClientLike {
 
       return {
         addMemory: legacyClient.addMemory.bind(legacyClient),
-        listMemories: async (input: ListInput) => {
+        listMemories: async (input: ListMemoriesInput) => {
           const result = await legacyClient.listMemories(input)
           return {
             memories: result.memories.map((record) =>
@@ -141,7 +165,7 @@ export function createMemoryTransport(): InternalMemoryServiceClientLike {
             count: result.count,
           }
         },
-        searchMemories: async (input: SearchInput) => {
+        searchMemories: async (input: SearchMemoriesInput) => {
           const result = await legacyClient.searchMemories(input)
           return {
             memories: result.memories.map((record) =>
@@ -151,7 +175,9 @@ export function createMemoryTransport(): InternalMemoryServiceClientLike {
           }
         },
         updateMemory: legacyClient.updateMemory.bind(legacyClient),
-        getMemory: async (input: GetInput): Promise<UnifiedMemory | null> => {
+        getMemory: async (
+          input: MemoryIdInput,
+        ): Promise<UnifiedMemory | null> => {
           const record = await legacyClient.getMemory(input)
           if (!record) return null
           return toUnifiedMemory(record, input.userId)
