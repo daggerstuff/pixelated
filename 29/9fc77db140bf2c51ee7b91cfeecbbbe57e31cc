@@ -1,0 +1,24 @@
+tests/unit/ci/check-unused-exports.test.ts
+  s_7d4811cf1b0ba7::t_3c30857b663bb3 1-65
+  s_7d4811cf1b0ba7::t_5a4e735e012f46 66-68
+scripts/ci/check-unused-exports.mjs
+  s_7d4811cf1b0ba7::t_b7d357e00b690e 32,35,43,45,85-125,419-425,484,601-640,646-647,708-717,796-804
+vitest.config.ts
+  s_7d4811cf1b0ba7::t_19b7394bc871ac 28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "299fc77db140bf2c51ee7b91cfeecbbbe57e31cc",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
