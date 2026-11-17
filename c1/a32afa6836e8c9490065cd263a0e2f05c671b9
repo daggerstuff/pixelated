@@ -1,0 +1,23 @@
+package.json
+  s_7d4811cf1b0ba7::t_266b52d69e8961 76
+scripts/devops/check-auth0-scopes.mjs
+  s_7d4811cf1b0ba7::t_37c10b06019556 1-169
+tests/unit/ci/auth0-scopes.test.ts
+  s_7d4811cf1b0ba7::t_91d7c58acb0173 1-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c1a32afa6836e8c9490065cd263a0e2f05c671b9",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
