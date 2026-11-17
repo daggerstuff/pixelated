@@ -1,0 +1,29 @@
+agents/intake-agent/agent/foresight-client.ts
+  s_3657d90acc867f::t_e49e76fc61b09a 8
+agents/qa-agent/agent/foresight-client.ts
+  s_3657d90acc867f::t_10caf69dd858d3 15
+agents/pipeline-agent/agent/foresight-client.ts
+  s_3657d90acc867f::t_71aede1eac480e 15
+agents/advisor-agent/agent/foresight-client.ts
+  s_3657d90acc867f::t_0a8581bbfa90a3 15
+agents/content-agent/agent/foresight-client.ts
+  s_3657d90acc867f::t_f6b6ca98503690 15
+agents/supervisor-agent/agent/foresight-client.ts
+  s_3657d90acc867f::t_0d685785996c4e 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f9611d2d1e52f19902d0faa87ca9ec43d41960fb",
+  "prompts": {},
+  "sessions": {
+    "s_3657d90acc867f": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "f930ce7e-c816-454d-86b0-e1b7fbbea2dd",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
