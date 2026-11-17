@@ -73,6 +73,7 @@
     "lint:ci:type-aware": "node scripts/ci/lint-changed.mjs --type-aware",
     "lint:ci:type-aware:all": "bash scripts/ci/lint-chunked.sh && bash scripts/ci/check-no-suppressions.sh",
     "lint:imports": "node scripts/ci/check-unresolved-imports.mjs",
+    "auth0:scopes": "node scripts/devops/check-auth0-scopes.mjs",
     "lint:unused-exports": "node scripts/ci/check-unused-exports.mjs",
     "lint:unused-exports:build-index": "node scripts/ci/check-unused-exports.mjs --build-index",
     "lint:ci:unused-exports": "node scripts/ci/lint-changed.mjs --unused-exports",
