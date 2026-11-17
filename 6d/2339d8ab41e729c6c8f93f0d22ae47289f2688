@@ -1,0 +1,14 @@
+scripts/ci/ai-strict-baseline.json
+  h_07d84030f79d30 4,571-574,604-607,700-701,722,734,736,779,801-804,819-822,839,865,877-878,888-889,898,1059-1062,1283-1284,1594-1611,1800-1808,1879-1883,2089-2090,2111-2112,2119-2122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6d2339d8ab41e729c6c8f93f0d22ae47289f2688",
+  "prompts": {},
+  "humans": {
+    "h_07d84030f79d30": {
+      "author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
