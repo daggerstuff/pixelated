@@ -1,0 +1,25 @@
+apps/web/src/lib/server/mcp-memory-transport.ts
+  s_7d4811cf1b0ba7::t_ac55a9ce1443b1 73-96
+  s_7d4811cf1b0ba7::t_000506f9c01bd7 482-488
+apps/web/src/lib/server/mcp-memory-transport.test.ts
+  s_7d4811cf1b0ba7::t_5d0527d1962e09 557,566-771,796-819
+  s_7d4811cf1b0ba7::t_f2a675ac2adea8 772-795
+  s_7d4811cf1b0ba7::t_99ceb7d7406b55 558-565
+  s_7d4811cf1b0ba7::t_d99908e67af432 820-821
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "38ed6bb925c0962cf454004cc4ee42ebed3048ae",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
