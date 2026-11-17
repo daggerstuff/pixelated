@@ -19,7 +19,7 @@ export const FORESIGHT_MCP_TOOLS = {
   getSystemStatus: 'get_system_status',
 } as const
 
-export type ForesightMcpToolName =
+type ForesightMcpToolName =
   (typeof FORESIGHT_MCP_TOOLS)[keyof typeof FORESIGHT_MCP_TOOLS]
 
 export const REQUIRED_FORESIGHT_MCP_TOOLS: readonly ForesightMcpToolName[] = [
