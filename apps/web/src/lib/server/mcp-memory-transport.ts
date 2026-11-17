@@ -70,6 +70,30 @@ const GHOST_MARKER = '\n[GHOST NODE - Content archived]'
 const TAGS_SEPARATOR = '\nTags: '
 const EMPTY_TAGS = 'none'
 
+const HYDRATION_CONCURRENCY = 8
+
+async function mapWithConcurrency<T, R>(
+  items: readonly T[],
+  limit: number,
+  mapper: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length)
+  let cursor = 0
+  const workerCount = Math.max(1, Math.min(limit, items.length))
+  const workers = Array.from({ length: workerCount }, async () => {
+    for (;;) {
+      const index = cursor
+      cursor += 1
+      if (index >= items.length) {
+        return
+      }
+      results[index] = await mapper(items[index])
+    }
+  })
+  await Promise.all(workers)
+  return results
+}
+
 function compact(entries: Record<string, unknown>): Record<string, unknown> {
   const out: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(entries)) {
@@ -455,19 +479,13 @@ export class McpMemoryTransport implements McpMemoryTransportLike {
     agentId?: string,
     projectId?: string,
   ): Promise<UnifiedMemory[]> {
-    const memories: UnifiedMemory[] = []
-    for (const id of ids) {
-      const detail = await this.fetchMemoryDetail(
-        id,
-        userId,
-        agentId,
-        projectId,
-      )
-      if (detail) {
-        memories.push(this.toUnifiedMemory(detail, userId))
-      }
-    }
-    return memories
+    const details = await mapWithConcurrency(ids, HYDRATION_CONCURRENCY, (id) =>
+      this.fetchMemoryDetail(id, userId, agentId, projectId),
+    )
+
+    return details
+      .filter((detail): detail is ParsedMemoryDetail => detail !== null)
+      .map((detail) => this.toUnifiedMemory(detail, userId))
   }
 
   async addMemory(input: {

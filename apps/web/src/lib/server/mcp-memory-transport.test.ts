@@ -554,4 +554,269 @@ describe('McpMemoryTransport', () => {
 
     expect(clientInstance.close).toHaveBeenCalledTimes(1)
   })
+
+  it('reuses the initialised client across successive calls', async () => {
+    await transport.addMemory({ content: 'probe', userId: mockUserId })
+    await transport.getMemoryStats({ userId: mockUserId })
+
+    expect(clientInstance.connect).toHaveBeenCalledTimes(1)
+    expect(clientInstance.listTools).toHaveBeenCalledTimes(1)
+  })
+
+  it('closes safely when the client was never initialised', async () => {
+    await expect(transport.close()).resolves.toBeUndefined()
+
+    expect(clientInstance.close).not.toHaveBeenCalled()
+  })
+
+  it('hydrates summary ids concurrently while preserving result order', async () => {
+    let inFlight = 0
+    let peak = 0
+    clientInstance.callTool.mockImplementation(async (request: ToolRequest) => {
+      const params = request.arguments?.['params'] as
+        | Record<string, unknown>
+        | undefined
+      const options = params?.['options'] as Record<string, unknown> | undefined
+
+      if (
+        request.name === FORESIGHT_MCP_TOOLS.searchMemories &&
+        options?.['query_type'] === 'list'
+      ) {
+        return textResponse(LIST_SUMMARY)
+      }
+
+      if (
+        request.name === FORESIGHT_MCP_TOOLS.searchMemories &&
+        options?.['query_type'] === 'id'
+      ) {
+        inFlight += 1
+        peak = Math.max(peak, inFlight)
+        await new Promise((resolve) => setTimeout(resolve, 5))
+        inFlight -= 1
+        const memoryId = String(options?.['memory_id'])
+        return textResponse(
+          DETAILS[memoryId] ?? `Memory ${memoryId} not found.`,
+        )
+      }
+
+      throw new Error(`unexpected MCP call ${request.name}`)
+    })
+
+    const result = await transport.listMemories({
+      userId: mockUserId,
+      limit: 10,
+    })
+
+    expect(peak).toBeGreaterThan(1)
+    expect(result.memories.map((memory) => memory.id)).toEqual([
+      storedMemoryId,
+      secondMemoryId,
+    ])
+  })
+
+  it('skips a memory that disappears between the summary and the hydration', async () => {
+    const summary = `Memories (2 found):\n- [${storedMemoryId}] (session/short_term) probe alpha...\n- [gone] (session/short_term) vanished...`
+    clientInstance.callTool.mockImplementation(async (request: ToolRequest) => {
+      const params = request.arguments?.['params'] as
+        | Record<string, unknown>
+        | undefined
+      const options = params?.['options'] as Record<string, unknown> | undefined
+
+      if (options?.['query_type'] === 'list') {
+        return textResponse(summary)
+      }
+      const memoryId = String(options?.['memory_id'])
+      return textResponse(DETAILS[memoryId] ?? `Memory ${memoryId} not found.`)
+    })
+
+    const result = await transport.listMemories({
+      userId: mockUserId,
+      limit: 10,
+    })
+
+    expect(result.memories.map((memory) => memory.id)).toEqual([storedMemoryId])
+    expect(result.count).toBe(1)
+  })
+
+  it('marks ghost nodes and strips the archive marker from the content', async () => {
+    clientInstance.callTool.mockResolvedValueOnce(
+      textResponse(
+        `[${storedMemoryId}] (fact/permanent)\nContent: compressed gist\nTags: none\n[GHOST NODE - Content archived]`,
+      ),
+    )
+
+    const result = await transport.getMemory({
+      userId: mockUserId,
+      memoryId: storedMemoryId,
+    })
+
+    expect(result?.isGhost).toBe(true)
+    expect(result?.content).toBe('compressed gist')
+    expect(result?.scope).toBe('fact')
+    expect(result?.retention).toBe('permanent')
+    expect(result?.tags).toEqual([])
+  })
+
+  it('keeps multi-line content that itself contains a Tags line', async () => {
+    const content = 'line one\nTags: not-the-real-line\nline three'
+    clientInstance.callTool.mockResolvedValueOnce(
+      textResponse(
+        `[${storedMemoryId}] (session/short_term)\nContent: ${content}\nTags: real, tag\n`,
+      ),
+    )
+
+    const result = await transport.getMemory({
+      userId: mockUserId,
+      memoryId: storedMemoryId,
+    })
+
+    expect(result?.content).toBe(content)
+    expect(result?.tags).toEqual(['real', 'tag'])
+  })
+
+  it('falls back to default scope and retention for unrecognised values', async () => {
+    clientInstance.callTool.mockResolvedValueOnce(
+      textResponse(
+        `[${storedMemoryId}] (weird/forever)\nContent: probe\nTags: none\n`,
+      ),
+    )
+
+    const result = await transport.getMemory({
+      userId: mockUserId,
+      memoryId: storedMemoryId,
+    })
+
+    expect(result?.scope).toBe('session')
+    expect(result?.retention).toBe('short_term')
+  })
+
+  it('raises when the id lookup returns an unparseable payload', async () => {
+    clientInstance.callTool.mockResolvedValueOnce(
+      textResponse('something entirely unexpected'),
+    )
+
+    await expect(
+      transport.getMemory({ userId: mockUserId, memoryId: storedMemoryId }),
+    ).rejects.toThrow(/Unable to parse memory detail/)
+  })
+
+  it('raises when a store confirmation carries no memory id', async () => {
+    clientInstance.callTool.mockResolvedValueOnce(textResponse('Stored'))
+
+    await expect(
+      transport.addMemory({ content: 'probe', userId: mockUserId }),
+    ).rejects.toThrow(/rejected the store request/)
+  })
+
+  it('raises when a tool returns no content blocks', async () => {
+    clientInstance.callTool.mockResolvedValueOnce({ content: [] })
+
+    await expect(
+      transport.addMemory({ content: 'probe', userId: mockUserId }),
+    ).rejects.toThrow(/Empty response from MCP tool manage_memories/)
+  })
+
+  it('raises when a tool returns a non-text block', async () => {
+    clientInstance.callTool.mockResolvedValueOnce({
+      content: [{ type: 'image', data: 'binary' }],
+    })
+
+    await expect(
+      transport.addMemory({ content: 'probe', userId: mockUserId }),
+    ).rejects.toThrow(
+      /Unexpected MCP response format from tool manage_memories/,
+    )
+  })
+
+  it('maps an aborted call to a 504 timeout error', async () => {
+    const aborted = new Error('aborted')
+    aborted.name = 'AbortError'
+    clientInstance.callTool.mockRejectedValueOnce(aborted)
+
+    await expect(
+      transport.addMemory({ content: 'probe', userId: mockUserId }),
+    ).rejects.toMatchObject({ status: 504 })
+  })
+
+  it('raises when get_system_status returns a non-JSON payload', async () => {
+    clientInstance.callTool.mockResolvedValueOnce(textResponse('not json'))
+
+    await expect(
+      transport.getMemoryStats({ userId: mockUserId }),
+    ).rejects.toThrow(/returned a non-JSON payload/)
+  })
+
+  it('defaults missing statistics fields instead of inventing counts', async () => {
+    clientInstance.callTool.mockResolvedValueOnce(
+      textResponse(JSON.stringify({ status: 'healthy' })),
+    )
+
+    const result = await transport.getMemoryStats({ userId: mockUserId })
+
+    expect(result).toEqual({ totalMemories: 0, categoryCounts: {} })
+  })
+
+  it('ignores non-numeric category counts', async () => {
+    clientInstance.callTool.mockResolvedValueOnce(
+      textResponse(
+        JSON.stringify({
+          memory_count: 3,
+          by_category: { fact: 2, broken: 'x' },
+        }),
+      ),
+    )
+
+    const result = await transport.getMemoryStats({ userId: mockUserId })
+
+    expect(result).toEqual({ totalMemories: 3, categoryCounts: { fact: 2 } })
+  })
+
+  it('raises when an update is refused with an unrecognised response', async () => {
+    clientInstance.callTool.mockResolvedValueOnce(
+      textResponse('No updates provided.'),
+    )
+
+    await expect(
+      transport.updateMemory({
+        userId: mockUserId,
+        memoryId: storedMemoryId,
+        content: 'probe',
+      }),
+    ).rejects.toThrow(/rejected the update request/)
+  })
+
+  it('raises when a delete is refused with an unrecognised response', async () => {
+    clientInstance.callTool.mockResolvedValueOnce(
+      textResponse('Cannot delete this memory.'),
+    )
+
+    await expect(
+      transport.deleteMemory({ userId: mockUserId, memoryId: storedMemoryId }),
+    ).rejects.toThrow(/rejected the delete request/)
+  })
+
+  it('does not send update fields that the update action cannot persist', async () => {
+    await transport.updateMemory({
+      userId: mockUserId,
+      memoryId: storedMemoryId,
+      content: 'probe alpha v2',
+      metadata: {
+        importance: 0.9,
+        emotional_context: { valence: 1 },
+        metrics: { reciprocity: 1 },
+        tags: ['x'],
+      },
+    })
+
+    const [request] = recordedRequests(clientInstance)
+    const params = request?.arguments['params'] as
+      | Record<string, unknown>
+      | undefined
+    const updates = params?.['updates'] as Record<string, unknown> | undefined
+
+    expect(updates).toEqual({ content: 'probe alpha v2', tags: ['x'] })
+    expect(updates).not.toHaveProperty('importance')
+    expect(updates).not.toHaveProperty('emotional_context')
+    expect(updates).not.toHaveProperty('metrics')
+  })
 })
