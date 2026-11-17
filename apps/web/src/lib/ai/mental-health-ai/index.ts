@@ -17,21 +17,19 @@ const logger = getHipaaCompliantLogger('general')
 
 export { MentalHealthAIAdapter } from './adapter/MentalHealthAIAdapter.ts'
 export { MentalHealthAIModelProvider } from './models/MentalHealthAIModelProvider.ts'
-export { MentalHealthTaskRouter } from './routing/MentalHealthTaskRouter.ts'
-export { createMentalHealthAIPythonBridge } from './bridge/server.ts'
 export * from './types/index.ts' // Export all types with explicit extension
 
 /**
  * Type for Python bridge instances returned by createMentalHealthAIPythonBridge
  */
-export type MentalHealthAIPythonBridgeInstance = Awaited<
+type MentalHealthAIPythonBridgeInstance = Awaited<
   ReturnType<typeof createMentalHealthAIPythonBridge>
 >
 
 /**
  * Configuration for the MentalHealthAIFactory.
  */
-export interface MentalHealthAIFactoryConfig {
+interface MentalHealthAIFactoryConfig {
   defaultModelTier?: '7B' | '13B'
   enablePythonBridge?: boolean
   pythonBridgeScriptPath?: string
@@ -39,7 +37,7 @@ export interface MentalHealthAIFactoryConfig {
 }
 
 // Creates and configures the MentalHealthAI components.
-export async function createMentalHealthAIFactory(
+async function createMentalHealthAIFactory(
   config: MentalHealthAIFactoryConfig = {},
 ): Promise<{
   adapter: MentalHealthAIAdapter
@@ -178,7 +176,7 @@ export async function createMentalHealthAIFactory(
 /**
  * Convenience method to create MentalHealthAI components using environment configurations.
  */
-export async function createMentalHealthAIFactoryFromEnv(): Promise<{
+async function createMentalHealthAIFactoryFromEnv(): Promise<{
   adapter: MentalHealthAIAdapter
   modelProvider: MentalHealthAIModelProvider
   taskRouter: MentalHealthTaskRouter
@@ -231,9 +229,4 @@ export async function createMentalHealthAIFromEnv(): Promise<{
     logger.error('Failed to create MentalHealthAI components', { error })
     throw error
   }
-}
-
-export default {
-  createMentalHealthAIFactory,
-  createMentalHealthAIFactoryFromEnv,
 }

@@ -75,7 +75,7 @@ class ApiMentalHealthAIAdapter implements ClientMentalHealthAIAdapter {
  * Factory function that creates a client-safe MentalHealthAI adapter
  * This will not import any server-side dependencies
  */
-export async function createClientMentalHealthAIAdapter(): Promise<{
+async function createClientMentalHealthAIAdapter(): Promise<{
   adapter: ClientMentalHealthAIAdapter
 }> {
   logger.info('Creating client-side MentalHealthAI adapter')

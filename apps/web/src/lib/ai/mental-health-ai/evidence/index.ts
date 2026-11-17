@@ -6,16 +6,4 @@
  */
 
 export { EvidenceExtractor } from './EvidenceExtractor'
-export {
-  EvidenceService,
-  createEvidenceService,
-  evidenceToStringArray,
-} from './EvidenceService'
-
-export type {
-  EvidenceItem,
-  EvidenceExtractionConfig,
-  EvidenceExtractionResult,
-} from './EvidenceExtractor'
-
-export type { EvidenceServiceConfig } from './EvidenceService'
+export { EvidenceService } from './EvidenceService'

@@ -3,19 +3,6 @@
 /**
  * Represents the overall result of a mental health analysis.
  */
-export interface MentalHealthAIAnalysisResult {
-  hasMentalHealthIssue: boolean
-  mentalHealthCategory: string // e.g., 'depression', 'anxiety', 'crisis', 'none'
-  confidence: number // Confidence score for the category (0.0 to 1.0)
-  explanation: string // Textual explanation of the analysis
-  supportingEvidence?: string[] // Specific phrases or sentences from the input text
-  expertGuided?: boolean // True if expert guidance was used
-  qualityMetrics?: ExplanationQualityMetrics // Metrics for the explanation quality
-  timestamp: string // ISO string of when the analysis was performed
-  modelTier?: string // Identifier for the model tier used (e.g., '7B', '13B')
-  _routingDecision?: RoutingDecision | null // Optional: For logging/debugging the router's decision
-  _rawModelOutput?: unknown // Optional: For logging/debugging raw output from the LLM
-}
 
 /**
  * Metrics for evaluating the quality of an explanation.
@@ -35,7 +22,7 @@ export interface ExplanationQualityMetrics {
  * or we can use that one directly. For now, let's assume it might have more details
  * specific to MentalHealthAI.
  */
-export interface CrisisAlertContext {
+interface CrisisAlertContext {
   userId?: string | null
   sessionId?: string | null
   sessionType?: string | null // e.g., 'chat_support', 'journal_entry'
@@ -49,7 +36,7 @@ export interface CrisisAlertContext {
 /**
  * Interface for an LLM invoker, abstracting the actual call to an LLM.
  */
-export type LLMInvoker = (
+type LLMInvoker = (
   messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
   options?: {
     temperature?: number
@@ -61,7 +48,7 @@ export type LLMInvoker = (
 /**
  * Represents a decision made by the MentalHealthTaskRouter.
  */
-export interface RoutingDecision {
+interface RoutingDecision {
   method:
     | 'explicit_hint'
     | 'keyword'
@@ -83,7 +70,7 @@ export interface RoutingDecision {
 /**
  * Contextual information provided to the MentalHealthTaskRouter.
  */
-export interface RoutingContext {
+interface RoutingContext {
   userId?: string | null
   sessionId?: string | null
   sessionHistory?: Array<{ role: 'user' | 'assistant'; content: string }> // Simplified history
@@ -101,45 +88,15 @@ export interface RoutingContext {
  * Parameters for the routing context, typically passed into `analyzeMentalHealth`.
  * Session history is excluded as it might be handled differently or added by the adapter if needed.
  */
-export type RoutingContextParams = Omit<RoutingContext, 'sessionHistory'>
+type RoutingContextParams = Omit<RoutingContext, 'sessionHistory'>
 
 /**
  * Represents a rule for keyword-based routing.
  */
-export interface KeywordRule {
-  id: string
-  targetAnalyzer: string
-  keywords: Array<string | RegExp>
-  confidence: number
-  isCritical?: boolean // Defaults to false
-  priority?: number // Higher number means higher priority
-}
 
 /**
  * Maps LLM output categories to internal analyzer names and critical status.
  */
-export interface LLMCategoryMapEntry {
-  targetAnalyzer: string
-  isCritical: boolean
-  confidenceBoost?: number // Optional boost to apply to LLM confidence for this category
-}
-
-export type LLMCategoryToAnalyzerMap = Record<string, LLMCategoryMapEntry>
-
-/**
- * Configuration for the MentalHealthAI models.
- */
-export interface MentalHealthAIModelConfig {
-  modelId: string // Identifier for the specific model (e.g., 'mental-health-ai-chat-7b-v1')
-  endpointUrl?: string // URL for the model inference API
-  apiKey?: string // API key if required
-  providerType:
-    | 'azure_openai'
-    | 'llm_api'
-    | 'custom_api'
-    | 'python_bridge' // Type of provider
-  // Add other model-specific parameters as needed
-}
 
 /**
  * Parameters for the analyzeMentalHealth method in MentalHealthAIAdapter.
@@ -157,24 +114,6 @@ export interface AnalyzeMentalHealthParams {
 }
 
 // PythonBridge related types
-export interface PythonBridgeRequest {
-  command: string
-  payload: Record<string, unknown>
-}
-
-export interface PythonBridgeResponse {
-  success: boolean
-  data?: unknown
-  error?: string
-  logs?: string[]
-}
-
-export interface IMHIEvaluationParams {
-  modelPath: string
-  outputPath: string
-  testDataset: string // e.g., 'IMHI'
-  isWorkersAI: boolean
-}
 
 // Add other core types and interfaces as they are identified.
 

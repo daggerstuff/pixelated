@@ -3,7 +3,7 @@
 /**
  * Represents the state of a previous conversation for contextual routing.
  */
-export interface ConversationState {
+interface ConversationState {
   lastMessages?: Array<{
     role: 'user' | 'assistant' | 'system'
     content: string
@@ -20,7 +20,7 @@ export interface ConversationState {
 /**
  * Insights data structure for routing decisions.
  */
-export interface RoutingInsights {
+interface RoutingInsights {
   matchedKeywords?: string[]
   matchedKeyword?: string // For backward compatibility
   llmReasoning?: string
@@ -132,7 +132,7 @@ export interface IModelProvider {
 /**
  * Interface for Python bridge implementations.
  */
-export interface IPythonBridge {
+interface IPythonBridge {
   executeScript(
     scriptPath: string,
     args?: Record<string, unknown>,
@@ -158,7 +158,7 @@ export interface IMentalHealthTaskRouter {
 /**
  * Common failure information structure used across different interfaces.
  */
-export interface FailureInfo {
+interface FailureInfo {
   errorType: string // Type of error that occurred
   errorMessage: string // Human-readable error description
   errorCode?: string // Machine-readable error code
@@ -385,29 +385,5 @@ export interface ICrisisNotificationHandler {
 }
 
 // Example of a more specific analysis result if needed in the future
-export interface DepressionAnalysisResult extends MentalHealthAnalysisResult {
-  beckDepressionInventoryScore?: number // Example specific field
-}
 
 // General purpose LLM Response for router if it needs to parse structured JSON
-export interface LLMRoutingResponse {
-  category: string
-  confidence: number
-  reasoning?: string
-  sub_categories?: string[]
-  is_critical_intent?: boolean
-  isFailure?: boolean // True if the LLM response indicates a processing failure
-  failureInfo?: {
-    errorType:
-      | 'model_unavailable'
-      | 'response_malformed'
-      | 'timeout'
-      | 'rate_limited'
-      | 'content_filtered'
-      | 'unknown_error'
-    errorMessage: string // Description of what went wrong
-    errorCode?: string // Provider-specific error code
-    fallbackResponse?: boolean // True if this is a fallback/default response
-    timestamp?: string // When the failure occurred
-  }
-}

@@ -279,4 +279,3 @@ export class MentalHealthAIModelProvider implements IModelProvider {
 }
 
 // Export the class and potentially instances or a factory function
-export default MentalHealthAIModelProvider

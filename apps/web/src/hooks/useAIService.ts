@@ -73,5 +73,3 @@ export function useAIService() {
     getAIResponse,
   }
 }
-
-export default useAIService

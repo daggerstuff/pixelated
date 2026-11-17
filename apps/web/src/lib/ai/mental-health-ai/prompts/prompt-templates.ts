@@ -43,15 +43,15 @@ export function buildGeneralAnalysisPrompt(
 }
 
 // Specialized prompts would follow a similar structure but with more targeted instructions
-export function buildDepressionAnalysisPrompt(text: string): Message[] {
+function buildDepressionAnalysisPrompt(text: string): Message[] {
   return buildGeneralAnalysisPrompt({ text, categoryHint: 'depression' })
 }
 
-export function buildAnxietyAnalysisPrompt(text: string): Message[] {
+function buildAnxietyAnalysisPrompt(text: string): Message[] {
   return buildGeneralAnalysisPrompt({ text, categoryHint: 'anxiety' })
 }
 
-export function buildCrisisAnalysisPrompt(text: string): Message[] {
+function buildCrisisAnalysisPrompt(text: string): Message[] {
   return buildGeneralAnalysisPrompt({ text, categoryHint: 'crisis' })
 }
 
@@ -67,27 +67,8 @@ Provide your output as a JSON object with the following fields:
 If the text strongly indicates a crisis (suicidal ideation, self-harm, immediate danger), you MUST classify it as "crisis".
 `
 
-export function buildRoutingPromptMessages(text: string): Message[] {
-  return [
-    {
-      role: 'system',
-      content: ROUTING_SYSTEM_PROMPT,
-    },
-    {
-      role: 'user',
-      content: `Please classify the following text:\n"""\n${text}\n"""\n\nRespond with JSON.`,
-    },
-  ]
-}
-
 // Placeholder for dynamic prompt template system
 // This would involve more complex logic to assemble prompts from parts.
-export class DynamicPromptTemplateSystem {
-  buildPrompt(text: string, _context?: unknown): Message[] {
-    // For now, defaults to general analysis
-    return buildGeneralAnalysisPrompt({ text })
-  }
-}
 
 // Example of how specialized prompts could be structured (as per markdown)
 // These are just conceptual for now and would need actual implementation.
@@ -102,11 +83,4 @@ export const specializedPrompts = {
     buildGeneralAnalysisPrompt({ text, categoryHint: 'interpersonal_risk' }),
   crisis: buildCrisisAnalysisPrompt,
   // ... other categories
-}
-
-export default {
-  buildGeneralAnalysisPrompt,
-  buildRoutingPromptMessages,
-  specializedPrompts,
-  DynamicPromptTemplateSystem,
 }

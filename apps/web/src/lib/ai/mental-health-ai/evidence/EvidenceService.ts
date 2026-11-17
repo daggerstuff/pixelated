@@ -510,18 +510,7 @@ export class EvidenceService {
 /**
  * Factory function to create evidence service
  */
-export function createEvidenceService(
-  modelProvider?: IModelProvider,
-  config?: Partial<EvidenceServiceConfig>,
-): EvidenceService {
-  return new EvidenceService(modelProvider, config)
-}
 
 /**
  * Helper to convert detailed evidence to simple string array
  */
-export function evidenceToStringArray(
-  evidenceResult: EvidenceExtractionResult,
-): string[] {
-  return EvidenceExtractor.convertToStringArray(evidenceResult.evidenceItems)
-}
