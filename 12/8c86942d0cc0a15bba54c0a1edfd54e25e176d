@@ -1,0 +1,31 @@
+agents/pipeline-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_2d671dcfdefbd1 15
+agents/supervisor-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_3fffc42903a944 8
+  s_7d809d2bbd9cef::t_4c086e1dd570e2 108
+agents/qa-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_68e1c2e28b2d22 115
+  s_7d809d2bbd9cef::t_fbb6789c0c18ab 15
+agents/intake-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_c2da41aa7a7492 8
+  s_7d809d2bbd9cef::t_04db7442da2f83 108
+agents/session-agent/agent/foresight-client.ts
+  s_7d809d2bbd9cef::t_6a8c4306b94a81 16
+  s_7d809d2bbd9cef::t_4e2ed1de60127a 116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "128c86942d0cc0a15bba54c0a1edfd54e25e176d",
+  "prompts": {},
+  "sessions": {
+    "s_7d809d2bbd9cef": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "478df62b-5505-4aec-b6a8-ba3fb0b5b2b4",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
