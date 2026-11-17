@@ -612,7 +612,7 @@ function roleCacheKey(userId: string): string {
 async function readCachedRole(userId: string): Promise<UserRole | null> {
   try {
     const cached = await withRoleCacheDeadline(
-      getFromCache<unknown>(roleCacheKey(userId)),
+      getFromCache(roleCacheKey(userId)),
       'read',
       ROLE_CACHE_DEADLINE_MS,
     )

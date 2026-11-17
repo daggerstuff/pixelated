@@ -628,10 +628,13 @@ function hardenPool(target: Pool): Pool {
       if (property === 'query') {
         return (text: string, params?: unknown[]) => query(text, params)
       }
-      const value = Reflect.get(object, property)
-      return typeof value === 'function' ? value.bind(object) : value
+      const value: unknown = Reflect.get(object, property)
+      if (typeof value === 'function') {
+        return (value as (...args: unknown[]) => unknown).bind(object)
+      }
+      return value
     },
-  }) as Pool
+  })
   poolHandles.set(target, handle)
   return handle
 }
