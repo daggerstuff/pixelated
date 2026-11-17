@@ -1,0 +1,24 @@
+tests/unit/auth0/auth0-service.test.ts
+  s_7d4811cf1b0ba7::t_cb53998cb0cace 626-628
+tests/integration/auth0/auth0-integration.test.ts
+  s_7d4811cf1b0ba7::t_506ea8615d279b 801,805,833
+  s_7d4811cf1b0ba7::t_af979722493949 141-175,348-351,791-798,809-814,832,834-837,849-851,862-864,937-944,947,1175-1177
+tests/unit/auth0/auth0-rbac-service.test.ts
+  s_7d4811cf1b0ba7::t_2469b2293505b4 7-16,141-148,151,155,158-163,170,181-188,191,206-213,216,220,223-228,235,248-250,255-257,264,277-279,291-293,308-310,323-325,350,367-369,383-385,399
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "08d7c89ce5838c1eb2f3797a2622fbd0c64bcb01",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
