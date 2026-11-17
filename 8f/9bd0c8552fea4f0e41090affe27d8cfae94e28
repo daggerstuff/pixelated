@@ -1,0 +1,19 @@
+knip.json
+  s_3509f369faebb5::t_c0c171194a25cf 54-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "8f9bd0c8552fea4f0e41090affe27d8cfae94e28",
+  "prompts": {},
+  "sessions": {
+    "s_3509f369faebb5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_030f9614affed5hQMGe3P4f0LS",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

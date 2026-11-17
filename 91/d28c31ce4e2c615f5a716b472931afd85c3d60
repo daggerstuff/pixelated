@@ -1,0 +1,21 @@
+.px/config.json
+  s_e48b09ab646938::t_4d7b0a2ffddcdb 1-21,23-72,74-105
+cli/px/src/commands/agents.ts
+  s_e48b09ab646938::t_53ea5b59be3eea 91-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "91d28c31ce4e2c615f5a716b472931afd85c3d60",
+  "prompts": {},
+  "sessions": {
+    "s_e48b09ab646938": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a5437650-db0e-4416-8ce7-1d3b1759f768",
+        "model": "z-ai/glm-5.2"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

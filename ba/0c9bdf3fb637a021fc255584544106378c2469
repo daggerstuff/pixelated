@@ -1,0 +1,21 @@
+src/lib/ai/bias-detection/__tests__/api-analyze.test.ts
+  s_af4afd94e4729e::t_81c8035998d9fd 101,127,135,292-297,478,494-495,497,499,501-505,507-511,513-514,516,518-519,521-522,524,526-527,529-530,532-537,539,541,543-547,549-552,554,556,558,560-563,565-566,568,570-574
+src/lib/ai/bias-detection/index.ts
+  s_af4afd94e4729e::t_915105f5976a93 4-5,8,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ba0c9bdf3fb637a021fc255584544106378c2469",
+  "prompts": {},
+  "sessions": {
+    "s_af4afd94e4729e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_ffb57f5e3ffea87Hed3o1SSa9Q",
+        "model": "unknown"
+      },
+      "human_author": "PR Churn Bot <bot@composio.dev>"
+    }
+  }
+}

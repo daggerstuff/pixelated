@@ -1,0 +1,19 @@
+scripts/devops/hooks/templates/pre-commit.tmpl
+  s_d41ffa394b93d4::t_e2d91a10f2971d 96-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7592e2a285465b696cef41d5c4b98f93c8e850e3",
+  "prompts": {},
+  "sessions": {
+    "s_d41ffa394b93d4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_0291aa089ffetfRVIHxG6s6Zjj",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

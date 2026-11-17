@@ -1,0 +1,11 @@
+src/lib/security/__tests__/audit-logging.test.ts
+  ai_agent 1-186
+src/lib/security/audit.logging.ts
+  ai_agent 28-36,41,137,143-168,172-173,175-207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3a698752512cd8df29e671eb63bd490a759ac0d6",
+  "prompts": {}
+}

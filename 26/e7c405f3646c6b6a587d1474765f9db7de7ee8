@@ -1,0 +1,19 @@
+packages/deslop/deslop/engine.py
+  s_8966adf124d5a9::t_49331de75c1b4a 28-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "26e7c405f3646c6b6a587d1474765f9db7de7ee8",
+  "prompts": {},
+  "sessions": {
+    "s_8966adf124d5a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_035434806ffetTxCxcj37tW03D",
+        "model": "unknown"
+      },
+      "human_author": "Chad <chad@pixelated.app>"
+    }
+  }
+}

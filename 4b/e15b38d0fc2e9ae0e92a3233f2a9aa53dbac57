@@ -1,0 +1,42 @@
+cli/px/src/config/schema.test.ts
+  s_e79c379de6b9af::t_562d4458bca510 195-197
+cli/px/src/integration.test.ts
+  s_e79c379de6b9af::t_6772e081323c89 3-7,12-16,18-20,66,68,71,81-93,95-105,108-111,113-117,119-123,125-146,151,153-252,254-271
+  s_e79c379de6b9af::t_f46548648438e8 106-107
+  s_e79c379de6b9af::t_9ca2ca88f87733 1-2,8-11,17,21-65,67,69-70,72-80,94,112,118,124,147-150,152,253
+cli/px/src/hooks.test.ts
+  s_e79c379de6b9af::t_2427b4c1f83417 88-89
+  s_e79c379de6b9af::t_b0d5d10f5137a6 32-33
+  s_e79c379de6b9af::t_b549ce4f109e4d 148
+  s_e79c379de6b9af::t_845d1ec427990e 143
+  s_e79c379de6b9af::t_667ad185f830a4 1-2,4-17,20-31,34-84,86-87,97-117,120-121,123-132,134-142,144-147,149-152,154-162,164-171,173-177,181-208
+  s_e79c379de6b9af::t_2bf5afdf2b8a8f 163
+  s_e79c379de6b9af::t_844ed1493faab2 133
+  s_e79c379de6b9af::t_b5342992e5cedf 122
+  s_e79c379de6b9af::t_ffd6b278218910 178-180
+  s_e79c379de6b9af::t_04e14d2595b8f9 18-19
+  s_e79c379de6b9af::t_9782431d6eae11 3
+  s_e79c379de6b9af::t_1fcd51ee159689 85
+  s_e79c379de6b9af::t_d039c25af72989 90-96
+  s_e79c379de6b9af::t_c1557d1529f13a 172
+  s_e79c379de6b9af::t_93d56f603c1be4 153
+  s_e79c379de6b9af::t_4cbf5a09a5cb2c 118-119
+cli/px/vitest.config.ts
+  s_e79c379de6b9af::t_6aaa919852dc43 1-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4be15b38d0fc2e9ae0e92a3233f2a9aa53dbac57",
+  "prompts": {},
+  "sessions": {
+    "s_e79c379de6b9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_030a9748fffejidjFI26VRl6Dh",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

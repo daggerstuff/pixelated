@@ -1,0 +1,51 @@
+cli/px/src/commands/config.ts
+  s_e79c379de6b9af::t_6a8c082a0634fb 1-16
+cli/px/src/config/schema.ts
+  s_e79c379de6b9af::t_34df33d4a80967 1-60
+cli/px/src/config/loader.ts
+  s_e79c379de6b9af::t_ee64d012fbe38c 1-50,52-66,68-74,77-171
+  s_e79c379de6b9af::t_9915e95dcd63b5 51,67,75-76
+cli/px/src/commands/health.ts
+  s_e79c379de6b9af::t_d90a70d798bea3 1,3-18,26-38,40-49
+  s_e79c379de6b9af::t_4885af22bfca71 2,19-25,39
+agents/px.config.json
+  s_e79c379de6b9af::t_e52ba6822dfacf 1-56
+cli/px/src/client/http.ts
+  s_e79c379de6b9af::t_84278b9a286e6d 1-127
+cli/px/tsconfig.json
+  s_e79c379de6b9af::t_96d6e113cf9b88 1-20
+cli/px/src/commands/list.ts
+  s_e79c379de6b9af::t_1edb36d25b124a 1-16
+cli/px/src/output/response.ts
+  s_e79c379de6b9af::t_9cfa799bb2b0a1 1-124
+cli/px/tsup.config.ts
+  s_e79c379de6b9af::t_f428c3de1a1375 1-12
+cli/px/src/commands/init.ts
+  s_e79c379de6b9af::t_85cc5c10cce23e 1-122
+pnpm-workspace.yaml
+  s_e79c379de6b9af::t_9c48e5c029393b 6
+cli/px/src/index.ts
+  s_e79c379de6b9af::t_a1506a5b7138c4 1-8,11-70,74-75,77-79,111-155
+  s_e79c379de6b9af::t_20d06e6edd3c29 9-10
+  s_e79c379de6b9af::t_00f51e5532259e 71-73,76,80-110
+cli/px/src/output/format.ts
+  s_e79c379de6b9af::t_bb56e94d7294fd 1-99
+cli/px/package.json
+  s_e79c379de6b9af::t_6ae3a326be388c 1-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2ce06ec81710f260661d5d5618f6f66e7b657b47",
+  "prompts": {},
+  "sessions": {
+    "s_e79c379de6b9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_030a9748fffejidjFI26VRl6Dh",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

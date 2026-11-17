@@ -1,0 +1,23 @@
+agents/session-agent/tests/start_session.test.ts
+  s_992233a7668668::t_d0b625133b5ddd 23,27-28,30
+agents/session-agent/tests/save_session.test.ts
+  s_992233a7668668::t_76efcc35bca16f 41-43,45-47
+agents/session-agent/tests/session-lifecycle.integration.test.ts
+  s_992233a7668668::t_c1eafaca29c231 60-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7e2921cd369c8baf63ae51484cfaba883ea97f4a",
+  "prompts": {},
+  "sessions": {
+    "s_992233a7668668": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6da6755e-7c7e-4795-b313-ac28273fda83",
+        "model": "z-ai/glm-5.2"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

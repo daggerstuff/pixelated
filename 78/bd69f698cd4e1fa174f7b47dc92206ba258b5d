@@ -1,0 +1,23 @@
+src/lib/audit/logger.ts
+  s_074527b93405dd::t_5f73d619ede117 18
+  s_074527b93405dd::t_94ff50878bbcc6 533-562
+src/lib/audit/events.ts
+  s_074527b93405dd::t_4d453f1a58ab9f 21
+  s_074527b93405dd::t_96b44bbe176e58 96-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "78bd69f698cd4e1fa174f7b47dc92206ba258b5d",
+  "prompts": {},
+  "sessions": {
+    "s_074527b93405dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e908ccef-534a-4b04-83e5-b6fdd20a6b3b",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

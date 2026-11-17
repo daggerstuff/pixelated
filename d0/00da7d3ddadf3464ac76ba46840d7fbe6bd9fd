@@ -1,0 +1,23 @@
+src/lib/shims/framer-motion.test.tsx
+  s_095b0a890287bd::t_5e7eaa2dce42c7 1-122
+src/lib/search-browser.test.ts
+  s_095b0a890287bd::t_a0bb2907932f74 1-27
+src/lib/shims/framer-motion.tsx
+  s_095b0a890287bd::t_9dd85506672109 136-137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d000da7d3ddadf3464ac76ba46840d7fbe6bd9fd",
+  "prompts": {},
+  "sessions": {
+    "s_095b0a890287bd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_ffa0e3c7bffeEr1VignKPjzROU",
+        "model": "unknown"
+      },
+      "human_author": "PR Churn Bot <bot@composio.dev>"
+    }
+  }
+}

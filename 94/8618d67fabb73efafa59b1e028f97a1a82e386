@@ -1,0 +1,19 @@
+src/lib/auth/index.ts
+  s_3509f369faebb5::t_f63453d5756bfc 16,120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "948618d67fabb73efafa59b1e028f97a1a82e386",
+  "prompts": {},
+  "sessions": {
+    "s_3509f369faebb5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_030f9614affed5hQMGe3P4f0LS",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

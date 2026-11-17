@@ -1,0 +1,20 @@
+src/lib/utils/request-headers.test.ts
+  s_3509f369faebb5::t_83ad003902f603 69-70
+  s_3509f369faebb5::t_aac6fdad7babe2 68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "597147cbb01a239d9e2a420fd57eeefa7bb4b712",
+  "prompts": {},
+  "sessions": {
+    "s_3509f369faebb5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_030f9614affed5hQMGe3P4f0LS",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

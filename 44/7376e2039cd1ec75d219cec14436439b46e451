@@ -1,0 +1,19 @@
+.gitignore
+  s_b59cc570d29467::t_79dc1c9247dc4a 336-340
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "447376e2039cd1ec75d219cec14436439b46e451",
+  "prompts": {},
+  "sessions": {
+    "s_b59cc570d29467": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_01d86c277ffeAjYCT85lRJWMqF",
+        "model": "unknown"
+      },
+      "human_author": "Chad <chad@pixelated.app>"
+    }
+  }
+}

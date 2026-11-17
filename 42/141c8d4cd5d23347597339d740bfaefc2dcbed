@@ -1,0 +1,19 @@
+cli/px/vitest.config.ts
+  s_e79c379de6b9af::t_6aaa919852dc43 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "42141c8d4cd5d23347597339d740bfaefc2dcbed",
+  "prompts": {},
+  "sessions": {
+    "s_e79c379de6b9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_030a9748fffejidjFI26VRl6Dh",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+cli/px/src/commands/index.ts
+  s_ce8b3c0a296613::t_7e03a9498348e7 5-9,14-18
+cli/px/src/lib/invoke.ts
+  s_ce8b3c0a296613::t_7e03a9498348e7 13
+cli/px/src/commands/invoke.ts
+  s_ce8b3c0a296613::t_7e03a9498348e7 6,20-23,33-36,38,62,72,77-82,95-116,123,125-140,142-143
+cli/px/src/commands/agents.ts
+  ai_agent 1-241
+cli/px/src/index.ts
+  s_ce8b3c0a296613::t_7e03a9498348e7 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "58badea34c7472d16ccb639b4d61b32ea90d5e58",
+  "prompts": {},
+  "sessions": {
+    "s_ce8b3c0a296613": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_02c9f2812ffeSODtiG0fbTpJ1D",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

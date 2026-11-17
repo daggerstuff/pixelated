@@ -1,0 +1,30 @@
+tests/video_emotion/test_types.py
+  s_9a329b4966c619::t_2496f585df741c 2
+  ai_agent 3
+src/video_emotion/temporal_filter.py
+  s_9a329b4966c619::t_595db596224cab 35
+tests/video_emotion/test_audit_writer.py
+  s_9a329b4966c619::t_de6176e83b7e87 1,10-11,17-18,21-23
+tests/video_emotion/test_au_extractor.py
+  s_9a329b4966c619::t_8fad033d2dabeb 1,7-12,16-21
+src/video_emotion/deception_layer.py
+  s_9a329b4966c619::t_13ddfa58d6e345 15-16
+tests/video_emotion/test_deception_layer.py
+  s_9a329b4966c619::t_784cde24bdde57 1,7-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "41b1835d0ba07e7aa489e4ff7e4855741dd45492",
+  "prompts": {},
+  "sessions": {
+    "s_9a329b4966c619": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7256f454-8f72-4c5e-b773-6fadc464480f",
+        "model": "thinkingmachines/inkling"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

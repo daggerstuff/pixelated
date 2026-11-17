@@ -1,0 +1,19 @@
+src/lib/ai/mental-llama/bridge/server.ts
+  s_b0af01f31b8ed4::t_17951e7ec97835 1-2,4-16,18,21-23,25-26,29-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3f432f278adb6950162ff8cbf1e217536f982849",
+  "prompts": {},
+  "sessions": {
+    "s_b0af01f31b8ed4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_ffbc5d63dffegqku3zkIS3oHhy",
+        "model": "unknown"
+      },
+      "human_author": "PR Churn Bot <bot@composio.dev>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+src/lib/metaaligner/api/adapter.ts
+  s_074527b93405dd::t_8398b614113f6b 3-4,15-16,21-60,64-65,67-71,85-88,90-93,95-102,107,123-211,213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "455f79b08451534eb75c4b74209e4c9c1ce6e59a",
+  "prompts": {},
+  "sessions": {
+    "s_074527b93405dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e908ccef-534a-4b04-83e5-b6fdd20a6b3b",
+        "model": "z-ai/glm-5.2"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

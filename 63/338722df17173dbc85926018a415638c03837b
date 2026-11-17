@@ -1,0 +1,30 @@
+tests/wandb/test_experiment_runner.py
+  s_5b20234c09af47::t_04468192c52c19 7-13
+  ai_agent 16,27-28
+  s_5b20234c09af47::t_c10f755e4d4974 3
+  s_5b20234c09af47::t_67f55ed8776cde 14-15,17-26
+pnpm-workspace.yaml
+  s_5b20234c09af47::t_6572f05be74b3f 78
+package.json
+  s_5b20234c09af47::t_6572f05be74b3f 218
+src/pages/index.astro
+  s_5b20234c09af47::t_6572f05be74b3f 63
+wandb/experiments/experiment_runner.py
+  s_5b20234c09af47::t_fed58e4c3148a1 28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "63338722df17173dbc85926018a415638c03837b",
+  "prompts": {},
+  "sessions": {
+    "s_5b20234c09af47": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d478ee3b-d9d6-460f-b8a5-621c4073cd47",
+        "model": "thinkingmachines/inkling"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

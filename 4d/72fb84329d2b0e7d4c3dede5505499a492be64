@@ -1,0 +1,45 @@
+agents/supervisor-agent/agent/instructions.md
+  ai_agent 48-52
+agents/advisor-agent/agent/foresight-client.ts
+  ai_agent 2,6,16
+agents/session-agent/agent/foresight-client.ts
+  ai_agent 2,8,18
+agents/intake-agent/README.md
+  ai_agent 15
+agents/intake-agent/tsconfig.json
+  ai_agent 10-13
+agents/content-agent/agent/foresight-client.ts
+  ai_agent 2,6,16
+agents/qa-agent/agent/foresight-client.ts
+  ai_agent 2,6,16
+agents/supervisor-agent/README.md
+  ai_agent 16
+agents/supervisor-agent/agent/foresight-client.ts
+  ai_agent 2,6,9
+agents/pipeline-agent/agent/agent.ts
+  ai_agent 12
+agents/content-agent/agent/agent.ts
+  ai_agent 12
+agents/pipeline-agent/agent/foresight-client.ts
+  ai_agent 2,6,16
+agents/intake-agent/agent/foresight-client.ts
+  ai_agent 2,6,9
+agents/qa-agent/agent/agent.ts
+  ai_agent 14
+agents/supervisor-agent/agent/agent.ts
+  ai_agent 12-14
+src/lib/context/startup-profiler.ts
+  ai_agent 51,67
+agents/session-agent/README.md
+  ai_agent 14,25
+agents/intake-agent/agent/agent.ts
+  ai_agent 12
+agents/supervisor-agent/tsconfig.json
+  ai_agent 10-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4d72fb84329d2b0e7d4c3dede5505499a492be64",
+  "prompts": {}
+}

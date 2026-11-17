@@ -1,0 +1,20 @@
+src/lib/auth/index.ts
+  s_3509f369faebb5::t_5f867d5b6859ba 9-10,13,15,20,130,135-136,142-143,146,155,166,168,181,189-194,196-197,204,209,213,215,222,224-225,260,262
+  s_3509f369faebb5::t_3aa772229a02f4 123-129,131-134,137-141,144-145,148-154,158-165,167,169-180,182-188,195,198-203,205-208,210-212,214,216-221,223,226-227,254-259,261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c2634a16c4c4aaa878860e14224de79be6ddca6f",
+  "prompts": {},
+  "sessions": {
+    "s_3509f369faebb5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_030f9614affed5hQMGe3P4f0LS",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

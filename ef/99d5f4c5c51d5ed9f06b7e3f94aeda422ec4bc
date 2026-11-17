@@ -1,0 +1,41 @@
+src/components/examples/ConversionTrackingDemo.astro
+  s_992233a7668668::t_94701f08ccacfa 27,34,40,45
+uv.lock
+  ai_agent 3363,3365,3367,4050,4056,4058,4063,4065,4067-4068
+src/components/ThemeSwitcher.astro
+  s_992233a7668668::t_94701f08ccacfa 2-35,38-62,65-106,110-118,121-124,127-151,153-170,173-207,209-211,213-227,230-233
+package.json
+  s_992233a7668668::t_94701f08ccacfa 514
+src/lib/ai/multimodal-bias-detection/python-service/pyproject.toml
+  s_992233a7668668::t_94701f08ccacfa 58,73
+src/components/docs/Aside.astro
+  s_992233a7668668::t_94701f08ccacfa 40-42
+scripts/ci/verify-build-contract.mjs
+  s_992233a7668668::t_94701f08ccacfa 56
+src/layouts/BaseLayout.astro
+  s_992233a7668668::t_94701f08ccacfa 11,165-169,186-192,194-215,226-239,241-272,279-290,292-298,301,304,315-475,477-478,484-485,487,490,493-495,497-498,500,504-505,507-509,511,518,521
+src/components/docs/Steps.astro
+  s_992233a7668668::t_94701f08ccacfa 33,50
+src/lib/ai/multimodal-bias-detection/python-service/uv.lock
+  ai_agent 174,181,183,2052,2081,4019,4025,4027
+src/components/docs/Tabs.astro
+  s_992233a7668668::t_94701f08ccacfa 26-27,33-34
+.github/workflows/px-agents.yml
+  s_992233a7668668::t_94701f08ccacfa 51,125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ef99d5f4c5c51d5ed9f06b7e3f94aeda422ec4bc",
+  "prompts": {},
+  "sessions": {
+    "s_992233a7668668": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6da6755e-7c7e-4795-b313-ac28273fda83",
+        "model": "z-ai/glm-5.2"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
