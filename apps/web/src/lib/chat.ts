@@ -3,11 +3,11 @@
  * Production-grade mental health analysis and therapeutic chat system
  */
 
-import { createMentalLLaMAFromEnvSafe } from './ai/mental-llama/client-adapter'
+import { createMentalHealthAIFromEnvSafe } from './ai/mental-health-ai/client-adapter'
 import type {
   MentalHealthAnalysisResult,
   RoutingContext,
-} from './ai/mental-llama/types/mentalLLaMATypes'
+} from './ai/mental-health-ai/types/mentalHealthAITypes'
 import { RecommendationService } from './ai/services/RecommendationService'
 import { createBuildSafeLogger } from './logging/build-safe-logger'
 import { MentalHealthService } from './mental-health/service'
@@ -140,7 +140,7 @@ function convertAnalysisToLegacyFormat(
     }
   }
 
-  // Handle MentalLLaMA analysis result
+  // Handle MentalHealthAI analysis result
   const llmAnalysis = analysis
   const isExpertGuided = 'expertGuidance' in llmAnalysis
   const category = llmAnalysis.mentalHealthCategory
@@ -215,10 +215,10 @@ export function createMentalHealthChat(
 ) {
   // Initialize services
   let mentalHealthService: MentalHealthService | null = null
-  type MentalLLaMAFactoryAdapter = Awaited<
-    ReturnType<typeof createMentalLLaMAFromEnvSafe>
+  type MentalHealthAIFactoryAdapter = Awaited<
+    ReturnType<typeof createMentalHealthAIFromEnvSafe>
   >['adapter']
-  let mentalLLaMAAdapter: MentalLLaMAFactoryAdapter | null = null
+  let mentalHealthAIAdapter: MentalHealthAIFactoryAdapter | null = null
   let recommendationService: RecommendationService | null = null
   let isInitialized = false
 
@@ -254,18 +254,19 @@ export function createMentalHealthChat(
 
       mentalHealthService = new MentalHealthService(analysisConfig)
 
-      // Initialize MentalLLaMA for advanced analysis (if available)
+      // Initialize MentalHealthAI for advanced analysis (if available)
       try {
-        const mentalLLaMAFactory = await createMentalLLaMAFromEnvSafe()
+        const mentalHealthAIFactory = await createMentalHealthAIFromEnvSafe()
         if (
-          'analyzeMentalHealthWithExpertGuidance' in mentalLLaMAFactory.adapter
+          'analyzeMentalHealthWithExpertGuidance' in
+          mentalHealthAIFactory.adapter
         ) {
-          mentalLLaMAAdapter = mentalLLaMAFactory.adapter
+          mentalHealthAIAdapter = mentalHealthAIFactory.adapter
         }
-        logger.info('MentalLLaMA adapter initialized successfully')
+        logger.info('MentalHealthAI adapter initialized successfully')
       } catch (error: unknown) {
         logger.warn(
-          'MentalLLaMA not available, falling back to basic analysis',
+          'MentalHealthAI not available, falling back to basic analysis',
           { error },
         )
       }
@@ -308,11 +309,11 @@ export function createMentalHealthChat(
       try {
         let analysis: MentalHealthAnalysis | null = null
 
-        // Use MentalLLaMA if available and expert guidance is enabled
+        // Use MentalHealthAI if available and expert guidance is enabled
         if (
-          mentalLLaMAAdapter &&
+          mentalHealthAIAdapter &&
           config.useExpertGuidance &&
-          'analyzeMentalHealthWithExpertGuidance' in mentalLLaMAAdapter
+          'analyzeMentalHealthWithExpertGuidance' in mentalHealthAIAdapter
         ) {
           const routingContext: RoutingContext = {
             userId: config.userId,
@@ -320,9 +321,9 @@ export function createMentalHealthChat(
             sessionType: 'therapeutic_chat',
           }
 
-          // Type-safe call to MentalLLaMA adapter
+          // Type-safe call to MentalHealthAI adapter
           const llmResult =
-            await mentalLLaMAAdapter.analyzeMentalHealthWithExpertGuidance(
+            await mentalHealthAIAdapter.analyzeMentalHealthWithExpertGuidance(
               message.content,
               true,
               routingContext,
@@ -472,7 +473,7 @@ export function createMentalHealthChat(
      */
     getStatus: () => ({
       isInitialized,
-      hasAdvancedAnalysis: !!mentalLLaMAAdapter,
+      hasAdvancedAnalysis: !!mentalHealthAIAdapter,
       hasRecommendations: !!recommendationService,
       hasBasicAnalysis: !!mentalHealthService,
       configuration: config,

@@ -1,24 +1,24 @@
 import type { APIRoute } from 'astro'
 
-import { createMentalLLaMAFromEnv } from '@/lib/ai/mental-llama'
+import { createMentalHealthAIFromEnv } from '@/lib/ai/mental-health-ai'
 import { getApiEndpointLogger } from '@/lib/logging/standardized-logger'
 
-import type { RoutingContext } from '../../../../lib/ai/mental-llama/types/mentalLLaMATypes.js'
+import type { RoutingContext } from '../../../../lib/ai/mental-health-ai/types/mentalHealthAITypes.js'
 
 const logger = getApiEndpointLogger('mental-health-analyze')
 
 /**
  * @file src/pages/api/ai/mental-health/analyze.ts
- * @description API endpoint for analyzing text for mental health indicators using MentalLLaMA.
+ * @description API endpoint for analyzing text for mental health indicators using MentalHealthAI.
  *
  * This endpoint accepts POST requests with text and optional configuration to perform
- * mental health analysis. It utilizes the MentalLLaMA adapter for processing.
+ * mental health analysis. It utilizes the MentalHealthAI adapter for processing.
  * It also handles OPTIONS requests for CORS preflight.
  */
 
-// Cache for the MentalLLaMA instance
-let mentalLLaMAInstanceCache: Awaited<
-  ReturnType<typeof createMentalLLaMAFromEnv>
+// Cache for the MentalHealthAI instance
+let mentalHealthAIInstanceCache: Awaited<
+  ReturnType<typeof createMentalHealthAIFromEnv>
 > | null = null
 
 /**
@@ -39,26 +39,26 @@ interface AnalyzeRequestBody {
   routingContext?: Partial<RoutingContext> // Allow partial context from client
 }
 
-async function getInitializedMentalLLaMA() {
-  if (!mentalLLaMAInstanceCache) {
-    logger.info('MentalLLaMA instance not cached, creating and caching...')
+async function getInitializedMentalHealthAI() {
+  if (!mentalHealthAIInstanceCache) {
+    logger.info('MentalHealthAI instance not cached, creating and caching...')
     try {
-      mentalLLaMAInstanceCache = await createMentalLLaMAFromEnv()
-      logger.info('MentalLLaMA instance created and cached successfully.')
+      mentalHealthAIInstanceCache = await createMentalHealthAIFromEnv()
+      logger.info('MentalHealthAI instance created and cached successfully.')
     } catch (error: unknown) {
-      logger.error('Failed to create MentalLLaMA instance for cache', { error })
+      logger.error('Failed to create MentalHealthAI instance for cache', { error })
       throw error // Rethrow to make it explicit that initialization failed
     }
   } else {
-    logger.info('Using cached MentalLLaMA instance.')
+    logger.info('Using cached MentalHealthAI instance.')
   }
-  return mentalLLaMAInstanceCache
+  return mentalHealthAIInstanceCache
 }
 
 /**
  * Mental Health Analysis API
  *
- * This endpoint analyzes text for mental health indicators using MentalLLaMA.
+ * This endpoint analyzes text for mental health indicators using MentalHealthAI.
  *
  * Request body:
  * {
@@ -150,7 +150,7 @@ export const POST: APIRoute = async ({ request }) => {
     logger.info('Analyzing text for mental health indicators', logContext)
 
     startTime = Date.now()
-    const { adapter, modelProvider } = await getInitializedMentalLLaMA()
+    const { adapter, modelProvider } = await getInitializedMentalHealthAI()
     timing.factoryCreationMs = Date.now() - startTime
 
     const modelInfo = modelProvider?.getModelInfo?.()
@@ -158,7 +158,7 @@ export const POST: APIRoute = async ({ request }) => {
       !!modelInfo && !modelInfo.name?.startsWith('mock-')
     const modelTier = modelInfo?.version || 'unknown'
 
-    logger.info('MentalLLaMA configuration', {
+    logger.info('MentalHealthAI configuration', {
       directModelAvailable,
       modelTier,
       userId: routingContext?.userId,

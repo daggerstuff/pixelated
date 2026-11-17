@@ -1,0 +1,300 @@
+import type { ChildProcessWithoutNullStreams } from 'child_process'
+import { spawn } from 'child_process'
+import { randomUUID } from 'crypto'
+
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import type {
+  PythonBridgeRequest,
+  PythonBridgeResponse,
+  IMHIEvaluationParams,
+  MentalHealthAIAnalysisResult,
+} from '../types/index.ts'
+
+const logger = createBuildSafeLogger('MentalHealthAI')
+
+/**
+ * Custom error for features not implemented or unavailable in the Python bridge.
+ */
+
+class PythonBridgeError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'PythonBridgeError'
+  }
+}
+
+/**
+ * MentalHealthAIPythonBridge provides a robust, production-grade interface to communicate with a Python backend
+ * for tasks that are better suited for Python libraries (e.g., specific ML models, complex evaluations).
+ *
+ * This implementation manages a Python child process and uses JSON-RPC over stdio for reliable inter-process communication.
+ * It supports request queueing, strict type safety, error handling, and full lifecycle management.
+ */
+
+export class MentalHealthAIPythonBridge {
+  private pythonProcess: ChildProcessWithoutNullStreams | null = null
+  private isInitialized = false
+  private isFunctional = false
+  private readonly pythonScriptPath: string
+  private readonly requestQueue: Map<
+    string,
+    {
+      resolve: (value: unknown) => void
+      reject: (reason?: unknown) => void
+      timeout: ReturnType<typeof setTimeout>
+    }
+  > = new Map()
+  private readonly REQUEST_TIMEOUT_MS = 20000
+  public pythonBridgeDisabled: boolean = false
+
+  constructor(pythonScriptPath?: string) {
+    this.pythonScriptPath =
+      pythonScriptPath ?? './scripts/mental_health_python_handler.py'
+    this.pythonBridgeDisabled = false
+    logger.info('MentalHealthAIPythonBridge instance created.', {
+      scriptPath: this.pythonScriptPath,
+    })
+  }
+
+  /**
+   * Initializes the Python bridge by spawning the Python process and establishing communication.
+   * @returns {Promise<void>} Resolves when the bridge is functional.
+   * @throws {PythonBridgeError} If initialization fails.
+   */
+
+  public async initialize(): Promise<void> {
+    if (this.isInitialized) {
+      logger.info(
+        `PythonBridge already attempted initialization. Functional: ${this.isFunctional}`,
+      )
+      if (!this.isFunctional) {
+        throw new PythonBridgeError('PythonBridge initialization previously failed.')
+      }
+      return
+    }
+    logger.info('Attempting to initialize PythonBridge...')
+    try {
+      this.pythonProcess = spawn('python3', [this.pythonScriptPath], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+      })
+      this.pythonProcess.stdout.setEncoding('utf-8')
+      this.pythonProcess.stderr.setEncoding('utf-8')
+
+      this.pythonProcess.stdout.on('data', (data: string) => {
+        data
+          .split(/\r?\n/)
+          .filter(Boolean)
+          .forEach((line) => {
+            try {
+              const parsed: unknown = JSON.parse(line)
+              if (!this.isPythonBridgeResponse(parsed)) {
+                return
+              }
+              const queueItem = this.requestQueue.get(parsed.id)
+              if (!queueItem) {
+                return
+              }
+              const { resolve, timeout } = queueItem
+              clearTimeout(timeout)
+              this.requestQueue.delete(parsed.id)
+              if (parsed.success) {
+                resolve(parsed.data)
+              } else {
+                resolve(parsed) // Let caller handle error
+              }
+            } catch (err: unknown) {
+              logger.error('Failed to parse PythonBridge response', line, err)
+            }
+          })
+      })
+
+      this.pythonProcess.stderr.on('data', (data: string) => {
+        logger.error('PythonBridge stderr:', data)
+      })
+
+      this.pythonProcess.on('close', (code: number | null) => {
+        logger.warn(`PythonBridge process closed with code ${code}`)
+        this.isFunctional = false
+        this.isInitialized = false
+      })
+
+      this.pythonProcess.on('error', (err: Error) => {
+        logger.error('PythonBridge process error:', err)
+        this.isFunctional = false
+        this.isInitialized = false
+      })
+
+      // Optionally, send a ping or health check here
+      this.isInitialized = true
+      this.isFunctional = true
+      logger.info('PythonBridge initialized and functional.')
+    } catch (error: unknown) {
+      logger.error('PythonBridge initialization failed.', { error })
+      this.isInitialized = true
+      this.isFunctional = false
+      this.pythonProcess = null
+      throw new PythonBridgeError(`PythonBridge initialization failed: ${String(error)}`)
+    }
+  }
+
+  /**
+   * Analyzes text using a Python-based model via the bridge.
+   * @param {string} text - The text to analyze.
+   * @param {Record<string, unknown>} [modelParams] - Optional parameters for the Python model.
+   * @returns {Promise<MentalHealthAIAnalysisResult | null>} The analysis result or null if failed.
+   * @throws {PythonBridgeError} if the bridge is not functional.
+   */
+
+  public async analyzeTextWithPythonModel(
+    text: string,
+    modelParams?: Record<string, unknown>,
+  ): Promise<MentalHealthAIAnalysisResult | null> {
+    if (!this.isFunctional) {
+      logger.error(
+        'PythonBridge is not functional. Cannot analyze text with Python model.',
+      )
+      throw new PythonBridgeError('PythonBridge is not functional.')
+    }
+    const payload = { text, modelParams }
+    const response = await this.sendRequest('analyze_text', payload)
+    if (this.isMentalHealthAIAnalysisResult(response)) {
+      return response
+    }
+    logger.error(
+      'Unexpected response from PythonBridge analyzeTextWithPythonModel',
+      response,
+    )
+    return null
+  }
+
+  /**
+   * Runs an IMHI (Integrated Mental Health Intelligence) evaluation using Python scripts.
+   * @param {IMHIEvaluationParams} params - Parameters for the IMHI evaluation.
+   * @returns {Promise<unknown>} The results of the evaluation.
+   * @throws {PythonBridgeError} if the bridge is not functional.
+   */
+
+  public async runIMHIEvaluation(
+    params: IMHIEvaluationParams,
+  ): Promise<unknown> {
+    if (!this.isFunctional) {
+      logger.error(
+        'PythonBridge is not functional. Cannot run IMHI evaluation.',
+      )
+      throw new PythonBridgeError('PythonBridge is not functional.')
+    }
+    const payload: Record<string, unknown> = {
+      modelPath: params.modelPath,
+      outputPath: params.outputPath,
+      testDataset: params.testDataset,
+      isWorkersAI: params.isWorkersAI,
+    }
+    return this.sendRequest('run_imhi_evaluation', payload)
+  }
+
+  /**
+   * Shuts down the Python bridge and terminates the Python process.
+   * Ensures all resources are cleaned up and the process is killed.
+   * @returns {Promise<void>}
+   */
+
+  public async shutdown(): Promise<void> {
+    logger.info('Shutting down PythonBridge...')
+    if (this.pythonProcess) {
+      try {
+        await this.sendRequest('shutdown', {})
+      } catch (e) {
+        logger.warn('Error during PythonBridge shutdown request', e)
+      }
+      this.pythonProcess.kill()
+      this.pythonProcess = null
+    }
+    this.isInitialized = false
+    this.isFunctional = false
+    logger.info('PythonBridge shut down.')
+  }
+
+  /**
+   * Checks if the Python bridge is initialized and functional.
+   * "Ready" means it has attempted initialization and is connected to a functional Python process.
+   * @returns {boolean} True if the bridge is ready, false otherwise.
+   */
+  public isReady(): boolean {
+    return this.isInitialized && this.isFunctional
+  }
+
+  /**
+   * Sends a request to the Python process and returns the response.
+   * Handles request queueing, timeouts, and error propagation.
+   * @param command Command string
+   * @param payload Payload object
+   * @returns {Promise<unknown>} The response from the Python process.
+   */
+  private isObject(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null
+  }
+
+  private isMentalHealthAIAnalysisResult(
+    value: unknown,
+  ): value is MentalHealthAIAnalysisResult {
+    if (!this.isObject(value)) {
+      return false
+    }
+
+    const candidate = value
+    return (
+      typeof candidate['hasMentalHealthIssue'] === 'boolean' &&
+      typeof candidate['confidence'] === 'number' &&
+      typeof candidate['riskLevel'] === 'string'
+    )
+  }
+
+  private isPythonBridgeResponse(
+    value: unknown,
+  ): value is PythonBridgeResponse & { id: string } {
+    if (!this.isObject(value)) {
+      return false
+    }
+
+    const candidate = value
+    return (
+      typeof candidate['id'] === 'string' &&
+      typeof candidate['success'] === 'boolean' &&
+      (candidate['error'] === undefined || typeof candidate['error'] === 'string') &&
+      (candidate['logs'] === undefined || Array.isArray(candidate['logs']))
+    )
+  }
+
+  private async sendRequest(
+    command: string,
+    payload: Record<string, unknown>,
+  ): Promise<unknown> {
+    if (!this.pythonProcess || !this.isFunctional) {
+      return Promise.reject(
+        new PythonBridgeError('Python process not running.'),
+      )
+    }
+    const id = randomUUID()
+    const request: PythonBridgeRequest & { id: string } = {
+      command,
+      payload,
+      id,
+    }
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        this.requestQueue.delete(id)
+        reject(new PythonBridgeError(`Request timed out: ${command}`))
+      }, this.REQUEST_TIMEOUT_MS)
+      this.requestQueue.set(id, { resolve, reject, timeout })
+      try {
+      this.pythonProcess!.stdin.write(JSON.stringify(request) + '\n')
+      } catch {
+        clearTimeout(timeout)
+        this.requestQueue.delete(id)
+        reject(new PythonBridgeError('Failed to write to Python process.'))
+      }
+    })
+  }
+}
+
+export default MentalHealthAIPythonBridge

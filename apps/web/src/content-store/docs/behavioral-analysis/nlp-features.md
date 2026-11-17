@@ -379,7 +379,7 @@ type TechniqueCategory =
 
 ```typescript
 interface ModelConfiguration {
-  baseModel: 'clinical-bert' | 'therapy-roberta' | 'mental-health-llama'
+  baseModel: 'clinical-bert' | 'therapy-roberta' | 'mental-health-ai'
   specializationDatasets: string[]
   finetuningParameters: FinetuningConfig
   tokenizer: TokenizerConfig

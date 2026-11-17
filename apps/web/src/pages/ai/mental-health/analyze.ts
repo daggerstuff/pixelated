@@ -1,6 +1,6 @@
 import type { APIContext } from 'astro'
 
-import { createMentalLLaMAFromEnv } from '@/lib/ai/mental-llama'
+import { createMentalHealthAIFromEnv } from '@/lib/ai/mental-health-ai'
 import { getApiEndpointLogger } from '@/lib/logging/standardized-logger'
 
 export const POST: (context: APIContext) => Promise<Response> = async ({
@@ -16,7 +16,7 @@ export const POST: (context: APIContext) => Promise<Response> = async ({
 
     logger.debug('Received messages', { messages })
 
-    const model = await createMentalLLaMAFromEnv()
+    const model = await createMentalHealthAIFromEnv()
     const result = await (model as { chat(messages: unknown[]): Promise<unknown> }).chat(messages)
 
     logger.info('Successfully analyzed mental health')

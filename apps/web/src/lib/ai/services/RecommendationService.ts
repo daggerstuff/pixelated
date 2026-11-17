@@ -1,12 +1,12 @@
 import type { MentalHealthAnalysis } from '@/lib/chat'
 import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
 
-import { ClinicalKnowledgeBase } from '../mental-llama/ClinicalKnowledgeBase'
+import { ClinicalKnowledgeBase } from '../mental-health-ai/ClinicalKnowledgeBase'
 import type {
   MentalHealthAnalysisResult,
   ExpertGuidedAnalysisResult,
   ExpertGuidance,
-} from '../mental-llama/types/mentalLLaMATypes'
+} from '../mental-health-ai/types/mentalHealthAITypes'
 import type { TherapySession } from '../models/ai-types'
 
 const logger = getClinicalAnalysisLogger('general')

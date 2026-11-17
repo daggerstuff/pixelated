@@ -909,7 +909,7 @@ setup_coding_agents() {
     {
       "title": "Ollama",
       "provider": "ollama",
-      "model": "llama3.1:8b",
+      "model": "mistral",
       "apiBase": "http://localhost:11434"
     }
   ],

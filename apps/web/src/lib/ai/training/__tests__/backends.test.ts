@@ -62,7 +62,7 @@ describe("LocalTrainingBackend (microservice path)", () => {
           success: true,
           job: {
             id: "local-123",
-            model: "llama3",
+            model: "mistral",
             status: "queued",
             created_at: 1_700_000_000,
             fine_tuned_model: null,
@@ -77,7 +77,7 @@ describe("LocalTrainingBackend (microservice path)", () => {
       microserviceUrl: "http://ai-svc",
     });
     const result = await backend.submitJob("/tmp/ds.jsonl", {
-      model: "llama3",
+      model: "mistral",
       nEpochs: 2,
       backend: "local",
     });
@@ -89,7 +89,7 @@ describe("LocalTrainingBackend (microservice path)", () => {
     expect(call[0]).toBe("http://ai-svc/api/training/jobs");
     expect(call[1].method).toBe("POST");
     const body = JSON.parse(call[1].body as string);
-    expect(body.model).toBe("llama3");
+    expect(body.model).toBe("mistral");
     expect(body.epochs).toBe(2);
   });
 
@@ -100,7 +100,7 @@ describe("LocalTrainingBackend (microservice path)", () => {
           success: true,
           job: {
             id: "local-123",
-            model: "llama3",
+            model: "mistral",
             status: "succeeded",
             created_at: 1_700_000_000,
             fine_tuned_model: "my-local-model",
@@ -214,7 +214,7 @@ describe("HuggingFaceTrainingBackend", () => {
           success: true,
           job: {
             id: "hf-123",
-            model: "meta-llama/Llama-2-7b-hf",
+            model: "Qwen/Qwen2.5-7B-Instruct",
             status: "succeeded",
             created_at: 1_700_000_000,
             fine_tuned_model: "my-model",
@@ -284,7 +284,7 @@ describe("HuggingFaceTrainingBackend", () => {
         JSON.stringify({
           success: true,
           models: [
-            { id: "meta-llama/Llama-2-7b-hf", owned_by: "meta", fine_tunable: true },
+            { id: "Qwen/Qwen2.5-7B-Instruct", owned_by: "Qwen", fine_tunable: true },
           ],
         }),
         { status: 200 },
@@ -297,7 +297,7 @@ describe("HuggingFaceTrainingBackend", () => {
     });
     const models = await backend.listModels();
     expect(models).toEqual([
-      { id: "meta-llama/Llama-2-7b-hf", ownedBy: "meta", fineTunable: true },
+      { id: "Qwen/Qwen2.5-7B-Instruct", ownedBy: "Qwen", fineTunable: true },
     ]);
   });
 
@@ -309,7 +309,7 @@ describe("HuggingFaceTrainingBackend", () => {
     });
     const models = await backend.listModels();
     const ids = models.map((m) => m.id);
-    expect(ids).toContain("meta-llama/Llama-2-7b-hf");
+    expect(ids).toContain("Qwen/Qwen2.5-7B-Instruct");
     expect(ids).toContain("mistralai/Mistral-7B-v0.1");
     expect(models.every((m) => m.fineTunable)).toBe(true);
   });

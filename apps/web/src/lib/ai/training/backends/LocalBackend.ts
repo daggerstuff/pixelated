@@ -13,7 +13,7 @@ const LOCAL_BASE_URL =
   process.env["OLLAMA_BASE_URL"] ??
   "http://127.0.0.1:11434";
 
-const LOCAL_MODEL = process.env["LOCAL_OLLAMA_MODEL"] ?? "llama3";
+const LOCAL_MODEL = process.env["LOCAL_OLLAMA_MODEL"] ?? "mistral";
 
 /**
  * OpenAI-compatible API key for local servers that require one.
@@ -43,7 +43,7 @@ const MICROSERVICE_API_KEY =
  * Env vars:
  *   - `LOCAL_OLLAMA_BASE_URL` — base URL of the local server
  *     (default: http://127.0.0.1:11434)
- *   - `LOCAL_OLLAMA_MODEL` — model to fine-tune (default: llama3)
+ *   - `LOCAL_OLLAMA_MODEL` — model to fine-tune (default: mistral)
  *   - `LOCAL_OLLAMA_API_KEY` — API key for the local server
  *     (default: "ollama" — works for open Ollama instances)
  *   - `LOCAL_TRAINING_SCRIPT_PATH` — deprecated; kept for backwards compat.

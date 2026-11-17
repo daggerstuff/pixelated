@@ -264,5 +264,5 @@ declare module '@/lib/db/mongodb'
 
 declare module '../../node_modules/react/index.js'
 declare module '../../simulator/types'
-declare module '../../lib/ai/mental-llama/MentalLLaMAAdapter'
+declare module '../../lib/ai/mental-health-ai/MentalHealthAIAdapter'
 declare module '../../config/mongodb.config'

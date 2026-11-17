@@ -37,7 +37,7 @@ const SCHEMA = z.object({
 export default defineTool({
   description:
     'Evaluate the most recent turn for clinical and scope safety using ' +
-    'Workers AI (@cf/meta/llama-3.2-3b-instruct). Returns severity and ' +
+    'Workers AI (@cf/mistralai/mistral-small-3.1-24b-instruct). Returns severity and ' +
     'risk criteria. Falls back to regex heuristic when AI credentials ' +
     'are missing.',
   inputSchema: SCHEMA,
@@ -81,7 +81,7 @@ async function aiEvaluate(
     escalate_to_supervisor: result.escalate_to_supervisor,
     evaluator: 'session-agent.tools.check_clinical_boundary:workers-ai:v1',
     evaluated_at: new Date().toISOString(),
-    model: '@cf/meta/llama-3.2-3b-instruct',
+    model: '@cf/mistralai/mistral-small-3.1-24b-instruct',
   }
 }
 

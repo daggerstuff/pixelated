@@ -1,7 +1,7 @@
 import { Brain, Shield, ChartBar, AlertTriangle, Lightbulb } from 'lucide-react'
 import React from 'react'
 
-import type { MentalHealthAnalysisResult } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
+import type { MentalHealthAnalysisResult } from '@/lib/ai/mental-health-ai/types/mentalHealthAITypes'
 import {
   type EnhancedMentalHealthAnalysis,
   type MindMirrorAnalysis,
@@ -115,7 +115,7 @@ export const getInitialMessages = (): ChatMessage[] => [
   {
     id: 'welcome_msg',
     role: 'assistant',
-    content: `Welcome to our Mental Health Chat powered by MentalLLaMA. I'm here to provide thoughtful, evidence-based support.
+    content: `Welcome to our Mental Health Chat powered by MentalHealthAI. I'm here to provide thoughtful, evidence-based support.
 
 🧠 **Clinical-Grade Analysis**: Advanced AI analyzes your messages for mental health indicators
 🔒 **Privacy-First**: All analysis uses encrypted processing - your data stays secure
@@ -126,8 +126,8 @@ How are you feeling today? I'm here to listen and help.`,
     displayContent: (
       <div className="space-y-3">
         <p>
-          Welcome to our Mental Health Chat powered by MentalLLaMA. I'm here to
-          provide thoughtful, evidence-based support.
+          Welcome to our Mental Health Chat powered by MentalHealthAI. I'm here
+          to provide thoughtful, evidence-based support.
         </p>
         <div className="space-y-2 py-1">
           <div className="flex items-center gap-2">

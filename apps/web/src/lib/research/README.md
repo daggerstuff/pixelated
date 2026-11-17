@@ -166,7 +166,7 @@ pnpm vitest run src/tests/research/ResearchPlatform.test.ts
 
 The Research Platform integrates seamlessly with:
 
-- **EmotionLlamaProvider** for emotion analysis
+- **EmotionAnalysisProvider** for emotion analysis
 - **InterventionAnalysisService** for outcome prediction
 - **AdvancedPatternAnalysisService** for therapeutic insights
 - **PredictiveCrisisModelingService** for risk assessment

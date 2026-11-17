@@ -63,7 +63,7 @@ NVIDIA_KEYS = [
 NIM_CLIENTS = [OpenAI(api_key=k, base_url="https://integrate.api.nvidia.com/v1") for k in NVIDIA_KEYS]
 
 ROUTER_BASE_URL = "http://localhost:20128/v1"
-ROUTER_MODELS = ["cmc/deepseek/deepseek-v4-flash", "cerebras/llama-3.3-70b", "meta/llama-3.1-8b-instruct"]
+ROUTER_MODELS = ["cmc/deepseek/deepseek-v4-flash", "qwen/qwen2.5-7b-instruct", "mistralai/mistral-7b-instruct-v0.3"]
 
 FAST_OLLAMA_MODELS = [
     "richardyoung/qwen3-4b-instruct-2507-abliterated:latest",
@@ -193,8 +193,8 @@ def generate_curated_session(row: dict[str, Any]) -> dict[str, Any]:
             # Triple-Key NVIDIA NIM Pool
             nim_m = random.choice(
                 [
-                    "meta/llama-3.1-8b-instruct",
-                    "nvidia/llama-3.1-nemotron-70b-instruct",
+                    "qwen/qwen2.5-7b-instruct",
+                    "mistralai/mistral-7b-instruct-v0.3",
                     "mistralai/mistral-medium-3.5-128b",
                 ]
             )

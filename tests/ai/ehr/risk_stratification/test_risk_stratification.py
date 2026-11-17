@@ -55,7 +55,7 @@ def configured_settings() -> RiskStratificationSettings:
     return RiskStratificationSettings(
         nim_url="http://hetzner-nim:8000",
         nim_api_key="test-key-12345",
-        nim_model="meta/llama-3.1-70b-instruct",
+        nim_model="mistralai/mistral-7b-instruct-v0.3",
         baa_confirmed=True,
         nim_timeout_seconds=5.0,
         nim_max_retries=2,

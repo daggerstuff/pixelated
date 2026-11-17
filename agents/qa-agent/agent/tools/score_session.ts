@@ -50,7 +50,7 @@ const SCHEMA = z.object({
   rubric_version: z.string().min(1),
 })
 
-const WORKERS_AI_MODEL = '@cf/meta/llama-3.2-3b-instruct'
+const WORKERS_AI_MODEL = '@cf/mistralai/mistral-small-3.1-24b-instruct'
 
 export default defineTool({
   description:

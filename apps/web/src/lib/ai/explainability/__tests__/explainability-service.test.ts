@@ -50,8 +50,8 @@ describe('ExplainabilityService', () => {
 
   describe('buildSources', () => {
     const baseContext: ExplainabilityContext = {
-      provider: 'llama',
-      modelVersion: 'llama-emotion-v1.0',
+      provider: 'emotion-analysis',
+      modelVersion: 'emotion-analysis-v1.0',
       inputLength: 500,
       processingTime: 120,
       fallbackUsed: false,
@@ -187,8 +187,8 @@ describe('ExplainabilityService', () => {
 
   describe('enrich', () => {
     const baseContext: ExplainabilityContext = {
-      provider: 'llama',
-      modelVersion: 'llama-emotion-v1.0',
+      provider: 'emotion-analysis',
+      modelVersion: 'emotion-analysis-v1.0',
       inputLength: 500,
       processingTime: 120,
       fallbackUsed: false,

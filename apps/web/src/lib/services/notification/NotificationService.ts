@@ -238,7 +238,7 @@ export class NotificationService {
         id: CRISIS_ALERT_TEMPLATE_ID,
         title: 'CRITICAL ALERT: Potential Crisis Detected',
         // Body can be simple, actual details will be in the data payload
-        body: 'A potential user crisis has been detected by the MentalLLaMA system. Urgent review required. Details: {{textSample}} UserID: {{userId}} SessionID: {{sessionId}} Timestamp: {{timestamp}}',
+        body: 'A potential user crisis has been detected by the MentalHealthAI system. Urgent review required. Details: {{textSample}} UserID: {{userId}} SessionID: {{sessionId}} Timestamp: {{timestamp}}',
         channels: adminEmail ? [NotificationChannel.EMAIL] : [], // Add other channels like SMS if admin phone is configured
         priority: NotificationPriority.URGENT,
         metadata: { isCrisisAlert: true },

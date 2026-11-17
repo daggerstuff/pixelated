@@ -109,7 +109,7 @@ export default defineTool({
         total_score: totalScore,
         max_total: maxTotal,
         demo_ready: totalScore >= Math.floor(maxTotal * 0.7),
-        model: '@cf/meta/llama-3.2-3b-instruct',
+        model: '@cf/mistralai/mistral-small-3.1-24b-instruct',
       }
     } catch {
       return base
