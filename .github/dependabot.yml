@@ -111,6 +111,13 @@ updates:
           - 'version-update:semver-patch'
           - 'version-update:semver-minor'
           - 'version-update:semver-major'
+      # typescript 7 has no typescript-eslint support yet, so any PR that
+      # carries it fails the lint gate. Excluded from the major group above and
+      # ignored here so Dependabot does not open a standalone one either; drop
+      # both when the parser supports TS 7.
+      - dependency-name: 'typescript'
+        update-types:
+          - 'version-update:semver-major'
       # typescript-eslint bumps fail pnpm minimumReleaseAge supply-chain policy
       # checks when Dependabot resolves freshly published releases into the lockfile.
       - dependency-name: 'typescript-eslint'
