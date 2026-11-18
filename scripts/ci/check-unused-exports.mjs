@@ -243,7 +243,8 @@ function extractExports(source, cleanSource) {
       .split(",")
       .map((s) => {
         const parts = s.trim().split(/\s+as\s+/);
-        return parts[0].trim().replace(/^type\s+/, "");
+        const exported = (parts[1] ?? parts[0]).trim();
+        return exported.replace(/^type\s+/, "");
       })
       .filter(Boolean);
     const line = countLines(cleanSource, m.index);
@@ -669,13 +670,22 @@ async function main() {
       let cleanSource = null;
       try {
         cleanSource = stripComments(await readFile(resolve(normalised), "utf8"));
-      } catch {
+      } catch (error) {
+        console.warn(
+          "check-unused-exports: could not read " +
+            normalised +
+            " (" +
+            (error instanceof Error ? error.message : String(error)) +
+            "); using the cached index entry.",
+        );
         cleanSource = null;
       }
 
       for (const [exportName, info] of Object.entries(fileEntry)) {
         const referencedInFile =
-          cleanSource === null ? info.referencedInFile : hasInternalReference(cleanSource, exportName);
+          exportName === "default" || cleanSource === null
+            ? info.referencedInFile
+            : hasInternalReference(cleanSource, exportName);
         const violationKind = classifyViolation({ ...info, referencedInFile });
         if (!violationKind) continue;
         violations.push({
@@ -744,7 +754,14 @@ async function main() {
     if (cleanSource === undefined) {
       try {
         cleanSource = stripComments(await readFile(resolve(filePath), "utf8"));
-      } catch {
+      } catch (error) {
+        console.warn(
+          "check-unused-exports: could not read " +
+            filePath +
+            " (" +
+            (error instanceof Error ? error.message : String(error)) +
+            "); classifying without in-file references.",
+        );
         cleanSource = null;
       }
       cleanSourceCache.set(filePath, cleanSource);
@@ -762,7 +779,9 @@ async function main() {
       if (!Array.isArray(items)) continue;
       for (const item of items) {
         const referencedInFile =
-          cleanSource === null ? false : hasInternalReference(cleanSource, item.name);
+          item.name === "default" || cleanSource === null
+            ? false
+            : hasInternalReference(cleanSource, item.name);
         violations.push({
           file: filePath,
           line: item.line,

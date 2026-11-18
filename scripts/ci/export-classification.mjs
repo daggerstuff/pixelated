@@ -25,7 +25,7 @@ function escapeRegExp(value) {
 export function hasInternalReference(source, name) {
   const declarationSource = source
     .replace(/export\s+(?:type\s+)?\{[^}]*\}(?:\s+from\s+['"][^'"]+['"])?/g, " ")
-    .replace(/export\s+default\s+[A-Za-z_$][\w$]*\s*;?/g, " ");
+    .replace(/export\s+default\s+[A-Za-z_$][\w$]*\s*;/g, " ");
   const pattern = new RegExp(
     "(?<![A-Za-z0-9_$])" + escapeRegExp(name) + "(?![A-Za-z0-9_$])",
     "g",

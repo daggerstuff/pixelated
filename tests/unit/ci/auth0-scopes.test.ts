@@ -9,6 +9,8 @@ const CONTRACT_SCOPES = [
   'read:roles',
   'read:users',
   'update:users',
+  'read:sessions',
+  'delete:sessions',
   'create:users',
   'create:roles',
   'create:user_tickets',

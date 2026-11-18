@@ -36,7 +36,12 @@ export const REQUIRED_SCOPES = [
     usedBy:
       "auth0-rbac-service users.roles.list; auth0.service users.get / list / listUsersByEmail / update; auth0-mfa-service users.enrollments.get",
   },
-  { scope: "update:users", usedBy: "auth0-rbac-service users.roles.assign / delete" },
+  {
+    scope: "update:users",
+    usedBy: "auth0-rbac-service users.roles.assign / delete; auth0.service users.update (profile and password)",
+  },
+  { scope: "read:sessions", usedBy: "auth0-activity-tracking-service getUserSessions (users.sessions)" },
+  { scope: "delete:sessions", usedBy: "auth0-activity-tracking-service terminateUserSessions (users.sessions)" },
   { scope: "create:users", usedBy: "auth0.service users.create (signup)" },
   { scope: "create:roles", usedBy: "auth0-rbac-service roles.create (role bootstrap)" },
   {
@@ -90,7 +95,7 @@ async function fetchGrantedScopes({ domain, clientId, clientSecret }) {
     throw new Error(String(detail));
   }
   if (typeof body.scope !== "string") {
-    if (typeof body.access_token === "string") return [];
+    if (typeof body.access_token === "string") return null;
     throw new Error("token response carried no scope claim");
   }
   return body.scope.split(/\s+/).filter(Boolean);
@@ -124,6 +129,12 @@ async function main() {
   } catch (error) {
     console.error("Could not obtain a management token: " + error.message);
     console.error("That is a credentials or connectivity problem, not a scope problem.");
+    process.exit(2);
+  }
+
+  if (granted === null) {
+    console.error("The token response carried no scope claim, so the granted set is unknown.");
+    console.error("Check the client's grants in the Auth0 dashboard, or use a client that returns scopes.");
     process.exit(2);
   }
 
