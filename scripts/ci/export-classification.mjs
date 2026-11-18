@@ -23,9 +23,10 @@ function escapeRegExp(value) {
  * over-reporting only changes which remedy is suggested.
  */
 export function hasInternalReference(source, name) {
-  const declarationSource = source
-    .replace(/export\s+(?:type\s+)?\{[^}]*\}(?:\s+from\s+['"][^'"]+['"])?/g, " ")
-    .replace(/export\s+default\s+[A-Za-z_$][\w$]*\s*;/g, " ");
+  const declarationSource = source.replace(
+    /export\s+(?:type\s+)?\{[^}]*\}(?:\s+from\s+['"][^'"]+['"])?/g,
+    " ",
+  );
   const pattern = new RegExp(
     "(?<![A-Za-z0-9_$])" + escapeRegExp(name) + "(?![A-Za-z0-9_$])",
     "g",
@@ -84,7 +85,13 @@ export function extractImports(cleanSource) {
   // import DefaultName from './path'
   const importDefaultRe = /import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g;
   while ((m = importDefaultRe.exec(cleanSource)) !== null) {
-    imports.push({ names: [m[1], "default"], source: m[2], line: countLines(cleanSource, m.index) });
+    imports.push({ names: ["default"], source: m[2], line: countLines(cleanSource, m.index) });
+  }
+
+  // import DefaultName, { Named } from './path'
+  const importDefaultNamedRe = /import\s+(\w+)\s*,\s*\{[^}]*\}\s+from\s+['"]([^'"]+)['"]/g;
+  while ((m = importDefaultNamedRe.exec(cleanSource)) !== null) {
+    imports.push({ names: ["default"], source: m[2], line: countLines(cleanSource, m.index) });
   }
 
   // import * as Namespace from './path'

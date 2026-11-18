@@ -225,7 +225,8 @@ function extractExports(source, cleanSource) {
           : m[0].includes("default")
             ? "export"
             : "export";
-    exports.push({ name: m[0].includes("default") ? "default" : m[1], line, col, kind });
+    const isDefault = /^export\s+default\s/.test(m[0]);
+    exports.push({ name: isDefault ? "default" : m[1], line, col, kind });
   }
 
   // export default Identifier (re-exporting a previously defined symbol, common in React)
@@ -593,7 +594,7 @@ async function main() {
       for (const [exportName, info] of Object.entries(fileEntry)) {
         const referencedInFile =
           exportName === "default" || cleanSource === null
-            ? info.referencedInFile
+            ? false
             : hasInternalReference(cleanSource, exportName);
         const violationKind = classifyViolation({ ...info, referencedInFile });
         if (!violationKind) continue;
@@ -665,6 +666,7 @@ async function main() {
         cleanSource = stripComments(await readFile(resolve(filePath), "utf8"));
       } catch (error) {
         warnUnreadable(filePath, error);
+        cleanSource = null;
       }
       cleanSourceCache.set(filePath, cleanSource);
     }
@@ -680,8 +682,9 @@ async function main() {
       const items = entry[key];
       if (!Array.isArray(items)) continue;
       for (const item of items) {
+        const memberKind = kind === "enum member" || kind === "namespace member";
         const referencedInFile =
-          item.name === "default" || cleanSource === null
+          memberKind || item.name === "default" || cleanSource === null
             ? false
             : hasInternalReference(cleanSource, item.name);
         violations.push({
