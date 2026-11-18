@@ -75,8 +75,11 @@ updates:
         # typescript 7 has no typescript-eslint support yet, so a group that
         # carries it cannot pass the lint gate. Take it on its own once the
         # parser ships TS 7 support.
+        # vitest 5 changes how a test file is assigned to a project, so its
+        # migration needs its own PR and its own runs, not a group bump.
         exclude-patterns:
           - 'typescript'
+          - 'vitest'
     ignore:
       # UnoCSS packages are pinned in package.json overrides. Dependabot cannot
       # update them synchronously with the overrides, causing install conflicts.
