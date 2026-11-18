@@ -72,6 +72,11 @@ updates:
       major-updates:
         update-types:
           - 'major'
+        # typescript 7 has no typescript-eslint support yet, so a group that
+        # carries it cannot pass the lint gate. Take it on its own once the
+        # parser ships TS 7 support.
+        exclude-patterns:
+          - 'typescript'
     ignore:
       # UnoCSS packages are pinned in package.json overrides. Dependabot cannot
       # update them synchronously with the overrides, causing install conflicts.
@@ -250,6 +255,14 @@ updates:
       uv:
         patterns:
           - '*'
+        # These two resolve DOWN in a group bump: semgrep 1.185.0 -> 1.79.0
+        # (a security scanner losing a hundred releases, and its certifi
+        # dependency) and pip-audit 2.10.1 -> 2.9.0, because the newer group
+        # members leave them without a compatible release. Keep them out of the
+        # group so the rest can land; they still get their own PRs.
+        exclude-patterns:
+          - 'semgrep'
+          - 'pip-audit'
     ignore:
       # cryptography 50 conflicts with data-designer-engine caps (<=49) until NeMo
       # ships a release compatible with cryptography 50. Ignore entirely (not just

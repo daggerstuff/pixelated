@@ -269,6 +269,7 @@ export default defineConfig({
           exclude: [
             '**/node_modules/**',
             ...nodeTestGlobs,
+            ...targetedNodeTestGlobs,
             'apps/web/src/lib/security/__tests__/**/*.test.ts',
             'apps/web/src/lib/ai/bias-detection/__tests__/**/*.test.ts',
             'apps/web/src/lib/security/threat-detection/**/*.test.ts',
@@ -336,6 +337,7 @@ export default defineConfig({
             'worktrees/**',
             'ai/.venv/**',
             ...cpuBoundNodeTestExcludes,
+            ...targetedJsdomTestGlobs,
           ],
           environment: 'node',
           isolate: true,
