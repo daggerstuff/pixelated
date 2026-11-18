@@ -1,0 +1,21 @@
+package.json
+  s_7d4811cf1b0ba7::t_41b52f426e8f48 550
+pnpm-lock.yaml
+  s_7d4811cf1b0ba7::t_02b608991774c3 10-11,15-16,20-21,25-26,30-31,35-36,40-41,46-47,52-53,58-59,64-65,70-71,76-77,82-88,92-93,97-98,104-107,110,113,116,119,122,125,128,131,134,137,140,143,146,149,151-165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6be329f6266ed8bb6880f672435f621d976ccd40",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
