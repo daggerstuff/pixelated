@@ -29,19 +29,28 @@
  */
 
 import { spawn } from "node:child_process";
-import { accessSync, constants, mkdirSync, writeFileSync, readFileSync } from "node:fs";
+import { accessSync, constants, mkdirSync, writeFileSync, readFileSync, realpathSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { resolve, dirname, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import { glob } from "glob";
+
+import {
+  classifyViolation,
+  countLines,
+  extractImports,
+  hasInternalReference,
+  stripComments,
+} from "./export-classification.mjs";
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 const INDEX_PATH = resolve(".cache/knip-index.json");
-const INDEX_VERSION = 3;
+const INDEX_VERSION = 5;
 const SCAN_GLOB = "apps/web/src/**/*.{ts,tsx,js,jsx,astro}";
-const CONSUMER_GLOB = "apps/web/src/**/*.{test,spec}.{ts,tsx,js,jsx}";
+const CONSUMER_GLOB = "{apps/web/src,tests}/**/*.{test,spec}.{ts,tsx,js,jsx}";
 const CONSUMER_IGNORE = [
   "**/node_modules/**",
   "**/dist/**",
@@ -80,6 +89,7 @@ function pathExists(filePath) {
     return false;
   }
 }
+
 
 const RESOLVE_EXTENSIONS = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".mts", ".cts"];
 const INDEX_FILES = RESOLVE_EXTENSIONS.map((ext) => "/index" + ext);
@@ -178,11 +188,11 @@ function isRelativePath(p) {
   return p.startsWith("./") || p.startsWith("../");
 }
 
-function stripComments(source) {
-  let result = source.replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, " "));
-  result = result.replace(/\/\/[^\n]*/g, (m) => " ".repeat(m.length));
-  return result;
+function warnUnreadable(file, error) {
+  const detail = error instanceof Error ? error.message : String(error);
+  console.warn("check-unused-exports: could not read " + file + " (" + detail + "); using the index entry.");
 }
+
 
 // ---------------------------------------------------------------------------
 // Index: regex-based export & import extraction
@@ -215,7 +225,8 @@ function extractExports(source, cleanSource) {
           : m[0].includes("default")
             ? "export"
             : "export";
-    exports.push({ name: m[1], line, col, kind });
+    const isDefault = /^export\s+default\s/.test(m[0]);
+    exports.push({ name: isDefault ? "default" : m[1], line, col, kind });
   }
 
   // export default Identifier (re-exporting a previously defined symbol, common in React)
@@ -226,9 +237,9 @@ function extractExports(source, cleanSource) {
     const line = countLines(cleanSource, m.index);
     const col = m.index - cleanSource.lastIndexOf("\n", m.index - 1) - 1;
     // Avoid duplicates: only add if this name is not already in exports
-    const alreadyExists = exports.some((e) => e.name === m[1] && Math.abs(e.line - line) < 2);
+    const alreadyExists = exports.some((e) => e.name === "default" && Math.abs(e.line - line) < 2);
     if (!alreadyExists) {
-      exports.push({ name: m[1], line, col, kind: "export" });
+      exports.push({ name: "default", line, col, kind: "export" });
     }
   }
 
@@ -239,114 +250,26 @@ function extractExports(source, cleanSource) {
       .split(",")
       .map((s) => {
         const parts = s.trim().split(/\s+as\s+/);
-        return parts[0].trim();
+        const local = parts[0].trim().replace(/^type\s+/, "");
+        const exported = (parts[1] ?? parts[0]).trim().replace(/^type\s+/, "");
+        return { name: exported, localName: local };
       })
-      .filter(Boolean);
+      .filter((entry) => Boolean(entry.name));
     const line = countLines(cleanSource, m.index);
     const col = m.index - cleanSource.lastIndexOf("\n", m.index - 1) - 1;
-    for (const name of list) {
-      exports.push({ name, line, col, kind: "export" });
+    for (const entry of list) {
+      exports.push({ name: entry.name, localName: entry.localName, line, col, kind: "export" });
     }
   }
 
   return exports;
 }
 
-function countLines(text, pos) {
-  let count = 1;
-  for (let i = 0; i < pos && i < text.length; i++) {
-    if (text.charCodeAt(i) === 10) count++;
-  }
-  return count;
-}
 
 /**
  * Extract import statements from source code.
  * Returns array of { names: string[], source: string, line }.
  */
-function extractImports(cleanSource) {
-  const imports = [];
-
-  // import { Name1, Name2 as Alias } from './path'
-  const importNamedRe = /import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g;
-  let m;
-  while ((m = importNamedRe.exec(cleanSource)) !== null) {
-    const names = m[1]
-      .split(",")
-      .map((s) => {
-        const withoutTypeModifier = s.trim().replace(/^type\s+/, "");
-        const parts = withoutTypeModifier.split(/\s+as\s+/);
-        return parts[0].trim();
-      })
-      .filter(Boolean);
-    imports.push({ names, source: m[2], line: countLines(cleanSource, m.index) });
-  }
-
-  // import DefaultName from './path'
-  const importDefaultRe = /import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g;
-  while ((m = importDefaultRe.exec(cleanSource)) !== null) {
-    imports.push({ names: [m[1]], source: m[2], line: countLines(cleanSource, m.index) });
-  }
-
-  // import * as Namespace from './path'
-  const importNamespaceRe = /import\s+\*\s+as\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g;
-  while ((m = importNamespaceRe.exec(cleanSource)) !== null) {
-    imports.push({ names: [m[1]], source: m[2], line: countLines(cleanSource, m.index) });
-  }
-
-  // Dynamic imports: import('...') with member access like module.Name
-  const dynamicImportRe = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
-  const moduleMemberRe = /module\.([A-Za-z_$][A-Za-z0-9_$]*)/g;
-
-  /** @type {{ source: string; index: number }[]} */
-  const dynamicImports = [];
-  while ((m = dynamicImportRe.exec(cleanSource)) !== null) {
-    dynamicImports.push({ source: m[1], index: m.index });
-  }
-
-  // For each dynamic import, capture member accesses on the module binding in the
-  // same top-level/async scope (approximated by the nearest closing brace after
-  // the import or end of file). This is conservative: it may over-count, but it
-  // prevents false positives for lazy-loaded components.
-  const findScopeEnd = (fromIndex) => {
-    let braceCount = 0;
-    let inString = null;
-    for (let i = fromIndex; i < cleanSource.length; i++) {
-      const ch = cleanSource[i];
-      const prev = cleanSource[i - 1];
-      if (inString) {
-        if (ch === inString && prev !== "\\") inString = null;
-      } else if (ch === '"' || ch === "'" || ch === "`") {
-        inString = ch;
-      } else if (ch === "{") {
-        braceCount++;
-      } else if (ch === "}") {
-        if (braceCount <= 1) return i;
-        braceCount--;
-      }
-    }
-    return cleanSource.length;
-  };
-
-  for (const di of dynamicImports) {
-    const scopeEnd = findScopeEnd(di.index);
-    const slice = cleanSource.slice(di.index, scopeEnd);
-    const localMembers = new Set();
-    let mm;
-    while ((mm = moduleMemberRe.exec(slice)) !== null) {
-      localMembers.add(mm[1]);
-    }
-    if (localMembers.size > 0) {
-      imports.push({
-        names: [...localMembers],
-        source: di.source,
-        line: countLines(cleanSource, di.index),
-      });
-    }
-  }
-
-  return imports;
-}
 
 // ---------------------------------------------------------------------------
 // Index builder
@@ -374,7 +297,13 @@ async function buildIndex() {
     const cleanSource = stripComments(source);
     const exports = extractExports(source, cleanSource);
     if (exports.length > 0) {
-      fileExports.set(absPath, exports);
+      fileExports.set(
+        absPath,
+        exports.map((exp) => ({
+          ...exp,
+          referencedInFile: hasInternalReference(source, exp.localName ?? exp.name),
+        })),
+      );
     }
   }
 
@@ -433,6 +362,8 @@ async function buildIndex() {
         line: exp.line,
         col: exp.col,
         kind: exp.kind,
+        localName: exp.localName,
+        referencedInFile: exp.referencedInFile === true,
         importedBy: consumers ? [...consumers].map((p) => relative(resolve("."), p)).sort() : [],
       };
     }
@@ -549,18 +480,53 @@ function reportViolations(violations, isScoped, fileCount) {
   }
 
   for (const v of violations) {
-    console.error(
-      v.file + ":" + v.line + ":" + v.col + "  error  Unused " + v.kind + ': "' + v.name + '"',
+    if (v.violationKind === "internal-only") {
+      console.error(
+        v.file +
+          ":" +
+          v.line +
+          ":" +
+          v.col +
+          "  error  Over-exported " +
+          v.kind +
+          ': "' +
+          v.name +
+          '" is referenced only inside its own file. Drop the `export` keyword; the declaration is live.',
+      );
+    } else if (v.violationKind === "unused") {
+      console.error(
+        v.file +
+          ":" +
+          v.line +
+          ":" +
+          v.col +
+          "  error  Unused " +
+          v.kind +
+          ': "' +
+          v.name +
+          '" has no importer and no in-file reference. Delete it.',
+      );
+    } else {
+      console.error(
+        v.file + ":" + v.line + ":" + v.col + "  error  Unused " + v.kind + ': "' + v.name + '"',
+      );
+    }
+  }
+
+  const overExported = violations.filter((v) => v.violationKind === "internal-only").length;
+  const unused = violations.length - overExported;
+  const parts = [];
+  if (unused > 0) parts.push(unused + (unused === 1 ? " unused symbol" : " unused symbols"));
+  if (overExported > 0) {
+    parts.push(
+      overExported + (overExported === 1 ? " over-exported symbol" : " over-exported symbols"),
     );
   }
 
-  const label = violations.length === 1 ? "unused symbol" : "unused symbols";
   console.error(
     "\nFound " +
-      violations.length +
-      " " +
-      label +
-      ". Remove them or add the --no-exit-code flag.\n" +
+      parts.join(" and ") +
+      ". Fix them or add the --no-exit-code flag.\n" +
       "(Hint: if these are false positives, add an entry point or pattern\n" +
       " to knip.json or ignoreDependencies.)",
   );
@@ -620,16 +586,31 @@ async function main() {
       }
       foundCount++;
 
+      let sourceText = null;
+      try {
+        sourceText = await readFile(resolve(normalised), "utf8");
+      } catch (error) {
+        warnUnreadable(normalised, error);
+      }
+
       for (const [exportName, info] of Object.entries(fileEntry)) {
-        if (info.importedBy.length === 0) {
-          violations.push({
-            file: filePath,
-            line: info.line,
-            col: info.col,
-            name: exportName,
-            kind: info.kind,
-          });
-        }
+        const referenceName = info.localName ?? exportName;
+        const referencedInFile =
+          exportName === "default"
+            ? false
+            : sourceText === null
+              ? (info.referencedInFile ?? false)
+              : hasInternalReference(sourceText, referenceName);
+        const violationKind = classifyViolation({ ...info, referencedInFile });
+        if (!violationKind) continue;
+        violations.push({
+          file: filePath,
+          line: info.line,
+          col: info.col,
+          name: exportName,
+          kind: info.kind,
+          violationKind,
+        });
       }
     }
 
@@ -676,11 +657,23 @@ async function main() {
   }
 
   const violations = [];
+  const sourceCache = new Map();
 
   for (const entry of issues) {
     const filePath = entry.file;
     if (isScoped && !normalisedFilters.includes(normalise(filePath))) {
       continue;
+    }
+
+    let sourceText = sourceCache.get(filePath);
+    if (sourceText === undefined) {
+      try {
+        sourceText = await readFile(resolve(filePath), "utf8");
+      } catch (error) {
+        warnUnreadable(filePath, error);
+        sourceText = null;
+      }
+      sourceCache.set(filePath, sourceText);
     }
 
     const categories = [
@@ -694,12 +687,18 @@ async function main() {
       const items = entry[key];
       if (!Array.isArray(items)) continue;
       for (const item of items) {
+        const memberKind = kind === "enum member" || kind === "namespace member";
+        const referencedInFile =
+          memberKind || item.name === "default" || sourceText === null
+            ? false
+            : hasInternalReference(sourceText, item.name);
         violations.push({
           file: filePath,
           line: item.line,
           col: item.col,
           name: item.name,
           kind,
+          violationKind: classifyViolation({ importedBy: [], referencedInFile }),
         });
       }
     }
@@ -708,4 +707,18 @@ async function main() {
   reportViolations(violations, isScoped, changedFiles.length);
 }
 
-main();
+function isDirectInvocation() {
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+}
+
+if (isDirectInvocation()) {
+  main().catch((error) => {
+    console.error("check-unused-exports: internal error");
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 2;
+  });
+}
