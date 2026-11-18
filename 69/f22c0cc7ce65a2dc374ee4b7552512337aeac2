@@ -1,0 +1,39 @@
+agents/pipeline-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 28
+agents/qa-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 28
+agents/content-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 22
+agents/session-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 28
+package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 302
+agents/supervisor-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 22
+agents/intake-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 22
+agents/eve-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 21
+tools/px/src/client/eve-session.ts
+  s_e96f85d720e925::t_91a88a00010c5d 139
+agents/advisor-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 20
+pnpm-lock.yaml
+  s_e96f85d720e925::t_f7da29114b2312 581-582,1258,1263-1264,1292,1297-1298,1326,1331-1332,1366,1371-1372,1424,1429-1430,1479,1484-1485,1534,1539-1540,1580,1585-1586,9908-9909,21750-21759,21766,23814,23828,23842
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "69f22c0cc7ce65a2dc374ee4b7552512337aeac2",
+  "prompts": {},
+  "sessions": {
+    "s_e96f85d720e925": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "spiffy-seagull",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
