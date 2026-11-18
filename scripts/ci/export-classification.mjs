@@ -89,7 +89,7 @@ export function extractImports(cleanSource) {
   }
 
   // import DefaultName, { Named } from './path'
-  const importDefaultNamedRe = /import\s+(\w+)\s*,\s*\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g;
+  const importDefaultNamedRe = /import\s+(\w+)\s*,\s*\{([^}]*)\}\s+from\s+['"]([^'"]+)['"]/g;
   while ((m = importDefaultNamedRe.exec(cleanSource)) !== null) {
     const named = m[2]
       .split(",")

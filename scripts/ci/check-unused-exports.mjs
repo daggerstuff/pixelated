@@ -250,14 +250,15 @@ function extractExports(source, cleanSource) {
       .split(",")
       .map((s) => {
         const parts = s.trim().split(/\s+as\s+/);
-        const exported = (parts[1] ?? parts[0]).trim();
-        return exported.replace(/^type\s+/, "");
+        const local = parts[0].trim().replace(/^type\s+/, "");
+        const exported = (parts[1] ?? parts[0]).trim().replace(/^type\s+/, "");
+        return { name: exported, localName: local };
       })
-      .filter(Boolean);
+      .filter((entry) => Boolean(entry.name));
     const line = countLines(cleanSource, m.index);
     const col = m.index - cleanSource.lastIndexOf("\n", m.index - 1) - 1;
-    for (const name of list) {
-      exports.push({ name, line, col, kind: "export" });
+    for (const entry of list) {
+      exports.push({ name: entry.name, localName: entry.localName, line, col, kind: "export" });
     }
   }
 
@@ -300,7 +301,7 @@ async function buildIndex() {
         absPath,
         exports.map((exp) => ({
           ...exp,
-          referencedInFile: hasInternalReference(cleanSource, exp.name),
+          referencedInFile: hasInternalReference(cleanSource, exp.localName ?? exp.name),
         })),
       );
     }
@@ -592,12 +593,13 @@ async function main() {
       }
 
       for (const [exportName, info] of Object.entries(fileEntry)) {
+        const referenceName = info.localName ?? exportName;
         const referencedInFile =
           exportName === "default"
             ? false
             : cleanSource === null
               ? (info.referencedInFile ?? false)
-              : hasInternalReference(cleanSource, exportName);
+              : hasInternalReference(cleanSource, referenceName);
         const violationKind = classifyViolation({ ...info, referencedInFile });
         if (!violationKind) continue;
         violations.push({
