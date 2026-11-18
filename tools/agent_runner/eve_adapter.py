@@ -54,17 +54,20 @@ class EveAgentAdapter(AgentAdapter):
             timeout=timeout,
         )
         res.raise_for_status()
-        data = res.json()
-        if not data.get("ok") or not data.get("sessionId"):
-            raise RuntimeError(f"session creation rejected: {data}")
-        return data["sessionId"]
+        payload = res.json()
+        if not isinstance(payload, dict):
+            raise RuntimeError(f"session creation rejected: {payload!r}")
+        session_id = payload.get("sessionId")
+        if not payload.get("ok") or not isinstance(session_id, str) or not session_id:
+            raise RuntimeError(f"session creation rejected: {payload}")
+        return session_id
 
     @staticmethod
     def _handle_entry(
         etype: str | None,
-        data: dict,
+        data: dict[str, object],
         reply_parts: list[str],
-        usage: dict,
+        usage: dict[str, object],
     ) -> str | None:
         """Process one stream event entry.
 
@@ -91,10 +94,12 @@ class EveAgentAdapter(AgentAdapter):
             return str(data.get("outcome") or "completed")
         return None
 
-    def _stream_session(self, endpoint: str, session_id: str, timeout: int) -> tuple[str, dict, bool]:
+    def _stream_session(
+        self, endpoint: str, session_id: str, timeout: int
+    ) -> tuple[str, dict[str, object], bool]:
         """Stream session events; return (reply_text, usage, completed)."""
         reply_parts: list[str] = []
-        usage: dict = {}
+        usage: dict[str, object] = {}
         outcome: str | None = None
 
         with requests.get(
