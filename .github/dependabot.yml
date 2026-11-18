@@ -116,8 +116,8 @@ updates:
       # ignored here so Dependabot does not open a standalone one either; drop
       # both when the parser supports TS 7.
       - dependency-name: 'typescript'
-        update-types:
-          - 'version-update:semver-major'
+        versions:
+          - '>=7.0.0'
       # typescript-eslint bumps fail pnpm minimumReleaseAge supply-chain policy
       # checks when Dependabot resolves freshly published releases into the lockfile.
       - dependency-name: 'typescript-eslint'
