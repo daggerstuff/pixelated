@@ -48,7 +48,7 @@ import {
 // ---------------------------------------------------------------------------
 
 const INDEX_PATH = resolve(".cache/knip-index.json");
-const INDEX_VERSION = 4;
+const INDEX_VERSION = 5;
 const SCAN_GLOB = "apps/web/src/**/*.{ts,tsx,js,jsx,astro}";
 const CONSUMER_GLOB = "{apps/web/src,tests}/**/*.{test,spec}.{ts,tsx,js,jsx}";
 const CONSUMER_IGNORE = [
@@ -362,6 +362,7 @@ async function buildIndex() {
         line: exp.line,
         col: exp.col,
         kind: exp.kind,
+        localName: exp.localName,
         referencedInFile: exp.referencedInFile === true,
         importedBy: consumers ? [...consumers].map((p) => relative(resolve("."), p)).sort() : [],
       };
