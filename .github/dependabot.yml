@@ -265,14 +265,20 @@ updates:
       uv:
         patterns:
           - '*'
-        # These two resolve DOWN in a group bump: semgrep 1.185.0 -> 1.79.0
-        # (a security scanner losing a hundred releases, and its certifi
-        # dependency) and pip-audit 2.10.1 -> 2.9.0, because the newer group
-        # members leave them without a compatible release. Keep them out of the
-        # group so the rest can land; they still get their own PRs.
+        # A group bump resolved semgrep DOWN (1.185.0 -> 1.79.0) and pip-audit
+        # 2.10.1 -> 2.9.0. The cause is opentelemetry: every semgrep release
+        # through 1.186.0 pins opentelemetry-api/sdk/exporter
+        # ~=1.37.0, so the group's 1.45.2 is unsatisfiable alongside it and
+        # the resolver falls back to the last semgrep without the pin. Keep
+        # semgrep, pip-audit and the opentelemetry family out of the group:
+        # the rest can land, and those five keep their own PRs.
         exclude-patterns:
           - 'semgrep'
           - 'pip-audit'
+          - 'opentelemetry-api'
+          - 'opentelemetry-sdk'
+          - 'opentelemetry-exporter-otlp-proto-http'
+          - 'opentelemetry-instrumentation-fastapi'
     ignore:
       # cryptography 50 conflicts with data-designer-engine caps (<=49) until NeMo
       # ships a release compatible with cryptography 50. Ignore entirely (not just
