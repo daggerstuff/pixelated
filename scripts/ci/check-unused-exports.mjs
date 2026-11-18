@@ -301,7 +301,7 @@ async function buildIndex() {
         absPath,
         exports.map((exp) => ({
           ...exp,
-          referencedInFile: hasInternalReference(cleanSource, exp.localName ?? exp.name),
+          referencedInFile: hasInternalReference(source, exp.localName ?? exp.name),
         })),
       );
     }
@@ -586,9 +586,9 @@ async function main() {
       }
       foundCount++;
 
-      let cleanSource = null;
+      let sourceText = null;
       try {
-        cleanSource = stripComments(await readFile(resolve(normalised), "utf8"));
+        sourceText = await readFile(resolve(normalised), "utf8");
       } catch (error) {
         warnUnreadable(normalised, error);
       }
@@ -598,9 +598,9 @@ async function main() {
         const referencedInFile =
           exportName === "default"
             ? false
-            : cleanSource === null
+            : sourceText === null
               ? (info.referencedInFile ?? false)
-              : hasInternalReference(cleanSource, referenceName);
+              : hasInternalReference(sourceText, referenceName);
         const violationKind = classifyViolation({ ...info, referencedInFile });
         if (!violationKind) continue;
         violations.push({
@@ -657,7 +657,7 @@ async function main() {
   }
 
   const violations = [];
-  const cleanSourceCache = new Map();
+  const sourceCache = new Map();
 
   for (const entry of issues) {
     const filePath = entry.file;
@@ -665,15 +665,15 @@ async function main() {
       continue;
     }
 
-    let cleanSource = cleanSourceCache.get(filePath);
-    if (cleanSource === undefined) {
+    let sourceText = sourceCache.get(filePath);
+    if (sourceText === undefined) {
       try {
-        cleanSource = stripComments(await readFile(resolve(filePath), "utf8"));
+        sourceText = await readFile(resolve(filePath), "utf8");
       } catch (error) {
         warnUnreadable(filePath, error);
-        cleanSource = null;
+        sourceText = null;
       }
-      cleanSourceCache.set(filePath, cleanSource);
+      sourceCache.set(filePath, sourceText);
     }
 
     const categories = [
@@ -689,9 +689,9 @@ async function main() {
       for (const item of items) {
         const memberKind = kind === "enum member" || kind === "namespace member";
         const referencedInFile =
-          memberKind || item.name === "default" || cleanSource === null
+          memberKind || item.name === "default" || sourceText === null
             ? false
-            : hasInternalReference(cleanSource, item.name);
+            : hasInternalReference(sourceText, item.name);
         violations.push({
           file: filePath,
           line: item.line,
