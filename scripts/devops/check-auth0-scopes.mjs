@@ -25,20 +25,30 @@
  *   AUTH0_DOMAIN, AUTH0_MANAGEMENT_CLIENT_ID, AUTH0_MANAGEMENT_CLIENT_SECRET
  */
 
-import { readFileSync, realpathSync } from "node:fs";
+import { realpathSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 export const REQUIRED_SCOPES = [
   { scope: "read:roles", usedBy: "auth0-rbac-service roles.list / getUserRoles" },
-  { scope: "read:users", usedBy: "auth0-rbac-service users.roles.list" },
-  { scope: "update:users", usedBy: "auth0-rbac-service users.roles.assign / delete" },
-  { scope: "read:logs", usedBy: "auth0-adaptive-mfa-service logs.list (IP and behaviour lookups)" },
-  { scope: "read:guardian_factors", usedBy: "auth0-mfa-service guardian.factors.list" },
   {
-    scope: "read:guardian_enrollments",
-    usedBy: "auth0-mfa-service guardian.enrollments.list",
+    scope: "read:users",
+    usedBy:
+      "auth0-rbac-service users.roles.list; auth0.service users.get / list / listUsersByEmail / update; auth0-mfa-service users.enrollments.get",
   },
+  { scope: "update:users", usedBy: "auth0-rbac-service users.roles.assign / delete" },
+  { scope: "create:users", usedBy: "auth0.service users.create (signup)" },
+  { scope: "create:roles", usedBy: "auth0-rbac-service roles.create (role bootstrap)" },
+  {
+    scope: "create:user_tickets",
+    usedBy: "auth0.service tickets.changePassword (password reset)",
+  },
+  {
+    scope: "read:logs",
+    usedBy:
+      "auth0-adaptive-mfa-service / auth0-activity-tracking-service logs.list (IP and behaviour lookups)",
+  },
+  { scope: "read:guardian_factors", usedBy: "auth0-mfa-service guardian.factors.list" },
   {
     scope: "create:guardian_enrollment_tickets",
     usedBy: "auth0-mfa-service guardian.enrollments.createTicket",
@@ -55,17 +65,10 @@ export function findMissingScopes(grantedList, requiredList = REQUIRED_SCOPES) {
 }
 
 function loadEnvFile() {
-  let text;
   try {
-    text = readFileSync(resolve(".env"), "utf8");
+    process.loadEnvFile(resolve(".env"));
   } catch {
     return;
-  }
-  for (const line of text.split("\n")) {
-    const match = /^([A-Z0-9_]+)=(.*)$/.exec(line.trim());
-    if (!match) continue;
-    if (process.env[match[1]] !== undefined) continue;
-    process.env[match[1]] = match[2].trim().replace(/^["']|["']$/g, "");
   }
 }
 
@@ -87,6 +90,7 @@ async function fetchGrantedScopes({ domain, clientId, clientSecret }) {
     throw new Error(String(detail));
   }
   if (typeof body.scope !== "string") {
+    if (typeof body.access_token === "string") return [];
     throw new Error("token response carried no scope claim");
   }
   return body.scope.split(/\s+/).filter(Boolean);
@@ -166,4 +170,10 @@ function isDirectInvocation() {
   }
 }
 
-if (isDirectInvocation()) main();
+if (isDirectInvocation()) {
+  main().catch((error) => {
+    console.error("check-auth0-scopes: internal error");
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 2;
+  });
+}

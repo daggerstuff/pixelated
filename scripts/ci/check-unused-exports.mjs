@@ -243,7 +243,7 @@ function extractExports(source, cleanSource) {
       .split(",")
       .map((s) => {
         const parts = s.trim().split(/\s+as\s+/);
-        return parts[0].trim();
+        return parts[0].trim().replace(/^type\s+/, "");
       })
       .filter(Boolean);
     const line = countLines(cleanSource, m.index);
@@ -666,8 +666,17 @@ async function main() {
       }
       foundCount++;
 
+      let cleanSource = null;
+      try {
+        cleanSource = stripComments(await readFile(resolve(normalised), "utf8"));
+      } catch {
+        cleanSource = null;
+      }
+
       for (const [exportName, info] of Object.entries(fileEntry)) {
-        const violationKind = classifyViolation(info);
+        const referencedInFile =
+          cleanSource === null ? info.referencedInFile : hasInternalReference(cleanSource, exportName);
+        const violationKind = classifyViolation({ ...info, referencedInFile });
         if (!violationKind) continue;
         violations.push({
           file: filePath,
@@ -723,11 +732,22 @@ async function main() {
   }
 
   const violations = [];
+  const cleanSourceCache = new Map();
 
   for (const entry of issues) {
     const filePath = entry.file;
     if (isScoped && !normalisedFilters.includes(normalise(filePath))) {
       continue;
+    }
+
+    let cleanSource = cleanSourceCache.get(filePath);
+    if (cleanSource === undefined) {
+      try {
+        cleanSource = stripComments(await readFile(resolve(filePath), "utf8"));
+      } catch {
+        cleanSource = null;
+      }
+      cleanSourceCache.set(filePath, cleanSource);
     }
 
     const categories = [
@@ -741,12 +761,15 @@ async function main() {
       const items = entry[key];
       if (!Array.isArray(items)) continue;
       for (const item of items) {
+        const referencedInFile =
+          cleanSource === null ? false : hasInternalReference(cleanSource, item.name);
         violations.push({
           file: filePath,
           line: item.line,
           col: item.col,
           name: item.name,
           kind,
+          violationKind: classifyViolation({ importedBy: [], referencedInFile }),
         });
       }
     }
@@ -763,4 +786,10 @@ function isDirectInvocation() {
   }
 }
 
-if (isDirectInvocation()) main();
+if (isDirectInvocation()) {
+  main().catch((error) => {
+    console.error("check-unused-exports: internal error");
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 2;
+  });
+}

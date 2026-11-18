@@ -23,13 +23,16 @@ function escapeRegExp(value) {
  * over-reporting only changes which remedy is suggested.
  */
 export function hasInternalReference(source, name) {
+  const declarationSource = source
+    .replace(/export\s+(?:type\s+)?\{[^}]*\}(?:\s+from\s+['"][^'"]+['"])?/g, " ")
+    .replace(/export\s+default\s+[A-Za-z_$][\w$]*\s*;?/g, " ");
   const pattern = new RegExp(
     "(?<![A-Za-z0-9_$])" + escapeRegExp(name) + "(?![A-Za-z0-9_$])",
     "g",
   );
   let seen = 0;
   let match;
-  while ((match = pattern.exec(source)) !== null) {
+  while ((match = pattern.exec(declarationSource)) !== null) {
     seen += 1;
     if (seen > 1) return true;
     if (match.index === pattern.lastIndex) pattern.lastIndex += 1;
