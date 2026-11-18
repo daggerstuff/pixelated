@@ -5049,8 +5049,8 @@ requires-dist = [
     { name = "scikit-learn" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "selenium", specifier = ">=4.43.0" },
-    { name = "semgrep", specifier = ">=1.60.0" },
-    { name = "semgrep", marker = "extra == 'dev'", specifier = ">=1.60.0" },
+    { name = "semgrep", specifier = ">=1.185.0" },
+    { name = "semgrep", marker = "extra == 'dev'", specifier = ">=1.185.0" },
     { name = "sentence-transformers", specifier = ">=2.7.0" },
     { name = "sentencepiece", specifier = ">=0.2.0" },
     { name = "sentry-sdk", specifier = ">=2.44.0" },
@@ -7351,7 +7351,7 @@ version = "0.34.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
-    { name = "cffi", marker = "implementation_name != 'pypy' and os_name == 'nt' and sys_platform != 'darwin'" },
+    { name = "cffi", marker = "implementation_name != 'pypy' and os_name == 'nt'" },
     { name = "idna" },
     { name = "outcome" },
     { name = "sniffio" },
