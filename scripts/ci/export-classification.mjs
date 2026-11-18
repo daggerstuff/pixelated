@@ -89,9 +89,17 @@ export function extractImports(cleanSource) {
   }
 
   // import DefaultName, { Named } from './path'
-  const importDefaultNamedRe = /import\s+(\w+)\s*,\s*\{[^}]*\}\s+from\s+['"]([^'"]+)['"]/g;
+  const importDefaultNamedRe = /import\s+(\w+)\s*,\s*\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g;
   while ((m = importDefaultNamedRe.exec(cleanSource)) !== null) {
-    imports.push({ names: ["default"], source: m[2], line: countLines(cleanSource, m.index) });
+    const named = m[2]
+      .split(",")
+      .map((s) => s.trim().replace(/^type\s+/, "").split(/\s+as\s+/)[0].trim())
+      .filter(Boolean);
+    imports.push({
+      names: ["default", ...named],
+      source: m[3],
+      line: countLines(cleanSource, m.index),
+    });
   }
 
   // import * as Namespace from './path'

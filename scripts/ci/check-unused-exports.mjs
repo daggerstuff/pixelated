@@ -593,9 +593,11 @@ async function main() {
 
       for (const [exportName, info] of Object.entries(fileEntry)) {
         const referencedInFile =
-          exportName === "default" || cleanSource === null
+          exportName === "default"
             ? false
-            : hasInternalReference(cleanSource, exportName);
+            : cleanSource === null
+              ? (info.referencedInFile ?? false)
+              : hasInternalReference(cleanSource, exportName);
         const violationKind = classifyViolation({ ...info, referencedInFile });
         if (!violationKind) continue;
         violations.push({
