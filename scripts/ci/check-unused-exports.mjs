@@ -219,7 +219,7 @@ function extractExports(source, cleanSource) {
           : m[0].includes("default")
             ? "export"
             : "export";
-    exports.push({ name: m[1], line, col, kind });
+    exports.push({ name: m[0].includes("default") ? "default" : m[1], line, col, kind });
   }
 
   // export default Identifier (re-exporting a previously defined symbol, common in React)
@@ -230,9 +230,9 @@ function extractExports(source, cleanSource) {
     const line = countLines(cleanSource, m.index);
     const col = m.index - cleanSource.lastIndexOf("\n", m.index - 1) - 1;
     // Avoid duplicates: only add if this name is not already in exports
-    const alreadyExists = exports.some((e) => e.name === m[1] && Math.abs(e.line - line) < 2);
+    const alreadyExists = exports.some((e) => e.name === "default" && Math.abs(e.line - line) < 2);
     if (!alreadyExists) {
-      exports.push({ name: m[1], line, col, kind: "export" });
+      exports.push({ name: "default", line, col, kind: "export" });
     }
   }
 
@@ -290,7 +290,7 @@ function extractImports(cleanSource) {
   // import DefaultName from './path'
   const importDefaultRe = /import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g;
   while ((m = importDefaultRe.exec(cleanSource)) !== null) {
-    imports.push({ names: [m[1]], source: m[2], line: countLines(cleanSource, m.index) });
+    imports.push({ names: [m[1], "default"], source: m[2], line: countLines(cleanSource, m.index) });
   }
 
   // import * as Namespace from './path'
