@@ -48,3 +48,101 @@ export function classifyViolation(info) {
   if (info.importedBy.length > 0) return null;
   return info.referencedInFile ? "internal-only" : "unused";
 }
+
+export function stripComments(source) {
+  let result = source.replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, " "));
+  result = result.replace(/\/\/[^\n]*/g, (m) => " ".repeat(m.length));
+  return result;
+}
+
+export function countLines(text, pos) {
+  let count = 1;
+  for (let i = 0; i < pos && i < text.length; i++) {
+    if (text.charCodeAt(i) === 10) count++;
+  }
+  return count;
+}
+
+export function extractImports(cleanSource) {
+  const imports = [];
+
+  // import { Name1, Name2 as Alias } from './path'
+  const importNamedRe = /import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g;
+  let m;
+  while ((m = importNamedRe.exec(cleanSource)) !== null) {
+    const names = m[1]
+      .split(",")
+      .map((s) => {
+        const withoutTypeModifier = s.trim().replace(/^type\s+/, "");
+        const parts = withoutTypeModifier.split(/\s+as\s+/);
+        return parts[0].trim();
+      })
+      .filter(Boolean);
+    imports.push({ names, source: m[2], line: countLines(cleanSource, m.index) });
+  }
+
+  // import DefaultName from './path'
+  const importDefaultRe = /import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g;
+  while ((m = importDefaultRe.exec(cleanSource)) !== null) {
+    imports.push({ names: [m[1], "default"], source: m[2], line: countLines(cleanSource, m.index) });
+  }
+
+  // import * as Namespace from './path'
+  const importNamespaceRe = /import\s+\*\s+as\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g;
+  while ((m = importNamespaceRe.exec(cleanSource)) !== null) {
+    imports.push({ names: [m[1]], source: m[2], line: countLines(cleanSource, m.index) });
+  }
+
+  // Dynamic imports: import('...') with member access like module.Name
+  const dynamicImportRe = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
+  const moduleMemberRe = /module\.([A-Za-z_$][A-Za-z0-9_$]*)/g;
+
+  /** @type {{ source: string; index: number }[]} */
+  const dynamicImports = [];
+  while ((m = dynamicImportRe.exec(cleanSource)) !== null) {
+    dynamicImports.push({ source: m[1], index: m.index });
+  }
+
+  // For each dynamic import, capture member accesses on the module binding in the
+  // same top-level/async scope (approximated by the nearest closing brace after
+  // the import or end of file). This is conservative: it may over-count, but it
+  // prevents false positives for lazy-loaded components.
+  const findScopeEnd = (fromIndex) => {
+    let braceCount = 0;
+    let inString = null;
+    for (let i = fromIndex; i < cleanSource.length; i++) {
+      const ch = cleanSource[i];
+      const prev = cleanSource[i - 1];
+      if (inString) {
+        if (ch === inString && prev !== "\\") inString = null;
+      } else if (ch === '"' || ch === "'" || ch === "`") {
+        inString = ch;
+      } else if (ch === "{") {
+        braceCount++;
+      } else if (ch === "}") {
+        if (braceCount <= 1) return i;
+        braceCount--;
+      }
+    }
+    return cleanSource.length;
+  };
+
+  for (const di of dynamicImports) {
+    const scopeEnd = findScopeEnd(di.index);
+    const slice = cleanSource.slice(di.index, scopeEnd);
+    const localMembers = new Set();
+    let mm;
+    while ((mm = moduleMemberRe.exec(slice)) !== null) {
+      localMembers.add(mm[1]);
+    }
+    if (localMembers.size > 0) {
+      imports.push({
+        names: [...localMembers],
+        source: di.source,
+        line: countLines(cleanSource, di.index),
+      });
+    }
+  }
+
+  return imports;
+}
