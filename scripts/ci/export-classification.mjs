@@ -51,8 +51,50 @@ export function classifyViolation(info) {
 }
 
 export function stripComments(source) {
-  let result = source.replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, " "));
-  result = result.replace(/\/\/[^\n]*/g, (m) => " ".repeat(m.length));
+  let result = "";
+  let index = 0;
+  let quote = null;
+  while (index < source.length) {
+    const ch = source[index];
+    const next = source[index + 1];
+    if (quote !== null) {
+      result += ch;
+      if (ch === "\\" && next !== undefined) {
+        result += next;
+        index += 2;
+        continue;
+      }
+      if (ch === quote) quote = null;
+      index += 1;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") {
+      quote = ch;
+      result += ch;
+      index += 1;
+      continue;
+    }
+    if (ch === "/" && next === "/") {
+      while (index < source.length && source[index] !== "\n") {
+        result += " ";
+        index += 1;
+      }
+      continue;
+    }
+    if (ch === "/" && next === "*") {
+      result += "  ";
+      index += 2;
+      while (index < source.length && !(source[index] === "*" && source[index + 1] === "/")) {
+        result += source[index] === "\n" ? "\n" : " ";
+        index += 1;
+      }
+      result += "  ";
+      index += 2;
+      continue;
+    }
+    result += ch;
+    index += 1;
+  }
   return result;
 }
 
