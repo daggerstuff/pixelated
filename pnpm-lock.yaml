@@ -629,8 +629,8 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       i18next:
-        specifier: ^27.1.1
-        version: 27.1.1(typescript@5.8.3)
+        specifier: ^27.1.2
+        version: 27.1.2(typescript@5.8.3)
       idb:
         specifier: ^8.0.4
         version: 8.0.4
@@ -732,7 +732,7 @@ importers:
         version: 2.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react-i18next:
         specifier: ^18.0.1
-        version: 18.0.1(@types/react@19.3.0)(i18next@27.1.1(typescript@5.8.3))(react@19.3.1)(typescript@5.8.3)
+        version: 18.0.1(@types/react@19.3.0)(i18next@27.1.2(typescript@5.8.3))(react@19.3.1)(typescript@5.8.3)
       recharts:
         specifier: ^3.10.1
         version: 3.10.1(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react-is@17.0.2)(react@19.3.1)(redux@5.0.1)
@@ -10686,8 +10686,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  i18next@27.1.1:
-    resolution: {integrity: sha512-Qq3aJizS3RXQ30crhx9BKQLrHoa6GKpgrOJjVZ9vgj3EBxAddrmVfDNUrAMxSUimw5Jc+ld4SSZUAzf1q4nGyQ==}
+  i18next@27.1.2:
+    resolution: {integrity: sha512-851D6dY9vuhn9hF0p5KpY7FPeYnm3P73tqyX2nxfsjeEYVg7Du0Fflw0rJtv7nFnZcDQS0+Hqn0UP6+SPx8mew==}
     engines: {node: '>=22'}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
@@ -24758,7 +24758,7 @@ snapshots:
 
   husky@9.1.7: {}
 
-  i18next@27.1.1(typescript@5.8.3):
+  i18next@27.1.2(typescript@5.8.3):
     optionalDependencies:
       typescript: 5.8.3
 
@@ -27325,10 +27325,10 @@ snapshots:
       '@types/react': 19.3.0
       '@types/react-dom': 19.3.0(@types/react@19.3.0)
 
-  react-i18next@18.0.1(@types/react@19.3.0)(i18next@27.1.1(typescript@5.8.3))(react@19.3.1)(typescript@5.8.3):
+  react-i18next@18.0.1(@types/react@19.3.0)(i18next@27.1.2(typescript@5.8.3))(react@19.3.1)(typescript@5.8.3):
     dependencies:
       html-parse-stringify: 4.0.1
-      i18next: 27.1.1(typescript@5.8.3)
+      i18next: 27.1.2(typescript@5.8.3)
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
