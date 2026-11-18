@@ -72,6 +72,14 @@ updates:
       major-updates:
         update-types:
           - 'major'
+        # typescript 7 has no typescript-eslint support yet, so a group that
+        # carries it cannot pass the lint gate. Take it on its own once the
+        # parser ships TS 7 support.
+        # vitest 5 changes how a test file is assigned to a project, so its
+        # migration needs its own PR and its own runs, not a group bump.
+        exclude-patterns:
+          - 'typescript'
+          - 'vitest'
     ignore:
       # UnoCSS packages are pinned in package.json overrides. Dependabot cannot
       # update them synchronously with the overrides, causing install conflicts.
@@ -106,6 +114,13 @@ updates:
           - 'version-update:semver-patch'
           - 'version-update:semver-minor'
           - 'version-update:semver-major'
+      # typescript 7 has no typescript-eslint support yet, so any PR that
+      # carries it fails the lint gate. Excluded from the major group above and
+      # ignored here so Dependabot does not open a standalone one either; drop
+      # both when the parser supports TS 7.
+      - dependency-name: 'typescript'
+        versions:
+          - '>=7.0.0'
       # typescript-eslint bumps fail pnpm minimumReleaseAge supply-chain policy
       # checks when Dependabot resolves freshly published releases into the lockfile.
       - dependency-name: 'typescript-eslint'
@@ -250,6 +265,14 @@ updates:
       uv:
         patterns:
           - '*'
+        # These two resolve DOWN in a group bump: semgrep 1.185.0 -> 1.79.0
+        # (a security scanner losing a hundred releases, and its certifi
+        # dependency) and pip-audit 2.10.1 -> 2.9.0, because the newer group
+        # members leave them without a compatible release. Keep them out of the
+        # group so the rest can land; they still get their own PRs.
+        exclude-patterns:
+          - 'semgrep'
+          - 'pip-audit'
     ignore:
       # cryptography 50 conflicts with data-designer-engine caps (<=49) until NeMo
       # ships a release compatible with cryptography 50. Ignore entirely (not just
