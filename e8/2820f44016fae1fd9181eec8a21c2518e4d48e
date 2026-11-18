@@ -1,0 +1,27 @@
+training/output/ovh-v29-qwen3-8b/run-v29-l4/ovh-run.json
+  s_7d4811cf1b0ba7::t_aeba409eb65e98 1-311
+training/output/ovh-v29-qwen3-8b/run-v29-l4/adapter-final/adapter_config.json
+  s_7d4811cf1b0ba7::t_aeba409eb65e98 1-51
+training/output/ovh-v29-qwen3-8b/run-v29-l4/adapter-final/tokenizer_config.json
+  s_7d4811cf1b0ba7::t_aeba409eb65e98 1-30
+training/output/ovh-v29-qwen3-8b/run-v29-l4/adapter-final/chat_template.jinja
+  s_7d4811cf1b0ba7::t_aeba409eb65e98 1-89
+docs
+  s_7d4811cf1b0ba7::t_29a474fb1c93b3 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e82820f44016fae1fd9181eec8a21c2518e4d48e",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
