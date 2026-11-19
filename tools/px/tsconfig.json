@@ -10,7 +10,8 @@
     "rootDir": "src",
     "declaration": true,
     "lib": ["ESNext"],
-    "types": ["node"]
+    "types": ["node"],
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "tests"]
