@@ -1,0 +1,21 @@
+agents/advisor-agent/README.md
+  s_e96f85d720e925::t_46d6136a2cc5fe 15
+agents/pipeline-agent/README.md
+  s_e96f85d720e925::t_46d6136a2cc5fe 14,19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "93613e0d3b2c741b9fa4ada5f84a38c864f4c5d3",
+  "prompts": {},
+  "sessions": {
+    "s_e96f85d720e925": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "spiffy-seagull",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

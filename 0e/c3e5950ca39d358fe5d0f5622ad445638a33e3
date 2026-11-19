@@ -1,0 +1,25 @@
+agents/deploy/README.md
+  s_e96f85d720e925::t_57ea74e031a922 171-185
+agents/deploy/slack-app-manifest.yaml
+  s_e96f85d720e925::t_f110e1b33ea777 3-25
+  s_e96f85d720e925::t_1da8633df1b01b 1-2
+  s_e96f85d720e925::t_b65d0a4597d457 26-28
+agents/deploy/slack-oauth-callback.py
+  s_e96f85d720e925::t_a54bc6ede6fc69 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0ec3e5950ca39d358fe5d0f5622ad445638a33e3",
+  "prompts": {},
+  "sessions": {
+    "s_e96f85d720e925": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "spiffy-seagull",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
