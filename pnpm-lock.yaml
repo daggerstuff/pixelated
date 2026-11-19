@@ -501,10 +501,10 @@ importers:
         version: 1.41.0
       '@vercel/analytics':
         specifier: ^2.0.1
-        version: 2.0.1(react@19.3.1)(vue@3.5.44(typescript@5.8.3))
+        version: 2.0.1(react@19.3.1)(vue@3.5.44(typescript@6.0.3))
       '@vercel/speed-insights':
         specifier: ^2.1.0
-        version: 2.1.0(react@19.3.1)(vue@3.5.44(typescript@5.8.3))
+        version: 2.1.0(react@19.3.1)(vue@3.5.44(typescript@6.0.3))
       ai:
         specifier: ^7.0.58
         version: 7.0.141(zod@4.6.7)
@@ -579,7 +579,7 @@ importers:
         version: 0.45.4(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.2.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.41.0)(better-sqlite3@13.2.0)(pg@8.23.1)(postgres@4.1.1)(sql.js@1.14.2)
       eve:
         specifier: 1.0.0
-        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3))
+        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3))
       express:
         specifier: '>=4.20.0'
         version: 5.3.0(supports-color@10.2.2)
@@ -630,7 +630,7 @@ importers:
         version: 3.0.3
       i18next:
         specifier: ^27.1.2
-        version: 27.1.2(typescript@5.8.3)
+        version: 27.1.2(typescript@6.0.3)
       idb:
         specifier: ^8.0.4
         version: 8.0.4
@@ -732,7 +732,7 @@ importers:
         version: 2.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react-i18next:
         specifier: ^18.0.1
-        version: 18.0.1(@types/react@19.3.0)(i18next@27.1.2(typescript@5.8.3))(react@19.3.1)(typescript@5.8.3)
+        version: 18.0.1(@types/react@19.3.0)(i18next@27.1.2(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
       recharts:
         specifier: ^3.10.1
         version: 3.10.1(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react-is@17.0.2)(react@19.3.1)(redux@5.0.1)
@@ -820,10 +820,10 @@ importers:
         version: 4.0.19
       '@astrojs/ts-plugin':
         specifier: ^1.11.0
-        version: 1.11.0(typescript@5.8.3)
+        version: 1.11.0(typescript@6.0.3)
       '@astrojs/vercel':
         specifier: 11.0.20
-        version: 11.0.20(patch_hash=98dab2aa3e8f14d981e78922cb973a7f1646e6894b56dc058447a3ea212c6c3b)(@aws-sdk/credential-provider-web-identity@3.972.80)(astro@7.4.12(patch_hash=74950e75e5c1b6b481917ab76bdc51751e1359ee6e6c5618fa69037bad96d2a5)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.6)(@upstash/redis@1.41.0)(@vercel/functions@3.10.1(@aws-sdk/credential-provider-web-identity@3.972.80)(ws@8.23.0(utf-8-validate@6.0.6)))(crossws@0.4.17(srvx@1.0.8))(db0@0.4.1)(esbuild@0.28.2)(ioredis@6.0.0(supports-color@10.2.2))(jiti@2.7.0)(ocache@0.3.2)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(react@19.3.1)(rollup@4.68.3)(supports-color@10.2.2)(vue@3.5.44(typescript@5.8.3))(ws@8.23.0(utf-8-validate@6.0.6))
+        version: 11.0.20(patch_hash=98dab2aa3e8f14d981e78922cb973a7f1646e6894b56dc058447a3ea212c6c3b)(@aws-sdk/credential-provider-web-identity@3.972.80)(astro@7.4.12(patch_hash=74950e75e5c1b6b481917ab76bdc51751e1359ee6e6c5618fa69037bad96d2a5)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.6)(@upstash/redis@1.41.0)(@vercel/functions@3.10.1(@aws-sdk/credential-provider-web-identity@3.972.80)(ws@8.23.0(utf-8-validate@6.0.6)))(crossws@0.4.17(srvx@1.0.8))(db0@0.4.1)(esbuild@0.28.2)(ioredis@6.0.0(supports-color@10.2.2))(jiti@2.7.0)(ocache@0.3.2)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(react@19.3.1)(rollup@4.68.3)(supports-color@10.2.2)(vue@3.5.44(typescript@6.0.3))(ws@8.23.0(utf-8-validate@6.0.6))
       '@axe-core/playwright':
         specifier: ^4.14.0
         version: 4.14.0(playwright-core@1.65.1)
@@ -853,7 +853,7 @@ importers:
         version: 1.0.34
       '@graphql-codegen/cli':
         specifier: ^8.0.0
-        version: 8.0.0(@parcel/watcher@2.6.0)(@types/node@26.6.6)(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(utf-8-validate@6.0.6)
+        version: 8.0.0(@parcel/watcher@2.6.0)(@types/node@26.6.6)(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(utf-8-validate@6.0.6)
       '@graphql-codegen/typescript':
         specifier: ^7.0.1
         version: 7.0.1(graphql@17.1.0)
@@ -889,7 +889,7 @@ importers:
         version: 6.17.1
       '@tarquinen/opencode-dcp':
         specifier: ^3.2.0
-        version: 3.2.0(@opencode-ai/plugin@1.19.0(@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)))(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)
+        version: 3.2.0(@opencode-ai/plugin@1.19.0(@opentui/core@0.4.5(typescript@6.0.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@6.0.3)(web-tree-sitter@0.25.10)))(supports-color@10.2.2)(typescript@6.0.3)(web-tree-sitter@0.25.10)
       '@testing-library/dom':
         specifier: ^10.4.2
         version: 10.4.2
@@ -1036,7 +1036,7 @@ importers:
         version: 10.15.0(jiti@2.7.0)(supports-color@10.2.2)
       eslint-plugin-n:
         specifier: ^18.5.0
-        version: 18.5.0(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@5.8.3)
+        version: 18.5.0(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
       espree:
         specifier: ^11.2.0
         version: 11.2.0
@@ -1105,7 +1105,7 @@ importers:
         version: 11.3.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10)(supports-color@10.2.2)
       msw:
         specifier: ^3.0.6
-        version: 3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
       node-gyp-build:
         specifier: ^4.8.4
         version: 4.8.4
@@ -1206,11 +1206,11 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       typescript:
-        specifier: ~5.8.0
-        version: 5.8.3
+        specifier: ~6.0.3
+        version: 6.0.3
       typescript-eslint:
         specifier: ^8.68.0
-        version: 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)
+        version: 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       unocss:
         specifier: ^66.7.0
         version: 66.11.0(@oxc-project/types@0.151.0)(@unocss/astro@66.11.0(cac@7.1.0)(ocache@0.3.2)(srvx@1.0.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(cac@7.1.0)(ocache@0.3.2)(rolldown@1.3.2)(rollup@4.68.3)(srvx@1.0.8)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
@@ -1231,13 +1231,13 @@ importers:
         version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
       vite-tsconfig-paths:
         specifier: ^6.1.1
-        version: 6.1.1(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 6.1.1(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
       vue:
         specifier: ^3.5.42
-        version: 3.5.44(typescript@5.8.3)
+        version: 3.5.44(typescript@6.0.3)
       wait-on:
         specifier: ^9.5.1
         version: 9.5.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
@@ -1280,7 +1280,7 @@ importers:
         version: 3.6.0(supports-color@10.2.2)
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   agents/content-agent:
     dependencies:
@@ -1295,7 +1295,7 @@ importers:
         version: 7.0.141(zod@4.6.7)
       eve:
         specifier: 1.0.0
-        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3))
+        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3))
       workers-ai-provider:
         specifier: ^4.0.1
         version: 4.0.1(@ai-sdk/anthropic@4.0.81(zod@4.6.7))(@ai-sdk/openai@4.0.95(zod@4.6.7))(@ai-sdk/provider@4.0.37)(ai@7.0.141(zod@4.6.7))
@@ -1317,7 +1317,7 @@ importers:
         version: 3.6.0(supports-color@10.2.2)
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   agents/eve-agent:
     dependencies:
@@ -1329,7 +1329,7 @@ importers:
         version: 7.0.141(zod@4.6.7)
       eve:
         specifier: 1.0.0
-        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3))
+        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3))
       express:
         specifier: '>=4.20.0'
         version: 5.3.0(supports-color@10.2.2)
@@ -1354,7 +1354,7 @@ importers:
         version: 3.6.0(supports-color@10.2.2)
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   agents/intake-agent:
     dependencies:
@@ -1369,7 +1369,7 @@ importers:
         version: 7.0.141(zod@4.6.7)
       eve:
         specifier: 1.0.0
-        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3))
+        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3))
       express:
         specifier: '>=4.20.0'
         version: 5.3.0(supports-color@10.2.2)
@@ -1394,7 +1394,7 @@ importers:
         version: 3.6.0(supports-color@10.2.2)
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   agents/pipeline-agent:
     dependencies:
@@ -1427,7 +1427,7 @@ importers:
         version: 7.0.141(zod@4.6.7)
       eve:
         specifier: 1.0.0
-        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3))
+        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3))
       workers-ai-provider:
         specifier: ^4.0.1
         version: 4.0.1(@ai-sdk/anthropic@4.0.81(zod@4.6.7))(@ai-sdk/openai@4.0.95(zod@4.6.7))(@ai-sdk/provider@4.0.37)(ai@7.0.141(zod@4.6.7))
@@ -1449,7 +1449,7 @@ importers:
         version: 3.6.0(supports-color@10.2.2)
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   agents/qa-agent:
     dependencies:
@@ -1482,7 +1482,7 @@ importers:
         version: 7.0.141(zod@4.6.7)
       eve:
         specifier: 1.0.0
-        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3))
+        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3))
       workers-ai-provider:
         specifier: ^4.0.1
         version: 4.0.1(@ai-sdk/anthropic@4.0.81(zod@4.6.7))(@ai-sdk/openai@4.0.95(zod@4.6.7))(@ai-sdk/provider@4.0.37)(ai@7.0.141(zod@4.6.7))
@@ -1504,7 +1504,7 @@ importers:
         version: 3.6.0(supports-color@10.2.2)
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   agents/session-agent:
     dependencies:
@@ -1537,7 +1537,7 @@ importers:
         version: 7.0.141(zod@4.6.7)
       eve:
         specifier: 1.0.0
-        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3))
+        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3))
       mongodb:
         specifier: 7.6.0
         version: 7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
@@ -1568,7 +1568,7 @@ importers:
         version: 3.6.0(supports-color@10.2.2)
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   agents/supervisor-agent:
     dependencies:
@@ -1583,7 +1583,7 @@ importers:
         version: 7.0.141(zod@4.6.7)
       eve:
         specifier: 1.0.0
-        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3))
+        version: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3))
       express:
         specifier: '>=4.20.0'
         version: 5.3.0(supports-color@10.2.2)
@@ -1608,7 +1608,7 @@ importers:
         version: 3.6.0(supports-color@10.2.2)
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   foresight/cli:
     dependencies:
@@ -1645,7 +1645,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   packages/autoreview:
     dependencies:
@@ -1672,11 +1672,11 @@ importers:
         specifier: 4.23.15
         version: 4.23.15
       typescript:
-        specifier: ~5.7.3
-        version: 5.7.3
+        specifier: ~6.0.3
+        version: 6.0.3
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   packages/memory-schema:
     dependencies:
@@ -1685,11 +1685,11 @@ importers:
         version: 4.6.7
     devDependencies:
       typescript:
-        specifier: ~5.7.3
-        version: 5.7.3
+        specifier: ~6.0.3
+        version: 6.0.3
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   packages/pixelated-sdk:
     dependencies:
@@ -1704,17 +1704,17 @@ importers:
         specifier: ^26.6.6
         version: 26.6.6
       typescript:
-        specifier: ~5.7.3
-        version: 5.7.3
+        specifier: ~6.0.3
+        version: 6.0.3
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   packages/sdk-typescript:
     devDependencies:
       typescript:
-        specifier: ~5.7.3
-        version: 5.7.3
+        specifier: ~6.0.3
+        version: 6.0.3
 
   tools/px:
     dependencies:
@@ -1733,13 +1733,13 @@ importers:
         version: 26.6.6
       tsup:
         specifier: ^9.0.0
-        version: 9.0.0(jiti@2.7.0)(postcss@8.5.33)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.8.4)
+        version: 9.0.0(jiti@2.7.0)(postcss@8.5.33)(tsx@4.23.15)(typescript@6.0.3)(yaml@2.8.4)
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.3
+        version: 6.0.3
       vitest:
         specifier: ^4.1.12
-        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
 packages:
 
@@ -14161,18 +14161,13 @@ packages:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  typescript@5.7.3:
-    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
-  typescript@5.8.3:
-    resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -15343,21 +15338,21 @@ snapshots:
       is-docker: 4.0.0
       package-manager-detector: 1.9.0
 
-  '@astrojs/ts-plugin@1.11.0(typescript@5.8.3)':
+  '@astrojs/ts-plugin@1.11.0(typescript@6.0.3)':
     dependencies:
       '@astrojs/astro2tsx': 0.1.4
       '@astrojs/yaml2ts': 0.2.4
       '@volar/language-core': 2.4.31
-      '@volar/typescript': 2.4.31(typescript@5.8.3)
+      '@volar/typescript': 2.4.31(typescript@6.0.3)
     transitivePeerDependencies:
       - typescript
 
   '@astrojs/underscore-redirects@1.0.4': {}
 
-  '@astrojs/vercel@11.0.20(patch_hash=98dab2aa3e8f14d981e78922cb973a7f1646e6894b56dc058447a3ea212c6c3b)(@aws-sdk/credential-provider-web-identity@3.972.80)(astro@7.4.12(patch_hash=74950e75e5c1b6b481917ab76bdc51751e1359ee6e6c5618fa69037bad96d2a5)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.6)(@upstash/redis@1.41.0)(@vercel/functions@3.10.1(@aws-sdk/credential-provider-web-identity@3.972.80)(ws@8.23.0(utf-8-validate@6.0.6)))(crossws@0.4.17(srvx@1.0.8))(db0@0.4.1)(esbuild@0.28.2)(ioredis@6.0.0(supports-color@10.2.2))(jiti@2.7.0)(ocache@0.3.2)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(react@19.3.1)(rollup@4.68.3)(supports-color@10.2.2)(vue@3.5.44(typescript@5.8.3))(ws@8.23.0(utf-8-validate@6.0.6))':
+  '@astrojs/vercel@11.0.20(patch_hash=98dab2aa3e8f14d981e78922cb973a7f1646e6894b56dc058447a3ea212c6c3b)(@aws-sdk/credential-provider-web-identity@3.972.80)(astro@7.4.12(patch_hash=74950e75e5c1b6b481917ab76bdc51751e1359ee6e6c5618fa69037bad96d2a5)(@azure/storage-blob@12.34.0(supports-color@10.2.2))(@types/node@26.6.6)(@upstash/redis@1.41.0)(@vercel/functions@3.10.1(@aws-sdk/credential-provider-web-identity@3.972.80)(ws@8.23.0(utf-8-validate@6.0.6)))(crossws@0.4.17(srvx@1.0.8))(db0@0.4.1)(esbuild@0.28.2)(ioredis@6.0.0(supports-color@10.2.2))(jiti@2.7.0)(ocache@0.3.2)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(react@19.3.1)(rollup@4.68.3)(supports-color@10.2.2)(vue@3.5.44(typescript@6.0.3))(ws@8.23.0(utf-8-validate@6.0.6))':
     dependencies:
       '@astrojs/internal-helpers': 0.13.1(patch_hash=ebdd1966ecd34c914d725ce2525d1ab4e759c3335374079650f9e3b4ebabc706)
-      '@vercel/analytics': 2.0.1(react@19.3.1)(vue@3.5.44(typescript@5.8.3))
+      '@vercel/analytics': 2.0.1(react@19.3.1)(vue@3.5.44(typescript@6.0.3))
       '@vercel/functions': 3.10.1(@aws-sdk/credential-provider-web-identity@3.972.80)(ws@8.23.0(utf-8-validate@6.0.6))
       '@vercel/nft': 1.11.0(rollup@4.68.3)(supports-color@10.2.2)
       '@vercel/routing-utils': 6.2.0
@@ -16762,7 +16757,7 @@ snapshots:
       graphql: 17.1.0
       tslib: 2.8.1
 
-  '@graphql-codegen/cli@8.0.0(@parcel/watcher@2.6.0)(@types/node@26.6.6)(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(utf-8-validate@6.0.6)':
+  '@graphql-codegen/cli@8.0.0(@parcel/watcher@2.6.0)(@types/node@26.6.6)(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(utf-8-validate@6.0.6)':
     dependencies:
       '@babel/generator': 7.29.8
       '@babel/template': 7.29.7
@@ -16783,11 +16778,11 @@ snapshots:
       '@inquirer/prompts': 8.7.3(@types/node@26.6.6)
       '@whatwg-node/fetch': 0.10.13
       chalk: 5.6.2
-      cosmiconfig: 9.0.2(typescript@5.8.3)
+      cosmiconfig: 9.0.2(typescript@6.0.3)
       debounce: 3.0.0
       detect-indent: 7.0.2
       graphql: 17.1.0
-      graphql-config: 6.0.0(@types/node@26.6.6)(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(typescript@5.8.3)(utf-8-validate@6.0.6)
+      graphql-config: 6.0.0(@types/node@26.6.6)(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(typescript@6.0.3)(utf-8-validate@6.0.6)
       is-glob: 4.0.3
       jiti: 2.7.0
       json-to-pretty-yaml: 1.2.2
@@ -18008,15 +18003,15 @@ snapshots:
 
   '@open-draft/until@3.0.1': {}
 
-  '@opencode-ai/plugin@1.19.0(@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10))':
+  '@opencode-ai/plugin@1.19.0(@opentui/core@0.4.5(typescript@6.0.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@6.0.3)(web-tree-sitter@0.25.10))':
     dependencies:
       '@ai-sdk/provider': 3.0.8
       '@opencode-ai/sdk': 1.19.0
       effect: 4.0.3
       zod: 4.6.7
     optionalDependencies:
-      '@opentui/core': 0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10)
-      '@opentui/solid': 0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(typescript@6.0.3)(web-tree-sitter@0.25.10)
+      '@opentui/solid': 0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@6.0.3)(web-tree-sitter@0.25.10)
 
   '@opencode-ai/sdk@1.19.0':
     dependencies:
@@ -19346,9 +19341,9 @@ snapshots:
   '@opentui/core-win32-x64@0.4.5':
     optional: true
 
-  '@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10)':
+  '@opentui/core@0.4.5(typescript@6.0.3)(web-tree-sitter@0.25.10)':
     dependencies:
-      bun-ffi-structs: 0.2.4(typescript@5.8.3)
+      bun-ffi-structs: 0.2.4(typescript@6.0.3)
       diff: 5.2.2
       marked: 17.0.1
       string-width: 7.2.0
@@ -19366,11 +19361,11 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)':
+  '@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@6.0.3)(web-tree-sitter@0.25.10)':
     dependencies:
       '@babel/core': 7.29.7(supports-color@10.2.2)
       '@babel/preset-typescript': 7.27.1(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2)
-      '@opentui/core': 0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(typescript@6.0.3)(web-tree-sitter@0.25.10)
       babel-plugin-module-resolver: 5.0.2
       babel-preset-solid: 1.9.12(@babel/core@7.29.7(supports-color@10.2.2))(solid-js@1.9.12)
       entities: 7.0.1
@@ -20986,13 +20981,13 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.3.0
 
-  '@tarquinen/opencode-dcp@3.2.0(@opencode-ai/plugin@1.19.0(@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)))(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)':
+  '@tarquinen/opencode-dcp@3.2.0(@opencode-ai/plugin@1.19.0(@opentui/core@0.4.5(typescript@6.0.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@6.0.3)(web-tree-sitter@0.25.10)))(supports-color@10.2.2)(typescript@6.0.3)(web-tree-sitter@0.25.10)':
     dependencies:
       '@anthropic-ai/tokenizer': 0.0.4
-      '@opencode-ai/plugin': 1.19.0(@opentui/core@0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10))
+      '@opencode-ai/plugin': 1.19.0(@opentui/core@0.4.5(typescript@6.0.3)(web-tree-sitter@0.25.10))(@opentui/solid@0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@6.0.3)(web-tree-sitter@0.25.10))
       '@opencode-ai/sdk': 1.19.0
-      '@opentui/core': 0.4.5(typescript@5.8.3)(web-tree-sitter@0.25.10)
-      '@opentui/solid': 0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@5.8.3)(web-tree-sitter@0.25.10)
+      '@opentui/core': 0.4.5(typescript@6.0.3)(web-tree-sitter@0.25.10)
+      '@opentui/solid': 0.4.5(solid-js@1.9.12)(supports-color@10.2.2)(typescript@6.0.3)(web-tree-sitter@0.25.10)
       jsonc-parser: 3.3.1
       solid-js: 1.9.12
     transitivePeerDependencies:
@@ -21082,7 +21077,7 @@ snapshots:
       picocolors: 1.1.1
       redent: 3.0.0
     optionalDependencies:
-      vitest: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+      vitest: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   '@testing-library/react@16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
@@ -21418,40 +21413,40 @@ snapshots:
     dependencies:
       '@types/node': 26.6.6
 
-  '@typescript-eslint/eslint-plugin@8.71.2(@typescript-eslint/parser@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)':
+  '@typescript-eslint/eslint-plugin@8.71.2(@typescript-eslint/parser@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)
+      '@typescript-eslint/parser': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       '@typescript-eslint/scope-manager': 8.71.2
-      '@typescript-eslint/type-utils': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)
-      '@typescript-eslint/utils': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)
+      '@typescript-eslint/type-utils': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       '@typescript-eslint/visitor-keys': 8.71.2
       eslint: 10.15.0(jiti@2.7.0)(supports-color@10.2.2)
       ignore: 7.0.12
       natural-compare: 1.4.0
-      ts-api-utils: 2.5.0(typescript@5.8.3)
-      typescript: 5.8.3
+      ts-api-utils: 2.5.0(typescript@6.0.3)
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)':
+  '@typescript-eslint/parser@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.71.2
       '@typescript-eslint/types': 8.71.2
-      '@typescript-eslint/typescript-estree': 8.71.2(supports-color@10.2.2)(typescript@5.8.3)
+      '@typescript-eslint/typescript-estree': 8.71.2(supports-color@10.2.2)(typescript@6.0.3)
       '@typescript-eslint/visitor-keys': 8.71.2
       debug: 4.4.3(supports-color@10.2.2)
       eslint: 10.15.0(jiti@2.7.0)(supports-color@10.2.2)
-      typescript: 5.8.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.71.2(supports-color@10.2.2)(typescript@5.8.3)':
+  '@typescript-eslint/project-service@8.71.2(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.71.2(typescript@5.8.3)
+      '@typescript-eslint/tsconfig-utils': 8.71.2(typescript@6.0.3)
       '@typescript-eslint/types': 8.71.2
       debug: 4.4.3(supports-color@10.2.2)
-      typescript: 5.8.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -21460,47 +21455,47 @@ snapshots:
       '@typescript-eslint/types': 8.71.2
       '@typescript-eslint/visitor-keys': 8.71.2
 
-  '@typescript-eslint/tsconfig-utils@8.71.2(typescript@5.8.3)':
+  '@typescript-eslint/tsconfig-utils@8.71.2(typescript@6.0.3)':
     dependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
-  '@typescript-eslint/type-utils@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)':
+  '@typescript-eslint/type-utils@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@typescript-eslint/types': 8.71.2
-      '@typescript-eslint/typescript-estree': 8.71.2(supports-color@10.2.2)(typescript@5.8.3)
-      '@typescript-eslint/utils': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)
+      '@typescript-eslint/typescript-estree': 8.71.2(supports-color@10.2.2)(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       debug: 4.4.3(supports-color@10.2.2)
       eslint: 10.15.0(jiti@2.7.0)(supports-color@10.2.2)
-      ts-api-utils: 2.5.0(typescript@5.8.3)
-      typescript: 5.8.3
+      ts-api-utils: 2.5.0(typescript@6.0.3)
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@8.71.2': {}
 
-  '@typescript-eslint/typescript-estree@8.71.2(supports-color@10.2.2)(typescript@5.8.3)':
+  '@typescript-eslint/typescript-estree@8.71.2(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/project-service': 8.71.2(supports-color@10.2.2)(typescript@5.8.3)
-      '@typescript-eslint/tsconfig-utils': 8.71.2(typescript@5.8.3)
+      '@typescript-eslint/project-service': 8.71.2(supports-color@10.2.2)(typescript@6.0.3)
+      '@typescript-eslint/tsconfig-utils': 8.71.2(typescript@6.0.3)
       '@typescript-eslint/types': 8.71.2
       '@typescript-eslint/visitor-keys': 8.71.2
       debug: 4.4.3(supports-color@10.2.2)
       minimatch: 9.0.9
       semver: 7.8.5
       tinyglobby: 0.2.17
-      ts-api-utils: 2.5.0(typescript@5.8.3)
-      typescript: 5.8.3
+      ts-api-utils: 2.5.0(typescript@6.0.3)
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)':
+  '@typescript-eslint/utils@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.10.1(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))
       '@typescript-eslint/scope-manager': 8.71.2
       '@typescript-eslint/types': 8.71.2
-      '@typescript-eslint/typescript-estree': 8.71.2(supports-color@10.2.2)(typescript@5.8.3)
+      '@typescript-eslint/typescript-estree': 8.71.2(supports-color@10.2.2)(typescript@6.0.3)
       eslint: 10.15.0(jiti@2.7.0)(supports-color@10.2.2)
-      typescript: 5.8.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -21754,10 +21749,10 @@ snapshots:
     dependencies:
       uncrypto: 0.1.3
 
-  '@vercel/analytics@2.0.1(react@19.3.1)(vue@3.5.44(typescript@5.8.3))':
+  '@vercel/analytics@2.0.1(react@19.3.1)(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
       react: 19.3.1
-      vue: 3.5.44(typescript@5.8.3)
+      vue: 3.5.44(typescript@6.0.3)
 
   '@vercel/cli-config@0.2.0':
     dependencies:
@@ -21775,7 +21770,7 @@ snapshots:
       '@ai-sdk/mcp': 2.0.77(zod@4.6.7)
       '@modelcontextprotocol/sdk': 1.32.2(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.7)
       ai: 7.0.141(zod@4.6.7)
-      eve: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3))
+      eve: 1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3))
 
   '@vercel/detect-agent@1.2.5': {}
 
@@ -21837,10 +21832,10 @@ snapshots:
       - bare-abort-controller
       - react-native-b4a
 
-  '@vercel/speed-insights@2.1.0(react@19.3.1)(vue@3.5.44(typescript@5.8.3))':
+  '@vercel/speed-insights@2.1.0(react@19.3.1)(vue@3.5.44(typescript@6.0.3))':
     optionalDependencies:
       react: 19.3.1
-      vue: 3.5.44(typescript@5.8.3)
+      vue: 3.5.44(typescript@6.0.3)
 
   '@vitejs/plugin-react@6.1.2(@rolldown/plugin-babel@0.2.4(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.7)(rolldown@1.3.2)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))':
     dependencies:
@@ -21868,7 +21863,7 @@ snapshots:
       obug: 3.0.0
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+      vitest: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
 
   '@vitest/expect@4.1.12':
     dependencies:
@@ -21879,22 +21874,22 @@ snapshots:
       chai: 6.3.0
       tinyrainbow: 3.2.0
 
-  '@vitest/mocker@4.1.12(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))':
+  '@vitest/mocker@4.1.12(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))':
     dependencies:
       '@vitest/spy': 4.1.12
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      msw: 3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+      msw: 3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
       vite: 8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
 
-  '@vitest/mocker@4.1.12(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))':
+  '@vitest/mocker@4.1.12(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))':
     dependencies:
       '@vitest/spy': 4.1.12
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      msw: 3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+      msw: 3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
 
   '@vitest/pretty-format@4.1.12':
@@ -21925,25 +21920,25 @@ snapshots:
     dependencies:
       '@volar/source-map': 2.4.31
 
-  '@volar/language-service@2.4.31(typescript@5.8.3)':
+  '@volar/language-service@2.4.31(typescript@6.0.3)':
     dependencies:
       '@volar/language-core': 2.4.31
       vscode-languageserver-protocol: 3.18.4
       vscode-languageserver-textdocument: 1.0.15
       vscode-uri: 3.2.0
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
   '@volar/source-map@2.4.31': {}
 
-  '@volar/typescript@2.4.31(typescript@5.8.3)':
+  '@volar/typescript@2.4.31(typescript@6.0.3)':
     dependencies:
       '@volar/language-core': 2.4.31
-      '@volar/language-service': 2.4.31(typescript@5.8.3)
+      '@volar/language-service': 2.4.31(typescript@6.0.3)
       path-browserify: 1.0.1
       vscode-uri: 3.2.0
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
   '@vue/compiler-core@3.5.44':
     dependencies:
@@ -22666,9 +22661,9 @@ snapshots:
 
   builtins@1.0.3: {}
 
-  bun-ffi-structs@0.2.4(typescript@5.8.3):
+  bun-ffi-structs@0.2.4(typescript@6.0.3):
     dependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
   bundle-name@4.1.1:
     dependencies:
@@ -23043,23 +23038,23 @@ snapshots:
       object-assign: 4.1.1
       vary: 1.1.2
 
-  cosmiconfig@8.3.6(typescript@5.8.3):
+  cosmiconfig@8.3.6(typescript@6.0.3):
     dependencies:
       import-fresh: 3.3.1
       js-yaml: 4.3.2
       parse-json: 5.2.0
       path-type: 4.0.0
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
-  cosmiconfig@9.0.2(typescript@5.8.3):
+  cosmiconfig@9.0.2(typescript@6.0.3):
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
       js-yaml: 4.3.2
       parse-json: 5.2.0
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
   crc-32@1.2.2: {}
 
@@ -23714,7 +23709,7 @@ snapshots:
       eslint: 10.15.0(jiti@2.7.0)(supports-color@10.2.2)
       eslint-compat-utils: 0.5.1(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))
 
-  eslint-plugin-n@18.5.0(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@5.8.3):
+  eslint-plugin-n@18.5.0(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3):
     dependencies:
       '@eslint-community/eslint-utils': 4.10.1(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))
       enhanced-resolve: 5.26.0
@@ -23727,7 +23722,7 @@ snapshots:
       js-yaml: 4.3.2
       semver: 7.8.5
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
   eslint-scope@9.1.2:
     dependencies:
@@ -23807,21 +23802,6 @@ snapshots:
 
   etag@1.8.1: {}
 
-  eve@1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.8.3)):
-    dependencies:
-      ai: 7.0.141(zod@4.6.7)
-      nitro: 3.0.261103-rc
-      rolldown: 1.3.2
-      undici: 7.30.1
-    optionalDependencies:
-      '@opentelemetry/api': 1.9.1
-      '@vercel/connect': 2.9.3(@ai-sdk/mcp@2.0.77(zod@4.6.7))(@modelcontextprotocol/sdk@1.32.2(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.7))(ai@7.0.141(zod@4.6.7))(eve@1.0.0)
-      chat: 4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7)
-      just-bash: 3.6.0(supports-color@10.2.2)
-      react: 19.3.1
-      vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
-      vue: 3.5.44(typescript@5.8.3)
-
   eve@1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@5.9.3)):
     dependencies:
       ai: 7.0.141(zod@4.6.7)
@@ -23836,6 +23816,21 @@ snapshots:
       react: 19.3.1
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
       vue: 3.5.44(typescript@5.9.3)
+
+  eve@1.0.0(@opentelemetry/api@1.9.1)(@vercel/connect@2.9.3)(ai@7.0.141(zod@4.6.7))(chat@4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7))(just-bash@3.6.0(supports-color@10.2.2))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))(vue@3.5.44(typescript@6.0.3)):
+    dependencies:
+      ai: 7.0.141(zod@4.6.7)
+      nitro: 3.0.261103-rc
+      rolldown: 1.3.2
+      undici: 7.30.1
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.1
+      '@vercel/connect': 2.9.3(@ai-sdk/mcp@2.0.77(zod@4.6.7))(@modelcontextprotocol/sdk@1.32.2(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.7))(ai@7.0.141(zod@4.6.7))(eve@1.0.0)
+      chat: 4.42.0(ai@7.0.141(zod@4.6.7))(supports-color@10.2.2)(zod@4.6.7)
+      just-bash: 3.6.0(supports-color@10.2.2)
+      react: 19.3.1
+      vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
+      vue: 3.5.44(typescript@6.0.3)
 
   event-target-polyfill@0.0.4: {}
 
@@ -24408,7 +24403,7 @@ snapshots:
 
   graceful-fs@4.2.11: {}
 
-  graphql-config@6.0.0(@types/node@26.6.6)(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(typescript@5.8.3)(utf-8-validate@6.0.6):
+  graphql-config@6.0.0(@types/node@26.6.6)(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(typescript@6.0.3)(utf-8-validate@6.0.6):
     dependencies:
       '@graphql-tools/graphql-file-loader': 9.1.1(graphql@17.1.0)
       '@graphql-tools/json-file-loader': 9.0.8(graphql@17.1.0)
@@ -24416,7 +24411,7 @@ snapshots:
       '@graphql-tools/merge': 10.0.8(graphql@17.1.0)
       '@graphql-tools/url-loader': 10.0.8(@types/node@26.6.6)(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(utf-8-validate@6.0.6)
       '@graphql-tools/utils': 13.2.2(graphql@17.1.0)
-      cosmiconfig: 8.3.6(typescript@5.8.3)
+      cosmiconfig: 8.3.6(typescript@6.0.3)
       graphql: 17.1.0
       jiti: 2.7.0
       minimatch: 10.2.6
@@ -24745,9 +24740,9 @@ snapshots:
 
   husky@9.1.7: {}
 
-  i18next@27.1.2(typescript@5.8.3):
+  i18next@27.1.2(typescript@6.0.3):
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
   iconv-lite@0.6.3:
     dependencies:
@@ -26389,7 +26384,7 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)):
+  msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)):
     dependencies:
       '@inquirer/confirm': 6.3.3(@types/node@26.6.6)
       '@msw/url': 0.1.2
@@ -26405,7 +26400,7 @@ snapshots:
       yargs: 18.2.0
     optionalDependencies:
       graphql: 17.1.0
-      typescript: 5.8.3
+      typescript: 6.0.3
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
     transitivePeerDependencies:
       - '@types/node'
@@ -27323,14 +27318,14 @@ snapshots:
       '@types/react': 19.3.0
       '@types/react-dom': 19.3.0(@types/react@19.3.0)
 
-  react-i18next@18.0.1(@types/react@19.3.0)(i18next@27.1.2(typescript@5.8.3))(react@19.3.1)(typescript@5.8.3):
+  react-i18next@18.0.1(@types/react@19.3.0)(i18next@27.1.2(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3):
     dependencies:
       html-parse-stringify: 4.0.1
-      i18next: 27.1.2(typescript@5.8.3)
+      i18next: 27.1.2(typescript@6.0.3)
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
-      typescript: 5.8.3
+      typescript: 6.0.3
 
   react-is@16.13.1: {}
 
@@ -28576,17 +28571,17 @@ snapshots:
 
   trough@2.2.0: {}
 
-  ts-api-utils@2.5.0(typescript@5.8.3):
+  ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
   ts-interface-checker@0.1.13: {}
 
   ts-log@3.0.3: {}
 
-  tsconfck@3.1.6(typescript@5.8.3):
+  tsconfck@3.1.6(typescript@6.0.3):
     optionalDependencies:
-      typescript: 5.8.3
+      typescript: 6.0.3
 
   tsconfig-paths-webpack-plugin@4.2.0:
     dependencies:
@@ -28642,7 +28637,7 @@ snapshots:
       - tsx
       - yaml
 
-  tsup@9.0.0(jiti@2.7.0)(postcss@8.5.33)(tsx@4.23.15)(typescript@5.9.3)(yaml@2.8.4):
+  tsup@9.0.0(jiti@2.7.0)(postcss@8.5.33)(tsx@4.23.15)(typescript@6.0.3)(yaml@2.8.4):
     dependencies:
       bundle-require: 5.1.0(esbuild@0.28.2)
       cac: 7.1.0
@@ -28663,7 +28658,7 @@ snapshots:
       tree-kill: 1.2.2
     optionalDependencies:
       postcss: 8.5.33
-      typescript: 5.9.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - jiti
       - tsx
@@ -28755,22 +28750,20 @@ snapshots:
 
   typed-query-selector@2.12.3: {}
 
-  typescript-eslint@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3):
+  typescript-eslint@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.71.2(@typescript-eslint/parser@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)
-      '@typescript-eslint/parser': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)
-      '@typescript-eslint/typescript-estree': 8.71.2(supports-color@10.2.2)(typescript@5.8.3)
-      '@typescript-eslint/utils': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@5.8.3)
+      '@typescript-eslint/eslint-plugin': 8.71.2(@typescript-eslint/parser@8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+      '@typescript-eslint/parser': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+      '@typescript-eslint/typescript-estree': 8.71.2(supports-color@10.2.2)(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.71.2(eslint@10.15.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
       eslint: 10.15.0(jiti@2.7.0)(supports-color@10.2.2)
-      typescript: 5.8.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  typescript@5.7.3: {}
-
-  typescript@5.8.3: {}
-
   typescript@5.9.3: {}
+
+  typescript@6.0.3: {}
 
   uc.micro@2.1.0: {}
 
@@ -29064,11 +29057,11 @@ snapshots:
 
   viewerjs@1.15.2: {}
 
-  vite-tsconfig-paths@6.1.1(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)):
+  vite-tsconfig-paths@6.1.1(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)):
     dependencies:
       debug: 4.4.3(supports-color@10.2.2)
       globrex: 0.1.2
-      tsconfck: 3.1.6(typescript@5.8.3)
+      tsconfck: 3.1.6(typescript@6.0.3)
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
     transitivePeerDependencies:
       - supports-color
@@ -29110,10 +29103,10 @@ snapshots:
     optionalDependencies:
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)
 
-  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)):
+  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)):
     dependencies:
       '@vitest/expect': 4.1.12
-      '@vitest/mocker': 4.1.12(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+      '@vitest/mocker': 4.1.12(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
       '@vitest/pretty-format': 4.1.12
       '@vitest/runner': 4.1.12
       '@vitest/snapshot': 4.1.12
@@ -29140,10 +29133,10 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)):
+  vitest@4.1.12(@opentelemetry/api@1.9.1)(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(jsdom@31.0.1(@noble/hashes@2.4.0))(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)):
     dependencies:
       '@vitest/expect': 4.1.12
-      '@vitest/mocker': 4.1.12(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@5.8.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
+      '@vitest/mocker': 4.1.12(msw@3.0.6(@types/node@26.6.6)(graphql@17.1.0)(supports-color@10.2.2)(typescript@6.0.3)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4)))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(tsx@4.23.15)(yaml@2.8.4))
       '@vitest/pretty-format': 4.1.12
       '@vitest/runner': 4.1.12
       '@vitest/snapshot': 4.1.12
@@ -29189,16 +29182,6 @@ snapshots:
 
   vscode-uri@3.2.0: {}
 
-  vue@3.5.44(typescript@5.8.3):
-    dependencies:
-      '@vue/compiler-dom': 3.5.44
-      '@vue/compiler-sfc': 3.5.44
-      '@vue/runtime-dom': 3.5.44
-      '@vue/server-renderer': 3.5.44
-      '@vue/shared': 3.5.44
-    optionalDependencies:
-      typescript: 5.8.3
-
   vue@3.5.44(typescript@5.9.3):
     dependencies:
       '@vue/compiler-dom': 3.5.44
@@ -29209,6 +29192,16 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
     optional: true
+
+  vue@3.5.44(typescript@6.0.3):
+    dependencies:
+      '@vue/compiler-dom': 3.5.44
+      '@vue/compiler-sfc': 3.5.44
+      '@vue/runtime-dom': 3.5.44
+      '@vue/server-renderer': 3.5.44
+      '@vue/shared': 3.5.44
+    optionalDependencies:
+      typescript: 6.0.3
 
   w3c-xmlserializer@6.0.0:
     dependencies:
@@ -29793,8 +29786,6 @@ time:
   tsx@4.23.15: '2026-09-20T07:22:17.792Z'
   tw-animate-css@1.4.0: '2025-09-24T05:25:53.055Z'
   typescript-eslint@8.71.2: '2026-10-12T17:10:00.963Z'
-  typescript@5.7.3: '2025-01-08T19:05:34.766Z'
-  typescript@5.8.3: '2025-04-05T00:17:37.851Z'
   unocss@66.11.0: '2026-10-12T06:41:36.594Z'
   url-polyfill@1.1.14: '2025-09-08T16:30:08.509Z'
   utf-8-validate@6.0.6: '2025-12-18T16:38:00.865Z'
