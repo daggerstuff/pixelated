@@ -86,15 +86,36 @@ const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
 const targetedJsdomLibGlobs = ['/lib/providers/', '/lib/hooks/']
 
 const globToRegExp = (glob: string): RegExp => {
-  const expanded = glob.replace(/\{([^}]+)\}/g, (_match, group: string) => `(${group.split(',').join('|')})`)
-  const escaped = expanded.replace(/[.+^$()|[\]\\]/g, '\\$&')
-  const body = escaped
-    .replace(/\*\*\//g, '\u0000')
-    .replace(/\*\*/g, '.*')
-    .replace(/\u0000/g, '(?:.*/)?')
-    .replace(/\*/g, '[^/]*')
-    .replace(/\?/g, '.')
-  return new RegExp(`^${body}$`)
+  let out = '^'
+  for (let index = 0; index < glob.length; index += 1) {
+    const ch = glob[index]
+    if (ch === '*') {
+      if (glob[index + 1] === '*') {
+        if (glob[index + 2] === '/') {
+          out += '(?:.*/)?'
+          index += 2
+        } else {
+          out += '.*'
+          index += 1
+        }
+      } else {
+        out += '[^/]*'
+      }
+    } else if (ch === '?') {
+      out += '.'
+    } else if (ch === '{') {
+      const end = glob.indexOf('}', index)
+      const alternatives = glob
+        .slice(index + 1, end)
+        .split(',')
+        .map((alternative) => alternative.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      out += `(${alternatives.join('|')})`
+      index = end
+    } else {
+      out += ch.replace(/[.+^$()|[\]\\]/g, '\\$&')
+    }
+  }
+  return new RegExp(`${out}$`)
 }
 const nodeGlobMatchers = nodeTestGlobs.map((glob) => globToRegExp(glob))
 const matchesNodeGlob = (entry: string) => nodeGlobMatchers.some((pattern) => pattern.test(entry))
