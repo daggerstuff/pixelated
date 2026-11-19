@@ -138,6 +138,11 @@ function buildVitestArgs(suite, passedArgs) {
         `⚠ VITEST_BUCKET="${process.env.VITEST_BUCKET}" is set but positional test paths were passed — bucket selection is bypassed.`,
       );
     }
+    // vitest 5 runs a file named on the command line in every project whose
+    // exclude does not match, so a jsdom test can run a second time under the
+    // node project and fail on `window`. The config already routes a file list
+    // through VITEST_TARGET_TESTS; use the same channel for explicit paths.
+    process.env["VITEST_TARGET_TESTS"] = positionalArgs.join(";");
     return passedArgs;
   }
 

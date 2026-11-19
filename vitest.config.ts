@@ -85,9 +85,24 @@ const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
 // them to node, where jsdom-dependent singletons are null (79 bucket failures).
 const targetedJsdomLibGlobs = ['/lib/providers/', '/lib/hooks/']
 
+const globToRegExp = (glob: string): RegExp => {
+  const expanded = glob.replace(/\{([^}]+)\}/g, (_match, group: string) => `(${group.split(',').join('|')})`)
+  const escaped = expanded.replace(/[.+^$()|[\]\\]/g, '\\$&')
+  const body = escaped
+    .replace(/\*\*\//g, '\u0000')
+    .replace(/\*\*/g, '.*')
+    .replace(/\u0000/g, '(?:.*/)?')
+    .replace(/\*/g, '[^/]*')
+    .replace(/\?/g, '.')
+  return new RegExp(`^${body}$`)
+}
+const nodeGlobMatchers = nodeTestGlobs.map((glob) => globToRegExp(glob))
+const matchesNodeGlob = (entry: string) => nodeGlobMatchers.some((pattern) => pattern.test(entry))
+
 const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
-    (entry.includes('/api/') ||
+    (matchesNodeGlob(entry) ||
+      entry.includes('/api/') ||
       entry.includes('/lib/') ||
       entry.startsWith('agents/') ||
       // tests/unit/auth0 is pinned to the node project by baseNodeTestGlobs
