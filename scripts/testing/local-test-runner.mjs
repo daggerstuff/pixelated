@@ -10,6 +10,7 @@
 // If SKIP_TESTS is set to "true" (case-insensitive) or "1", the script exits 0 without running tests.
 
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 /**
@@ -19,6 +20,8 @@ import { resolve } from "node:path";
 
 /** @type {string} */
 const scriptDir = resolve(process.cwd(), "scripts", "testing");
+/** Test files only: these are what the config can route to one project. */
+const TEST_FILE_PATTERN = /\.(test|spec)\.(js|mjs|cjs|ts|mts|cts|jsx|tsx)$/;
 /** @type {string} */
 const skip = (process.env.SKIP_TESTS ?? "").toLowerCase();
 if (skip === "true" || skip === "1") {
@@ -137,6 +140,21 @@ function buildVitestArgs(suite, passedArgs) {
       console.warn(
         `⚠ VITEST_BUCKET="${process.env.VITEST_BUCKET}" is set but positional test paths were passed — bucket selection is bypassed.`,
       );
+    }
+    // vitest 5 runs a file named on the command line in every project whose
+    // exclude does not match, so a jsdom test can run a second time under the
+    // node project and fail on `window`. The config already routes a file list
+    // through VITEST_TARGET_TESTS; use the same channel for explicit paths.
+    //
+    // Only real test files may travel that channel: it turns each entry into a
+    // project include glob, so a directory filter, a substring filter or an
+    // option value (`--reporter json` makes `json` positional) would become a
+    // pattern that matches nothing. Anything else stays a positional argument
+    // and keeps vitest's own path filtering.
+    const isTargetEntry = (arg) =>
+      /[*?{]/.test(arg) || (TEST_FILE_PATTERN.test(arg) && existsSync(resolve(process.cwd(), arg)));
+    if (positionalArgs.every(isTargetEntry)) {
+      process.env["VITEST_TARGET_TESTS"] = positionalArgs.join(";");
     }
     return passedArgs;
   }

@@ -85,9 +85,48 @@ const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
 // them to node, where jsdom-dependent singletons are null (79 bucket failures).
 const targetedJsdomLibGlobs = ['/lib/providers/', '/lib/hooks/']
 
+const globToRegExp = (glob: string): RegExp => {
+  let out = '^'
+  for (let index = 0; index < glob.length; index += 1) {
+    const ch = glob[index]
+    if (ch === '*') {
+      if (glob[index + 1] === '*') {
+        if (glob[index + 2] === '/') {
+          out += '(?:.*/)?'
+          index += 2
+        } else {
+          out += '.*'
+          index += 1
+        }
+      } else {
+        out += '[^/]*'
+      }
+    } else if (ch === '?') {
+      out += '.'
+    } else if (ch === '{') {
+      const end = glob.indexOf('}', index)
+      const alternatives = glob
+        .slice(index + 1, end)
+        .split(',')
+        .map((alternative) =>
+          alternative.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+        )
+      out += `(${alternatives.join('|')})`
+      index = end
+    } else {
+      out += ch.replace(/[.+^$()|[\]\\]/g, '\\$&')
+    }
+  }
+  return new RegExp(`${out}$`)
+}
+const nodeGlobMatchers = nodeTestGlobs.map((glob) => globToRegExp(glob))
+const matchesNodeGlob = (entry: string) =>
+  nodeGlobMatchers.some((pattern) => pattern.test(entry))
+
 const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
-    (entry.includes('/api/') ||
+    (matchesNodeGlob(entry) ||
+      entry.includes('/api/') ||
       entry.includes('/lib/') ||
       entry.startsWith('agents/') ||
       // tests/unit/auth0 is pinned to the node project by baseNodeTestGlobs
@@ -202,7 +241,12 @@ export default defineConfig({
     ],
     projects: [
       {
-        plugins: [react(), ...astroPlugins],
+        // Vitest 5 merges the root config into every project, so declaring
+        // `react()` and the Astro plugins again here applied each of them
+        // twice: the Astro transform ran on its own output and every `.astro`
+        // import died with "CompilerError: Unexpected token". The root
+        // `plugins` array already supplies both, so the jsdom project inherits
+        // them and declares none of its own.
         resolve: {
           alias: [
             memorySchemaAlias,
