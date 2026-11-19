@@ -9,7 +9,7 @@ requires-python = ">=3.14, <3.15"
 dependencies = [
   "flask[async]",
   "flask-cors>=6.0.5", # Updated to latest secure version
-  "pandas",
+  "pandas<3", # nemoguardrails 0.22 caps pandas<3; 0.23+ needs jsonschema>=4.26
   "numpy",
   "scikit-learn",
   "pyjwt",
@@ -128,7 +128,9 @@ dependencies = [
   "python-telegram-bot>=22.7",
   "anthropic>=0.107.1",
   "libcst>=1.8.6",
-  "nemoguardrails>=0.22.0",
+  # 0.23+ requires jsonschema>=4.26, which semgrep>=1.185.0 caps at <4.26.
+  # Keep the resolver inside the region that can actually satisfy both.
+  "nemoguardrails>=0.22.0,<0.23.0",
   "pinecone-client>=6.0.0",
   "ruff>=0.15.17",
   "beautifulsoup4>=4.15.0",
