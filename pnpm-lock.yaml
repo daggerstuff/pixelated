@@ -1077,8 +1077,8 @@ importers:
         specifier: ^13.6.0
         version: 13.6.0(proxy-agent@8.0.2(supports-color@10.2.2))(rollup@4.68.3)(supports-color@10.2.2)(utf-8-validate@6.0.6)(yauzl@3.4.0)
       lint-staged:
-        specifier: ^17.6.0
-        version: 17.6.0
+        specifier: ^17.6.1
+        version: 17.6.1
       markdownlint:
         specifier: ^0.42.1
         version: 0.42.1(supports-color@10.2.2)
@@ -11509,8 +11509,8 @@ packages:
   linkify-it@5.0.2:
     resolution: {integrity: sha512-ONTm2jCMAVZjgQa/Fy1kScXsuOoF5NPTsoFBdE1KVIZ2vAh/r9+Bqo+0jINCBYnavTPQZz38QzFTme79ENoN3Q==}
 
-  lint-staged@17.6.0:
-    resolution: {integrity: sha512-nOhBfYkZEwkFtNzD5pK9s9LkcWoxJ+whLzEnhqi9nl7zTB5n7tg8+9iYgMGx2Wm3VlLu8cbNj0RACzY+nWi5iQ==}
+  lint-staged@17.6.1:
+    resolution: {integrity: sha512-3MXgVN7BERDR/6CXZs2fDHGc+r0+hlvGAa9wqMlVbIS6RVRuaPOnb5SnN6wMXulwfEy9DXVkMVUN/8cUlpPDnw==}
     engines: {node: '>=22.22.1'}
     hasBin: true
 
@@ -13693,9 +13693,9 @@ packages:
   strict-url-sanitise@0.0.1:
     resolution: {integrity: sha512-nuFtF539K8jZg3FjaWH/L8eocCR6gegz5RDOsaWxfdbF5Jqr2VXWxZayjTwUzsWJDC91k2EbnJXp6FuWW+Z4hg==}
 
-  string-argv@0.3.2:
-    resolution: {integrity: sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==}
-    engines: {node: '>=0.6.19'}
+  string-argv@0.4.0:
+    resolution: {integrity: sha512-UOtaksJ3SK3KLHba2i9I27fvuZNfBlImDP5wKsCOxCDMRDNxlipCe8rmnUAaDpqlQ93upnA0SzF2pjWhttozSA==}
+    engines: {node: '>=16.20.0'}
 
   string-env-interpolation@1.0.1:
     resolution: {integrity: sha512-78lwMoCcn0nNu8LszbP1UA7g55OeE4v7rCeWnM5B453rnNr4aq+5it3FEYtZrSEiMvHZOZ9Jlqb0OD0M2VInqg==}
@@ -25574,10 +25574,10 @@ snapshots:
     dependencies:
       uc.micro: 2.1.0
 
-  lint-staged@17.6.0:
+  lint-staged@17.6.1:
     dependencies:
       picomatch: 4.0.7
-      string-argv: 0.3.2
+      string-argv: 0.4.0
       tinyexec: 1.3.1
     optionalDependencies:
       yaml: 2.8.4
@@ -28225,7 +28225,7 @@ snapshots:
 
   strict-url-sanitise@0.0.1: {}
 
-  string-argv@0.3.2: {}
+  string-argv@0.4.0: {}
 
   string-env-interpolation@1.0.1: {}
 
@@ -29733,7 +29733,6 @@ time:
   jsonwebtoken@9.0.3: '2025-12-04T10:27:57.257Z'
   just-bash@3.6.0: '2026-10-01T12:48:02.977Z'
   langsmith@0.10.13: '2026-10-13T11:38:45.948Z'
-  lint-staged@17.6.0: '2026-09-26T06:01:39.503Z'
   markdown-table-prettify@4.1.0: '2026-05-22T12:48:20.853Z'
   markdownlint-cli@0.50.0: '2026-10-24T23:25:08.838Z'
   mdast-util-to-string@4.0.0: '2023-07-07T16:19:50.488Z'
