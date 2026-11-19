@@ -108,7 +108,9 @@ const globToRegExp = (glob: string): RegExp => {
       const alternatives = glob
         .slice(index + 1, end)
         .split(',')
-        .map((alternative) => alternative.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .map((alternative) =>
+          alternative.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+        )
       out += `(${alternatives.join('|')})`
       index = end
     } else {
@@ -118,7 +120,8 @@ const globToRegExp = (glob: string): RegExp => {
   return new RegExp(`${out}$`)
 }
 const nodeGlobMatchers = nodeTestGlobs.map((glob) => globToRegExp(glob))
-const matchesNodeGlob = (entry: string) => nodeGlobMatchers.some((pattern) => pattern.test(entry))
+const matchesNodeGlob = (entry: string) =>
+  nodeGlobMatchers.some((pattern) => pattern.test(entry))
 
 const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
@@ -238,7 +241,12 @@ export default defineConfig({
     ],
     projects: [
       {
-        plugins: [react(), ...astroPlugins],
+        // Vitest 5 merges the root config into every project, so declaring
+        // `react()` and the Astro plugins again here applied each of them
+        // twice: the Astro transform ran on its own output and every `.astro`
+        // import died with "CompilerError: Unexpected token". The root
+        // `plugins` array already supplies both, so the jsdom project inherits
+        // them and declares none of its own.
         resolve: {
           alias: [
             memorySchemaAlias,

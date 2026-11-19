@@ -82,6 +82,41 @@ if (typeof window !== 'undefined') {
   })
 }
 
+// jsdom installs requestAnimationFrame only when `pretendToBeVisual` is on,
+// and vitest.config.ts keeps that off so jsdom never runs its own frame loop.
+// Animation tests spy on the frame callback, so install the pair jsdom would
+// have provided, driven by timers instead of a jsdom-driven repaint loop.
+if (
+  typeof window !== 'undefined' &&
+  typeof window.requestAnimationFrame !== 'function'
+) {
+  const pendingFrames = new Map<number, ReturnType<typeof setTimeout>>()
+  let nextFrameId = 1
+  Object.defineProperty(window, 'requestAnimationFrame', {
+    writable: true,
+    configurable: true,
+    value: (callback: FrameRequestCallback): number => {
+      const id = nextFrameId++
+      const timer = setTimeout(() => {
+        pendingFrames.delete(id)
+        callback(performance.now())
+      }, 16)
+      pendingFrames.set(id, timer)
+      return id
+    },
+  })
+  Object.defineProperty(window, 'cancelAnimationFrame', {
+    writable: true,
+    configurable: true,
+    value: (id: number): void => {
+      const timer = pendingFrames.get(id)
+      if (timer === undefined) return
+      clearTimeout(timer)
+      pendingFrames.delete(id)
+    },
+  })
+}
+
 if (typeof HTMLCanvasElement !== 'undefined') {
   Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
     value: vi.fn(() => ({
