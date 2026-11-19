@@ -37,7 +37,7 @@
     "@vitest/coverage-v8": "^4.1.12",
     "express": "5.x",
     "just-bash": "^3.6.0",
-    "vitest": "^4.1.12"
+    "vitest": "^5.1.0"
   },
   "peerDependencies": {
     "express": "5.x"
