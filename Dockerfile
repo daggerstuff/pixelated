@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Enable pnpm
-ARG PNPM_VERSION=12.18.0
+ARG PNPM_VERSION=12.21.0
 RUN npm install -g pnpm@$PNPM_VERSION
 
 # Copy package manifests for dependency installation
