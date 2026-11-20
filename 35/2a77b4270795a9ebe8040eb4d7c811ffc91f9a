@@ -1,0 +1,25 @@
+agents/pipeline-agent/agent/tools/run_evaluation.ts
+  s_7d4811cf1b0ba7::t_b0b5c62d10a628 57-63,65-66,74
+agents/pipeline-agent/tests/run_evaluation.test.ts
+  s_7d4811cf1b0ba7::t_b0b5c62d10a628 35-60
+agents/pipeline-agent/tests/run_training.test.ts
+  s_7d4811cf1b0ba7::t_b0b5c62d10a628 81-107
+agents/pipeline-agent/agent/tools/run_training.ts
+  s_7d4811cf1b0ba7::t_b0b5c62d10a628 60-61,64,66-70,79-80,97-100,120-122,128-130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "352a77b4270795a9ebe8040eb4d7c811ffc91f9a",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
