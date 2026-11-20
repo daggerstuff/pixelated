@@ -650,3 +650,11 @@ apps/web/src/simulator/utils/__tests__/scenarios.test.ts
 
 # Cloudflare Wrangler local state (wrangler dev/deploy cache)
 .wrangler/
+
+# Ephemeral session/planning artifacts (one-off, not source)
+planning/
+codex-session-*.md
+conversation-*.txt
+thread-export-*.md
+trajectory-*.json
+training/output/**/tinker-dataset.json
