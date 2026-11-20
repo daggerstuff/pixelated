@@ -331,8 +331,8 @@ async function runAgentTool(
   let body: unknown = {}
   if (options.stdin) {
     const chunks: Buffer[] = []
-    for await (const chunk of process.stdin) {
-      chunks.push(Buffer.from(chunk))
+    for await (const chunk of process.stdin as AsyncIterable<Buffer>) {
+      chunks.push(chunk)
     }
     const raw = Buffer.concat(chunks).toString('utf8').trim()
     body = raw.length > 0 ? JSON.parse(raw) : {}
@@ -444,7 +444,7 @@ export function registerAgentCommands(program: Command): void {
         .option('--no-color', 'Disable colored output')
         .action(async (...args: unknown[]) => {
           // Root-level options (from invoke) may consume flags before subcommand parsing
-          const rootOpts = program.opts() as Record<string, unknown>
+          const rootOpts = program.opts<Record<string, unknown>>()
           const options = args[0] as InvokeOptions
           await runAgentTool(agentName, tool, {
             ...options,
@@ -469,7 +469,7 @@ export function registerAgentCommands(program: Command): void {
           .option('--no-color', 'Disable colored output')
           .action(async (...args: unknown[]) => {
             // Root-level options (from invoke) may consume flags before subcommand parsing
-            const rootOpts = program.opts() as Record<string, unknown>
+            const rootOpts = program.opts<Record<string, unknown>>()
             const options = args[0] as InvokeOptions
             await runAgentTool(agentName, tool, {
               ...options,

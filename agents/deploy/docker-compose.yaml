@@ -66,6 +66,10 @@ services:
       - PORT=2000
       - HOST=0.0.0.0
       - NODE_ENV=production
+    # Reads the training-infra MCP read-only (recipe registry, eval gate) to
+    # review recipe proposals; reach the host systemd unit via the gateway.
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     restart: unless-stopped
 
   content-agent:
@@ -130,6 +134,11 @@ services:
       - PORT=2000
       - HOST=0.0.0.0
       - NODE_ENV=production
+    # The training-infra MCP runs as a host systemd unit (not a Compose
+    # service); host-gateway lets this agent reach it at
+    # TRAINING_INFRA_MCP_URL=http://host.docker.internal:8766/mcp.
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     restart: unless-stopped
 
   qa-agent:

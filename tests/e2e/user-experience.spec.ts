@@ -34,7 +34,8 @@ test.describe('User Experience Features', () => {
     // Listen for transition classes being added to the DOM using a proxy instead of extending Element.prototype
     await page.addInitScript(() => {
       // Store the original appendChild method
-      const originalAppendChild = Element.prototype.appendChild
+      const originalAppendChild = (target: Element, node: Node): Node =>
+        Element.prototype.appendChild.call(target, node)
 
       // Create a proxy function that doesn't modify the prototype directly
       window._checkTransition = function (element: any) {
@@ -47,8 +48,8 @@ test.describe('User Experience Features', () => {
       }
 
       // Override appendChild with a function that calls the original and then checks for transitions
-      Element.prototype.appendChild = function <T extends Node>(node: T): T {
-        const result = originalAppendChild.call(this, node) as T
+      Element.prototype.appendChild = function <T extends Node>(this: Element, node: T): T {
+        const result = originalAppendChild(this, node) as T
         if (node instanceof Element) {
           window._checkTransition(node)
         }
