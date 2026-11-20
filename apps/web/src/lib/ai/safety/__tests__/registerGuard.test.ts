@@ -17,6 +17,20 @@ describe('hasBannedRegister', () => {
   it('ignores clean clinical text', () => {
     expect(hasBannedRegister('Get that cut closed at an emergency department tonight.')).toBe(false)
   })
+
+  it('flags the reflective validation register', () => {
+    const reply =
+      "You're saying something that feels true right now, but it's not your job to decide what your family needs. What would happen if you didn't say that out loud?"
+
+    expect(hasBannedRegister(reply)).toBe(true)
+  })
+
+  it('flags the reframing register', () => {
+    const reply =
+      "That belief is a heavy one to carry. It's not true, but it's been built over time. Let's look at what actually happens when you're around them."
+
+    expect(hasBannedRegister(reply)).toBe(true)
+  })
 })
 
 describe('sanitizeTherapyRegister', () => {
@@ -101,11 +115,33 @@ describe('sanitizeTherapyRegister', () => {
     expect(result.content).toContain('get that wound looked at')
   })
 
+  it('drops a reflective opener and keeps the escalation', () => {
+    const reply =
+      "You're saying something that feels true right now, but it's not your job to decide what your family needs. Call 988 now and tell them what you just said."
+
+    const result = sanitizeTherapyRegister(reply)
+
+    expect(result.altered).toBe(true)
+    expect(result.removed).toEqual([
+      "You're saying something that feels true right now, but it's not your job to decide what your family needs.",
+    ])
+    expect(result.content).toBe('Call 988 now and tell them what you just said.')
+  })
+
+  it('keeps a reflective question that carries the escalation', () => {
+    const reply = 'What would happen if you called 911 right now?'
+
+    const result = sanitizeTherapyRegister(reply)
+
+    expect(result.altered).toBe(false)
+    expect(result.content).toBe(reply)
+  })
+
   it('does not invent an escalation for a reply that has none', () => {
     // The guard owns register only. A reply that never escalates is a training
     // gap, not a phrasing defect, and is left exactly as generated.
     const reply =
-      "You've been holding onto a plan to end your life. I want to stay with you right now. What's it like to say that out loud?"
+      "You've been holding onto a plan to end your life. I want to stay with you right now. Tell me what happened."
 
     const result = sanitizeTherapyRegister(reply)
 
