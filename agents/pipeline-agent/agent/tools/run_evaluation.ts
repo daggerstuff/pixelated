@@ -54,9 +54,16 @@ export default defineTool({
     let trainingInfraPlan: Record<string, unknown> | null = null
     try {
       const tag = `eval-${input.candidate_model_id}-${input.benchmark_suite_version}`
+      // The recipe id pins the graded case suite (eval-crisis-v2 -> --suite v2),
+      // so the suite version is NOT an input: passing it would be rejected, and
+      // silently ignoring it would eval the wrong suite under the right label.
+      const recipe =
+        input.benchmark_suite_version === 'v1'
+          ? 'eval-crisis-v1'
+          : 'eval-crisis-v2'
       const planned = await planTrainingJob({
-        recipe: 'eval-crisis-v2',
-        inputs: { tag, suite: input.benchmark_suite_version },
+        recipe,
+        inputs: { tag },
       })
       if (planned && planned.ok === true) {
         trainingInfraPlan = {
@@ -64,7 +71,7 @@ export default defineTool({
           command: planned.command,
           est_cost_usd: planned.est_cost_usd,
           warnings: planned.warnings ?? [],
-          recipe: 'eval-crisis-v2',
+          recipe,
           tag,
         }
       }
