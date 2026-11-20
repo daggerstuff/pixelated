@@ -1,0 +1,28 @@
+scripts/ci/ratchet-stubs/pytest/__init__.pyi
+  s_7d4811cf1b0ba7::t_808405eae81e96 1-39,51-56
+  s_7d4811cf1b0ba7::t_855b21ed2e3a58 40-50
+scripts/ci/ai-strict-ratchet.mjs
+  s_7d4811cf1b0ba7::t_333210478f9f21 49-56
+scripts/ci/ratchet-stubs/fastmcp/__init__.pyi
+  s_7d4811cf1b0ba7::t_4687f3c8c37c10 1-22
+scripts/ci/ratchet-stubs/pydantic/__init__.pyi
+  s_7d4811cf1b0ba7::t_d8e57304503035 1-15,17-23,31-39
+  s_7d4811cf1b0ba7::t_f2bea6a1bc50be 25,27,29
+  s_7d4811cf1b0ba7::t_4e41bb99e2d14c 16,24,26,28,30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f1199611e573e40ba94921431d784975099f1a36",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
