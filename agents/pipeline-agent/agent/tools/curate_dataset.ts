@@ -2,29 +2,37 @@ import { defineTool } from 'eve/tools'
 import { always } from 'eve/tools/approval'
 import { z } from 'zod'
 
-import { planTrainingJob } from '../lib/training-infra-client.js'
+import {
+  planTrainingJob,
+  submitTrainingJob,
+} from '../lib/training-infra-client.js'
 
 interface CurateDatasetInput {
   dataset_id: string
   cohort_id?: string
   include_synthetic: boolean
+  submit: boolean
 }
 
 const SCHEMA = z.object({
   dataset_id: z.string().min(1),
   cohort_id: z.string().min(1).optional(),
   include_synthetic: z.boolean().default(true),
+  submit: z.boolean().default(false),
 })
 
 export default defineTool({
   description:
-    'Trigger dataset curation on the training infrastructure. Plans (and, ' +
-    'behind approval, submits) a curate-sft-v30 job via the training-infra ' +
-    'MCP. Returns the curation_run_id for downstream stages.',
+    'Trigger dataset curation on the training infrastructure. Plans a ' +
+    'curate-sft-v30 job via the training-infra MCP, and when submit=true ' +
+    'submits the approved plan_hash to start a real curation run. Returns ' +
+    'the training_infra_job_id for downstream stages.',
   inputSchema: SCHEMA,
   approval: always<CurateDatasetInput>(),
   async execute(input: CurateDatasetInput) {
     let trainingInfraPlan: Record<string, unknown> | null = null
+    let trainingInfraJobId: string | null = null
+    let submitError: string | null = null
     try {
       const planned = await planTrainingJob({
         recipe: 'curate-sft-v30',
@@ -40,25 +48,45 @@ export default defineTool({
           warnings: planned.warnings ?? [],
           recipe: 'curate-sft-v30',
         }
+        if (input.submit && typeof planned.plan_hash === 'string') {
+          const submitted = await submitTrainingJob({
+            plan_hash: planned.plan_hash,
+            requested_by: 'pipeline-agent:curate_dataset',
+            idempotency_key: `curate:${input.dataset_id}:${input.cohort_id ?? 'all'}`,
+          })
+          if (submitted && submitted.ok === true) {
+            trainingInfraJobId = (submitted.job_id as string) ?? null
+          } else {
+            submitError =
+              (submitted?.error as string) ?? 'submit_job returned no job id'
+          }
+        }
       }
-    } catch {
-      // Advisory: MCP may be unavailable; fall back to local id.
+    } catch (err) {
+      submitError = err instanceof Error ? err.message : String(err)
     }
 
-    const suffix = Date.now().toString(36)
-    const curationRunId = `curation-${suffix}`
-
     return {
-      curation_run_id: curationRunId,
-      training_infra_job_id: null,
+      // The real handle is the registry job id; it stays null until a plan is
+      // actually submitted, so no fabricated run id is ever reported.
+      training_infra_job_id: trainingInfraJobId,
       training_infra_plan: trainingInfraPlan,
+      submit_requested: input.submit,
+      submit_error: submitError,
       dataset_id: input.dataset_id,
       cohort_id: input.cohort_id ?? null,
       started_at: new Date().toISOString(),
       include_synthetic: input.include_synthetic,
-      note: trainingInfraPlan
-        ? 'Curation planned via training-infra MCP.'
-        : 'Training-infra MCP unavailable; using local run id. Retry when service is up.',
+      status: trainingInfraJobId
+        ? 'queued'
+        : trainingInfraPlan
+          ? 'planned'
+          : 'unavailable',
+      note: trainingInfraJobId
+        ? 'Curation submitted to the training-infra MCP; poll with check_training_job.'
+        : trainingInfraPlan
+          ? 'Curation planned; pass submit=true (behind approval) to launch it.'
+          : 'Training-infra MCP unavailable; no job was created.',
     }
   },
 })
