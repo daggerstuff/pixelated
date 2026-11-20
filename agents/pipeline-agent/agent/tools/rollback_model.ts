@@ -33,7 +33,7 @@ export default defineTool({
           'Automated rollback is not wired. The fleet runs from ' +
           'agents/deploy/docker-compose.yaml on the fleet host; roll back by ' +
           'pinning AGENT_IMAGE_TAG to the previous release and re-running ' +
-          '`make deploy`, then confirm the service reports healthy.',
+          '`make -f Makefile.agents deploy`, then confirm the service reports healthy.',
       },
     }
   },

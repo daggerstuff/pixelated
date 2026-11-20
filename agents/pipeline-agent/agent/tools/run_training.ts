@@ -32,7 +32,10 @@ export default defineTool({
     method: z.enum(['sft', 'dpo', 'grpo']).default('dpo'),
     hyperparams: z
       .object({
-        epochs: z.number().int().min(1).max(100).default(3),
+        // Max matches the train-sft-latest recipe override bound (recipes.yaml:
+        // epochs {min: 1, max: 10}). A wider schema would accept values the MCP
+        // rejects, turning a caller error into a confusing plan failure.
+        epochs: z.number().int().min(1).max(10).default(3),
         batch_size: z.number().int().min(1).max(512).default(8),
         learning_rate: z.number().min(1e-7).max(1).default(5e-5),
       })
