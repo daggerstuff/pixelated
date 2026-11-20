@@ -6,3 +6,5 @@ allowBuilds:
   sharp: false
   '@mongodb-js/zstd': true
   node-liblzma: false
+overrides:
+  '@ai-sdk/provider': 4.0.37

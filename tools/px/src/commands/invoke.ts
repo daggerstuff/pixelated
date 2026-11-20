@@ -94,8 +94,8 @@ export function registerInvoke(program: Command): void {
         let body: unknown = {}
         if (options.stdin) {
           const chunks: Buffer[] = []
-          for await (const chunk of process.stdin) {
-            chunks.push(Buffer.from(chunk))
+          for await (const chunk of process.stdin as AsyncIterable<Buffer>) {
+            chunks.push(chunk)
           }
           const raw = Buffer.concat(chunks).toString('utf8').trim()
           body = raw.length > 0 ? JSON.parse(raw) : {}
