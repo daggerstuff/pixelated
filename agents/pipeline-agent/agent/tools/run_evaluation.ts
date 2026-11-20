@@ -3,6 +3,7 @@ import { defineTool } from 'eve/tools'
 import { always } from 'eve/tools/approval'
 import { z } from 'zod'
 
+import { planTrainingJob } from '../lib/training-infra-client.js'
 import { getModel } from '../lib/workers-ai.js'
 
 interface RunEvaluationInput {
@@ -47,6 +48,30 @@ export default defineTool({
       }
     }
 
+    // Wire to the training-infra MCP: resolve (plan, do not launch) an eval
+    // job for this candidate/suite. Planning is side-effect free; submission
+    // happens separately via submit_job with the returned plan_hash.
+    let trainingInfraPlan: Record<string, unknown> | null = null
+    try {
+      const tag = `eval-${input.candidate_model_id}-${input.benchmark_suite_version}`
+      const planned = await planTrainingJob({
+        recipe: 'eval-crisis-v2',
+        inputs: { tag, suite: input.benchmark_suite_version },
+      })
+      if (planned && planned.ok === true) {
+        trainingInfraPlan = {
+          plan_hash: planned.plan_hash,
+          command: planned.command,
+          est_cost_usd: planned.est_cost_usd,
+          warnings: planned.warnings ?? [],
+          recipe: 'eval-crisis-v2',
+          tag,
+        }
+      }
+    } catch {
+      // Advisory: MCP may be unavailable; keep EVAL_REQUESTED state.
+    }
+
     return {
       candidate_model_id: input.candidate_model_id,
       benchmark_suite_version: input.benchmark_suite_version,
@@ -59,12 +84,10 @@ export default defineTool({
               model: '@cf/mistralai/mistral-small-3.1-24b-instruct',
             }
           : null,
-      benchmark_run_stub: {
-        note:
-          'Benchmark runner is not yet wired. The expected integration is ' +
-          'an MCP connection owned by the QA agent or by the ai/training ' +
-          'directory once it exists.',
-      },
+      training_infra_plan: trainingInfraPlan,
+      note: trainingInfraPlan
+        ? 'Eval plan resolved via training-infra MCP; submit with the returned plan_hash to launch.'
+        : 'Training-infra MCP unavailable; eval not planned. Retry when the service is up.',
     }
   },
 })
