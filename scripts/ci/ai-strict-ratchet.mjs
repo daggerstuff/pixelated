@@ -46,6 +46,14 @@ const MYPY_CONFIG = `[mypy]
 python_version = 3.14
 strict = True
 ignore_missing_imports = True
+# --no-site-packages keeps dev machines and CI on one error set, but it also
+# makes every third-party library invisible. For pytest, pydantic and fastmcp
+# that shows up as "untyped decorator" and "cannot subclass BaseModel (has
+# type Any)" — errors about the missing stub, not about the code, and ones no
+# amount of annotation in the code can clear. The stubs below declare just the
+# decorator and base-class shapes; everything else falls through to a module
+# __getattr__, so an unknown API stays Any instead of becoming a false error.
+mypy_path = ${join(ROOT, 'scripts/ci/ratchet-stubs')}
 # __main__ scripts collide on module names. training/output (and any other
 # output/ dir under the pinned trees) and wandb/ run-artifact dirs hold
 # gitignored files a clean CI checkout never has (training/models/ holds

@@ -1,0 +1,39 @@
+"""Minimal pydantic surface for the isolated ratchet analysis.
+
+Without this, `BaseModel` is Any under --no-site-packages, and every
+`class Foo(BaseModel)` in a new file reports `Class cannot subclass
+"BaseModel" (has type "Any")` — an error that says nothing about the code
+and cannot be fixed in the code. 107 files already carry 197 of those
+pinned in the baseline for exactly this reason; the ratchet refuses to pin
+new files, so no new pydantic module could ever pass the gate.
+
+Declaring BaseModel as a real class removes the artefact and keeps
+`disallow_subclassing_any` in force for genuinely Any bases. Instance
+attribute access stays Any because the stub does not know the model's
+fields, which is the honest answer rather than a guess.
+"""
+
+from typing import Any, Callable, Self, TypeVar
+
+_F = TypeVar("_F", bound=Callable[..., Any])
+
+class BaseModel:
+    def __init__(self, **data: Any) -> None: ...
+    def model_dump(self, **kwargs: Any) -> dict[str, Any]: ...
+    def model_dump_json(self, **kwargs: Any) -> str: ...
+    def model_copy(self, **kwargs: Any) -> Self: ...
+    @classmethod
+    def model_validate(cls, obj: Any, **kwargs: Any) -> Self: ...
+    @classmethod
+    def model_validate_json(cls, obj: Any, **kwargs: Any) -> Self: ...
+    @classmethod
+    def model_construct(cls, **values: Any) -> Self: ...
+    def __getattr__(self, name: str) -> Any: ...
+
+def Field(*args: Any, **kwargs: Any) -> Any: ...
+
+def field_validator(*args: Any, **kwargs: Any) -> Callable[[_F], _F]: ...
+
+def model_validator(*args: Any, **kwargs: Any) -> Callable[[_F], _F]: ...
+
+def __getattr__(name: str) -> Any: ...
