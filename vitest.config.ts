@@ -12,6 +12,7 @@ const memorySchemaAlias = {
   replacement: path.resolve(projectRoot, 'packages/memory-schema/src/index.ts'),
 }
 const baseNodeTestGlobs = [
+  'apps/web/src/tests/auth.test.ts',
   'apps/web/src/tests/health-monitor.test.ts',
   'apps/web/src/tests/hipaa-compliance.test.ts',
   'apps/web/src/lib/logging/__tests__/audit-logger.test.ts',
@@ -212,13 +213,6 @@ export default defineConfig({
         classNameStrategy: 'non-scoped' as const,
       },
     },
-    include:
-      targetedTestGlobs.length > 0
-        ? targetedTestGlobs
-        : [
-            'apps/web/src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-            'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
-          ],
     exclude: [
       '**/node_modules/**',
       'apps/web/src/tests/simple-browser-compatibility.test.ts',
@@ -237,7 +231,6 @@ export default defineConfig({
       'backups/**/*',
       'worktrees/**',
       'ai/.venv/**',
-      ...nodeTestGlobs,
     ],
     projects: [
       {
@@ -369,7 +362,6 @@ export default defineConfig({
                   'apps/web/src/lib/ai/bias-detection/__tests__/**/*.test.ts',
                   'apps/web/src/lib/security/threat-detection/**/*.test.ts',
                   'apps/web/src/lib/ai/crisis/**/*.test.ts',
-                  'apps/web/src/tests/auth.test.ts',
                   'apps/web/src/tests/integration/dream-consolidation.integration.test.ts',
                 ],
           exclude: [

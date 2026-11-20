@@ -136,7 +136,7 @@ export async function streamEveSession(
       throw new EveSessionError('stream response has no body', 200, endpoint)
     }
 
-    const reader = res.body.getReader()
+    const reader: ReadableStreamDefaultReader<Uint8Array> = res.body.getReader()
     const decoder = new TextDecoder()
     let buffer = ''
     const replyParts: string[] = []

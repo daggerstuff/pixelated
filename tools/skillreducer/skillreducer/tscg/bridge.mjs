@@ -51,14 +51,14 @@ if (!Array.isArray(tools) || tools.length === 0) {
 }
 
 const result = compress(tools, {
-  model: input.model || 'claude-sonnet',
-  profile: input.profile || 'balanced',
+  model: input.model ?? 'claude-sonnet',
+  profile: input.profile ?? 'balanced',
 })
 
 process.stdout.write(
   JSON.stringify({
     compressed: result.compressed,
     metrics: result.metrics,
-    appliedPrinciples: result.appliedPrinciples || [],
+    appliedPrinciples: result.appliedPrinciples ?? [],
   }),
 )

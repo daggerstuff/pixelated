@@ -4,12 +4,18 @@ import type { ToolContext } from 'eve/tools'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { searchMemories, storeMemory } from '../agent/foresight-client.js'
+import { checkEvalGate } from '../agent/lib/training-infra-client.js'
 import promoteToStaging from '../agent/tools/promote_to_staging.js'
 
 vi.mock('../agent/foresight-client.js', () => ({
   searchMemories: vi.fn(),
   storeMemory: vi.fn(),
   getSystemStatus: vi.fn(),
+}))
+
+vi.mock('../agent/lib/training-infra-client.js', () => ({
+  getTrainingJob: vi.fn().mockResolvedValue(null),
+  checkEvalGate: vi.fn(),
 }))
 
 const ctx = {} as ToolContext
@@ -21,6 +27,14 @@ beforeEach(() => {
     { content: JSON.stringify({ session_ids: ['s3'] }), memory_id: 'm2' },
   ])
   ;(storeMemory as any).mockResolvedValue({ memory_id: 'stored-1' })
+  ;(checkEvalGate as any).mockResolvedValue({
+    ok: true,
+    passed: true,
+    reasons: [],
+    min_delta: 0,
+    min_pass_rate: 0,
+    runs: {},
+  })
 })
 
 describe('promote_to_staging tool', () => {
@@ -33,6 +47,7 @@ describe('promote_to_staging tool', () => {
       },
       ctx,
     )
+    expect(result.promoted).toBe(true)
     expect(result.deploy_target).toBe('docker_compose')
     expect(result.training_provenance.model_card_hash).toBe(
       createHash('sha256')
@@ -53,6 +68,30 @@ describe('promote_to_staging tool', () => {
         importance: 0.9,
       }),
     )
+  })
+
+  it('blocks promotion when the eval gate fails and stores nothing', async () => {
+    ;(checkEvalGate as any).mockResolvedValue({
+      ok: true,
+      passed: false,
+      reasons: ['run1: no graded results'],
+      min_delta: 0.02,
+      min_pass_rate: 0.5,
+      runs: {},
+    })
+    const result = await promoteToStaging.execute(
+      {
+        training_job_id: 'train-gate',
+        model_uri: 'models/gated',
+        image_tag: 'v9',
+        eval_tag: 'v9-eval',
+      },
+      ctx,
+    )
+    expect(result.promoted).toBe(false)
+    expect(result.blocked_by).toBe('eval_gate')
+    expect(result.deploy_target).toBeUndefined()
+    expect(storeMemory).not.toHaveBeenCalled()
   })
 
   it('stores provenance even when Foresight returns no memories', async () => {
