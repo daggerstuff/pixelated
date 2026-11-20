@@ -560,8 +560,8 @@ importers:
         specifier: ^1.8.2
         version: 1.8.2(supports-color@10.2.2)
       connect-redis:
-        specifier: ^10.0.0
-        version: 10.0.0(express-session@1.19.0(supports-color@10.2.2))(redis@6.3.1(@opentelemetry/api@1.9.1))
+        specifier: ^11.0.0
+        version: 11.0.0(express-session@1.19.0(supports-color@10.2.2))(redis@6.3.1(@opentelemetry/api@1.9.1))
       cors:
         specifier: ^2.8.6
         version: 2.8.6
@@ -9118,8 +9118,8 @@ packages:
     resolution: {integrity: sha512-U51WPZg+o6FDFhBCV6yYFEspGMCoHvCgJSGFw9AwsW2u75gYBPoDlYca5XfDs4TdMUu3/y0R6FFdvvgyH31mKQ==}
     engines: {node: '>=20'}
 
-  connect-redis@10.0.0:
-    resolution: {integrity: sha512-x6EotIY20pvocamMtcOsgxFzYufAMfipE+rjWa0cZMeSx+3K0yoHi4Nv4sfMlgF+Z5KnUbMFxyCx9pDZP39p0Q==}
+  connect-redis@11.0.0:
+    resolution: {integrity: sha512-lVO16GY2/iNmddbOkjU7nZJtCS4ArDA+BHK+3mLVOEjcs6LyIzuDqa0EaTA7iP9eg2meLZ8uSis7byiwv+beWA==}
     engines: {node: '>=22'}
     peerDependencies:
       express-session: '>=1'
@@ -23122,7 +23122,7 @@ snapshots:
       is-safe-filename: 0.1.1
       xdg-basedir: 5.1.0
 
-  connect-redis@10.0.0(express-session@1.19.0(supports-color@10.2.2))(redis@6.3.1(@opentelemetry/api@1.9.1)):
+  connect-redis@11.0.0(express-session@1.19.0(supports-color@10.2.2))(redis@6.3.1(@opentelemetry/api@1.9.1)):
     dependencies:
       express-session: 1.19.0(supports-color@10.2.2)
       redis: 6.3.1(@opentelemetry/api@1.9.1)
@@ -29809,7 +29809,6 @@ time:
   clsx@2.1.1: '2024-04-23T05:26:04.645Z'
   commander@12.1.0: '2024-05-18T11:16:54.043Z'
   compression@1.8.2: '2026-09-11T11:16:47.669Z'
-  connect-redis@10.0.0: '2026-07-24T20:26:40.365Z'
   cors@2.8.6: '2026-01-22T14:41:30.223Z'
   cross-env@10.1.0: '2025-09-29T17:34:12.232Z'
   crypto-js@4.2.0: '2023-10-24T22:20:29.229Z'
