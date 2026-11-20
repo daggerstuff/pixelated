@@ -1,0 +1,14 @@
+ai
+  h_07d84030f79d30 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bd7e81b8cc22acd6e6d06c4b7313b4a21794f7a3",
+  "prompts": {},
+  "humans": {
+    "h_07d84030f79d30": {
+      "author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
