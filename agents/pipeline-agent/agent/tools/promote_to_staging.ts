@@ -4,6 +4,7 @@ import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
 import { searchMemories, storeMemory } from '../foresight-client.js'
+import { getTrainingJob } from '../lib/training-infra-client.js'
 
 // Promote a trained/evaluated model artifact to staging. Runs a smoke-test
 // probe after deploy and attaches a training_provenance block sourced from
@@ -31,6 +32,13 @@ export default defineTool({
     image_tag: z.string().min(1),
   }),
   async execute(input: PromoteToStagingInput) {
+    // --- Consume the real training job from the training-infra MCP (best-effort) ---
+    const job = await getTrainingJob(input.training_job_id)
+    const jobStatus = (job?.status as string) ?? null
+    const artifactRefs = job
+      ? (job.artifact_refs ?? job.artifacts_json ?? null)
+      : null
+
     // --- Derive a deterministic model card fingerprint ---
     const modelCardHash = createHash('sha256')
       .update(`${input.model_uri}:${input.image_tag}`)
@@ -85,6 +93,8 @@ export default defineTool({
 
     return {
       training_job_id: input.training_job_id,
+      training_job_status: jobStatus,
+      artifact_refs: artifactRefs,
       model_uri: input.model_uri,
       image_tag: input.image_tag,
       deploy_target: 'docker_compose',

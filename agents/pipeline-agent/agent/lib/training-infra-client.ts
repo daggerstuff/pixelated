@@ -92,3 +92,23 @@ export async function submitTrainingJob(params: {
     return null
   }
 }
+
+export async function getTrainingJob(
+  jobId: string,
+): Promise<Record<string, unknown> | null> {
+  try {
+    const c = await getClient()
+    const result = await c.callTool({
+      name: 'get_job',
+      arguments: { job_id: jobId },
+    })
+    const parsed = extractStructured(result)
+    if (parsed && typeof parsed.job === 'object' && parsed.job !== null) {
+      return parsed.job as Record<string, unknown>
+    }
+    return parsed
+  } catch (err) {
+    console.error('[training-infra-client] getTrainingJob failed:', err)
+    return null
+  }
+}
