@@ -16,6 +16,25 @@ vi.mock('../agent/foresight-client.js', () => ({
 vi.mock('../agent/lib/workers-ai.js', () => ({
   getModel: vi.fn().mockReturnValue(null),
 }))
+vi.mock('../agent/lib/training-infra-client.js', () => ({
+  planTrainingJob: vi.fn().mockResolvedValue({
+    ok: true,
+    plan_hash: 'plan-abc',
+    command: 'python -m train',
+    est_cost_usd: 1.5,
+    warnings: [],
+  }),
+  submitTrainingJob: vi.fn().mockResolvedValue(null),
+  getTrainingJob: vi.fn().mockResolvedValue(null),
+  checkEvalGate: vi.fn().mockResolvedValue({
+    ok: true,
+    passed: true,
+    reasons: [],
+    min_delta: 0,
+    min_pass_rate: 0,
+    runs: {},
+  }),
+}))
 
 import { searchMemories, storeMemory } from '../agent/foresight-client.js'
 

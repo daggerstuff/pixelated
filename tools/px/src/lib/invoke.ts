@@ -56,7 +56,7 @@ function buildToolMessage(tool: string, body: unknown): string {
   if (
     body &&
     typeof body === 'object' &&
-    Object.keys(body as object).length > 0
+    Object.keys(body).length > 0
   ) {
     return `Run the ${tool} tool with these parameters:\n${JSON.stringify(body, null, 2)}`
   }
