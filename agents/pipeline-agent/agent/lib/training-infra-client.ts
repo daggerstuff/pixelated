@@ -126,8 +126,16 @@ export async function checkEvalGate(params: {
       name: 'eval_gate',
       arguments: {
         tag: params.tag,
-        min_delta: params.min_delta ?? 0,
-        min_pass_rate: params.min_pass_rate ?? 0,
+        // Omit rather than sending 0: the MCP then applies its operator policy
+        // (TRAINING_MCP_GATE_MIN_DELTA / _MIN_PASS_RATE). Sending 0 would turn
+        // the promotion gate into a rubber stamp for a caller that forgets to
+        // set thresholds.
+        ...(params.min_delta === undefined
+          ? {}
+          : { min_delta: params.min_delta }),
+        ...(params.min_pass_rate === undefined
+          ? {}
+          : { min_pass_rate: params.min_pass_rate }),
       },
     })
     return extractStructured(result)
