@@ -1,0 +1,36 @@
+tools/px/src/commands/agents.ts
+  s_7d4811cf1b0ba7::t_5350ed53fe7992 334-335
+  s_7d4811cf1b0ba7::t_8e214d511e9db0 447,472
+tools/px/src/output/formatters.ts
+  s_7d4811cf1b0ba7::t_b6d997d1424375 451
+  s_7d4811cf1b0ba7::t_eadf239c252e8a 483
+  s_7d4811cf1b0ba7::t_0a359b2ef5c03f 444
+  s_7d4811cf1b0ba7::t_58b45be465e277 404-408
+  s_7d4811cf1b0ba7::t_a7ca6d727665d6 399
+  s_7d4811cf1b0ba7::t_1054fc81d74c9b 389-391,394
+tools/skillreducer/skillreducer/tscg/bridge.mjs
+  s_7d4811cf1b0ba7::t_961cd976e63970 54-55,62
+tests/e2e/user-experience.spec.ts
+  s_7d4811cf1b0ba7::t_89c31f4c657edd 51-52
+  s_7d4811cf1b0ba7::t_a63e05b58596c1 37-38
+tools/px/src/lib/invoke.ts
+  s_7d4811cf1b0ba7::t_e8d0c0c771206f 59
+tools/px/src/commands/invoke.ts
+  s_7d4811cf1b0ba7::t_897f0115950eb1 97-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7e60e6145137318e845dbd9292788c367901f11d",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
