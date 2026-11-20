@@ -1,0 +1,25 @@
+agents/pipeline-agent/agent/tools/evaluate_pipeline_review.ts
+  s_7d4811cf1b0ba7::t_4c6fbfd25fa6e8 213-228,232
+  s_7d4811cf1b0ba7::t_0a916014908d23 233
+agents/pipeline-agent/agent/lib/training-infra-client.ts
+  s_7d4811cf1b0ba7::t_5f63ce3ea1f3bd 117-138
+  s_7d4811cf1b0ba7::t_3b2547b6b08ded 52,66
+agents/pipeline-agent/agent/tools/promote_to_staging.ts
+  s_7d4811cf1b0ba7::t_5f63ce3ea1f3bd 7,9-14,24-26,31-35,40-53,63-94,153-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "aaf35672abc0ebd53cf91ee75f90aa820ee1cefd",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
