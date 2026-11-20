@@ -42,18 +42,22 @@ const IGNORE_DIRS = new Set(['__pycache__', '.venv', 'venv', 'node_modules', '.g
 /** The live trees the parent imports (research/quadit, pipelines, training). */
 const TREES = ['research', 'pipelines', 'training']
 
-const MYPY_CONFIG = `[mypy]
+/** Third-party libraries the pinned trees import directly, installed as real
+ * wheels so mypy --strict type-checks against the same API the code runs on.
+ * Versions are the resolutions in ai/uv.lock; bump them with it. fastmcp is
+ * installed as fastmcp-slim: since 4.x the `fastmcp` distribution is an empty
+ * meta-package and the importable, py.typed package ships in fastmcp-slim.
+ * Everything is installed with --no-deps on purpose — pytest's and fastmcp's
+ * own dependencies (httpx, anyio, starlette, mcp, …) are not part of the ai
+ * tree's contract, and letting them resolve would make this gate's error set
+ * move with every release of an unrelated HTTP client. */
+const TYPE_DEPS = ['pytest==9.1.1', 'pydantic==2.13.4', 'fastmcp-slim==4.1.3']
+
+const mypyConfig = (typeDepsPath) => `[mypy]
 python_version = 3.14
 strict = True
 ignore_missing_imports = True
-# --no-site-packages keeps dev machines and CI on one error set, but it also
-# makes every third-party library invisible. For pytest, pydantic and fastmcp
-# that shows up as "untyped decorator" and "cannot subclass BaseModel (has
-# type Any)" — errors about the missing stub, not about the code, and ones no
-# amount of annotation in the code can clear. The stubs below declare just the
-# decorator and base-class shapes; everything else falls through to a module
-# __getattr__, so an unknown API stays Any instead of becoming a false error.
-mypy_path = ${join(ROOT, 'scripts/ci/ratchet-stubs')}
+mypy_path = ${typeDepsPath}
 # __main__ scripts collide on module names. training/output (and any other
 # output/ dir under the pinned trees) and wandb/ run-artifact dirs hold
 # gitignored files a clean CI checkout never has (training/models/ holds
@@ -141,9 +145,22 @@ function writeBaselineContent(files, errors) {
 
 /** Run dependency-light mypy --strict on the pinned trees. */
 function runStrictMypy() {
-  const configDir = mkdtempSync(join(tmpdir(), 'ai-strict-ratchet-'))
-  const configPath = join(configDir, 'mypy.ini')
-  writeFileSync(configPath, MYPY_CONFIG, 'utf8')
+  const workDir = mkdtempSync(join(tmpdir(), 'ai-strict-ratchet-'))
+  const typeDepsPath = join(workDir, 'lib')
+  const configPath = join(workDir, 'mypy.ini')
+
+  const install = spawnSync(
+    'uv',
+    ['pip', 'install', '--python', '3.14', '--target', typeDepsPath, '--no-deps', '--quiet', ...TYPE_DEPS],
+    { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, timeout: 10 * 60 * 1000 },
+  )
+  if (install.status !== 0) {
+    console.error('❌ Could not install the pinned type dependencies:')
+    console.error(install.stderr || install.stdout)
+    process.exit(1)
+  }
+
+  writeFileSync(configPath, mypyConfig(typeDepsPath), 'utf8')
 
   return spawnSync(
     'uv',
@@ -163,7 +180,9 @@ function runStrictMypy() {
       // Isolated analysis: without this, mypy searches the target
       // interpreter's site-packages, so dev machines with pytest et al.
       // installed type third-party decorators that CI's bare interpreter
-      // cannot — the error set diverges between environments.
+      // cannot — the error set diverges between environments. The three
+      // pinned libraries reach mypy through mypy_path instead, so a laptop
+      // and a runner see the same view.
       '--no-site-packages',
       '--explicit-package-bases',
       '--follow-imports',
