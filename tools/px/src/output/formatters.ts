@@ -386,20 +386,25 @@ function formatCompact(data: unknown): string {
     if (keys.length === 0) return '(empty)'
 
     const parts: string[] = []
-    if ('status' in obj) parts.push(`status=${obj['status']}`)
-    if ('score' in obj) parts.push(`score=${obj['score']}`)
-    if ('risk' in obj) parts.push(`risk=${obj['risk']}`)
+    if ('status' in obj) parts.push(`status=${scalar(obj['status'])}`)
+    if ('score' in obj) parts.push(`score=${scalar(obj['score'])}`)
+    if ('risk' in obj) parts.push(`risk=${scalar(obj['risk'])}`)
     if ('task_id' in obj)
       parts.push(`task=${(obj['task_id'] as string).slice(0, 8)}...`)
-    if ('error' in obj) parts.push(`error="${obj['error']}"`)
+    if ('error' in obj) parts.push(`error="${scalar(obj['error'])}"`)
     if (parts.length === 0) parts.push(`${keys.length} field(s)`)
     return parts.join('  ')
   }
 
-  return String(data ?? 'unknown')
+  return scalar(data)
 }
 
 // ── Helpers ──────────────────────────────────────────
+
+function scalar(value: unknown): string {
+  if (typeof value === 'object' && value !== null) return JSON.stringify(value)
+  return String(value)
+}
 
 function renderBar(value: number, max: number, width: number = 10): string {
   const clamped = Math.max(0, Math.min(value, max))
@@ -436,14 +441,14 @@ function formatObjectBrief(obj: Record<string, unknown>): string {
   ]
   for (const key of priority) {
     if (key in obj && obj[key] !== undefined) {
-      parts.push(`${key}=${obj[key]}`)
+      parts.push(`${key}=${scalar(obj[key])}`)
     }
   }
 
   if (parts.length === 0) {
     const keys = Object.keys(obj).slice(0, 3)
     for (const key of keys) {
-      parts.push(`${key}=${obj[key]}`)
+      parts.push(`${key}=${scalar(obj[key])}`)
     }
   }
 
@@ -475,5 +480,5 @@ function formatDataInner(data: unknown, indent: number): string {
       })
       .join('\n')
   }
-  return `${pad}${String(data)}`
+  return `${pad}${scalar(data)}`
 }
