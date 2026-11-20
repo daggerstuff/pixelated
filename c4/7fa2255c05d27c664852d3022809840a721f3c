@@ -1,0 +1,18 @@
+agents/advisor-agent/agent/lib/training-infra-client.ts
+  h_07d84030f79d30 99-106
+agents/pipeline-agent/agent/lib/training-infra-client.ts
+  h_07d84030f79d30 129-138
+ai
+  h_07d84030f79d30 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c47fa2255c05d27c664852d3022809840a721f3c",
+  "prompts": {},
+  "humans": {
+    "h_07d84030f79d30": {
+      "author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
