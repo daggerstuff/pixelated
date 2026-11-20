@@ -1,0 +1,40 @@
+agents/eve-agent/.env.example
+  s_7d4811cf1b0ba7::t_b9d66dd70098fd 1-14
+agents/pipeline-agent/agent/tools/curate_dataset.ts
+  s_bbc30f62df05e2::t_b9c4bc6dd5d50d 17-22,34-41,50-51,56-77,79,81-95,110-111,118-119,121
+  s_bbc30f62df05e2::t_d7e0c0be1801e5 78,80
+  s_bbc30f62df05e2::t_91efca47c713d2 105
+  s_bbc30f62df05e2::t_5cd24ef4074081 30-33,42-49,52-55
+agents/advisor-agent/agent/schedules/weekly-recipe-review.ts
+  s_7d4811cf1b0ba7::t_af52f0e3a694d9 22
+agents/content-agent/.env.example
+  s_7d4811cf1b0ba7::t_144e88e3cb3a3a 1-15
+agents/intake-agent/.env.example
+  s_7d4811cf1b0ba7::t_7555a763c520b8 1-15
+agents/pipeline-agent/agent/tools/run_training.ts
+  s_7d4811cf1b0ba7::t_9787217197fffa 35-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3ef2bb561bc0965e1e5d2710077f762c253a8602",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    },
+    "s_bbc30f62df05e2": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "dazed-resistance",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
