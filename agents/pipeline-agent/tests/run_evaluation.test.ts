@@ -58,6 +58,23 @@ describe('run_evaluation tool', () => {
     expect(inputs).not.toHaveProperty('suite')
   })
 
+  it('reports the MCP rejection reason instead of blaming an outage', async () => {
+    const { planTrainingJob } =
+      await import('../agent/lib/training-infra-client.js')
+    vi.mocked(planTrainingJob).mockResolvedValueOnce({
+      ok: false,
+      error: "unknown input 'suite' is not accepted by recipe eval-crisis-v2",
+    })
+    const result = await runEvaluation.execute(
+      { candidate_model_id: 'cand-3', benchmark_suite_version: 'v2' },
+      ctx,
+    )
+    expect(result.state).toBe('EVAL_REQUESTED')
+    expect(result.training_infra_plan).toBeNull()
+    expect(result.plan_error).toContain('unknown input')
+    expect(result.note).toContain('unknown input')
+  })
+
   it('keeps EVAL_REQUESTED but reports no plan when the MCP is unreachable', async () => {
     const { planTrainingJob } =
       await import('../agent/lib/training-infra-client.js')

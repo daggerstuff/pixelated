@@ -61,6 +61,9 @@ export default defineTool({
               (submitted?.error as string) ?? 'submit_job returned no job id'
           }
         }
+      } else if (planned && typeof planned.error === 'string') {
+        // A rejected plan is not an outage: report the MCP's reason.
+        submitError = planned.error
       }
     } catch (err) {
       submitError = err instanceof Error ? err.message : String(err)
@@ -81,12 +84,16 @@ export default defineTool({
         ? 'queued'
         : trainingInfraPlan
           ? 'planned'
-          : 'unavailable',
+          : submitError
+            ? 'rejected'
+            : 'unavailable',
       note: trainingInfraJobId
         ? 'Curation submitted to the training-infra MCP; poll with check_training_job.'
         : trainingInfraPlan
           ? 'Curation planned; pass submit=true (behind approval) to launch it.'
-          : 'Training-infra MCP unavailable; no job was created.',
+          : submitError
+            ? `The MCP rejected this plan or submit: ${submitError}`
+            : 'Training-infra MCP unavailable; no job was created.',
     }
   },
 })
