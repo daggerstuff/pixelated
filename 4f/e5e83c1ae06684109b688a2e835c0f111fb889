@@ -1,0 +1,23 @@
+scripts/ci/ai-strict-ratchet.mjs
+  s_7d4811cf1b0ba7::t_81730eb9495a0c 148-163
+  s_7d4811cf1b0ba7::t_70ac724507c8f1 183-185
+  s_7d4811cf1b0ba7::t_3e8959799ffe8e 47-54
+  s_7d4811cf1b0ba7::t_4a460e94e452e5 45-46,56,60
+  s_7d4811cf1b0ba7::t_0990f6ea0e9b25 55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "4fe5e83c1ae06684109b688a2e835c0f111fb889",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
