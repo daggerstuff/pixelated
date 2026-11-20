@@ -407,7 +407,7 @@ mdurl==0.1.2
     # via
     #   -r requirements.txt
     #   markdown-it-py
-mistune==3.3.3
+mistune==3.3.4
     # via
     #   -r requirements.txt
     #   great-expectations
