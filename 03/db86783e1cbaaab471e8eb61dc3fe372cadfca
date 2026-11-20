@@ -1,0 +1,18 @@
+agents/pipeline-agent/agent/tools/curate_dataset.ts
+  h_07d84030f79d30 64-66,87-89,94-96
+agents/pipeline-agent/agent/tools/run_evaluation.ts
+  h_07d84030f79d30 55,78-79,81,83,99,102-104
+agents/pipeline-agent/tests/run_evaluation.test.ts
+  h_07d84030f79d30 61-77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "03db86783e1cbaaab471e8eb61dc3fe372cadfca",
+  "prompts": {},
+  "humans": {
+    "h_07d84030f79d30": {
+      "author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
