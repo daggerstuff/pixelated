@@ -291,7 +291,7 @@
     "clsx": "^2.1.1",
     "commander": "^15.1.0",
     "compression": "^1.8.2",
-    "connect-redis": "^10.0.0",
+    "connect-redis": "^11.0.0",
     "cors": "^2.8.6",
     "crypto-js": "^4.2.0",
     "date-fns": "^4.4.0",
