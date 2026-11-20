@@ -1,0 +1,19 @@
+scripts/ci/ai-strict-baseline.json
+  s_7d4811cf1b0ba7::t_aedb179b75bdee 4,1494,1724
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c52a9cff3dd35e2ecb94128661b41fd1ffe0d8c8",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
