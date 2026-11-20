@@ -81,10 +81,26 @@ wait, the agent parks durably (Eve sessions survive restarts).
 | State            | Allowed tools                                                                       |
 | ---------------- | ----------------------------------------------------------------------------------- |
 | Dataset Curation | curate_dataset, check_pipeline_health                                               |
-| Training Launch  | run_training, check_pipeline_health                                                 |
+| Training Launch  | run_training, check_training_job, check_pipeline_health                             |
 | Evaluation       | run_evaluation                                                                      |
 | Promotion        | promote_to_staging, promote_to_production, rollback_model, evaluate_pipeline_review |
 | Any              | ask_question, and `evaluator` sub-agent tooling                                     |
+
+## Training-infra job ids
+
+`curate_dataset` and `run_training` are **plan-first**: by default they call
+`plan_job` on the training-infra MCP and return `training_infra_plan`
+(`plan_hash`, `command`, `est_cost_usd`, `warnings`) with
+`training_infra_job_id: null` and `status: "planned"`. Nothing is launched.
+
+To actually start work, pass `submit: true` (both tools are behind
+`approval: always`, so a human approves first). A successful submit returns the
+real registry `training_infra_job_id` and `status: "queued"`; a rejected submit
+returns `training_infra_job_id: null` plus `submit_error` (for example
+`daily job cap reached`) and the tool never invents an id.
+
+Poll that id with `check_training_job`. Do not hand-write or guess a job id —
+if `training_infra_job_id` is null, no job exists.
 
 ## Advisor review gate
 

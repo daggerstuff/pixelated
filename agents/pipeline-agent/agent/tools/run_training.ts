@@ -2,7 +2,10 @@ import { defineTool } from 'eve/tools'
 import { always } from 'eve/tools/approval'
 import { z } from 'zod'
 
-import { planTrainingJob } from '../lib/training-infra-client.js'
+import {
+  planTrainingJob,
+  submitTrainingJob,
+} from '../lib/training-infra-client.js'
 
 interface RunTrainingInput {
   curation_run_id: string
@@ -15,13 +18,15 @@ interface RunTrainingInput {
   }
   manifest?: string
   launch_config?: string
+  submit: boolean
 }
 
 export default defineTool({
   description:
     'Launch an SFT/DPO/GRPO training job on the training infrastructure. ' +
-    'Plans (and, behind approval, submits) a train-sft-latest job via the ' +
-    'training-infra MCP. Returns the training_job_id for downstream monitoring.',
+    'Plans a train-sft-latest job via the training-infra MCP, and when ' +
+    'submit=true submits the approved plan_hash to get a real job id. ' +
+    'Returns the training_infra_job_id for downstream monitoring.',
   inputSchema: z.object({
     curation_run_id: z.string().min(1),
     model_id: z.string().min(1),
@@ -35,6 +40,7 @@ export default defineTool({
       .default(() => ({ epochs: 3, batch_size: 8, learning_rate: 5e-5 })),
     manifest: z.string().optional(),
     launch_config: z.string().optional(),
+    submit: z.boolean().default(false),
   }),
   approval: always<RunTrainingInput>(),
   async execute(input: RunTrainingInput) {
@@ -47,6 +53,8 @@ export default defineTool({
 
     // Plan (side-effect free) a train-sft-latest job via the MCP.
     let trainingInfraPlan: Record<string, unknown> | null = null
+    let trainingInfraJobId: string | null = null
+    let submitError: string | null = null
     try {
       const planned = await planTrainingJob({
         recipe: 'train-sft-latest',
@@ -68,26 +76,47 @@ export default defineTool({
           warnings: planned.warnings ?? [],
           recipe: 'train-sft-latest',
         }
+        // Submitting is gated behind approval and an explicit submit=true so a
+        // planning call can never launch GPU spend by accident.
+        if (input.submit && typeof planned.plan_hash === 'string') {
+          const submitted = await submitTrainingJob({
+            plan_hash: planned.plan_hash,
+            requested_by: `pipeline-agent:${input.curation_run_id}`,
+            idempotency_key: `train:${input.curation_run_id}:${input.model_id}`,
+          })
+          if (submitted && submitted.ok === true) {
+            trainingInfraJobId = (submitted.job_id as string) ?? null
+          } else {
+            submitError =
+              (submitted?.error as string) ?? 'submit_job returned no job id'
+          }
+        }
       }
-    } catch {
-      // Advisory: MCP may be unavailable; fall back to local id.
+    } catch (err) {
+      submitError = err instanceof Error ? err.message : String(err)
     }
 
-    const suffix = Date.now().toString(36)
-    const trainingJobId = `train-${suffix}`
-
     return {
-      training_job_id: trainingJobId,
-      training_infra_job_id: null,
+      // No fabricated id: the registry job id is the only real handle, and it
+      // is null until a plan is actually submitted.
+      training_infra_job_id: trainingInfraJobId,
       training_infra_plan: trainingInfraPlan,
+      submit_requested: input.submit,
+      submit_error: submitError,
       curation_run_id: input.curation_run_id,
       model_id: input.model_id,
       method,
-      status: 'queued',
+      status: trainingInfraJobId
+        ? 'queued'
+        : trainingInfraPlan
+          ? 'planned'
+          : 'unavailable',
       started_at: new Date().toISOString(),
-      note: trainingInfraPlan
-        ? 'Training planned via training-infra MCP; submit with returned plan_hash if not auto-submitted.'
-        : 'Training-infra MCP unavailable; using local job id. Retry when service is up.',
+      note: trainingInfraJobId
+        ? 'Training submitted to the training-infra MCP; poll with check_training_job.'
+        : trainingInfraPlan
+          ? 'Training planned; pass submit=true (behind approval) to launch it.'
+          : 'Training-infra MCP unavailable; no job was created.',
     }
   },
 })
