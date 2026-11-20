@@ -1,0 +1,16 @@
+agents/pipeline-agent/package.json
+  h_07d84030f79d30 46
+agents/pipeline-agent/pnpm-workspace.yaml
+  h_07d84030f79d30 9-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "250549af68bb8e3da742672bb73499be86ec816f",
+  "prompts": {},
+  "humans": {
+    "h_07d84030f79d30": {
+      "author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
