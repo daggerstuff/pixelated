@@ -1,0 +1,25 @@
+agents/pipeline-agent/agent/tools/check_pipeline_health.ts
+  s_e96f85d720e925::t_5ce2fad95a1200 6-107,111-113,132
+  s_e96f85d720e925::t_3c81a4ebdbee62 139-140,145,147-148
+agents/pipeline-agent/tests/check_pipeline_health.test.ts
+  s_e96f85d720e925::t_767967b0aaa9ce 20
+  s_e96f85d720e925::t_d1a889b6d0928b 67,70,77,80-86
+  s_e96f85d720e925::t_1f037babf87fc1 15-19,21-49
+  s_e96f85d720e925::t_53b46a732cb788 52,59,87-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a1c5a601bb1375d9c6e84a26c54e96543db6b0bd",
+  "prompts": {},
+  "sessions": {
+    "s_e96f85d720e925": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "spiffy-seagull",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

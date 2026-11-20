@@ -1,0 +1,43 @@
+apps/web/src/lib/ai/safety/__tests__/registerGuard.test.ts
+  s_7d4811cf1b0ba7::t_dba4a4081dee70 20-26,118-139,144
+  s_e96f85d720e925::t_45d8a6a6429d51 27-33
+vitest.config.ts
+  s_2d5856da696824::t_19a56978517721 15
+apps/web/src/pages/api/ai/__tests__/response.test.ts
+  s_2d5856da696824::t_746190a8c5779d 1-68
+apps/web/src/lib/ai/safety/registerGuard.ts
+  s_7d4811cf1b0ba7::t_dba4a4081dee70 41-50
+  s_e96f85d720e925::t_45d8a6a6429d51 51-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "662945fc83fd60ef82d6c4e49dd3f635b5293158",
+  "prompts": {},
+  "sessions": {
+    "s_2d5856da696824": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1f291-fcb0-7ec0-bd62-b77d02388594",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    },
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    },
+    "s_e96f85d720e925": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "spiffy-seagull",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

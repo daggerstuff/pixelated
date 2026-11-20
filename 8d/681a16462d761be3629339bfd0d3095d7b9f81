@@ -1,0 +1,39 @@
+agents/pipeline-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 28
+agents/qa-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 28
+agents/content-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 22
+agents/session-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 28
+package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 303
+agents/supervisor-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 22
+agents/intake-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 22
+agents/eve-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 21
+tools/px/src/client/eve-session.ts
+  s_e96f85d720e925::t_91a88a00010c5d 139
+agents/advisor-agent/package.json
+  s_e96f85d720e925::t_0b1f6c686b7762 20
+pnpm-lock.yaml
+  s_e96f85d720e925::t_f7da29114b2312 590,1272,1306,1340,1380,1438,1493,1548,1594,9949-9950,21854-21859,21861
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8d681a16462d761be3629339bfd0d3095d7b9f81",
+  "prompts": {},
+  "sessions": {
+    "s_e96f85d720e925": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "spiffy-seagull",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
