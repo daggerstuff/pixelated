@@ -1,0 +1,19 @@
+agents/pipeline-agent/agent/lib/training-infra-client.ts
+  s_7d4811cf1b0ba7::t_6c00c51e997ed1 95-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5ba4532efbdc2e1a48dcbe3b8d496aabbe08010f",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
