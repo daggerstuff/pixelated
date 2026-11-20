@@ -49,6 +49,7 @@ export type PlanJobParams = {
   recipe: string
   inputs?: Record<string, unknown>
   overrides?: Record<string, unknown>
+  requested_by?: string
 }
 
 export async function planTrainingJob(
@@ -62,6 +63,7 @@ export async function planTrainingJob(
         recipe: params.recipe,
         inputs: params.inputs ?? {},
         overrides: params.overrides ?? {},
+        requested_by: params.requested_by ?? 'pipeline-agent',
       },
     })
     return extractStructured(result)
@@ -109,6 +111,28 @@ export async function getTrainingJob(
     return parsed
   } catch (err) {
     console.error('[training-infra-client] getTrainingJob failed:', err)
+    return null
+  }
+}
+
+export async function checkEvalGate(params: {
+  tag: string
+  min_delta?: number
+  min_pass_rate?: number
+}): Promise<Record<string, unknown> | null> {
+  try {
+    const c = await getClient()
+    const result = await c.callTool({
+      name: 'eval_gate',
+      arguments: {
+        tag: params.tag,
+        min_delta: params.min_delta ?? 0,
+        min_pass_rate: params.min_pass_rate ?? 0,
+      },
+    })
+    return extractStructured(result)
+  } catch (err) {
+    console.error('[training-infra-client] checkEvalGate failed:', err)
     return null
   }
 }

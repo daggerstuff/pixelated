@@ -7,6 +7,7 @@ import { always } from 'eve/tools/approval'
 import { z } from 'zod'
 
 import { storeMemory } from '../foresight-client.js'
+import { checkEvalGate } from '../lib/training-infra-client.js'
 
 /**
  * Evaluate the current pipeline worktree state through the advisor-agent.
@@ -15,23 +16,31 @@ import { storeMemory } from '../foresight-client.js'
  * a structured review payload. The orchestrator should pass this payload
  * to the advisor-agent via the subagent tool for a full critique.
  *
- * If the advisor-agent returns issues scoring >= 80, the orchestrator
- * MUST block the promotion gate.
+ * The gate also consumes the training-infra MCP eval results (P3.2): when an
+ * `eval_tag` is supplied, `eval_gate` decides whether the eval deltas pass,
+ * and the verdict is surfaced as `eval_gate`. The gate MUST block promotion
+ * when either the advisor finds issues scoring >= 80 or `eval_gate.passed`
+ * is false.
  */
 
 interface EvaluatePipelineReviewInput {
   gate_name: string
   stage: string
   training_job_id?: string
+  eval_tag?: string
+  min_eval_delta?: number
+  min_pass_rate?: number
 }
 
 export default defineTool({
   description:
     'Evaluate the current pipeline worktree through the advisor-agent ' +
     'before a promotion gate. Collects git diff, status, and changed ' +
-    'source files. Returns a structured review payload for the orchestrator ' +
-    'to forward to the advisor-agent subagent. If the advisor returns ' +
-    'issues scoring >= 80, this gate MUST block promotion.',
+    'source files and, when eval_tag is given, consults the training-infra ' +
+    'MCP eval_gate for the eval deltas. Returns a structured review payload ' +
+    'for the orchestrator to forward to the advisor-agent subagent. If the ' +
+    'advisor returns issues scoring >= 80, or eval_gate.passed is false, ' +
+    'this gate MUST block promotion.',
   inputSchema: z.object({
     gate_name: z
       .string()
@@ -45,6 +54,21 @@ export default defineTool({
       .string()
       .optional()
       .describe('Training job ID for provenance.'),
+    eval_tag: z
+      .string()
+      .optional()
+      .describe(
+        'Eval results tag under evals/ in the training bucket. When set, the ' +
+          'gate consumes eval_gate for it.',
+      ),
+    min_eval_delta: z
+      .number()
+      .optional()
+      .describe('Minimum sft-minus-base pass-rate delta required.'),
+    min_pass_rate: z
+      .number()
+      .optional()
+      .describe('Minimum absolute sft-arm pass rate required.'),
   }),
   approval: always<EvaluatePipelineReviewInput>(),
   async execute(input: EvaluatePipelineReviewInput) {
@@ -121,6 +145,16 @@ export default defineTool({
       }
     }
 
+    // --- Consume eval results through the training-infra MCP gate (P3.2) ---
+    const evalGate = input.eval_tag
+      ? await checkEvalGate({
+          tag: input.eval_tag,
+          min_delta: input.min_eval_delta,
+          min_pass_rate: input.min_pass_rate,
+        })
+      : null
+    const evalGatePassed = evalGate ? evalGate.passed === true : null
+
     // --- Build review payload ---
     const reviewPayload = {
       type: 'pipeline_review_request',
@@ -176,10 +210,27 @@ export default defineTool({
           changed_files: fileContents.map((f) => f.path),
         },
       },
+      eval_gate: input.eval_tag
+        ? {
+            tag: input.eval_tag,
+            passed: evalGatePassed,
+            reasons: evalGate?.reasons ?? [
+              'eval_gate unavailable (training-infra MCP unreachable or gate error)',
+            ],
+            min_delta: evalGate?.min_delta ?? input.min_eval_delta ?? null,
+            min_pass_rate:
+              evalGate?.min_pass_rate ?? input.min_pass_rate ?? null,
+          }
+        : null,
+      gate_blocked_by: [
+        ...(input.eval_tag && evalGatePassed !== true ? ['eval_gate'] : []),
+        'advisor_review_pending',
+      ],
       advisor_review_required: true,
       instruction:
         'Forward the review_payload to the advisor-agent via subagent tool. ' +
-        'If advisor-agent returns issues scoring >= 80, block this gate.',
+        'If advisor-agent returns issues scoring >= 80, or eval_gate.passed ' +
+        'is false, block this gate.',
       foresight_memory: stored ?? {
         memory_id: null,
         note: 'Foresight MCP write may have failed.',
