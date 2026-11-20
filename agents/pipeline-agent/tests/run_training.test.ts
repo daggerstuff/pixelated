@@ -78,6 +78,33 @@ describe('run_training tool', () => {
     expect(result.status).toBe('planned')
   })
 
+  it('never forwards the recipe-locked learning_rate override', async () => {
+    // train-sft-latest locks learning_rate (invariant recipe_derived_lr), and
+    // the MCP rejects the entire plan if it is sent. The LR schedule comes
+    // from the launch config, so the caller's value must not be forwarded.
+    const { planTrainingJob } =
+      await import('../agent/lib/training-infra-client.js')
+    await runTraining.execute(base, ctx)
+    const arg = vi.mocked(planTrainingJob).mock.calls[0][0]
+    expect(arg.overrides).toEqual({ epochs: 3 })
+    expect(arg.overrides).not.toHaveProperty('learning_rate')
+  })
+
+  it('reports a plan rejected by the MCP instead of a fake plan', async () => {
+    const { planTrainingJob, submitTrainingJob } =
+      await import('../agent/lib/training-infra-client.js')
+    vi.mocked(planTrainingJob).mockResolvedValueOnce({
+      ok: false,
+      error: "override 'learning_rate' is locked by recipe train-sft-latest",
+    })
+    const result = await runTraining.execute({ ...base, submit: true }, ctx)
+    expect(result.training_infra_plan).toBeNull()
+    expect(result.training_infra_job_id).toBeNull()
+    expect(result.status).toBe('rejected')
+    expect(result.submit_error).toContain('locked by recipe')
+    expect(submitTrainingJob).not.toHaveBeenCalled()
+  })
+
   it('honors an explicit sft method', async () => {
     const result = await runTraining.execute({ ...base, method: 'sft' }, ctx)
     expect(result.method).toBe('sft')

@@ -32,6 +32,32 @@ describe('run_evaluation tool', () => {
     expect(result.training_infra_plan?.plan_hash).toBe('plan-eval-1')
   })
 
+  it('selects the recipe that pins the requested suite version', async () => {
+    // The graded suite is recipe identity, not an input: v1 must route to
+    // eval-crisis-v1 and anything else to eval-crisis-v2, with no `suite` input.
+    const { planTrainingJob } =
+      await import('../agent/lib/training-infra-client.js')
+    await runEvaluation.execute(
+      { candidate_model_id: 'cand-v1', benchmark_suite_version: 'v1' },
+      ctx,
+    )
+    expect(vi.mocked(planTrainingJob).mock.calls[0][0]).toMatchObject({
+      recipe: 'eval-crisis-v1',
+      inputs: { tag: 'eval-cand-v1-v1' },
+    })
+    vi.mocked(planTrainingJob).mockClear()
+    await runEvaluation.execute(
+      { candidate_model_id: 'cand-v2', benchmark_suite_version: 'v2' },
+      ctx,
+    )
+    expect(vi.mocked(planTrainingJob).mock.calls[0][0]).toMatchObject({
+      recipe: 'eval-crisis-v2',
+      inputs: { tag: 'eval-cand-v2-v2' },
+    })
+    const inputs = vi.mocked(planTrainingJob).mock.calls[0][0].inputs
+    expect(inputs).not.toHaveProperty('suite')
+  })
+
   it('keeps EVAL_REQUESTED but reports no plan when the MCP is unreachable', async () => {
     const { planTrainingJob } =
       await import('../agent/lib/training-infra-client.js')
