@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && npm install -g pnpm@${PNPM_VERSION} \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ${AGENT_DIR}/package.json ${AGENT_DIR}/pnpm-workspace.yaml ./
+COPY ${AGENT_DIR}/package.json ./
 RUN pnpm install --no-frozen-lockfile
 
 COPY ${AGENT_DIR}/ ./
