@@ -15,6 +15,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ${AGENT_DIR}/package.json ./
+# The image is its own install root, so it carries the workspace policy that
+# governs install scripts; the per-agent workspace files it used are gone.
+RUN printf 'minimumReleaseAge: 0\nallowBuilds:\n  protobufjs: false\n  sharp: false\n  "@mongodb-js/zstd": true\n  node-liblzma: false\n' > pnpm-workspace.yaml
 RUN pnpm install --no-frozen-lockfile
 
 COPY ${AGENT_DIR}/ ./
