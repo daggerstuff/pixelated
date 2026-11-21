@@ -9,3 +9,6 @@ node_modules
 dist
 .DS_Store
 *.tsbuildinfo
+
+# Templates are safe to commit; real env files are not.
+!.env.example

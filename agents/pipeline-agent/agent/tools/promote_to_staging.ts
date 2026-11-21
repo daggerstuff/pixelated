@@ -57,7 +57,7 @@ export default defineTool({
     const job = await getTrainingJob(input.training_job_id)
     const jobStatus = (job?.status as string) ?? null
     const artifactRefs = job
-      ? (job.artifact_refs ?? job.artifacts_json ?? null)
+      ? (job.artifact_refs ?? job.artifacts ?? null)
       : null
 
     // --- Eval gate (P3.2): promotion is blocked unless evals clear it ---
@@ -160,20 +160,20 @@ export default defineTool({
         runs: gate?.runs ?? {},
       },
       deploy_target: 'docker_compose',
-      smoke_test: {
-        status: 'pass',
-        latency_ms: 180,
-        error_rate_pct: 0,
-        behavioral_sanity: 'pass',
-      },
+      // No smoke probe is performed here. Reporting invented numbers would be
+      // worse than reporting nothing: a reviewer cannot tell fabricated
+      // evidence from measured evidence. Run the smoke battery explicitly and
+      // attach its output when recording the release.
+      smoke_test: null,
       training_provenance: trainingProvenance,
       deployed_at: new Date().toISOString(),
       deploy_stub: {
         note:
           'Automated rollout is not wired. The fleet runs from ' +
           'agents/deploy/docker-compose.yaml on the fleet host — pin ' +
-          'AGENT_IMAGE_TAG to this release and re-run `make deploy` to ' +
-          'apply it, then run the smoke battery against the service.',
+          'AGENT_IMAGE_TAG to this release and re-run ' +
+          '`make -f Makefile.agents deploy` to apply it, then run the smoke ' +
+          'battery against the service.',
       },
       _provenance_stored: stored !== null,
     }

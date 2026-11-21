@@ -239,6 +239,11 @@ peerDependencyRules:
     vitest: '*'
     zod: '*'
 overrides:
+  # workers-ai-provider floats on ^4.0.0 while every agent pins ai@7.0.141
+  # (which requires exactly @ai-sdk/provider 4.0.27); the split resolution makes
+  # WorkersAIChatLanguageModel structurally incompatible with ai's LanguageModel.
+  # Pin one provider version so the types unify.
+  '@ai-sdk/provider': 4.0.37
   # Drift consolidation (#6050): pin newest to collapse duplicate resolutions.
   '@opentelemetry/instrumentation-mongodb': 0.72.0
   '@oxc-project/types': 0.151.0
