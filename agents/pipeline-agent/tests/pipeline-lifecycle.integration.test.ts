@@ -24,7 +24,12 @@ vi.mock('../agent/lib/training-infra-client.js', () => ({
     est_cost_usd: 1.5,
     warnings: [],
   }),
-  submitTrainingJob: vi.fn().mockResolvedValue(null),
+  submitTrainingJob: vi.fn().mockResolvedValue({
+    ok: true,
+    job_id: 'job-lifecycle01',
+    status: 'queued',
+    plan_hash: 'plan-abc',
+  }),
   getTrainingJob: vi.fn().mockResolvedValue(null),
   checkEvalGate: vi.fn().mockResolvedValue({
     ok: true,
@@ -51,21 +56,25 @@ beforeEach(() => {
 describe('pipeline lifecycle (integration)', () => {
   it('curate -> train -> evaluate -> staging -> production -> rollback', async () => {
     const curated = await curateDataset.execute(
-      { dataset_id: 'ds-1', include_synthetic: true },
+      { dataset_id: 'ds-1', include_synthetic: true, submit: true },
       ctx,
     )
-    expect(curated.curation_run_id).toMatch(/^curation-/)
+    // The registry job id is the only real handle; no fabricated run id.
+    expect(curated.training_infra_job_id).toBe('job-lifecycle01')
+    expect(curated).not.toHaveProperty('curation_run_id')
 
     const trained = await runTraining.execute(
       {
-        curation_run_id: curated.curation_run_id,
+        curation_run_id: curated.training_infra_job_id,
         model_id: 'mdl-1',
         method: 'dpo',
         hyperparams: { epochs: 3, batch_size: 8, learning_rate: 5e-5 },
+        submit: true,
       },
       ctx,
     )
     expect(trained.status).toBe('queued')
+    expect(trained.training_infra_job_id).toBe('job-lifecycle01')
 
     const evaluated = await runEvaluation.execute(
       { candidate_model_id: 'mdl-1', benchmark_suite_version: 'v1' },
@@ -75,7 +84,7 @@ describe('pipeline lifecycle (integration)', () => {
 
     const staged = await promoteToStaging.execute(
       {
-        training_job_id: trained.training_job_id,
+        training_job_id: trained.training_infra_job_id,
         model_uri: 'models/mdl-1',
         image_tag: 'v1',
       },

@@ -49,6 +49,10 @@ services:
       - PORT=2000
       - HOST=0.0.0.0
       - NODE_ENV=production
+    # Foresight runs on the host, not in this file: reach it (and any
+    # other host MCP) through the gateway.
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     restart: unless-stopped
     depends_on: [mongo, redis]
 
@@ -86,6 +90,10 @@ services:
       - PORT=2000
       - HOST=0.0.0.0
       - NODE_ENV=production
+    # Foresight runs on the host, not in this file: reach it (and any
+    # other host MCP) through the gateway.
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     restart: unless-stopped
 
   eve-agent:
@@ -118,6 +126,10 @@ services:
       - PORT=2000
       - HOST=0.0.0.0
       - NODE_ENV=production
+    # Foresight runs on the host, not in this file: reach it (and any
+    # other host MCP) through the gateway.
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     restart: unless-stopped
 
   pipeline-agent:
@@ -155,6 +167,10 @@ services:
       - PORT=2000
       - HOST=0.0.0.0
       - NODE_ENV=production
+    # Foresight runs on the host, not in this file: reach it (and any
+    # other host MCP) through the gateway.
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     restart: unless-stopped
 
   session-agent:
@@ -171,6 +187,10 @@ services:
       - PORT=2000
       - HOST=0.0.0.0
       - NODE_ENV=production
+    # Foresight runs on the host, not in this file: reach it (and any
+    # other host MCP) through the gateway.
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     restart: unless-stopped
     depends_on: [mongo]
 

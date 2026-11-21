@@ -113,7 +113,7 @@ export default defineTool({
           'Automated rollout is not wired. The fleet runs from ' +
           'agents/deploy/docker-compose.yaml on the fleet host; promote by ' +
           'pinning AGENT_IMAGE_TAG to this release and re-running ' +
-          '`make deploy`.',
+          '`make -f Makefile.agents deploy`.',
       },
     }
   },

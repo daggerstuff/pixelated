@@ -52,11 +52,19 @@ export default defineTool({
     // job for this candidate/suite. Planning is side-effect free; submission
     // happens separately via submit_job with the returned plan_hash.
     let trainingInfraPlan: Record<string, unknown> | null = null
+    let planError: string | null = null
     try {
       const tag = `eval-${input.candidate_model_id}-${input.benchmark_suite_version}`
+      // The recipe id pins the graded case suite (eval-crisis-v2 -> --suite v2),
+      // so the suite version is NOT an input: passing it would be rejected, and
+      // silently ignoring it would eval the wrong suite under the right label.
+      const recipe =
+        input.benchmark_suite_version === 'v1'
+          ? 'eval-crisis-v1'
+          : 'eval-crisis-v2'
       const planned = await planTrainingJob({
-        recipe: 'eval-crisis-v2',
-        inputs: { tag, suite: input.benchmark_suite_version },
+        recipe,
+        inputs: { tag },
       })
       if (planned && planned.ok === true) {
         trainingInfraPlan = {
@@ -64,12 +72,15 @@ export default defineTool({
           command: planned.command,
           est_cost_usd: planned.est_cost_usd,
           warnings: planned.warnings ?? [],
-          recipe: 'eval-crisis-v2',
+          recipe,
           tag,
         }
+      } else if (planned && typeof planned.error === 'string') {
+        planError = planned.error
       }
-    } catch {
+    } catch (err) {
       // Advisory: MCP may be unavailable; keep EVAL_REQUESTED state.
+      planError = err instanceof Error ? err.message : String(err)
     }
 
     return {
@@ -85,9 +96,12 @@ export default defineTool({
             }
           : null,
       training_infra_plan: trainingInfraPlan,
+      plan_error: planError,
       note: trainingInfraPlan
         ? 'Eval plan resolved via training-infra MCP; submit with the returned plan_hash to launch.'
-        : 'Training-infra MCP unavailable; eval not planned. Retry when the service is up.',
+        : planError
+          ? `Eval was not planned: ${planError}`
+          : 'Training-infra MCP unreachable; eval not planned. Retry when the service is up.',
     }
   },
 })

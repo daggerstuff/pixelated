@@ -3,3 +3,7 @@
 node_modules/
 dist/
 .cache/
+.env*
+
+# Templates are safe to commit; real env files are not.
+!.env.example

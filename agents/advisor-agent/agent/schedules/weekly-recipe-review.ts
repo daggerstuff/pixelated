@@ -19,7 +19,7 @@ const REVIEW_CHANNEL =
   process.env.SLACK_TRAINING_CHANNEL_ID ?? 'training-pipeline'
 
 // Mirrors the enforcement in `ai/training/mcp/recipes.py::_multi_node_errors`
-// (see docs/MULTI_NODE_DECISION.md). If the MCP ever relaxes that rule, this
+// (see ai/training/mcp/MULTI_NODE_DECISION.md). If the MCP ever relaxes that rule, this
 // detector is the thing that will start reporting healthy multi-GPU recipes as
 // suspicious — so it is deliberately conservative and read-only.
 function multiGpuReason(recipe: Record<string, unknown>): string | null {
