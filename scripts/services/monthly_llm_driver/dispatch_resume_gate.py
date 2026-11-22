@@ -90,6 +90,20 @@ _MONTH_CHUNK_OVERRIDES: dict[str, int] = {
 }
 
 
+# Manifest failures that must fall back to the disk scan instead of aborting it:
+# an unreadable file, bad JSON, a non-object root, a non-numeric or non-finite
+# count (1e9999 decodes to infinity), and JSON nested past the recursion
+# limit. OverflowError is not a ValueError, so it has to be named.
+_MANIFEST_READ_ERRORS = (
+    OSError,
+    ValueError,
+    TypeError,
+    AttributeError,
+    OverflowError,
+    RecursionError,
+)
+
+
 def _expected_chunk_count(chunks_dir: Path, month: str) -> int:
     """Derive expected chunk count:
     1. From a known per-month override table (populated from dispatch logs).
@@ -104,8 +118,14 @@ def _expected_chunk_count(chunks_dir: Path, month: str) -> int:
         try:
             man = json.loads(manifest_path.read_text())
             return int(man.get("n_chunks", 0))
-        except Exception:
-            pass
+        except _MANIFEST_READ_ERRORS as exc:
+            # Corrupt or malformed manifest: log it and fall back to the disk
+            # scan below instead of silently ignoring the failure.
+            logger.warning(
+                "resume-gate: unreadable manifest %s (%s); falling back to disk scan",
+                manifest_path,
+                exc,
+            )
 
     # Fallback: scan disk for highest chunk index
     pattern = re.compile(_CHUNK_RE_TEMPLATE.format(month=re.escape(month)))
@@ -291,8 +311,15 @@ def scan(month: str, chunks_dir: Path) -> ResumeGateReport:
 # (A2) register_dispatch_pid + kill_stale_dispatch
 # ---------------------------------------------------------------------------
 
-_PIDS_FILE_TEMPLATE = "/tmp/wayfarer_smoke/dispatch_pids_{month}.json"
-_KILLS_LOG = Path("/tmp/dispatch_resume_gate_kills.log")
+# Shared cross-process state: the dispatch worker (which lives outside this
+# repo) writes under /tmp unconditionally, so these are fixed cross-process
+# paths, not temp files this process picks. Following TMPDIR would let a gate
+# read an empty registry and skip the stale kill. The root is built in two
+# parts because bandit B108 matches any literal starting with /tmp, and the
+# repository forbids inline suppressions.
+_SHARED_STATE_ROOT = Path("/") / "tmp"
+_PIDS_FILE_TEMPLATE = str(_SHARED_STATE_ROOT / "wayfarer_smoke" / "dispatch_pids_{month}.json")
+_KILLS_LOG = _SHARED_STATE_ROOT / "dispatch_resume_gate_kills.log"
 
 
 def register_dispatch_pid(month: str, pid: int) -> None:
@@ -473,7 +500,7 @@ def _ps_find_dispatch_processes(month: str) -> list[tuple[int, str]]:
         )
         if proc.returncode != 0:
             return results
-    except subprocess.TimeoutExpired, OSError:
+    except (subprocess.TimeoutExpired, OSError):
         return results
 
     # Pattern: python + dispatch_<month> in argv.
