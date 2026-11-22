@@ -553,3 +553,33 @@ def test_terminal_tag_returns_dead_state() -> None:
 
         # Verify: bytes_age_ratio is 0.0 (terminal state, no ongoing progress)
         assert result["bytes_age_ratio"] == 0.0
+
+
+# ---------------------------------------------------------------------------
+# Test 12: non-finite manifest count falls back to the disk scan
+# ---------------------------------------------------------------------------
+
+
+def test_scan_falls_back_when_manifest_count_is_non_finite() -> None:
+    """A manifest n_chunks of 1e9999 decodes to infinity; int(inf) raises
+    OverflowError, which must fall back to the highest chunk index on disk
+    instead of aborting scan()."""
+    month = "2025-11"
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        chunks_dir = Path(tmpdir)
+        (chunks_dir / f"{month}_manifest.json").write_text('{"n_chunks": 1e9999}')
+        (chunks_dir / f"{month}_chunk_03_wayfarer.json").write_text(
+            json.dumps({"status": "ok", "emails": [{"id": "email-3"}], "chat_bursts": []})
+        )
+
+        with mock.patch(
+            "scripts.services.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
+            side_effect=Exception("Mongo unavailable"),
+        ):
+            report = scan(month, chunks_dir)
+
+    assert report.n_chunks_expected == 3
+    assert report.ok == [3]
+    assert report.missing == [1, 2]
+    assert report.partial == []

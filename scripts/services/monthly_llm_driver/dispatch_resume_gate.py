@@ -28,7 +28,6 @@ import os
 import re
 import signal
 import subprocess
-import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -91,6 +90,20 @@ _MONTH_CHUNK_OVERRIDES: dict[str, int] = {
 }
 
 
+# Manifest failures that must fall back to the disk scan instead of aborting it:
+# an unreadable file, bad JSON, a non-object root, a non-numeric or non-finite
+# count (1e9999 decodes to infinity), and JSON nested past the recursion
+# limit. OverflowError is not a ValueError, so it has to be named.
+_MANIFEST_READ_ERRORS = (
+    OSError,
+    ValueError,
+    TypeError,
+    AttributeError,
+    OverflowError,
+    RecursionError,
+)
+
+
 def _expected_chunk_count(chunks_dir: Path, month: str) -> int:
     """Derive expected chunk count:
     1. From a known per-month override table (populated from dispatch logs).
@@ -105,10 +118,9 @@ def _expected_chunk_count(chunks_dir: Path, month: str) -> int:
         try:
             man = json.loads(manifest_path.read_text())
             return int(man.get("n_chunks", 0))
-        except (OSError, ValueError, TypeError, AttributeError) as exc:
-            # Corrupt or malformed manifest (unreadable file, bad JSON, or a
-            # JSON root that is not an object): log it and fall back to the
-            # disk scan below instead of silently ignoring the failure.
+        except _MANIFEST_READ_ERRORS as exc:
+            # Corrupt or malformed manifest: log it and fall back to the disk
+            # scan below instead of silently ignoring the failure.
             logger.warning(
                 "resume-gate: unreadable manifest %s (%s); falling back to disk scan",
                 manifest_path,
@@ -299,12 +311,15 @@ def scan(month: str, chunks_dir: Path) -> ResumeGateReport:
 # (A2) register_dispatch_pid + kill_stale_dispatch
 # ---------------------------------------------------------------------------
 
-# Shared cross-process state: the dispatch worker and this gate must agree on
-# the same file locations, so the filenames stay fixed while the base dir
-# comes from ``tempfile.gettempdir()`` (``/tmp`` by default, honoring
-# ``TMPDIR``) rather than hard-coding ``/tmp``.
-_PIDS_FILE_TEMPLATE = str(Path(tempfile.gettempdir()) / "wayfarer_smoke" / "dispatch_pids_{month}.json")
-_KILLS_LOG = Path(tempfile.gettempdir()) / "dispatch_resume_gate_kills.log"
+# Shared cross-process state: the dispatch worker (which lives outside this
+# repo) and this gate must agree on the same file locations. The worker writes
+# these paths under /tmp unconditionally, so they are a cross-process contract
+# and must not follow TMPDIR -- a gate started with a different TMPDIR would
+# read an empty registry and skip the stale kill. bandit B108 flags hard-coded
+# temp paths, but these are shared registry locations rather than temp files
+# this process chooses, so the finding is suppressed.
+_PIDS_FILE_TEMPLATE = "/tmp/wayfarer_smoke/dispatch_pids_{month}.json"  # nosec B108
+_KILLS_LOG = Path("/tmp/dispatch_resume_gate_kills.log")  # nosec B108
 
 
 def register_dispatch_pid(month: str, pid: int) -> None:
