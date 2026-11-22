@@ -473,7 +473,7 @@ def _ps_find_dispatch_processes(month: str) -> list[tuple[int, str]]:
         )
         if proc.returncode != 0:
             return results
-    except subprocess.TimeoutExpired, OSError:
+    except (subprocess.TimeoutExpired, OSError):
         return results
 
     # Pattern: python + dispatch_<month> in argv.
