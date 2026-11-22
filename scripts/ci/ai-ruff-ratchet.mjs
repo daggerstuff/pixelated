@@ -65,14 +65,20 @@ function countByRule() {
     stdout = err.stdout.toString()
   }
   const byRule = {}
+  const filesByRule = {}
   for (const finding of JSON.parse(stdout)) {
     const rule = finding.code ?? 'unknown'
     byRule[rule] = (byRule[rule] ?? 0) + 1
+    const file = finding.filename.replace(ROOT, '')
+    if (!filesByRule[rule]) filesByRule[rule] = []
+    if (filesByRule[rule].length < 5 && !filesByRule[rule].includes(file)) {
+      filesByRule[rule].push(file)
+    }
   }
-  return byRule
+  return { byRule, filesByRule }
 }
 
-const current = countByRule()
+const { byRule: current, filesByRule } = countByRule()
 const total = Object.values(current).reduce((sum, n) => sum + n, 0)
 
 if (update || !existsSync(BASELINE_PATH)) {
@@ -105,6 +111,7 @@ if (grown.length > 0) {
   console.log('')
   for (const [rule, pinned, now] of grown.sort((a, b) => b[2] - b[1] - (a[2] - a[1]))) {
     console.log(`  GREW  ${rule}  ${pinned} -> ${now}`)
+    for (const file of filesByRule[rule] ?? []) console.log(`          ${file}`)
   }
   console.log('\nFix the new findings, or re-pin after an intentional change:')
   console.log('  node scripts/ci/ai-ruff-ratchet.mjs -- --update')

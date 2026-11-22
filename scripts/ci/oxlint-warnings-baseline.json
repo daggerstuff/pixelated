@@ -1,8 +1,8 @@
 {
-  "total": 1866,
+  "total": 1867,
   "rules": {
     "eslint(no-extra-bind)": 1,
-    "react(exhaustive-effect-dependencies)": 22,
+    "react(exhaustive-effect-dependencies)": 23,
     "react(hooks)": 1,
     "react(memo-dependencies)": 17,
     "typescript(consistent-return)": 21,

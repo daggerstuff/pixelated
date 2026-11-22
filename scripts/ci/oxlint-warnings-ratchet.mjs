@@ -54,6 +54,7 @@ if (files.length === 0) {
 }
 
 const byRule = {}
+const filesByRule = {}
 let warnings = 0
 let errors = 0
 
@@ -68,6 +69,11 @@ for (let index = 0; index < files.length; index += BATCH_SIZE) {
     warnings += 1
     const code = diagnostic.code ?? 'unknown'
     byRule[code] = (byRule[code] ?? 0) + 1
+    if (!filesByRule[code]) filesByRule[code] = []
+    const file = diagnostic.filename ?? ''
+    if (filesByRule[code].length < 5 && !filesByRule[code].includes(file)) {
+      filesByRule[code].push(file)
+    }
   }
 }
 
@@ -108,6 +114,7 @@ if (warnings > baseTotal || grown.length > 0) {
   console.log('')
   for (const [rule, pinned, now] of grown.sort((a, b) => b[2] - b[1] - (a[2] - a[1]))) {
     console.log(`  GREW  ${rule}  ${pinned} -> ${now}`)
+    for (const file of filesByRule[rule] ?? []) console.log(`          ${file}`)
   }
   console.log('\nFix the new warnings, or re-pin after an intentional change:')
   console.log('  node scripts/ci/oxlint-warnings-ratchet.mjs -- --update')
