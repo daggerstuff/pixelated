@@ -65,5 +65,4 @@ else
     echo "   This is expected if running locally without Struct account"
     exit 0
 fi
-fi
 echo "✅ Struct MCP connection test completed"
