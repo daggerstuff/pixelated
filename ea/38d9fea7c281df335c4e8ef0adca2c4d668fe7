@@ -1,0 +1,28 @@
+scripts/ci/ai-ruff-ratchet.mjs
+  s_7d4811cf1b0ba7::t_07ade795097dfd 114
+  s_7d4811cf1b0ba7::t_2a24b90ba148ba 68,72-76,78,81
+scripts/ci/oxlint-warnings-ratchet.mjs
+  s_7d4811cf1b0ba7::t_2605b09d3d98d8 57
+  s_7d4811cf1b0ba7::t_69c941cc58dcb4 117
+  s_7d4811cf1b0ba7::t_67e03b9c2bc61f 72-76
+scripts/ci/ai-ruff-baseline.json
+  s_7d4811cf1b0ba7::t_15463055a0612f 38
+scripts/ci/oxlint-warnings-baseline.json
+  s_7d4811cf1b0ba7::t_15463055a0612f 2,5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ea38d9fea7c281df335c4e8ef0adca2c4d668fe7",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
