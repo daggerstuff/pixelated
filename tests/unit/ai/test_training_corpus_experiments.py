@@ -43,13 +43,13 @@ def test_pick_winner_prefers_higher_score_then_variant_id() -> None:
         variant=ExperimentVariant("A", "A1.2", "lower", {}),
         score=71.0,
         metrics={},
-        artifact_dir=Path("/tmp/a12"),
+        artifact_dir=Path("test-artifacts/a12"),
     )
     higher = VariantOutcome(
         variant=ExperimentVariant("A", "A1.1", "higher", {}),
         score=72.0,
         metrics={},
-        artifact_dir=Path("/tmp/a11"),
+        artifact_dir=Path("test-artifacts/a11"),
     )
 
     assert _pick_winner([lower, higher]) == higher
@@ -167,7 +167,7 @@ def test_variant_metrics_count_wave1_sources() -> None:
     manifest = CorpusManifest(
         name="pixelated",
         version="test",
-        destination=Path("/tmp/wave1-metrics"),
+        destination=Path("test-artifacts/wave1-metrics"),
         total_entries=3,
         by_split={"train": 2, "holdout": 1},
         by_stage={
@@ -241,7 +241,7 @@ def test_variant_metrics_count_wave2_sources() -> None:
     manifest = CorpusManifest(
         name="pixelated",
         version="test",
-        destination=Path("/tmp/wave2-metrics"),
+        destination=Path("test-artifacts/wave2-metrics"),
         total_entries=3,
         by_split={"train": 2, "holdout": 1},
         by_stage={
@@ -315,7 +315,7 @@ def test_variant_metrics_count_wave3_sources() -> None:
     manifest = CorpusManifest(
         name="pixelated",
         version="test",
-        destination=Path("/tmp/wave3-metrics"),
+        destination=Path("test-artifacts/wave3-metrics"),
         total_entries=3,
         by_split={"train": 2, "holdout": 1},
         by_stage={
@@ -389,7 +389,7 @@ def test_variant_metrics_count_wave4_sources() -> None:
     manifest = CorpusManifest(
         name="pixelated",
         version="test",
-        destination=Path("/tmp/wave4-metrics"),
+        destination=Path("test-artifacts/wave4-metrics"),
         total_entries=3,
         by_split={"train": 2, "holdout": 1},
         by_stage={
@@ -558,25 +558,25 @@ def test_release_candidate_source_limits_follow_wave1_winner() -> None:
         variant=ExperimentVariant("A", "A1.2", "winner", {}),
         score=72.0,
         metrics={},
-        artifact_dir=Path("/tmp/a12"),
+        artifact_dir=Path("test-artifacts/a12"),
     )
     no_wave1 = VariantOutcome(
         variant=ExperimentVariant("I", "I1.1", "control", {}),
         score=58.0,
         metrics={},
-        artifact_dir=Path("/tmp/i11"),
+        artifact_dir=Path("test-artifacts/i11"),
     )
     simulation_only = VariantOutcome(
         variant=ExperimentVariant("I", "I1.2", "simulation", {}),
         score=66.0,
         metrics={},
-        artifact_dir=Path("/tmp/i12"),
+        artifact_dir=Path("test-artifacts/i12"),
     )
     full_stack = VariantOutcome(
         variant=ExperimentVariant("I", "I1.3", "full", {}),
         score=72.0,
         metrics={},
-        artifact_dir=Path("/tmp/i13"),
+        artifact_dir=Path("test-artifacts/i13"),
     )
 
     assert "wave1_seed_simulation" not in _release_candidate_source_limits({"A": placeholder, "I": no_wave1})
@@ -591,7 +591,7 @@ def test_release_candidate_source_limits_follow_wave1_winner() -> None:
         variant=ExperimentVariant("J", "J1.3", "wave2 full", {}),
         score=80.0,
         metrics={},
-        artifact_dir=Path("/tmp/j13"),
+        artifact_dir=Path("test-artifacts/j13"),
     )
     held_out_limits = _release_candidate_source_limits({"A": placeholder, "I": full_stack, "J": held_out_wave2})
     assert "wave2_seed_simulation" not in held_out_limits
@@ -601,7 +601,7 @@ def test_release_candidate_source_limits_follow_wave1_winner() -> None:
         variant=ExperimentVariant("K", "K1.3", "wave3 full", {}),
         score=84.0,
         metrics={},
-        artifact_dir=Path("/tmp/k13"),
+        artifact_dir=Path("test-artifacts/k13"),
     )
     held_out_limits = _release_candidate_source_limits(
         {"A": placeholder, "I": full_stack, "J": held_out_wave2, "K": held_out_wave3}
@@ -613,7 +613,7 @@ def test_release_candidate_source_limits_follow_wave1_winner() -> None:
         variant=ExperimentVariant("L", "L1.3", "wave4 full", {}),
         score=90.0,
         metrics={},
-        artifact_dir=Path("/tmp/l13"),
+        artifact_dir=Path("test-artifacts/l13"),
     )
     held_out_limits = _release_candidate_source_limits(
         {"A": placeholder, "I": full_stack, "J": held_out_wave2, "K": held_out_wave3, "L": held_out_wave4}
