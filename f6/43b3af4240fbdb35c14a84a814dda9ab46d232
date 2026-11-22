@@ -1,0 +1,19 @@
+scripts/services/monthly_llm_driver/dispatch_resume_gate.py
+  s_300e345e99e201::t_e3b423c9043419 476
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f643b3af4240fbdb35c14a84a814dda9ab46d232",
+  "prompts": {},
+  "sessions": {
+    "s_300e345e99e201": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "granite-clam",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
