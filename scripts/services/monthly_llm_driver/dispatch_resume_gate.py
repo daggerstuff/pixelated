@@ -28,6 +28,7 @@ import os
 import re
 import signal
 import subprocess
+import tempfile
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -104,8 +105,15 @@ def _expected_chunk_count(chunks_dir: Path, month: str) -> int:
         try:
             man = json.loads(manifest_path.read_text())
             return int(man.get("n_chunks", 0))
-        except Exception:
-            pass
+        except (OSError, ValueError, TypeError, AttributeError) as exc:
+            # Corrupt or malformed manifest (unreadable file, bad JSON, or a
+            # JSON root that is not an object): log it and fall back to the
+            # disk scan below instead of silently ignoring the failure.
+            logger.warning(
+                "resume-gate: unreadable manifest %s (%s); falling back to disk scan",
+                manifest_path,
+                exc,
+            )
 
     # Fallback: scan disk for highest chunk index
     pattern = re.compile(_CHUNK_RE_TEMPLATE.format(month=re.escape(month)))
@@ -291,8 +299,12 @@ def scan(month: str, chunks_dir: Path) -> ResumeGateReport:
 # (A2) register_dispatch_pid + kill_stale_dispatch
 # ---------------------------------------------------------------------------
 
-_PIDS_FILE_TEMPLATE = "/tmp/wayfarer_smoke/dispatch_pids_{month}.json"
-_KILLS_LOG = Path("/tmp/dispatch_resume_gate_kills.log")
+# Shared cross-process state: the dispatch worker and this gate must agree on
+# the same file locations, so the filenames stay fixed while the base dir
+# comes from ``tempfile.gettempdir()`` (``/tmp`` by default, honoring
+# ``TMPDIR``) rather than hard-coding ``/tmp``.
+_PIDS_FILE_TEMPLATE = str(Path(tempfile.gettempdir()) / "wayfarer_smoke" / "dispatch_pids_{month}.json")
+_KILLS_LOG = Path(tempfile.gettempdir()) / "dispatch_resume_gate_kills.log"
 
 
 def register_dispatch_pid(month: str, pid: int) -> None:
