@@ -55,6 +55,8 @@
     "lint:naming": "node scripts/ci/naming-audit.mjs",
     "lint:mock-paths": "node scripts/ci/mock-paths-audit.mjs",
     "lint:python-correctness": "node scripts/ci/python-ruff-audit.mjs",
+    "lint:python-style:ai": "node scripts/ci/ai-ruff-ratchet.mjs",
+    "lint:oxlint-warnings": "node scripts/ci/oxlint-warnings-ratchet.mjs",
     "vitest": "vitest",
     "lint:agents-md": "node scripts/ci/agents-md-audit.mjs",
     "lint:quality": "pnpm lint:boundaries && pnpm lint:duplication && pnpm lint:complexity && pnpm lint:file-size && pnpm lint:tech-debt && pnpm lint:naming && pnpm lint:python-correctness",

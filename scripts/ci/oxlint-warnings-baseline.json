@@ -1,0 +1,30 @@
+{
+  "total": 1866,
+  "rules": {
+    "eslint(no-extra-bind)": 1,
+    "react(exhaustive-effect-dependencies)": 22,
+    "react(hooks)": 1,
+    "react(memo-dependencies)": 17,
+    "typescript(consistent-return)": 21,
+    "typescript(no-base-to-string)": 68,
+    "typescript(no-generated-empty-object-type)": 3,
+    "typescript(no-misused-spread)": 9,
+    "typescript(no-redundant-type-constituents)": 38,
+    "typescript(no-unnecessary-template-expression)": 2,
+    "typescript(no-unnecessary-type-assertion)": 82,
+    "typescript(no-unnecessary-type-conversion)": 27,
+    "typescript(no-unnecessary-type-parameters)": 7,
+    "typescript(no-unsafe-argument)": 192,
+    "typescript(no-unsafe-assignment)": 715,
+    "typescript(no-unsafe-call)": 260,
+    "typescript(no-unsafe-enum-assignment)": 25,
+    "typescript(no-unsafe-enum-comparison)": 16,
+    "typescript(no-unsafe-member-access)": 100,
+    "typescript(no-unsafe-return)": 81,
+    "typescript(prefer-nullish-coalescing)": 21,
+    "typescript(prefer-optional-chain)": 18,
+    "typescript(restrict-template-expressions)": 41,
+    "typescript(unbound-method)": 98,
+    "vitest(no-commented-out-tests)": 1
+  }
+}

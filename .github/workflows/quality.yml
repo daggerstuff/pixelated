@@ -149,6 +149,9 @@ jobs:
       - name: Strict-typing ratchet (ai/research)
         run: node scripts/ci/ai-strict-ratchet.mjs
 
+      - name: Style ratchet (ai, ruff per rule)
+        run: node scripts/ci/ai-ruff-ratchet.mjs
+
   # pe service test suite against a real postgres (the DB-backed tests are
   # integration tests; there is no in-memory escape hatch for asyncpg).
   # Coverage floor is a regression gate: current coverage is ~79%; the

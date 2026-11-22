@@ -78,6 +78,9 @@ jobs:
       - name: Lint code (type-aware)
         run: pnpm lint:ci
 
+      - name: Lint warning ratchet (no growth)
+        run: pnpm lint:oxlint-warnings
+
       - name: Type check
         env:
           NODE_OPTIONS: '--max-old-space-size=8192'
