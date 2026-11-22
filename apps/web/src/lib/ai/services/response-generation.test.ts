@@ -46,6 +46,12 @@ describe('ResponseGenerationService', () => {
     expect(sentMessages?.[0]?.content).toContain('one brief, specific reflection')
     expect(sentMessages?.[0]?.content).toContain('Preserve safety and uncertainty context')
     expect(sentMessages?.[0]?.content).toContain(
+      'when the message indicates imminent risk of serious harm',
+    )
+    expect(sentMessages?.[0]?.content).toContain(
+      'lead with the concrete safety step first',
+    )
+    expect(sentMessages?.[0]?.content).toContain(
       'Additional instructions: Keep the answer relevant to this support request.',
     )
     expect(sentMessages?.[1]).toEqual({
