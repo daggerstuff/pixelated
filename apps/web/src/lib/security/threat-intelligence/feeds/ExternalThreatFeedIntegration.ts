@@ -1153,7 +1153,7 @@ export class ExternalThreatFeedIntegrationCore
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
-        message: `Health check failed: ${error}`,
+        message: `Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
       }
     }
   }
@@ -1274,6 +1274,60 @@ function defaultGlobalThreatFields(
   }
 }
 
+interface FeedThreatConversionOptions {
+  campaignPrefix: string
+  threatType: string
+  errorLabel: string
+  extraMetadata?: Record<string, unknown>
+}
+
+function convertFeedItemToThreat(
+  item: FeedItem,
+  subscription: FeedSubscription,
+  options: FeedThreatConversionOptions,
+): GlobalThreatIntelligence | null {
+  try {
+    const threatId = `external_${item.itemId}`
+    const timestamp = new Date(item.timestamp)
+
+    return {
+      ...defaultGlobalThreatFields(threatId, item.confidence),
+      threatId,
+      threatType: options.threatType,
+      severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
+      confidence: item.confidence,
+      indicators: [
+        {
+          indicatorType: item.indicatorType,
+          value: item.indicator,
+          confidence: item.confidence,
+          firstSeen: timestamp,
+          lastSeen: timestamp,
+        },
+      ],
+      firstSeen: timestamp,
+      lastSeen: timestamp,
+      regions: ['global'],
+      attribution: {
+        family: subscription.provider,
+        campaign: `${options.campaignPrefix}_${subscription.feedId}`,
+        confidence: item.confidence,
+      },
+      metadata: {
+        source: 'external_feed',
+        feedId: subscription.feedId,
+        provider: subscription.provider,
+        itemId: item.itemId,
+        description: item.description,
+        ...options.extraMetadata,
+      },
+    }
+  } catch (error: unknown) {
+    logger.error(`${options.errorLabel} threat conversion failed:`, { error })
+    return null
+  }
+}
+
 // STIX Feed Processor
 class STIXFeedProcessor implements FeedProcessor {
   async parseFeed(
@@ -1334,44 +1388,11 @@ class STIXFeedProcessor implements FeedProcessor {
     item: FeedItem,
     subscription: FeedSubscription,
   ): Promise<GlobalThreatIntelligence | null> {
-    try {
-      const threatId = `external_${item.itemId}`
-
-      return {
-        ...defaultGlobalThreatFields(threatId, item.confidence),
-        threatId,
-        threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
-        confidence: item.confidence,
-        indicators: [
-          {
-            indicatorType: item.indicatorType,
-            value: item.indicator,
-            confidence: item.confidence,
-            firstSeen: new Date(item.timestamp),
-            lastSeen: new Date(item.timestamp),
-          },
-        ],
-        firstSeen: new Date(item.timestamp),
-        lastSeen: new Date(item.timestamp),
-        regions: ['global'],
-        attribution: {
-          family: subscription.provider,
-          campaign: `feed_${subscription.feedId}`,
-          confidence: item.confidence,
-        },
-        metadata: {
-          source: 'external_feed',
-          feedId: subscription.feedId,
-          provider: subscription.provider,
-          itemId: item.itemId,
-          description: item.description,
-        },
-      }
-    } catch (error: unknown) {
-      logger.error('STIX threat conversion failed:', { error })
-      return null
-    }
+    return convertFeedItemToThreat(item, subscription, {
+      campaignPrefix: 'feed',
+      threatType: this.mapIndicatorToThreatType(item.indicatorType),
+      errorLabel: 'STIX',
+    })
   }
 
   private mapIndicatorToThreatType(indicatorType: string): string {
@@ -1469,44 +1490,11 @@ class TAXIIFeedProcessor implements FeedProcessor {
     item: FeedItem,
     subscription: FeedSubscription,
   ): Promise<GlobalThreatIntelligence | null> {
-    try {
-      const threatId = `external_${item.itemId}`
-
-      return {
-        ...defaultGlobalThreatFields(threatId, item.confidence),
-        threatId,
-        threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
-        confidence: item.confidence,
-        indicators: [
-          {
-            indicatorType: item.indicatorType,
-            value: item.indicator,
-            confidence: item.confidence,
-            firstSeen: new Date(item.timestamp),
-            lastSeen: new Date(item.timestamp),
-          },
-        ],
-        firstSeen: new Date(item.timestamp),
-        lastSeen: new Date(item.timestamp),
-        regions: ['global'],
-        attribution: {
-          family: subscription.provider,
-          campaign: `taxii_${subscription.feedId}`,
-          confidence: item.confidence,
-        },
-        metadata: {
-          source: 'external_feed',
-          feedId: subscription.feedId,
-          provider: subscription.provider,
-          itemId: item.itemId,
-          description: item.description,
-        },
-      }
-    } catch (error: unknown) {
-      logger.error('TAXII threat conversion failed:', { error })
-      return null
-    }
+    return convertFeedItemToThreat(item, subscription, {
+      campaignPrefix: 'taxii',
+      threatType: this.mapIndicatorToThreatType(item.indicatorType),
+      errorLabel: 'TAXII',
+    })
   }
 
   private mapIndicatorToThreatType(indicatorType: string): string {
@@ -1610,45 +1598,12 @@ class MISPFeedProcessor implements FeedProcessor {
     item: FeedItem,
     subscription: FeedSubscription,
   ): Promise<GlobalThreatIntelligence | null> {
-    try {
-      const threatId = `external_${item.itemId}`
-
-      return {
-        ...defaultGlobalThreatFields(threatId, item.confidence),
-        threatId,
-        threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
-        confidence: item.confidence,
-        indicators: [
-          {
-            indicatorType: item.indicatorType,
-            value: item.indicator,
-            confidence: item.confidence,
-            firstSeen: new Date(item.timestamp),
-            lastSeen: new Date(item.timestamp),
-          },
-        ],
-        firstSeen: new Date(item.timestamp),
-        lastSeen: new Date(item.timestamp),
-        regions: ['global'],
-        attribution: {
-          family: subscription.provider,
-          campaign: `misp_${subscription.feedId}`,
-          confidence: item.confidence,
-        },
-        metadata: {
-          source: 'external_feed',
-          feedId: subscription.feedId,
-          provider: subscription.provider,
-          itemId: item.itemId,
-          description: item.description,
-          eventId: item.metadata?.['eventId'],
-        },
-      }
-    } catch (error: unknown) {
-      logger.error('MISP threat conversion failed:', { error })
-      return null
-    }
+    return convertFeedItemToThreat(item, subscription, {
+      campaignPrefix: 'misp',
+      threatType: this.mapIndicatorToThreatType(item.indicatorType),
+      errorLabel: 'MISP',
+      extraMetadata: { eventId: item.metadata?.['eventId'] },
+    })
   }
 
   private mapIndicatorToThreatType(indicatorType: string): string {
@@ -1745,46 +1700,15 @@ class OTXFeedProcessor implements FeedProcessor {
     item: FeedItem,
     subscription: FeedSubscription,
   ): Promise<GlobalThreatIntelligence | null> {
-    try {
-      const threatId = `external_${item.itemId}`
-
-      return {
-        ...defaultGlobalThreatFields(threatId, item.confidence),
-        threatId,
-        threatType: this.mapIndicatorToThreatType(item.indicatorType),
-        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
-        confidence: item.confidence,
-        indicators: [
-          {
-            indicatorType: item.indicatorType,
-            value: item.indicator,
-            confidence: item.confidence,
-            firstSeen: new Date(item.timestamp),
-            lastSeen: new Date(item.timestamp),
-          },
-        ],
-        firstSeen: new Date(item.timestamp),
-        lastSeen: new Date(item.timestamp),
-        regions: ['global'],
-        attribution: {
-          family: subscription.provider,
-          campaign: `otx_${subscription.feedId}`,
-          confidence: item.confidence,
-        },
-        metadata: {
-          source: 'external_feed',
-          feedId: subscription.feedId,
-          provider: subscription.provider,
-          itemId: item.itemId,
-          description: item.description,
-          pulseId: item.metadata?.['pulseId'],
-          tags: item.metadata?.['tags'],
-        },
-      }
-    } catch (error: unknown) {
-      logger.error('OTX threat conversion failed:', { error })
-      return null
-    }
+    return convertFeedItemToThreat(item, subscription, {
+      campaignPrefix: 'otx',
+      threatType: this.mapIndicatorToThreatType(item.indicatorType),
+      errorLabel: 'OTX',
+      extraMetadata: {
+        pulseId: item.metadata?.['pulseId'],
+        tags: item.metadata?.['tags'],
+      },
+    })
   }
 
   private mapIndicatorToThreatType(indicatorType: string): string {
@@ -1883,48 +1807,17 @@ class VirusTotalFeedProcessor implements FeedProcessor {
     item: FeedItem,
     subscription: FeedSubscription,
   ): Promise<GlobalThreatIntelligence | null> {
-    try {
-      const threatId = `external_${item.itemId}`
-
-      return {
-        ...defaultGlobalThreatFields(threatId, item.confidence),
-        threatId,
-        threatType: 'malware',
-        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
-        confidence: item.confidence,
-        indicators: [
-          {
-            indicatorType: item.indicatorType,
-            value: item.indicator,
-            confidence: item.confidence,
-            firstSeen: new Date(item.timestamp),
-            lastSeen: new Date(item.timestamp),
-          },
-        ],
-        firstSeen: new Date(item.timestamp),
-        lastSeen: new Date(item.timestamp),
-        regions: ['global'],
-        attribution: {
-          family: subscription.provider,
-          campaign: `virustotal_${subscription.feedId}`,
-          confidence: item.confidence,
-        },
-        metadata: {
-          source: 'external_feed',
-          feedId: subscription.feedId,
-          provider: subscription.provider,
-          itemId: item.itemId,
-          description: item.description,
-          fileName: item.metadata?.['fileName'],
-          fileSize: item.metadata?.['fileSize'],
-          fileType: item.metadata?.['fileType'],
-          vtLink: item.metadata?.['vtLink'],
-        },
-      }
-    } catch (error: unknown) {
-      logger.error('VirusTotal threat conversion failed:', { error })
-      return null
-    }
+    return convertFeedItemToThreat(item, subscription, {
+      campaignPrefix: 'virustotal',
+      threatType: 'malware',
+      errorLabel: 'VirusTotal',
+      extraMetadata: {
+        fileName: item.metadata?.['fileName'],
+        fileSize: item.metadata?.['fileSize'],
+        fileType: item.metadata?.['fileType'],
+        vtLink: item.metadata?.['vtLink'],
+      },
+    })
   }
 }
 
@@ -1935,122 +1828,101 @@ class GenericFeedProcessor implements FeedProcessor {
     subscription: FeedSubscription,
   ): Promise<FeedItem[]> {
     try {
-      const items: FeedItem[] = []
-
-      // Handle generic JSON format
-      if (Array.isArray(data)) {
-        for (const it of data) {
-          const item = it as Record<string, unknown>
-          if (item['indicator'] || item['value'] || item['ioc']) {
-            items.push({
-              itemId: (item['id'] ??
-                item['indicator'] ??
-                item['value'] ??
-                item['ioc']) as string,
-              indicator: (item['indicator'] ??
-                item['value'] ??
-                item['ioc']) as string,
-              indicatorType: (item['type'] ??
-                item['indicator_type'] ??
-                'unknown') as string,
-              severity: (item['severity'] ??
-                item['threat_level'] ??
-                'medium') as string,
-              confidence: (item['confidence'] ??
-                item['reliability'] ??
-                0.5) as number,
-              timestamp: new Date(
-                (item['timestamp'] ?? item['created'] ?? Date.now()) as number,
-              ),
-              description: (item['description'] ??
-                item['notes'] ??
-                '') as string,
-              source: subscription.provider,
-              metadata: {
-                rawData: item,
-                sourceFormat: 'generic',
-              },
-            })
-          }
-        }
-      } else {
-        const indicators = data['indicators'] as
-          | Record<string, unknown>[]
-          | undefined
-        if (indicators) {
-          // Handle nested indicator format
-          for (const ind of indicators) {
-            const indicator = ind
-            items.push({
-              itemId: (indicator['id'] ?? indicator['value']) as string,
-              indicator: indicator['value'] as string,
-              indicatorType: (indicator['type'] ?? 'unknown') as string,
-              severity: (indicator['severity'] ?? 'medium') as string,
-              confidence: (indicator['confidence'] ?? 0.5) as number,
-              timestamp: new Date(
-                (indicator['timestamp'] ?? Date.now()) as number,
-              ),
-              description: (indicator['description'] ?? '') as string,
-              source: subscription.provider,
-              metadata: {
-                rawData: indicator,
-                sourceFormat: 'generic_nested',
-              },
-            })
-          }
-        }
-      }
-
-      return items
+      return Array.isArray(data)
+        ? this.parseGenericArrayFeed(data, subscription)
+        : this.parseGenericNestedFeed(data, subscription)
     } catch (error: unknown) {
       logger.error('Generic feed parsing failed:', { error })
       return []
     }
   }
 
+  private parseGenericArrayFeed(
+    data: unknown[],
+    subscription: FeedSubscription,
+  ): FeedItem[] {
+    const items: FeedItem[] = []
+
+    // Handle generic JSON format
+    for (const it of data) {
+      const item = it as Record<string, unknown>
+      if (item['indicator'] || item['value'] || item['ioc']) {
+        items.push({
+          itemId: (item['id'] ??
+            item['indicator'] ??
+            item['value'] ??
+            item['ioc']) as string,
+          indicator: (item['indicator'] ??
+            item['value'] ??
+            item['ioc']) as string,
+          indicatorType: (item['type'] ??
+            item['indicator_type'] ??
+            'unknown') as string,
+          severity: (item['severity'] ??
+            item['threat_level'] ??
+            'medium') as string,
+          confidence: (item['confidence'] ??
+            item['reliability'] ??
+            0.5) as number,
+          timestamp: new Date(
+            (item['timestamp'] ?? item['created'] ?? Date.now()) as number,
+          ),
+          description: (item['description'] ?? item['notes'] ?? '') as string,
+          source: subscription.provider,
+          metadata: {
+            rawData: item,
+            sourceFormat: 'generic',
+          },
+        })
+      }
+    }
+
+    return items
+  }
+
+  private parseGenericNestedFeed(
+    data: Record<string, unknown>,
+    subscription: FeedSubscription,
+  ): FeedItem[] {
+    const items: FeedItem[] = []
+
+    // Handle nested indicator format
+    const indicators = data['indicators'] as
+      | Record<string, unknown>[]
+      | undefined
+    if (indicators) {
+      for (const ind of indicators) {
+        const indicator = ind
+        items.push({
+          itemId: (indicator['id'] ?? indicator['value']) as string,
+          indicator: indicator['value'] as string,
+          indicatorType: (indicator['type'] ?? 'unknown') as string,
+          severity: (indicator['severity'] ?? 'medium') as string,
+          confidence: (indicator['confidence'] ?? 0.5) as number,
+          timestamp: new Date((indicator['timestamp'] ?? Date.now()) as number),
+          description: (indicator['description'] ?? '') as string,
+          source: subscription.provider,
+          metadata: {
+            rawData: indicator,
+            sourceFormat: 'generic_nested',
+          },
+        })
+      }
+    }
+
+    return items
+  }
+
   async convertToThreat(
     item: FeedItem,
     subscription: FeedSubscription,
   ): Promise<GlobalThreatIntelligence | null> {
-    try {
-      const threatId = `external_${item.itemId}`
-
-      return {
-        ...defaultGlobalThreatFields(threatId, item.confidence),
-        threatId,
-        threatType: this.mapGenericToThreatType(item.indicatorType),
-        severity: item.severity as 'low' | 'medium' | 'high' | 'critical',
-        confidence: item.confidence,
-        indicators: [
-          {
-            indicatorType: item.indicatorType,
-            value: item.indicator,
-            confidence: item.confidence,
-            firstSeen: new Date(item.timestamp),
-            lastSeen: new Date(item.timestamp),
-          },
-        ],
-        firstSeen: new Date(item.timestamp),
-        lastSeen: new Date(item.timestamp),
-        regions: ['global'],
-        attribution: {
-          family: subscription.provider,
-          campaign: `generic_${subscription.feedId}`,
-          confidence: item.confidence,
-        },
-        metadata: {
-          source: 'external_feed',
-          feedId: subscription.feedId,
-          provider: subscription.provider,
-          itemId: item.itemId,
-          description: item.description,
-          rawData: item.metadata?.['rawData'],
-        },
-      }
-    } catch (error: unknown) {
-      logger.error('Generic threat conversion failed:', { error })
-      return null
-    }
+    return convertFeedItemToThreat(item, subscription, {
+      campaignPrefix: 'generic',
+      threatType: this.mapGenericToThreatType(item.indicatorType),
+      errorLabel: 'Generic',
+      extraMetadata: { rawData: item.metadata?.['rawData'] },
+    })
   }
 
   private mapGenericToThreatType(indicatorType: string): string {

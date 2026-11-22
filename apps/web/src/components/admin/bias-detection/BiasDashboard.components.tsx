@@ -1241,6 +1241,86 @@ export const TrendsTab: React.FC<TrendsTabProps> = ({
 // 11. DemographicsTab
 // ---------------------------------------------------------------------------
 
+interface DemographicsPieCardProps {
+  title: string
+  data: BiasDashboardData['demographics'][string] | undefined
+  sliceKeyPrefix: string
+  fill: string
+}
+
+const DemographicsPieCard: React.FC<DemographicsPieCardProps> = ({
+  title,
+  data,
+  sliceKeyPrefix,
+  fill,
+}) => {
+  const entries = Object.entries(data ?? {})
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={250}>
+          <PieChart>
+            <Pie
+              data={entries.map(([name, value]) => ({ name, value }))}
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              fill={fill}
+              dataKey="value"
+              label={({ name, percent }: { name: string; percent?: number }) =>
+                `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`
+              }
+              isAnimationActive={false}
+              animationDuration={0}
+            >
+              {entries.map(([name, value], index) => (
+                <Cell
+                  key={`${sliceKeyPrefix}-${name}-${String(value)}`}
+                  fill={getChartColors(index, entries.length)}
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              content={({
+                active,
+                payload,
+              }: {
+                active?: boolean
+                payload?: Array<{
+                  name?: string
+                  value?: number
+                  percent?: number
+                }>
+              }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div className="border border-border bg-popover p-2 text-popover-foreground">
+                      <p className="font-semibold">{payload[0]?.name}</p>
+                      <p>Count: {payload[0]?.value}</p>
+                      <p>
+                        Percentage:{' '}
+                        {payload[0]?.percent
+                          ? (payload[0].percent * 100).toFixed(1)
+                          : 0}
+                        %
+                      </p>
+                    </div>
+                  )
+                }
+                return null
+              }}
+            />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  )
+}
+
 interface DemographicsTabProps {
   demographics: BiasDashboardData['demographics']
 }
@@ -1252,160 +1332,20 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({
     <TabsContent value="demographics" className="space-y-6">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Age Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Age Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={Object.entries(demographics?.age ?? {}).map(
-                    ([age, count]) => ({
-                      name: age,
-                      value: count,
-                    }),
-                  )}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  fill="#8a8a8a"
-                  dataKey="value"
-                  label={({
-                    name,
-                    percent,
-                  }: {
-                    name: string
-                    percent?: number
-                  }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
-                  isAnimationActive={false}
-                  animationDuration={0}
-                >
-                  {Object.entries(demographics?.age ?? {}).map(
-                    ([age, count], index) => (
-                      <Cell
-                        key={`age-${age}-${String(count)}`}
-                        fill={getChartColors(
-                          index,
-                          Object.keys(demographics?.age ?? {}).length,
-                        )}
-                      />
-                    ),
-                  )}
-                </Pie>
-                <Tooltip
-                  content={({
-                    active,
-                    payload,
-                  }: {
-                    active?: boolean
-                    payload?: Array<{
-                      name?: string
-                      value?: number
-                      percent?: number
-                    }>
-                  }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="border border-border bg-popover p-2 text-popover-foreground">
-                          <p className="font-semibold">{payload[0]?.name}</p>
-                          <p>Count: {payload[0]?.value}</p>
-                          <p>
-                            Percentage:{' '}
-                            {payload[0]?.percent
-                              ? (payload[0].percent * 100).toFixed(1)
-                              : 0}
-                            %
-                          </p>
-                        </div>
-                      )
-                    }
-                    return null
-                  }}
-                />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <DemographicsPieCard
+          title="Age Distribution"
+          data={demographics?.age}
+          sliceKeyPrefix="age"
+          fill="#8a8a8a"
+        />
 
         {/* Gender Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Gender Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={Object.entries(demographics?.gender ?? {}).map(
-                    ([gender, count]) => ({
-                      name: gender,
-                      value: count,
-                    }),
-                  )}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  fill="#82ca9d"
-                  dataKey="value"
-                  label={({
-                    name,
-                    percent,
-                  }: {
-                    name: string
-                    percent?: number
-                  }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
-                  isAnimationActive={false}
-                  animationDuration={0}
-                >
-                  {Object.entries(demographics?.gender ?? {}).map(
-                    ([gender, count], index) => (
-                      <Cell
-                        key={`gender-${gender}-${String(count)}`}
-                        fill={getChartColors(
-                          index,
-                          Object.keys(demographics?.gender ?? {}).length,
-                        )}
-                      />
-                    ),
-                  )}
-                </Pie>
-                <Tooltip
-                  content={({
-                    active,
-                    payload,
-                  }: {
-                    active?: boolean
-                    payload?: Array<{
-                      name?: string
-                      value?: number
-                      percent?: number
-                    }>
-                  }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="border border-border bg-popover p-2 text-popover-foreground">
-                          <p className="font-semibold">{payload[0]?.name}</p>
-                          <p>Count: {payload[0]?.value}</p>
-                          <p>
-                            Percentage:{' '}
-                            {payload[0]?.percent
-                              ? (payload[0].percent * 100).toFixed(1)
-                              : 0}
-                            %
-                          </p>
-                        </div>
-                      )
-                    }
-                    return null
-                  }}
-                />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <DemographicsPieCard
+          title="Gender Distribution"
+          data={demographics?.gender}
+          sliceKeyPrefix="gender"
+          fill="#82ca9d"
+        />
       </div>
 
       {/* Ethnicity Breakdown */}
