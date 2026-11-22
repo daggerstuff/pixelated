@@ -1,0 +1,33 @@
+scripts/ci/ai-ruff-ratchet.mjs
+  s_7d4811cf1b0ba7::t_87aaed1e3151c4 1-84
+.github/workflows/ci.yml
+  s_7d4811cf1b0ba7::t_4e8d5505259b89 81-83
+.github/workflows/quality.yml
+  s_7d4811cf1b0ba7::t_21e2fa742e7585 152-154
+package.json
+  s_7d4811cf1b0ba7::t_f2469c0f33fe73 58-59
+scripts/ci/oxlint-warnings-baseline.json
+  s_7d4811cf1b0ba7::t_31cd135c3f0e34 1-30
+scripts/ci/ai-ruff-baseline.json
+  s_7d4811cf1b0ba7::t_a9ed0db795ad0f 1-115
+scripts/ci/oxlint-warnings-ratchet.mjs
+  s_7d4811cf1b0ba7::t_0be0533cd9bb99 1-117
+ai
+  s_7d4811cf1b0ba7::t_c3e4c1356411c3 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9955618556bd4a0daf0a2c601dd423c8e43fd004",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
