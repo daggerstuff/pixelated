@@ -1,0 +1,19 @@
+tests/unit/ai/test_training_corpus_experiments.py
+  s_500dcc0b965aaa::t_4f453d274ebcc9 46,52,170,244,318,392,561,567,573,579,594,604,616
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "679360fee3ad74054b8c1146ef8e16542d8f7b4e",
+  "prompts": {},
+  "sessions": {
+    "s_500dcc0b965aaa": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "fallacious-paddleboat",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
