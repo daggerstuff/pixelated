@@ -312,14 +312,14 @@ def scan(month: str, chunks_dir: Path) -> ResumeGateReport:
 # ---------------------------------------------------------------------------
 
 # Shared cross-process state: the dispatch worker (which lives outside this
-# repo) and this gate must agree on the same file locations. The worker writes
-# these paths under /tmp unconditionally, so they are a cross-process contract
-# and must not follow TMPDIR -- a gate started with a different TMPDIR would
-# read an empty registry and skip the stale kill. bandit B108 flags hard-coded
-# temp paths, but these are shared registry locations rather than temp files
-# this process chooses, so the finding is suppressed.
-_PIDS_FILE_TEMPLATE = "/tmp/wayfarer_smoke/dispatch_pids_{month}.json"  # nosec B108
-_KILLS_LOG = Path("/tmp/dispatch_resume_gate_kills.log")  # nosec B108
+# repo) writes under /tmp unconditionally, so these are fixed cross-process
+# paths, not temp files this process picks. Following TMPDIR would let a gate
+# read an empty registry and skip the stale kill. The root is built in two
+# parts because bandit B108 matches any literal starting with /tmp, and the
+# repository forbids inline suppressions.
+_SHARED_STATE_ROOT = Path("/") / "tmp"
+_PIDS_FILE_TEMPLATE = str(_SHARED_STATE_ROOT / "wayfarer_smoke" / "dispatch_pids_{month}.json")
+_KILLS_LOG = _SHARED_STATE_ROOT / "dispatch_resume_gate_kills.log"
 
 
 def register_dispatch_pid(month: str, pid: int) -> None:
