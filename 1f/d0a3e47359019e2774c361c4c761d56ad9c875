@@ -1,0 +1,23 @@
+scripts/deploy/deploy-cloudrun.sh
+  s_7d4811cf1b0ba7::t_f321fefb5d45b5 1-52
+scripts/deploy/setup-gcp-startup-stack.sh
+  s_7d4811cf1b0ba7::t_2f46c75e42def0 1-87
+services/ai/__init__.py
+  s_7d4811cf1b0ba7::t_7158ee7f0a1233 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1fd0a3e47359019e2774c361c4c761d56ad9c875",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
