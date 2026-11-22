@@ -1,0 +1,32 @@
+apps/web/src/lib/security/threat-intelligence/feeds/ExternalThreatFeedIntegration.ts
+  s_ebf418ed8b34d9::t_d542689609520e 1601-1606
+  s_ebf418ed8b34d9::t_7c9ba24cdbef82 1277-1330
+  s_ebf418ed8b34d9::t_9ea95cd8ff5c74 1156
+  s_ebf418ed8b34d9::t_9f38dff44161ac 1493-1497
+  s_ebf418ed8b34d9::t_589b4c993118d1 1703-1711
+  s_ebf418ed8b34d9::t_dd6141d284d2de 1810-1820
+  s_ebf418ed8b34d9::t_c2d81467e74f39 1831-1833,1840-1841,1843-1878,1880-1907,1909,1912,1916,1924
+  s_ebf418ed8b34d9::t_f68c2c0fd82ae3 1918-1923
+  s_ebf418ed8b34d9::t_e59e24a8ef7f08 1391-1395
+  s_ebf418ed8b34d9::t_6f205a241e800c 1913-1915
+  s_ebf418ed8b34d9::t_3881abb79cc041 1917
+  s_ebf418ed8b34d9::t_2447230c6fda25 1925
+apps/web/src/components/admin/bias-detection/BiasDashboard.components.tsx
+  s_ebf418ed8b34d9::t_4e75da04a2e8ec 1244-1323,1335-1340,1343-1348
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1d9e616a0ad33c342d7eab481fd0e875db60314f",
+  "prompts": {},
+  "sessions": {
+    "s_ebf418ed8b34d9": {
+      "agent_id": {
+        "tool": "windsurf",
+        "id": "mahogany-viscose",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
