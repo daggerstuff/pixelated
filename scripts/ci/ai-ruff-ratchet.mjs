@@ -17,18 +17,48 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 
 const ROOT = new URL('../..', import.meta.url).pathname
 const BASELINE_PATH = new URL('./ai-ruff-baseline.json', import.meta.url).pathname
+const LOCK_PATH = new URL('../../uv.lock', import.meta.url).pathname
 const TARGET = 'ai/'
 
 const update = process.argv.slice(2).includes('--update')
 
+/**
+ * Read ruff's version out of the lockfile, so the gate runs the same ruff a
+ * developer runs without resolving the project environment for a lint pass.
+ */
+function pinnedRuffVersion() {
+  try {
+    const lock = readFileSync(LOCK_PATH, 'utf8')
+    return lock.match(/^name = "ruff"\nversion = "([^"]+)"/m)?.[1] ?? null
+  } catch {
+    return null
+  }
+}
+
 function countByRule() {
+  const version = pinnedRuffVersion()
+  const args = version
+    ? [
+        'run',
+        '--no-project',
+        '--with',
+        `ruff==${version}`,
+        '--',
+        'ruff',
+        'check',
+        TARGET,
+        '--output-format',
+        'json',
+        '--no-cache',
+      ]
+    : ['run', 'ruff', 'check', TARGET, '--output-format', 'json', '--no-cache']
   let stdout
   try {
-    stdout = execFileSync(
-      'uv',
-      ['run', 'ruff', 'check', TARGET, '--output-format', 'json', '--no-cache'],
-      { cwd: ROOT, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 },
-    ).toString()
+    stdout = execFileSync('uv', args, {
+      cwd: ROOT,
+      encoding: 'utf8',
+      maxBuffer: 256 * 1024 * 1024,
+    }).toString()
   } catch (err) {
     // ruff exits 1 when findings exist; the JSON report is still on stdout
     if (err.status !== 1 || !err.stdout) throw err
