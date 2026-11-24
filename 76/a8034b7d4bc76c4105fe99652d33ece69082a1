@@ -1,0 +1,23 @@
+scripts/ci/ai-strict-baseline.json
+  s_7d4811cf1b0ba7::t_f5847131e58c7a 4
+tests/memory/test_unified_memory.py
+  s_7d4811cf1b0ba7::t_303563b487868f 2,7
+ai
+  s_7d4811cf1b0ba7::t_4c6855b3265f04 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "76a8034b7d4bc76c4105fe99652d33ece69082a1",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
