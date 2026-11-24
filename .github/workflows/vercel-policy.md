@@ -26,7 +26,7 @@ retired. Vercel provides:
 | Push to `staging`        | Yes, **only on frontend path changes** | Image publishes cover backend/agent changes |
 | PR to `staging`          | Yes (preview)                          | Only when frontend files change, and never for Dependabot PRs |
 | Push to feature branches | No                                     | Use `staging` for previews                  |
-| Manual dispatch          | Yes                                    | `workflow_dispatch` always allowed          |
+| Manual dispatch          | Only from `staging`                     | The preview job is gated on `pull_request`; a dispatch elsewhere runs no job |
 
 ## One Deployer Only
 
@@ -63,14 +63,14 @@ Vercel.
 ### Frontend-relevant paths (Vercel):
 
 ```
-apps/web/src/**
-apps/web/public/**
+apps/web/**
 astro.config.*
-apps/web/tailwind.config.*
-packages/ui/**
-packages/components/**
+packages/**
 vercel.json
 .vercelignore
+package.json
+pnpm-lock.yaml
+.github/workflows/vercel.yml
 ```
 
 ### NOT Vercel paths (handled elsewhere):
