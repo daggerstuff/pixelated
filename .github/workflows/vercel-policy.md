@@ -24,9 +24,19 @@ retired. Vercel provides:
 | Event                    | Vercel Build?                          | Notes                                       |
 | ------------------------ | -------------------------------------- | ------------------------------------------- |
 | Push to `staging`        | Yes, **only on frontend path changes** | Image publishes cover backend/agent changes |
-| PR to `staging`          | Yes (preview)                          | Only when frontend files change             |
+| PR to `staging`          | Yes (preview)                          | Only when frontend files change, and never for Dependabot PRs |
 | Push to feature branches | No                                     | Use `staging` for previews                  |
 | Manual dispatch          | Yes                                    | `workflow_dispatch` always allowed          |
+
+## One Deployer Only
+
+`vercel.json` sets `git.deploymentEnabled: false`. Vercel's own GitHub Git
+integration used to build a deployment for **every** push and PR, ignoring the
+path filters below, which burned the account build quota and surfaced as
+`Deployment rate limited` checks on unrelated PRs (Dependabot bumps included).
+It is off, so the only deployer is `.github/workflows/vercel.yml`, which
+path-filters and skips Dependabot previews. Re-enable the integration only if
+the workflow is retired.
 
 ## Path Filtering
 

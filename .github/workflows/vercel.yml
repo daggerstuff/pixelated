@@ -48,7 +48,12 @@ env:
 jobs:
   preview:
     name: Preview (Vercel)
-    if: github.event_name == 'pull_request'
+    # Dependabot bumps need no preview deployment: their dependency graph,
+    # lockfile resolution and source build are already validated by CI, and
+    # each preview spends one deployment from the account build quota.
+    if: >-
+      github.event_name == 'pull_request'
+      && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
