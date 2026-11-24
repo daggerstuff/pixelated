@@ -11,12 +11,12 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 sys.path.insert(0, str(_PROJECT_ROOT))
 
-from ai.memory.gates import GateDecision, GateResult, GatingReport
-from ai.memory.gates.consent_gate import ConsentGateChecker
-from ai.memory.gates.crisis_detector import CrisisDetector
-from ai.memory.gates.pii_redactor import PiiRedactor
-from ai.memory.gates.trauma_filter import TraumaFilter
-from ai.memory.schema import ConsentGate
+from ai.research.gates import GateDecision, GateResult, GatingReport
+from ai.research.gates.consent_gate import ConsentGateChecker
+from ai.research.gates.crisis_detector import CrisisDetector
+from ai.research.gates.pii_redactor import PiiRedactor
+from ai.research.gates.trauma_filter import TraumaFilter
+from ai.research.schema import ConsentGate
 
 
 def test_pii_gate() -> None:

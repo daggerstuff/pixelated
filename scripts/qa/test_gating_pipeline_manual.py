@@ -8,9 +8,9 @@ from typing import Any
 
 sys.path.insert(0, ".")
 
-from ai.memory.gates import GatingReport
-from ai.memory.local_foresight_memory_write_service import LocalForesightMemoryWriteService
-from ai.memory.schema import ConsentGate
+from ai.research.gates import GatingReport
+from ai.research.local_foresight_memory_write_service import LocalForesightMemoryWriteService
+from ai.research.schema import ConsentGate
 
 
 # Mock protocol adapter for QA
