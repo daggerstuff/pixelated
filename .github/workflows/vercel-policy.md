@@ -41,9 +41,11 @@ the workflow is retired.
 ## Known Trade-offs (Git integration off)
 
 - **Fork PRs get no preview.** Vercel's approval-based fork authorization ships
-  with the GitHub integration; the workflow cannot borrow the token for a fork
-  pull request. Fork previews would need a maintainer-run `workflow_dispatch`
-  or the integration re-enabled.
+  with the GitHub integration, and GitHub withholds the token the workflow
+  needs on a fork pull request. A manual dispatch run does **not** help: the
+  preview job is gated on the `pull_request` event, so a dispatch only reaches
+  the production job. To preview fork work, push its commits to a same-repo
+  branch and open a pull request from it, or re-enable the integration.
 - **Vercel may still post a status.** The `Vercel Deployments - <project>`
   context can appear on a PR even when no build is created; it is not evidence
   a deployment ran, and it is not a required check.
