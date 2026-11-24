@@ -1,0 +1,26 @@
+{
+  "$schema": "https://linear.app/schemas/agent-environment.json",
+  "name": "pixelated",
+  "runtime": {
+    "node": "24",
+    "python": "3.14"
+  },
+  "setup": [
+    "pnpm install --frozen-lockfile",
+    "uv sync"
+  ],
+  "verification": {
+    "lint": "pnpm lint",
+    "test_ts": "pnpm vitest run -c config/vitest.config.ts",
+    "test_py": "uv run pytest"
+  },
+  "byok": {
+    "provider_type": "openai_compatible",
+    "models": {
+      "code": "deepseek/deepseek-chat",
+      "fast_edit": "qwen/qwen-2.5-coder-32b-instruct",
+      "reasoning_review": "deepseek/deepseek-r1",
+      "general": "meta-llama/llama-3.3-70b-instruct"
+    }
+  }
+}

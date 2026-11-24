@@ -1,0 +1,111 @@
+name: Modal
+
+# The Modal integration is credential-gated on purpose: `validate` needs no
+# account and runs on every change under infra/modal, while `deploy` only runs
+# on manual dispatch and is skipped with a warning when the MODAL_TOKEN_*
+# secrets are not configured yet. Nothing here can block the staging pipeline.
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'infra/modal/**'
+      - 'tests/infra/test_modal_app_config.py'
+      - '.github/workflows/modal.yml'
+  pull_request:
+    branches: [staging]
+    paths:
+      - 'infra/modal/**'
+      - 'tests/infra/test_modal_app_config.py'
+      - '.github/workflows/modal.yml'
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy the repo apps to Modal'
+        type: boolean
+        default: false
+
+concurrency:
+  group: modal-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint and offline tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+
+      - name: Lint the integration
+        run: >-
+          uv run --no-project --with ruff ruff check
+          infra/modal tests/infra/test_modal_app_config.py
+
+      - name: Check formatting
+        run: >-
+          uv run --no-project --with ruff ruff format --check --exclude '*.md'
+          infra/modal tests/infra/test_modal_app_config.py
+
+      # No account, token or network: the apps are imported locally and the
+      # naming/parsing/CLI logic is exercised in-process.
+      - name: Run offline tests
+        run: >-
+          uv run --no-project --with "modal>=1.6.4" --with pytest
+          pytest tests/infra/test_modal_app_config.py -q -p no:cacheprovider
+
+  deploy:
+    name: Deploy apps
+    needs: validate
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+
+      - name: Check Modal credentials
+        id: credentials
+        env:
+          MODAL_TOKEN_ID: ${{ secrets['MODAL_TOKEN_ID'] }}
+          MODAL_TOKEN_SECRET: ${{ secrets['MODAL_TOKEN_SECRET'] }}
+        run: |
+          if [ -z "$MODAL_TOKEN_ID" ] || [ -z "$MODAL_TOKEN_SECRET" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::MODAL_TOKEN_ID / MODAL_TOKEN_SECRET are not set; skipping deploy"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy apps
+        if: steps.credentials.outputs.configured == 'true'
+        env:
+          MODAL_TOKEN_ID: ${{ secrets['MODAL_TOKEN_ID'] }}
+          MODAL_TOKEN_SECRET: ${{ secrets['MODAL_TOKEN_SECRET'] }}
+        run: >-
+          uv run --no-project --with "modal>=1.6.4"
+          python -m infra.modal.ops.cli deploy

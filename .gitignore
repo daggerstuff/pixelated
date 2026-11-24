@@ -227,6 +227,11 @@ nohup.out
 .dev.vars
 .dev.vars.*
 .flaskenv*
+# Modal CLI credentials. The real config lives at ~/.modal.toml, but
+# MODAL_CONFIG_PATH lets it be pointed into the checkout, so both names are
+# ignored rather than trusting the default location.
+modal.toml
+.modal.toml
 *.key
 *.p12
 *.pem

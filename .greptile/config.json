@@ -12,7 +12,7 @@
   "excludeAuthors": ["dependabot[bot]"],
   "ignoreKeywords": "WIP\n[WIP]\nDraft\n[Draft]",
   "ignorePatterns": "node_modules/\ndist/\ndist-ssr/\nworktrees/\n.git/\n*.lock\npnpm-lock.yaml\npackage-lock.json\nuv.lock\n*.min.js\n*.map\n*.csv\n*.jsonl\n**/Books/**\n**/*.svg\n**/*.generated.*\nsubmodules/**\nai/\nforesight/\ndocs/\ncoverage/\ntest-results/\nplaywright-report/",
-  "instructions": "Pixelated Empathy: Astro 6 + React 19 frontend (TypeScript, Tailwind), Python 3.12+ backend via uv/ruff, PostgreSQL 17 + pgvector. Default/base branch is staging. Be concise, direct, and high-signal: focus on real defects, HIPAA/PHI privacy, security, race conditions, and regressions. Do not comment on style, formatting, or whitespace (enforced by oxlint/ruff/oxfmt). Do not suggest tsc or astro check (OOM); type-aware oxlint is used instead.",
+  "instructions": "Pixelated Empathy: Astro 6 + React 19 frontend (TypeScript, Tailwind), Python 3.14 backend via uv/ruff, PostgreSQL 17 + pgvector. Default/base branch is staging. Be concise, direct, and high-signal: focus on real defects, HIPAA/PHI privacy, security, race conditions, and regressions. Do not comment on style, formatting, or whitespace (enforced by oxlint/ruff/oxfmt). Do not suggest tsc or astro check (OOM); type-aware oxlint is used instead.",
   "summarySection": {
     "included": true,
     "collapsible": true,

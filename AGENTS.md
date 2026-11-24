@@ -101,7 +101,7 @@ phase:
 ### Stack
 
 - **Frontend / SSR**: Astro 6 + React 19 (TypeScript, Tailwind CSS)
-- **Backend / AI Services**: FastAPI / Express / Flask (Python 3.12+ via `uv`,
+- **Backend / AI Services**: FastAPI / Express / Flask (Python 3.14 via `uv`,
   Node v24 via `pnpm`)
 - **Databases**: PostgreSQL 17 + pgvector (`5432`), MongoDB (`27017`), Redis
   (`6379`)
@@ -124,6 +124,25 @@ phase:
 |                | Strict types (mypy)      | `pnpm typecheck:python`                                |
 | **Foresight**  | System Health            | `foresight doctor` / `foresight security status`       |
 |                | Run Proof Benchmark      | `foresight prove`                                      |
+| **Modal**      | Status / smoke check     | `make modal-status` / `make modal-check`               |
+|                | Workload targets         | `make modal-targets`; `modal-dataset` / `modal-train` / `modal-test` / `modal-embed` |
+|                | Deploy GPU/CPU apps      | `make modal-deploy` (needs `uv run modal setup`)       |
+
+### Headless MCP Auth (Vercel)
+
+`https://mcp.vercel.com` is OAuth-only: a missing or expired bearer token gets a
+`401 invalid_token` + `resource_metadata` challenge, and the client then opens a
+browser to finish the login — which never completes on a headless box. Do not
+hand-edit tokens; reuse the one the Vercel CLI already holds:
+
+```bash
+scripts/devops/vercel-mcp-headless.sh check   # probe the CLI token against the server
+scripts/devops/vercel-mcp-headless.sh sync    # write it into the user-level MCP configs
+```
+
+`sync` is idempotent, keeps tokens out of the repo, and also disables the
+OAuth-only server shipped by the Vercel Claude plugin (`plugin:vercel:vercel`)
+so it stops prompting. Re-run it after `vercel login` or a plugin update.
 
 ---
 

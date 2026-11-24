@@ -35,20 +35,32 @@ def test_vertex_ai_config_defaults() -> None:
     config = VertexAIConfig()
     assert config.project_id == "one-moon-505501-u3"
     assert config.location == "us-central1"
-    assert config.default_model == "gemini-1.5-flash"
+    assert config.default_model == "gemini-3.8-flash"
     assert config.default_embedding_model == "text-embedding-004"
 
 
 def test_vertex_ai_config_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Verify configuration loads properly from environment variables."""
+    monkeypatch.delenv("GOOGLE_API_KEY", raising=False)
     monkeypatch.setenv("GCP_PROJECT_ID", "custom-project")
     monkeypatch.setenv("GCP_REGION", "us-east4")
-    monkeypatch.setenv("VERTEX_DEFAULT_MODEL", "gemini-1.5-pro")
+    monkeypatch.setenv("VERTEX_DEFAULT_MODEL", "gemini-3.8-flash")
 
     config = VertexAIConfig.from_env()
     assert config.project_id == "custom-project"
     assert config.location == "us-east4"
-    assert config.default_model == "gemini-1.5-pro"
+    assert config.default_model == "gemini-3.8-flash"
+    assert config.api_key is None
+
+
+def test_vertex_ai_config_api_key_mode(monkeypatch: pytest.MonkeyPatch) -> None:
+    """GOOGLE_API_KEY switches to AI Studio mode with gemini-embedding-001."""
+    monkeypatch.setenv("GOOGLE_API_KEY", "test-key")
+    monkeypatch.delenv("VERTEX_EMBEDDING_MODEL", raising=False)
+
+    config = VertexAIConfig.from_env()
+    assert config.api_key == "test-key"
+    assert config.default_embedding_model == "gemini-embedding-001"
 
 
 def test_generate_text_mocked() -> None:

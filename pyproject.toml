@@ -283,6 +283,16 @@ ignore = ["E501", "UP017", "PLR2004"]
 # suppressed inline.
 "apps/web/src/pe/api/**" = ["PLC0415"]
 "apps/web/src/pe/tasks/**" = ["PLC0415"]
+# Modal app modules import heavy runtime deps (torch, via
+# sentence-transformers) inside the container-side function instead of at
+# module scope — Modal's documented pattern, so building the app object locally
+# never loads them. By-design exemption, documented here rather than
+# suppressed inline.
+"infra/modal/apps/**" = ["PLC0415"]
+# The training workload's entrypoints are a flat flag surface (dataset, model,
+# epochs, learning rate, batch size, output dir): Modal derives its CLI options
+# from parameter names, so grouping them into an object would hide the flags.
+"infra/modal/apps/train.py" = ["PLR0913", "PLR0917"]
 "tests/python/test_*.py" = ["ARG005"]
 "Stage1_Training_Notebook.ipynb" = ["E402", "PLC0415", "Q000", "I001", "T201"]
 "foresight-mcp/foresight_mcp/server.py" = [
@@ -359,7 +369,7 @@ ignore = ["E501", "UP017", "PLR2004"]
 "tools/skillreducer/src/skillrevise/method/diagnosis.py" = ["BLE001"]
 "tools/skillreducer/src/skillrevise/method/principles.py" = ["BLE001"]
 [tool.ruff.lint.isort]
-known-first-party = ["ai", "src"]
+known-first-party = ["ai", "src", "infra"]
 combine-as-imports = true
 force-single-line = false
 [tool.black]
@@ -369,7 +379,7 @@ skip-string-normalization = false
 [tool.isort]
 profile = "black"
 line_length = 120
-known_first_party = ["ai", "src"]
+known_first_party = ["ai", "src", "infra"]
 combine_as_imports = true
 force_single_line = false
 [tool.pytest.ini_options]

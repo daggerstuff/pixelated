@@ -1,8 +1,10 @@
-"""Vertex AI client for Google Cloud Gemini and Embeddings.
+"""Gemini client for Google Cloud (Vertex AI) and Google AI Studio.
 
 Adheres strictly to Pixelated Empathy's Google Cloud & Gemini Usage Policy:
-- Vertex AI on Google Cloud is the sole approved Gemini path.
-- Routes under project `one-moon-505501-u3` in `us-central1`.
+- Vertex AI on Google Cloud project `one-moon-505501-u3` (`us-central1`) is the
+  approved embeddings path (text-embedding-004, 768 dims).
+- Generative text routes through the Google AI Studio key (`GOOGLE_API_KEY`)
+  when set; the project has no generative model entitlement on Vertex.
 - Built-in HIPAA pre-check prevents transmission of unmasked identifiers.
 - Eligible for the Google for Startups $2,000 credit package.
 """
@@ -40,26 +42,35 @@ def validate_phi_free(text: str) -> None:
 
 @dataclass
 class VertexAIConfig:
-    """Configuration for Vertex AI connections."""
+    """Configuration for Gemini connections (Vertex AI or Google AI Studio)."""
 
     project_id: str = "one-moon-505501-u3"
     location: str = "us-central1"
-    default_model: str = "gemini-1.5-flash"
+    default_model: str = "gemini-3.8-flash"
     default_embedding_model: str = "text-embedding-004"
+    api_key: str | None = None
 
     @classmethod
     def from_env(cls) -> VertexAIConfig:
-        """Create configuration from environment variables."""
+        """Create configuration from environment variables.
+
+        When GOOGLE_API_KEY is set, generation routes through Google AI Studio
+        and embeddings default to gemini-embedding-001 (text-embedding-004 is
+        Vertex-only). Without the key, the classic Vertex ADC path is used.
+        """
+        api_key = os.getenv("GOOGLE_API_KEY") or None
+        default_embedding = "gemini-embedding-001" if api_key else "text-embedding-004"
         return cls(
             project_id=os.getenv("GCP_PROJECT_ID", "one-moon-505501-u3"),
             location=os.getenv("GCP_REGION", "us-central1"),
-            default_model=os.getenv("VERTEX_DEFAULT_MODEL", "gemini-1.5-flash"),
-            default_embedding_model=os.getenv("VERTEX_EMBEDDING_MODEL", "text-embedding-004"),
+            default_model=os.getenv("VERTEX_DEFAULT_MODEL", "gemini-3.8-flash"),
+            default_embedding_model=os.getenv("VERTEX_EMBEDDING_MODEL", default_embedding),
+            api_key=api_key,
         )
 
 
 class VertexAIClient:
-    """Client for interacting with Gemini and Embeddings on Google Cloud Vertex AI."""
+    """Client for Gemini generation and embeddings (AI Studio key or Vertex AI)."""
 
     def __init__(self, config: VertexAIConfig | None = None) -> None:
         self.config = config or VertexAIConfig.from_env()
@@ -67,13 +78,16 @@ class VertexAIClient:
 
     @property
     def client(self) -> genai.Client:
-        """Lazy-initialize the Google GenAI client configured for Vertex AI."""
+        """Lazy-initialize the GenAI client (AI Studio key or Vertex AI)."""
         if self._client is None:
-            self._client = genai.Client(
-                vertexai=True,
-                project=self.config.project_id,
-                location=self.config.location,
-            )
+            if self.config.api_key:
+                self._client = genai.Client(api_key=self.config.api_key)
+            else:
+                self._client = genai.Client(
+                    vertexai=True,
+                    project=self.config.project_id,
+                    location=self.config.location,
+                )
         return self._client
 
     def generate_text(
@@ -84,7 +98,7 @@ class VertexAIClient:
         max_output_tokens: int | None = None,
         system_instruction: str | None = None,
     ) -> str:
-        """Generate text using Gemini on Vertex AI.
+        """Generate text using Gemini (AI Studio when GOOGLE_API_KEY is set, else Vertex AI).
 
         Args:
             prompt: User prompt text.
@@ -123,7 +137,7 @@ class VertexAIClient:
         max_output_tokens: int | None = None,
         system_instruction: str | None = None,
     ) -> str:
-        """Generate text asynchronously using Gemini on Vertex AI."""
+        """Generate text asynchronously (AI Studio when GOOGLE_API_KEY is set, else Vertex AI)."""
         validate_phi_free(prompt)
         if system_instruction:
             validate_phi_free(system_instruction)
@@ -148,7 +162,7 @@ class VertexAIClient:
         text_or_texts: str | list[str],
         model: str | None = None,
     ) -> list[list[float]]:
-        """Generate vector embeddings using Vertex AI text-embedding-004.
+        """Generate vector embeddings (gemini-embedding-001 via AI Studio, text-embedding-004 via Vertex).
 
         Args:
             text_or_texts: Single string or list of text strings.

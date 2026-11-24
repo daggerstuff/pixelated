@@ -1,7 +1,7 @@
 # Pixelated Empathy — Developer Makefile
 # Usage: make <target>
 
-.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test regression-suite python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down lockfile-resolve
+.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test regression-suite python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down lockfile-resolve modal-status modal-check modal-deploy modal-embed modal-targets modal-dataset modal-train modal-test
 
 .DEFAULT_GOAL := help
 
@@ -113,6 +113,32 @@ backend-build: ## Build (or rebuild) all backend service images
 
 backend-health: ## Check all backend services health
 	./scripts/devops/backend-health-check.sh
+
+# ── Modal (serverless GPU compute) ───────────────────────
+
+modal-status: ## Report Modal configuration and auth state
+	./scripts/devops/modal.sh status
+
+modal-check: ## Run the Modal smoke app on a real container
+	./scripts/devops/modal.sh check
+
+modal-deploy: ## Deploy the repo's Modal apps
+	./scripts/devops/modal.sh deploy
+
+modal-embed: ## Embed texts on a Modal GPU (ARGS='--texts "a|b"')
+	./scripts/devops/modal.sh embed $(ARGS)
+
+modal-targets: ## List the Modal workload targets (training, testing, dataset)
+	./scripts/devops/modal.sh targets
+
+modal-dataset: ## Build a Modal dataset (ARGS='--inputs dataset/final_dataset.jsonl')
+	./scripts/devops/modal.sh dataset $(ARGS)
+
+modal-train: ## Fine-tune on a Modal GPU (ARGS='--dataset /datasets/out/train.jsonl')
+	./scripts/devops/modal.sh train $(ARGS)
+
+modal-test: ## Run the offline suite in a clean Modal container (ARGS='--paths tests/infra')
+	./scripts/devops/modal.sh test $(ARGS)
 
 # ── Setup ───────────────────────────────────────────────
 
