@@ -1,0 +1,33 @@
+index.ts
+  s_7d4811cf1b0ba7::t_ed25f6d30b2786 1-20
+docs
+  s_7d4811cf1b0ba7::t_5a1ce12548a9a3 1
+foresight
+  s_7d4811cf1b0ba7::t_4a79611f38f480 1
+pyproject.toml
+  s_7d4811cf1b0ba7::t_f484a0d2959539 286-295,372,382
+tests/ai/test_vertex_client.py
+  s_7d4811cf1b0ba7::t_8a7481804fa431 38,44,47,52-63
+infra/modal/apps/dataset.py
+  s_7d4811cf1b0ba7::t_5c5baf974d75e7 1-161
+infra/modal/shared/gpu.py
+  s_7d4811cf1b0ba7::t_cc7f9f4f4e660c 1-50
+services/ai/vertex_client.py
+  s_7d4811cf1b0ba7::t_73c83a3670e7d3 1,4-7,45,49,51,55-62,66-68,73,81,83-90,101,140,165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bfc610c7085bd8d73468172ea2d0c8b8c81cf576",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
