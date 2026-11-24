@@ -1,7 +1,7 @@
 {
   "$schema": "Legacy strict-typing debt in the ai submodule research tree, pinned by scripts/ci/ai-strict-ratchet.mjs.",
   "description": "files: legacy .py files under the pinned ai trees. errors: \"file :: code\" → pinned strict-error count. The ratchet fails CI on any new file with strict errors, any new error key, or any increased count. Fixes shrink these maps; --update re-pins deliberately.",
-  "generatedAt": "2026-11-24T11:19:15.890Z",
+  "generatedAt": "2026-11-24T12:18:30.104Z",
   "files": [
     "pipelines/__init__.py",
     "pipelines/corpus_hold/__init__.py",
@@ -495,7 +495,6 @@
     "research/reverie/soft_injector.py",
     "research/reverie_types.py",
     "research/schema.py",
-    "research/schema_compat.py",
     "research/test_dream_reflection_integration.py",
     "research/therapeutic_concept_hierarchy.py",
     "research/unified_memory.py",
@@ -1573,8 +1572,6 @@
     "research/reflection_subagent.py :: attr-defined": 1,
     "research/reflection_subagent.py :: type-arg": 1,
     "research/reverie/reverie_engine.py :: no-any-return": 1,
-    "research/schema_compat.py :: arg-type": 1,
-    "research/schema_compat.py :: no-any-return": 1,
     "research/test_dream_reflection_integration.py :: no-untyped-def": 7,
     "training/ab_test_validity_gating.py :: arg-type": 2,
     "training/ab_test_validity_gating.py :: type-arg": 9,
