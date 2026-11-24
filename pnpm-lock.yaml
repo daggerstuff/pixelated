@@ -640,7 +640,7 @@ importers:
         version: 3.0.3
       i18next:
         specifier: ^27.2.2
-        version: 27.2.2(typescript@6.0.3)
+        version: 27.2.3(typescript@6.0.3)
       idb:
         specifier: ^8.0.4
         version: 8.0.4
@@ -742,7 +742,7 @@ importers:
         version: 2.6.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react-i18next:
         specifier: ^18.0.3
-        version: 18.0.3(@types/react@19.3.0)(i18next@27.2.2(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
+        version: 18.0.3(@types/react@19.3.0)(i18next@27.2.3(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3)
       recharts:
         specifier: ^3.11.0
         version: 3.11.0(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react-is@17.0.2)(react@19.3.1)(redux@5.0.1)
@@ -10753,8 +10753,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  i18next@27.2.2:
-    resolution: {integrity: sha512-1/AJgz/bpE/YL6tqekQlZAzDhkmrUBbgU8+Xon/Lwv6c5WdYuyFZ9mb86OVfR2C2XujUDT7Rz23Ydaq4l981lA==}
+  i18next@27.2.3:
+    resolution: {integrity: sha512-14wcQLAu5Aykwk4scBGl8tosKYth4S2PQDcusbES/bUsQ7X7DbcPygMzCe298U/NcAvDpqr+CX6oygbQoyLBRA==}
     engines: {node: '>=22'}
     peerDependencies:
       typescript: ^5 || ^6 || ^7
@@ -13483,8 +13483,8 @@ packages:
     peerDependencies:
       seroval: ^1.0
 
-  seroval@1.5.6:
-    resolution: {integrity: sha512-rVQVWjjSvlINzaQPZH5JFqsqEsIWdTxY3iJZCnTL/5gQbXIRooVZKI60tVCkOVfzcRPejboxO2t0P89dg5mQaA==}
+  seroval@1.6.8:
+    resolution: {integrity: sha512-HlSgSAkTk4EqHcje1ptJjfZi1YDv5KbhVJ/d3P7T/nAXua2VmDu+AKDX5VTdFfZf48nDkWB2TKYt0DrCSa+3wg==}
     engines: {node: '>=10'}
 
   serve-static@2.2.1:
@@ -24911,7 +24911,7 @@ snapshots:
 
   husky@9.1.7: {}
 
-  i18next@27.2.2(typescript@6.0.3):
+  i18next@27.2.3(typescript@6.0.3):
     optionalDependencies:
       typescript: 6.0.3
 
@@ -27479,10 +27479,10 @@ snapshots:
       '@types/react': 19.3.0
       '@types/react-dom': 19.3.0(@types/react@19.3.0)
 
-  react-i18next@18.0.3(@types/react@19.3.0)(i18next@27.2.2(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3):
+  react-i18next@18.0.3(@types/react@19.3.0)(i18next@27.2.3(typescript@6.0.3))(react@19.3.1)(typescript@6.0.3):
     dependencies:
       html-parse-stringify: 4.0.1
-      i18next: 27.2.2(typescript@6.0.3)
+      i18next: 27.2.3(typescript@6.0.3)
       react: 19.3.1
     optionalDependencies:
       '@types/react': 19.3.0
@@ -28056,11 +28056,11 @@ snapshots:
 
   sentry@0.45.0: {}
 
-  seroval-plugins@1.5.6(seroval@1.5.6):
+  seroval-plugins@1.5.6(seroval@1.6.8):
     dependencies:
-      seroval: 1.5.6
+      seroval: 1.6.8
 
-  seroval@1.5.6: {}
+  seroval@1.6.8: {}
 
   serve-static@2.2.1(supports-color@10.2.2):
     dependencies:
@@ -28283,8 +28283,8 @@ snapshots:
   solid-js@1.9.12:
     dependencies:
       csstype: 3.2.3
-      seroval: 1.5.6
-      seroval-plugins: 1.5.6(seroval@1.5.6)
+      seroval: 1.6.8
+      seroval-plugins: 1.5.6(seroval@1.6.8)
 
   sonner@2.0.8(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
     dependencies:
