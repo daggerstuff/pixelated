@@ -38,6 +38,20 @@ It is off, so the only deployer is `.github/workflows/vercel.yml`, which
 path-filters and skips Dependabot previews. Re-enable the integration only if
 the workflow is retired.
 
+## Known Trade-offs (Git integration off)
+
+- **Fork PRs get no preview.** Vercel's approval-based fork authorization ships
+  with the GitHub integration; the workflow cannot borrow the token for a fork
+  pull request. Fork previews would need a maintainer-run `workflow_dispatch`
+  or the integration re-enabled.
+- **Vercel may still post a status.** The `Vercel Deployments - <project>`
+  context can appear on a PR even when no build is created; it is not evidence
+  a deployment ran, and it is not a required check.
+- **Workspace packages are part of the build.** The path filters cover
+  `packages/**` because the web build imports workspace sources
+  (`@pixelated/memory-schema`), so a package-only change must still refresh the
+  standby.
+
 ## Path Filtering
 
 Vercel builds only fire when frontend-relevant files change. All other pushes

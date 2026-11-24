@@ -12,8 +12,7 @@ on:
       # Rebuild Vercel when frontend assets or deployment configs change.
       - apps/web/**
       - astro.config.*
-      - packages/ui/**
-      - packages/components/**
+      - packages/**
       - vercel.json
       - .vercelignore
       - package.json
@@ -26,8 +25,7 @@ on:
       # Throttled to frontend changes and deployment configs to avoid burning build credits on infra/backend pushes.
       - apps/web/**
       - astro.config.*
-      - packages/ui/**
-      - packages/components/**
+      - packages/**
       - vercel.json
       - .vercelignore
       - package.json
@@ -51,9 +49,11 @@ jobs:
     # Dependabot bumps need no preview deployment: their dependency graph,
     # lockfile resolution and source build are already validated by CI, and
     # each preview spends one deployment from the account build quota.
+    # Keyed on the PR author, not github.actor: a maintainer amending a
+    # Dependabot branch must not turn its preview back on.
     if: >-
       github.event_name == 'pull_request'
-      && github.actor != 'dependabot[bot]'
+      && github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -67,12 +67,13 @@ jobs:
         env:
           NODE_ENV: production
 
+      # No --prod flag: `--prod=false` still parses as --prod in the Vercel CLI,
+      # which shipped a production deployment from a pull request.
       - name: Deploy Preview
         run: |
           npx vercel deploy \
             --token ${{ secrets.VERCEL_TOKEN }} \
             --yes \
-            --prod=false \
             ${{ env.VERCEL_PROJECT_ID && format('--project={0}', env.VERCEL_PROJECT_ID) || '' }}
         continue-on-error: true
 
