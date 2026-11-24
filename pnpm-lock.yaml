@@ -1100,8 +1100,8 @@ importers:
         specifier: ^0.16.7
         version: 0.16.7(supports-color@10.2.2)
       mdast-util-directive:
-        specifier: ^3.2.0
-        version: 3.2.0(supports-color@10.2.2)
+        specifier: ^3.2.1
+        version: 3.2.1(supports-color@10.2.2)
       mdast-util-to-string:
         specifier: ^4.0.0
         version: 4.0.0
@@ -11752,8 +11752,8 @@ packages:
     resolution: {integrity: sha512-mKYcD/mkD5yGlyc2fwU7zFkgGRxzEzBplPcLhoykgaqnQxW/IVC4ol6VHEqIhJkKDdmSNToI9MXiOXCsrsTjxA==}
     hasBin: true
 
-  mdast-util-directive@3.2.0:
-    resolution: {integrity: sha512-Yxq+hH4pBEmtaLIJyMVcNbtBiCIKzdOK3HvDeM+JAqC8XVAT1e5PUYbHBpwFvQLIJuJfO2zCu7aNUXWoyZLmhw==}
+  mdast-util-directive@3.2.1:
+    resolution: {integrity: sha512-KAzmHyiPBxPEgX9dh+uk6a9xivmiQIqAvRnQSMm3xkk+iX/EsXEXHT1CTGsMc3jerKDCbQbOgLEejfrUjRTnaw==}
 
   mdast-util-find-and-replace@3.0.3:
     resolution: {integrity: sha512-xPgpDNl0/OXHsI7TlaIs22lWnH3KlpvZdXG1ET/m/YT2Hhdkx8lJV4kLphE6l9simyM4KPDFBwas08BgEob6Jw==}
@@ -25939,7 +25939,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  mdast-util-directive@3.2.0(supports-color@10.2.2):
+  mdast-util-directive@3.2.1(supports-color@10.2.2):
     dependencies:
       '@types/mdast': 4.0.4
       '@types/unist': 3.0.3
