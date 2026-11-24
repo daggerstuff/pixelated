@@ -399,7 +399,7 @@ overrides:
   tmp: '>=0.2.4'
   undici: ^7.30.1
   unocss: ^66.7.0
-  wrangler: ^4.59.1
+  wrangler: ^4.166.0
   yaml: npm:yaml@2.8.4
   yaml@2.7.1: npm:yaml@2.8.4
   yaml@>=2.0.0 <2.8.3: ^2.8.3
