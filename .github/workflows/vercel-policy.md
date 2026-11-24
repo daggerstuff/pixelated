@@ -38,6 +38,19 @@ It is off, so the only deployer is `.github/workflows/vercel.yml`, which
 path-filters and skips Dependabot previews. Re-enable the integration only if
 the workflow is retired.
 
+## Fork Pull Requests
+
+Fork PRs get no Vercel preview. GitHub withholds repository secrets from
+`pull_request` runs of fork branches, so `Deploy Preview` cannot
+authenticate; the step is `continue-on-error: true`, so the run stays green
+and CI's own build remains the check. Vercel's Git integration had an
+approval-based fork preview, and re-enabling it would restore that path at
+the cost of the quota burn this policy removed.
+
+The Vercel GitHub App still posts a `Vercel Deployments – pixelthis` status
+on PR heads. With the integration's builds off, that status does not imply
+a build ran; only removing the app from the org stops the status.
+
 ## Path Filtering
 
 Vercel builds only fire when frontend-relevant files change. All other pushes
@@ -46,16 +59,25 @@ Vercel.
 
 ### Frontend-relevant paths (Vercel):
 
+Mirror of the `paths:` filters in `.github/workflows/vercel.yml` — change
+both together.
+
 ```
-apps/web/src/**
-apps/web/public/**
+apps/web/**
 astro.config.*
-apps/web/tailwind.config.*
 packages/ui/**
 packages/components/**
+packages/memory-schema/**
 vercel.json
 .vercelignore
+package.json
+pnpm-lock.yaml
+.github/workflows/vercel.yml
 ```
+
+`packages/memory-schema/**` is on the list because the site imports it
+through `TherapyGate` and the Memory API contract rules: a schema-only
+change would otherwise leave the standby serving the old validation rules.
 
 ### NOT Vercel paths (handled elsewhere):
 
@@ -69,6 +91,13 @@ vercel.json
 
 - All Vercel jobs use `concurrency` group to cancel stale runs
 - `continue-on-error: true` on preview deploys (don't block PRs)
+- Previews deploy with `--no-prod`: the Vercel CLI reads `--prod=false` as
+  `--prod` (66.6.0 prints `! --prod=false turns --prod on`), so the preview
+  job used to publish a Production deployment of the PR head on the standby
+  project (pixelated#7036, `pixelated-lfog1pnte-pixelthis.vercel.app`)
+- The Dependabot skip keys on `github.event.pull_request.user.login`, not
+  `github.actor`: a maintainer's amendment keeps the PR author, so the
+  preview stays skipped
 - Vercel only builds on frontend path changes — no wasted builds on staging
 - `workflow_dispatch` is the only way to force a Vercel build on demand
 

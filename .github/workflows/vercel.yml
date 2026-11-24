@@ -14,6 +14,7 @@ on:
       - astro.config.*
       - packages/ui/**
       - packages/components/**
+      - packages/memory-schema/**
       - vercel.json
       - .vercelignore
       - package.json
@@ -28,6 +29,7 @@ on:
       - astro.config.*
       - packages/ui/**
       - packages/components/**
+      - packages/memory-schema/**
       - vercel.json
       - .vercelignore
       - package.json
@@ -51,9 +53,11 @@ jobs:
     # Dependabot bumps need no preview deployment: their dependency graph,
     # lockfile resolution and source build are already validated by CI, and
     # each preview spends one deployment from the account build quota.
+    # Keyed on the PR author: an amendment pushed by a maintainer keeps the
+    # PR's author, so github.actor would re-enable the skipped preview.
     if: >-
       github.event_name == 'pull_request'
-      && github.actor != 'dependabot[bot]'
+      && github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -69,10 +73,12 @@ jobs:
 
       - name: Deploy Preview
         run: |
+          # --prod=false is read as --prod by the Vercel CLI (66.6.0:
+          # '! --prod=false turns --prod on'); --no-prod is the preview.
           npx vercel deploy \
             --token ${{ secrets.VERCEL_TOKEN }} \
             --yes \
-            --prod=false \
+            --no-prod \
             ${{ env.VERCEL_PROJECT_ID && format('--project={0}', env.VERCEL_PROJECT_ID) || '' }}
         continue-on-error: true
 
