@@ -17,7 +17,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 
 const ROOT = new URL('../..', import.meta.url).pathname
 const BASELINE_PATH = new URL('./ai-ruff-baseline.json', import.meta.url).pathname
-const LOCK_PATH = new URL('../../uv.lock', import.meta.url).pathname
+const LOCK_PATH = new URL('../../ai/uv.lock', import.meta.url).pathname
 const TARGET = 'ai/'
 
 const update = process.argv.slice(2).includes('--update')
