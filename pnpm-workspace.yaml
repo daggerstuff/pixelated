@@ -424,6 +424,9 @@ overrides:
   # lines. Force the patched versions; drop when the agents peer ranges move.
   '@modelcontextprotocol/node': ^2.1.0
   '@modelcontextprotocol/server': ^2.3.0
+  # seroval 1.5.6 carries five advisories that 1.6.8 fixes, while solid-js pins
+  # ~1.5.0 and the plugin range is ^1.0: authorize one version.
+  seroval: 1.6.8
 patchedDependencies:
   # Patched for URL-unsafe characters in file paths. 0.10–0.12 retired; 0.13.1 pinned.
   '@astrojs/internal-helpers@0.13.1': patches/@astrojs__internal-helpers@0.13.0.patch
