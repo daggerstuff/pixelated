@@ -313,6 +313,7 @@ overrides:
   '@modelcontextprotocol/client': ^2.2.0
   '@modelcontextprotocol/node': ^2.1.0
   '@modelcontextprotocol/server': ^2.3.0
+  seroval: 1.6.8
 
 patchedDependencies:
   '@astrojs/internal-helpers@0.13.1': ebdd1966ecd34c914d725ce2525d1ab4e759c3335374079650f9e3b4ebabc706
