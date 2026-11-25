@@ -162,8 +162,9 @@ CC_AGENTS_MCP_SOURCE=~/.claude.json make agents-sync
 ```
 
 Keep the target in user scope. `env` and `headers` values are copied verbatim, so
-a project-scoped `.mcp.json` would commit whatever credentials the source
-carries.
+a project-scoped `.mcp.json` puts the source's credentials in the working tree.
+This repository ignores `.mcp.json` (`.gitignore:54`), but a checkout that does
+not would commit them.
 
 For one-off servers, use the native command rather than the bridge:
 
