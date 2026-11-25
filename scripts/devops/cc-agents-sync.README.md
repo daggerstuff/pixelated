@@ -146,7 +146,10 @@ The merge is additive and conservative:
   HTTP also `url` and `headers` — so two servers differing only in an env var
   are treated as different, while true aliases are skipped so they do not spawn
   duplicate processes (`skillroute` vs `skill-route`);
-- preserves every other key in the target document, top-level and per-server.
+- preserves every other key in the target document, top-level and per-server;
+- holds an exclusive lock on `<target>.lock` from the read through the replace, so
+  a second `sync` started at the same time waits for the first and then merges
+  onto its result instead of overwriting it. `status` takes no lock.
 
 Exit codes: `0` success or nothing to do, `1` source file missing, `2` bad
 usage or unparseable/invalid JSON in either file.

@@ -86,6 +86,8 @@ if [ ! -f "$SOURCE" ]; then
 fi
 
 exec python3 - "$SOURCE" "$TARGET" "$apply" <<'PY'
+import atexit
+import fcntl
 import json
 import os
 import shutil
@@ -101,6 +103,15 @@ apply = sys.argv[3] == "1"
 def die(message):
     print(f"error: {message}", file=sys.stderr)
     sys.exit(2)
+
+
+def acquire_lock(path):
+    """Serialise writers on a sidecar lock so no merge reads a stale target."""
+    lock_path = path + ".lock"
+    os.makedirs(os.path.dirname(lock_path) or ".", exist_ok=True)
+    handle = open(lock_path, "a+", encoding="utf-8")
+    fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+    return handle
 
 
 def read_document(path, label):
@@ -167,6 +178,10 @@ def redacted_shape(server):
             parts.append(f"{key}={'|'.join(sorted(server[key]))}")
     return " ".join(parts)
 
+
+if apply:
+    lock = acquire_lock(target_path)
+    atexit.register(lock.close)
 
 source_doc = read_document(source_path, "source")
 target_doc = read_document(target_path, "target")
