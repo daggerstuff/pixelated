@@ -35,6 +35,20 @@ deployment has been retired.** `staging` is the main branch.
 - `.github/branch-pipeline.md` — branch roles diagram
 - `scripts/ci/get-changed-frontend-files.sh` — path filter helper
 
+## Skill Home
+
+Shared agent skills live in `~/.agents/skills` (single source of truth for user-scope skills),
+declared in `~/.agents/agents.toml` and locked in `~/.agents/agents.lock`; `npx
+@sentry/dotagents install` links each declared skill into the agents that manifest names.
+Project-scoped skills stay in the repository's own `.agents/skills` and are not moved into the
+home. `~/.claude/skills` and `~/.omo/agent/skills` are single directory symlinks to the home.
+`~/.codex/skills` is a real directory holding one symlink per skill beside Codex's own hidden
+`.system` bundle, so Codex is linked rather than copied; `~/.cursor/skills` and `~/.vscode/skills`
+exist only where those tools are installed. Never copy a skill's files: add or edit shared
+skills in the home and let `install` relink. Remove a declared skill with `npx
+@sentry/dotagents remove <name>`, which edits `agents.toml` as well; deleting its directory
+alone is undone by the next `install`, which restores every skill the manifest still declares.
+
 ## 1. ⚡ Mandatory Session Lifecycle (Foresight Memory Protocol)
 
 Every agent session touching real work must follow this streamlined continuity
