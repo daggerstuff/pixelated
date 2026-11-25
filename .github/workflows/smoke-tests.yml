@@ -68,22 +68,18 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
       - name: Restore pnpm store
         id: pnpm-store-cache
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-store-v2-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      # Only staging publishes the store; branches restore the newest match.
-      - name: Save pnpm store
-        if: github.ref == 'refs/heads/staging' && steps.pnpm-store-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+            ${{ runner.os }}-pnpm-store-v2-
 
       - name: Install native build dependencies
         run: |
@@ -93,6 +89,16 @@ jobs:
 
       - name: Install dependencies
         run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+
+      # Only staging publishes the store; branches restore the newest match.
+      # Saving after the install keeps the entry complete, and the key the restore
+      # looked up survives an install that rewrites the lockfile.
+      - name: Save pnpm store
+        if: github.ref == 'refs/heads/staging' && steps.pnpm-store-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ steps.pnpm-store-cache.outputs.cache-primary-key }}
 
       - name: Install Playwright browser
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}

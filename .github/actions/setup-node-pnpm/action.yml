@@ -20,7 +20,7 @@ inputs:
     description: |
       Optional prefix for the pnpm-store cache key, e.g. 'v2' from
       PNPM_CACHE_VERSION. Produces key with the prefix inserted between
-      'pnpm-store-' and the hash-based portion for manual cache busting.
+      'pnpm-store-v2-' and the hash-based portion for manual cache busting.
     required: false
     default: ''
   install-native-deps:
@@ -39,7 +39,9 @@ inputs:
     description: |
       Run PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
       after setup is complete. Set to 'false' when a custom install command
-      (e.g. --ignore-scripts) is needed.
+      (e.g. --ignore-scripts) is needed. Such a caller installs on its own and
+      therefore never publishes the store either: the save is gated on this
+      input, so a job that skipped the install cannot cache an empty store.
     required: false
     default: 'true'
 
@@ -68,26 +70,12 @@ runs:
       with:
         path: ${{ steps.pnpm-store.outputs.path }}
         key: >-
-          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != '' &&
+          ${{ runner.os }}-pnpm-store-v2${{ inputs.cache-key-prefix != '' &&
           format('-{0}', inputs.cache-key-prefix) || '' }}-${{
           hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
-          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != '' &&
+          ${{ runner.os }}-pnpm-store-v2${{ inputs.cache-key-prefix != '' &&
           format('-{0}', inputs.cache-key-prefix) || '' }}-
-
-    # Only staging publishes the store. Every branch used to save its own
-    # ~770 MB entry keyed by its lockfile hash, and the account's Actions
-    # storage quota refused all artifact uploads. Branches still restore the
-    # newest matching store; only staging writes new entries.
-    - name: Save pnpm store
-      if: github.ref == 'refs/heads/staging' && steps.pnpm-store-cache.outputs.cache-hit != 'true'
-      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-      with:
-        path: ${{ steps.pnpm-store.outputs.path }}
-        key: >-
-          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != '' &&
-          format('-{0}', inputs.cache-key-prefix) || '' }}-${{
-          hashFiles('**/pnpm-lock.yaml') }}
 
     - name: Clean pnpm workspace artifacts
       if: ${{ inputs.clean-node-modules == 'true' }}
@@ -108,3 +96,20 @@ runs:
       env:
         PNPM_CONFIG_TRUST_LOCKFILE: 'true'
       run: pnpm install --no-frozen-lockfile
+
+    # Only staging publishes the store. Every branch used to save its own
+    # ~770 MB entry keyed by its lockfile hash, and the account's Actions
+    # storage quota refused all artifact uploads. Branches still restore the
+    # newest matching store; only staging writes new entries.
+    #
+    # This runs after the install so the entry holds the populated store, and it
+    # reuses the key the restore looked up: pnpm can rewrite the lockfile during
+    # install, and the save must not land under a hash nobody will look up.
+    - name: Save pnpm store
+      if: >-
+        github.ref == 'refs/heads/staging' && inputs.install-deps == 'true' &&
+        steps.pnpm-store-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: ${{ steps.pnpm-store-cache.outputs.cache-primary-key }}

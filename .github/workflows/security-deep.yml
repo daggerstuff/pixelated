@@ -104,17 +104,9 @@ jobs:
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-store-v2-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      # Only staging publishes the store; branches restore the newest match.
-      - name: Save pnpm store
-        if: matrix.language == 'javascript' && github.ref == 'refs/heads/staging' && steps.pnpm-store-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+            ${{ runner.os }}-pnpm-store-v2-
 
       - name: Clean pnpm workspace artifacts
         if: matrix.language == 'javascript'
@@ -132,6 +124,16 @@ jobs:
         if: matrix.language == 'javascript'
         run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
           --ignore-scripts
+
+      # Only staging publishes the store; branches restore the newest match.
+      # Saving after the install keeps the entry complete, and the key the restore
+      # looked up survives an install that rewrites the lockfile.
+      - name: Save pnpm store
+        if: matrix.language == 'javascript' && github.ref == 'refs/heads/staging' && steps.pnpm-store-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ steps.pnpm-store-cache.outputs.cache-primary-key }}
 
       - name: Autobuild JavaScript/TypeScript
         if: matrix.language == 'javascript'

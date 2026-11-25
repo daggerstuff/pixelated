@@ -43,10 +43,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
+      # No `lhci` prefix: this workflow only runs on pull requests, and staging is
+      # the only ref that publishes the store, so a prefix of its own would never
+      # be written and would go cold as soon as old entries expired. Sharing the
+      # `pnpm-store` prefix restores what ci.yml and quality.yml publish.
       - uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache-key-prefix: 'lhci'
 
       - name: Build Astro site
         run: pnpm run build
