@@ -51,8 +51,9 @@ for duplicate names, and four dangling links (`configure`, `debug`, `research`,
 Removing both farms leaves only the genuine project/user shadowing.
 
 ```bash
-# The correct state: no .commandcode/skills at all
-ls -la .commandcode/skills ~/.commandcode/skills 2>&1 | grep -i 'no such' && echo clean
+# The correct state: neither farm exists, as a directory or a dangling link
+[ ! -e .commandcode/skills ] && [ ! -L .commandcode/skills ] &&
+    [ ! -e ~/.commandcode/skills ] && [ ! -L ~/.commandcode/skills ] && echo clean
 cmd skills list          # no duplicate warnings
 ```
 
@@ -151,14 +152,17 @@ usage or unparseable/invalid JSON in either file.
 
 Note that `npx @sentry/dotagents mcp add` writes to each configured agent's own
 file (`~/.claude.json`, `~/.codex/config.toml`, …), not to
-`~/.agents/mcp.json`. If you declare MCP servers through the CLI rather than
-editing `~/.agents/mcp.json` by hand, point the script at the file dotagents
-actually wrote:
+`~/.agents/mcp.json`. The bridge reads **JSON only**: point it at a JSON file
+dotagents wrote (`~/.claude.json`), not at the Codex TOML config, which it
+cannot parse.
 
 ```bash
 CC_AGENTS_MCP_SOURCE=~/.claude.json make agents-sync
-CC_MCP_TARGET=./.mcp.json make agents-sync     # project scope instead
 ```
+
+Keep the target in user scope. `env` and `headers` values are copied verbatim, so
+a project-scoped `.mcp.json` would commit whatever credentials the source
+carries.
 
 For one-off servers, use the native command rather than the bridge:
 

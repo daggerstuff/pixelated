@@ -91,6 +91,7 @@ import os
 import shutil
 import sys
 import tempfile
+from urllib.parse import urlsplit
 
 source_path = os.path.abspath(sys.argv[1])
 target_path = os.path.abspath(sys.argv[2])
@@ -113,8 +114,11 @@ def read_document(path, label):
         die(f"{label} is not valid JSON ({path}): {exc}")
     if not isinstance(doc, dict):
         die(f"{label} must be a JSON object ({path})")
-    if not isinstance(doc.get("mcpServers", {}), dict):
-        die(f'{label}: "mcpServers" must be an object ({path})')
+    servers = doc.get("mcpServers", {})
+    if not isinstance(servers, dict) or any(
+        not isinstance(server, dict) for server in servers.values()
+    ):
+        die(f'{label}: "mcpServers" and each server must be objects ({path})')
     return doc
 
 
@@ -124,11 +128,38 @@ def identity(server):
     if server.get("url"):
         headers = tuple(sorted((server.get("headers") or {}).items()))
         return ("http", server["url"], headers, env)
-    return ("stdio", server.get("command"), tuple(server.get("args") or []), env)
+    return (
+        "stdio",
+        server.get("command"),
+        tuple(server.get("args") or []),
+        server.get("cwd"),
+        env,
+    )
+
+
+def enabled(server):
+    return server.get("enabled", True) is not False
 
 
 def kind(server):
     return "http" if server.get("url") else "stdio"
+
+
+def redacted_shape(server):
+    parts = [kind(server)]
+    if server.get("url"):
+        split = urlsplit(str(server["url"]))
+        parts.append(f"url={split.scheme}://{split.hostname or ''}{split.path}")
+    if server.get("command"):
+        parts.append(f"command={server['command']}")
+    if server.get("args"):
+        parts.append(f"args={len(server['args'])}")
+    if server.get("cwd"):
+        parts.append(f"cwd={server['cwd']}")
+    for key in ("env", "headers"):
+        if server.get(key):
+            parts.append(f"{key}={'|'.join(sorted(server[key]))}")
+    return " ".join(parts)
 
 
 source_doc = read_document(source_path, "source")
@@ -136,9 +167,9 @@ target_doc = read_document(target_path, "target")
 source = source_doc.get("mcpServers") or {}
 target = target_doc.get("mcpServers") or {}
 
-seen = {identity(server) for server in target.values()}
+seen = {identity(server) for server in target.values() if enabled(server)}
 
-added, conflicts, duplicates = [], [], []
+added, conflicts, duplicates, dormant = [], [], [], []
 merged = dict(target)
 
 for name in sorted(source):
@@ -148,9 +179,11 @@ for name in sorted(source):
         incoming["transport"] = incoming["type"]
 
     if name in merged:
-        if identity(merged[name]) == identity(incoming):
-            continue
-        conflicts.append((name, merged[name], incoming))
+        existing = merged[name]
+        if identity(existing) != identity(incoming):
+            conflicts.append((name, existing, incoming))
+        elif enabled(incoming) and not enabled(existing):
+            dormant.append(name)
         continue
 
     ident = identity(incoming)
@@ -159,7 +192,8 @@ for name in sorted(source):
         continue
 
     merged[name] = incoming
-    seen.add(ident)
+    if enabled(incoming):
+        seen.add(ident)
     added.append(name)
 
 print(f"source: {source_path} ({len(source)} servers)")
@@ -176,8 +210,14 @@ if conflicts:
     print(f"\nconflict ({len(conflicts)}) — left untouched, resolve by hand:")
     for name, existing, incoming in conflicts:
         print(f"  ! {name}")
-        print(f"      cc:      {json.dumps(existing, sort_keys=True)}")
-        print(f"      .agents: {json.dumps(incoming, sort_keys=True)}")
+        print(f"      cc:      {redacted_shape(existing)}")
+        print(f"      .agents: {redacted_shape(incoming)}")
+    print("  (env and header values are omitted; read both files to compare secrets)")
+
+if dormant:
+    print(f"\nsame connection, disabled in {target_path} ({len(dormant)}) — enable it there:")
+    for name in dormant:
+        print(f"  ~ {name}")
 
 if duplicates:
     print(f"\nalready configured under another name ({len(duplicates)}) — skipped:")
