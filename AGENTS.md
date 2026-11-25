@@ -35,6 +35,14 @@ deployment has been retired.** `staging` is the main branch.
 - `.github/branch-pipeline.md` — branch roles diagram
 - `scripts/ci/get-changed-frontend-files.sh` — path filter helper
 
+## Skill Home
+
+All agent skills live in `~/.agents/skills` (single source of truth).
+`~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, and
+`~/.omo/agent/skills` are single directory symlinks to it. Never copy skills or
+create per-skill symlinks; add, edit, or remove skills in the home. Codex's
+built-in `.system` bundle lives hidden at `~/.agents/skills/.system`.
+
 ## 1. ⚡ Mandatory Session Lifecycle (Foresight Memory Protocol)
 
 Every agent session touching real work must follow this streamlined continuity

@@ -1,7 +1,7 @@
 # Pixelated Empathy — Developer Makefile
 # Usage: make <target>
 
-.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test regression-suite python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down lockfile-resolve modal-status modal-check modal-deploy modal-embed modal-targets modal-dataset modal-train modal-test
+.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test regression-suite python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down lockfile-resolve agents-status agents-sync modal-status modal-check modal-deploy modal-embed modal-targets modal-dataset modal-train modal-test
 
 .DEFAULT_GOAL := help
 
@@ -76,6 +76,12 @@ pe-test-db-down: ## Stop the pe test database container
 
 lockfile-resolve: ## Resolve a conflicted pnpm-lock.yaml merge by regenerating it
 	./scripts/devops/resolve-lockfile-conflict.sh --add
+
+agents-status: ## Report what dotagents manages vs what Command Code sees
+	./scripts/devops/cc-agents-sync.sh status
+
+agents-sync: ## Bridge .agents/mcp.json into Command Code's user MCP config
+	./scripts/devops/cc-agents-sync.sh sync
 
 docker-up: ## Start database containers
 	docker compose -f infra/docker/docker-compose.db.yml up -d
