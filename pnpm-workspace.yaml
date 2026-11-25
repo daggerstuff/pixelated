@@ -246,7 +246,6 @@ overrides:
   # Pin one provider version so the types unify.
   '@ai-sdk/provider': 4.0.37
   # Drift consolidation (#6050): pin newest to collapse duplicate resolutions.
-  '@opentelemetry/instrumentation-mongodb': 0.72.0
   '@oxc-project/types': 0.159.0
   aria-query: 5.3.2
   cluster-key-slot: 1.1.2
@@ -291,7 +290,6 @@ overrides:
   '@opentelemetry/otlp-proto-exporter-base': ^0.51.1
   '@opentelemetry/propagator-jaeger': ^2.10.0
   '@opentelemetry/otlp-transformer>protobufjs': 8.0.2
-  '@opentelemetry/otlp-transformer@0.217.0>protobufjs': 8.0.2
   '@tootallnate/once': ^3.0.1
   '@typescript-eslint/typescript-estree>minimatch': ^9.0.9
   '@unocss/astro': ^66.7.0
@@ -351,7 +349,7 @@ overrides:
   # CVE-2026-84375 (HIGH, fixed in 4.3.2).
   js-yaml: 4.3.2
   markdown-it: 14.2.0
-  '@opentelemetry/core': 2.8.0
+  '@opentelemetry/core': 2.12.1
   joi: 17.13.9
   # Version-drift ratchet: consolidate duplicate resolutions introduced by
   # the Dependabot major-updates merge (#6053) — single-version pins, all
