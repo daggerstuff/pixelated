@@ -202,6 +202,8 @@ for name in sorted(source):
         seen.add(ident)
     added.append(name)
 
+dormant = [name for name in dormant if identity(merged[name]) not in seen]
+
 print(f"source: {source_path} ({len(source)} servers)")
 print(f"target: {target_path} ({len(target)} servers)")
 
