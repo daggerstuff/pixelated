@@ -39,7 +39,9 @@ inputs:
     description: |
       Run PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
       after setup is complete. Set to 'false' when a custom install command
-      (e.g. --ignore-scripts) is needed.
+      (e.g. --ignore-scripts) is needed. Such a caller installs on its own and
+      therefore never publishes the store either: the save is gated on this
+      input, so a job that skipped the install cannot cache an empty store.
     required: false
     default: 'true'
 
