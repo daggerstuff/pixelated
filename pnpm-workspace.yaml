@@ -334,7 +334,7 @@ overrides:
   eslint>minimatch: ^3.1.4
   express: '>=4.20.0'
   fast-xml-parser: 5.7.0
-  follow-redirects: '>=1.16.2'
+  follow-redirects: '>=1.16.3'
   glob: ^14.0.2
   h3: '>=1.15.9'
   # Exact pin, not a caret range: prerelease ranges (^x-rc.N) re-resolve to
