@@ -1,0 +1,27 @@
+AGENTS.md
+  s_7d4811cf1b0ba7::t_ed72df94db6e43 38-45
+scripts/devops/cc-agents-sync.sh
+  s_7d4811cf1b0ba7::t_4f93a7f891c50d 204-222
+  s_7d4811cf1b0ba7::t_9698d118a21a86 1-203,223
+scripts/devops/cc-agents-sync.README.md
+  s_7d4811cf1b0ba7::t_a90198d2a62ab8 14,29,75-110
+  s_7d4811cf1b0ba7::t_79d496ed22624e 1-13,15-28,30-74,111-235
+Makefile
+  s_7d4811cf1b0ba7::t_0dfe04e1dce7f1 4,80-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ab19930553413bc8ffd07289f5a6f43bfa52161d",
+  "prompts": {},
+  "sessions": {
+    "s_7d4811cf1b0ba7": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "fa4a58ec-9e06-45bf-9ce6-8aa28e8d919e",
+        "model": "custom:9Router-cf-deepseek-v4.1-flash-1017"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
