@@ -57,26 +57,55 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
+            const fs = require('node:fs');
             const month = '${{ steps.bias-audit.outputs.month }}';
             const alertLevel = '${{ steps.bias-audit.outputs.alert-level }}';
+            // The uploaded artifact is kept for seven days, so the findings a
+            // maintainer needs are inlined into the issue below: an alert that
+            // stays open past the retention window must still be actionable.
+            const report = JSON.parse(
+              fs.readFileSync('${{ steps.bias-audit.outputs.report-path }}', 'utf8')
+            );
+            const exceeded = report.varianceResults
+              .filter((v) => v.exceeded)
+              .sort((a, b) => b.variance - a.variance);
+            const rows = exceeded.map(
+              (v) => `| ${v.metric} | ${v.max} | ${v.min} | ${v.variance} ${v.unit} | ${v.threshold} ${v.unit} |`
+            );
+            const table = [
+              '| Metric | Max | Min | Spread | Threshold |',
+              '| --- | --- | --- | --- | --- |',
+              ...rows,
+            ].join('\n');
+            const recommendations = report.recommendations.map((r) => `- ${r}`).join('\n');
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `[BIAS ALERT ${alertLevel.toUpperCase()}] Bias audit threshold exceeded for ${month}`,
-            body: [
-              `## Bias Audit Alert — ${month}`,
-              ``,
-              `**Alert Level**: ${alertLevel}`,
-              `**Report Artifact**: bias-audit-report-${month} (see workflow run artifacts)`,
-              `**Workflow Run**: ${context.payload.repository.html_url}/actions/runs/${context.runId}`,
-              ``,
-                `The monthly bias audit has detected variance exceeding the 2% threshold across demographic segments.`,
+              body: [
+                `## Bias Audit Alert — ${month}`,
+                ``,
+                `**Alert Level**: ${alertLevel}`,
+                `**Sessions analysed**: ${report.totalSessions} (${report.totalResponses} responses sampled)`,
+                `**Report Artifact**: bias-audit-report-${month} — retained for 7 days in the workflow run artifacts`,
+                `**Workflow Run**: ${context.payload.repository.html_url}/actions/runs/${context.runId}`,
+                ``,
+                report.summary,
+                ``,
+                `### Metrics Above Threshold`,
+                ``,
+                table,
+                ``,
+                `The numbers above are copied from \`ai/data/reports/bias-audit-${month}.json\` when this issue was created, so this issue stays complete after the artifact expires.`,
+                ``,
+                `### Recommendations`,
+                ``,
+                recommendations,
                 ``,
                 `### Action Required`,
-                `1. Review the audit report at \`ai/data/reports/bias-audit-${month}.json\``,
-                `2. Identify which metrics and segments show the highest variance`,
-                `3. Investigate potential bias sources in the AI pipeline`,
-                `4. Document mitigation steps taken`,
+                `1. Review the metrics above and identify which segments drive the spread`,
+                `2. Investigate potential bias sources in the AI pipeline`,
+                `3. Document mitigation steps taken`,
                 ``,
                 `This issue was automatically created by the Monthly Bias Audit workflow.`,
               ].join('\n'),
