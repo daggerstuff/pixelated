@@ -89,6 +89,7 @@ jobs:
         with:
           name: security-audit-results
           path: audit-results.json
+          retention-days: 7
 
       - name: Summarize dependency vulnerabilities
         if: github.event_name == 'pull_request'
@@ -175,6 +176,7 @@ jobs:
             pip-audit-ai.json
             pip-audit-bias.json
             pip-audit-multimodal.json
+          retention-days: 7
         continue-on-error: true
 
   # -----------------------------------------------------------------------

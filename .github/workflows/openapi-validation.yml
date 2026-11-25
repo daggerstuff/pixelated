@@ -75,7 +75,7 @@ jobs:
           name: openapi-spectral-results
           path: |
             spectral-results.json
-          retention-days: 30
+          retention-days: 7
 
   export-fastapi-schema:
     name: Export FastAPI OpenAPI Schema
@@ -140,7 +140,7 @@ jobs:
         with:
           name: fastapi-openapi-schema
           path: openapi/generated/
-          retention-days: 30
+          retention-days: 7
 
   publish-spec:
     name: Publish OpenAPI Spec
@@ -162,4 +162,4 @@ jobs:
             apps/web/src/pages/docs/api/_openapi.yaml
             apps/web/src/content-store/docs/api/openapi/openapi.yaml
             docs/api/memory-v1.openapi.yaml
-          retention-days: 90
+          retention-days: 7

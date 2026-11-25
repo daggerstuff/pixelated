@@ -182,6 +182,6 @@ jobs:
           path: |
             playwright-report/
             test-results/
-          retention-days: 30
+          retention-days: 7
           if-no-files-found: warn
           compression-level: 6

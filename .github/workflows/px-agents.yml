@@ -249,4 +249,4 @@ jobs:
         with:
           name: px-qa-results
           path: qa-score.json
-          retention-days: 30
+          retention-days: 7

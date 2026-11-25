@@ -215,7 +215,7 @@ jobs:
         with:
           name: codeql-sarif-${{ matrix.language }}
           path: ${{ steps.codeql-sarif.outputs.paths }}
-          retention-days: 30
+          retention-days: 7
 
   # -----------------------------------------------------------------------
   # Trivy filesystem scan + Checkov infrastructure/Helm scan
@@ -367,6 +367,7 @@ jobs:
         with:
           name: trivy-sarif
           path: trivy-results.sarif
+          retention-days: 7
 
       - name: Upload Checkov infra SARIF to Security tab
         uses: github/codeql-action/upload-sarif@v4
@@ -400,6 +401,7 @@ jobs:
             checkov-infra-results.sarif
             checkov-helm-results.sarif
             checkov-helm-metoro-results.sarif
+          retention-days: 7
 
       - name: Trivy security gate notice
         if: always() && steps.trivy_sarif.outputs.found == 'true'
@@ -434,7 +436,7 @@ jobs:
         with:
           name: sbom-cyclonedx
           path: sbom.cyclonedx.json
-          retention-days: 30
+          retention-days: 7
 
       - name: Summarize SBOM
         if: github.event_name == 'pull_request'
@@ -517,6 +519,7 @@ jobs:
         with:
           name: container-scan-${{ matrix.dockerfile }}
           path: trivy-image-${{ matrix.dockerfile }}.json
+          retention-days: 7
         continue-on-error: true
 
   # -----------------------------------------------------------------------
@@ -564,3 +567,4 @@ jobs:
         with:
           name: dockerfile-config-sarif
           path: dockerfile-config-results.sarif
+          retention-days: 7

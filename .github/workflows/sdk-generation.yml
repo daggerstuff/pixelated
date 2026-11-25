@@ -120,7 +120,7 @@ jobs:
             packages/sdk-typescript/src/
             packages/sdk-python/pixelated_empathy_sdk/
             packages/sdk-typescript/dist/
-          retention-days: 30
+          retention-days: 7
 
   sdk-summary:
     name: SDK Generation Summary

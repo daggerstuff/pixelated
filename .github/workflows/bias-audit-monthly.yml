@@ -44,40 +44,88 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Upload report artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: bias-audit-report-${{ steps.bias-audit.outputs.month }}
-          path: ${{ steps.bias-audit.outputs.report-path }}
-          if-no-files-found: error
-
+      # Runs before the upload: an artifact failure must not swallow the alert.
       - name: Create alert issue if threshold exceeded
         if: steps.bias-audit.outputs.threshold-exceeded == 'true'
         uses: actions/github-script@v9
         with:
           script: |
+            const fs = require('node:fs');
             const month = '${{ steps.bias-audit.outputs.month }}';
             const alertLevel = '${{ steps.bias-audit.outputs.alert-level }}';
+            // The uploaded artifact is kept for seven days, so the findings a
+            // maintainer needs are inlined into the issue below: an alert that
+            // stays open past the retention window must still be actionable.
+            const report = JSON.parse(
+              fs.readFileSync('${{ steps.bias-audit.outputs.report-path }}', 'utf8')
+            );
+            const exceeded = report.varianceResults
+              .filter((v) => v.exceeded)
+              .sort((a, b) => b.variance - a.variance);
+            // computeVariance reports only the numbers, so the segments behind
+            // them are looked up here: after the artifact's seven-day retention
+            // the issue still has to say who sits on each end of the spread.
+            const eligibleSegments = report.segments.filter((s) => s.sampleSize > 0);
+            const segmentsAtEnds = (metric) => {
+              if (eligibleSegments.length < 2) return 'n/a (fewer than two populated segments)';
+              let high = eligibleSegments[0];
+              let low = eligibleSegments[0];
+              for (const segment of eligibleSegments) {
+                if (segment.metrics[metric] > high.metrics[metric]) high = segment;
+                if (segment.metrics[metric] < low.metrics[metric]) low = segment;
+              }
+              return `${high.segmentKey}=${high.segmentValue} / ${low.segmentKey}=${low.segmentValue}`;
+            };
+            const rows = exceeded.map(
+              (v) => `| ${v.metric} | ${v.max} | ${v.min} | ${v.variance} ${v.unit} | ${v.threshold} ${v.unit} | ${segmentsAtEnds(v.metric)} |`
+            );
+            const table = [
+              '| Metric | Max | Min | Spread | Threshold | Segments (max / min) |',
+              '| --- | --- | --- | --- | --- | --- |',
+              ...rows,
+            ].join('\n');
+            const recommendations = report.recommendations.map((r) => `- ${r}`).join('\n');
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `[BIAS ALERT ${alertLevel.toUpperCase()}] Bias audit threshold exceeded for ${month}`,
-            body: [
-              `## Bias Audit Alert — ${month}`,
-              ``,
-              `**Alert Level**: ${alertLevel}`,
-              `**Report Artifact**: bias-audit-report-${month} (see workflow run artifacts)`,
-              `**Workflow Run**: ${context.payload.repository.html_url}/actions/runs/${context.runId}`,
-              ``,
-                `The monthly bias audit has detected variance exceeding the 2% threshold across demographic segments.`,
+              body: [
+                `## Bias Audit Alert — ${month}`,
+                ``,
+                `**Alert Level**: ${alertLevel}`,
+                `**Sessions analysed**: ${report.totalSessions} (${report.totalResponses} responses sampled)`,
+                `**Report Artifact**: bias-audit-report-${month} — retained for 7 days in the workflow run artifacts`,
+                `**Workflow Run**: ${context.payload.repository.html_url}/actions/runs/${context.runId}`,
+                ``,
+                report.summary,
+                ``,
+                `### Metrics Above Threshold`,
+                ``,
+                table,
+                ``,
+                `The numbers above are copied from \`ai/data/reports/bias-audit-${month}.json\` when this issue was created, so this issue stays complete after the artifact expires.`,
+                ``,
+                `### Recommendations`,
+                ``,
+                recommendations,
                 ``,
                 `### Action Required`,
-                `1. Review the audit report at \`ai/data/reports/bias-audit-${month}.json\``,
-                `2. Identify which metrics and segments show the highest variance`,
-                `3. Investigate potential bias sources in the AI pipeline`,
-                `4. Document mitigation steps taken`,
+                `1. Review the metrics above; each row names the segments sitting at both ends of the spread`,
+                `2. Investigate potential bias sources in the AI pipeline`,
+                `3. Document mitigation steps taken`,
                 ``,
                 `This issue was automatically created by the Monthly Bias Audit workflow.`,
               ].join('\n'),
               labels: ['bias-alert', 'safety-critical', 'automated'],
             });
+
+      - name: Upload report artifact
+        # The alert step runs first; a failure there must not discard the report.
+        if: ${{ !cancelled() && steps.bias-audit.outcome == 'success' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: bias-audit-report-${{ steps.bias-audit.outputs.month }}
+          path: ${{ steps.bias-audit.outputs.report-path }}
+          if-no-files-found: error
+          retention-days: 7
+

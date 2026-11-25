@@ -100,7 +100,7 @@ jobs:
           # .lighthouseci is a hidden directory — without this the upload
           # silently matches nothing and the PR comment's artifact link is dead.
           include-hidden-files: true
-          retention-days: 30
+          retention-days: 7
           if-no-files-found: warn
 
       - name: Post Lighthouse report to PR

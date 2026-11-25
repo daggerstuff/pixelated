@@ -160,7 +160,7 @@ jobs:
           path: |
             migration-checksums.md
             schema-snapshot.md
-          retention-days: 90
+          retention-days: 7
 
       - name: Post migration validation summary
         if: github.event_name == 'pull_request'
