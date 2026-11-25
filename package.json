@@ -469,7 +469,7 @@
     "js-base64": "^3.9.7",
     "jscpd": "^5.4.3",
     "jsdom": "^31.0.1",
-    "knip": "^6.47.0",
+    "knip": "^6.48.0",
     "lighthouse": "^13.6.0",
     "lint-staged": "^17.6.1",
     "markdown-table-prettify": "^4.1.0",
