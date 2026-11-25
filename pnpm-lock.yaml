@@ -252,7 +252,7 @@ overrides:
   eslint>minimatch: ^3.1.4
   express: '>=4.20.0'
   fast-xml-parser: 5.7.0
-  follow-redirects: '>=1.16.2'
+  follow-redirects: '>=1.16.3'
   glob: ^14.0.2
   h3: '>=1.15.9'
   nitro>h3: 2.0.1-rc.32
@@ -10235,8 +10235,8 @@ packages:
   fnv1a-64@0.1.2:
     resolution: {integrity: sha512-mJbcILTPybAR1jdOwt/lVv8N2cffeJFFP+gVbSAwLEx1ujXH27RpPd8Rokec/KX9c76UYIB6Co+H4lQzxPnJfA==}
 
-  follow-redirects@1.16.2:
-    resolution: {integrity: sha512-/kVP2U8z596Ia0gwFrwyIeo74ta5aVmSeU1FfAUMAmcEP5EP7zydmag3SLiN64NaRKef3lxsq7i/g7ltJQDGow==}
+  follow-redirects@1.16.3:
+    resolution: {integrity: sha512-toOSoqN6d51Wjf1aOFJYcoVv1aND9rj/CwjLU0Vz40oDuSpWDayCeKe4JpL5NL0WdFvoOOCI3BRo69HahjbR1A==}
     engines: {node: '>=4.0'}
     peerDependencies:
       debug: '*'
@@ -22612,7 +22612,7 @@ snapshots:
 
   axios@1.21.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
-      follow-redirects: 1.16.2(debug@4.4.3(supports-color@10.2.2))
+      follow-redirects: 1.16.3(debug@4.4.3(supports-color@10.2.2))
       form-data: 4.0.6
       https-proxy-agent: 5.0.1(supports-color@10.2.2)
       proxy-from-env: 2.1.0
@@ -24273,7 +24273,7 @@ snapshots:
 
   fnv1a-64@0.1.2: {}
 
-  follow-redirects@1.16.2(debug@4.4.3(supports-color@10.2.2)):
+  follow-redirects@1.16.3(debug@4.4.3(supports-color@10.2.2)):
     optionalDependencies:
       debug: 4.4.3(supports-color@10.2.2)
 
@@ -26415,7 +26415,7 @@ snapshots:
       camelcase: 6.3.0
       debug: 4.4.3(supports-color@10.2.2)
       find-cache-dir: 3.3.2
-      follow-redirects: 1.16.2(debug@4.4.3(supports-color@10.2.2))
+      follow-redirects: 1.16.3(debug@4.4.3(supports-color@10.2.2))
       https-proxy-agent: 7.0.6(supports-color@10.2.2)
       mongodb: 7.9.1(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
       new-find-package-json: 2.0.0(supports-color@10.2.2)
