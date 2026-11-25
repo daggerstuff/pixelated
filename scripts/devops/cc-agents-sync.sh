@@ -148,8 +148,14 @@ def kind(server):
 def redacted_shape(server):
     parts = [kind(server)]
     if server.get("url"):
-        split = urlsplit(str(server["url"]))
-        parts.append(f"url={split.scheme}://{split.hostname or ''}{split.path}")
+        try:
+            split = urlsplit(str(server["url"]))
+            netloc = split.hostname or ""
+            if split.port:
+                netloc = f"{netloc}:{split.port}"
+            parts.append(f"url={split.scheme}://{netloc}{split.path}")
+        except ValueError:
+            parts.append("url=<unparseable>")
     if server.get("command"):
         parts.append(f"command={server['command']}")
     if server.get("args"):
@@ -182,7 +188,7 @@ for name in sorted(source):
         existing = merged[name]
         if identity(existing) != identity(incoming):
             conflicts.append((name, existing, incoming))
-        elif enabled(incoming) and not enabled(existing):
+        elif enabled(incoming) and not enabled(existing) and identity(existing) not in seen:
             dormant.append(name)
         continue
 
