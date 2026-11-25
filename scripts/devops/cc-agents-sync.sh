@@ -70,8 +70,8 @@ fi
 # Expand a leading ~ so `CC_MCP_TARGET=~/x ...` works under `set -u`.
 expand() {
     case "$1" in
-        '~') printf '%s\n' "$HOME" ;;
-        '~/'*) printf '%s\n' "$HOME/${1#\~/}" ;;
+        \~) printf '%s\n' "$HOME" ;;
+        \~/*) printf '%s\n' "$HOME/${1#\~/}" ;;
         *) printf '%s\n' "$1" ;;
     esac
 }
