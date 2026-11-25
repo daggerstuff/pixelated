@@ -20,7 +20,7 @@ inputs:
     description: |
       Optional prefix for the pnpm-store cache key, e.g. 'v2' from
       PNPM_CACHE_VERSION. Produces key with the prefix inserted between
-      'pnpm-store-' and the hash-based portion for manual cache busting.
+      'pnpm-store-v2-' and the hash-based portion for manual cache busting.
     required: false
     default: ''
   install-native-deps:
@@ -68,11 +68,11 @@ runs:
       with:
         path: ${{ steps.pnpm-store.outputs.path }}
         key: >-
-          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != '' &&
+          ${{ runner.os }}-pnpm-store-v2${{ inputs.cache-key-prefix != '' &&
           format('-{0}', inputs.cache-key-prefix) || '' }}-${{
           hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
-          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != '' &&
+          ${{ runner.os }}-pnpm-store-v2${{ inputs.cache-key-prefix != '' &&
           format('-{0}', inputs.cache-key-prefix) || '' }}-
 
     - name: Clean pnpm workspace artifacts
