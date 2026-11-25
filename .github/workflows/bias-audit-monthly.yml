@@ -120,6 +120,8 @@ jobs:
             });
 
       - name: Upload report artifact
+        # The alert step runs first; a failure there must not discard the report.
+        if: ${{ !cancelled() && steps.bias-audit.outcome == 'success' }}
         uses: actions/upload-artifact@v7
         with:
           name: bias-audit-report-${{ steps.bias-audit.outputs.month }}
