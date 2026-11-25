@@ -69,12 +69,26 @@ jobs:
             const exceeded = report.varianceResults
               .filter((v) => v.exceeded)
               .sort((a, b) => b.variance - a.variance);
+            // computeVariance reports only the numbers, so the segments behind
+            // them are looked up here: after the artifact's seven-day retention
+            // the issue still has to say who sits on each end of the spread.
+            const eligibleSegments = report.segments.filter((s) => s.sampleSize > 0);
+            const segmentsAtEnds = (metric) => {
+              if (eligibleSegments.length < 2) return 'n/a (fewer than two populated segments)';
+              let high = eligibleSegments[0];
+              let low = eligibleSegments[0];
+              for (const segment of eligibleSegments) {
+                if (segment.metrics[metric] > high.metrics[metric]) high = segment;
+                if (segment.metrics[metric] < low.metrics[metric]) low = segment;
+              }
+              return `${high.segmentKey}=${high.segmentValue} / ${low.segmentKey}=${low.segmentValue}`;
+            };
             const rows = exceeded.map(
-              (v) => `| ${v.metric} | ${v.max} | ${v.min} | ${v.variance} ${v.unit} | ${v.threshold} ${v.unit} |`
+              (v) => `| ${v.metric} | ${v.max} | ${v.min} | ${v.variance} ${v.unit} | ${v.threshold} ${v.unit} | ${segmentsAtEnds(v.metric)} |`
             );
             const table = [
-              '| Metric | Max | Min | Spread | Threshold |',
-              '| --- | --- | --- | --- | --- |',
+              '| Metric | Max | Min | Spread | Threshold | Segments (max / min) |',
+              '| --- | --- | --- | --- | --- | --- |',
               ...rows,
             ].join('\n');
             const recommendations = report.recommendations.map((r) => `- ${r}`).join('\n');
@@ -103,7 +117,7 @@ jobs:
                 recommendations,
                 ``,
                 `### Action Required`,
-                `1. Review the metrics above and identify which segments drive the spread`,
+                `1. Review the metrics above; each row names the segments sitting at both ends of the spread`,
                 `2. Investigate potential bias sources in the AI pipeline`,
                 `3. Document mitigation steps taken`,
                 ``,
