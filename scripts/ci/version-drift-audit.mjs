@@ -28,15 +28,23 @@ const LOCKFILE = resolve(ROOT, 'pnpm-lock.yaml')
 const BASELINE_PATH = resolve(import.meta.dirname, 'version-drift-baseline.json')
 
 function countVersions() {
-  // pnpm >= 12 emits the lockfile as two YAML documents: a
-  // packageManagerDependencies header followed by `---` and the lockfile
-  // body. pnpm itself handles both single- and multi-document files, so the
-  // audit must too — parse everything and use the lockfile body (the document
-  // carrying lockfileVersion).
+  // pnpm >= 12 emits the lockfile as two YAML documents that BOTH carry
+  // lockfileVersion: a packageManagerDependencies header (a handful of
+  // packages, one importer) followed by `---` and the lockfile body. Taking
+  // the first match audits the header and reports almost no drift, so use the
+  // document holding the most packages — the lockfile body.
   const docs = parseAllDocuments(readFileSync(LOCKFILE, 'utf8')).map((d) =>
     d.toJS(),
   )
-  const lock = docs.find((d) => d?.lockfileVersion)
+  const locks = docs.filter((d) => d?.lockfileVersion)
+  const lock = locks.reduce(
+    (best, doc) =>
+      Object.keys(doc?.packages ?? {}).length >
+      Object.keys(best?.packages ?? {}).length
+        ? doc
+        : best,
+    locks[0],
+  )
   if (!lock) {
     console.error('No lockfile document found in pnpm-lock.yaml.')
     process.exit(1)

@@ -34,9 +34,11 @@ WORKDIR /app
 # Install uv package manager
 RUN pip install --no-cache-dir uv
 
-# Copy requirements and install dependencies
-COPY pyproject.toml ./
-RUN uv pip install --system --no-cache-dir -e .
+# Install the exact versions pinned in uv.lock instead of re-resolving from the
+# version ranges in pyproject.toml. --frozen makes a stale lockfile fail the build.
+COPY pyproject.toml uv.lock ./
+RUN uv export --frozen --no-emit-project -o /tmp/requirements.txt \
+    && uv pip install --system --no-cache-dir -r /tmp/requirements.txt
 
 # Runtime stage
 FROM python:3.14-slim as runtime
