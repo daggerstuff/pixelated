@@ -246,6 +246,9 @@ overrides:
   # Pin one provider version so the types unify.
   '@ai-sdk/provider': 4.0.37
   # Drift consolidation (#6050): pin newest to collapse duplicate resolutions.
+  # auto-instrumentations-node 0.81.2 wants 0.76.0; @sentry/node 8.55.2 still
+  # asks 0.51.0 for its bundled spotlights chain, so pin the newest single copy.
+  '@opentelemetry/instrumentation-mongodb': 0.76.0
   '@oxc-project/types': 0.159.0
   aria-query: 5.3.2
   cluster-key-slot: 1.1.2
