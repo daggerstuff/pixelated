@@ -239,6 +239,11 @@ npx @sentry/dotagents list      # dotagents' own view
    Command Code reads `.agents/skills/` directly.
 3. Keep each skill declared in exactly one scope, and park orphans in the other
    scope's `skills-disabled/` rather than deleting them.
-4. Run `make agents-sync` to bridge MCP servers into user scope.
+4. `make agents-sync` bridges MCP servers into user scope, and it reads
+   `~/.agents/mcp.json` unless `CC_AGENTS_MCP_SOURCE` names another file; with no such
+   file it exits 1 (`No dotagents MCP config at … — nothing to bridge.`). Step 1 restores
+   the skill manifests only, so copy `~/.agents/mcp.json` from the old host, or point the
+   bridge at a config that already declares the servers — `CC_AGENTS_MCP_SOURCE=~/.claude.json
+   make agents-sync` — then run it.
 5. Port subagents and hooks by hand if you need them, mapping tool ids and
    matchers as above.
