@@ -99,6 +99,7 @@ past install, but nothing proves it — confirm with their owner before moving
 them, and prefer parking to deleting:
 
 ```bash
+mkdir -p ~/.agents/skills-disabled
 mv ~/.agents/skills/<name> ~/.agents/skills-disabled/<name>
 ```
 
@@ -227,7 +228,10 @@ npx @sentry/dotagents list      # dotagents' own view
 
 ## Reproducing on another host
 
-1. `npx @sentry/dotagents install` (global) and
+1. Restore the global manifest first: `~/.agents/agents.toml` and its
+   `agents.lock` (copy them from the old host, or recreate the declarations).
+   `install` only materialises what that file declares, so a host without it
+   installs nothing. Then `npx @sentry/dotagents install` (global) and
    `npx @sentry/dotagents --project install` (repo) to populate `.agents/`.
    Do not use `sync` for this — it also adopts orphans into `agents.toml`.
 2. Do **not** create `.commandcode/skills` or `~/.commandcode/skills` symlinks;
