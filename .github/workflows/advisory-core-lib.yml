@@ -68,4 +68,4 @@ jobs:
         with:
           name: advisory-test-log-${{ matrix.bucket }}
           path: advisory-test-${{ matrix.bucket }}.log
-          retention-days: 14
+          retention-days: 7

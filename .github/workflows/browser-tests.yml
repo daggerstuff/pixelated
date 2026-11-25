@@ -178,7 +178,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
-          retention-days: 30
+          retention-days: 7
           if-no-files-found: warn
           compression-level: 6
 
@@ -310,7 +310,7 @@ jobs:
         with:
           name: browser-compatibility-report-${{ github.run_id }}
           path: report.html
-          retention-days: 90
+          retention-days: 7
           if-no-files-found: error
 
       - name: Send notifications

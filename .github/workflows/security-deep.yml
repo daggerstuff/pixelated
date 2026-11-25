@@ -206,7 +206,7 @@ jobs:
         with:
           name: codeql-sarif-${{ matrix.language }}
           path: ${{ steps.codeql-sarif.outputs.paths }}
-          retention-days: 30
+          retention-days: 7
 
   # -----------------------------------------------------------------------
   # Trivy filesystem scan + Checkov infrastructure/Helm scan
@@ -425,7 +425,7 @@ jobs:
         with:
           name: sbom-cyclonedx
           path: sbom.cyclonedx.json
-          retention-days: 30
+          retention-days: 7
 
       - name: Summarize SBOM
         if: github.event_name == 'pull_request'

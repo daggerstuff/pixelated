@@ -51,4 +51,4 @@ jobs:
         with:
           name: advisory-test-log-agents
           path: advisory-test-agents.log
-          retention-days: 14
+          retention-days: 7

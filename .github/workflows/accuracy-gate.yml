@@ -51,4 +51,4 @@ jobs:
         with:
           name: accuracy-test-log
           path: accuracy-test.log
-          retention-days: 14
+          retention-days: 7
