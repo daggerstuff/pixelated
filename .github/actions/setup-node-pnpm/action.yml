@@ -62,8 +62,9 @@ runs:
       shell: bash
       run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
 
-    - name: Cache pnpm store
-      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+    - name: Restore pnpm store
+      id: pnpm-store-cache
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
       with:
         path: ${{ steps.pnpm-store.outputs.path }}
         key: >-
@@ -71,8 +72,22 @@ runs:
           format('-{0}', inputs.cache-key-prefix) || '' }}-${{
           hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
-          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != ''
-          && format('-{0}', inputs.cache-key-prefix) || '' }}-
+          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != '' &&
+          format('-{0}', inputs.cache-key-prefix) || '' }}-
+
+    # Only staging publishes the store. Every branch used to save its own
+    # ~770 MB entry keyed by its lockfile hash, and the account's Actions
+    # storage quota refused all artifact uploads. Branches still restore the
+    # newest matching store; only staging writes new entries.
+    - name: Save pnpm store
+      if: github.ref == 'refs/heads/staging' && steps.pnpm-store-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: >-
+          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != '' &&
+          format('-{0}', inputs.cache-key-prefix) || '' }}-${{
+          hashFiles('**/pnpm-lock.yaml') }}
 
     - name: Clean pnpm workspace artifacts
       if: ${{ inputs.clean-node-modules == 'true' }}
