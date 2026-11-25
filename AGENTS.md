@@ -37,11 +37,14 @@ deployment has been retired.** `staging` is the main branch.
 
 ## Skill Home
 
-All agent skills live in `~/.agents/skills` (single source of truth).
-`~/.claude/skills`, `~/.codex/skills`, `~/.cursor/skills`, and
-`~/.omo/agent/skills` are single directory symlinks to it. Never copy skills or
-create per-skill symlinks; add, edit, or remove skills in the home. Codex's
-built-in `.system` bundle lives hidden at `~/.agents/skills/.system`.
+All agent skills live in `~/.agents/skills` (single source of truth), declared in
+`~/.agents/agents.toml` and locked in `~/.agents/agents.lock`; `npx @sentry/dotagents install`
+links each declared skill into the agents that manifest names. `~/.claude/skills` and
+`~/.omo/agent/skills` are single directory symlinks to the home. `~/.codex/skills` is a real
+directory holding one symlink per skill beside Codex's own hidden `.system` bundle, so Codex is
+linked rather than copied; `~/.cursor/skills` and `~/.vscode/skills` exist only where those tools
+are installed. Never copy a skill's files: add, edit, or remove skills in the home and let
+`install` relink.
 
 ## 1. ⚡ Mandatory Session Lifecycle (Foresight Memory Protocol)
 
