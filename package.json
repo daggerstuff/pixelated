@@ -449,7 +449,7 @@
     "concurrently": "^10.0.7",
     "cross-env": "^10.1.0",
     "del-cli": "^8.0.1",
-    "dependency-cruiser": "^18.8.0",
+    "dependency-cruiser": "^18.9.0",
     "es-module-lexer": "^3.0.5",
     "esbuild": "^0.28.2",
     "eslint": "^10.15.0",
