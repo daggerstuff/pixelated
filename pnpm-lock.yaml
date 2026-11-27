@@ -615,8 +615,8 @@ importers:
         specifier: ^6.4.3
         version: 6.4.3(crossws@0.4.17(srvx@1.0.8))(graphql@17.1.0)(ws@8.23.0(utf-8-validate@6.1.0))
       graphql-yoga:
-        specifier: ^6.1.0
-        version: 6.1.0(graphql@17.1.0)(winston@3.19.0)
+        specifier: ^6.1.1
+        version: 6.1.1(graphql@17.1.0)(winston@3.19.0)
       helmet:
         specifier: ^8.3.0
         version: 8.3.0
@@ -865,8 +865,8 @@ importers:
         specifier: ^13.2.2
         version: 13.2.2(graphql@17.1.0)
       '@graphql-yoga/plugin-persisted-operations':
-        specifier: ^4.1.0
-        version: 4.1.0(graphql-yoga@6.1.0(graphql@17.1.0)(winston@3.19.0))(graphql@17.1.0)
+        specifier: ^4.1.1
+        version: 4.1.1(graphql-yoga@6.1.1(graphql@17.1.0)(winston@3.19.0))(graphql@17.1.0)
       '@iconify-json/ri':
         specifier: ^1.2.10
         version: 1.2.10
@@ -3518,12 +3518,12 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@graphql-yoga/plugin-persisted-operations@4.1.0':
-    resolution: {integrity: sha512-lmN4Yf8pAsoRrtYdXI5qTOzfIbfKldfcD2qL8YFyggT+G+wTn3HqrM/+3vxI+CUIe4xDfuvCZhLKJrrffRRkhQ==}
+  '@graphql-yoga/plugin-persisted-operations@4.1.1':
+    resolution: {integrity: sha512-pnFWY7sQRFrNRFBTwyS8GPyG2+S2959RSq9N4sH/ETY7ULBCoKXmIE5BnE825qhWaiCf8Z4NcVwq/jQjiMh/Tw==}
     engines: {node: '>=22.15.0'}
     peerDependencies:
       graphql: ^16.0.0 || ^17.0.0
-      graphql-yoga: ^6.1.0
+      graphql-yoga: ^6.1.1
 
   '@graphql-yoga/subscription@6.0.0':
     resolution: {integrity: sha512-7itRaKCigZXL5gbgtKg8+/xCB2NI5T/1p1yIcAx8fht2nEMmu/2RlQ8xtpsa25xKy/u5h4Y9nDSQo7kV/nCcBg==}
@@ -10271,8 +10271,8 @@ packages:
       ws:
         optional: true
 
-  graphql-yoga@6.1.0:
-    resolution: {integrity: sha512-YID0cgrgx3oyh5fJA98414kU3x9cx88ZXGascBGrBkpibQkKRkkb4okMMCLx9n5HCMLiBdaWaFbi31D/7JvqPw==}
+  graphql-yoga@6.1.1:
+    resolution: {integrity: sha512-N5LXp9W6o0sStOI7ILkhzYr4NSlf1PXgxHFH3/iCqaJDxm+xPT41nYOGtK+3brpUfVmjfDtJk1yd57qLshKj1w==}
     engines: {node: '>=22.15.0'}
     peerDependencies:
       graphql: ^16.0.0 || ^17.0.0
@@ -17067,11 +17067,11 @@ snapshots:
     dependencies:
       graphql: 17.1.0
 
-  '@graphql-yoga/plugin-persisted-operations@4.1.0(graphql-yoga@6.1.0(graphql@17.1.0)(winston@3.19.0))(graphql@17.1.0)':
+  '@graphql-yoga/plugin-persisted-operations@4.1.1(graphql-yoga@6.1.1(graphql@17.1.0)(winston@3.19.0))(graphql@17.1.0)':
     dependencies:
       '@whatwg-node/promise-helpers': 2.0.2
       graphql: 17.1.0
-      graphql-yoga: 6.1.0(graphql@17.1.0)(winston@3.19.0)
+      graphql-yoga: 6.1.1(graphql@17.1.0)(winston@3.19.0)
 
   '@graphql-yoga/subscription@6.0.0':
     dependencies:
@@ -24007,7 +24007,7 @@ snapshots:
       crossws: 0.4.17(srvx@1.0.8)
       ws: 8.23.0(utf-8-validate@6.1.0)
 
-  graphql-yoga@6.1.0(graphql@17.1.0)(winston@3.19.0):
+  graphql-yoga@6.1.1(graphql@17.1.0)(winston@3.19.0):
     dependencies:
       '@envelop/core': 6.0.1
       '@envelop/instrumentation': 2.0.1
