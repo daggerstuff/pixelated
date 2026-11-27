@@ -104,3 +104,68 @@ def test_status_does_not_take_the_write_lock(tmp_path):
 
     assert reported.returncode == 0, reported.stderr
     assert "incoming" in reported.stdout
+
+
+# A blocking probe: it returns only once the bridge lets the lock go, so what it
+# reads is the target as it stood the instant the lock came free. A bridge that
+# drops the lock before replacing the config hands the probe the pre-sync
+# document; a bridge that holds it across the replacement always hands it the
+# synced one.
+LOCK_PROBE = """
+import fcntl, json, sys
+
+target, done = sys.argv[1], sys.argv[2]
+lock = open(target + ".lock", "a+", encoding="utf-8")
+fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+with open(target, encoding="utf-8") as fh:
+    servers = json.load(fh).get("mcpServers") or {}
+with open(done, "w", encoding="utf-8") as fh:
+    json.dump({"synced": "incoming" in servers}, fh)
+"""
+
+
+def test_lock_is_held_while_the_target_is_replaced(tmp_path):
+    source = tmp_path / "agents-mcp.json"
+    target = tmp_path / "cc-mcp.json"
+    done = tmp_path / "probe.json"
+    write_servers(source, {"incoming": {"command": "/bin/incoming"}})
+    # A target big enough that the bridge spends real time merging and replacing
+    # it: that is the window in which a released lock would become observable.
+    write_servers(
+        target,
+        {f"base-{index}": {"command": "/bin/base", "args": [str(index)]} for index in range(50000)},
+    )
+
+    syncing = subprocess.Popen(
+        [str(SCRIPT), "sync"],
+        env=bridge_env(source, target),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    probe = None
+    try:
+        with open(str(target) + ".lock", "a+", encoding="utf-8") as watcher:
+            deadline = time.time() + 60
+            while True:
+                try:
+                    fcntl.flock(watcher.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    break  # only the bridge can hold this lock
+                fcntl.flock(watcher.fileno(), fcntl.LOCK_UN)
+                assert syncing.poll() is None, "the bridge finished before taking the lock"
+                assert time.time() < deadline, "the bridge never took the lock"
+
+            probe = subprocess.Popen([sys.executable, "-c", LOCK_PROBE, str(target), str(done)])
+            _, stderr = syncing.communicate(timeout=120)
+            probe.wait(timeout=120)
+    finally:
+        if probe is not None and probe.poll() is None:
+            probe.kill()
+            probe.wait(timeout=30)
+
+    assert syncing.returncode == 0, stderr
+    assert json.loads(done.read_text(encoding="utf-8"))["synced"] is True
+    servers = read_servers(target)
+    assert len(servers) == 50001, len(servers)
+    assert servers["incoming"] == {"command": "/bin/incoming", "enabled": True}
