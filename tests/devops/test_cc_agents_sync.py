@@ -163,6 +163,9 @@ def test_lock_is_held_while_the_target_is_replaced(tmp_path):
         if probe is not None and probe.poll() is None:
             probe.kill()
             probe.wait(timeout=30)
+        if syncing.poll() is None:
+            syncing.kill()
+            syncing.communicate()
 
     assert syncing.returncode == 0, stderr
     assert json.loads(done.read_text(encoding="utf-8"))["synced"] is True
