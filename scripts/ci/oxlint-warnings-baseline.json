@@ -1,5 +1,5 @@
 {
-  "total": 1867,
+  "total": 1925,
   "rules": {
     "eslint(no-extra-bind)": 1,
     "react(exhaustive-effect-dependencies)": 23,
@@ -17,13 +17,14 @@
     "typescript(no-unsafe-argument)": 192,
     "typescript(no-unsafe-assignment)": 715,
     "typescript(no-unsafe-call)": 260,
+    "typescript(no-unsafe-class-instance-assignment)": 60,
     "typescript(no-unsafe-enum-assignment)": 25,
     "typescript(no-unsafe-enum-comparison)": 16,
     "typescript(no-unsafe-member-access)": 100,
     "typescript(no-unsafe-return)": 81,
     "typescript(prefer-nullish-coalescing)": 21,
-    "typescript(prefer-optional-chain)": 18,
-    "typescript(restrict-template-expressions)": 41,
+    "typescript(prefer-optional-chain)": 17,
+    "typescript(restrict-template-expressions)": 40,
     "typescript(unbound-method)": 98,
     "vitest(no-commented-out-tests)": 1
   }
