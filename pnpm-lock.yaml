@@ -269,7 +269,7 @@ overrides:
   jws: '>=4.0.1'
   kerberos: ^7.0.0
   kysely: '>=0.28.14'
-  langsmith: 0.13.1
+  langsmith: 0.14.0
   lodash: ^4.18.0
   multer: ^2.1.1
   basic-ftp: '>=5.2.0'
@@ -648,8 +648,8 @@ importers:
         specifier: ^9.0.0
         version: 9.0.3
       langsmith:
-        specifier: 0.13.1
-        version: 0.13.1(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.223.2(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.12.1(@opentelemetry/api@1.9.1))(openai@6.37.0(ws@8.23.0(utf-8-validate@6.1.0))(zod@4.6.7))(ws@8.23.0(utf-8-validate@6.1.0))
+        specifier: 0.14.0
+        version: 0.14.0(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.223.2(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.12.1(@opentelemetry/api@1.9.1))(openai@6.37.0(ws@8.23.0(utf-8-validate@6.1.0))(zod@4.6.7))(ws@8.23.0(utf-8-validate@6.1.0))
       lucide-react:
         specifier: ^1.78.0
         version: 1.78.0(@types/react@19.3.0)(react@19.3.1)
@@ -11159,8 +11159,8 @@ packages:
   kuler@2.0.0:
     resolution: {integrity: sha512-Xq9nH7KlWZmXAtodXDDRE7vs6DU1gTU8zYDHDiWLSip45Egwq3plLHzPn27NgvzL2r1LMPC1vdqh98sQxtqj4A==}
 
-  langsmith@0.13.1:
-    resolution: {integrity: sha512-9MIiVbmyFI0f1VVNp5eYVrsQGVKa/w+Rc1LvX/q5ooH73SdppTaK010pWXGxK6cxbzxX+3AaCzSPJ+QsxZGckA==}
+  langsmith@0.14.0:
+    resolution: {integrity: sha512-GpOpjx2rfsfKD6A4nnWfG9kxYbLlx9//catR1eCUwW/nMQxj4Mq2OQL7NJO9MQ5ZcGnvgsnUZdxBZLd2JJC1qA==}
     peerDependencies:
       '@opentelemetry/api': ^1.9.0
       '@opentelemetry/exporter-trace-otlp-proto': '*'
@@ -24967,7 +24967,7 @@ snapshots:
   kuler@2.0.0:
     optional: true
 
-  langsmith@0.13.1(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.223.2(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.12.1(@opentelemetry/api@1.9.1))(openai@6.37.0(ws@8.23.0(utf-8-validate@6.1.0))(zod@4.6.7))(ws@8.23.0(utf-8-validate@6.1.0)):
+  langsmith@0.14.0(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.223.2(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.12.1(@opentelemetry/api@1.9.1))(openai@6.37.0(ws@8.23.0(utf-8-validate@6.1.0))(zod@4.6.7))(ws@8.23.0(utf-8-validate@6.1.0)):
     dependencies:
       p-queue: 6.6.2
     optionalDependencies:
