@@ -242,7 +242,7 @@ overrides:
   micromark-extension-gfm-table: 2.1.2
   '@colors/colors': 1.6.1
   diff: ^5.2.2
-  dompurify: ^3.4.3
+  dompurify: ^3.5.0
   drizzle-orm: ^0.45.2
   effect: '>=3.20.0'
   esbuild: ^0.28.1
@@ -567,8 +567,8 @@ importers:
         specifier: ^5.9.4
         version: 5.9.4
       dompurify:
-        specifier: ^3.4.3
-        version: 3.4.18
+        specifier: ^3.5.0
+        version: 3.5.0
       dotenv:
         specifier: 18.0.1
         version: 18.0.1
@@ -9328,8 +9328,8 @@ packages:
     resolution: {integrity: sha512-gYzvtM72ZtxQO0T048kd6HWSbbGCNOUwcnfQ01cqIJ4X2IYKFFHZ5mKvrQETcFXxsRObZulDaKmy//R7TPtsBg==}
     engines: {node: '>=20.19.0'}
 
-  dompurify@3.4.18:
-    resolution: {integrity: sha512-ofe3wI/uNm68HInABYFJYqQxRw1EaKAjNdrFVKqjUY+UZurvNd2L/HuQe097s/4RivWiZyP6tT7aoT8atjfhwg==}
+  dompurify@3.5.0:
+    resolution: {integrity: sha512-LYC0ZkE8P1V42JsRYTwMdme/2ET8SpOc5AA2eOFjP/IadvRd2fwiT4TVz5vkfy0XUx12aS2UaRkTnfVPNOv9vw==}
 
   domutils@3.2.2:
     resolution: {integrity: sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==}
@@ -22951,7 +22951,7 @@ snapshots:
     dependencies:
       domelementtype: 3.0.0
 
-  dompurify@3.4.18:
+  dompurify@3.5.0:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
@@ -24660,7 +24660,7 @@ snapshots:
 
   isomorphic-dompurify@4.8.0(@noble/hashes@2.4.0):
     dependencies:
-      dompurify: 3.4.18
+      dompurify: 3.5.0
       jsdom: 31.0.1(@noble/hashes@2.4.0)
     transitivePeerDependencies:
       - '@napi-rs/canvas'
