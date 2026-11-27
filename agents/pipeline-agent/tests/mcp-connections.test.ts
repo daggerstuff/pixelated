@@ -26,7 +26,9 @@ describe('training infra MCP connection', () => {
     expect((await loadTrainingInfra()).url).toBe('http://127.0.0.1:8766/mcp')
 
     vi.stubEnv('TRAINING_INFRA_MCP_URL', 'http://training-infra.local/mcp')
-    expect((await loadTrainingInfra()).url).toBe('http://training-infra.local/mcp')
+    expect((await loadTrainingInfra()).url).toBe(
+      'http://training-infra.local/mcp',
+    )
   })
 
   it('carries no auth when no token is configured', async () => {
@@ -53,7 +55,9 @@ describe('Workers AI MCP connection', () => {
   it('declares the deployed endpoint once and asks for SSE responses', async () => {
     const def = await loadWorkersAi()
     expect(def.url).toBe('https://workers-ai-mcp.coburncd.workers.dev/mcp')
-    expect(def.headers).toEqual({ Accept: 'application/json, text/event-stream' })
+    expect(def.headers).toEqual({
+      Accept: 'application/json, text/event-stream',
+    })
     expect(def.auth).toBeUndefined()
   })
 })
