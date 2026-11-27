@@ -249,7 +249,7 @@ overrides:
   # auto-instrumentations-node 0.81.2 wants 0.76.0; @sentry/node 8.55.2 still
   # asks 0.51.0 for its bundled spotlights chain, so pin the newest single copy.
   '@opentelemetry/instrumentation-mongodb': 0.76.0
-  '@oxc-project/types': 0.159.0
+  '@oxc-project/types': 0.160.0
   aria-query: 5.3.2
   cluster-key-slot: 1.1.2
   cookie-signature: 1.2.2
@@ -262,7 +262,7 @@ overrides:
   lighthouse-stack-packs: 1.12.3
   mime-db: 1.54.0
   mongodb: 7.9.1
-  oxc-parser: 0.159.0
+  oxc-parser: 0.160.0
   webdriver-bidi-protocol: 0.4.3
   '@cloudflare/workers-types': 4.20260611.1
   'eslint-plugin-jsx-a11y>minimatch': 3.1.5

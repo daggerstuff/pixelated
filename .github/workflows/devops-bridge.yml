@@ -1,0 +1,65 @@
+name: Command Code bridge
+
+# The bridge writes a user-scope MCP file, so nothing else in CI covers it.
+# These tests take the write lock from outside and prove a concurrent `sync`
+# waits for the writer instead of overwriting the other run's servers.
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'scripts/devops/cc-agents-sync.sh'
+      - 'scripts/devops/cc-agents-sync.README.md'
+      - 'tests/devops/**'
+      - '.github/workflows/devops-bridge.yml'
+  pull_request:
+    branches: [staging]
+    paths:
+      - 'scripts/devops/cc-agents-sync.sh'
+      - 'scripts/devops/cc-agents-sync.README.md'
+      - 'tests/devops/**'
+      - '.github/workflows/devops-bridge.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: devops-bridge-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sync-bridge:
+    name: Test the sync bridge
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7
+
+      - name: Lint the bridge tests
+        run: >-
+          uv run --no-project --with ruff ruff check
+          tests/devops/test_cc_agents_sync.py
+
+      - name: Check test formatting
+        run: >-
+          uv run --no-project --with ruff ruff format --check --exclude '*.md'
+          tests/devops/test_cc_agents_sync.py
+
+      # No network, no agent config: both tests run the real script against a
+      # temporary source and target.
+      - name: Run the bridge tests
+        run: >-
+          uv run --no-project --with pytest
+          python -m pytest tests/devops/test_cc_agents_sync.py -q -p no:cacheprovider
