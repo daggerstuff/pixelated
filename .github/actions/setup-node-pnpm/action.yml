@@ -86,8 +86,20 @@ runs:
       if: ${{ inputs.install-native-deps == 'true' }}
       shell: bash
       run: |
-        sudo apt-get update
-        sudo apt-get install -y python3 build-essential
+        # node-gyp needs python3, make and a C++ compiler, all of which the runner
+        # image already provides. Only reach for apt when one is genuinely missing:
+        # a blanket `apt-get update` also refreshes the image's vendor sources, and
+        # packages.microsoft.com answers 403 intermittently for ubuntu-26.04, which
+        # fails this step before any of this repository's code runs.
+        missing=""
+        for bin in python3 make g++; do
+          command -v "$bin" >/dev/null || missing="$missing $bin"
+        done
+        if [ -n "$missing" ]; then
+          echo "installing missing build tools:$missing"
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+        fi
         npm install -g node-gyp
 
     - name: Install dependencies
